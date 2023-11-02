@@ -7,13 +7,14 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
 import { GamepadContext } from './utils/context';
-import { setCurrentGamepadProfile, setGamepadProfileList } from './utils/actions';
+import { setCurrentGamepadProfile, setGamepadProfileList, setCurrentModal } from './utils/actions';
 
 import styles from '../index.styl';
 import Fieldset from '../../components/Fieldset';
 import ButtonActionsTable from './components/ButtonActionsTable';
 import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
+import { GAMEPAD_MODAL } from './utils/constants';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -90,7 +91,7 @@ const Profile = ({ data }) => {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Fieldset legend="Button Actions" style={{ width: '60%', padding: '0.75rem' }}>
-                    <div style={{ overflowY: 'auto', height: '480px', backgroundColor: 'white' }}>
+                    <div style={{ overflowY: 'auto', height: '460px', backgroundColor: 'white' }}>
                         <ButtonActionsTable />
                     </div>
                 </Fieldset>
@@ -99,6 +100,10 @@ const Profile = ({ data }) => {
                     <JoystickOptions />
                 </Fieldset>
             </div>
+
+            <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))}>
+                Help with Gamepad
+            </Button>
         </>
     );
 };
