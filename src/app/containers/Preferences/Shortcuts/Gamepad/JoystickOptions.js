@@ -268,10 +268,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Zero Threshold</div>
                 <Input
-                    value={zeroThreshold}
-                    additionalProps={{ min: 0, max: 0.99, step: 0.1, type: 'number' }}
+                    value={(zeroThreshold).toFixed(1)}
+                    additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
                     onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
                     className={styles['joystick-option-zero-threshold']}
+                    units="%"
                 />
             </div>
         </div>
