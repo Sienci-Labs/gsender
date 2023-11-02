@@ -42,7 +42,7 @@ class Gamepad extends GamepadListener {
             return;
         }
 
-        const deadZone = currentProfile?.joystickOptions?.zeroThreshold;
+        const deadZone = currentProfile?.joystickOptions?.zeroThreshold && currentProfile?.joystickOptions?.zeroThreshold / 100;
 
         const [leftStickX, leftStickY, rightStickX, rightStickY] = detail.gamepad.axes;
 
