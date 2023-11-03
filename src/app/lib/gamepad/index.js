@@ -24,7 +24,7 @@ class Gamepad extends GamepadListener {
         this.shouldHold = true;
     }
 
-    unholdLisetner = () => {
+    unholdListener = () => {
         this.shouldHold = false;
     }
 
