@@ -68,7 +68,7 @@ const JoystickOptions = () => {
                 <div />
                 <div>Action</div>
                 <div>2nd Action</div>
-                <div />
+                <div>Invert</div>
             </div>
 
             <div className={styles.joystickOption}>
@@ -95,7 +95,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick1.horizontal.secondaryAction', value)}
                     isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick1.horizontal.isReversed}
                         onChange={(e) => handleChange('stick1.horizontal.isReversed', e.target.checked)}
@@ -128,7 +128,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick1.vertical.secondaryAction', value)}
                     isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick1.vertical.isReversed}
                         onChange={(e) => handleChange('stick1.vertical.isReversed', e.target.checked)}
@@ -159,7 +159,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick1.mpgMode.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick1.mpgMode.isReversed}
                         onChange={(e) => handleChange('stick1.mpgMode.isReversed', e.target.checked)}
@@ -191,7 +191,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick2.horizontal.secondaryAction', value)}
                     isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick2.horizontal.isReversed}
                         onChange={(e) => handleChange('stick2.horizontal.isReversed', e.target.checked)}
@@ -224,7 +224,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick2.vertical.secondaryAction', value)}
                     isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick2.vertical.isReversed}
                         onChange={(e) => handleChange('stick2.vertical.isReversed', e.target.checked)}
@@ -257,7 +257,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick2.mpgMode.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick2.mpgMode.isReversed}
                         onChange={(e) => handleChange('stick2.mpgMode.isReversed', e.target.checked)}
