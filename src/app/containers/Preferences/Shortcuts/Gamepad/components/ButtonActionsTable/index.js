@@ -10,6 +10,7 @@ import { GAMEPAD_MODAL } from '../../utils/constants';
 
 import styles from './index.styl';
 import { get } from 'lodash';
+import classNames from 'classnames';
 
 const ButtonActionsTable = () => {
     const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile } } = useContext(GamepadContext);
@@ -175,29 +176,49 @@ const ButtonActionsTable = () => {
     };
 
     const Action = ({ button = {} }) => {
-        if (button.value === get(profile, 'lockout.button')) {
+        const activeStyles = {
+            backgroundColor: 'rgb(75, 181, 67)',
+            borderColor: 'rgb(75, 181, 67)',
+            color: 'white'
+        };
+
+        const inactiveStyles = {
+            backgroundColor: 'lightgrey'
+        };
+
+        const buttonIsPressed = buttons[button.value]?.pressed;
+
+        const lockoutButton = get(profile, 'lockout.button');
+        const modifierButton = get(profile, 'modifier.button');
+
+        const secondActionButtonBeingPressed = buttons.find((button, index) => index === modifierButton && button.pressed);
+
+        if (button.value === lockoutButton) {
             return (
-                <td className={styles.tableCell} colSpan={2} style={{ backgroundColor: 'lightgrey' }}>
+                <td className={styles.tableCell} colSpan={2} style={buttonIsPressed ? activeStyles : inactiveStyles}>
                     {render.lockout(null, button)}
                 </td>
             );
         }
 
-        if (button.value === get(profile, 'modifier.button')) {
+        if (button.value === modifierButton) {
             return (
-                <td className={styles.tableCell} colSpan={2} style={{ backgroundColor: 'lightgrey' }}>
+                <td className={styles.tableCell} colSpan={2} style={buttonIsPressed ? activeStyles : inactiveStyles}>
                     {render.modifier(null, button)}
                 </td>
             );
         }
 
+        const highlightPrimaryActionCell = button.primaryAction !== null && buttonIsPressed && !secondActionButtonBeingPressed;
+        const highlightSecondaryActionCell = button.secondaryAction !== null && buttonIsPressed && secondActionButtonBeingPressed;
+
         return (
             <>
-                <td className={styles.tableCell}>
+                <td className={classNames(styles.tableCell, highlightPrimaryActionCell ? styles.active : '')}>
                     {render.primaryAction(null, button)}
                 </td>
 
-                <td className={styles.tableCell}>
+                <td className={classNames(styles.tableCell, highlightSecondaryActionCell ? styles.active : '')}>
                     {render.secondaryAction(null, button)}
                 </td>
             </>
