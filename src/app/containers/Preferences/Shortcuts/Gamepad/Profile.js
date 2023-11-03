@@ -91,7 +91,8 @@ const Profile = ({ data }) => {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Fieldset legend="Button Actions" style={{ width: '60%', padding: '0.75rem' }}>
-                    <div style={{ overflowY: 'auto', height: '460px', backgroundColor: 'white' }}>
+                    <p>Use lockout button for gamepad safety. Use enable 2nd actions button for utilizing the second action assigned to the button.</p>
+                    <div style={{ overflowY: 'auto', height: '390px', backgroundColor: 'white' }}>
                         <ButtonActionsTable />
                     </div>
                 </Fieldset>
