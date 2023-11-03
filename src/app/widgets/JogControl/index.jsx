@@ -1050,6 +1050,10 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
+            if (gamepad.shouldHold) {
+                return;
+            }
+
             const { degrees, axis, value } = detail;
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
@@ -1110,7 +1114,11 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees, axis, gamepad } = detail;
+            if (gamepad.shouldHold) {
+                return;
+            }
+
+            const { degrees, axis } = detail;
 
             // detail.axis
             // 0 - left stick x-axis
@@ -1223,8 +1231,7 @@ class AxesWidget extends PureComponent {
                 });
             }
 
-            // const thumbsticksAreIdle = gamepad.axes?.every(axis => axis === 0);
-            const thumbsticksAreIdle = checkThumbsticskAreIdle(gamepad.axes, currentProfile);
+            const thumbsticksAreIdle = checkThumbsticskAreIdle(detail.gamepad.axes, currentProfile);
 
             if (thumbsticksAreIdle) {
                 this.joystickLoop.stop();
