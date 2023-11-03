@@ -29,10 +29,6 @@ class Gamepad extends GamepadListener {
     }
 
     onAxis = ({ detail }) => {
-        if (this.shouldHold) {
-            return;
-        }
-
         const profiles = store.get('workspace.gamepad.profiles', []);
         const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
 
