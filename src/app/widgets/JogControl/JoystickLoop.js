@@ -1,9 +1,14 @@
 import { throttle, inRange } from 'lodash';
 
 import gamepad from 'app/lib/gamepad';
+import controller from 'app/lib/controller';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
     const deadZone = profile?.joystickOptions?.zeroThreshold && profile?.joystickOptions?.zeroThreshold / 100;
+
+    if (!deadZone || deadZone === 0) {
+        return axes?.every(axis => axis === 0);
+    }
 
     return axes?.every(axis => inRange(axis, -deadZone, deadZone));
 };
@@ -20,6 +25,7 @@ export class JoystickLoop {
         this.standardJog = standardJog;
         this.cancelJog = throttle(cancelJog, 50, { leading: false, trailing: true });
         this.feedrate = feedrate;
+        this.isReadyForNextCommand = true;
     }
 
     _getCurrentGamepad = () => {
@@ -51,6 +57,10 @@ export class JoystickLoop {
             return;
         }
 
+        if (!this.isReadyForNextCommand) {
+            return;
+        }
+
         const currentGamepad = this._getCurrentGamepad();
 
         const axesValues = currentGamepad?.axes;
@@ -74,6 +84,8 @@ export class JoystickLoop {
         }, {});
 
         this.jog({ ...updatedAxis, F: this._computeFeedrate(axesValues[activeAxis]) });
+
+        this.isReadyForNextCommand = false;
     }
 
     setOptions = ({ gamepadProfile, feedrate, axes }) => {
@@ -86,6 +98,14 @@ export class JoystickLoop {
         if (this.isRunning) {
             return;
         }
+
+        this.isListeningToController = true;
+
+        controller.addListener('serialport:read', (data) => {
+            if (data === 'ok') {
+                this.isReadyForNextCommand = true;
+            }
+        });
 
         this.isRunning = true;
         this.startTime = new Date();
@@ -109,6 +129,8 @@ export class JoystickLoop {
 
         clearInterval(this.runLoop);
         clearTimeout(this.timeout);
+        controller.removeListener('serialport:read');
+
 
         const timer = new Date() - this.startTime;
 
@@ -121,5 +143,6 @@ export class JoystickLoop {
         this.cancelJog();
 
         this.isRunning = false;
+        this.isListeningToController = false;
     }
 }
