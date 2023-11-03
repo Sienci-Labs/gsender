@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useContext } from 'react';
 import Select from 'react-select';
 import { cloneDeep, set } from 'lodash';
@@ -11,6 +12,7 @@ import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';
 
 import styles from './index.styl';
+import { useGamepadListener } from '../../../../lib/hooks/useGamepadListener';
 
 const JoystickOptions = () => {
     const {
@@ -18,6 +20,8 @@ const JoystickOptions = () => {
         actions: { getGamepadProfile },
         dispatch
     } = useContext(GamepadContext);
+
+    const { axes, buttons } = useGamepadListener({ profile: currentProfile });
 
     const handleChange = (key, value) => {
         const updatedProfiles =
@@ -61,6 +65,8 @@ const JoystickOptions = () => {
         dropdownIndicator: provided => ({ ...provided, padding: 2 }),
         container: provided => ({ ...provided, padding: 0 })
     };
+
+    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     return (
         <div style={{ fontSize: '1rem' }}>
