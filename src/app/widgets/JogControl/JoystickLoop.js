@@ -1,7 +1,12 @@
-import { throttle } from 'lodash';
+import { throttle, inRange } from 'lodash';
 
 import gamepad from 'app/lib/gamepad';
-// import controller from 'app/lib/controller';
+
+export const checkThumbsticskAreIdle = (axes, profile) => {
+    const deadZone = profile?.joystickOptions?.zeroThreshold && profile?.joystickOptions?.zeroThreshold / 100;
+
+    return axes?.every(axis => inRange(axis, -deadZone, deadZone));
+};
 
 export class JoystickLoop {
     timeoutAmount = 600; // 600 ms to be consistent with jog controls
@@ -53,9 +58,9 @@ export class JoystickLoop {
         const lockoutButton = this.gamepadProfile.lockout.button;
         const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
 
-        const thumbsticksAreIdle = axesValues?.every(axis => axis === 0);
+        const thumbsticksAreIdle = checkThumbsticskAreIdle(axesValues, this.gamepadProfile);
 
-        if (thumbsticksAreIdle || lockoutButton && !isHoldingLockoutButton) {
+        if (thumbsticksAreIdle || ((lockoutButton === 0 || lockoutButton) && !isHoldingLockoutButton)) {
             this.stop();
             return;
         }
@@ -90,11 +95,6 @@ export class JoystickLoop {
         this.timeout = setTimeout(() => {
             this._runJog({ axes: this.axes, activeAxis });
 
-            // controller.addListener('serialport:read', (data) => {
-            //     if (data === 'ok') {
-            //         this._runJog({ axes: this.axes, activeAxis });
-            //     }
-            // });
 
             this.runLoop = setInterval(() => {
                 this._runJog({ axes: this.axes, activeAxis });
@@ -109,8 +109,6 @@ export class JoystickLoop {
 
         clearInterval(this.runLoop);
         clearTimeout(this.timeout);
-
-        // controller.removeListener('serialport:read');
 
         const timer = new Date() - this.startTime;
 

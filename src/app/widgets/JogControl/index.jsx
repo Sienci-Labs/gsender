@@ -78,7 +78,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
-import { JoystickLoop } from './JoystickLoop';
+import { JoystickLoop, checkThumbsticskAreIdle } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
 
 class AxesWidget extends PureComponent {
@@ -1110,7 +1110,7 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees, value, axis, gamepad } = detail;
+            const { degrees, axis, gamepad } = detail;
 
             // detail.axis
             // 0 - left stick x-axis
@@ -1223,9 +1223,10 @@ class AxesWidget extends PureComponent {
                 });
             }
 
-            const thumbsticksAreIdle = gamepad.axes?.every(axis => axis === 0);
+            // const thumbsticksAreIdle = gamepad.axes?.every(axis => axis === 0);
+            const thumbsticksAreIdle = checkThumbsticskAreIdle(gamepad.axes, currentProfile);
 
-            if (value === 0 || thumbsticksAreIdle) {
+            if (thumbsticksAreIdle) {
                 this.joystickLoop.stop();
                 return;
             }
