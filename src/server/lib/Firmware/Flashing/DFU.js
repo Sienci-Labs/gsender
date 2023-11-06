@@ -1,6 +1,7 @@
 /* eslint camelcase: 0 */
 
 import { SerialPort } from 'serialport';
+import { getDeviceList } from 'usb';
 
 class DFU {
     // DFU request commands
@@ -34,16 +35,13 @@ class DFU {
     static DFU_TIMEOUT = 5000;
 
     constructor(path) {
-        this.port = this.open(path);
+        this.port = path;
         console.log(this.port);
     }
 
     open(path) {
-        SerialPort.list().then(ports => {
-            ports.forEach((port) => {
-                console.log(port);
-            });
-        });
+        const devices = getDeviceList();
+        devices.map(d => console.log(`${d.deviceDescriptor.idVendor}`));
         const port = new SerialPort({
             path,
             baudRate: 115200

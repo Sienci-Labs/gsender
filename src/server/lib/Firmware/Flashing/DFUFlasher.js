@@ -2,7 +2,9 @@
 import fs from 'fs';
 import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
-import slbHex from '!file-loader!./slb_orange.hex';
+//import slbHex from '!file-loader!./slb_orange.hex';
+import { STM32Loader } from 'server/lib/Firmware/Flashing/STM32Loader';
+
 
 //const VALID_VENDOR_IDS = [0x0483];
 //const VALID_DEVICE_ID = [0x441];
@@ -27,20 +29,23 @@ import slbHex from '!file-loader!./slb_orange.hex';
 
 
 class DFUFlasher {
+    static VENDOR_ID = 0x0483;
+
     constructor({ port, ...options }) {
         this.path = port;
         this.options = options;
-        this.dfu = new DFU(port);
+        this.flasher = new STM32Loader(this.path);
     }
 
     flash() {
-        this.dfu.open(this.path);
-        const map = this.parseHex(slbHex);
-        if (map) {
-            for (let [address, dataBlock] of map) {
-                console.log('Data block at ', address.toString(16), ', bytes: ', dataBlock);
-            }
-        }
+        this.flasher.open();
+        //const map = this.parseHex(slbHex);
+        //console.log(map.length);
+        /*        if (map) {
+                    for (let [address, dataBlock] of map) {
+                        console.log('Data block at ', address.toString(16), ', bytes: ', dataBlock);
+                    }
+                }*/
     }
 
     /**
