@@ -460,7 +460,7 @@ class CNCEngine {
                 if (isHal) {
                     // Do hal flash
                     const halFlasher = new DFUFlasher({
-                        port: flashPort,
+                        port: 'COM6',
                         image: imageType,
                         isHal
                     });

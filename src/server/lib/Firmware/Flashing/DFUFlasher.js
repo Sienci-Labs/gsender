@@ -1,4 +1,6 @@
+
 import fs from 'fs';
+import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
 import slbHex from '!file-loader!./slb_orange.hex';
 
@@ -24,40 +26,20 @@ import slbHex from '!file-loader!./slb_orange.hex';
  */
 
 
-class DFU {
-    static DETACH = 0x00;
-    static DNLOAD = 0x01;
-    static UPLOAD = 0x02;
-    static GETSTATUS = 0x03;
-    static CLRSTATUS = 0x04;
-    static GETSTATE = 0x05;
-    static ABORT = 6;
-
-    static appIDLE = 0;
-    static appDETACH = 1;
-    static dfuIDLE = 2;
-    static dfuDNLOAD_SYNC = 3;
-    static dfuDNBUSY = 4;
-    static dfuDNLOAD_IDLE = 5;
-    static dfuMANIFEST_SYNC = 6;
-    static dfuMANIFEST = 7;
-    static dfuMANIFEST_WAIT_RESET = 8;
-    static dfuUPLOAD_IDLE = 9;
-    static dfuERROR = 10;
-
-    static STATUS_OK = 0x0;
-}
-
 class DFUFlasher {
     constructor({ port, ...options }) {
-        this.port = port;
+        this.path = port;
         this.options = options;
+        this.dfu = new DFU(port);
     }
 
     flash() {
+        this.dfu.open(this.path);
         const map = this.parseHex(slbHex);
-        for (let [address, dataBlock] of map) {
-            console.log('Data block at ', address.toString(16), ', bytes: ', dataBlock);
+        if (map) {
+            for (let [address, dataBlock] of map) {
+                console.log('Data block at ', address.toString(16), ', bytes: ', dataBlock);
+            }
         }
     }
 
@@ -74,7 +56,7 @@ class DFUFlasher {
             });
             return MemoryMap.fromHex(data);
         } catch (err) {
-            return err;
+            throw err;
         }
     }
 
@@ -114,16 +96,14 @@ class DFUFlasher {
         // Poll status
         let status = await this.pollUntil(state => (state !== DFU.dfuDNBUSY));
         if (status.status !== DFU.STATUS_OK) {
-            throw new Error('Special DfuSe command ' + command + " failed");
+            throw new Error('Special DfuSe command ' + command + ' failed');
         }
     }
 
 
-    async pollUntil(){
+    //async pollUntil() {}
 
-    }
-
-    async download(payload, offset) {}
+    //async download(payload, offset)  {}
 
     /**
      * Return buffer from string of hex characters
@@ -132,22 +112,6 @@ class DFUFlasher {
      */
     hexStringToByte(line) {
         return Buffer.from([parseInt(line, 16)]);
-    }
-
-    static get SET_ADDRESS() {
-        return 0x21;
-    }
-
-    static get ERASE_SECTOR() {
-        return 0x41;
-    }
-
-    static get READ_UNPROTECT() {
-        return 0x92;
-    }
-
-    static get GET_COMMANDS() {
-        return 0x00;
     }
 }
 
