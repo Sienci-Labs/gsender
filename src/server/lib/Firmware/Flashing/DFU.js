@@ -1,6 +1,5 @@
 /* eslint camelcase: 0 */
 
-import { SerialPort } from 'serialport';
 import { findByIds } from 'usb';
 
 class DFU {
@@ -41,27 +40,20 @@ class DFU {
         console.log(this.port);
     }
 
-    open(path) {
+    async open(path) {
         const [vid, pid] = this.IDS;
         console.log(vid);
 
         const device = findByIds(vid, pid);
         if (device) {
             this.device = device;
+            console.log(device);
+            console.log(JSON.stringify(device.__getAllConfigDescriptors()));
+            await this.device.__open();
+            console.log(this.device.interfaces);
         } else {
             throw new Error('Unable to find valid device');
         }
-        const port = new SerialPort({
-            path,
-            baudRate: 115200
-        }, (err) => {
-            if (err) {
-                console.log(err);
-                return new Error(`Unable to open port on path ${path}`);
-            }
-
-            return port;
-        });
     }
 
 
