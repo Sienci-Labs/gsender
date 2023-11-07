@@ -3,7 +3,6 @@ import fs from 'fs';
 import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
 //import slbHex from '!file-loader!./slb_orange.hex';
-import { STM32Loader } from 'server/lib/Firmware/Flashing/STM32Loader';
 
 
 //const VALID_VENDOR_IDS = [0x0483];
@@ -34,11 +33,11 @@ class DFUFlasher {
     constructor({ port, ...options }) {
         this.path = port;
         this.options = options;
-        this.flasher = new STM32Loader(this.path);
+        this.dfu = new DFU(this.path, options);
     }
 
     flash() {
-        this.flasher.open();
+        this.dfu.open();
         //const map = this.parseHex(slbHex);
         //console.log(map.length);
         /*        if (map) {

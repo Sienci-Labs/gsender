@@ -1,9 +1,10 @@
 /* eslint camelcase: 0 */
 
 import { SerialPort } from 'serialport';
-import { getDeviceList } from 'usb';
+import { findByIds } from 'usb';
 
 class DFU {
+    IDS = [1155, 57105] // 0x0483 VID 0xDF11 PID for usb in DFU mode
     // DFU request commands
     static DETACH = 0x00;
     static DNLOAD = 0x01;
@@ -34,14 +35,22 @@ class DFU {
 
     static DFU_TIMEOUT = 5000;
 
-    constructor(path) {
-        this.port = path;
+    constructor(path, options = {}) {
+        this.path = path;
+        this.options = options;
         console.log(this.port);
     }
 
     open(path) {
-        const devices = getDeviceList();
-        devices.map(d => console.log(`${d.deviceDescriptor.idVendor}`));
+        const [vid, pid] = this.IDS;
+        console.log(vid);
+
+        const device = findByIds(vid, pid);
+        if (device) {
+            this.device = device;
+        } else {
+            throw new Error('Unable to find valid device');
+        }
         const port = new SerialPort({
             path,
             baudRate: 115200
