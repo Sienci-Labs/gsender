@@ -1,0 +1,5 @@
+{
+    "grbl_port": "/dev/tty.usbmodemEXAMPLE",
+    "grblhal_port": "/dev/tty.usbmodemEXAMPLE",
+    "file": "./examples/gcode/arc-ijk.gcode"
+}

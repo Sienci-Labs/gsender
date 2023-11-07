@@ -513,6 +513,7 @@ class WorkflowControl extends PureComponent {
                     multiple={false}
                     onChange={this.handleChangeFile}
                     accept=".gcode,.gc,.nc,.tap,.cnc"
+                    id="fileInput"
                 />
 
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', width: 'calc(100% - 9rem)' }}>
