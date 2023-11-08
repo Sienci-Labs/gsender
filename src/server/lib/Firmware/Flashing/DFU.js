@@ -1,6 +1,11 @@
 /* eslint camelcase: 0 */
 
-import { findByIds } from 'usb';
+import { findByIds, WebUSBDevice } from 'usb';
+import { get } from 'lodash';
+import logger from '../../logger';
+
+
+const log = logger('DFU');
 
 class DFU {
     IDS = [1155, 57105] // 0x0483 VID 0xDF11 PID for usb in DFU mode
@@ -37,25 +42,82 @@ class DFU {
     constructor(path, options = {}) {
         this.path = path;
         this.options = options;
-        console.log(this.port);
     }
 
     async open(path) {
         const [vid, pid] = this.IDS;
-        console.log(vid);
 
         const device = findByIds(vid, pid);
         if (device) {
-            this.device = device;
-            console.log(device);
-            console.log(JSON.stringify(device.__getAllConfigDescriptors()));
-            await this.device.__open();
-            console.log(this.device.interfaces);
+            try {
+                this.device = await WebUSBDevice.createInstance(device);
+                await this.device.open();
+                console.log(this.device);
+                this.configurations = get(this.device, 'configurations');
+                this.interfaces = this.configurations[0].interfaces;
+                this.interface = this.interfaces[0];
+                log.info('Device opened');
+                console.log(this.interface);
+                await this.close();
+            } catch (e) {
+                log.error(e);
+            }
         } else {
+            log.error('Unable to find valid DFU device');
             throw new Error('Unable to find valid device');
         }
     }
 
+    requestIn(bRequest, wLength, wValue = 0) {
+        return this.device.controlTransferIn({
+            requestType: 'class',
+            recipient: 'interface',
+            request: bRequest,
+            value: wValue,
+            index: this.interfaceNumber
+        }, wLength)
+            .then((result) => {
+                if (result.status === 'ok') {
+                    return Promise.resolve(result.data);
+                } else {
+                    return Promise.resolve(result.status);
+                }
+            }, (err) => {
+                log.error(err);
+                return Promise.reject(`requestIn Fail: ${err}`);
+            });
+    }
+
+    requestOut(bRequest, data, wValue = 0) {
+        return this.device.controlTransferOut({
+            requestType: 'class',
+            recipient: 'interface',
+            request: bRequest,
+            value: wValue,
+            index: this.interfaceNumber
+        }, data)
+            .then(
+                (result) => {
+                    if (result.status === 'ok') {
+                        return Promise.resolve(result.bytesWritten);
+                    } else {
+                        return Promise.reject(result.status);
+                    }
+                },
+                (err) => {
+                    log.error(err);
+                    return Promise.reject(`requestOut Fail: ${err}`);
+                }
+            );
+    }
+
+    async close() {
+        try {
+            this.device && await this.device.close();
+        } catch (err) {
+            log.err(err);
+        }
+    }
 
     writeData(bytes) {}
 
