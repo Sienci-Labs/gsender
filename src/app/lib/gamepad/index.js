@@ -130,6 +130,10 @@ export const onGamepadButtonPress = ({ detail }) => {
 
     const foundAction = currentProfile.buttons.find(({ value }) => value === button);
 
+    if (!detail.pressed && foundAction.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
+        return 'STOP_JOG';
+    }
+
     const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
     const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];
 
@@ -145,10 +149,6 @@ export const onGamepadButtonPress = ({ detail }) => {
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
-    if (!event.detail.pressed) {
-        return;
-    }
-
     const action = onGamepadButtonPress(event);
 
     if (!action) {
