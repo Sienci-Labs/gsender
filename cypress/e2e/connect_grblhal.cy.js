@@ -1,4 +1,3 @@
-// sometimes connection fails when realHover glitches and doesn't hover properly. retry the test
 describe('Connect To GrblHAL Machine', () => {
     it('Gets, hovers, clicks and asserts', () => {
         // visit site

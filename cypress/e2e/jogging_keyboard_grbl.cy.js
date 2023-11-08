@@ -1,4 +1,3 @@
-// sometimes connection fails when realHover glitches and doesn't hover properly. retry the test
 describe('Jog with GRBL', () => {
     it('Connects and Jogs with Keyboard', () => {
         // visit site

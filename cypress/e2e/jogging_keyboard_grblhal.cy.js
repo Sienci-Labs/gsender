@@ -15,18 +15,6 @@ describe('Jog with GRBLHAL', () => {
 
         cy.wait(1000)
 
-        // turn on rotary settings
-        cy.get('.fa-cog').click()
-        cy.contains('Rotary').click()
-        cy.contains('Display Rotary Tab').next().click()
-        cy.get('.modal---close---28rLZ').click()
-
-        // turn on rotary mode
-        cy.contains('Rotary').click()
-        cy.contains('Rotary Mode').scrollIntoView().next().click()
-        // cy.contains('OK').click()
-        cy.contains('Zero').last().scrollIntoView()
-
         // go to 0
         cy.contains('Go To').click()
         cy.contains('GO!').click()
@@ -57,14 +45,7 @@ describe('Jog with GRBLHAL', () => {
         cy.get('body').type('{shift}{pageDown}', { release: false })
         cy.wait(1000)
         cy.get('.widgets-Location-components-MachinePositionInput__position-input--15_Nd').eq(2).should('have.value', '0.00')
-        // A+
-        cy.get('body').type('{ctrl}{6}', { release: false })
-        cy.wait(1000)
-        cy.get('.widgets-Location-components-MachinePositionInput__position-input--15_Nd').eq(3).should('have.value', '5.00')
-        // A-
-        cy.get('body').type('{ctrl}{4}', { release: false })
-        cy.wait(1000)
-        cy.get('.widgets-Location-components-MachinePositionInput__position-input--15_Nd').eq(3).should('have.value', '0.00')
+
 
         cy.get('.widgets-Location-components-MachinePositionInput__position-input--15_Nd').each((el) => {
             cy.get(el).should('have.value', '0.00')

@@ -1,4 +1,3 @@
-// sometimes connection fails when realHover glitches and doesn't hover properly. retry the test
 describe('Load File', () => {
     it('Connects then loads file', () => {
         // visit site
