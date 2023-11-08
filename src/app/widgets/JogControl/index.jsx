@@ -499,9 +499,11 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
-            if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
+
+            if (isGrbl && axis.a && !isInRotaryMode) {
                 return;
             }
+
             this.handleShortcutJog({ axis });
         },
         UPDATE_WORKSPACE_MODE: () => {
@@ -936,12 +938,11 @@ class AxesWidget extends PureComponent {
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
-        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -953,8 +954,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: aStep
-
+            a: xyStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
