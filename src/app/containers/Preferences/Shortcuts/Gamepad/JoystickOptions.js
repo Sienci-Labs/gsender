@@ -66,6 +66,13 @@ const JoystickOptions = () => {
         container: provided => ({ ...provided, padding: 0 })
     };
 
+    const activeStyle = {
+        control: (provided) => ({ ...provided, backgroundColor: 'rgb(75, 181, 67)', borderColor: 'rgb(75, 181, 67)' }),
+        singleValue: (provided) => ({ ...provided, color: 'white' }),
+        dropdownIndicator: (provided) => ({ ...provided, padding: 2, color: 'white' }),
+        indicatorSeparator: (provided) => ({ ...provided, backgroundColor: 'white' }),
+    };
+
     const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     return (
@@ -80,7 +87,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 1 Left/Right</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick1PrimaryActionIsUsingMPG && axes && axes[0] !== 0 && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -91,7 +102,11 @@ const JoystickOptions = () => {
                     isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick1SecondaryActionIsUsingMPG && axes && axes[0] !== 0 && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -113,7 +128,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 1 Up/Down</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick1PrimaryActionIsUsingMPG && axes && axes[1] !== 0 && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -124,7 +143,11 @@ const JoystickOptions = () => {
                     isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick1SecondaryActionIsUsingMPG && axes && axes[1] !== 0 && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -146,7 +169,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 1 Use MPG</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        stick1PrimaryActionIsUsingMPG && axes && (axes[0] !== 0 || axes[1] !== 0) && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -156,7 +183,11 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick1.mpgMode.primaryAction', value)}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        stick1SecondaryActionIsUsingMPG && axes && (axes[0] !== 0 || axes[1] !== 0) && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -176,7 +207,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 2 Left/Right</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick2PrimaryActionIsUsingMPG && axes && axes[2] !== 0 && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -187,7 +222,11 @@ const JoystickOptions = () => {
                     isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick2SecondaryActionIsUsingMPG && axes && axes[2] !== 0 && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -209,7 +248,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 2 Up/Down</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick2PrimaryActionIsUsingMPG && axes && axes[3] !== 0 && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -220,7 +263,11 @@ const JoystickOptions = () => {
                     isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        !stick2SecondaryActionIsUsingMPG && axes && axes[3] !== 0 && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     options={axesOptions}
                     placeholder={null}
                     value={{
@@ -242,7 +289,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Stick 2 Use MPG</div>
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        stick2PrimaryActionIsUsingMPG && axes && (axes[2] !== 0 || axes[3] !== 0) && !isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     menuPlacement="top"
                     options={axesOptions}
                     placeholder={null}
@@ -253,7 +304,11 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick2.mpgMode.primaryAction', value)}
                 />
                 <Select
-                    styles={selectOverrideStyle}
+                    styles={
+                        stick2SecondaryActionIsUsingMPG && axes && (axes[2] !== 0 || axes[3] !== 0) && isHoldingModifierButton
+                            ? { ...selectOverrideStyle, ...activeStyle }
+                            : selectOverrideStyle
+                    }
                     menuPlacement="top"
                     options={axesOptions}
                     placeholder={null}
