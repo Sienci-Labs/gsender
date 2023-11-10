@@ -1153,71 +1153,73 @@ class AxesWidget extends PureComponent {
             const computeAxesAndDirection = (degrees) => {
                 const { horizontal, vertical } = joystickOptions[activeStick];
 
-                const factor = (isReversed) => (!isReversed ? 1 : -1);
+                const getDirection = (isReversed) => (!isReversed ? 1 : -1);
 
                 const MOVEMENT_DISTANCE = 1;
 
                 // X-axis Positive (default behaviour)
-                if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
-                    };
+                if (inRange(degrees, 0, 2) || inRange(degrees, 358, 360)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                    ];
                 }
 
-                // Top Right (X-axis Positive, Y-axis Positive - default behaviour)
-                if (inRange(degrees, 31, 59)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed),
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
-                    };
+                // Top Right
+                if (inRange(degrees, 3, 84)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) },
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                    ];
                 }
 
                 // Y-axis Positive (default behaviour)
-                if (inRange(degrees, 60, 120)) {
-                    return {
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(vertical.isReversed)
-                    };
+                if (inRange(degrees, 88, 102)) {
+                    return [
+                        null,
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(vertical.isReversed) }
+                    ];
                 }
 
-                // Top Left (X-axis Negative, Y-axis Positive - default behaviour)
-                if (inRange(degrees, 121, 149)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed),
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
-                    };
+                // Top Left
+                if (inRange(degrees, 103, 177)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) },
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                    ];
                 }
 
-                // X-axis Negative (default behaviour)
-                if (inRange(degrees, 150, 210)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
-                    };
+                // X-axis Negative
+                if (inRange(degrees, 178, 182)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                    ];
                 }
 
-                // Top Left (X-axis Negative, Y-axis Negative - default behaviour)
-                if (inRange(degrees, 211, 239)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed),
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
-                    };
+                // Bottom Left
+                if (inRange(degrees, 183, 267)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) },
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                    ];
                 }
 
-                // Y-axis Negative (default behaviour)
-                if (inRange(degrees, 240, 300)) {
-                    return {
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
-                    };
+                // Y-axis Negative
+                if (inRange(degrees, 268, 272)) {
+                    return [
+                        null,
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!vertical.isReversed) }
+                    ];
                 }
 
-                // Top Left (X-axis Positive, Y-axis Negative - default behaviour)
-                if (inRange(degrees, 301, 329)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed),
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
-                    };
+                // Bottom Right
+                if (inRange(degrees, 273, 357)) {
+                    return [
+                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) },
+                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                    ];
                 }
 
-                return null;
+                return [];
             };
 
             const data = computeAxesAndDirection(activeAxis);
@@ -1242,6 +1244,7 @@ class AxesWidget extends PureComponent {
                 gamepadProfile: currentProfile,
                 feedrate: this.actions.getFeedrate(),
                 axes: data,
+                multiplier: detail.distance,
             });
             this.joystickLoop.start(axis);
         }, 50, { leading: false, trailing: true }));
