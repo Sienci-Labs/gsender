@@ -25,13 +25,14 @@ export class JoystickLoop {
 
     currentJogDirection = null;
 
-    constructor({ gamepadProfile, jog, standardJog, cancelJog, feedrate }) {
+    constructor({ gamepadProfile, jog, standardJog, cancelJog, feedrate, multiplier }) {
         this.isRunning = false;
         this.gamepadProfile = gamepadProfile;
         this.jog = jog;
         this.standardJog = standardJog;
         this.cancelJog = throttle(cancelJog, 50, { leading: false, trailing: true });
         this.feedrate = feedrate;
+        this.multiplier = multiplier;
         this.isReadyForNextCommand = true;
     }
 
@@ -62,13 +63,14 @@ export class JoystickLoop {
     }
 
     _computeFeedrate = (stickValue) => {
-        const feedrate = this.feedrate;
+        const givenFeedrate = this.feedrate;
+        const { settings } = controller.settings;
 
-        if (!stickValue) {
-            return feedrate;
-        }
+        const maxFeedrate = Math.max(...[Number(settings.$110), Number(settings.$111), Number(settings.$112)]);
 
-        return Math.round(Math.abs(feedrate * stickValue));
+        const feedrate = givenFeedrate > maxFeedrate ? maxFeedrate : givenFeedrate;
+
+        return Math.round(Math.abs(feedrate * (stickValue)));
     };
 
     _computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
@@ -87,44 +89,17 @@ export class JoystickLoop {
 
         const feedrateInMMPerSec = Math.round(feedrate / 60);
 
-        const executionTimeOfSingleCommand = 0.25;
+        const executionTimeOfSingleCommand = 0.06;
 
         const incrementalDistance = feedrateInMMPerSec * executionTimeOfSingleCommand;
 
         return +(incrementalDistance.toFixed(2));
-
-        // const v = Math.round(feedrate / 60); // Feedrate in mm/sec
-        // const N = 15;
-
-        // const { settings } = controller.settings;
-
-        // const axisAcceleration = Number(
-        //     {
-        //         x: settings.$110,
-        //         y: settings.$111,
-        //         z: settings.$112,
-        //         a: settings.$111,
-        //     }[axis] ?? settings.$110
-        // );
-
-        // const a = (axisAcceleration / 60) ** 2;
-
-        // const dt = ((v ** 2) / (2 * a * (N - 1)));
-
-        // console.log(dt);
-
-        // const s = v * (dt * 2);
-
-        // return +(s.toFixed(2));
     };
 
-    _runJog = ({ axes, activeAxis }) => {
-        if (!axes) {
-            return;
-        }
+    _runJog = ({ activeAxis }) => {
+        const axes = this.axes;
 
-        const timer = new Date() - this.jogMovementStartTime;
-        const nextJogDirection = Object.keys(axes).join();
+        const timer = (new Date() - this.jogMovementStartTime);
 
         if (!this.isReadyForNextCommand) {
             return;
@@ -132,10 +107,6 @@ export class JoystickLoop {
 
         if (this.jogMovementStartTime && timer <= this.jogMovementDuration) {
             return;
-        }
-
-        if (this.currentJogDirection !== nextJogDirection) {
-            this.cancelJog();
         }
 
         const currentGamepad = this._getCurrentGamepad();
@@ -152,40 +123,79 @@ export class JoystickLoop {
             return;
         }
 
-        const feedrate = this._computeFeedrate(axesValues[activeAxis]);
+        const { leftStick, rightStick } = this.multiplier;
 
-        const updatedAxis = Object.entries(axes).reduce((acc, [key, value]) => {
-            acc[key] = value * this._computeIncrementalDistance({ axis: key, feedrate });
+        const multiplier = [leftStick, leftStick, rightStick, rightStick][activeAxis];
+        const feedrate = this._computeFeedrate(multiplier);
+
+        const axesData = activeAxis < 2 ? axesValues.slice(0, 2) : axesValues.slice(2, 4);
+
+        const updatedAxes = axesData.reduce((acc, curr, index) => {
+            const axesData = axes[index];
+
+            if (!axesData) {
+                return acc;
+            }
+
+            const [axis, axisValue] = Object.entries(axesData)[0];
+
+            const feedrate = this._computeFeedrate(curr);
+
+            acc[axis] = axisValue * this._computeIncrementalDistance({ axis, feedrate });
 
             return acc;
         }, {});
 
-        this.jog({ ...updatedAxis, F: feedrate });
-
-        const largestAxisMovement = Object.entries(updatedAxis).reduce((acc, [key, value]) => {
-            if (!acc || value > acc?.value) {
+        const largestAxisMovement = Object.entries(updatedAxes).reduce((acc, [key, value]) => {
+            const val = Math.abs(value);
+            if (acc === null || val > acc?.value) {
                 acc = {
                     axis: key,
-                    value
+                    value: val
                 };
             }
 
             return acc;
         }, null);
 
-        this.currentJogDirection = nextJogDirection;
+        const updatedAxesMovementsAreZero = Object.values(updatedAxes).every((value) => value === 0);
+
+        if (updatedAxesMovementsAreZero) {
+            return;
+        }
+
+        if (feedrate === 0) {
+            return;
+        }
+
+        this.jog({ ...updatedAxes, F: feedrate });
 
         this.jogMovementStartTime = new Date();
 
-        this.jogMovementDuration = Math.abs((largestAxisMovement.value / (feedrate / 60)) * 1000);
+        this.jogMovementDuration = Math.abs(((largestAxisMovement.value) / (feedrate / 60)) * 1000);
 
         this.isReadyForNextCommand = false;
     }
 
-    setOptions = ({ gamepadProfile, feedrate, axes }) => {
+    _axesArrayToObject = (arr) => {
+        return arr.reduce((acc, curr) => {
+            if (!curr) {
+                return acc;
+            }
+
+            const [axis, axisValue] = Object.entries(curr)[0];
+
+            acc[axis] = axisValue;
+
+            return acc;
+        }, {});
+    }
+
+    setOptions = ({ gamepadProfile, feedrate, axes, multiplier }) => {
         this.gamepadProfile = gamepadProfile;
         this.feedrate = feedrate;
         this.axes = axes;
+        this.multiplier = multiplier;
     }
 
     start = (activeAxis) => {
@@ -207,10 +217,10 @@ export class JoystickLoop {
         const INTERVAL_IN_MS = 0;
 
         this.timeout = setTimeout(() => {
-            this._runJog({ axes: this.axes, activeAxis });
+            this._runJog({ activeAxis });
 
             this.runLoop = setInterval(() => {
-                this._runJog({ axes: this.axes, activeAxis });
+                this._runJog({ activeAxis });
             }, INTERVAL_IN_MS);
         }, this.timeoutAmount);
     }
@@ -227,7 +237,8 @@ export class JoystickLoop {
         const timer = new Date() - this.startTime;
 
         if (timer < this.timeoutAmount) {
-            this.jog(this.axes, true);
+            const axes = this._axesArrayToObject(this.axes);
+            this.jog(axes, true);
             this.isRunning = false;
             return;
         }
