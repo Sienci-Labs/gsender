@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { inRange } from 'lodash';
 
 const TOTAL_ANGLE = 60;
-const ANGLE_THRESHOLD = 20;
+const ANGLE_THRESHOLD = 30;
 
 export class MPGHelper extends EventEmitter {
     constructor(jog) {
