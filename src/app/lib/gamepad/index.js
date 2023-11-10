@@ -5,7 +5,7 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 class Gamepad extends GamepadListener {
     constructor() {
-        super({ precision: 2 });
+        super({ axis: { precision: 2 }, button: { analog: false } });
         this.shouldHold = false;
         this.start();
     }
