@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import throttle from 'lodash/throttle';
 
 import gamepad from 'app/lib/gamepad';
 
@@ -30,7 +29,7 @@ export const useGamepadListener = ({ profile } = {}) => {
         setAxes(gamepad.axes);
     };
 
-    const axisListener = throttle(({ detail }) => {
+    const axisListener = (({ detail }) => {
         const { gamepad } = detail;
 
         if (profile && !profile.includes(gamepad.id)) {
@@ -38,7 +37,7 @@ export const useGamepadListener = ({ profile } = {}) => {
         }
 
         setAxes(gamepad.axes);
-    }, 250, { trailing: false });
+    });
 
     return { buttons, axes };
 };
