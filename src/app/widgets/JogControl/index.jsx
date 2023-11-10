@@ -1157,65 +1157,77 @@ class AxesWidget extends PureComponent {
 
                 const MOVEMENT_DISTANCE = 1;
 
-                // X-axis Positive (default behaviour)
-                if (inRange(degrees, 0, 2) || inRange(degrees, 358, 360)) {
+                const stickX = {
+                    axis: horizontal[actionType],
+                    positiveDirection: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed),
+                    negativeDirection: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed),
+                };
+
+                const stickY = {
+                    axis: vertical[actionType],
+                    positiveDirection: MOVEMENT_DISTANCE * getDirection(vertical.isReversed),
+                    negativeDirection: MOVEMENT_DISTANCE * getDirection(!vertical.isReversed)
+                };
+
+                // X-axis Positive
+                if (inRange(degrees, 0, 5) || inRange(degrees, 355, 360)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null
                     ];
                 }
 
                 // Top Right
-                if (inRange(degrees, 3, 84)) {
+                if (inRange(degrees, 6, 84)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) },
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
                     ];
                 }
 
-                // Y-axis Positive (default behaviour)
-                if (inRange(degrees, 88, 102)) {
+                // Y-axis Positive
+                if (inRange(degrees, 85, 95)) {
                     return [
                         null,
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(vertical.isReversed) }
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null
                     ];
                 }
 
                 // Top Left
-                if (inRange(degrees, 103, 177)) {
+                if (inRange(degrees, 96, 174)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) },
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
                     ];
                 }
 
                 // X-axis Negative
-                if (inRange(degrees, 178, 182)) {
+                if (inRange(degrees, 175, 185)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                     ];
                 }
 
                 // Bottom Left
-                if (inRange(degrees, 183, 267)) {
+                if (inRange(degrees, 186, 264)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) },
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
                     ];
                 }
 
                 // Y-axis Negative
-                if (inRange(degrees, 268, 272)) {
+                if (inRange(degrees, 265, 275)) {
                     return [
                         null,
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!vertical.isReversed) }
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null
                     ];
                 }
 
                 // Bottom Right
-                if (inRange(degrees, 273, 357)) {
+                if (inRange(degrees, 276, 354)) {
                     return [
-                        { [horizontal[actionType]]: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed) },
-                        { [vertical[actionType]]: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed) }
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
                     ];
                 }
 
