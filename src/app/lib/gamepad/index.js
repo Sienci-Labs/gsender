@@ -48,6 +48,15 @@ class Gamepad extends GamepadListener {
             return (degrees + 360) % 360; //https://stackoverflow.com/a/25725005
         };
 
+        const cartesian2PolarDistance = (x, y) => {
+            const distance = Math.sqrt(x * x + y * y);
+
+            return +(distance.toFixed(2));
+        };
+
+        const leftStickDistance = cartesian2PolarDistance(leftStickX, leftStickY);
+        const rightStickDistance = cartesian2PolarDistance(rightStickX, rightStickY);
+
         const leftStick = cartesian2Polar(leftStickX, leftStickY);
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
@@ -56,7 +65,11 @@ class Gamepad extends GamepadListener {
             degrees: {
                 leftStick,
                 rightStick,
-            }
+            },
+            distance: {
+                leftStick: leftStickDistance,
+                rightStick: rightStickDistance
+            },
         };
 
         const { index } = dataOutput;
@@ -132,6 +145,10 @@ export const onGamepadButtonPress = ({ detail }) => {
 
     if (!detail.pressed && foundAction.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
         return 'STOP_JOG';
+    }
+
+    if (!detail.pressed) {
+        return null;
     }
 
     const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
