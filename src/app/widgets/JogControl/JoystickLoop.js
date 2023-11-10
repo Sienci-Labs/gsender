@@ -237,7 +237,13 @@ export class JoystickLoop {
         const timer = new Date() - this.startTime;
 
         if (timer < this.timeoutAmount) {
+            if (this.axes.every(item => item === null)) {
+                this.isRunning = false;
+                return;
+            }
+
             const axes = this._axesArrayToObject(this.axes);
+
             this.jog(axes, true);
             this.isRunning = false;
             return;
