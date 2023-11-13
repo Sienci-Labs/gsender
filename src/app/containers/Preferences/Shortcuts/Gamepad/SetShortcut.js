@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import Table from 'app/components/Table';
 import Modal from 'app/components/ToolModal/ToolModal';
 import {
@@ -15,9 +15,9 @@ import {
     COOLANT_CATEGORY,
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
-// import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import ToggleSwitch from 'Components/ToggleSwitch';
-// import Button from 'Components/FunctionButton/FunctionButton';
+import Button from 'Components/FunctionButton/FunctionButton';
 
 import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';
@@ -32,6 +32,7 @@ const SetShortcut = () => {
         dispatch,
         actions: { getGamepadProfile },
     } = useContext(GamepadContext);
+    const [isChanged, setIsChanged] = useState(false);
 
     const { value: currentButtonValue, type: currentButtonType } = currentButton || {};
 
@@ -51,6 +52,8 @@ const SetShortcut = () => {
             ));
 
         dispatch(setGamepadProfileList(updatedProfiles));
+
+        setIsChanged(true);
     };
 
     const handleSetToggle = (type, button, shouldSet) => {
@@ -88,17 +91,19 @@ const SetShortcut = () => {
             ));
 
         dispatch(setGamepadProfileList(updatedProfiles));
+
+        setIsChanged(true);
     };
 
-    // const onSetClick = () => {
-    //     closeModal();
+    const onSetClick = () => {
+        closeModal();
 
-    //     Toaster.pop({
-    //         msg: 'Set Button Shortcut',
-    //         type: TOASTER_INFO,
-    //         duration: 3000
-    //     });
-    // };
+        Toaster.pop({
+            msg: 'Button Shortcut Set',
+            type: TOASTER_INFO,
+            duration: 3000
+        });
+    };
 
     const data = Object.values(shuttleEvents.allShuttleControlEvents)
         .reduce((acc, value) => {
@@ -184,7 +189,7 @@ const SetShortcut = () => {
                             columns={columns}
                             data={data}
                             width={650}
-                            height={358}
+                            height={365}
                         />
                     </div>
 
@@ -198,7 +203,7 @@ const SetShortcut = () => {
                         </div>
 
                         <div>
-                            <p>Use As Activate Second Action Button</p>
+                            <p>Use As Enable Second Action Button</p>
                             <ToggleSwitch
                                 checked={isSecondaryActionButton}
                                 onChange={(checked) => handleSetToggle('modifier', currentButtonValue, checked)}
@@ -213,19 +218,21 @@ const SetShortcut = () => {
                         <kbd>{buttonLabel}</kbd>
                     </div>
 
-                    {/* <Button
-                        onClick={onSetClick}
-                        style={{ margin: 0, maxWidth: '200px' }}
-                    >
-                        Set Shortcut
-                    </Button> */}
-
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         <div>Action:</div>
                         <div className={styles['action-item-active']}>
                             {lockoutLabel || secondaryActionLabel || currentShortcutTitle || '...'}
                         </div>
                     </div>
+
+                    <Button
+                        primary
+                        onClick={onSetClick}
+                        style={{ margin: 0, maxWidth: '200px' }}
+                        disabled={!isChanged}
+                    >
+                        Set Shortcut
+                    </Button>
                 </div>
 
             </div>

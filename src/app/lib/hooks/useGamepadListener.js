@@ -1,44 +1,50 @@
 import { useState, useEffect } from 'react';
-import throttle from 'lodash/throttle';
 
 import gamepad from 'app/lib/gamepad';
 
-export const useGamepadListener = ({ profile } = {}) => {
+export const useGamepadListener = ({ profile, axisThreshold } = {}) => {
     const [buttons, setButtons] = useState([]);
     const [axes, setAxes] = useState(null);
 
     useEffect(() => {
         gamepad.start();
 
-        gamepad.on('gamepad:button', gamepadListener);
-        gamepad.on('gamepad:axis', axisListener);
+        gamepad.on('gamepad:button', validator(buttonListener));
+        gamepad.on('gamepad:axis', validator(axisListener));
 
         return () => {
-            gamepad.removeEventListener('gamepad:button', gamepadListener);
-            gamepad.removeEventListener('gamepad:axis', axisListener);
+            gamepad.removeEventListener('gamepad:button', validator(buttonListener));
+            gamepad.removeEventListener('gamepad:axis', validator(axisListener));
         };
     }, []);
 
-    const gamepadListener = ({ detail }) => {
+    const validator = (givenListener) => ({ detail }) => {
         const { gamepad } = detail;
 
         if (profile && !profile.includes(gamepad.id)) {
-            return;
+            console.error('Gamepad profile not found');
+            return null;
         }
 
-        setButtons(gamepad.buttons);
-        setAxes(gamepad.axes);
+        return givenListener(detail);
     };
 
-    const axisListener = throttle(({ detail }) => {
+    const buttonListener = (detail) => {
+        setButtons(detail.gamepad.buttons);
+    };
+
+    const axisListener = (detail) => {
         const { gamepad } = detail;
 
-        if (profile && !profile.includes(gamepad.id)) {
+        if (!axisThreshold) {
+            setAxes(gamepad.axes);
             return;
         }
 
-        setAxes(gamepad.axes);
-    }, 250, { trailing: false });
+        // Map values under threshold to zero for easier hook usage when determining whether
+        // that certain axis was changed or not
+        setAxes(gamepad.axes.map(axis => (Math.abs(axis) < axisThreshold ? 0 : axis)));
+    };
 
     return { buttons, axes };
 };

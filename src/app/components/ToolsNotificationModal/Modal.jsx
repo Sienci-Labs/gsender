@@ -44,6 +44,8 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
 
     const [portList, setPortList] = useState(_get(reduxStore.getState(), 'connection.ports'));
 
+    const genericCNCProfile = machineProfiles.find(profile => profile.name === 'Generic CNC');
+
     //Refresh port and clear state variables if machine disconnected
     const refreshPorts = () => {
         controller.listPorts();
@@ -131,7 +133,7 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                                             .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
                                             .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
                                     }
-                                    defaultValue={{ value: machineProfile, label: getMachineProfileLabel(machineProfile) }}
+                                    defaultValue={machineProfile.company !== 'Sienci Labs' ? { value: genericCNCProfile, label: getMachineProfileLabel(genericCNCProfile) } : { value: machineProfile, label: getMachineProfileLabel(machineProfile) }}
                                     onChange={(e) => {
                                         setProfileId(e.value);
                                     }}

@@ -47,14 +47,13 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
                         <ol>
                             <li style={{ marginBottom: '1rem' }}>Zero the Y-Axis in it&apos;s current position</li>
-                            <li style={{ marginBottom: '1rem' }}>Turn Hard Limits off, if they are on</li>
+                            <li style={{ marginBottom: '1rem' }}>Turn soft and hard limits off, if they are on</li>
                             <li>
                                 <span>Update the following firmware values:</span>
 
                                 <ul style={{ marginTop: '0.5rem' }}>
                                     <li>$101 (Y-Axis travel resolution)</li>
                                     <li>$111 (Y-Axis maximum rate)</li>
-                                    <li>$21 (Hard limits)</li>
                                 </ul>
                             </li>
                         </ol>

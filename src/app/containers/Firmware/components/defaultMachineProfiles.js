@@ -31,6 +31,7 @@ import MK2LongMill30x30File from '../eepromFiles/MK2_30x30.json';
 import MK2LongMill48x30File from '../eepromFiles/MK2_48x30.json';
 import MK1LongMill48x30File from '../eepromFiles/MK1_48x30.json';
 import DefaultGrblHalSettings from '../eepromFiles/DefaultGrblHalSettings.json';
+import DefaultSLBSettings from '../eepromFiles/DefaultSLBSettings.json';
 
 export default [
     // this is a fake test machine for grblHal, for testing purposes
@@ -600,4 +601,27 @@ export default [
         'laser': false,
         'laserOnOutline': false,
     },
+    {
+        'id': 53,
+        'company': 'Sienci Labs',
+        'name': 'SLB',
+        'type': '',
+        'version': '',
+        'mm': {
+            'width': 792,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 31.18,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+        'eepromSettings': DefaultSLBSettings,
+    }
 ];

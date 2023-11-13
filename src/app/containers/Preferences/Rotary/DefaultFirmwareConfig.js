@@ -4,7 +4,6 @@ import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import store from 'app/store';
 
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
@@ -22,10 +21,9 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
         });
     };
 
-    const units = store.get('workspace.units');
-
     const $101 = rotary.defaultFirmwareSettings.$101;
     const $111 = rotary.defaultFirmwareSettings.$111;
+    const $20 = !!Number(rotary.defaultFirmwareSettings.$20);
     const $21 = !!Number(rotary.defaultFirmwareSettings.$21);
 
     return (
@@ -39,7 +37,7 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
                         label="Y-axis Travel Resolution"
                         value={$101}
                         onChange={(e) => actions.rotary.updateDefaultFirmwareSetting('$101', e.target.value)}
-                        units={`step/${units}`}
+                        units="step/mm"
                     />
                 </Tooltip>
             </div>
@@ -53,7 +51,7 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
                         label="Y-axis Maximum Rate"
                         value={$111}
                         onChange={(e) => actions.rotary.updateDefaultFirmwareSetting('$111', e.target.value)}
-                        units={`${units}/min`}
+                        units="mm/min"
                     />
                 </Tooltip>
             </div>
@@ -67,6 +65,20 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
                         onChange={(value) => actions.rotary.updateDefaultFirmwareSetting('$21', (+value).toString())}
                         checked={$21}
                         label="Hard Limits"
+                        size="small"
+                    />
+                </Tooltip>
+            </div>
+
+            <div className={styles.addMargin}>
+                <Tooltip
+                    content="The value used here will be used to update $20 in the firmware when toggling into rotary mode."
+                    location="default"
+                >
+                    <ToggleSwitch
+                        onChange={(value) => actions.rotary.updateFirmwareSetting('$20', (+value).toString())}
+                        checked={$20}
+                        label="Force Soft Limits"
                         size="small"
                     />
                 </Tooltip>

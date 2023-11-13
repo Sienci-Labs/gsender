@@ -78,7 +78,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
-import { JoystickLoop } from './JoystickLoop';
+import { JoystickLoop, checkThumbsticskAreIdle } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
 
 class AxesWidget extends PureComponent {
@@ -499,9 +499,11 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
-            if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
+
+            if (isGrbl && axis.a && !isInRotaryMode) {
                 return;
             }
+
             this.handleShortcutJog({ axis });
         },
         UPDATE_WORKSPACE_MODE: () => {
@@ -893,18 +895,54 @@ class AxesWidget extends PureComponent {
         }
     };
 
-    handleJoystickJog = (params) => {
+    handleJoystickJog = (params, { doRegularJog } = {}) => {
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+
+        const xyStep = getXYJogDistance();
+        const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
+
+        const feedrate = Number(this.actions.getFeedrate());
+
+        const axisValue = {
+            x: xyStep,
+            y: xyStep,
+            z: zStep,
+            a: aStep
+
+        };
+
+        if (doRegularJog) {
+            const axisList = {};
+
+            if (params.x) {
+                axisList.x = axisValue.x * params.x;
+            }
+            if (params.y) {
+                axisList.y = axisValue.y * params.y;
+            }
+            if (params.z) {
+                axisList.z = axisValue.z * params.z;
+            }
+            if (params.a) {
+                axisList.A = axisValue.a * params.a;
+            }
+
+            this.actions.jog({ ...axisList, F: feedrate });
+
+            return;
+        }
+
         this.actions.jog(params);
     };
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
-        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -916,8 +954,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: aStep
-
+            a: xyStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -1010,9 +1047,13 @@ class AxesWidget extends PureComponent {
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
 
-        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+        gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
+            if (gamepad.shouldHold) {
+                return;
+            }
+
             const { degrees, axis, value } = detail;
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
@@ -1073,7 +1114,11 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees, value, axis } = detail;
+            if (gamepad.shouldHold) {
+                return;
+            }
+
+            const { degrees, axis } = detail;
 
             // detail.axis
             // 0 - left stick x-axis
@@ -1092,7 +1137,7 @@ class AxesWidget extends PureComponent {
             const { joystickOptions } = currentProfile;
             const { leftStick, rightStick } = degrees;
 
-            const activeAxis = [leftStick, leftStick, rightStick, rightStick][axis];
+            const activeStickDegrees = [leftStick, leftStick, rightStick, rightStick][axis];
             const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][axis];
 
             const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
@@ -1108,60 +1153,129 @@ class AxesWidget extends PureComponent {
             const computeAxesAndDirection = (degrees) => {
                 const { horizontal, vertical } = joystickOptions[activeStick];
 
-                const factor = (isReversed) => (!isReversed ? 1 : -1);
+                const getDirection = (isReversed) => (!isReversed ? 1 : -1);
 
                 const MOVEMENT_DISTANCE = 1;
 
-                // X-axis Positive (default behaviour)
+                const stickX = {
+                    axis: horizontal[actionType],
+                    positiveDirection: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed),
+                    negativeDirection: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed),
+                };
+
+                const stickY = {
+                    axis: vertical[actionType],
+                    positiveDirection: MOVEMENT_DISTANCE * getDirection(vertical.isReversed),
+                    negativeDirection: MOVEMENT_DISTANCE * getDirection(!vertical.isReversed)
+                };
+
+                // X-axis Positive
                 if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
-                    };
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null
+                    ];
                 }
 
-                // Y-axis Positive (default behaviour)
+                // Top Right
+                if (inRange(degrees, 31, 59)) {
+                    if (!stickX.axis || !stickY.axis) {
+                        return [null, null];
+                    }
+
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
+                    ];
+                }
+
+                // Y-axis Positive
                 if (inRange(degrees, 60, 120)) {
-                    return {
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(vertical.isReversed)
-                    };
+                    return [
+                        null,
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null
+                    ];
                 }
 
-                // X-axis Negative (default behaviour)
+                // Top Left
+                if (inRange(degrees, 121, 149)) {
+                    if (!stickX.axis || !stickY.axis) {
+                        return [null, null];
+                    }
+
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
+                    ];
+                }
+
+                // X-axis Negative
                 if (inRange(degrees, 150, 210)) {
-                    return {
-                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
-                    };
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                    ];
                 }
 
-                // Y-axis Negative (default behaviour)
+                // Bottom Left
+                if (inRange(degrees, 211, 239)) {
+                    if (!stickX.axis || !stickY.axis) {
+                        return [null, null];
+                    }
+
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
+                    ];
+                }
+
+                // Y-axis Negative
                 if (inRange(degrees, 240, 300)) {
-                    return {
-                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
-                    };
+                    return [
+                        null,
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null
+                    ];
                 }
 
-                return null;
+                // Bottom Right
+                if (inRange(degrees, 301, 329)) {
+                    if (!stickX.axis || !stickY.axis) {
+                        return [null, null];
+                    }
+
+                    return [
+                        stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                        stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
+                    ];
+                }
+
+                return [];
             };
 
-            const data = computeAxesAndDirection(activeAxis);
+            const data = computeAxesAndDirection(activeStickDegrees);
 
             if (!this.joystickLoop) {
                 this.joystickLoop = new JoystickLoop({
                     gamepadProfile: currentProfile,
-                    jog: this.handleJoystickJog,
-                    axis,
-                    feedrate: this.actions.getFeedrate()
+                    jog: (params, doRegularJog) => this.handleJoystickJog(params, { doRegularJog }),
+                    feedrate: this.actions.getFeedrate(),
+                    cancelJog: this.actions.cancelJog
                 });
             }
 
-            if (value === 0) {
+            const thumbsticksAreIdle = checkThumbsticskAreIdle(detail.gamepad.axes, currentProfile);
+
+            if (thumbsticksAreIdle) {
                 this.joystickLoop.stop();
-                this.actions.cancelJog();
                 return;
             }
 
-            this.joystickLoop.update({ gamepadProfile: currentProfile, feedrate: this.actions.getFeedrate() });
-            this.joystickLoop.start({ axes: data }, axis);
+            this.joystickLoop.setOptions({
+                gamepadProfile: currentProfile,
+                feedrate: this.actions.getFeedrate(),
+                axes: data,
+                multiplier: detail.distance,
+                degrees: activeStickDegrees,
+            });
+            this.joystickLoop.start(axis);
         }, 50, { leading: false, trailing: true }));
     }
 

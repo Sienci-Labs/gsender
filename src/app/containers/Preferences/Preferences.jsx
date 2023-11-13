@@ -858,7 +858,7 @@ class PreferencesPage extends PureComponent {
     }
 
     componentWillUnmount() {
-        gamepad.unholdLisetner();
+        gamepad.unholdListener();
         this.removeControllerEvents();
     }
 

@@ -13,10 +13,13 @@ const HelpModal = () => {
         <ToolModal
             onClose={closeModal}
             size="xs"
-            title="Gamepad Help"
+            title="Help with Gamepad"
         >
-            <div style={{ padding: '1rem' }}>
-                <p>If you are experiencing issues connecting or using your gamepad, refer to this online diagnostics tool and verify if it is working there:</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem' }}>
+                <p>
+                    Your gamepad setup needs to work correctly for shortcuts to behave as expected.{' '}
+                    If you are experiencing issues, use this online diagnostics tool to verify its stability:
+                </p>
 
                 <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener noreferrer">
                     Hardware Tester
