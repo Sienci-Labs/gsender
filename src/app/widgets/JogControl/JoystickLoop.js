@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { throttle, inRange } from 'lodash';
 
-import gamepad from 'app/lib/gamepad';
+import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
@@ -96,8 +96,117 @@ export class JoystickLoop {
         return +(incrementalDistance.toFixed(2));
     };
 
+    _getAxesAndDirection = ({ degrees, activeAxis }) => {
+        const { joystickOptions } = this.gamepadProfile;
+
+        const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][activeAxis];
+
+        const { horizontal, vertical } = joystickOptions[activeStick];
+
+
+        const getDirection = (isReversed) => (!isReversed ? 1 : -1);
+
+        const MOVEMENT_DISTANCE = 1;
+
+        const isHoldingModifierButton = checkButtonHold('modifier', this.gamepadProfile);
+
+        const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
+
+        const stickX = {
+            axis: horizontal[actionType],
+            positiveDirection: MOVEMENT_DISTANCE * getDirection(horizontal.isReversed),
+            negativeDirection: MOVEMENT_DISTANCE * getDirection(!horizontal.isReversed),
+        };
+
+        const stickY = {
+            axis: vertical[actionType],
+            positiveDirection: MOVEMENT_DISTANCE * getDirection(vertical.isReversed),
+            negativeDirection: MOVEMENT_DISTANCE * getDirection(!vertical.isReversed)
+        };
+
+        // X-axis Positive
+        if (inRange(degrees, 0, 5) || inRange(degrees, 355, 360)) {
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null
+            ];
+        }
+
+        // Top Right
+        if (inRange(degrees, 6, 84)) {
+            if (!stickX.axis || !stickY.axis) {
+                return [null, null];
+            }
+
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
+            ];
+        }
+
+        // Y-axis Positive
+        if (inRange(degrees, 85, 95)) {
+            return [
+                null,
+                stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null
+            ];
+        }
+
+        // Top Left
+        if (inRange(degrees, 96, 174)) {
+            if (!stickX.axis || !stickY.axis) {
+                return [null, null];
+            }
+
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
+            ];
+        }
+
+        // X-axis Negative
+        if (inRange(degrees, 175, 185)) {
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+            ];
+        }
+
+        // Bottom Left
+        if (inRange(degrees, 186, 264)) {
+            if (!stickX.axis || !stickY.axis) {
+                return [null, null];
+            }
+
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
+                stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
+            ];
+        }
+
+        // Y-axis Negative
+        if (inRange(degrees, 265, 275)) {
+            return [
+                null,
+                stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null
+            ];
+        }
+
+        // Bottom Right
+        if (inRange(degrees, 276, 354)) {
+            if (!stickX.axis || !stickY.axis) {
+                return [null, null];
+            }
+
+            return [
+                stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
+                stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
+            ];
+        }
+
+        return [];
+    }
+
     _runJog = ({ activeAxis }) => {
-        const axes = this.axes;
+        const axes = this._getAxesAndDirection({ degrees: this.degrees, activeAxis });
 
         const timer = (new Date() - this.jogMovementStartTime);
 
@@ -191,11 +300,12 @@ export class JoystickLoop {
         }, {});
     }
 
-    setOptions = ({ gamepadProfile, feedrate, axes, multiplier }) => {
+    setOptions = ({ gamepadProfile, feedrate, axes, multiplier, degrees }) => {
         this.gamepadProfile = gamepadProfile;
         this.feedrate = feedrate;
         this.axes = axes;
         this.multiplier = multiplier;
+        this.degrees = degrees;
     }
 
     start = (activeAxis) => {
