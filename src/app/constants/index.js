@@ -216,12 +216,14 @@ export const OVERRIDE_VALUE_RANGES = {
 export const ROTARY_MODE_FIRMWARE_SETTINGS = {
     $101: '19.75308642',
     $111: '8000.00',
+    $20: '0',
     $21: '0'
 };
 
 export const DEFAULT_FIRMWARE_SETTINGS = {
     $101: '200',
     $111: '4000',
+    $20: '0',
     $21: '0'
 };
 

@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import { inRange } from 'lodash';
 
-const TOTAL_ANGLE = 90;
-const ANGLE_THRESHOLD = 30;
+const TOTAL_ANGLE = 60;
+const ANGLE_THRESHOLD = 15;
 
 export class MPGHelper extends EventEmitter {
     constructor(jog) {
@@ -24,6 +24,7 @@ export class MPGHelper extends EventEmitter {
     _updateValue = (newValue) => {
         if (this.value === null) {
             this.value = newValue;
+            return;
         }
 
         const { axis, step, feedrate, factor } = this;

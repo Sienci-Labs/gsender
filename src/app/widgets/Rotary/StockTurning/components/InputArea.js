@@ -83,7 +83,7 @@ const InputArea = () => {
                 <Input
                     label="Stepdown"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'stepdown', min: 1, max: 1000000, style: { ...inputStyles } }}
+                    additionalProps={{ type: 'number', id: 'stepdown', min: 0.1, max: 1000000, style: { ...inputStyles } }}
                     value={stepdown}
                     onChange={handleChange}
                     tooltip={{ content: `Default Value: ${defaultValues.stepdown}` }}

@@ -23,6 +23,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
 
     const $101 = rotary.firmwareSettings.$101;
     const $111 = rotary.firmwareSettings.$111;
+    const $20 = !!Number(rotary.firmwareSettings.$20);
     const $21 = !!Number(rotary.firmwareSettings.$21);
 
     return (
@@ -64,6 +65,20 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                         onChange={(value) => actions.rotary.updateFirmwareSetting('$21', (+value).toString())}
                         checked={$21}
                         label="Force Hard Limits"
+                        size="small"
+                    />
+                </Tooltip>
+            </div>
+
+            <div className={styles.addMargin}>
+                <Tooltip
+                    content="The value used here will be used to update $20 in the firmware when toggling into rotary mode."
+                    location="default"
+                >
+                    <ToggleSwitch
+                        onChange={(value) => actions.rotary.updateFirmwareSetting('$20', (+value).toString())}
+                        checked={$20}
+                        label="Force Soft Limits"
                         size="small"
                     />
                 </Tooltip>

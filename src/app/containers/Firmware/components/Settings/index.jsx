@@ -1,23 +1,23 @@
 import React, { useContext } from 'react';
+import { connect } from 'react-redux';
 import Select from 'react-select';
+import get from 'lodash/get';
+
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import get from 'lodash/get';
-import { connect } from 'react-redux';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import HalSettings from 'Containers/Firmware/components/HalSettings';
+import { GRBL, GRBLHAL } from 'Constants';
+
 import SettingsList from './List';
 import SearchBar from './SearchBar';
 import { connectToLastDevice, FirmwareContext } from '../../utils';
 import machineProfiles from '../defaultMachineProfiles';
 import NotConnectedWarning from '../NotConnected/NotConnectedWarning';
 
-
 import styles from '../../index.styl';
-import { GRBLHAL } from 'Constants';
-import HalSettings from 'Containers/Firmware/components/HalSettings';
 
 const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
-
 
 const SettingsArea = ({ firmwareType }) => {
     const { hasSettings, machineProfile, setMachineProfile } = useContext(FirmwareContext);
@@ -46,6 +46,11 @@ const SettingsArea = ({ firmwareType }) => {
         }
     };
 
+    const Settings = {
+        [GRBL]: SettingsList,
+        [GRBLHAL]: HalSettings,
+    }[firmwareType] ?? SettingsList;
+
     return (
         <div className={styles.settingsAreaContainer}>
             {
@@ -67,22 +72,19 @@ const SettingsArea = ({ firmwareType }) => {
                     </>
                 )
             }
+
             {
-                hasSettings && (
-                <>
-                    <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
-                        {
-                            firmwareType === GRBLHAL ?
-                                <HalSettings />
-                                : <SettingsList />
-                        }
-                    </div>
-                    <SearchBar />
-                </>
-                )
-            }
-            {
-                !hasSettings && <NotConnectedWarning onReconnectClick={() => connectToLastDevice()} disabled={!port} />
+                hasSettings
+                    ? (
+                        <>
+                            <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
+                                <Settings />
+                            </div>
+                            <SearchBar />
+                        </>
+                    ) : (
+                        <NotConnectedWarning onReconnectClick={() => connectToLastDevice()} disabled={!port} />
+                    )
             }
         </div>
     );
