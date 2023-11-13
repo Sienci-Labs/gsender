@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useContext } from 'react';
 import Select from 'react-select';
 import { cloneDeep, set } from 'lodash';
@@ -10,9 +9,9 @@ import Input from '../../components/Input';
 import { GamepadContext } from './utils/context';
 import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';
+import { useGamepadListener } from '../../../../lib/hooks/useGamepadListener';
 
 import styles from './index.styl';
-import { useGamepadListener } from '../../../../lib/hooks/useGamepadListener';
 
 const JoystickOptions = () => {
     const {

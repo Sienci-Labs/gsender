@@ -20,7 +20,7 @@ const ProfileList = () => {
             </Button>
 
             <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))}>
-                <span>Help With Gamepad</span>
+                <span>Help</span>
             </Button>
         </div>
     );

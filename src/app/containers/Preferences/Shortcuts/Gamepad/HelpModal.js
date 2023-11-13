@@ -13,7 +13,7 @@ const HelpModal = () => {
         <ToolModal
             onClose={closeModal}
             size="xs"
-            title="Help With Gamepad"
+            title="Help with Gamepad"
         >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem' }}>
                 <p>
