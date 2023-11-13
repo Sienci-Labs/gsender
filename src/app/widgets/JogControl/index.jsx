@@ -1137,7 +1137,7 @@ class AxesWidget extends PureComponent {
             const { joystickOptions } = currentProfile;
             const { leftStick, rightStick } = degrees;
 
-            const activeAxis = [leftStick, leftStick, rightStick, rightStick][axis];
+            const activeStickDegrees = [leftStick, leftStick, rightStick, rightStick][axis];
             const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][axis];
 
             const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
@@ -1170,14 +1170,14 @@ class AxesWidget extends PureComponent {
                 };
 
                 // X-axis Positive
-                if (inRange(degrees, 0, 5) || inRange(degrees, 355, 360)) {
+                if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null
                     ];
                 }
 
                 // Top Right
-                if (inRange(degrees, 6, 84)) {
+                if (inRange(degrees, 31, 59)) {
                     if (!stickX.axis || !stickY.axis) {
                         return [null, null];
                     }
@@ -1189,7 +1189,7 @@ class AxesWidget extends PureComponent {
                 }
 
                 // Y-axis Positive
-                if (inRange(degrees, 85, 95)) {
+                if (inRange(degrees, 60, 120)) {
                     return [
                         null,
                         stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null
@@ -1197,7 +1197,7 @@ class AxesWidget extends PureComponent {
                 }
 
                 // Top Left
-                if (inRange(degrees, 96, 174)) {
+                if (inRange(degrees, 121, 149)) {
                     if (!stickX.axis || !stickY.axis) {
                         return [null, null];
                     }
@@ -1209,14 +1209,14 @@ class AxesWidget extends PureComponent {
                 }
 
                 // X-axis Negative
-                if (inRange(degrees, 175, 185)) {
+                if (inRange(degrees, 150, 210)) {
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                     ];
                 }
 
                 // Bottom Left
-                if (inRange(degrees, 186, 264)) {
+                if (inRange(degrees, 211, 239)) {
                     if (!stickX.axis || !stickY.axis) {
                         return [null, null];
                     }
@@ -1228,7 +1228,7 @@ class AxesWidget extends PureComponent {
                 }
 
                 // Y-axis Negative
-                if (inRange(degrees, 265, 275)) {
+                if (inRange(degrees, 240, 300)) {
                     return [
                         null,
                         stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null
@@ -1236,7 +1236,7 @@ class AxesWidget extends PureComponent {
                 }
 
                 // Bottom Right
-                if (inRange(degrees, 276, 354)) {
+                if (inRange(degrees, 301, 329)) {
                     if (!stickX.axis || !stickY.axis) {
                         return [null, null];
                     }
@@ -1250,7 +1250,7 @@ class AxesWidget extends PureComponent {
                 return [];
             };
 
-            const data = computeAxesAndDirection(activeAxis);
+            const data = computeAxesAndDirection(activeStickDegrees);
 
             if (!this.joystickLoop) {
                 this.joystickLoop = new JoystickLoop({
@@ -1273,6 +1273,7 @@ class AxesWidget extends PureComponent {
                 feedrate: this.actions.getFeedrate(),
                 axes: data,
                 multiplier: detail.distance,
+                degrees: activeStickDegrees,
             });
             this.joystickLoop.start(axis);
         }, 50, { leading: false, trailing: true }));
