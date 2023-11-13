@@ -118,10 +118,6 @@ class DFU {
             log.err(err);
         }
     }
-
-    writeData(bytes) {}
-
-    writeCommand(bytes) {}
 }
 
 export default DFU;

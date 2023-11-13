@@ -2,7 +2,6 @@
 import fs from 'fs';
 import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
-//import slbHex from '!file-loader!./slb_orange.hex';
 
 
 //const VALID_VENDOR_IDS = [0x0483];
@@ -36,7 +35,7 @@ class DFUFlasher {
         this.dfu = new DFU(this.path, options);
     }
 
-    flash() {
+    flash(data) {
         this.dfu.open();
         //const map = this.parseHex(slbHex);
         //console.log(map.length);

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import store from 'app/store';
 import { get } from 'lodash';
 import reduxStore from 'app/store/redux';
 import { GRBLHAL } from 'app/constants';
@@ -9,6 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { FirmwareContext, getResetToDefaultMessage, restoreDefaultSettings, startFlash } from '../../utils';
 import defaultGRBLSettings from '../../eepromFiles/DefaultGrblSettings.json';
 import defaultGRBLHALSettings from '../../eepromFiles/DefaultGrblHalSettings.json';
+import HalFlashModal from 'Containers/Firmware/components/HalFlashModal';
 
 const Notifications = () => {
     const {
@@ -23,6 +25,7 @@ const Notifications = () => {
     } = useContext(FirmwareContext);
 
     const [portSelected, setPortSelected] = useState('');
+    const controllerType = store.get('widgets.connection.controller.type', 'invalid');
 
     const beginFlashing = (port, profile) => {
         if (profile === '' || port === '') {
@@ -42,7 +45,7 @@ const Notifications = () => {
     const message = getResetToDefaultMessage(machineProfile);
 
     const restoreDefaults = () => {
-        const controllerType = get(reduxStore.getState(), 'controller.type');
+        const controllerType = get(reduxStore.getState(), 'controller.type', 'grbl');
         const machineProfileUpdated = { ...machineProfile, eepromSettings: machineProfile.eepromSettings ?? (controllerType === GRBLHAL ? defaultGRBLHALSettings : defaultGRBLSettings) };
         restoreDefaultSettings(machineProfileUpdated);
         setSettings(prev => prev.map(item => ({ ...item, value: machineProfileUpdated.eepromSettings[item.setting] })));
@@ -52,7 +55,22 @@ const Notifications = () => {
     return (
         <>
             <div style={{ position: 'absolute', width: '968px' }}>
-                {initiateFlashing && (
+                {(initiateFlashing && controllerType === GRBLHAL) && (
+                    <HalFlashModal
+                        title="Grbl Flashing"
+                        onClose={() => setInitiateFlashing(false)}
+                        show={initiateFlashing}
+                        footer="This process will disconnect your machine, and may take a couple minutes to complete."
+                        footerTwo="Continue?"
+                        yesFunction={beginFlashing}
+                        showOptions={true}
+                    >
+                        This feature exists to flash the GRBL firmware onto compatible Arduino boards only!
+                        Improper flashing could damage your device.
+                    </HalFlashModal>
+                )}
+
+                {(initiateFlashing && controllerType !== GRBLHAL) && (
                     <ToolsNotificationModal
                         title="Grbl Flashing"
                         onClose={() => setInitiateFlashing(false)}

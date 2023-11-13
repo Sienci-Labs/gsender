@@ -68,7 +68,7 @@ const ActionArea = () => {
             <div className={styles.buttonsContainer}>
                 <div>
                     <Tooltip content={tooltipContent} location="default">
-                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)}>
+                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true, controllerType === GRBLHAL)}>
                             Flash GRBL
                         </ToolModalButton>
                     </Tooltip>

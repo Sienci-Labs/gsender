@@ -450,7 +450,7 @@ class CNCEngine {
                 controller.command.apply(controller, [cmd].concat(args));
             });
 
-            socket.on('flash:start', (flashPort, imageType, isHal = false) => {
+            socket.on('flash:start', (flashPort, imageType, isHal = false, data = null) => {
                 log.debug('flash-start called');
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
@@ -464,7 +464,7 @@ class CNCEngine {
                         image: imageType,
                         isHal
                     });
-                    halFlasher.flash();
+                    halFlasher.flash(data);
                     return;
                 }
 
