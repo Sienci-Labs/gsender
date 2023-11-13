@@ -21,7 +21,7 @@ const JoystickOptions = () => {
         dispatch
     } = useContext(GamepadContext);
 
-    const { axes, buttons } = useGamepadListener({ profile: currentProfile });
+    const { axes, buttons } = useGamepadListener({ profile: currentProfile, axisThreshold: 0.4 });
 
     const handleChange = (key, value) => {
         const updatedProfiles =
