@@ -64,7 +64,7 @@ const Profile = ({ data }) => {
 
     return (
         <>
-            <div style={{ display: 'grid', gridTemplateColumns: '10fr 4fr 6fr', gap: '1.5rem', alignItems: 'center', margin: '0 0 0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '8fr 4fr 2fr 6fr', gap: '1.5rem', alignItems: 'center', margin: '0 0 0.5rem' }}>
                 <input
                     type="text"
                     value={name}
@@ -82,7 +82,9 @@ const Profile = ({ data }) => {
                 >
                     {isConnected ? 'Connected' : 'Not Connected'}
                 </span>
-
+                <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))} style={{ margin: 0 }}>
+                    Help
+                </Button>
                 <Button onClick={() => dispatch(setCurrentGamepadProfile(null))} style={{ margin: 0 }}>
                     <i className="fas fa-arrow-left" />
                     <span>Back to Gamepad Profiles</span>
@@ -91,8 +93,11 @@ const Profile = ({ data }) => {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Fieldset legend="Button Actions" style={{ width: '60%', padding: '0.75rem' }}>
-                    <p>Use lockout button for gamepad safety. Use enable 2nd actions button for utilizing the second action assigned to the button.</p>
-                    <div style={{ overflowY: 'auto', height: '390px', backgroundColor: 'white' }}>
+                    <p style={{ textAlign: 'center' }}>
+                        Assign a &quot;Lockout&quot; button for gamepad safety, or a &quot;2nd Action&quot;{' '}
+                        button to use like a Function key and give your gamepad double the functions!
+                    </p>
+                    <div style={{ overflowY: 'auto', height: '425px', backgroundColor: 'white' }}>
                         <ButtonActionsTable />
                     </div>
                 </Fieldset>
@@ -101,10 +106,6 @@ const Profile = ({ data }) => {
                     <JoystickOptions />
                 </Fieldset>
             </div>
-
-            <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))}>
-                Help with Gamepad
-            </Button>
         </>
     );
 };
