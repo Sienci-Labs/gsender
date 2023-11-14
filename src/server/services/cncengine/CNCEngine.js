@@ -466,7 +466,11 @@ class CNCEngine {
                     });
 
                     halFlasher.on('error', (err) => {
-                        this.emit('flash:message', { type: 'error', content: err });
+                        this.emit('flash:message', { type: 'Error', content: err });
+                    });
+
+                    halFlasher.on('info', (msg) => {
+                        this.emit('flash:message', { type: 'Info', content: msg });
                     });
 
                     halFlasher.on('end', () => {

@@ -85,14 +85,12 @@ class DFUFlasher extends events.EventEmitter {
             let bytesWritten = 0;
             let dfuStatus;
             try {
-                log.info('Setting address');
                 await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
-                log.info(`Set address to ${address.toString(16)}`);
                 const status = await this.dfu.getStatus();
                 log.info(status);
-                log.info(`Downloading slice ${chunks}`);
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
                 log.info(`Sent ${bytesWritten} bytes`);
+                this.emit('info', `Wrote chunk ${chunks} with size ${bytesWritten}`);
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
                 chunks += 1;
