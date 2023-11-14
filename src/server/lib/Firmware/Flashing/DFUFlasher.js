@@ -63,11 +63,24 @@ class DFUFlasher {
         return Buffer.from([parseInt(line, 16)]);
     }
 
+    getSectorStart(addr, segment) {
+        const sectorIndex = Math.floor((addr - segment.start) / segment.sectorSize);
+        return segment.start + sectorIndex * segment.sectorSize;
+    }
+
+    getSectorEnd(addr, segment) {
+        const sectorIndex = Math.floor((addr - segment.start) / segment.sectorSize);
+        return segment.start + (sectorIndex + 1) * segment.sectorSize;
+    }
+
     async erase(startAddr, length) {
-        // get segment TODO FIX
         let segment = this.dfu.getSegment(startAddr);
-        let endAddr;
-        let addr;
+        if (!segment) {
+            log.error(`Unable to find valid segment for address ${startAddr}`);
+            return;
+        }
+        let endAddr = this.getSectorStart(startAddr, segment);
+        let addr = this.getSectorEnd(startAddr + length - 1, segment);
 
         let bytesErased = 0;
         const bytesToErase = endAddr - addr;
@@ -89,6 +102,7 @@ class DFUFlasher {
             addr = sectorAddr + segment.sectorSize;
             bytesErased += segment.sectorSize;
             this.logProgress(bytesErased, bytesToErase);
+            log.info(`Erased ${bytesErased} of ${bytesToErase} bytes`);
         }
     }
 
@@ -113,7 +127,7 @@ class DFUFlasher {
         }
 
         // Poll status
-        let status = await this.pollUntil(state => (state !== DFU.dfuDNBUSY));
+        let status = await this.dfu.pollUntil(state => (state !== DFU.dfuDNBUSY));
         if (status.status !== DFU.STATUS_OK) {
             throw new Error('Special DfuSe command ' + command + ' failed');
         }

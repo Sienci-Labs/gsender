@@ -48,7 +48,8 @@ class DFU {
         this.segments = {};
     }
 
-    parseMemorySegments(desc) {
+    parseMemorySegments(desc = '') {
+        log.info(desc);
         const nameEndIndex = desc.indexOf('/');
         if (!desc.startsWith('@' || nameEndIndex === -1)) {
             throw new Error(`Invalid description passed: ${desc}`);
@@ -81,9 +82,9 @@ class DFU {
                 segment.start = startAddress;
                 segment.sectorSize = sectorSize;
                 segment.end = startAddress + sectorSize * sectorCount;
-                segment.readable = (properties & 0x1) != 0;
-                segment.erasable = (properties & 0x2) != 0;
-                segment.writable = (properties & 0x4) != 0;
+                segment.readable = (properties & 0x1) !== 0;
+                segment.erasable = (properties & 0x2) !== 0;
+                segment.writable = (properties & 0x4) !== 0;
                 segments.push(segment);
 
                 startAddress += sectorSize * sectorCount;
@@ -101,7 +102,12 @@ class DFU {
     }
 
     getSegment(addr) {
-
+        for (let segment of this.segments) {
+            if (segment.start <= addr && addr < segment.end) {
+                return segment;
+            }
+        }
+        return null;
     }
 
     async open() {
@@ -111,15 +117,25 @@ class DFU {
         if (device) {
             try {
                 this.device = await WebUSBDevice.createInstance(device);
+
                 await this.device.open();
-                console.log(this.device);
+
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;
                 this.interface = this.interfaces[0];
-                this.parseMemorySegments(this.interface.alternates[0]);
+                console.log(this.interface);
+
+                const alternate = this.interface.alternates[0];
+                this.parseMemorySegments(alternate.interfaceName);
+
+                await this.device.selectConfiguration(this.configurations[0].configurationValue);
+                await this.device.claimInterface(this.interface.interfaceNumber);
+
+                await this.device.selectAlternateInterface(0, alternate.alternateSetting);
                 log.info('Device opened');
             } catch (e) {
                 log.error(e);
+                throw new Error(`Open failed: ${e}`);
             }
         } else {
             log.error('Unable to find valid DFU device');
