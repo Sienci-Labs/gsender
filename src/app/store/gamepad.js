@@ -1,20 +1,4 @@
-// import { shortcuts } from './shortcuts';
-
 import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from '../constants';
-
-/*
-***********IMPORTANT*************
-- default gamepad keys are in shuttleControlEvents now
-    (this makes it easier to implement, since the default shortcuts don't have the new keybindings changes (cmd changes, id changes).
-    this way I don't have to edit all 70 of them to make the gamepad shortcuts work,
-    and it makes the process of adding shortcuts consistent)
-- to find and remove them:
-    - global search this regex: \s*gamepadKeys: .*\n\s*keysName: .*,
-    - replace with nothing
-    - for reference, they should only exist in:
-        /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/JogControl/index.jsx
-        /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/Visualizer/index.jsx
-*/
 
 export const defaultOptions = {
     joystickOptions: {
@@ -52,7 +36,7 @@ export const defaultOptions = {
                 isReversed: false,
             },
         },
-        zeroThreshold: 0,
+        zeroThreshold: 15,
     },
     buttons: []
 };
