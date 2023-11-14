@@ -168,7 +168,7 @@ class DFU {
             recipient: 'interface',
             request: bRequest,
             value: wValue,
-            index: this.interfaceNumber
+            index: this.interface.interfaceNumber
         }, data)
             .then(
                 (result) => {
@@ -213,11 +213,13 @@ class DFU {
 
     async pollUntil(predicate) {
         let dfuStatus = await this.getStatus();
+        log.info(dfuStatus);
 
         while (!predicate(dfuStatus.state) && dfuStatus.state !== this.dfuERROR) {
             await delay(dfuStatus.pollTimeout);
             dfuStatus = await this.getStatus();
         }
+        return dfuStatus;
     }
 
     pollUntilIdle(idle_state) {
@@ -236,7 +238,7 @@ class DFU {
             state = await this.getState();
         }
         if (state !== this.dfuIDLE) {
-            throw new Error('Failed to retuirn to idle state after abort');
+            throw new Error('Failed to return to idle state after abort');
         }
     }
 

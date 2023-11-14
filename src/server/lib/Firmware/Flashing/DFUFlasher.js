@@ -41,13 +41,14 @@ class DFUFlasher extends events.EventEmitter {
         this.dfu = new DFU(this.path, options);
     }
 
-    flash(data) {
-        this.dfu.open();
+    async flash() {
+        await this.dfu.open();
         this.map = this.parseHex(this.hex);
 
+        log.info('Flash loop');
         for (let [address, dataBlock] of this.map) {
             console.log(`Data block at ${address} of length ${dataBlock.length}`);
-            //this.download(address, this.XFER_SIZE, dataBlock);
+            await this.download(address, this.XFER_SIZE, dataBlock);
         }
     }
 
@@ -69,6 +70,9 @@ class DFUFlasher extends events.EventEmitter {
         let bytesSent = 0;
         let expectedSize = data.byteLength;
 
+        await this.dfu.clearStatus();
+        log.info('Cleared status');
+
         let address = startAddress;
         while (bytesSent < expectedSize) {
             const bytesLeft = expectedSize - bytesSent;
@@ -77,6 +81,7 @@ class DFUFlasher extends events.EventEmitter {
             let bytesWritten = 0;
             let dfuStatus;
             try {
+                log.info('Setting address');
                 await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
                 log.info(`Set address to ${address.toString(16)}`);
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
@@ -84,6 +89,7 @@ class DFUFlasher extends events.EventEmitter {
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
             } catch (e) {
+                log.error(e);
                 this.emit('error', `Error during download: ${e}`);
             }
 
@@ -94,6 +100,7 @@ class DFUFlasher extends events.EventEmitter {
             bytesSent += bytesWritten;
             this.logProgress(bytesSent, expectedSize);
         }
+        log.info('Finished download chunk');
     }
 
     /**
@@ -171,11 +178,13 @@ class DFUFlasher extends events.EventEmitter {
         try {
             await this.dfu.download(payload, 0);
         } catch (err) {
+            log.error(err);
             this.emit('error', `Error during DFU command ${command}`);
             return;
         }
 
         // Poll status
+        log.info('Poll status');
         let status = await this.dfu.pollUntil(state => (state !== DFU.dfuDNBUSY));
         if (status.status !== DFU.STATUS_OK) {
             this.emit('error', 'Special DfuSe command ' + command + ' failed');
