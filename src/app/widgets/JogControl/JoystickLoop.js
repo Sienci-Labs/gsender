@@ -125,18 +125,14 @@ export class JoystickLoop {
         };
 
         // X-axis Positive
-        if (inRange(degrees, 0, 5) || inRange(degrees, 355, 360)) {
+        if (inRange(degrees, 0, 15) || inRange(degrees, 345, 360)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null
             ];
         }
 
         // Top Right
-        if (inRange(degrees, 6, 84)) {
-            if (!stickX.axis || !stickY.axis) {
-                return [null, null];
-            }
-
+        if (inRange(degrees, 16, 74)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
                 stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
@@ -144,7 +140,7 @@ export class JoystickLoop {
         }
 
         // Y-axis Positive
-        if (inRange(degrees, 85, 95)) {
+        if (inRange(degrees, 75, 105)) {
             return [
                 null,
                 stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null
@@ -152,11 +148,7 @@ export class JoystickLoop {
         }
 
         // Top Left
-        if (inRange(degrees, 96, 174)) {
-            if (!stickX.axis || !stickY.axis) {
-                return [null, null];
-            }
-
+        if (inRange(degrees, 106, 164)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                 stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
@@ -164,18 +156,14 @@ export class JoystickLoop {
         }
 
         // X-axis Negative
-        if (inRange(degrees, 175, 185)) {
+        if (inRange(degrees, 165, 195)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
             ];
         }
 
         // Bottom Left
-        if (inRange(degrees, 186, 264)) {
-            if (!stickX.axis || !stickY.axis) {
-                return [null, null];
-            }
-
+        if (inRange(degrees, 196, 254)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                 stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
@@ -183,7 +171,7 @@ export class JoystickLoop {
         }
 
         // Y-axis Negative
-        if (inRange(degrees, 265, 275)) {
+        if (inRange(degrees, 255, 285)) {
             return [
                 null,
                 stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null
@@ -191,11 +179,7 @@ export class JoystickLoop {
         }
 
         // Bottom Right
-        if (inRange(degrees, 276, 354)) {
-            if (!stickX.axis || !stickY.axis) {
-                return [null, null];
-            }
-
+        if (inRange(degrees, 286, 344)) {
             return [
                 stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
                 stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
