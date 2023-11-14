@@ -45,13 +45,11 @@ class DFUFlasher extends events.EventEmitter {
         await this.dfu.open();
         this.map = this.parseHex(this.hex);
 
-        log.info('Flash loop');
         for (let [address, dataBlock] of this.map) {
-            console.log(`Data block at ${address} of length ${dataBlock.length}`);
+            this.emit('info', `Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`);
             await this.download(address, this.XFER_SIZE, dataBlock);
         }
         await this.dfu.close();
-        log.info('Finished');
         this.emit('end');
     }
 

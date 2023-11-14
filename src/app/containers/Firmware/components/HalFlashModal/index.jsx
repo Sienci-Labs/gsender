@@ -24,8 +24,8 @@ const HalFlashModal = ({ onClose }) => {
 
         // Listen to flash events
         controller.addListener('flash:message', (msg) => {
-            let newNotifications = notifications.push(`${msg.type}: ${msg.content}`);
-            setNotifications([...newNotifications]);
+            let newNotifications = [...notifications].push(`${msg.type}: ${msg.content}`);
+            setNotifications(newNotifications);
         });
 
         controller.addListener('flash:progress', (value, total) => {
