@@ -1,7 +1,8 @@
+/* eslint no-await-in-loop: 0 */
 
-import fs from 'fs';
 import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
+import logger from '../../logger';
 
 
 //const VALID_VENDOR_IDS = [0x0483];
@@ -25,56 +26,70 @@ import MemoryMap from 'nrf-intel-hex';
   0x08020000 128k+
  */
 
+const log = logger('DFUFlasher');
 
 class DFUFlasher {
-    static VENDOR_ID = 0x0483;
+    SET_ADDRESS = 0x21;
+    ERASE_PAGE = 0x41;
 
-    constructor({ port, ...options }) {
-        this.path = port;
+    constructor({ hex, ...options }) {
         this.options = options;
+        this.hex = Buffer.from(hex, 'utf-8').toString();
         this.dfu = new DFU(this.path, options);
     }
 
     flash(data) {
         this.dfu.open();
-        //const map = this.parseHex(slbHex);
-        //console.log(map.length);
-        /*        if (map) {
-                    for (let [address, dataBlock] of map) {
-                        console.log('Data block at ', address.toString(16), ', bytes: ', dataBlock);
-                    }
-                }*/
+        this.map = this.parseHex(this.hex);
     }
 
     /**
      * Returns parsed data from either string path or file blob
-     * @param file
      * @returns {Buffer|*}
      */
-    parseHex(file) {
+    parseHex() {
         try {
-            let data = null;
-            data = fs.readFileSync(file, {
-                encoding: 'utf8'
-            });
-            return MemoryMap.fromHex(data);
+            return MemoryMap.fromHex(this.hex);
         } catch (err) {
             throw err;
         }
     }
+    /**
+     * Return buffer from string of hex characters
+     * @param line string hex value
+     * @returns {Buffer}
+     */
+    hexStringToByte(line) {
+        return Buffer.from([parseInt(line, 16)]);
+    }
 
-    async downloadBlock(data, size, manifestTolerant) {
-        // Erase Segment
+    async erase(startAddr, length) {
+        // get segment TODO FIX
+        let segment = this.dfu.getSegment(startAddr);
+        let endAddr;
+        let addr;
 
-        // while bytes_sent < size
-        // Copy data
-        // set address DFUSE
-        // write chunk
-        // poll until idle
-        // address += chunk_size
+        let bytesErased = 0;
+        const bytesToErase = endAddr - addr;
 
-
-        // check manifest
+        while (addr < endAddr) {
+            if (segment.end <= addr) {
+                segment = this.getSegment(addr);
+            }
+            if (!segment.eraseable) {
+                bytesErased = Math.min(bytesErased - segment.end - addr, bytesToErase);
+                addr = segment.end;
+                this.logProgress(bytesErased, bytesToErase);
+                continue;
+            }
+            const sectorIndex = Math.floor((addr - segment.start) / segment.sectorSize);
+            const sectorAddr = segment.start + sectorIndex * segment.sectorSize;
+            // eslint-disable-next-line no-await-in-loop
+            await this.sendDFUCommand(this.ERASE_PAGE, sectorAddr, 4);
+            addr = sectorAddr + segment.sectorSize;
+            bytesErased += segment.sectorSize;
+            this.logProgress(bytesErased, bytesToErase);
+        }
     }
 
     async sendDFUCommand(command, param = 0x00, len = 1) {
@@ -82,6 +97,7 @@ class DFUFlasher {
         let payload = new ArrayBuffer(len + 1);
         const dv = new DataView(payload);
         dv.setUint8(0, command);
+
         if (len === 1) {
             dv.setUint8(1, param);
         } else if (len === 4) {
@@ -91,7 +107,7 @@ class DFUFlasher {
         }
 
         try {
-            await this.download(payload, 0);
+            await this.dfu.download(payload, 0);
         } catch (err) {
             throw new Error(`Error during DFU command ${command}`);
         }
@@ -101,20 +117,6 @@ class DFUFlasher {
         if (status.status !== DFU.STATUS_OK) {
             throw new Error('Special DfuSe command ' + command + ' failed');
         }
-    }
-
-
-    //async pollUntil() {}
-
-    //async download(payload, offset)  {}
-
-    /**
-     * Return buffer from string of hex characters
-     * @param line string hex value
-     * @returns {Buffer}
-     */
-    hexStringToByte(line) {
-        return Buffer.from([parseInt(line, 16)]);
     }
 }
 

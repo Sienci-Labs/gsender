@@ -321,9 +321,8 @@ class Controller {
     //Sends an event to start flashing
     //@param {string} flashPort The port to be flashed
     //@param {string} imageType The type of image to be flashed to the port
-    flashFirmware(flashPort, imageType, type) {
-        console.log(type);
-        this.socket && this.socket.emit('flash:start', flashPort, imageType, type);
+    flashFirmware(flashPort, imageType, isHal, hex) {
+        this.socket && this.socket.emit('flash:start', flashPort, imageType, isHal, hex);
     }
 
     // Retrieves a list of available serial ports with metadata.

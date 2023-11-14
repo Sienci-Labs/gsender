@@ -67,12 +67,10 @@ export const getResetToDefaultMessage = ({ name, type } = {}) => {
 };
 
 export const getMachineProfileVersion = (profile) => {
-    //const machineProfile = store.get('workspace.machineProfile');
-    // return get(machineProfile, 'version', 'MK1');
     return get(profile, 'version', 'MK1');
 };
 
-export const startFlash = (port, profile) => {
+export const startFlash = (port, profile, hex = null, isHal = false) => {
     if (!port) {
         Toaster.pop({
             msg: 'No port specified - please connect to the device to determine what is being flashed',
@@ -87,7 +85,8 @@ export const startFlash = (port, profile) => {
         duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
-    controller.flashFirmware(port, imageType, profile.isHAL);
+    console.log(`${port} - ${imageType} - ${isHal}`);
+    controller.flashFirmware(port, imageType, isHal, hex);
 };
 
 export const restoreDefaultSettings = (machineProfile) => {

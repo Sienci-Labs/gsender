@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'app/components/Modal';
 import styles from './index.styl';
 import ProgressBar from './ProgressBar';
@@ -6,21 +6,40 @@ import Select from 'react-select';
 import _get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
+import { startFlash } from 'Containers/Firmware/utils';
 
 const HalFlashModal = ({ onClose }) => {
     const [notifications, setNotifications] = useState([]);
     const [portList, setPortList] = useState(_get(reduxStore.getState(), 'connection.ports'));
     const [port, setPort] = useState(controller.port);
-    const [isFlashing, setIsFlashing] = useState(true);
+    const [isFlashing, setIsFlashing] = useState(false);
+    const fileInputRef = useRef();
+    const [file, setFile] = useState(0);
+    const [fileContent, setFileContent] = useState(0);
 
     useEffect(() => {
-        setNotifications([
-            '- Flashing \'slb_orange.hex\' to device...',
-            '- Erasing Sectors...',
-            '- Parsing Write Data...',
-            '- Writing Data...'
-        ]);
-    });
+        setNotifications([]);
+    }, []);
+
+    useEffect(() => {
+        let fileReader, isCancel = false;
+        if (file) {
+            fileReader = new FileReader();
+            fileReader.onload = (e) => {
+                const { result } = e.target;
+                if (result && !isCancel) {
+                    setFileContent(result);
+                }
+            };
+            fileReader.readAsText(file);
+        }
+        return () => {
+            isCancel = true;
+            if (fileReader && fileReader.readyState === 1) {
+                fileReader.abort();
+            }
+        };
+    }, [file]);
 
     const refreshPorts = () => {
         controller.listPorts();
@@ -30,6 +49,15 @@ const HalFlashModal = ({ onClose }) => {
         }) === -1) {
             setPort('');
         }
+    };
+
+    const onChangefileInput = (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            console.error('No file found');
+            return;
+        }
+        setFile(file);
     };
 
     const notificationsToStr = () => {
@@ -59,7 +87,7 @@ const HalFlashModal = ({ onClose }) => {
                         }}
                     />
                     <label htmlFor="firmware_image">Choose a hex file</label>
-                    <input type="file" id="firmware_image" accept=".hex"/>
+                    <input type="file" id="firmware_image" accept=".hex" ref={fileInputRef} onChange={onChangefileInput}/>
                     <ProgressBar total={1024} sent={256}/>
                     <textarea value={notificationsToStr()} rows="6" cols="70" className={styles.notifications} readOnly={true}/>
                 </div>
@@ -73,8 +101,14 @@ const HalFlashModal = ({ onClose }) => {
                                 <button onClick={onClose} className="button-no">No</button>
                                 <button
                                     className="button" onClick={() => {
+                                        if (!fileContent || !file) {
+                                            console.error('No file');
+                                            return;
+                                        }
                                         setIsFlashing(true);
-                                    }}
+                                        startFlash(port, null, fileContent, true);
+                                    }
+                                    }
                                     onMouseEnter={refreshPorts}
                                     onMouseLeave={refreshPorts}
                                 >Yes

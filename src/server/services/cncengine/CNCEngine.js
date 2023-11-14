@@ -49,6 +49,7 @@ import {
     //validateUser
 } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
+import delay from '../../lib/delay';
 
 const log = logger('service:cncengine');
 
@@ -457,22 +458,30 @@ class CNCEngine {
                     return;
                 }
 
-                if (isHal) {
-                    // Do hal flash
-                    const halFlasher = new DFUFlasher({
-                        port: 'COM6',
-                        image: imageType,
-                        isHal
-                    });
-                    halFlasher.flash(data);
-                    return;
-                }
-
-                //Close the controller for AvrgirlArduino to take over the port
+                //Close the controller for flasher utility to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
+                    // handle HAL behaviour - send DFU command
+                    if (isHal) {
+                        // Do hal flash
+                        const halFlasher = new DFUFlasher({
+                            image: imageType,
+                            isHal,
+                            hex: data
+                        });
+                        controller.writeln('$DFU');
+                        store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                        delay(1500).then(() => {
+                            console.log('Flash started for HAL');
+                            halFlasher.flash(data);
+                        });
+                        return;
+                    }
+                    // Normal flash - close port then flash using AVRgirl
                     controller.close(
-                        () => FlashingFirmware(flashPort, imageType, socket)
+                        () => {
+                            FlashingFirmware(flashPort, imageType, socket);
+                        }
                     );
                     store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                 } else {
