@@ -46,6 +46,7 @@ class DFU {
         this.path = path;
         this.options = options;
         this.segments = {};
+        this.interfaceNumber = 0;
     }
 
     parseMemorySegments(desc = '') {
@@ -118,7 +119,6 @@ class DFU {
 
                 await this.device.open();
                 await delay(250);
-                console.log(this.device);
 
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;
@@ -148,7 +148,7 @@ class DFU {
             recipient: 'interface',
             request: bRequest,
             value: wValue,
-            index: this.interfaceNumber
+            index: this.interface.interfaceNumber
         }, wLength)
             .then((result) => {
                 if (result.status === 'ok') {

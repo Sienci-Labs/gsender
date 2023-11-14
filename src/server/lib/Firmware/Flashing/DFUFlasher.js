@@ -92,7 +92,7 @@ class DFUFlasher extends events.EventEmitter {
             }
 
             bytesSent += bytesWritten;
-            this.logProgress(bytesSent, expectedsize);
+            this.logProgress(bytesSent, expectedSize);
         }
     }
 
@@ -113,6 +113,10 @@ class DFUFlasher extends events.EventEmitter {
     getSectorEnd(addr, segment) {
         const sectorIndex = Math.floor((addr - segment.start) / segment.sectorSize);
         return segment.start + (sectorIndex + 1) * segment.sectorSize;
+    }
+
+    logProgress(value, total) {
+        this.emit('progress', value, total);
     }
 
     async erase(startAddr, length) {
