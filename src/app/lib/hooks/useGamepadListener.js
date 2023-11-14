@@ -9,35 +9,31 @@ export const useGamepadListener = ({ profile, axisThreshold } = {}) => {
     useEffect(() => {
         gamepad.start();
 
-        gamepad.on('gamepad:button', validator(buttonListener));
-        gamepad.on('gamepad:axis', validator(axisListener));
+        gamepad.on('gamepad:button', buttonListener);
+        gamepad.on('gamepad:axis', axisListener);
 
         return () => {
-            gamepad.removeEventListener('gamepad:button', validator(buttonListener));
-            gamepad.removeEventListener('gamepad:axis', validator(axisListener));
+            gamepad.off('gamepad:button', buttonListener);
+            gamepad.off('gamepad:axis', axisListener);
         };
     }, []);
 
-    const validator = (givenListener) => ({ detail }) => {
+    const buttonListener = ({ detail }) => {
         const { gamepad } = detail;
 
         if (profile && !profile.includes(gamepad.id)) {
             console.error('Gamepad profile not found');
-            return null;
+            return;
         }
 
-        return givenListener(detail);
-    };
-
-    const buttonListener = (detail) => {
         setButtons(detail.gamepad.buttons);
     };
 
-    const axisListener = (detail) => {
+    const axisListener = ({ detail }) => {
         const { gamepad } = detail;
 
-        if (!axisThreshold) {
-            setAxes(gamepad.axes);
+        if (profile && !profile.includes(gamepad.id)) {
+            console.error('Gamepad profile not found');
             return;
         }
 
