@@ -457,6 +457,25 @@ class CNCEngine {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
+                let halFlasher;
+                if (isHal) {
+                    halFlasher = new DFUFlasher({
+                        image: imageType,
+                        isHal,
+                        hex: data
+                    });
+
+                    halFlasher.on('error', (err) => {
+                        this.emit('flash:message', { type: 'error', content: err });
+                    });
+
+                    halFlasher.on('end', () => {
+                        this.emit('flash:end');
+                    });
+                    halFlasher.on('progress', (amount, total) => {
+                        this.emit('flash:progress', amount, total);
+                    });
+                }
 
                 //Close the controller for flasher utility to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
@@ -464,11 +483,6 @@ class CNCEngine {
                     // handle HAL behaviour - send DFU command
                     if (isHal) {
                         // Do hal flash
-                        const halFlasher = new DFUFlasher({
-                            image: imageType,
-                            isHal,
-                            hex: data
-                        });
                         controller.writeln('$DFU');
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                         delay(1500).then(() => {

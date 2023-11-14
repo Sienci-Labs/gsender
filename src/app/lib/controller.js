@@ -109,7 +109,9 @@ class Controller {
         'virtual_stop_toggle': [],
         'filetype': [],
         'toolchange:preHookComplete': [],
-        'networkScan:status': [],
+        'flash:end': [],
+        'flash:message': [],
+        'flash:progress': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],

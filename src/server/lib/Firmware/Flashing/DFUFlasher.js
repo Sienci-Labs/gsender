@@ -50,6 +50,9 @@ class DFUFlasher extends events.EventEmitter {
             console.log(`Data block at ${address} of length ${dataBlock.length}`);
             await this.download(address, this.XFER_SIZE, dataBlock);
         }
+        await this.dfu.close();
+        log.info('Finished');
+        this.emit('end');
     }
 
     /**

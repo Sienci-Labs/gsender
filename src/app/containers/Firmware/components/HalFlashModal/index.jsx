@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'app/components/Modal';
+import controller from 'app/lib/controller';
 import styles from './index.styl';
 import ProgressBar from './ProgressBar';
 import Select from 'react-select';
@@ -16,10 +17,28 @@ const HalFlashModal = ({ onClose }) => {
     const fileInputRef = useRef();
     const [file, setFile] = useState(0);
     const [fileContent, setFileContent] = useState(0);
+    const [percentage, setPercentage] = useState(0);
 
     useEffect(() => {
         setNotifications([]);
+
+        // Listen to flash events
+        controller.addListener('flash:message', (msg) => {
+            let newNotifications = notifications.push(`${msg.type}: ${msg.content}`)
+            setNotifications([...newNotifications]);
+        });
+
+        controller.addListener('flash:progress', (value, total) => {
+            setPercentage((value / total).toFixed(1) * 100);
+        });
+
+        controller.addListener('flash:end', () => {
+            console.log('ENDED');
+            setIsFlashing(false);
+        });
     }, []);
+
+
 
     useEffect(() => {
         let fileReader, isCancel = false;
