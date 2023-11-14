@@ -623,5 +623,6 @@ export default [
         'laser': false,
         'laserOnOutline': false,
         'eepromSettings': DefaultSLBSettings,
+        isHal: true
     }
 ];

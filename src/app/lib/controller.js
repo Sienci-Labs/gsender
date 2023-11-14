@@ -109,7 +109,9 @@ class Controller {
         'virtual_stop_toggle': [],
         'filetype': [],
         'toolchange:preHookComplete': [],
-        'networkScan:status': [],
+        'flash:end': [],
+        'flash:message': [],
+        'flash:progress': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
@@ -321,8 +323,8 @@ class Controller {
     //Sends an event to start flashing
     //@param {string} flashPort The port to be flashed
     //@param {string} imageType The type of image to be flashed to the port
-    flashFirmware(flashPort, imageType) {
-        this.socket && this.socket.emit('flash:start', flashPort, imageType);
+    flashFirmware(flashPort, imageType, isHal, hex) {
+        this.socket && this.socket.emit('flash:start', flashPort, imageType, isHal, hex);
     }
 
     // Retrieves a list of available serial ports with metadata.
