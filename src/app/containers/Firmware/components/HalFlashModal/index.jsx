@@ -22,24 +22,37 @@ const HalFlashModal = ({ onClose }) => {
     useEffect(() => {
         setNotifications([]);
 
-        // Listen to flash events
-        controller.addListener('flash:message', (msg) => {
-            let newNotifications = [...notifications].push(`${msg.type}: ${msg.content}`);
-            setNotifications(newNotifications);
-        });
-
         controller.addListener('flash:progress', (value, total) => {
             setCurValue(value);
             if (totalSize !== total) {
                 setTotalSize(total);
             }
         });
+    }, []);
+
+    useEffect(() => {
+        // Listen to flash events
+        controller.addListener('flash:message', (msg) => {
+            let data = `${msg.type}: ${msg.content}`;
+            setNotifications([
+                data,
+                ...notifications,
+            ]);
+        });
 
         controller.addListener('flash:end', () => {
-            console.log('ENDED');
+            setNotifications([
+                'Flash completed, please reset your board',
+                ...notifications,
+            ]);
             setIsFlashing(false);
         });
-    }, []);
+
+        return () => {
+            controller.removeListener('flash:message');
+            controller.removeListener('flash:end');
+        };
+    }, [notifications]);
 
 
     useEffect(() => {
@@ -81,7 +94,7 @@ const HalFlashModal = ({ onClose }) => {
         setFile(file);
     };
 
-    const notificationsToStr = () => {
+    const getNotificationsString = () => {
         return notifications.join('\n');
     };
 
@@ -110,7 +123,7 @@ const HalFlashModal = ({ onClose }) => {
                     <label htmlFor="firmware_image">Choose a hex file</label>
                     <input type="file" id="firmware_image" accept=".hex" ref={fileInputRef} onChange={onChangefileInput}/>
                     <ProgressBar total={totalSize} sent={curValue}/>
-                    <textarea value={notificationsToStr()} rows="6" cols="70" className={styles.notifications} readOnly={true}/>
+                    <textarea value={getNotificationsString()} rows="6" cols="70" className={styles.notifications} readOnly={true}/>
                 </div>
                 {
                     !isFlashing &&

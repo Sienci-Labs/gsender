@@ -32,7 +32,7 @@ const log = logger('DFUFlasher');
 class DFUFlasher extends events.EventEmitter {
     SET_ADDRESS = 0x21;
     ERASE_PAGE = 0x41;
-    XFER_SIZE = 1024; // we evaluate this
+    XFER_SIZE = 2048; // we evaluate this
 
     constructor({ hex, ...options }) {
         super();
@@ -88,7 +88,7 @@ class DFUFlasher extends events.EventEmitter {
                 log.info(status);
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
                 log.info(`Sent ${bytesWritten} bytes`);
-                this.emit('info', `Wrote chunk ${chunks} with size ${bytesWritten}`);
+                this.emit('info', `Wrote chunk ${chunks} with size ${bytesWritten}b`);
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
                 chunks += 1;
