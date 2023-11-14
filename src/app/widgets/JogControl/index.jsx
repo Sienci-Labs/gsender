@@ -896,11 +896,10 @@ class AxesWidget extends PureComponent {
     };
 
     handleJoystickJog = (params, { doRegularJog } = {}) => {
-        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
-        const aStep = getAJogDistance();
 
         const feedrate = Number(this.actions.getFeedrate());
 
@@ -908,8 +907,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: aStep
-
+            a: xyStep
         };
 
         if (doRegularJog) {
