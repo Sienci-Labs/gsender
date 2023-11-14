@@ -91,8 +91,6 @@ class DFU {
             }
         }
 
-        console.log(segments);
-
         this.segments = {
             name,
             segments
@@ -119,11 +117,11 @@ class DFU {
                 this.device = await WebUSBDevice.createInstance(device);
 
                 await this.device.open();
+                await delay(250);
 
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;
                 this.interface = this.interfaces[0];
-                console.log(this.interface);
 
                 const alternate = this.interface.alternates[0];
                 this.parseMemorySegments(alternate.interfaceName);

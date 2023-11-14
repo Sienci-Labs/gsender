@@ -41,6 +41,10 @@ class DFUFlasher {
     flash(data) {
         this.dfu.open();
         this.map = this.parseHex(this.hex);
+
+        for (let [address, dataBlock] of this.map) {
+            console.log(`Data block at ${address} of length ${dataBlock.length}`);
+        }
     }
 
     /**
@@ -54,6 +58,40 @@ class DFUFlasher {
             throw err;
         }
     }
+
+    async download(startAddress, xferSize, data, manifestTolerant) {
+        log.info('Starting download to board');
+
+        let bytesSent = 0;
+        let expectedsize = data.byteLength;
+
+        let address = startAddress;
+        while (bytesSent < expectedsize) {
+            const bytesLeft = expectedsize - bytesSent;
+            const chunkSize = Math.min(bytesLeft, xferSize);
+
+            let bytesWritten = 0;
+            let dfuStatus;
+            try {
+                await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
+                log.info(`Set address to ${address.toString(16)}`);
+                bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
+                log.info(`Sent ${bytesWritten} bytes`);
+                dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
+                address += chunkSize;
+            } catch (e) {
+                throw new Error(`Error during download: ${e}`);
+            }
+
+            if (dfuStatus.status !== this.dfu.STATUS_OK) {
+                throw `DFU DOWNLOAD failed state=${dfuStatus.state}, status=${dfuStatus.status}`;
+            }
+
+            bytesSent += bytesWritten;
+            this.logProgress(bytesSent, expectedsize);
+        }
+    }
+
     /**
      * Return buffer from string of hex characters
      * @param line string hex value
