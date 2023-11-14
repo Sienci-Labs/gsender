@@ -32,7 +32,7 @@ const log = logger('DFUFlasher');
 class DFUFlasher extends events.EventEmitter {
     SET_ADDRESS = 0x21;
     ERASE_PAGE = 0x41;
-    XFER_SIZE = 2048; // we evaluate this
+    XFER_SIZE = 1024; // we evaluate this
 
     constructor({ hex, ...options }) {
         super();
@@ -69,9 +69,10 @@ class DFUFlasher extends events.EventEmitter {
 
         let bytesSent = 0;
         let expectedSize = data.byteLength;
+        let chunks = 1;
 
-        await this.dfu.clearStatus();
-        log.info('Cleared status');
+        await this.dfu.abortToIdle();
+        log.info('Aborted to IDLE state');
 
         let address = startAddress;
         while (bytesSent < expectedSize) {
@@ -84,10 +85,14 @@ class DFUFlasher extends events.EventEmitter {
                 log.info('Setting address');
                 await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
                 log.info(`Set address to ${address.toString(16)}`);
+                const status = await this.dfu.getStatus();
+                log.info(status);
+                log.info(`Downloading slice ${chunks}`);
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
                 log.info(`Sent ${bytesWritten} bytes`);
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
+                chunks += 1;
             } catch (e) {
                 log.error(e);
                 this.emit('error', `Error during download: ${e}`);
@@ -186,7 +191,7 @@ class DFUFlasher extends events.EventEmitter {
         // Poll status
         log.info('Poll status');
         let status = await this.dfu.pollUntil(state => (state !== DFU.dfuDNBUSY));
-        if (status.status !== DFU.STATUS_OK) {
+        if (status.status !== this.dfu.STATUS_OK) {
             this.emit('error', 'Special DfuSe command ' + command + ' failed');
         }
     }

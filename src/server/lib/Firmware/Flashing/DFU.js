@@ -113,6 +113,7 @@ class DFU {
         const [vid, pid] = this.IDS;
 
         const device = findByIds(vid, pid);
+        device.timeout = this.DFU_TIMEOUT;
         if (device) {
             try {
                 this.device = await WebUSBDevice.createInstance(device);
@@ -123,6 +124,10 @@ class DFU {
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;
                 this.interface = this.interfaces[0];
+
+                console.log(this.interfaces);
+                console.log(this.device);
+                console.log(this.configurations);
 
                 const alternate = this.interface.alternates[0];
                 this.parseMemorySegments(alternate.interfaceName);
@@ -168,10 +173,11 @@ class DFU {
             recipient: 'interface',
             request: bRequest,
             value: wValue,
-            index: this.interface.interfaceNumber
+            index: 0
         }, data)
             .then(
                 (result) => {
+                    log.info(result);
                     if (result.status === 'ok') {
                         return Promise.resolve(result.bytesWritten);
                     } else {
