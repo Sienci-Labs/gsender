@@ -32,7 +32,7 @@ class Gamepad extends GamepadListener {
         const profiles = store.get('workspace.gamepad.profiles', []);
         const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
 
-        const lockoutButton = detail.gamepad.buttons[currentProfile.lockout?.button];
+        const lockoutButton = detail.gamepad.buttons[currentProfile?.lockout?.button];
 
         if (lockoutButton && !lockoutButton?.pressed) {
             return;
