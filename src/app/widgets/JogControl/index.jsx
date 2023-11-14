@@ -1176,10 +1176,6 @@ class AxesWidget extends PureComponent {
 
                 // Top Right
                 if (inRange(degrees, 31, 59)) {
-                    if (!stickX.axis || !stickY.axis) {
-                        return [null, null];
-                    }
-
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
                         stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
@@ -1196,10 +1192,6 @@ class AxesWidget extends PureComponent {
 
                 // Top Left
                 if (inRange(degrees, 121, 149)) {
-                    if (!stickX.axis || !stickY.axis) {
-                        return [null, null];
-                    }
-
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                         stickY.axis ? { [stickY.axis]: stickY.positiveDirection } : null,
@@ -1215,10 +1207,6 @@ class AxesWidget extends PureComponent {
 
                 // Bottom Left
                 if (inRange(degrees, 211, 239)) {
-                    if (!stickX.axis || !stickY.axis) {
-                        return [null, null];
-                    }
-
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.negativeDirection } : null,
                         stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
@@ -1235,10 +1223,6 @@ class AxesWidget extends PureComponent {
 
                 // Bottom Right
                 if (inRange(degrees, 301, 329)) {
-                    if (!stickX.axis || !stickY.axis) {
-                        return [null, null];
-                    }
-
                     return [
                         stickX.axis ? { [stickX.axis]: stickX.positiveDirection } : null,
                         stickY.axis ? { [stickY.axis]: stickY.negativeDirection } : null,
