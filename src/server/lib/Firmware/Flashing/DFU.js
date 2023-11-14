@@ -118,6 +118,7 @@ class DFU {
 
                 await this.device.open();
                 await delay(250);
+                console.log(this.device);
 
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;

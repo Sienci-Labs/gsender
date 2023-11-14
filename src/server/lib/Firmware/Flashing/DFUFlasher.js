@@ -3,6 +3,7 @@
 import DFU from './DFU';
 import MemoryMap from 'nrf-intel-hex';
 import logger from '../../logger';
+import events from 'events';
 
 
 //const VALID_VENDOR_IDS = [0x0483];
@@ -28,11 +29,13 @@ import logger from '../../logger';
 
 const log = logger('DFUFlasher');
 
-class DFUFlasher {
+class DFUFlasher extends events.EventEmitter {
     SET_ADDRESS = 0x21;
     ERASE_PAGE = 0x41;
+    XFER_SIZE = 2048; // we evaluate this
 
     constructor({ hex, ...options }) {
+        super();
         this.options = options;
         this.hex = Buffer.from(hex, 'utf-8').toString();
         this.dfu = new DFU(this.path, options);
@@ -44,6 +47,7 @@ class DFUFlasher {
 
         for (let [address, dataBlock] of this.map) {
             console.log(`Data block at ${address} of length ${dataBlock.length}`);
+            //this.download(address, this.XFER_SIZE, dataBlock);
         }
     }
 
@@ -63,11 +67,11 @@ class DFUFlasher {
         log.info('Starting download to board');
 
         let bytesSent = 0;
-        let expectedsize = data.byteLength;
+        let expectedSize = data.byteLength;
 
         let address = startAddress;
-        while (bytesSent < expectedsize) {
-            const bytesLeft = expectedsize - bytesSent;
+        while (bytesSent < expectedSize) {
+            const bytesLeft = expectedSize - bytesSent;
             const chunkSize = Math.min(bytesLeft, xferSize);
 
             let bytesWritten = 0;
@@ -80,11 +84,11 @@ class DFUFlasher {
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
             } catch (e) {
-                throw new Error(`Error during download: ${e}`);
+                this.emit('error', `Error during download: ${e}`);
             }
 
             if (dfuStatus.status !== this.dfu.STATUS_OK) {
-                throw `DFU DOWNLOAD failed state=${dfuStatus.state}, status=${dfuStatus.status}`;
+                this.emit('error', `DFU DOWNLOAD failed state=${dfuStatus.state}, status=${dfuStatus.status}`);
             }
 
             bytesSent += bytesWritten;
@@ -114,6 +118,7 @@ class DFUFlasher {
     async erase(startAddr, length) {
         let segment = this.dfu.getSegment(startAddr);
         if (!segment) {
+            this.emit('error', 'Invalid segment in memory map');
             log.error(`Unable to find valid segment for address ${startAddr}`);
             return;
         }
@@ -155,19 +160,21 @@ class DFUFlasher {
         } else if (len === 4) {
             dv.setUint32(1, param, true);
         } else {
-            throw new Error(`Invalid length of ${len} specified - must be 1 or 4`);
+            this.emit('error', `Invalid length of ${len} specified - must be 1 or 4`);
+            return;
         }
 
         try {
             await this.dfu.download(payload, 0);
         } catch (err) {
-            throw new Error(`Error during DFU command ${command}`);
+            this.emit('error', `Error during DFU command ${command}`);
+            return;
         }
 
         // Poll status
         let status = await this.dfu.pollUntil(state => (state !== DFU.dfuDNBUSY));
         if (status.status !== DFU.STATUS_OK) {
-            throw new Error('Special DfuSe command ' + command + ' failed');
+            this.emit('error', 'Special DfuSe command ' + command + ' failed');
         }
     }
 }
