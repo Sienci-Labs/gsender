@@ -32,7 +32,7 @@ import _isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import cx from 'classnames';
+//import cx from 'classnames';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
@@ -462,7 +462,14 @@ class DisplayPanel extends PureComponent {
                                         singleAxisHoming ? (
                                             <>
                                                 <div className={styles.homeWrapper}>
-                                                    <i className={cx('fas fa-home fa-2xl', styles.homeIcon)} /> Homing
+                                                    <FunctionButton
+                                                        primary
+                                                        disabled={!canHome}
+                                                        onClick={this.actions.startHoming}
+                                                        className={styles.runHomeButton}
+                                                    >
+                                                        <i className="fas fa-home" /> Home
+                                                    </FunctionButton>
                                                 </div>
                                                 <ButtonCollection
                                                     disabled={!canHome}
