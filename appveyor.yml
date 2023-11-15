@@ -161,9 +161,9 @@ for:
             yarn build:linux-x64
             ls -al output output/*
             mkdir -p releases/linux
-            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.AppImage"
-            cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.deb"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm"
+            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage"
+            cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-amd64.deb"
             pushd releases/linux
             ln -sf ../../output/linux-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
             tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
@@ -186,9 +186,9 @@ for:
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.rpm" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.AppImage" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64bit.deb" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-amd64.deb" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64.tar.gz";
               #rm -f "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm";
               #rm -f "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage";
@@ -251,9 +251,9 @@ for:
             yarn build:linux-arm64
             ls -al output output/*
             mkdir -p releases/linux
-            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.arm64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.AppImage"
-            cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.deb"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.arm64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.arm64.rpm"
+            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage"
+            cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
             pushd releases/linux
             ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
             tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
@@ -276,9 +276,9 @@ for:
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.rpm" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.AppImage" \
-                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64bit.deb" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.arm64.rpm" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage" \
+                "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.tar.gz";
               #rm -f "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.arm64.rpm";
               #rm -f "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage";
@@ -360,7 +360,7 @@ for:
             yarn build:macos-x64
             ls -al output output/*
             mkdir -p releases/macos
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-Mac-Intel-64bit.dmg"
+            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg"
             ls -al releases/macos/*
             if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
               yarn github-release delete \
@@ -368,15 +368,15 @@ for:
                 --repo=sender \
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
-                "*-Mac-Intel-64bit.dmg";
+                "*-macos.x64.dmg";
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
-                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-Mac-Intel-64bit.dmg";
-              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-Mac-Intel-64bit.dmg";
+                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
+              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
             fi
           fi
       - sh: |
@@ -477,10 +477,11 @@ for:
             $GIT_COMMIT_LOG = git log -1 --format='%ci %H %s'
             $PACKAGE_NAME = node -e "console.log(require('./src/package.json').name)"
             $PACKAGE_VERSION = node -e "console.log(require('./src/package.json').version)"
-            $PRODUCT_NAME = "gSender"            mkdir -Force -Path releases\windows
+            $PRODUCT_NAME = "gSender"
+            mkdir -Force -Path releases\windows
             yarn build:windows
             Get-ChildItem output
-            Copy-Item "output\${PRODUCT_NAME}-${PACKAGE_VERSION}.exe" "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-Windows-64bit.exe"
+            Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
             Get-ChildItem releases\windows
             if ($env:CI_BRANCH -eq "master" -And -not $env:CI_TAG) {
               yarn github-release delete `
@@ -495,7 +496,7 @@ for:
                 --tag="${env:CI_BRANCH}-latest" `
                 --release-name="${env:CI_BRANCH}" `
                 --body="${GIT_COMMIT_LOG}" `
-                "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-Windows-64bit.exe"
+                "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
               #Remove-Item "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
             }
           }
