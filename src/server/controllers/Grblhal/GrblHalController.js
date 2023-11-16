@@ -526,6 +526,10 @@ class GrblHalController {
 
             let pauseTime = new Date().getTime() - this.timePaused;
 
+            // if there was error and feeder was holding, don't reset
+            if (this.feeder.state.hold) {
+                this.feeder.unhold();
+            }
             // Reset feeder prior to resume program execution
             this.feeder.reset();
 
@@ -625,6 +629,11 @@ class GrblHalController {
         });
 
         this.runner.on('error', (res) => {
+            this.sender.hold();
+            this.feeder.hold({ comment: `Error occurred at ${new Date().toISOString()}` });
+            this.workflow.pause();
+            this.write('!');
+
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code });
 
@@ -673,18 +682,14 @@ class GrblHalController {
                     if (preferences.showLineWarnings === false) {
                         const msg = `Error ${code} on line ${received + 1} - ${error.message}`;
                         this.emit('gcode_error', msg);
-                        this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
 
                     if (preferences.showLineWarnings) {
-                        this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
-                this.sender.ack();
-                this.sender.next();
 
                 return;
             }
@@ -695,10 +700,6 @@ class GrblHalController {
 
             // Clear error by sending newline for grblHAL
             //this.connection.write('\n');
-
-            // Feeder
-            this.feeder.ack();
-            this.feeder.next();
         });
 
         this.runner.on('alarm', (res) => {
