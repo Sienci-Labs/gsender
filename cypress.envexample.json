@@ -1,0 +1,9 @@
+{
+    "grbl_port": "/dev/tty.usbmodemEXAMPLE",
+    "grblhal_port": "/dev/tty.usbmodemEXAMPLE",
+    "file": "./examples/gcode/arc-ijk.gcode",
+    "X+Y+": "{alt}{upArrow}",
+    "X-Y-": "{alt}{downArrow}",
+    "X+Y-": "{alt}{rightArrow}",
+    "X-Y+": "{alt}{leftArrow}"
+}

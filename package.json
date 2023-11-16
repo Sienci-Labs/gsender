@@ -75,7 +75,8 @@
     "eslint:debug": "echo \"Checking code style...\"; DEBUG=eslint:cli-engine eslint --ext .js --ext .jsx *.js src scripts test",
     "stylint": "stylint src/app",
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
-    "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls"
+    "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
+    "cypress:open": "cypress open"
   },
   "build": {
     "appId": "org.sienci.gsender-edge",
@@ -208,6 +209,7 @@
     "core-js": "~3.26.1",
     "cors": "^2.8.5",
     "csv": "^6.3.3",
+    "cypress-real-events": "^1.11.0",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
@@ -359,6 +361,7 @@
     "cross-env": "^5.2.1",
     "css-loader": "~2.1.1",
     "css-split-webpack-plugin": "~0.2.6",
+    "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
     "electron": "^26.2.2",
     "electron-builder": "~23.6.0",
