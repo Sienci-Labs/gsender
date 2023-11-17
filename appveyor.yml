@@ -89,7 +89,7 @@ for:
       - sudo dpkg --add-architecture i386
       - sudo dpkg --print-foreign-architectures
       - sudo apt-get update --allow-releaseinfo-change
-      - sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick gcc-multilib g++-multilib rpm
+      - sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick gcc-multilib g++-multilib rpm libudev-dev
       - nvm install $nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto

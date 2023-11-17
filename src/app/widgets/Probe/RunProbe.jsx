@@ -184,7 +184,6 @@ class RunProbe extends PureComponent {
                 </Modal.Header>
                 <Modal.Body>
                     <div className={styles.runProbeBody}>
-
                         <div className={styles.left}>
                             <div className={styles.greyText}>
                                 <p>Ensure tool is positioned as shown.</p>
