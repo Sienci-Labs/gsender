@@ -753,7 +753,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    showStats &&
+                    showStats && (
                         <Modal onClose={() => {
                             this.setState({
                                 job: {
@@ -781,16 +781,20 @@ class WorkflowControl extends PureComponent {
                                             <span>{` ${time}\n`}</span>
                                         </div>
                                         <strong>{'Errors:\n'}</strong>
-                                        <span className={styles.statsWrapper} style={{ marginLeft: '10px', color: 'red' }}>
-                                            {
-                                                errors.length > 0 ?
-                                                    errors.map(error => {
-                                                        return <span key={uniqueId()}>{`- ${error}\n`}</span>;
-                                                    })
-                                                    :
-                                                    'None'
-                                            }
-                                        </span>
+
+                                        {
+                                            errors.length === 0
+                                                ? <span className={styles.statsWrapper} style={{ marginLeft: '10px' }}>None</span>
+                                                : (
+                                                    <span className={styles.statsWrapper} style={{ marginLeft: '10px', color: 'red' }}>
+                                                        {
+                                                            errors.map(error => {
+                                                                return <span key={uniqueId()}>{`- ${error}\n`}</span>;
+                                                            })
+                                                        }
+                                                    </span>
+                                                )
+                                        }
                                     </div>
                                     <div className={styles.buttonsContainer}>
                                         <FunctionButton
@@ -813,7 +817,7 @@ class WorkflowControl extends PureComponent {
                                 </div>
                             </Modal.Body>
                         </Modal>
-                }
+                    )}
                 {
                     !renderSVG
                         ? (
