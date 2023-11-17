@@ -189,8 +189,12 @@ export class JoystickLoop {
         return [];
     }
 
-    _runJog = ({ activeAxis }) => {
-        const axes = this._getAxesAndDirection({ degrees: this.degrees, activeAxis });
+    _runJog = () => {
+        const { degrees, activeAxis, multiplier: { leftStick, rightStick } } = this;
+
+        const axes = this._getAxesAndDirection({ degrees, activeAxis });
+
+        const numberOfAxes = axes.reduce((acc, curr) => (curr !== null ? acc + 1 : acc), 0);
 
         const timer = (new Date() - this.jogMovementStartTime);
 
@@ -216,12 +220,10 @@ export class JoystickLoop {
             return;
         }
 
-        const { leftStick, rightStick } = this.multiplier;
-
         const multiplier = [leftStick, leftStick, rightStick, rightStick][activeAxis];
-        const feedrate = this._computeFeedrate(multiplier);
-
         const axesData = activeAxis < 2 ? axesValues.slice(0, 2) : axesValues.slice(2, 4);
+
+        const feedrate = this._computeFeedrate(numberOfAxes === 1 ? Math.max(...axesData.map(item => Math.abs(item))) : multiplier);
 
         const updatedAxes = axesData.reduce((acc, curr, index) => {
             const axesData = axes[index];
@@ -284,12 +286,13 @@ export class JoystickLoop {
         }, {});
     }
 
-    setOptions = ({ gamepadProfile, feedrate, axes, multiplier, degrees }) => {
+    setOptions = ({ gamepadProfile, feedrate, axes, multiplier, degrees, activeAxis }) => {
         this.gamepadProfile = gamepadProfile;
         this.feedrate = feedrate;
         this.axes = axes;
         this.multiplier = multiplier;
         this.degrees = degrees;
+        this.activeAxis = activeAxis;
     }
 
     start = (activeAxis) => {
