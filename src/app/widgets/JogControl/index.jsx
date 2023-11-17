@@ -986,6 +986,11 @@ class AxesWidget extends PureComponent {
     handleShortcutStop = (payload) => {
         const feedrate = Number(this.actions.getFeedrate());
 
+        if (payload.force) {
+            this.actions.stopContinuousJog();
+            return;
+        }
+
         if (!payload) {
             this.joggingHelper && this.joggingHelper.onKeyUp({ F: feedrate });
             return;
@@ -1253,6 +1258,7 @@ class AxesWidget extends PureComponent {
             this.joystickLoop.setOptions({
                 gamepadProfile: currentProfile,
                 feedrate: this.actions.getFeedrate(),
+                activeAxis: axis,
                 axes: data,
                 multiplier: detail.distance,
                 degrees: activeStickDegrees,
