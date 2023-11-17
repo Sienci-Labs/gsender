@@ -1003,15 +1003,11 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.connection.writeImmediate(String.fromCharCode(0x87));
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-        this.connection.writeImmediate('$ES\n');
         await delay(100);
-        this.connection.writeImmediate('$ESH\n');
-        this.connection.writeImmediate('$EG\n');
-        this.connection.writeImmediate('$EA\n');
+        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n');
     }
 
     populateContext(context = {}) {
