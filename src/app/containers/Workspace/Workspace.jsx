@@ -388,60 +388,6 @@ class Workspace extends PureComponent {
         }
     };
 
-    updateWidgetsForPrimaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
-            const widgets = Object.keys(store.get('widgets', {}))
-                .filter(widgetId => {
-                    // e.g. "webcam" or "webcam:d8e6352f-80a9-475f-a4f5-3e9197a48a23"
-                    const name = widgetId.split(':')[0];
-                    return _.includes(activeWidgets, name);
-                });
-
-            const defaultWidgets = store.get('workspace.container.default.widgets');
-            const sortableWidgets = _.difference(widgets, defaultWidgets);
-            let primaryWidgets = store.get('workspace.container.primary.widgets');
-            let secondaryWidgets = store.get('workspace.container.secondary.widgets');
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
-
-            secondaryWidgets = sortableWidgets.slice();
-            _.pullAll(secondaryWidgets, primaryWidgets);
-            pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            // Update inactive count
-            this.setState({ inactiveCount: _.size(inactiveWidgets) });
-        });
-    };
-
-    updateWidgetsForSecondaryContainer = () => {
-        widgetManager.show((activeWidgets, inactiveWidgets) => {
-            const widgets = Object.keys(store.get('widgets', {}))
-                .filter(widgetId => {
-                    // e.g. "webcam" or "webcam:d8e6352f-80a9-475f-a4f5-3e9197a48a23"
-                    const name = widgetId.split(':')[0];
-                    return _.includes(activeWidgets, name);
-                });
-
-            const defaultWidgets = store.get('workspace.container.default.widgets');
-            const sortableWidgets = _.difference(widgets, defaultWidgets);
-            let primaryWidgets = store.get('workspace.container.primary.widgets');
-            let secondaryWidgets = store.get('workspace.container.secondary.widgets');
-
-            secondaryWidgets = sortableWidgets.slice();
-            _.pullAll(secondaryWidgets, primaryWidgets);
-            pubsub.publish('updateSecondaryWidgets', secondaryWidgets);
-
-            primaryWidgets = sortableWidgets.slice();
-            _.pullAll(primaryWidgets, secondaryWidgets);
-            pubsub.publish('updatePrimaryWidgets', primaryWidgets);
-
-            // Update inactive count
-            this.setState({ inactiveCount: _.size(inactiveWidgets) });
-        });
-    };
-
     handleCollectUserData = async () => {
         const { INITIAL, ACCEPTED, REJECTED } = USER_DATA_COLLECTION;
         const res = await api.metrics.getCollectDataStatus();

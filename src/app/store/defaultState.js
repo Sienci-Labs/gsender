@@ -54,6 +54,9 @@ const defaultState = {
         timeSpentRunning: 0,
         longestTimeRun: 0,
         jobTimes: [],
+        toolChange: {
+            passthrough: false
+        },
         toolChangeOption: 'Ignore',
         toolChangePosition: {
             x: 0,
@@ -69,6 +72,11 @@ const defaultState = {
                 show: true,
                 widgets: [
                     'location', 'axes', 'secondary'
+                ]
+            },
+            default: {
+                widgets: [
+                    'visualizer', 'job_status'
                 ]
             }
         },
@@ -137,7 +145,8 @@ const defaultState = {
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
-        }
+        },
+        shouldWarnZero: false,
     },
     widgets: {
         axes: {
@@ -218,17 +227,18 @@ const defaultState = {
                     rtscts: false
                 }
             },
-            autoReconnect: false
+            autoReconnect: false,
+            ip: [192, 168, 5, 1]
         },
         console: {
             minimized: false
         },
         job_status: {
             minimized: false,
-            feedrateMin: 500,
-            feedrateMax: 2000,
-            spindleSpeedMin: 0,
-            spindleSpeedMax: 1000
+            speed: '',
+            lastFile: '',
+            lastFileSize: '',
+            lastFileRunLength: '',
         },
         grbl: {
             minimized: false,
@@ -300,7 +310,8 @@ const defaultState = {
             },
             touchPlateHeight: 10,
             probeType: 'Auto',
-            direction: 0
+            direction: 0,
+            probeAxis: 'Z',
         },
         rotary: {
             stockTurning: {
@@ -390,6 +401,7 @@ const defaultState = {
             },
             showWarning: false,
             showLineWarnings: false,
+            showSoftLimitWarning: false
         }
     },
     commandKeys: {}
