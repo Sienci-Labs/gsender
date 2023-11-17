@@ -1,79 +1,48 @@
 import { EventEmitter } from 'events';
+import { inRange } from 'lodash';
 
-const ROTATION_COUNT_UPPER_LIMIT = 5;
-const ROTATION_COUNT_LOWER_LIMIT = 5;
+const TOTAL_ANGLE = 60;
+const ANGLE_THRESHOLD = 15;
 
 export class MPGHelper extends EventEmitter {
-    constructor (value, threshold = 0, previousValuesLimit = 100) {
+    constructor(jog) {
         super();
-        this.threshold = threshold;
-        this.rotationPosition = 0;
-        this.value = value;
-        this.previousValues = [];
-        this.previousValuesLimit = previousValuesLimit;
-        this.rotationInProgress = false;
+        this.value = null;
+
+        this.jog = jog;
     }
 
-    updateValue = (newValue) => {
-        //Flush out history when hitting upper limit
-        if (this.previousValues.length > this.previousValuesLimit) {
-            this.previousValues = [];
-        }
+    update = (value, axis, step, feedrate, factor = 1) => {
+        this.axis = axis;
+        this.step = step;
+        this.feedrate = feedrate;
+        this.factor = factor;
 
-        if (this.previousValues.length === 0 && newValue !== 0) {
+        this._updateValue(value);
+    }
+
+    _updateValue = (newValue) => {
+        if (this.value === null) {
+            this.value = newValue;
             return;
         }
 
-        if (newValue === 0) {
-            const didFullRotation = this.checkIfDidFullRotation();
+        const { axis, step, feedrate, factor } = this;
 
-            if (didFullRotation) {
-                return;
-            }
+        if (inRange(this.value - newValue, TOTAL_ANGLE - ANGLE_THRESHOLD, TOTAL_ANGLE + ANGLE_THRESHOLD)) {
+            this.jog({ [axis]: step * factor, F: feedrate });
+            this.value = newValue;
+            return;
         }
 
-        this.previousValues.push(this.value);
-
-        this.value = newValue;
+        if (inRange(this.value - newValue, -TOTAL_ANGLE - ANGLE_THRESHOLD, -TOTAL_ANGLE + ANGLE_THRESHOLD)) {
+            this.jog({ [axis]: -step * factor, F: feedrate });
+            this.value = newValue;
+            return;
+        }
     }
 
-    checkIfDidFullRotation = () => {
-        const prevValues = this.previousValues.reverse();
-
-        const didFullRotation = prevValues
-            .every((value, index) => {
-                const prevValue = this.previousValues[index - 1];
-
-                if (value === 0) {
-                    return true;
-                }
-
-                return value > prevValue;
-            });
-
-        if (didFullRotation) {
-            this.updateRotationPosition('increment');
-
-            this.previousValues = [];
-            this.rotationInProgress = false;
-
-            this.emit('full:rotation', {
-                rotationPosition: this.rotationPosition,
-            });
-
-            return true;
-        }
-
-        return false;
-    }
-
-    updateRotationPosition = (type) => {
-        if (type === 'increment' && this.rotationPosition < ROTATION_COUNT_UPPER_LIMIT) {
-            this.rotationPosition += 1;
-        }
-
-        if (type === 'decrement' && this.rotationPosition > ROTATION_COUNT_LOWER_LIMIT) {
-            this.rotationPosition -= 1;
-        }
+    clearValue = () => {
+        this.value = null;
     }
 }

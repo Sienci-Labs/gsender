@@ -5,7 +5,7 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 class Gamepad extends GamepadListener {
     constructor() {
-        super({ precision: 2 });
+        super({ axis: { precision: 2 }, button: { analog: false } });
         this.shouldHold = false;
         this.start();
     }
@@ -24,25 +24,21 @@ class Gamepad extends GamepadListener {
         this.shouldHold = true;
     }
 
-    unholdLisetner = () => {
+    unholdListener = () => {
         this.shouldHold = false;
     }
 
     onAxis = ({ detail }) => {
-        if (this.shouldHold) {
-            return;
-        }
-
         const profiles = store.get('workspace.gamepad.profiles', []);
         const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
 
-        const lockoutButton = detail.gamepad.buttons[currentProfile.lockout?.button];
+        const lockoutButton = detail.gamepad.buttons[currentProfile?.lockout?.button];
 
         if (lockoutButton && !lockoutButton?.pressed) {
             return;
         }
 
-        const deadZone = currentProfile?.joystickOptions?.zeroThreshold;
+        const deadZone = currentProfile?.joystickOptions?.zeroThreshold && currentProfile?.joystickOptions?.zeroThreshold / 100;
 
         const [leftStickX, leftStickY, rightStickX, rightStickY] = detail.gamepad.axes;
 
@@ -52,6 +48,15 @@ class Gamepad extends GamepadListener {
             return (degrees + 360) % 360; //https://stackoverflow.com/a/25725005
         };
 
+        const cartesian2PolarDistance = (x, y) => {
+            const distance = Math.sqrt(x * x + y * y);
+
+            return +(distance.toFixed(2));
+        };
+
+        const leftStickDistance = cartesian2PolarDistance(leftStickX, leftStickY);
+        const rightStickDistance = cartesian2PolarDistance(rightStickX, rightStickY);
+
         const leftStick = cartesian2Polar(leftStickX, leftStickY);
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
@@ -60,7 +65,11 @@ class Gamepad extends GamepadListener {
             degrees: {
                 leftStick,
                 rightStick,
-            }
+            },
+            distance: {
+                leftStick: leftStickDistance,
+                rightStick: rightStickDistance
+            },
         };
 
         const { index } = dataOutput;
@@ -133,6 +142,14 @@ export const onGamepadButtonPress = ({ detail }) => {
     }
 
     const foundAction = currentProfile.buttons.find(({ value }) => value === button);
+
+    if (!detail.pressed && foundAction.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
+        return 'STOP_JOG';
+    }
+
+    if (!detail.pressed) {
+        return null;
+    }
 
     const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
     const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];

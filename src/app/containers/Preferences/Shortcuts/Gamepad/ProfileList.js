@@ -12,11 +12,17 @@ import { setCurrentModal } from './utils/actions';
 const ProfileList = () => {
     const { state: { settings: { profiles } }, dispatch } = useContext(GamepadContext);
 
-    const addNewGamepadProfileButton = (
-        <Button primary onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.ADD_NEW_PROFILE))}>
-            <i className="fas fa-plus" />
-            <span>Add New Gamepad Profile</span>
-        </Button>
+    const ActionArea = () => (
+        <div style={{ display: 'flex', gap: '1rem' }}>
+            <Button primary onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.ADD_NEW_PROFILE))}>
+                <i className="fas fa-plus" />
+                <span>Add New Gamepad Profile</span>
+            </Button>
+
+            <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))}>
+                <span>Help</span>
+            </Button>
+        </div>
     );
 
     if (profiles.length === 0) {
@@ -24,7 +30,7 @@ const ProfileList = () => {
             <div className={styles.profileListEmpty}>
                 <p style={{ fontSize: '1.5rem' }}>No Profiles, Click the Button Below to Add One</p>
 
-                { addNewGamepadProfileButton }
+                <ActionArea />
             </div>
         );
     }
@@ -44,7 +50,7 @@ const ProfileList = () => {
                 }
             </div>
 
-            { addNewGamepadProfileButton }
+            <ActionArea />
         </>
     );
 };

@@ -25,6 +25,5 @@ export const convertBitfieldToValue = (bitMap) => {
         }
         bitValue *= 2;
     });
-    console.log(sum);
     return sum;
 };

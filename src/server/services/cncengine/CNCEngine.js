@@ -48,6 +48,8 @@ import {
     authorizeIPAddress,
     //validateUser
 } from '../../access-control';
+import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
+import delay from '../../lib/delay';
 
 const log = logger('service:cncengine');
 
@@ -449,17 +451,55 @@ class CNCEngine {
                 controller.command.apply(controller, [cmd].concat(args));
             });
 
-            socket.on('flash:start', (flashPort, imageType) => {
+            socket.on('flash:start', (flashPort, imageType, isHal = false, data = null) => {
                 log.debug('flash-start called');
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
-                //Close the controller for AvrgirlArduino to take over the port
+                let halFlasher;
+                if (isHal) {
+                    halFlasher = new DFUFlasher({
+                        image: imageType,
+                        isHal,
+                        hex: data
+                    });
+
+                    halFlasher.on('error', (err) => {
+                        this.emit('flash:message', { type: 'Error', content: err });
+                    });
+
+                    halFlasher.on('info', (msg) => {
+                        this.emit('flash:message', { type: 'Info', content: msg });
+                    });
+
+                    halFlasher.on('end', () => {
+                        this.emit('flash:end');
+                    });
+                    halFlasher.on('progress', (amount, total) => {
+                        this.emit('flash:progress', amount, total);
+                    });
+                }
+
+                //Close the controller for flasher utility to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
+                    // handle HAL behaviour - send DFU command
+                    if (isHal) {
+                        // Do hal flash
+                        controller.writeln('$DFU');
+                        store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                        delay(1500).then(() => {
+                            console.log('Flash started for HAL');
+                            halFlasher.flash(data);
+                        });
+                        return;
+                    }
+                    // Normal flash - close port then flash using AVRgirl
                     controller.close(
-                        () => FlashingFirmware(flashPort, imageType, socket)
+                        () => {
+                            FlashingFirmware(flashPort, imageType, socket);
+                        }
                     );
                     store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                 } else {

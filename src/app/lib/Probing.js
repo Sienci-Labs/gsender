@@ -704,11 +704,20 @@ export const getProbeCode = (options, direction = 0) => {
     } else if (axes.x && axes.y) {
         return get3AxisStandardRoutine(options);
     } else if (axes.z) {
-        return getSingleAxisStandardRoutine('Z');
+        return [
+            ...getPreamble(options),
+            ...getSingleAxisStandardRoutine('Z')
+        ];
     } else if (axes.y) {
-        return getSingleAxisStandardRoutine('Y');
+        return [
+            ...getPreamble(options),
+            ...getSingleAxisStandardRoutine('Y')
+        ];
     } else if (axes.x) {
-        return getSingleAxisStandardRoutine('X');
+        return [
+            ...getPreamble(options),
+            ...getSingleAxisStandardRoutine('X')
+        ];
     }
 
     // Default do nothing bc we don't recognize the options

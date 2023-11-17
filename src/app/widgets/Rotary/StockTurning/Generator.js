@@ -13,6 +13,7 @@ export class StockTurningGenerator {
 
         const newStartHeight = Number((newOptions.startHeight / 2).toFixed(2));
         const newFinalHeight = Number((newOptions.finalHeight / 2).toFixed(2));
+        const feedrate = this.processValue(newOptions.feedrate);
 
         // Checking for odd and even number of passes for full spiral is done later
         if ((newStartHeight - newOptions.stepdown <= newFinalHeight) && !newOptions.enableRehoming) { // check if one pass
@@ -24,6 +25,7 @@ export class StockTurningGenerator {
         this.options = {
             ...newOptions,
             method,
+            feedrate,
             startHeight: newStartHeight,
             finalHeight: newFinalHeight
         };

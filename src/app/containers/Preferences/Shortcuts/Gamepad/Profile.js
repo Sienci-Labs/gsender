@@ -7,13 +7,14 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
 import { GamepadContext } from './utils/context';
-import { setCurrentGamepadProfile, setGamepadProfileList } from './utils/actions';
+import { setCurrentGamepadProfile, setGamepadProfileList, setCurrentModal } from './utils/actions';
 
 import styles from '../index.styl';
 import Fieldset from '../../components/Fieldset';
 import ButtonActionsTable from './components/ButtonActionsTable';
 import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
+import { GAMEPAD_MODAL } from './utils/constants';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -63,7 +64,7 @@ const Profile = ({ data }) => {
 
     return (
         <>
-            <div style={{ display: 'grid', gridTemplateColumns: '10fr 4fr 6fr', gap: '1.5rem', alignItems: 'center', margin: '0 0 0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '8fr 4fr 2fr 6fr', gap: '1.5rem', alignItems: 'center', margin: '0 0 0.5rem' }}>
                 <input
                     type="text"
                     value={name}
@@ -81,7 +82,9 @@ const Profile = ({ data }) => {
                 >
                     {isConnected ? 'Connected' : 'Not Connected'}
                 </span>
-
+                <Button onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))} style={{ margin: 0 }}>
+                    Help
+                </Button>
                 <Button onClick={() => dispatch(setCurrentGamepadProfile(null))} style={{ margin: 0 }}>
                     <i className="fas fa-arrow-left" />
                     <span>Back to Gamepad Profiles</span>
@@ -90,7 +93,11 @@ const Profile = ({ data }) => {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <Fieldset legend="Button Actions" style={{ width: '60%', padding: '0.75rem' }}>
-                    <div style={{ overflowY: 'auto', height: '480px', backgroundColor: 'white' }}>
+                    <p style={{ textAlign: 'center' }}>
+                        Assign a &quot;Lockout&quot; button for gamepad safety, or a &quot;2nd Action&quot;{' '}
+                        button to use like a Function key and give your gamepad double the functions!
+                    </p>
+                    <div style={{ overflowY: 'auto', height: '425px', backgroundColor: 'white' }}>
                         <ButtonActionsTable />
                     </div>
                 </Fieldset>

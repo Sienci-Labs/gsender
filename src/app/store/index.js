@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import merge from 'lodash/merge';
+// import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
 import { isEmpty } from 'lodash';
 import semver from 'semver';
@@ -159,6 +159,28 @@ const normalizeState = (state) => {
     return state;
 };
 
+const merge = (base, saved) => {
+    if ((!(base instanceof Object) || base instanceof Array) && (!(saved instanceof Object) || saved instanceof Array)) {
+        // if they are the same type, use saved
+        if (typeof base === typeof saved) {
+            return saved;
+        }
+        // if they are not, default structure changed, so use base
+        return base;
+    } else if ((!(base instanceof Object) || base instanceof Array) || (!(saved instanceof Object) || saved instanceof Array)) {
+        // if one is an object and the other isn't, then default structure changed, so use base
+        return base;
+    }
+
+    const result = base;
+    // merge
+    Object.entries(result).forEach(([key, value]) => {
+        result[key] = merge(value, saved[key]);
+    });
+
+    return result;
+};
+
 const cnc = {
     version: settings.version,
     state: {}
@@ -174,7 +196,7 @@ try {
     log.error(e);
 }
 
-store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
+store.state = normalizeState(merge(defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on('change', debounce((state) => {
