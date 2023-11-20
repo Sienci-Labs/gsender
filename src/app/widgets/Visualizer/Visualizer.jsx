@@ -1503,6 +1503,7 @@ class Visualizer extends Component {
 
         const { fileType } = this.props;
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+        let duration = 0.24;
 
         const pivotPoint = this.pivotPoint.get();
         const { x: wpox = 0, y: wpoy = 0, z: wpoz = 0 } = position ?? this.workPosition;
@@ -1511,6 +1512,10 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
+        if (x0 === 0 && y0 === 0 && z0 === 0) {
+            duration = 0.15;
+        }
+
         // The force parameter will skip here and update the positioning of all axes
         if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
             const yFixed = 0 - pivotPoint.y;
@@ -1518,7 +1523,7 @@ class Visualizer extends Component {
                 x: x0,
                 z: z0,
                 y: yFixed,
-                duration: 0.15
+                duration: duration
             });
 
             return;
@@ -1528,7 +1533,7 @@ class Visualizer extends Component {
             x: x0,
             y: y0,
             z: z0,
-            duration: 0.15,
+            duration: duration,
             onComplete: () => this.updateScene({ forceUpdate: true })
         });
     }
@@ -1599,7 +1604,7 @@ class Visualizer extends Component {
             x: x0,
             y: y0,
             z: z0,
-            duration: 0.25
+            duration: 0.24
         });
     }
 
