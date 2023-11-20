@@ -647,7 +647,7 @@ class GrblHalController {
             this.write('!');
 
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_HAL_ERRORS, { code: code });
+            const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
 
             log.error(`Error occurred at ${Date.now()}`);
 
