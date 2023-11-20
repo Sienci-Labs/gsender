@@ -406,7 +406,7 @@ class Visualizer extends Component {
             }
 
             if (needUpdatePosition) {
-                this.updateCuttingToolPosition();
+                this.updateCuttingToolPosition(newPos);
                 this.updateLaserPointerPosition();
                 this.updateCuttingPointerPosition();
                 this.updateLimitsPosition();
@@ -1362,10 +1362,6 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
-            /*this.copyComposer.render();
-            this.fxaaComposer.render();
-            this.renderBloom();
-            this.finalComposer.render();*/
         }
     }
 
@@ -1522,7 +1518,7 @@ class Visualizer extends Component {
                 x: x0,
                 z: z0,
                 y: yFixed,
-                duration: 0.24
+                duration: 0.15
             });
 
             return;
@@ -1532,7 +1528,8 @@ class Visualizer extends Component {
             x: x0,
             y: y0,
             z: z0,
-            duration: 0.24
+            duration: 0.15,
+            onComplete: () => this.updateScene({ forceUpdate: true })
         });
     }
 
