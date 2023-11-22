@@ -139,6 +139,12 @@ export function* initialize() {
             yAccel: _get(reduxStore.getState(), 'controller.settings.settings.$121'),
             zAccel: _get(reduxStore.getState(), 'controller.settings.settings.$122'),
         };
+        const maxFeedrates = {
+            xMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$110', 4000.0)),
+            yMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$111', 4000.0)),
+            zMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$112', 3000.0)),
+        };
+        console.log(maxFeedrates);
         // const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
 
         // compare previous file data to see if it's a new file and we need to reparse
@@ -180,7 +186,8 @@ export function* initialize() {
                         visualizer,
                         parsedData,
                         isNewFile,
-                        accelerations
+                        accelerations,
+                        maxFeedrates
                     });
                 });
             } else {
@@ -246,7 +253,8 @@ export function* initialize() {
                 needsVisualization,
                 parsedData,
                 isNewFile,
-                accelerations
+                accelerations,
+                maxFeedrates
             });
         });
     };
