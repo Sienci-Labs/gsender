@@ -424,8 +424,8 @@ class Sender extends events.EventEmitter {
 
         // Make a 1 second delay before estimating the remaining time
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-            const timePerCode = this.state.elapsedTime / this.state.received;
-            this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
+            const timePerCode = this.state.timeRunning / this.state.received;
+            this.state.remainingTime = (timePerCode * this.state.total - this.state.timeRunning);
         }
 
         if (this.state.received >= this.state.total || forceEnd) {

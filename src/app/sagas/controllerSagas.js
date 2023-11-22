@@ -134,6 +134,11 @@ export function* initialize() {
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
+        const accelerations = {
+            xAccel: _get(reduxStore.getState(), 'controller.settings.settings.$120'),
+            yAccel: _get(reduxStore.getState(), 'controller.settings.settings.$121'),
+            zAccel: _get(reduxStore.getState(), 'controller.settings.settings.$122'),
+        };
         // const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
 
         // compare previous file data to see if it's a new file and we need to reparse
@@ -174,7 +179,8 @@ export function* initialize() {
                         content,
                         visualizer,
                         parsedData,
-                        isNewFile
+                        isNewFile,
+                        accelerations
                     });
                 });
             } else {
@@ -239,7 +245,8 @@ export function* initialize() {
                 shouldIncludeSVG,
                 needsVisualization,
                 parsedData,
-                isNewFile
+                isNewFile,
+                accelerations
             });
         });
     };

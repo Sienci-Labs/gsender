@@ -72,6 +72,12 @@ class GCodeVirtualizer extends EventEmitter {
 
     collate = false;
 
+    xAccel = 750;
+
+    yAccel = 750;
+
+    zAccel = 500;
+
     re1 = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
 
     re2 = new RegExp(/\s*;.*/g); // Remove anything after a semi-colon to the end of the line, including preceding spaces
@@ -823,9 +829,14 @@ class GCodeVirtualizer extends EventEmitter {
 
     constructor(options) {
         super();
-        const { addLine = noop, addArcCurve = noop, addCurve = noop, callback = noop, collate = false } = options;
+        const { addLine = noop, addArcCurve = noop, addCurve = noop, callback = noop, collate = false, accelerations } = options;
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
+
+        const { xAccel, yAccel, zAccel } = accelerations;
+        this.xAccel = xAccel;
+        this.yAccel = yAccel;
+        this.zAccel = zAccel;
 
         if (this.collate) {
             this.vmState.feedrates = new Set();
@@ -1174,8 +1185,10 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     calculateMachiningTime(endPos) {
+        let isZMove = false;
+
         // assumption:  750/s^2 acceleration, TODO: Look at eeprom/configure
-        const ACCELERATION = 750;
+        // const ACCELERATION = 750;
 
         let moveDuration = 0;
         // Convert to metric
@@ -1198,12 +1211,25 @@ class GCodeVirtualizer extends EventEmitter {
             if (endPos.z !== this.position.z) {
                 travel = Math.abs(endPos.z - this.position.z);
             }
+            isZMove = true;
+        }
+
+        // figure out which accel to use
+        let accel;
+        if (isZMove) {
+            accel = this.zAccel;
+        } else if (dx !== 0 && dy === 0) {
+            accel = this.xAccel;
+        } else if (dx === 0 && dy !== 0) {
+            accel = this.yAccel;
+        } else {
+            accel = Math.hypot(this.xAccel, this.yAccel);
         }
 
         if (f === this.lastF) {
             moveDuration = f !== 0 ? (travel / f) : 0;
         } else {
-            const distance = 2 * Math.abs(((this.lastF + f) * (f - this.lastF) * 0.5) / ACCELERATION);
+            const distance = 2 * Math.abs(((this.lastF + f) * (f - this.lastF) * 0.5) / accel);
             if (distance < travel && (this.lastF + f !== 0) && f !== 0) {
                 moveDuration = 2 * distance / (this.lastF + f);
                 moveDuration += (travel - distance) / f;
