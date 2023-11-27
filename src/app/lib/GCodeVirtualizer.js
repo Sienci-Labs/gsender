@@ -1207,11 +1207,6 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     calculateMachiningTime(endPos) {
-        // let isZMove = false;
-
-        // assumption:  750/s^2 acceleration, TODO: Look at eeprom/configure
-        // const ACCELERATION = 750;
-
         let moveDuration = 0;
 
         const dx = endPos.x - this.position.x;
@@ -1219,93 +1214,52 @@ class GCodeVirtualizer extends EventEmitter {
         const dz = endPos.z - this.position.z;
 
         let travelXY = Math.hypot(dx, dy);
-        let travelZ = 0;
-        let travel = 0;
         if (Number.isNaN(travelXY)) {
             console.error('Invalid travel while calculating distance between V1 and V2');
             return;
         }
-
-        // Look for Z movement if no X/Y movement
-        // if (travelXY === 0) {
-        if (endPos.z !== this.position.z) {
-            travelZ = Math.abs(dz);
-        }
-        // isZMove = true;
-        // }
-
-        travel = Math.hypot(travelXY, travelZ);
+        let travel = 0;
+        travel = Math.hypot(travelXY, dz);
 
 
         let feed;
-        if (this.modal.motion === 'G0') {
-            // if d[var] is 0, we aren't moving in that direction, so we don't need to use that feed.
-            // put max integer so it will never be the min
-            if (travelXY !== 0 && travelZ !== 0) {
-                feed = Math.min(dx !== 0 ? this.xMaxFeed : Number.MAX_SAFE_INTEGER, dy !== 0 ? this.yMaxFeed : Number.MAX_SAFE_INTEGER, this.zMaxFeed);
-            } else if (travelZ === 0) {
-                feed = Math.min(dx !== 0 ? this.xMaxFeed : Number.MAX_SAFE_INTEGER, dy !== 0 ? this.yMaxFeed : Number.MAX_SAFE_INTEGER);
-            } else {
-                feed = this.zMaxFeed;
-            }
-        } else {
-            feed = this.feed;
-            let min = this.zMaxFeed; // default is when only z movement
-            // if d[var] is 0, we aren't moving in that direction, so we don't need to use that feed.
-            // put max integer so it will never be the min
-            if (travelXY !== 0 && travelZ !== 0) {
-                min = Math.min(dx !== 0 ? this.xMaxFeed : Number.MAX_SAFE_INTEGER, dy !== 0 ? this.yMaxFeed : Number.MAX_SAFE_INTEGER, this.zMaxFeed); // when 3d
-            } else if (travelZ === 0) {
-                min = Math.min(dx !== 0 ? this.xMaxFeed : Number.MAX_SAFE_INTEGER, dy !== 0 ? this.yMaxFeed : Number.MAX_SAFE_INTEGER); // when only XY
-            }
-            if (feed > min) { // if the feed is above the min, use the min instead
-                feed = min;
-            }
+        const maxFeedArray = [];
+        const accelArray = [];
+        // if d[var] is 0, we aren't moving in that direction, so we don't need to use that feed/accel.
+        if (dx !== 0) {
+            maxFeedArray.push(this.xMaxFeed);
+            accelArray.push(this.xAccel);
+        }
+        if (dy !== 0) {
+            maxFeedArray.push(this.yMaxFeed);
+            accelArray.push(this.yAccel);
+        }
+        if (dz !== 0) {
+            maxFeedArray.push(this.zMaxFeed);
+            accelArray.push(this.zAccel);
+        }
+        // find the lowest max feed/accel
+        const minMaxFeed = Math.min(...maxFeedArray);
+        const minAccel = Math.min(...accelArray);
+        // if motion is G0, use the max feed
+        feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
+        // if the feed is above the lowest max, use the lowest max instead
+        if (feed > minMaxFeed) {
+            feed = minMaxFeed;
         }
 
         // Convert to metric
         feed = this.modal.units === 'G20' ? feed * 25.4 : feed;
 
-        // Convert to metric
-        // const feed = this.modal.units === 'G20' ? this.feed * 25.4 : this.feed;
-
         // mm/s to mm/m
         const f = feed / 60;
 
-        // figure out which accel to use
-        // let accel;
-        // if (isZMove) {
-        //     accel = this.zAccel;
-        // } else if (dx !== 0 && dy === 0) {
-        //     accel = this.xAccel;
-        // } else if (dx === 0 && dy !== 0) {
-        //     accel = this.yAccel;
-        // } else {
-        //     accel = Math.hypot(this.xAccel, this.yAccel);
-        // }
-
         if (f === this.lastF) {
             moveDuration = f !== 0 ? (travel / f) : 0;
-            // console.log('same f');
-            // console.log(f !== 0 ? (travel / f) : 0);
         } else {
-            // if (this.modal.motion === 'G0' || this.modal.motion === 'G1') {
-            if (travelXY > 0) {
-                moveDuration = this.getAcceleratedMove(travelXY, f, /*this.lastF,*/ Math.hypot(this.xAccel, this.yAccel));
-            }
-            // if (travelZ > 0) {
-            moveDuration += this.getAcceleratedMove(travelZ, f, /*this.lastF,*/ this.zAccel);
+            moveDuration = this.getAcceleratedMove(travel, f, /*this.lastF,*/ minAccel);
         }
 
-
-        // const distance = 2 * Math.abs(((this.lastF + f) * (f - this.lastF) * 0.5) / accel);
-        // if (distance < travel && (this.lastF + f !== 0) && f !== 0) {
-        //     moveDuration = 2 * distance / (this.lastF + f);
-        //     moveDuration += (travel - distance) / f;
-        // } else {
-        //     moveDuration = 2 * (travel / (this.lastF + f));
-        // }
-        // }
 
         this.lastF = f;
         this.totalTime += moveDuration;
