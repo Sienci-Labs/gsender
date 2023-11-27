@@ -504,6 +504,13 @@ class GCodeVirtualizer extends EventEmitter {
         // Example
         //   G4 P200
         'G4': (params) => {
+            console.log(params);
+            if (params.P) {
+                this.totalTime += params.P / 1000;
+            }
+            if (params.S) {
+                this.totalTime += params.S;
+            }
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
         'G10': (params) => {
@@ -1284,10 +1291,10 @@ class GCodeVirtualizer extends EventEmitter {
         } else {
             // if (this.modal.motion === 'G0' || this.modal.motion === 'G1') {
             if (travelXY > 0) {
-                moveDuration = this.getAcceleratedMove(travelXY, f, Math.hypot(this.xAccel, this.yAccel));
+                moveDuration = this.getAcceleratedMove(travelXY, f, /*this.lastF,*/ Math.hypot(this.xAccel, this.yAccel));
             }
             // if (travelZ > 0) {
-            moveDuration += this.getAcceleratedMove(travelZ, f, this.zAccel);
+            moveDuration += this.getAcceleratedMove(travelZ, f, /*this.lastF,*/ this.zAccel);
         }
 
 
@@ -1304,22 +1311,25 @@ class GCodeVirtualizer extends EventEmitter {
         this.totalTime += moveDuration;
     }
 
-    getAcceleratedMove(length, velocity, acceleration) {
+    // TODO: if we find something we need to account for that will make the times longer,
+    // we can include the initial accelerations in these calculations to make it more accurate and shorter
+    getAcceleratedMove(length, velocity, /*lastVelocity,*/ acceleration) {
         // taken from https://github.com/slic3r/Slic3r
         // for half of the move, there are 2 zones, where the speed is increasing/decreasing and
         // where the speed is constant.
         // Since the slowdown is assumed to be uniform, calculate the average velocity for half of the
         // expected displacement.
+        // const lastF = lastVelocity * 0.1;
         const accel = (acceleration === 0 ? 750 : acceleration); // Set a default accel to use for print time in case it's 0 somehow.
         let halfLen = length / 2;
         const initTime = velocity / accel; // time to final velocity
-        const initDxTime = (0.5 * velocity * initTime); // Initial displacement for the time to get to final velocity
+        const initDxTime = (0.5 * (velocity /*+ lastF*/) * initTime); // Initial displacement for the time to get to final velocity
         let time = 0;
         if (halfLen >= initDxTime) {
-            halfLen -= (0.5 * velocity * initTime);
+            halfLen -= (0.5 * (velocity /*+ lastF*/) * initTime);
             time += initTime;
         }
-        time += (halfLen / velocity); // constant speed for rest of the time and too short displacements
+        time += (halfLen / (velocity /*+ lastF*/)); // constant speed for rest of the time and too short displacements
 
         return 2 * time; // cut in half before, so double to get full time spent.
     }
