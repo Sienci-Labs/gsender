@@ -24,6 +24,7 @@
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
+import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
 import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
@@ -32,7 +33,7 @@ import reduxStore from 'app/store/redux';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import pkg from '../../package.json';
 import { LASER_MODE } from '../constants';
-import { getAllErrors } from '../containers/Preferences/Safety/helper';
+import api from 'app/api';
 
 const styles = StyleSheet.create({
     body: {
@@ -243,9 +244,13 @@ function generateSupportFile() {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
-    let logs = [];
-    logs = getAllErrors().then((data) => {
-        logs = data;
+    let alarms, errors = [];
+
+    api.alarmList.fetch().then(data => {
+        const grblAlarmsAndErrors = get(data, 'body.list', []);
+        [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
+        console.log(alarms);
+        console.log(errors);
     });
 
     let eepromData = [];
@@ -557,24 +562,19 @@ function generateSupportFile() {
                 </Text>
                 <View style={styles.container}>
                     {
-                        logs.length > 0 ? (
-                            logs.map((log, i) => {
-                                if (log.toLowerCase().includes('alarm') && log.includes('[error] GRBL_ALARM:')) {
-                                    const split = log.split('[error] GRBL_ALARM:');
-                                    const time = split[0].slice(1, 20).replace(' ', ' at ');
-                                    const msg = split[1];
-                                    return (
-                                        <View style={styles.lineWrapper} key={uniqueId()}>
-                                            <Text style={styles.text}>
-                                                {time + '\n'}
-                                                <Text style={[styles.error, { color: 'red' }]}>
-                                                    {'    ' + msg + '\n'}
-                                                </Text>
+                        alarms.length > 0 ? (
+                            alarms.map((log, i) => {
+                                return (
+                                    <View style={styles.lineWrapper} key={uniqueId()}>
+                                        <Text style={styles.text}>
+                                            {new Date(log.time).toLocaleString() + '\n'}
+                                            <Text style={[styles.error, { color: 'red' }]}>
+                                                {'    ' + log.MESSAGE + '\n'}
                                             </Text>
-                                        </View>
-                                    );
-                                }
-                                return null;
+                                            <Text>{'    Input:' + log.line + '\n'}</Text>
+                                        </Text>
+                                    </View>
+                                );
                             })
                         ) : (
                             <Text style={styles.text}>
@@ -588,28 +588,19 @@ function generateSupportFile() {
                 </Text>
                 <View style={styles.container}>
                     {
-                        logs.length > 0 ? (
-                            logs.map((log, i) => {
-                                if (log.toLowerCase().includes('error') && log.includes('[error] GRBL_ERROR:')) {
-                                    const split = log.split('[error] GRBL_ERROR:');
-                                    const content = split[1].split('Line');
-
-                                    const time = split[0].slice(1, 20).replace(' ', ' at ');
-                                    const msg = content[0];
-                                    const line = content[1].split('Origin')[0];
-                                    return (
-                                        <View style={styles.lineWrapper} key={uniqueId()}>
-                                            <Text style={styles.text}>
-                                                {time + '\n'}
-                                                <Text style={[styles.error, { color: 'red' }]}>
-                                                    {'    ' + msg + '\n'}
-                                                </Text>
-                                                {'    On Line ' + line + '\n'}
+                        errors.length > 0 ? (
+                            errors.map((log, i) => {
+                                return (
+                                    <View style={styles.lineWrapper} key={uniqueId()}>
+                                        <Text style={styles.text}>
+                                            {new Date(log.time).toLocaleString() + '\n'}
+                                            <Text style={[styles.error, { color: 'red' }]}>
+                                                {'    ' + log.MESSAGE + '\n'}
                                             </Text>
-                                        </View>
-                                    );
-                                }
-                                return null;
+                                            {'    Input: ' + log.line + '\n'}
+                                        </Text>
+                                    </View>
+                                );
                             })
                         ) : (
                             <Text style={styles.text}>
