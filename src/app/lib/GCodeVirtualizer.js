@@ -188,6 +188,8 @@ class GCodeVirtualizer extends EventEmitter {
         }
     ];
 
+    estimates = [];
+
     modalChanges = [
         {
             change: null,
@@ -1263,6 +1265,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.lastF = f;
         this.totalTime += moveDuration;
+        this.estimates.push(moveDuration);
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
@@ -1290,7 +1293,10 @@ class GCodeVirtualizer extends EventEmitter {
 
     getData() {
         this.data.pop(); // get rid of the last entry, as it is a temp one with null values
-        return this.data;
+        return {
+            data: this.data,
+            estimates: this.estimates,
+        };
     }
 
     getModalChanges() {

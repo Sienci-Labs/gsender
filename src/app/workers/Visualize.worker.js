@@ -463,7 +463,8 @@ onmessage = function({ data }) {
         const modalChanges = vm.getModalChanges();
         fileInfo = vm.generateFileStats();
         parsedDataToSend = {
-            data,
+            data: data.data,
+            estimates: data.estimates,
             info: fileInfo,
             modalChanges
         };

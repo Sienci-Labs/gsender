@@ -62,7 +62,7 @@ import {
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
-import { getParsedData } from '../lib/indexedDB';
+import { getEstimateData, getParsedData } from '../lib/indexedDB';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -70,6 +70,7 @@ export function* initialize() {
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
     let errors = [];
+    let finishLoad = false;
 
     /* Health check - every 3 minutes */
     setInterval(() => {
@@ -490,6 +491,7 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:load', (name, content) => {
+        finishLoad = false;
         const size = new Blob([content]).size;
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_CONTENT,
@@ -523,6 +525,18 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('requestEstimateData', () => {
+        console.log('heard request');
+        if (finishLoad) {
+            finishLoad = false;
+            console.log('sagas, getting estimate data');
+            getEstimateData().then((value) => {
+                console.log('sending estimate data');
+                controller.command('updateEstimateData', value);
+            });
+        }
+    });
+
     // Need this to handle unload when machine not connected since controller event isn't sent
     pubsub.subscribe('gcode:unload', () => {
         reduxStore.dispatch({
@@ -533,6 +547,16 @@ export function* initialize() {
 
     pubsub.subscribe('file:load', (msg, data) => {
         visualizeWorker.terminate();
+    });
+
+    pubsub.subscribe('parsedData:stored', () => {
+        console.log('in parsedData:stored');
+        finishLoad = true;
+        console.log('receiving data');
+        getEstimateData().then((value) => {
+            console.log('sending estimate data');
+            controller.command('updateEstimateData', value);
+        });
     });
 
     // for when you don't want to send file to backend

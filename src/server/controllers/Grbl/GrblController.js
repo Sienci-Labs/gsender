@@ -562,6 +562,10 @@ class GrblController {
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
         });
+        this.sender.on('requestData', () => {
+            log.error('requesting data');
+            this.emit('requestEstimateData');
+        });
 
         // Workflow
         this.workflow = new Workflow();
@@ -1367,6 +1371,7 @@ class GrblController {
             // sender status
             socket.emit('sender:status', this.sender.toJSON());
             log.info('Emitting Sender');
+            // this.emit('updateEstimateData');
         }
         if (this.workflow) {
             // workflow state
@@ -2049,6 +2054,14 @@ class GrblController {
                 this.feederCB = () => {
                     this.emit('wizard:next', stepIndex, substepIndex);
                 };
+            },
+            'updateEstimateData': () => {
+                log.error('in update estimate data');
+                const [estimateData] = args;
+                log.error(estimateData.estimates);
+                log.error('estimated time controller: ' + estimateData.estimatedTime);
+                this.sender.setEstimateData(estimateData.estimates);
+                this.sender.setEstimatedTime(estimateData.estimatedTime);
             }
         }[cmd];
 
