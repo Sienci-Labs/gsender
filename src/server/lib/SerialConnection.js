@@ -166,10 +166,11 @@ class SerialConnection extends EventEmitter {
             console.log('telnet');
             this.port = new net.Socket();
 
-            this.port.on('connect', () => {
+            this.port.once('connect', () => {
                 callback();
             });
             this.port.on('error', (err) => {
+                this.port.setTimeout(0);
                 callback(err);
             });
 
@@ -182,6 +183,7 @@ class SerialConnection extends EventEmitter {
                 ...rest,
                 autoOpen: false
             });
+            this.port.setTimeout(0);
             this.addPortListeners();
             this.port.open(callback);
         }
