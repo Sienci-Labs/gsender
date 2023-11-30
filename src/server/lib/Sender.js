@@ -336,7 +336,6 @@ class Sender extends events.EventEmitter {
         this.state.estimateData = [];
 
         this.emit('load', name, gcode, context);
-        // this.emit('requestData');
         log.debug('sender requesting');
         this.emit('requestData');
         this.emit('change');
@@ -440,7 +439,6 @@ class Sender extends events.EventEmitter {
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
             if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
                 if (this.state.received < this.state.estimateData.length) {
-                    log.error(Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
                     this.state.remainingTime -= (Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
                 }
             }
@@ -499,7 +497,6 @@ class Sender extends events.EventEmitter {
     setEstimatedTime(estimatedTime) {
         this.state.remainingTime = Number(estimatedTime);
         this.state.estimatedTime = Number(estimatedTime);
-        log.error('estimated time: ' + estimatedTime);
     }
 
     setOvF(ovF) {

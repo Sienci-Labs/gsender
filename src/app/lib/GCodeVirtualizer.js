@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import { parseLine } from 'gcode-parser';
 import { FILE_TYPE } from '../constants';
-// import { distXY } from './distance';
 
 const translatePosition = (position, newPosition, relative) => {
     relative = !!relative;
