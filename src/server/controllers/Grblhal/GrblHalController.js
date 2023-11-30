@@ -2011,6 +2011,14 @@ class GrblHalController {
             'virtual_stop_toggle': () => {
                 this.write(GRBLHAL_REALTIME_COMMANDS.VIRTUAL_STOP_TOGGLE);
             },
+            'updateEstimateData': () => {
+                log.error('in update estimate data');
+                const [estimateData] = args;
+                log.error(estimateData.estimates);
+                log.error('estimated time controller: ' + estimateData.estimatedTime);
+                this.sender.setEstimateData(estimateData.estimates);
+                this.sender.setEstimatedTime(estimateData.estimatedTime);
+            }
         }[cmd];
 
         if (!handler) {
