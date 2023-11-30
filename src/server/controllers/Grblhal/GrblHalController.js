@@ -541,7 +541,6 @@ class GrblHalController {
             this.sender.unhold();
 
             // subtract time paused
-            this.setSenderTimeout();
             this.sender.next({ timePaused: pauseTime });
         });
 
@@ -599,10 +598,6 @@ class GrblHalController {
                 }
                 this.actionMask.queryParserState.reply = false;
 
-                if (this.forceOK) {
-                    this.forceOK = false;
-                    this.runner.forceOK();
-                }
                 return;
             }
 
@@ -613,7 +608,6 @@ class GrblHalController {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                     this.sender.unhold();
                 }
-                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -627,7 +621,6 @@ class GrblHalController {
                 if (received + 1 >= sent) {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
-                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -702,7 +695,7 @@ class GrblHalController {
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
-                this.setSenderTimeout();
+                this.sender.ack();
 
                 return;
             }
@@ -1495,7 +1488,6 @@ class GrblHalController {
                         this.feeder.reset();
                         this.workflow.start();
                         // Sender
-                        this.setSenderTimeout();
                         this.sender.next();
                         this.feederCB = null;
                     };
@@ -1508,7 +1500,6 @@ class GrblHalController {
 
                     // Sender
                     this.sender.setStartLine(0);
-                    this.setSenderTimeout();
                     this.sender.next({ startFromLine: true });
                 }
             },
@@ -1784,7 +1775,6 @@ class GrblHalController {
                 this.feederCB = () => {
                     this.workflow.start();
                     this.feeder.reset();
-                    this.setSenderTimeout();
                     this.sender.next();
                     this.feederCB = null;
                 };

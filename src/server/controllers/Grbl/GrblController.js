@@ -714,7 +714,6 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
-            console.log(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
