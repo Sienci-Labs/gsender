@@ -183,7 +183,6 @@ class SerialConnection extends EventEmitter {
                 ...rest,
                 autoOpen: false
             });
-            this.port.setTimeout(0);
             this.addPortListeners();
             this.port.open(callback);
         }

@@ -703,6 +703,9 @@ class GrblHalController {
             if (error) {
                 this.emit('serialport:read', `error:${code} (${error.message})`);
             }
+
+            this.feeder.ack();
+            this.feeder.next();
         });
 
         this.runner.on('alarm', (res) => {
