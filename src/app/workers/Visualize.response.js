@@ -35,9 +35,7 @@ export const visualizeResponse = ({ data }) => {
 
         // if there's new parsed data, send to redux
         if (parsedData) {
-            console.log('new parsed data');
             replaceParsedData(parsedData).then(() => {
-                console.log('parsed data stored');
                 pubsub.publish('parsedData:stored');
             });
 
@@ -48,7 +46,6 @@ export const visualizeResponse = ({ data }) => {
             //     }
             // });
         } else {
-            console.log('data alrdy stored');
             pubsub.publish('parsedData:stored');
         }
 

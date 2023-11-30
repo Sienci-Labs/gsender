@@ -38,7 +38,6 @@ import { convertSecondsToTimeStamp } from '../../../lib/datetime';
 const ProgressArea = ({ state }) => {
     const { senderStatus } = state;
     const { total, received, elapsedTime, remainingTime, startTime } = senderStatus;
-    console.log(remainingTime);
 
     /**
      * Format given time value to display minutes and seconds

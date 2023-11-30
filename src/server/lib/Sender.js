@@ -166,6 +166,7 @@ class Sender extends events.EventEmitter {
         toolChanges: 0,
         estimatedTime: 0,
         estimateData: [],
+        ovF: 100,
     };
 
     stateChanged = false;
@@ -277,6 +278,7 @@ class Sender extends events.EventEmitter {
             bufferSize: this.state.bufferSize,
             dataLength: this.state.dataLength,
             estimatedTime: this.state.estimatedTime,
+            ovF: this.state.ovF,
         };
     }
 
@@ -436,14 +438,11 @@ class Sender extends events.EventEmitter {
 
         // Make a 1 second delay before estimating the remaining time
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-            // const timePerCode = this.state.timeRunning / this.state.received;
-            if (this.state.estimatedTime > 0) {
+            if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
                 if (this.state.received < this.state.estimateData.length) {
-                    this.state.remainingTime -= Number(this.state.estimateData[this.state.received] || 0);
+                    log.error(Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
+                    this.state.remainingTime -= (Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
                 }
-            } else {
-                // const timePerCode = this.state.timeRunning / this.state.received;
-                // this.state.remainingTime = (timePerCode * this.state.total - this.state.timeRunning);
             }
         }
 
@@ -501,6 +500,14 @@ class Sender extends events.EventEmitter {
         this.state.remainingTime = Number(estimatedTime);
         this.state.estimatedTime = Number(estimatedTime);
         log.error('estimated time: ' + estimatedTime);
+    }
+
+    setOvF(ovF) {
+        if (this.state.ovF !== 100) {
+            this.state.remainingTime *= this.state.ovF / 100; // reset to 100%
+        }
+        this.state.remainingTime /= ovF / 100; // set to new time
+        this.state.ovF = ovF;
     }
 }
 

@@ -563,7 +563,6 @@ class GrblController {
             this.actionTime.senderFinishTime = finishTime;
         });
         this.sender.on('requestData', () => {
-            log.error('requesting data');
             this.emit('requestEstimateData');
         });
 
@@ -1371,7 +1370,6 @@ class GrblController {
             // sender status
             socket.emit('sender:status', this.sender.toJSON());
             log.info('Emitting Sender');
-            // this.emit('updateEstimateData');
         }
         if (this.workflow) {
             // workflow state
@@ -1732,6 +1730,8 @@ class GrblController {
                         }, 50 * (index + 1));
                     });
                 }
+
+                this.sender.setOvF(value);
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -2056,10 +2056,7 @@ class GrblController {
                 };
             },
             'updateEstimateData': () => {
-                log.error('in update estimate data');
                 const [estimateData] = args;
-                log.error(estimateData.estimates);
-                log.error('estimated time controller: ' + estimateData.estimatedTime);
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
             }

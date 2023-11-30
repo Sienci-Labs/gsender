@@ -502,6 +502,9 @@ class GrblHalController {
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
         });
+        this.sender.on('requestData', () => {
+            this.emit('requestEstimateData');
+        });
 
         // Workflow
         this.workflow = new Workflow();
@@ -1681,6 +1684,8 @@ class GrblHalController {
                         }, 50 * (index + 1));
                     });
                 }
+
+                this.sender.setOvF(value);
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -2012,10 +2017,7 @@ class GrblHalController {
                 this.write(GRBLHAL_REALTIME_COMMANDS.VIRTUAL_STOP_TOGGLE);
             },
             'updateEstimateData': () => {
-                log.error('in update estimate data');
                 const [estimateData] = args;
-                log.error(estimateData.estimates);
-                log.error('estimated time controller: ' + estimateData.estimatedTime);
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
             }

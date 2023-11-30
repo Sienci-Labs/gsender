@@ -506,7 +506,6 @@ class GCodeVirtualizer extends EventEmitter {
         // Example
         //   G4 P200
         'G4': (params) => {
-            console.log(params);
             if (params.P) {
                 this.totalTime += params.P / 1000;
             }
@@ -854,9 +853,7 @@ class GCodeVirtualizer extends EventEmitter {
         this.yAccel = yAccel;
         this.zAccel = zAccel;
 
-        console.log(maxFeedrates);
         const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
-        console.log(xMaxFeed);
         this.xMaxFeed = xMaxFeed;
         this.yMaxFeed = yMaxFeed;
         this.zMaxFeed = zMaxFeed;

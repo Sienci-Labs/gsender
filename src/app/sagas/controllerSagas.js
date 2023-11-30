@@ -145,8 +145,6 @@ export function* initialize() {
             yMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$111', 4000.0)),
             zMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$112', 3000.0)),
         };
-        console.log(maxFeedrates);
-        // const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -526,12 +524,9 @@ export function* initialize() {
     });
 
     controller.addListener('requestEstimateData', () => {
-        console.log('heard request');
         if (finishLoad) {
             finishLoad = false;
-            console.log('sagas, getting estimate data');
             getEstimateData().then((value) => {
-                console.log('sending estimate data');
                 controller.command('updateEstimateData', value);
             });
         }
@@ -550,11 +545,8 @@ export function* initialize() {
     });
 
     pubsub.subscribe('parsedData:stored', () => {
-        console.log('in parsedData:stored');
         finishLoad = true;
-        console.log('receiving data');
         getEstimateData().then((value) => {
-            console.log('sending estimate data');
             controller.command('updateEstimateData', value);
         });
     });
