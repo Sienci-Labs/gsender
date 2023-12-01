@@ -481,7 +481,7 @@ for:
             mkdir -Force -Path releases\windows
             yarn build:windows
             Get-ChildItem output
-            Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
+            Copy-Item "output\${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases\windows\gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
             Get-ChildItem releases\windows
             if ($env:CI_BRANCH -eq "master" -And -not $env:CI_TAG) {
               yarn github-release delete `

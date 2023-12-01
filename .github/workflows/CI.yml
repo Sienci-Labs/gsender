@@ -104,6 +104,8 @@ jobs:
         with:
           files: |
             releases/linux/*
+          prerelease: true
+          draft: true
   build-macos:
     name: Build macOS packages
     runs-on: macos-latest
@@ -188,6 +190,8 @@ jobs:
         with:
           files: |
             releases/macos/*
+          prerelease: true
+          draft: true
   build-windows:
     name: Build Windows packages
     runs-on: windows-latest
@@ -243,7 +247,7 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/windows
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
           ls -al output releases/windows
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             yarn github-release delete \
@@ -266,3 +270,5 @@ jobs:
         with:
           files: |
             releases/windows/*
+          prerelease: true
+          draft: true
