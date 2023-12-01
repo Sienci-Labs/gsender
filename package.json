@@ -85,6 +85,7 @@
     "asarUnpack": [],
     "productName": "gSender Edge",
     "generateUpdatesFilesForAllChannels": true,
+    "npmRebuild": false,
     "extraResources": [
       "./node_modules/@electron/remote/**"
     ],
