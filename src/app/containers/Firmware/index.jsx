@@ -32,7 +32,8 @@ const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroup
             setting: setting,
             value: eeprom[setting],
             ...halData,
-            group: halGroup
+            group: halGroup,
+            groupID: halData.group
         };
     });
 };
@@ -159,7 +160,7 @@ export default connect((store) => {
     const halGroups = get(store, 'controller.settings.groups', {});
 
     return {
-        halDescriptions,
-        halGroups
+        halDescriptions: { ...halDescriptions },
+        halGroups: { ...halGroups }
     };
 })(Firmware);
