@@ -72,6 +72,18 @@ class GCodeVirtualizer extends EventEmitter {
 
     collate = false;
 
+    xAccel = 750;
+
+    yAccel = 750;
+
+    zAccel = 500;
+
+    xMaxFeed = 0;
+
+    yMaxFeed = 0;
+
+    zMaxFeed = 0;
+
     re1 = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
 
     re2 = new RegExp(/\s*;.*/g); // Remove anything after a semi-colon to the end of the line, including preceding spaces
@@ -174,6 +186,8 @@ class GCodeVirtualizer extends EventEmitter {
             lineData: null, // modal changes, v1, v2, v0
         }
     ];
+
+    estimates = [];
 
     modalChanges = [
         {
@@ -491,6 +505,12 @@ class GCodeVirtualizer extends EventEmitter {
         // Example
         //   G4 P200
         'G4': (params) => {
+            if (params.P) {
+                this.totalTime += params.P / 1000;
+            }
+            if (params.S) {
+                this.totalTime += params.S;
+            }
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
         'G10': (params) => {
@@ -823,9 +843,20 @@ class GCodeVirtualizer extends EventEmitter {
 
     constructor(options) {
         super();
-        const { addLine = noop, addArcCurve = noop, addCurve = noop, callback = noop, collate = false } = options;
+        const { addLine = noop, addArcCurve = noop, addCurve = noop, callback = noop, collate = false, accelerations, maxFeedrates } = options;
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
+
+        const { xAccel, yAccel, zAccel } = accelerations;
+        this.xAccel = xAccel;
+        this.yAccel = yAccel;
+        this.zAccel = zAccel;
+
+        const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
+        this.xMaxFeed = xMaxFeed;
+        this.yMaxFeed = yMaxFeed;
+        this.zMaxFeed = zMaxFeed;
+
 
         if (this.collate) {
             this.vmState.feedrates = new Set();
@@ -1174,51 +1205,94 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     calculateMachiningTime(endPos) {
-        // assumption:  750/s^2 acceleration, TODO: Look at eeprom/configure
-        const ACCELERATION = 750;
-
         let moveDuration = 0;
+
+        const dx = endPos.x - this.position.x;
+        const dy = endPos.y - this.position.y;
+        const dz = endPos.z - this.position.z;
+
+        let travelXY = Math.hypot(dx, dy);
+        if (Number.isNaN(travelXY)) {
+            console.error('Invalid travel while calculating distance between V1 and V2');
+            return;
+        }
+        let travel = 0;
+        travel = Math.hypot(travelXY, dz);
+
+
+        let feed;
+        const maxFeedArray = [];
+        const accelArray = [];
+        // if d[var] is 0, we aren't moving in that direction, so we don't need to use that feed/accel.
+        if (dx !== 0) {
+            maxFeedArray.push(this.xMaxFeed);
+            accelArray.push(this.xAccel);
+        }
+        if (dy !== 0) {
+            maxFeedArray.push(this.yMaxFeed);
+            accelArray.push(this.yAccel);
+        }
+        if (dz !== 0) {
+            maxFeedArray.push(this.zMaxFeed);
+            accelArray.push(this.zAccel);
+        }
+        // find the lowest max feed/accel
+        const minMaxFeed = Math.min(...maxFeedArray);
+        const minAccel = Math.min(...accelArray);
+        // if motion is G0, use the max feed
+        feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
+        // if the feed is above the lowest max, use the lowest max instead
+        if (feed > minMaxFeed) {
+            feed = minMaxFeed;
+        }
+
         // Convert to metric
-        const feed = this.modal.units === 'G20' ? this.feed * 25.4 : this.feed;
+        feed = this.modal.units === 'G20' ? feed * 25.4 : feed;
 
         // mm/s to mm/m
         const f = feed / 60;
 
-        const dx = endPos.x - this.position.x;
-        const dy = endPos.y - this.position.y;
-
-        let travel = Math.hypot(dx, dy);
-        if (Number.isNaN(travel)) {
-            console.error('Invalid travel while calculating distance between V1 and V2');
-            return;
-        }
-
-        // Look for Z movement if no X/Y movement
-        if (travel === 0) {
-            if (endPos.z !== this.position.z) {
-                travel = Math.abs(endPos.z - this.position.z);
-            }
-        }
-
         if (f === this.lastF) {
             moveDuration = f !== 0 ? (travel / f) : 0;
         } else {
-            const distance = 2 * Math.abs(((this.lastF + f) * (f - this.lastF) * 0.5) / ACCELERATION);
-            if (distance < travel && (this.lastF + f !== 0) && f !== 0) {
-                moveDuration = 2 * distance / (this.lastF + f);
-                moveDuration += (travel - distance) / f;
-            } else {
-                moveDuration = 2 * (travel / (this.lastF + f));
-            }
+            moveDuration = this.getAcceleratedMove(travel, f, /*this.lastF,*/ minAccel);
         }
+
 
         this.lastF = f;
         this.totalTime += moveDuration;
+        this.estimates.push(moveDuration);
+    }
+
+    // TODO: if we find something we need to account for that will make the times longer,
+    // we can include the initial accelerations in these calculations to make it more accurate and shorter
+    getAcceleratedMove(length, velocity, /*lastVelocity,*/ acceleration) {
+        // taken from https://github.com/slic3r/Slic3r
+        // for half of the move, there are 2 zones, where the speed is increasing/decreasing and
+        // where the speed is constant.
+        // Since the slowdown is assumed to be uniform, calculate the average velocity for half of the
+        // expected displacement.
+        // const lastF = lastVelocity * 0.1;
+        const accel = (acceleration === 0 ? 750 : acceleration); // Set a default accel to use for print time in case it's 0 somehow.
+        let halfLen = length / 2;
+        const initTime = velocity / accel; // time to final velocity
+        const initDxTime = (0.5 * (velocity /*+ lastF*/) * initTime); // Initial displacement for the time to get to final velocity
+        let time = 0;
+        if (halfLen >= initDxTime) {
+            halfLen -= (0.5 * (velocity /*+ lastF*/) * initTime);
+            time += initTime;
+        }
+        time += (halfLen / (velocity /*+ lastF*/)); // constant speed for rest of the time and too short displacements
+
+        return 2 * time; // cut in half before, so double to get full time spent.
     }
 
     getData() {
         this.data.pop(); // get rid of the last entry, as it is a temp one with null values
-        return this.data;
+        return {
+            data: this.data,
+            estimates: this.estimates,
+        };
     }
 
     getModalChanges() {

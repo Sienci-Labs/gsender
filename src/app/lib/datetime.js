@@ -35,6 +35,10 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
     return null;
 };
 
+export const convertSecondsToTimeStamp = (seconds) => {
+    return convertMillisecondsToTimeStamp(seconds * 1000);
+};
+
 export const convertISOStringToDateAndTime = (ISOString) => {
     const dateTime = new Date(ISOString);
     const date = `${String(dateTime.getFullYear())}-${String(dateTime.getMonth()).padStart(2, 0)}-${String(dateTime.getDate()).padStart(2, 0)}`;

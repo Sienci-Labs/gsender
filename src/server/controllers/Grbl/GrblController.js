@@ -562,6 +562,9 @@ class GrblController {
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
         });
+        this.sender.on('requestData', () => {
+            this.emit('requestEstimateData');
+        });
 
         // Workflow
         this.workflow = new Workflow();
@@ -597,7 +600,6 @@ class GrblController {
             this.sender.unhold();
 
             // subtract time paused
-            this.setSenderTimeout();
             this.sender.next({ timePaused: pauseTime });
         });
 
@@ -681,7 +683,6 @@ class GrblController {
 
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
-                this.setSenderTimeout();
                 this.emit('serialport:read', res.raw);
                 if (hold && (received + 1 >= sent)) {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
@@ -693,7 +694,6 @@ class GrblController {
             }
 
             if ((this.workflow.state === WORKFLOW_STATE_PAUSED) && (received < sent)) {
-                this.setSenderTimeout();
                 this.emit('serialport:read', res.raw);
                 if (!hold) {
                     log.error('The sender does not hold off during the paused state');
@@ -714,7 +714,6 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
-            console.log(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
@@ -773,7 +772,6 @@ class GrblController {
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
-                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
 
@@ -1566,7 +1564,6 @@ class GrblController {
                         this.feeder.reset();
                         this.workflow.start();
                         // Sender
-                        this.setSenderTimeout();
                         this.sender.next();
                         this.feederCB = null;
                     };
@@ -1579,7 +1576,6 @@ class GrblController {
 
                     // Sender
                     this.sender.setStartLine(0);
-                    this.setSenderTimeout();
                     this.sender.next({ startFromLine: true });
                 }
             },
@@ -1727,6 +1723,8 @@ class GrblController {
                         }, 50 * (index + 1));
                     });
                 }
+
+                this.sender.setOvF(value);
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -1830,7 +1828,6 @@ class GrblController {
                 this.feederCB = () => {
                     this.workflow.start();
                     this.feeder.reset();
-                    this.setSenderTimeout();
                     this.sender.next();
                     this.feederCB = null;
                 };
@@ -2049,6 +2046,11 @@ class GrblController {
                 this.feederCB = () => {
                     this.emit('wizard:next', stepIndex, substepIndex);
                 };
+            },
+            'updateEstimateData': () => {
+                const [estimateData] = args;
+                this.sender.setEstimateData(estimateData.estimates);
+                this.sender.setEstimatedTime(estimateData.estimatedTime);
             }
         }[cmd];
 

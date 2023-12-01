@@ -41,6 +41,7 @@ module.exports = {
             'global.NODE_ENV': JSON.stringify('development'),
             'global.PUBLIC_PATH': JSON.stringify(publicPath),
             'global.BUILD_VERSION': JSON.stringify(buildVersion),
+            'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT),
             'process.env': JSON.stringify(process.env),
         })
     ],

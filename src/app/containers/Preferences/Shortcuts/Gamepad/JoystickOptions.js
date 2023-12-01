@@ -51,7 +51,7 @@ const JoystickOptions = () => {
 
     const profile = getGamepadProfile(currentProfile);
 
-    const { joystickOptions: { stick1, stick2, zeroThreshold = {} } } = profile;
+    const { joystickOptions: { stick1, stick2, zeroThreshold = 15 } } = profile;
 
     const stick1PrimaryActionIsUsingMPG = stick1.mpgMode.primaryAction !== null;
     const stick1SecondaryActionIsUsingMPG = stick1.mpgMode.secondaryAction !== null;
@@ -328,7 +328,7 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Zero Threshold</div>
                 <Input
-                    value={(zeroThreshold).toFixed(1)}
+                    value={zeroThreshold.toFixed(1)}
                     additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
                     onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
                     className={styles['joystick-option-zero-threshold']}

@@ -116,6 +116,8 @@ class Controller {
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
         'connection:new': [],
+
+        'requestEstimateData': [],
     };
 
     context = {

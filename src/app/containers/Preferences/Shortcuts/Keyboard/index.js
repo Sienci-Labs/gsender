@@ -26,14 +26,11 @@ import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import Mousetrap from 'mousetrap';
-import { ALL_CATEGORY } from 'app/constants';
 
-// import { useSelector, useDispatch } from 'react-redux';
-
+import { ALL_CATEGORY, USAGE_TOOL_NAME } from 'app/constants';
 import store from 'app/store';
 import Modal from 'app/components/Modal';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
-// import { updateShortcutsList, holdShortcutsListener, unholdShortcutsListener } from 'app/actions/preferencesActions';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
@@ -43,6 +40,7 @@ import EditArea from './EditArea';
 import { generateList } from '../utils';
 
 import styles from '../index.styl';
+import { collectUserUsageData } from '../../../../lib/heatmap';
 
 /**
  * Keybinding settings page
@@ -85,12 +83,17 @@ const Keyboard = () => {
             }
         });
 
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.SHORTCUTS.KEYBOARD);
+        }, 5000);
+
         // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
         // within the location widget again
         return () => {
             pubsub.unsubscribe(token);
             // pubsub.publish('addshortcutsListener');
             // dispatch(unholdShortcutsListener());
+            clearTimeout(timeout);
         };
     }, []);
 
