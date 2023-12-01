@@ -208,7 +208,7 @@ class Sender extends events.EventEmitter {
                         continue;
                     }
 
-                    const line = sp.line + '\r\n';
+                    const line = sp.line + '\n';
                     sp.line = '';
                     sp.dataLength += line.length;
                     sp.queue.push(line.length);
