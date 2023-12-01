@@ -165,12 +165,18 @@ class SerialConnection extends EventEmitter {
         if (network || path.match(expr)) {
             console.log('telnet');
             this.port = new net.Socket();
+            this.port.setTimeout(5000, () => {
+                this.port.destroy();
+                callback('Connection timeout');
+            });
 
             this.port.once('connect', () => {
+                this.port.setTimeout(0);
                 callback();
             });
             this.port.on('error', (err) => {
                 this.port.setTimeout(0);
+                this.port.destroy();
                 callback(err);
             });
 
