@@ -556,11 +556,11 @@ class WorkflowControl extends PureComponent {
                                 <button
                                     type="button"
                                     className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                                    title={i18n._('Test Run')}
+                                    title={i18n._('Verify Job')}
                                     onClick={this.handleTestFile}
                                     disabled={!canRun}
                                 >
-                                    {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
+                                    {i18n._('Verify Job')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
                             </div>
                         )

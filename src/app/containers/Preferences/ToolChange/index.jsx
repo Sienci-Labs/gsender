@@ -21,12 +21,24 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
 import ToolChange from './ToolChange';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const EventWidget = ({ state, actions, active }) => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.TOOL_CHANGE);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
+
     return (
         <SettingWrapper title="Tool Change" show={active}>
             <GeneralArea>

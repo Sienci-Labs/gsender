@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import store from 'app/store';
 import pubsub from 'pubsub-js';
@@ -31,10 +31,22 @@ import Tools from './Tools';
 
 import GeneralArea from '../components/GeneralArea';
 import SettingWrapper from '../components/SettingWrapper';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 
 const Probe = ({ active, state, actions }) => {
     const [type, setType] = useState(store.get('workspace.probeProfile.touchplateType'));
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.PROBE);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
 
     const { probeSettings, probe, units } = state;
     const probeActions = actions.probe;

@@ -40,7 +40,8 @@ import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import logger from '../../lib/logger';
 import {
     GRBL_HAL_ACTIVE_STATE_IDLE,
-    GRBL_HAL_ACTIVE_STATE_ALARM
+    GRBL_HAL_ACTIVE_STATE_ALARM,
+    GRBL_HAL_ACTIVE_STATE_CHECK
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
@@ -410,6 +411,11 @@ class GrblHalRunner extends events.EventEmitter {
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_HAL_ACTIVE_STATE_ALARM;
+    }
+
+    isCheck() {
+        const activeState = _.get(this.state, 'status.activeState');
+        return activeState === GRBL_HAL_ACTIVE_STATE_CHECK;
     }
 
     isIdle() {

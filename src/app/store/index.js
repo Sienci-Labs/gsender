@@ -160,19 +160,37 @@ const normalizeState = (state) => {
 };
 
 const merge = (base, saved) => {
-    if ((!(base instanceof Object) || base instanceof Array) && (!(saved instanceof Object) || saved instanceof Array)) {
+    const baseIsObject = base instanceof Object;
+    const baseIsArray = Array.isArray(base);
+
+    const savedIsObject = saved instanceof Object;
+    const savedIsArray = Array.isArray(saved);
+
+    if (
+        (!(baseIsObject) || baseIsArray) &&
+        (!(savedIsObject) || savedIsArray)
+    ) {
         // if they are the same type, use saved
         if (typeof base === typeof saved) {
             return saved;
         }
         // if they are not, default structure changed, so use base
         return base;
-    } else if ((!(base instanceof Object) || base instanceof Array) || (!(saved instanceof Object) || saved instanceof Array)) {
+    } else if ((!(baseIsObject) || baseIsArray) || (!(savedIsObject) || savedIsArray)) {
         // if one is an object and the other isn't, then default structure changed, so use base
         return base;
     }
 
+    const baseIsEmpty = Object.keys(base).length === 0;
+    const savedIsEmpty = Object.keys(saved).length === 0;
+
+    // In cases where the base obj is empty and the saved obj is not, we can just return saved
+    if (baseIsEmpty && !savedIsEmpty) {
+        return saved;
+    }
+
     const result = base;
+
     // merge
     Object.entries(result).forEach(([key, value]) => {
         result[key] = merge(value, saved[key]);

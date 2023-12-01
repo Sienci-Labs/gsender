@@ -21,7 +21,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
 
@@ -32,8 +32,20 @@ import ErrorLog from './ErrorLogs/ErrorLog';
 import VisualizerSafety from './VisualizerSafety';
 import Movement from './Movement';
 import WorkspaceSafety from './WorkspaceSafety';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const SafetySettings = ({ active, state, actions }) => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.SAFETY);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
+
     return (
         <SettingWrapper title="Safety" show={active}>
             <ReduxProvider store={reduxStore}>

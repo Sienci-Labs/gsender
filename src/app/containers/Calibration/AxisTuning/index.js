@@ -9,6 +9,8 @@ import Result from './Result';
 
 import styles from './index.styl';
 import { axisSteps } from './data';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const AxisTuning = ({ onClose }) => {
     const steps = [axisSteps.x];
@@ -30,6 +32,16 @@ const AxisTuning = ({ onClose }) => {
             actualDistance,
         };
     };
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.MOVEMENT_TUNING);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
 
     useEffect(() => {
         const isFinished = actions.every((action) => action.checked);

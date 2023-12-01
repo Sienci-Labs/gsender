@@ -27,13 +27,14 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Toaster, TOASTER_DANGER, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-import { PROGRAM_START, PROGRAM_END, PROGRAM_PAUSE, PROGRAM_RESUME } from '../../../constants';
+import { PROGRAM_START, PROGRAM_END, PROGRAM_PAUSE, PROGRAM_RESUME, USAGE_TOOL_NAME } from '../../../constants';
 
 import Fieldset from '../components/Fieldset';
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
 
 import styles from '../index.styl';
+import { collectUserUsageData } from '../../../lib/heatmap';
 
 const Events = ({ active }) => {
     const [programStartEvent, setProgramStartEvent] = useState(null);
@@ -258,7 +259,16 @@ const Events = ({ active }) => {
                 });
             }
         }
+
         fetchEvents();
+
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.PROGRAM_EVENTS);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
     }, []);
 
     return (

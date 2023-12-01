@@ -81,6 +81,7 @@ import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfi
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
+import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -501,6 +502,12 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
+            /*if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+                log.info('Exiting check mode');
+                this.command('gcode', ['$C', '[global.state.testWCS]']);
+                this.workflow.stopTesting();
+                this.emit('gcode_error_checking_file', this.sender.state, 'finished');
+            }*/
         });
         this.sender.on('requestData', () => {
             this.emit('requestEstimateData');
@@ -544,7 +551,6 @@ class GrblHalController {
             this.sender.unhold();
 
             // subtract time paused
-            this.setSenderTimeout();
             this.sender.next({ timePaused: pauseTime });
         });
 
@@ -602,10 +608,6 @@ class GrblHalController {
                 }
                 this.actionMask.queryParserState.reply = false;
 
-                if (this.forceOK) {
-                    this.forceOK = false;
-                    this.runner.forceOK();
-                }
                 return;
             }
 
@@ -616,7 +618,6 @@ class GrblHalController {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                     this.sender.unhold();
                 }
-                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -630,7 +631,6 @@ class GrblHalController {
                 if (received + 1 >= sent) {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
-                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -644,10 +644,14 @@ class GrblHalController {
         });
 
         this.runner.on('error', (res) => {
-            this.sender.hold();
-            this.feeder.hold({ comment: `Error occurred at ${new Date().toISOString()}` });
-            this.workflow.pause();
-            this.write('!');
+            // Only pause on workflow error with hold + sender halt
+            const isRunning = this.workflow.isRunning();
+            if (isRunning) {
+                this.workflow.pause();
+                this.sender.hold();
+                this.connection.writeImmediate('\n');
+                this.write('!');
+            }
 
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
@@ -684,6 +688,7 @@ class GrblHalController {
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
                 controller: GRBLHAL,
+                fileRunning: isRunning
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -705,7 +710,7 @@ class GrblHalController {
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
-                this.setSenderTimeout();
+                this.sender.ack();
 
                 return;
             }
@@ -713,6 +718,10 @@ class GrblHalController {
             if (error) {
                 this.emit('serialport:read', `error:${code} (${error.message})`);
             }
+
+
+            this.feeder.ack();
+            this.feeder.next();
         });
 
         this.runner.on('alarm', (res) => {
@@ -769,9 +778,9 @@ class GrblHalController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === 'Check') {
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
+                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
             }
@@ -1498,7 +1507,6 @@ class GrblHalController {
                         this.feeder.reset();
                         this.workflow.start();
                         // Sender
-                        this.setSenderTimeout();
                         this.sender.next();
                         this.feederCB = null;
                     };
@@ -1511,7 +1519,6 @@ class GrblHalController {
 
                     // Sender
                     this.sender.setStartLine(0);
-                    this.setSenderTimeout();
                     this.sender.next({ startFromLine: true });
                 }
             },
@@ -1787,9 +1794,8 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    this.workflow.start();
                     this.feeder.reset();
-                    this.setSenderTimeout();
+                    this.workflow.start();
                     this.sender.next();
                     this.feederCB = null;
                 };

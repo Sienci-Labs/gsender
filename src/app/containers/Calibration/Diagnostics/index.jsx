@@ -20,15 +20,27 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
 import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
 import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
 import AtAGlance from 'app/containers/Calibration/Diagnostics/components/AtAGlance';
 import styles from './index.styl';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 
 const DiagnosticTool = () => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.DIAGNOSTICS);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
+
     return (
         <div>
             <div className={styles.diagnosticWrapper}>
