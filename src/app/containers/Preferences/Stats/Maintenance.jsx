@@ -33,6 +33,8 @@ import EditArea from './EditArea';
 import AddArea from './AddArea';
 import styles from '../index.styl';
 import maintenanceActions from './lib/maintenanceApiActions';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const determineTime = (task) => {
     const { rangeStart, rangeEnd, currentTime } = task;
@@ -108,6 +110,14 @@ const Maintenance = () => {
 
     useEffect(() => {
         updateData();
+
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.MAINTENANCE);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
     }, []);
 
     const onClear = (id) => {

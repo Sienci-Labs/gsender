@@ -21,7 +21,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import JoggingPresets from './JoggingPresets';
 import SettingWrapper from '../components/SettingWrapper';
 import Connection from './Connection';
@@ -29,8 +29,20 @@ import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Settings from './Settings';
 import DataCollection from './DataCollection';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const General = ({ active, state, actions }) => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.GENERAL);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
+
     return (
         <SettingWrapper title="General" show={active}>
             <GeneralArea>

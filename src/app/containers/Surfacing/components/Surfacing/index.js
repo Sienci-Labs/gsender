@@ -7,7 +7,7 @@ import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
-import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
+import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY, USAGE_TOOL_NAME } from 'app/constants';
 import GcodeViewer from 'app/components/GcodeViewer';
 
 import Visualizer from '../Visualizer';
@@ -15,9 +15,9 @@ import InputArea from '../InputArea';
 import ActionArea from '../ActionArea';
 import styles from '../../index.styl';
 import Generator from '../../utils/Generator';
-// import { convertValuesToImperial } from '../../utils';
 import TabArea from '../TabArea';
 import { SurfacingContext } from './Context';
+import { collectUserUsageData } from '../../../../lib/heatmap';
 
 /**
  * @component Surfacing
@@ -87,7 +87,12 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
             }
         }
 
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SURFACING);
+        }, 5000);
+
         return () => {
+            clearTimeout(timeout);
             reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_PRIMARY });
         };
     }, []);

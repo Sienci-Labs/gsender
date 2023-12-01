@@ -14,6 +14,8 @@ import introImage from './assets/XY_squaring_example.jpg';
 
 import styles from './index.styl';
 import { step1, step2 } from './data';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const Alignment = ({ onClose }) => {
     const initialShapes = {
@@ -116,6 +118,16 @@ const Alignment = ({ onClose }) => {
             }));
         }
     };
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.XY_SQUARING);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
 
     useEffect(() => {
         highlightShapes();

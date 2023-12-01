@@ -21,7 +21,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
 
@@ -31,8 +31,20 @@ import GeneralArea from '../components/GeneralArea';
 
 import VisualizerOptions from './VisualizerOptions';
 import Theme from './Theme';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const VisualizerSettings = ({ active, state, actions }) => {
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.VISUALIZER);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
+
     return (
         <SettingWrapper title="Visualizer" show={active}>
             <ReduxProvider store={reduxStore}>

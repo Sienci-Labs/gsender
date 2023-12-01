@@ -38,6 +38,8 @@ import ConsoleWidget from '../Console';
 import SpindleWidget from '../Spindle';
 
 import { MODAL_NONE, } from './constants';
+import { collectUserUsageData } from '../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../constants';
 
 
 class SecondaryFunctionality extends PureComponent {
@@ -51,6 +53,8 @@ class SecondaryFunctionality extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    collectHeatMapDataTimeout = null;
 
     actions = {
         toggleDisabled: () => {
@@ -138,13 +142,31 @@ class SecondaryFunctionality extends PureComponent {
             disabled,
             minimized,
             title,
-            url
+            url,
+            selectedTab
         } = this.state;
 
         this.config.set('disabled', disabled);
         this.config.set('minimized', minimized);
         this.config.set('title', title);
         this.config.set('url', url);
+
+        if (prevState.selectedTab !== selectedTab) {
+            clearTimeout(this.collectHeatMapDataTimeout);
+
+            const currentTool = [
+                USAGE_TOOL_NAME.PROBING,
+                USAGE_TOOL_NAME.MACROS,
+                USAGE_TOOL_NAME.CONSOLE,
+                USAGE_TOOL_NAME.SPINDLE_LASER,
+                USAGE_TOOL_NAME.COOLANT,
+                USAGE_TOOL_NAME.ROTARY
+            ][selectedTab];
+
+            this.collectHeatMapDataTimeout = setTimeout(() => {
+                collectUserUsageData(currentTool);
+            }, 5000);
+        }
     }
 
     getInitialState() {
@@ -191,7 +213,8 @@ class SecondaryFunctionality extends PureComponent {
                     component: RotaryWidget,
                     show: true,
                 },
-            ]
+            ],
+            isFirstRender: true,
         };
     }
 

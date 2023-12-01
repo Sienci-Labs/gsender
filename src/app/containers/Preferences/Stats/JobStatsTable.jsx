@@ -28,7 +28,8 @@ import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import SortableTable from 'app/components/SortableTable/SortableTable';
 import styles from '../index.styl';
 import jobActions from './lib/jobApiActions';
-import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../constants';
+import { GRBL, JOB_STATUS, JOB_TYPES, USAGE_TOOL_NAME } from '../../../constants';
+import { collectUserUsageData } from '../../../lib/heatmap';
 
 const columnData = [
     {
@@ -97,6 +98,14 @@ const JobStatsTable = () => {
 
     useEffect(() => {
         jobActions.fetch(setData, setJobsFinished, setJobsCancelled);
+
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.JOB_TABLE);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
     }, []);
 
 
