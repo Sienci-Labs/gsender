@@ -903,6 +903,19 @@ metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => 
         });
 });
 
+metrics.sendUsageData = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/sendUsageData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 //
 // Alarms/Errors
 //
