@@ -96,9 +96,49 @@ export const sendData = async (req, res) => {
     }
 
     try {
-        const metricsRes = await axios.post(ENDPOINT, payload);
+        const metricsRes = await axios.post(`${ENDPOINT}/metrics`, payload);
 
         res.status(201).json(metricsRes.data);
+    } catch (error) {
+        log.debug(`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`);
+        res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
+    }
+};
+
+export const sendUsageData = async (req, res) => {
+    const payload = {
+        toolName: req.body?.data,
+        user: {
+            gSenderVersion: pkg.version,
+            os: os.type(),
+            osVersion: os.version(),
+            release: os.release(),
+            arch: os.arch(),
+            userID: getUniqueID(),
+        },
+    };
+
+    const ENDPOINT = global.METRICS_ENDPOINT;
+
+    const NODE_ENV = global.NODE_ENV;
+
+    //Don't need to ping the API
+    if (NODE_ENV === 'development') {
+        res.json({ message: 'Mock 200 status return' });
+        return;
+    }
+
+    const internetConnectivity = await isOnline();
+
+    if (!internetConnectivity) {
+        res.status(ERR_BAD_REQUEST).send({ msg: 'Not Connected to the Internet' });
+        return;
+    }
+
+    try {
+        const usageRes = await axios.post(`${ENDPOINT}/usage`, payload);
+
+        res.status(201).json(usageRes.data);
     } catch (error) {
         log.debug(`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`);
         res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });

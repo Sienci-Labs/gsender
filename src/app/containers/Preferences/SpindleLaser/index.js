@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
@@ -10,10 +10,22 @@ import GeneralArea from '../components/GeneralArea';
 import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import Laser from './Laser';
 import Spindle from './Spindle';
+import { collectUserUsageData } from '../../../lib/heatmap';
+import { USAGE_TOOL_NAME } from '../../../constants';
 
 const SpindleLaser = ({ active, state, actions }) => {
     const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile', {}));
     const [delay, setDelay] = useState(store.get('widgets.spindle.delay', false));
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.SPINDLE_LASER);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, []);
 
     const handleToggle = () => {
         const value = !machineProfile.spindle;

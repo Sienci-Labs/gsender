@@ -147,6 +147,11 @@ const defaultState = {
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
         },
         shouldWarnZero: false,
+        diagnostics: {
+            stepperMotor: {
+                storedValue: null,
+            }
+        }
     },
     widgets: {
         axes: {

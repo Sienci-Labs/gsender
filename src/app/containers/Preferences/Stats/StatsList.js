@@ -32,8 +32,10 @@ import {
     STATS_PAGES,
     OVERALL_STATS,
     JOB_PER_PORT,
-    RUN_TIME_PER_PORT
+    RUN_TIME_PER_PORT,
+    USAGE_TOOL_NAME
 } from '../../../constants';
+import { collectUserUsageData } from '../../../lib/heatmap';
 
 const columnData = {
     jobsPerPort: [
@@ -112,6 +114,14 @@ const StatsList = () => {
 
             setStatsPages(getStatsPages(allStats));
         });
+
+        const timeout = setTimeout(() => {
+            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.STATISTICS);
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
     }, []);
 
     const getStatsPages = (stats) => {

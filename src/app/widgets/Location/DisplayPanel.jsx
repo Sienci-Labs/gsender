@@ -21,28 +21,26 @@
  *
  */
 
-/* eslint-disable dot-notation */
-/* eslint-disable jsx-a11y/heading-has-content */
-
+import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
-import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
-import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-//import cx from 'classnames';
+
+import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
 import controller from 'app/lib/controller';
-//import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Modal from 'app/components/Modal';
+import combokeys from 'app/lib/combokeys';
+import gamepad, { runAction } from 'app/lib/gamepad';
+
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
 import Input from '../../containers/Preferences/components/Input';
-
 import {
     AXIS_E,
     AXIS_X,
@@ -56,7 +54,8 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_RUNNING,
     GRBL_ACTIVE_STATE_ALARM,
-    WORKSPACE_MODE
+    WORKSPACE_MODE,
+    LOCATION_CATEGORY
 } from '../../constants';
 import styles from './index.styl';
 import AxisButton from './components/AxisButton';
@@ -64,6 +63,7 @@ import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
 import ButtonCollection from '../../components/ButtonCollection/ButtonCollection';
 import Switch from '../../components/ToggleSwitch';
+import useKeybinding from '../../lib/useKeybinding';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -76,6 +76,35 @@ class DisplayPanel extends PureComponent {
         actions: PropTypes.object,
         safeRetractHeight: PropTypes.number,
     };
+
+    actions = {
+        jogtoFRCorner: () => {
+            const { homingDirection, homingFlag, pullOff } = this.props;
+            const gcode = getMovementGCode('FR', homingDirection, homingFlag, pullOff);
+            controller.command('gcode', gcode);
+        },
+        jogtoFLCorner: () => {
+            const { homingDirection, homingFlag, pullOff } = this.props;
+            const gcode = getMovementGCode('FL', homingDirection, homingFlag, pullOff);
+            controller.command('gcode', gcode);
+        },
+        jogtoBRCorner: () => {
+            const { homingDirection, homingFlag, pullOff } = this.props;
+            const gcode = getMovementGCode('BR', homingDirection, homingFlag, pullOff);
+            controller.command('gcode', gcode);
+        },
+        jogtoBLCorner: () => {
+            const { homingDirection, homingFlag, pullOff } = this.props;
+            const gcode = getMovementGCode('BL', homingDirection, homingFlag, pullOff);
+            controller.command('gcode', gcode);
+        },
+        startHoming: () => {
+            controller.command('homing');
+        },
+        startSingleAxisHoming: (axis) => {
+            controller.command('homing', axis);
+        }
+    }
 
     controllerEvents = {
         'controller:state': (data, controllerState) => {
@@ -96,9 +125,76 @@ class DisplayPanel extends PureComponent {
         },
     }
 
+    shuttleControlEvents = {
+        HOMING_GO_TO_BACK_LEFT_CORNER: {
+            title: 'Homing - Go to Back Left Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.actions.jogtoBLCorner
+        },
+        HOMING_GO_TO_BACK_RIGHT_CORNER: {
+            title: 'Homing - Go to Back Right Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.actions.jogtoBRCorner
+        },
+        HOMING_GO_TO_FRONT_LEFT_CORNER: {
+            title: 'Homing - Go to Front Left Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.actions.jogtoFLCorner
+        },
+        HOMING_GO_TO_FRONT_RIGHT_CORNER: {
+            title: 'Homing - Go to Front Right Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.actions.jogtoFRCorner
+        },
+    }
+
+    componentDidMount() {
+        store.on('change', this.updateMachineProfileFromStore);
+        this.addControllerEvents();
+        this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+    }
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.removeShuttleControlEvents();
+    }
+
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
+            combokeys.removeListener(eventName, callback);
+        });
     }
 
     addControllerEvents() {
@@ -195,7 +291,7 @@ class DisplayPanel extends PureComponent {
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
                                     // get current Z
-                                    const currentZ = Number(machinePosition['z']);
+                                    const currentZ = Number(machinePosition.z);
                                     const retractHeight = (Math.abs(safeRetractHeight) * -1);
                                     // only move Z if it is less than Z0-SafeHeight
                                     if (currentZ < retractHeight) {
@@ -242,40 +338,6 @@ class DisplayPanel extends PureComponent {
 
         this.setState({ machineProfile });
     };
-
-    componentDidMount() {
-        store.on('change', this.updateMachineProfileFromStore);
-        this.addControllerEvents();
-    }
-
-    actions = {
-        jogtoFRCorner: () => {
-            const { homingDirection, homingFlag, pullOff } = this.props;
-            const gcode = getMovementGCode('FR', homingDirection, homingFlag, pullOff);
-            controller.command('gcode', gcode);
-        },
-        jogtoFLCorner: () => {
-            const { homingDirection, homingFlag, pullOff } = this.props;
-            const gcode = getMovementGCode('FL', homingDirection, homingFlag, pullOff);
-            controller.command('gcode', gcode);
-        },
-        jogtoBRCorner: () => {
-            const { homingDirection, homingFlag, pullOff } = this.props;
-            const gcode = getMovementGCode('BR', homingDirection, homingFlag, pullOff);
-            controller.command('gcode', gcode);
-        },
-        jogtoBLCorner: () => {
-            const { homingDirection, homingFlag, pullOff } = this.props;
-            const gcode = getMovementGCode('BL', homingDirection, homingFlag, pullOff);
-            controller.command('gcode', gcode);
-        },
-        startHoming: () => {
-            controller.command('homing');
-        },
-        startSingleAxisHoming: (axis) => {
-            controller.command('homing', axis);
-        }
-    }
 
     determineSingleAxisHoming() {
         const { homingSetting } = this.props;
