@@ -141,7 +141,6 @@
     "Pause Job": "Pause Job",
     "Stop Job": "Stop Job",
     "Add New Macro": "Add New Macro",
-    "Test Run": "Test Run",
     "JogControl Widget": "JogControl Widget",
     "JogControl Settings": "JogControl Settings",
     "Outline": "Outline",
@@ -153,5 +152,6 @@
     "Task Name": "Task Name",
     "Add New Task": "Add New Task",
     "Add Task": "Add Task",
-    "Delete Task": "Delete Task"
+    "Delete Task": "Delete Task",
+    "Verify Job": "Verify Job"
 }
