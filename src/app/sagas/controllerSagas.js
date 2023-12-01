@@ -62,7 +62,7 @@ import {
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
-import { getParsedData } from '../lib/indexedDB';
+import { getEstimateData, getParsedData } from '../lib/indexedDB';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -70,6 +70,7 @@ export function* initialize() {
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
     let errors = [];
+    let finishLoad = false;
 
     /* Health check - every 3 minutes */
     setInterval(() => {
@@ -134,7 +135,16 @@ export function* initialize() {
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
-        // const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
+        const accelerations = {
+            xAccel: _get(reduxStore.getState(), 'controller.settings.settings.$120'),
+            yAccel: _get(reduxStore.getState(), 'controller.settings.settings.$121'),
+            zAccel: _get(reduxStore.getState(), 'controller.settings.settings.$122'),
+        };
+        const maxFeedrates = {
+            xMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$110', 4000.0)),
+            yMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$111', 4000.0)),
+            zMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$112', 3000.0)),
+        };
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -174,7 +184,9 @@ export function* initialize() {
                         content,
                         visualizer,
                         parsedData,
-                        isNewFile
+                        isNewFile,
+                        accelerations,
+                        maxFeedrates
                     });
                 });
             } else {
@@ -239,7 +251,9 @@ export function* initialize() {
                 shouldIncludeSVG,
                 needsVisualization,
                 parsedData,
-                isNewFile
+                isNewFile,
+                accelerations,
+                maxFeedrates
             });
         });
     };
@@ -475,6 +489,7 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:load', (name, content) => {
+        finishLoad = false;
         const size = new Blob([content]).size;
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_CONTENT,
@@ -508,6 +523,15 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('requestEstimateData', () => {
+        if (finishLoad) {
+            finishLoad = false;
+            getEstimateData().then((value) => {
+                controller.command('updateEstimateData', value);
+            });
+        }
+    });
+
     // Need this to handle unload when machine not connected since controller event isn't sent
     pubsub.subscribe('gcode:unload', () => {
         reduxStore.dispatch({
@@ -518,6 +542,13 @@ export function* initialize() {
 
     pubsub.subscribe('file:load', (msg, data) => {
         visualizeWorker.terminate();
+    });
+
+    pubsub.subscribe('parsedData:stored', () => {
+        finishLoad = true;
+        getEstimateData().then((value) => {
+            controller.command('updateEstimateData', value);
+        });
     });
 
     // for when you don't want to send file to backend

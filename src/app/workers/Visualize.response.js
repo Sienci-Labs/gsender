@@ -35,7 +35,9 @@ export const visualizeResponse = ({ data }) => {
 
         // if there's new parsed data, send to redux
         if (parsedData) {
-            replaceParsedData(parsedData);
+            replaceParsedData(parsedData).then(() => {
+                pubsub.publish('parsedData:stored');
+            });
 
             // reduxStore.dispatch({
             //     type: UPDATE_FILE_PARSED_DATA,
@@ -43,6 +45,8 @@ export const visualizeResponse = ({ data }) => {
             //         value: parsedData
             //     }
             // });
+        } else {
+            pubsub.publish('parsedData:stored');
         }
 
         // Handle file load

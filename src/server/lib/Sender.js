@@ -23,9 +23,12 @@
 
 /* eslint max-classes-per-file: 0 */
 import events from 'events';
+import logger from './logger';
 
 export const SP_TYPE_SEND_RESPONSE = 0;
 export const SP_TYPE_CHAR_COUNTING = 1;
+
+const log = logger('controller:Grbl');
 
 const noop = () => {};
 
@@ -160,7 +163,10 @@ class Sender extends events.EventEmitter {
         finishTime: 0,
         elapsedTime: 0,
         remainingTime: 0,
-        toolChanges: 0
+        toolChanges: 0,
+        estimatedTime: 0,
+        estimateData: [],
+        ovF: 100,
     };
 
     stateChanged = false;
@@ -270,7 +276,9 @@ class Sender extends events.EventEmitter {
             remainingTime: this.state.remainingTime,
             toolChanges: this.state.toolChanges,
             bufferSize: this.state.bufferSize,
-            dataLength: this.state.dataLength
+            dataLength: this.state.dataLength,
+            estimatedTime: this.state.estimatedTime,
+            ovF: this.state.ovF,
         };
     }
 
@@ -324,8 +332,12 @@ class Sender extends events.EventEmitter {
         this.state.timeRunning = 0;
         this.state.remainingTime = 0;
         this.state.toolChanges = 0;
+        this.state.estimatedTime = 0;
+        this.state.estimateData = [];
 
         this.emit('load', name, gcode, context);
+        log.debug('sender requesting');
+        this.emit('requestData');
         this.emit('change');
 
         return true;
@@ -351,6 +363,8 @@ class Sender extends events.EventEmitter {
         this.state.timeRunning = 0;
         this.state.remainingTime = 0;
         this.state.toolChanges = 0;
+        this.state.estimatedTime = 0;
+        this.state.estimateData = [];
 
         this.emit('unload');
         this.emit('change');
@@ -393,7 +407,6 @@ class Sender extends events.EventEmitter {
             this.state.startTime = now;
             this.state.finishTime = 0;
             this.state.elapsedTime = 0;
-            this.state.remainingTime = 0;
             this.state.timePaused = 0;
             this.state.timeRunning = 0;
             this.emit('start', this.state.startTime);
@@ -424,8 +437,11 @@ class Sender extends events.EventEmitter {
 
         // Make a 1 second delay before estimating the remaining time
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-            const timePerCode = this.state.elapsedTime / this.state.received;
-            this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
+            if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
+                if (this.state.received < this.state.estimateData.length) {
+                    this.state.remainingTime -= (Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
+                }
+            }
         }
 
         if (this.state.received >= this.state.total || forceEnd) {
@@ -472,6 +488,23 @@ class Sender extends events.EventEmitter {
         this.state.toolChanges = this.state.toolChanges + 1;
         this.emit('change');
         return this.state.toolChanges;
+    }
+
+    setEstimateData(estimates) {
+        this.state.estimateData = estimates;
+    }
+
+    setEstimatedTime(estimatedTime) {
+        this.state.remainingTime = Number(estimatedTime);
+        this.state.estimatedTime = Number(estimatedTime);
+    }
+
+    setOvF(ovF) {
+        if (this.state.ovF !== 100) {
+            this.state.remainingTime *= this.state.ovF / 100; // reset to 100%
+        }
+        this.state.remainingTime /= ovF / 100; // set to new time
+        this.state.ovF = ovF;
     }
 }
 
