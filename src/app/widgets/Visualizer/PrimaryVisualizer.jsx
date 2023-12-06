@@ -21,6 +21,7 @@ import WatchDirectory from './WatchDirectory';
 import { MODAL_WATCH_DIRECTORY } from './constants';
 import styles from './index.styl';
 import SoftLimitsWarningArea from './SoftLimitsWarningArea';
+import LoadingAnimation from './LoadingAnimation';
 
 
 const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering, showVisualizer, visualizerRef, workflowRef, widgetContentRef }) => {
@@ -58,10 +59,13 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                 id={containerID}
             >
                 {showLoading &&
-                <Loading />
+                    <div className={styles.loaderWrapper}>
+                        <Loading />
+                        <LoadingAnimation/>
+                    </div>
                 }
                 {showRendering &&
-                <Rendering />
+                    <Rendering />
                 }
                 {modal.name === MODAL_WATCH_DIRECTORY && (
                     <WatchDirectory

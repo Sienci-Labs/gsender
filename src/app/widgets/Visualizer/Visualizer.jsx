@@ -62,6 +62,8 @@ import log from 'app/lib/log';
 import _ from 'lodash';
 import store from 'app/store';
 import api from 'app/api';
+import ColorsWorker from 'app/workers/colors.worker';
+import { colorsResponse } from 'app/workers/colors.response';
 import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
@@ -134,6 +136,10 @@ class Visualizer extends Component {
         b: 0,
         c: 0,
     };
+
+    vizualization = null;
+
+    renderCallback = null;
 
     machineProfile = store.get('workspace.machineProfile');
 
@@ -822,6 +828,9 @@ class Visualizer extends Component {
             }),
             pubsub.subscribe('visualizer:updateposition', (_, data) => {
                 this.updateCuttingToolPosition(data, { forceUpdateAllAxes: true });
+            }),
+            pubsub.subscribe('colors:load', (_, colorArray) => {
+                this.handleSceneRender(this.vizualization, colorArray, this.renderCallback);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1665,7 +1674,7 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    handleSceneRender(vizualization, callback) {
+    handleSceneRender(vizualization, colorArray, callback) {
         const { controllerType, fileType, workPosition } = this.props;
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
 
@@ -1675,7 +1684,7 @@ class Visualizer extends Component {
             return;
         }
 
-        const obj = this.visualizer.render(vizualization);
+        const obj = this.visualizer.render(vizualization, colorArray);
         obj.name = '';
         this.group.add(obj);
 
@@ -1752,7 +1761,19 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.handleSceneRender(vizualization, callback);
+            this.vizualization = vizualization;
+            this.renderCallback = callback;
+            let colorsWorker = new ColorsWorker();
+            colorsWorker.onmessage = colorsResponse;
+            colorsWorker.postMessage({
+                colors: vizualization.colors,
+                frames: vizualization.frames,
+                spindleSpeeds: vizualization.spindleSpeeds,
+                isLazer: vizualization.isLazer,
+                spindleChanges: vizualization.spindleChanges,
+                theme: currentTheme
+            });
+            // this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }
