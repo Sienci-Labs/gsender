@@ -437,6 +437,11 @@ class GrblHalController {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
 
+                    const currentState = _.get(this.state, 'status.activeState', '');
+                    if (currentState === 'Check') {
+                        return line.replace('M6', '(M6)');
+                    }
+
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action

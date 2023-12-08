@@ -472,6 +472,13 @@ class GrblController {
                 /* Emit event to UI for toolchange handler */
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+
+                    // No toolchange in check mode
+                    const currentState = _.get(this.state, 'status.activeState', '');
+                    if (currentState === 'Check') {
+                        return line.replace('M6', '(M6)');
+                    }
+
                     const { toolChangeOption } = this.toolChangeContext;
 
                     let tool = line.match(toolCommand);
