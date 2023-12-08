@@ -30,34 +30,11 @@ import MK2LongMill12x30File from '../eepromFiles/MK2_12x30.json';
 import MK2LongMill30x30File from '../eepromFiles/MK2_30x30.json';
 import MK2LongMill48x30File from '../eepromFiles/MK2_48x30.json';
 import MK1LongMill48x30File from '../eepromFiles/MK1_48x30.json';
-import DefaultGrblHalSettings from '../eepromFiles/DefaultGrblHalSettings.json';
+//import DefaultGrblHalSettings from '../eepromFiles/DefaultGrblHalSettings.json';
 import DefaultSLBSettings from '../eepromFiles/DefaultSLBSettings.json';
 
 export default [
     // this is a fake test machine for grblHal, for testing purposes
-    {
-        'id': 10000,
-        'company': 'Sienci Labs',
-        'name': 'LongMill MK2',
-        'type': '30x30',
-        'version': 'MK2',
-        'mm': {
-            'width': 792,
-            'depth': 845,
-            'height': 114.3
-        },
-        'in': {
-            'width': 31.18,
-            'depth': 33.27,
-            'height': 4.5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false,
-        'laserOnOutline': false,
-        'eepromSettings': DefaultGrblHalSettings,
-    },
     {
         'id': 0,
         'company': 'Sienci Labs',
@@ -414,7 +391,7 @@ export default [
     {
         'id': 34,
         'company': '',
-        'name': 'Mill Right',
+        'name': 'MillRight',
         'type': '',
         'mm': {
             'width': 260,
@@ -496,10 +473,94 @@ export default [
         'laserOnOutline': false,
     },
     {
-        'id': 45,
+        'id': 59,
         'company': '',
-        'name': 'Blue Carve',
-        'type': '',
+        'name': 'BlueCarve',
+        'type': 'Bluey',
+        'mm': {
+            'width': 750,
+            'depth': 750,
+            'height': 85
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+    },
+    {
+        'id': 55,
+        'company': '',
+        'name': 'BlueCarve',
+        'type': 'Turbo',
+        'mm': {
+            'width': 750,
+            'depth': 750,
+            'height': 85
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+    },
+    {
+        'id': 56,
+        'company': '',
+        'name': 'BlueCarve',
+        'type': 'Turbo Z Upgrade',
+        'mm': {
+            'width': 750,
+            'depth': 750,
+            'height': 85
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+    },
+    {
+        'id': 57,
+        'company': '',
+        'name': 'BlueCarve',
+        'type': 'Trax',
+        'mm': {
+            'width': 750,
+            'depth': 750,
+            'height': 85
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+    },
+    {
+        'id': 58,
+        'company': '',
+        'name': 'BlueCarve',
+        'type': 'Trax Z Upgrade',
         'mm': {
             'width': 750,
             'depth': 750,
