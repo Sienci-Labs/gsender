@@ -110,7 +110,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Jog speed properly converts through preferred unit changes
 - Larger margin on shortcut printout
 - M0 in feeder macros now displays M0 pause dialog
-- Added missing outline keybind
+- Added missing outline keybinds
 - Unlock keybind should work in more situations where a soft reset was required
 
 ### 1.2.1 (Jun 22, 2023)

@@ -117,7 +117,7 @@ for:
             ls -al output output/*
             mkdir -p releases/linux
             cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.i686.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.i686.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-i386.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-i386.AppImage"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-i386.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-i386.AppImage"
             cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_i386.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-i386.deb"
             pushd releases/linux
             ln -sf ../../output/linux-ia32-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-ia32"
@@ -162,7 +162,7 @@ for:
             ls -al output output/*
             mkdir -p releases/linux
             cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-Intel-64Bit.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
             cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-Intel-64Bit.deb"
             pushd releases/linux
             ln -sf ../../output/linux-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
@@ -207,7 +207,7 @@ for:
             ls -al output output/*
             mkdir -p releases/linux
             cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.armv7l.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.armv7l.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-armv7l.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.AppImage"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-armv7l.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.AppImage"
             cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
             pushd releases/linux
             ln -sf ../../output/linux-armv7l-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
@@ -252,7 +252,7 @@ for:
             ls -al output output/*
             mkdir -p releases/linux
             cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.arm64.rpm" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-ARM-64Bit.rpm"
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage"
             cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/gSender-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb"
             pushd releases/linux
             ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
@@ -360,7 +360,7 @@ for:
             yarn build:macos-x64
             ls -al output output/*
             mkdir -p releases/macos
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Intel-64Bit.dmg"
+            cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Intel-64Bit.dmg"
             ls -al releases/macos/*
             if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
               yarn github-release delete \
@@ -481,7 +481,7 @@ for:
             mkdir -Force -Path releases\windows
             yarn build:windows
             Get-ChildItem output
-            Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
+            Copy-Item "output\${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases\windows\gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
             Get-ChildItem releases\windows
             if ($env:CI_BRANCH -eq "master" -And -not $env:CI_TAG) {
               yarn github-release delete `
