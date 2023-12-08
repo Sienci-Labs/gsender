@@ -44,7 +44,9 @@ let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
 
-Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
+if (process.env.NODE_ENV === 'production') {
+    Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
+}
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
