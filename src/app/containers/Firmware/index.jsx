@@ -24,7 +24,7 @@ const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroup
             return obj.setting === setting;
         });
         const key = setting.replace('$', '');
-        const halData = get(halDescriptions, `${key}`, { group: -1 });
+        const halData = get(halDescriptions, `${key}`, { group: -1, details: '' });
         const halGroup = get(halGroups, `${halData.group}.label`, '');
 
         return {

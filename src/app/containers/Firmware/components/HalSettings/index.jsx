@@ -17,6 +17,13 @@ const HalSettings = ({ descriptions }) => {
         });
     };
 
+    const filterNewlines = (data = '') => {
+        if (!data) {
+            return '';
+        }
+        return data.replace(/\\n/gmi, '\n');
+    };
+
 
     return (
         <div className={styles.settingsContainer}>
@@ -36,7 +43,7 @@ const HalSettings = ({ descriptions }) => {
                     console.log(setting);
                     const settingKey = setting.setting.replace('$', '');
                     const { message, dataType, ...info } = descriptionLookup(settingKey, descriptions);
-                    const description = setting.details.replace(/\\n/gmi, '\n');
+                    const description = filterNewlines(setting.details);
                     const InputElement = getDatatypeInput(dataType);
 
                     const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
