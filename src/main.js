@@ -30,7 +30,7 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-// import * as Sentry from '@sentry/electron/main';
+import * as Sentry from '@sentry/electron/main';
 
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
@@ -44,7 +44,7 @@ let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
 
-// Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
+Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -134,7 +134,7 @@ const main = () => {
                 }
             }
 
-            const { address, port, requestedHost, kiosk } = { ...res };
+            const { address, port, kiosk } = { ...res };
             log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
@@ -201,12 +201,12 @@ const main = () => {
                 if ('type' in error) {
                     log.transports.file.level = 'error';
                 }
-                if(error.type.includes('GRBL_HAL')) {
+
+                if (error.type.includes('GRBL_HAL')) {
                     (error.type === 'GRBL_HAL_ERROR') ? grblLog.error(`GRBL_HAL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_HAL_ALARM:Alarm ${error.code} - ${error.description}`);
                 } else {
                     (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
                 }
-
             });
 
             ipcMain.on('clipboard', (channel, text) => {
