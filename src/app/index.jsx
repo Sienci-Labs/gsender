@@ -39,7 +39,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
 import { Provider as ReduxProvider } from 'react-redux';
-//import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/react';
 
 import { Provider as GridSystemProvider } from 'app/components/GridSystem';
 import rootSaga from 'app/sagas';
@@ -65,15 +65,13 @@ import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
-// import * as Sentry from '@sentry/react';
-
-// Sentry.init({
-//     dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
-//     integrations: [
-//         new Sentry.BrowserTracing(),
-//         new Sentry.Replay()
-//     ],
-// });
+Sentry.init({
+    dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
+    integrations: [
+        new Sentry.BrowserTracing(),
+        new Sentry.Replay()
+    ],
+});
 
 const renderPage = () => {
     const container = document.createElement('div');
