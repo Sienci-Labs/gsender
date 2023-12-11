@@ -83,24 +83,6 @@ const TouchPlate = ({ state, actions, values, type, onTypeChange }) => {
                                             additionalProps={{ type: 'number', id: 'xyThickness' }}
                                         />
                                     </Tooltip>
-                                    <Tooltip content="Specify the length of your Touchplate" location="default">
-                                        <Input
-                                            label="Length"
-                                            value={values.length}
-                                            units={units}
-                                            onChange={probeActions.changePlateLength}
-                                            additionalProps={{ type: 'number', id: 'plateLength' }}
-                                        />
-                                    </Tooltip>
-                                    <Tooltip content="Specify the width of your Touchplate" location="default">
-                                        <Input
-                                            label="Width"
-                                            value={values.width}
-                                            units={units}
-                                            onChange={probeActions.changePlateWidth}
-                                            additionalProps={{ type: 'number', id: 'plateWidth' }}
-                                        />
-                                    </Tooltip>
                                 </>
                             )
                         }
