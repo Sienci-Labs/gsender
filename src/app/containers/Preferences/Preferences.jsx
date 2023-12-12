@@ -921,10 +921,9 @@ class PreferencesPage extends PureComponent {
             if (units === 'in') {
                 store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
             }
-
-            roundAllStoreValues(units);
         }
 
+        roundAllStoreValues(units);
 
         if (this.shouldShowToast) {
             this.showToast();
