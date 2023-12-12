@@ -43,6 +43,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     IMPERIAL_UNITS,
     LASER_MODE,
+    METRIC_UNITS,
     SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING
@@ -54,7 +55,7 @@ import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
 import useKeybinding from '../../lib/useKeybinding';
 import { convertToImperial } from '../../containers/Preferences/calculate';
-import { roundMetric } from '../../lib/rounding';
+import { roundMetric, round } from '../../lib/rounding';
 
 
 class SpindleWidget extends PureComponent {
@@ -391,9 +392,13 @@ class SpindleWidget extends PureComponent {
 
     // Take into account the current wpos when setting offsets
     calculateAdjustedOffsets(xOffset, yOffset) {
-        const { wpos } = this.props;
+        const { wpos, $13 } = this.props;
         const { x, y } = wpos;
-        return [Number(x) + Number(xOffset), Number(y) + Number(yOffset)];
+        let units = METRIC_UNITS;
+        if ($13 === '1') {
+            units = IMPERIAL_UNITS;
+        }
+        return [round(Number(x) + Number(xOffset), units), round(Number(y) + Number(yOffset), units)];
     }
 
     getLaserOffsetCode() {
@@ -576,6 +581,7 @@ export default connect((store) => {
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
+    const $13 = get(store, 'controller.settings.settings.$13', '0');
 
     return {
         workflow,
@@ -589,6 +595,7 @@ export default connect((store) => {
         laserAsSpindle,
         wcs,
         wpos,
-        units
+        units,
+        $13
     };
 })(SpindleWidget);
