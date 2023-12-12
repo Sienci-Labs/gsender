@@ -6,6 +6,7 @@ import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import { METRIC_UNITS } from '../../../constants';
 import { convertToImperial } from '../calculate';
+import { roundMetric } from '../../../lib/rounding';
 
 const Laser = ({ state, actions }) => {
     const { units, laser } = state;
@@ -23,13 +24,13 @@ const Laser = ({ state, actions }) => {
                 <Input
                     label="X Axis Offset"
                     units={units}
-                    value={units === METRIC_UNITS ? xOffset : convertToImperial(xOffset)}
+                    value={units === METRIC_UNITS ? roundMetric(xOffset) : convertToImperial(xOffset)}
                     onChange={(e) => laserActions.handleOffsetChange(e, 'X')}
                 />
                 <Input
                     label="Y Axis Offset"
                     units={units}
-                    value={units === METRIC_UNITS ? yOffset : convertToImperial(yOffset)}
+                    value={units === METRIC_UNITS ? roundMetric(yOffset) : convertToImperial(yOffset)}
                     onChange={(e) => laserActions.handleOffsetChange(e, 'Y')}
                 />
             </Fieldset>

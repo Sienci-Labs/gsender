@@ -31,6 +31,7 @@ import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
 import gamepad from 'app/lib/gamepad';
+import { roundImperial, roundAllStoreValues } from 'app/lib/rounding';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
 import Shortcuts from './Shortcuts';
@@ -505,6 +506,8 @@ class PreferencesPage extends PureComponent {
                 let value = Number(e.target.value) || 0;
                 if (units === IMPERIAL_UNITS) {
                     value = convertToMetric(value);
+                } else {
+                    value = roundImperial(value, units);
                 }
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
@@ -918,6 +921,8 @@ class PreferencesPage extends PureComponent {
             if (units === 'in') {
                 store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
             }
+
+            roundAllStoreValues(units);
         }
 
 

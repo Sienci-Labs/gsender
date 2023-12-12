@@ -54,6 +54,7 @@ import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
 import useKeybinding from '../../lib/useKeybinding';
 import { convertToImperial } from '../../containers/Preferences/calculate';
+import { roundMetric } from '../../lib/rounding';
 
 
 class SpindleWidget extends PureComponent {
@@ -406,6 +407,9 @@ class SpindleWidget extends PureComponent {
         if (units === IMPERIAL_UNITS) {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
+        } else {
+            xOffset = roundMetric(xOffset);
+            yOffset = roundMetric(yOffset);
         }
         const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
 
@@ -439,6 +443,9 @@ class SpindleWidget extends PureComponent {
         if (units === IMPERIAL_UNITS) {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
+        } else {
+            xOffset = roundMetric(xOffset);
+            yOffset = roundMetric(yOffset);
         }
         const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
         if (xOffset === 0 && yOffset !== 0) {
