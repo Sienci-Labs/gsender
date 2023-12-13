@@ -73,7 +73,6 @@ const wizard = {
             '%global.toolchange.SPINDLE=modal.spindle',
             '%global.toolchange.DISTANCE=modal.distance',
             '%global.toolchange.FEEDRATE=programFeedrate',
-            '([JSON.stringify(global.toolchange)])',
             'M5',
             'G91 G21',
             '(Toolchange Initiated)',
