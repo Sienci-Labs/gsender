@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 // import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
-import { isEmpty } from 'lodash';
+import { isEmpty, isNumber, isString } from 'lodash';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
@@ -160,18 +160,25 @@ const normalizeState = (state) => {
 };
 
 const merge = (base, saved) => {
+    const numberRegex = /^-?\d+.?\d*$/;
+
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
     const savedIsObject = saved instanceof Object;
     const savedIsArray = Array.isArray(saved);
 
+    const fromStringToNumber = isNumber(base) && isString(saved) && numberRegex.test(saved);
+    const fromNumberToString = isNumber(saved) && isString(base) && numberRegex.test(base);
+
     if (
         (!(baseIsObject) || baseIsArray) &&
         (!(savedIsObject) || savedIsArray)
     ) {
         // if they are the same type, use saved
-        if (typeof base === typeof saved) {
+        // when numbers are rounded, they become strings
+        // so if it changes between those two types, and the string is a number, keep saved
+        if ((typeof base === typeof saved) || fromStringToNumber || fromNumberToString) {
             return saved;
         }
         // if they are not, default structure changed, so use base
