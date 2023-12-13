@@ -79,7 +79,7 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
     };
 
     const localChange = (e) => {
-        setLocalValue(round(inputRef.current.value, units));
+        setLocalValue(inputRef.current.value, units);
     };
 
     return (
