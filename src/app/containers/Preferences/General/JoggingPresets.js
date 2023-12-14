@@ -377,6 +377,7 @@ export default class JoggingPresets extends Component {
                             onChange={this.handleSpeedChange}
                             additionalProps={{ type: 'number', id: 'feedrate' }}
                             value={speedValue}
+                            hasRounding={false}
                         />
                     </Tooltip>
                 </div>

@@ -31,7 +31,7 @@ import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
 import gamepad from 'app/lib/gamepad';
-import { roundImperial, roundAllStoreValues } from 'app/lib/rounding';
+import { roundImperial } from 'app/lib/rounding';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
 import Shortcuts from './Shortcuts';
@@ -922,8 +922,6 @@ class PreferencesPage extends PureComponent {
                 store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
             }
         }
-
-        roundAllStoreValues(units);
 
         if (this.shouldShowToast) {
             this.showToast();

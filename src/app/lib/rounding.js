@@ -21,8 +21,42 @@
  *
  */
 
-import store from '../store';
 import { METRIC_UNITS } from '../constants';
+
+const storeValuesThatNeedRounding = new Set([
+    'workspace.safeRetractHeight',
+    'workspace.toolChangePosition.x',
+    'workspace.toolChangePosition.y',
+    'workspace.toolChangePosition.z',
+    'widgets.rotary.stockTurning.options.stockLength',
+    'widgets.rotary.stockTurning.options.stepdown',
+    'widgets.rotary.stockTurning.options.bitDiameter',
+    'widgets.rotary.stockTurning.options.stepover',
+    'widgets.rotary.stockTurning.options.startHeight',
+    'widgets.rotary.stockTurning.options.finalHeight',
+    'widgets.surfacing.bitDiameter',
+    'widgets.surfacing.stepover',
+    'widgets.surfacing.length',
+    'widgets.surfacing.width',
+    'widgets.surfacing.skimDepth',
+    'widgets.surfacing.maxDepth',
+    'widgets.spindle.laser.xOffset',
+    'widgets.spindle.laser.yOffset',
+    'widgets["rotary"].stockTurning.options.stockLength',
+    'widgets["rotary"].stockTurning.options.stepdown',
+    'widgets["rotary"].stockTurning.options.bitDiameter',
+    'widgets["rotary"].stockTurning.options.stepover',
+    'widgets["rotary"].stockTurning.options.startHeight',
+    'widgets["rotary"].stockTurning.options.finalHeight',
+    'widgets["surfacing"].bitDiameter',
+    'widgets["surfacing"].stepover',
+    'widgets["surfacing"].length',
+    'widgets["surfacing"].width',
+    'widgets["surfacing"].skimDepth',
+    'widgets["surfacing"].maxDepth',
+    'widgets["spindle"].laser.xOffset',
+    'widgets["spindle"].laser.yOffset',
+]);
 
 export const roundImperial = (val) => {
     return Number(val).toFixed(3);
@@ -40,56 +74,18 @@ export const round = (val, units) => {
     }
 };
 
-export const roundAllStoreValues = (newUnits) => {
-    let roundFunc = roundImperial;
-    if (newUnits === METRIC_UNITS) {
-        roundFunc = roundMetric;
+// determine whether value needs to be rounded or not
+// recursive, looks through object properties
+export const determineRoundedValue = (key, value) => {
+    console.log(key);
+    console.log(value);
+    if (value instanceof Object) {
+        return Object.keys(value).map((el, index) => {
+            return determineRoundedValue(key + '.' + el, value[el]);
+        });
     }
-    const settings = store.get();
-    const newSettings = {
-        ...settings,
-        workspace: {
-            safeRetractHeight: roundFunc(settings.workspace.safeRetractHeight),
-            toolChangePosition: {
-                x: roundFunc(settings.workspace.toolChangePosition.x),
-                y: roundFunc(settings.workspace.toolChangePosition.y),
-                z: roundFunc(settings.workspace.toolChangePosition.z),
-            },
-            machineProfile: {
-                ...settings.workspace.machineProfile,
-                limits: {
-                    xmax: roundFunc(settings.workspace.machineProfile.limits.xmax),
-                    ymax: roundFunc(settings.workspace.machineProfile.limits.ymax),
-                    zmax: roundFunc(settings.workspace.machineProfile.limits.zmax),
-                }
-            },
-        },
-        widgets: {
-            rotary: {
-                ...settings.widgets.rotary,
-                stockTurning: {
-                    ...settings.widgets.rotary.stockTurning,
-                    options: {
-                        ...settings.widgets.rotary.stockTurning.options,
-                        stockLength: roundFunc(settings.widgets.rotary.stockTurning.options.stockLength),
-                        stepdown: roundFunc(settings.widgets.rotary.stockTurning.options.stepdown),
-                        bitDiameter: roundFunc(settings.widgets.rotary.stockTurning.options.bitDiameter),
-                        stepover: roundFunc(settings.widgets.rotary.stockTurning.options.stepover),
-                        startHeight: roundFunc(settings.widgets.rotary.stockTurning.options.startHeight),
-                        finalHeight: roundFunc(settings.widgets.rotary.stockTurning.options.finalHeight),
-                    }
-                },
-                surfacing: {
-                    ...settings.widgets.rotary.surfacing,
-                    bitDiameter: roundFunc(settings.widgets.rotary.surfacing.bitDiameter),
-                    stepover: roundFunc(settings.widgets.rotary.surfacing.stepover),
-                    length: roundFunc(settings.widgets.rotary.surfacing.length),
-                    width: roundFunc(settings.widgets.rotary.surfacing.width),
-                    skimDepth: roundFunc(settings.widgets.rotary.surfacing.skimDepth),
-                    maxDepth: roundFunc(settings.widgets.rotary.surfacing.maxDepth),
-                }
-            }
-        }
-    };
-    store.set('', newSettings);
+    if (storeValuesThatNeedRounding.has(key)) {
+        return roundMetric(value);
+    }
+    return value;
 };
