@@ -28,6 +28,12 @@ const storeValuesThatNeedRounding = new Set([
     'workspace.toolChangePosition.x',
     'workspace.toolChangePosition.y',
     'workspace.toolChangePosition.z',
+    'workspace.probeProfile.xyThickness',
+    'workspace.probeProfile.zThickness',
+    'workspace.probeProfile.plateWidth',
+    'workspace[probeProfile].xyThickness',
+    'workspace[probeProfile].zThickness',
+    'workspace[probeProfile].plateWidth',
     'widgets.rotary.stockTurning.options.stockLength',
     'widgets.rotary.stockTurning.options.stepdown',
     'widgets.rotary.stockTurning.options.bitDiameter',
@@ -42,6 +48,23 @@ const storeValuesThatNeedRounding = new Set([
     'widgets.surfacing.maxDepth',
     'widgets.spindle.laser.xOffset',
     'widgets.spindle.laser.yOffset',
+    'widgets.axes.jog.rapid.xyStep',
+    'widgets.axes.jog.rapid.zStep',
+    'widgets.axes.jog.rapid.feedrate',
+    'widgets.axes.jog.normal.xyStep',
+    'widgets.axes.jog.normal.zStep',
+    'widgets.axes.jog.normal.feedrate',
+    'widgets.axes.jog.precise.xyStep',
+    'widgets.axes.jog.precise.zStep',
+    'widgets.axes.jog.precise.feedrate',
+    'widgets.axes.jog.step',
+    'widgets.axes.jog.distances',
+    'widgets.location.jog.step',
+    'widgets.location.jog.distances',
+    'widgets.probe.probeFeedrate',
+    'widgets.probe.probeFastFeedrate',
+    'widgets.probe.retractionDistance',
+    'widgets.probe.zProbeDistance',
     'widgets["rotary"].stockTurning.options.stockLength',
     'widgets["rotary"].stockTurning.options.stepdown',
     'widgets["rotary"].stockTurning.options.bitDiameter',
@@ -56,6 +79,23 @@ const storeValuesThatNeedRounding = new Set([
     'widgets["surfacing"].maxDepth',
     'widgets["spindle"].laser.xOffset',
     'widgets["spindle"].laser.yOffset',
+    'widgets["axes"].jog.rapid.xyStep',
+    'widgets["axes"].jog.rapid.zStep',
+    'widgets["axes"].jog.rapid.feedrate',
+    'widgets["axes"].jog.normal.xyStep',
+    'widgets["axes"].jog.normal.zStep',
+    'widgets["axes"].jog.normal.feedrate',
+    'widgets["axes"].jog.precise.xyStep',
+    'widgets["axes"].jog.precise.zStep',
+    'widgets["axes"].jog.precise.feedrate',
+    'widgets["axes"].jog.step',
+    'widgets["axes"].jog.distances',
+    'widgets["location"].jog.step',
+    'widgets["location"].jog.distances',
+    'widgets["probe"].probeFeedrate',
+    'widgets["probe"].probeFastFeedrate',
+    'widgets["probe"].retractionDistance',
+    'widgets["probe"].zProbeDistance',
 ]);
 
 export const roundImperial = (val) => {
@@ -77,11 +117,9 @@ export const round = (val, units) => {
 // determine whether value needs to be rounded or not
 // recursive, looks through object properties
 export const determineRoundedValue = (key, value) => {
-    console.log(key);
-    console.log(value);
     if (value instanceof Object) {
-        return Object.keys(value).map((el, index) => {
-            return determineRoundedValue(key + '.' + el, value[el]);
+        Object.keys(value).forEach((el, index) => {
+            value[el] = determineRoundedValue(key + '.' + el, value[el]);
         });
     }
     if (storeValuesThatNeedRounding.has(key)) {

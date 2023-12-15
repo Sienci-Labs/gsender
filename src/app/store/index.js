@@ -225,6 +225,7 @@ store.state = normalizeState(merge(defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on('change', debounce((state) => {
+    console.log(state);
     persist({ state: state });
 }, 100));
 
@@ -234,6 +235,60 @@ store.on('change', debounce((state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
+    }
+    console.log(cnc.version);
+    if (semver.lt(cnc.version, '1.3.10') || semver.lt(cnc.version, '1.3.10-EDGE')) {
+        const settings = store.get();
+
+        if (settings.workspace.probeProfile.xyThickness.mm) {
+            store.set('workspace.probeProfile', {
+                ...settings.workspace.probeProfile,
+                xyThickness: settings.workspace.probeProfile.xyThickness.mm,
+                zThickness: settings.workspace.probeProfile.zThickness.mm,
+                plateWidth: settings.workspace.probeProfile.plateWidth.mm
+            });
+        }
+
+        if (settings.widgets.axes.jog.rapid.mm) {
+            store.set('widgets.axes.jog', {
+                ...settings.widgets.axes.jog,
+                rapid: {
+                    xyStep: settings.widgets.axes.jog.rapid.mm.xyStep,
+                    zStep: settings.widgets.axes.jog.rapid.mm.zStep,
+                    feedrate: settings.widgets.axes.jog.rapid.mm.feedrate,
+                },
+                normal: {
+                    xyStep: settings.widgets.axes.jog.normal.mm.xyStep,
+                    zStep: settings.widgets.axes.jog.normal.mm.zStep,
+                    feedrate: settings.widgets.axes.jog.normal.mm.feedrate,
+                },
+                precise: {
+                    xyStep: settings.widgets.axes.jog.precise.mm.xyStep,
+                    zStep: settings.widgets.axes.jog.precise.mm.zStep,
+                    feedrate: settings.widgets.axes.jog.precise.mm.feedrate,
+                },
+                step: settings.widgets.axes.jog.metric.step,
+                distances: settings.widgets.axes.jog.metric.distances
+            });
+        }
+
+        if (settings.widgets.location.jog.metric) {
+            store.set('widgets.axes.location', {
+                ...settings.widgets.axes.location,
+                step: settings.widgets.location.jog.metric.step,
+                distances: settings.widgets.location.jog.metric.distances
+            });
+        }
+
+        if (settings.widgets.probe.probeFeedrate.mm) {
+            store.set('widgets.probe', {
+                ...settings.widgets.probe,
+                probeFeedrate: settings.widgets.probe.probeFeedrate.mm,
+                probeFastFeedrate: settings.widgets.probe.probeFastFeedrate.mm,
+                retractionDistance: settings.widgets.probe.retractionDistance.mm,
+                zProbeDistance: settings.widgets.probe.zProbeDistance.mm
+            });
+        }
     }
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
