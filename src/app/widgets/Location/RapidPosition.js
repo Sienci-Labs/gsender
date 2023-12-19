@@ -144,7 +144,6 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
         const settings = get(store, 'controller.settings.settings');
         const { $22: homingValue } = settings;
         homingFlag = getBit(homingValue, 3);
-        console.log(homingFlag);
     }
 
     const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
