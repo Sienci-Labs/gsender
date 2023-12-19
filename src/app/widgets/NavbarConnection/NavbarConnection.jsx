@@ -71,13 +71,9 @@ class NavbarConnection extends PureComponent {
         const { scanning } = this.props.state;
         const { startedScan, hasScanned } = this.state;
         if (scanning) {
-            this.setState({
-                startedScan: true
-            });
+            this.setState({ startedScan: true });
         } else if (startedScan && !hasScanned) {
-            this.setState({
-                hasScanned: true
-            });
+            this.setState({ hasScanned: true });
         }
     }
 
