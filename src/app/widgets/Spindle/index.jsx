@@ -26,6 +26,7 @@ import classNames from 'classnames';
 import includes from 'lodash/includes';
 import reduxStore from 'app/store/redux';
 import * as controllerActions from 'app/actions/controllerActions';
+import SpindleSelector from 'app/widgets/Spindle/components/SpindleSelector';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
@@ -512,8 +513,10 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles } = this.props;
         const { minimized, isFullscreen } = this.state;
+        const controllerType = store.get('widgets.connection.controller.type', '-');
+
         const state = {
             ...this.state,
             spindleModal,
@@ -538,9 +541,18 @@ class SpindleWidget extends PureComponent {
                     )}
                 >
                     <div className={styles.modalWrapper}>
-                        <div className={styles.modalRow}>
-                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
-                            <ActiveIndicator canClick={this.canClick()} active={active} />
+                        <div>
+                            <div className={styles.modalRow}>
+                                <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
+                                <ActiveIndicator canClick={this.canClick()} active={active} />
+                            </div>
+                            {
+                                (controllerType === GRBLHAL) && (
+                                    <div className={styles.modalRow}>
+                                        <SpindleSelector spindles={availableSpindles}/>
+                                    </div>
+                                )
+                            }
                         </div>
                         <div>
                             {
@@ -569,6 +581,7 @@ export default connect((store) => {
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
+    const availableSpindles = [];
 
     return {
         workflow,
@@ -582,6 +595,7 @@ export default connect((store) => {
         laserAsSpindle,
         wcs,
         wpos,
-        units
+        units,
+        availableSpindles,
     };
 })(SpindleWidget);
