@@ -974,7 +974,7 @@ class AxesWidget extends PureComponent {
 
     componentDidMount() {
         console.log('mounting');
-        // store.on('change', this.updateJogPresets);
+        store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
@@ -1197,7 +1197,7 @@ class AxesWidget extends PureComponent {
     }
 
     componentWillUnmount() {
-        // store.removeListener('change', this.updateJogPresets);
+        store.removeListener('change', this.updateJogPresets);
         this.unsubscribe();
     }
 
@@ -1212,10 +1212,12 @@ class AxesWidget extends PureComponent {
         this.config.set('minimized', minimized);
         this.config.set('axes', axes);
         this.config.set('jog.keypad', jog.keypad);
-        if (units === METRIC_UNITS) {
-            this.config.set('jog.step', Number(jog.step) || 0);
-        } else {
-            this.config.set('jog.step', convertToMetric(jog.step) || 0);
+        if (units !== prevState.units) {
+            if (units === METRIC_UNITS) {
+                this.config.set('jog.step', Number(jog.step) || 0);
+            } else {
+                this.config.set('jog.step', convertToMetric(jog.step) || 0);
+            }
         }
     }
 
