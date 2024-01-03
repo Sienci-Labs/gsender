@@ -1391,7 +1391,7 @@ class GrblHalController {
                 const delay = _.get(preferences, 'spindle.delay', false);
 
                 if (delay) {
-                    gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
+                    gcode = gcode.replace(/(S[0-9]* M[3-4])|(M[3-4] S[0-9]*)/g, '$& G4 P1');
                 }
 
                 const ok = this.sender.load(name, gcode + '\n', context);

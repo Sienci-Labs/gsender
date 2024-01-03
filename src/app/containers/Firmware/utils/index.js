@@ -85,7 +85,7 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
-    console.log(`${port} - ${imageType} - ${isHal}`);
+
     controller.flashFirmware(port, imageType, isHal, hex);
 };
 

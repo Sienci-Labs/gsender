@@ -21,6 +21,8 @@
  *
  */
 import reduxStore from 'app/store/redux';
+import prefStore from 'app/store';
+
 import get from 'lodash/get';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 
@@ -56,6 +58,15 @@ const getMachineMovementLimits = () => {
 
     return [xLimit, yLimit];
 };
+
+
+// Get a single bit from integer at position
+export function getBit(number, bitPosition) {
+    number = Number(number);
+    console.log(number);
+    // eslint-disable-next-line no-bitwise
+    return (number & (1 << bitPosition)) !== 0;
+}
 
 const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pullOff) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
@@ -124,6 +135,17 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
     const homingPosition = getHomingLocation(homingPositionSetting);
+
+    // Change homing flag for grblHal specifically
+    const controllerType = prefStore.get('widgets.connection.controller.type', 'grbl');
+    console.log(controllerType);
+    if (controllerType === 'grblHAL') {
+        const store = reduxStore.getState();
+        const settings = get(store, 'controller.settings.settings');
+        const { $22: homingValue } = settings;
+        homingFlag = getBit(homingValue, 3);
+    }
+
     const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
 
     if (xMovement === null || yMovement === null) {

@@ -151,31 +151,36 @@ const Rotary = () => {
     }[activeDialog];
 
     return (
-        <div className={styles['rotary-axis-wrapper']}>
-            <div className={styles['rotary-jog-control-area']}>
-                <p className={styles['rotary-tab-section-title']}>
-                    Jog Control
-                </p>
-                <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
+        <>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <RotaryToggle />
+            </div>
 
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <JogControlArea
-                        selectedSpeed={speedPreset} actions={actions} jog={jog}
-                        disabled={!enableRotaryAxis || isFileRunning()}
-                    />
-                    <SpeedControls jog={jog} actions={actions} />
+            <div className={styles['rotary-axis-wrapper']}>
+                <div className={styles['rotary-jog-control-area']}>
+                    <p className={styles['rotary-tab-section-title']}>
+                        Jog Control
+                    </p>
+                    <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
+
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <JogControlArea
+                            selectedSpeed={speedPreset} actions={actions} jog={jog}
+                            disabled={!enableRotaryAxis || isFileRunning()}
+                        />
+                        <SpeedControls jog={jog} actions={actions} />
+                    </div>
+                </div>
+
+                <div className={styles['rotary-tools-area']}>
+                    <p className={styles['rotary-tab-section-title']}>Tools</p>
+
+                    <ActionArea actions={actions} />
+
+                    {ActiveModal && <ActiveModal actions={actions} />}
                 </div>
             </div>
-
-            <div className={styles['rotary-tools-area']}>
-                <p className={styles['rotary-tab-section-title']}>Tools</p>
-                <RotaryToggle />
-
-                <ActionArea actions={actions} />
-
-                {ActiveModal && <ActiveModal actions={actions} />}
-            </div>
-        </div>
+        </>
     );
 };
 
