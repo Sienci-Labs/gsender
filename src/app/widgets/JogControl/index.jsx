@@ -1336,12 +1336,12 @@ class AxesWidget extends PureComponent {
             zStep = convertToImperial(zStep);
             xyStep = convertToImperial(xyStep);
             aStep = convertToImperial(aStep);
-            feedrate = convertToImperial(feedrate).toFixed(0);
+            feedrate = Number(convertToImperial(feedrate).toFixed(0));
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
             zStep = convertToMetric(zStep);
             xyStep = convertToMetric(xyStep);
             aStep = convertToMetric(aStep);
-            feedrate = convertToMetric(feedrate).toFixed(0);
+            feedrate = Number(convertToMetric(feedrate).toFixed(0));
         }
         const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
 
