@@ -240,7 +240,7 @@ const migrateStore = () => {
         const settings = store.get();
 
         if (settings.workspace.probeProfile.xyThickness.mm) {
-            store.set('workspace.probeProfile', {
+            store.replace('workspace.probeProfile', {
                 ...settings.workspace.probeProfile,
                 xyThickness: settings.workspace.probeProfile.xyThickness.mm,
                 zThickness: settings.workspace.probeProfile.zThickness.mm,
@@ -249,7 +249,7 @@ const migrateStore = () => {
         }
 
         if (settings.widgets.axes.jog.rapid.mm) {
-            store.set('widgets.axes.jog', {
+            store.replace('widgets.axes.jog', {
                 ...settings.widgets.axes.jog,
                 rapid: {
                     xyStep: settings.widgets.axes.jog.rapid.mm.xyStep,
@@ -272,7 +272,7 @@ const migrateStore = () => {
         }
 
         if (settings.widgets.location.jog.metric) {
-            store.set('widgets.axes.location', {
+            store.replace('widgets.axes.location', {
                 ...settings.widgets.axes.location,
                 step: settings.widgets.location.jog.metric.step,
                 distances: settings.widgets.location.jog.metric.distances
@@ -280,7 +280,7 @@ const migrateStore = () => {
         }
 
         if (settings.widgets.probe.probeFeedrate.mm) {
-            store.set('widgets.probe', {
+            store.replace('widgets.probe', {
                 ...settings.widgets.probe,
                 probeFeedrate: settings.widgets.probe.probeFeedrate.mm,
                 probeFastFeedrate: settings.widgets.probe.probeFastFeedrate.mm,

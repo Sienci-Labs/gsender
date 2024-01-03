@@ -99,11 +99,11 @@ const storeValuesThatNeedRounding = new Set([
 ]);
 
 export const roundImperial = (val) => {
-    return Number(val).toFixed(3);
+    return Number(Number(val).toFixed(3));
 };
 
 export const roundMetric = (val) => {
-    return Number(val).toFixed(2);
+    return Number(Number(val).toFixed(2));
 };
 
 export const round = (val, units) => {
