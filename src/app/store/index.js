@@ -225,7 +225,6 @@ store.state = normalizeState(merge(defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on('change', debounce((state) => {
-    console.log(state);
     persist({ state: state });
 }, 100));
 

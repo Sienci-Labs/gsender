@@ -36,7 +36,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
-import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
+import { mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction, checkButtonHold } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -422,8 +422,8 @@ class AxesWidget extends PureComponent {
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
         setJogFromPreset: (presetKey) => {
-            const { jog, units } = this.state;
-            const jogObj = jog[presetKey][units];
+            const { jog } = this.state;
+            const jogObj = jog[presetKey];
 
             this.setState({
                 jog: {
@@ -953,7 +953,6 @@ class AxesWidget extends PureComponent {
     shuttleControl = null;
 
     updateJogPresets = () => {
-        console.log('hi');
         const { jog } = this.state;
         const data = store.get('widgets.axes.jog');
 
@@ -973,7 +972,6 @@ class AxesWidget extends PureComponent {
     }
 
     componentDidMount() {
-        console.log('mounting');
         store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
@@ -1221,8 +1219,31 @@ class AxesWidget extends PureComponent {
         }
     }
 
+    convertPresetUnits(units, preset) {
+        const conversionFunc = units === METRIC_UNITS ? convertToMetric : convertToImperial;
+        let convertedPreset = preset;
+        for (const key of Object.keys(preset)) {
+            convertedPreset[key] = conversionFunc(preset[key]);
+            if (key === 'feedrate') {
+                convertedPreset[key] = Number(convertedPreset[key]).toFixed(0);
+            }
+        }
+        return convertedPreset;
+    }
+
+    convertAllPresetsUnits(units, initJog) {
+        const jog = initJog || this.state.jog;
+        const { rapid, normal, precise } = jog;
+        const convertedRapid = this.convertPresetUnits(units, rapid);
+        const convertedNormal = this.convertPresetUnits(units, normal);
+        const convertedPrecise = this.convertPresetUnits(units, precise);
+
+        return { convertedRapid, convertedNormal, convertedPrecise };
+    }
+
     getInitialState() {
-        const { rapid, normal, precise } = store.get('widgets.axes.jog');
+        const initialUnits = store.get('workspace.units', METRIC_UNITS);
+        let { rapid, normal, precise } = initialUnits === IMPERIAL_UNITS ? this.convertAllPresetsUnits(initialUnits, store.get('widgets.axes.jog')) : store.get('widgets.axes.jog');
 
         return {
             minimized: this.config.get('minimized', false),
@@ -1312,16 +1333,17 @@ class AxesWidget extends PureComponent {
         const { jog } = this.state;
         let { zStep, xyStep, aStep, feedrate } = jog;
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
-            zStep = mm2in(zStep).toFixed(3);
-            xyStep = mm2in(xyStep).toFixed(3);
-            aStep = mm2in(aStep).toFixed(3);
-            feedrate = mm2in(feedrate).toFixed(2);
+            zStep = convertToImperial(zStep);
+            xyStep = convertToImperial(xyStep);
+            aStep = convertToImperial(aStep);
+            feedrate = convertToImperial(feedrate).toFixed(0);
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
-            zStep = in2mm(zStep).toFixed(2);
-            xyStep = in2mm(xyStep).toFixed(2);
-            aStep = in2mm(aStep).toFixed(2);
-            feedrate = in2mm(feedrate).toFixed(0);
+            zStep = convertToMetric(zStep);
+            xyStep = convertToMetric(xyStep);
+            aStep = convertToMetric(aStep);
+            feedrate = convertToMetric(feedrate).toFixed(0);
         }
+        const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
 
         this.setState({
             units: units,
@@ -1330,7 +1352,10 @@ class AxesWidget extends PureComponent {
                 zStep: zStep,
                 xyStep: xyStep,
                 aStep: aStep,
-                feedrate
+                feedrate,
+                rapid,
+                normal,
+                precise
             }
         });
     }
