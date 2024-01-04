@@ -93,8 +93,11 @@ class Header extends PureComponent {
                 this.showToast();
                 return;
             }
+
+            const commandIsValidForAlarmState = ['reset', 'reset:limit', 'homing'].includes(command);
+            const isInAlarmState = activeState === GRBL_ACTIVE_STATE_ALARM;
             // feedhold, cyclestart, homing, unlock, reset
-            if (((command === 'reset:limit' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+            if (((commandIsValidForAlarmState) && isInAlarmState) ||
                 (command !== 'reset:limit' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
                 // unlock + reset on alarm 1 and 2, just unlock on others
                 if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode !== 1 && alarmCode !== 2) {

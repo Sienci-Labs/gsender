@@ -36,7 +36,8 @@ const RotaryToggle = () => {
 
     return (
         <ToggleSwitch
-            label="Rotary Mode"
+            label="4th Axis"
+            secondaryLabel="Rotary"
             checked={workspaceMode === ROTARY}
             onChange={handleToggle}
             size="small"

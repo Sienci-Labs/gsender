@@ -80,15 +80,40 @@ const ButtonActionsTable = () => {
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
+    const handleButtonLabelChange = (currentButtonValue, label) => {
+        const updatedProfiles =
+            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
+                ? ({
+                    ...profile,
+                    buttons: profile.buttons.map(button => (button.value === currentButtonValue ? { ...button, label } : button))
+                })
+                : profile
+            ));
+
+        dispatch(setGamepadProfileList(updatedProfiles));
+    };
+
     const render = {
         button: (_, row) => {
             const buttonIsPressed = buttons[row.value]?.pressed;
 
             if (buttonIsPressed) {
-                return <input defaultValue={row.label} className={styles['button-render-active']} />;
+                return (
+                    <input
+                        defaultValue={row.label}
+                        className={styles['button-render-active']}
+                        onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                    />
+                );
             }
 
-            return <input defaultValue={row.label} className={styles['button-render']} />;
+            return (
+                <input
+                    defaultValue={row.label}
+                    className={styles['button-render']}
+                    onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                />
+            );
         },
         action: (action, value, type) => {
             if (!action) {

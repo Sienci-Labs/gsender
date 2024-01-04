@@ -206,6 +206,23 @@ const merge = (base, saved) => {
     return result;
 };
 
+// Save backup
+const backupPreviousState = (data) => {
+    const value = JSON.stringify({ state: data, version: settings.version }, null, 2);
+
+    if (isElectron()) {
+        const { app } = window.require('@electron/remote');
+        const path = window.require('path'); // Require the path module within Electron
+
+        const backupPath = path.join(app.getPath('userData'), 'preferences-backup.json');
+
+        const fs = window.require('fs'); // Use window.require to require fs module in Electron
+        fs.writeFileSync(backupPath, value);
+    } else {
+        localStorage.setItem('sienci-backup', value);
+    }
+};
+
 const cnc = {
     version: settings.version,
     state: {}
@@ -216,6 +233,8 @@ try {
     const data = JSON.parse(text);
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
+
+    backupPreviousState(cnc.state);
 } catch (e) {
     // set(settings, 'error.corruptedWorkspaceSettings', true);
     log.error(e);
@@ -469,6 +488,7 @@ const migrateStore = () => {
 };
 
 try {
+    // saveBackup();
     migrateStore();
 } catch (err) {
     log.error(err);

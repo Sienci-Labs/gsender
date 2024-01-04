@@ -913,11 +913,6 @@ class AxesWidget extends PureComponent {
     handleShortcutStop = (payload) => {
         const feedrate = Number(this.actions.getFeedrate());
 
-        if (payload?.force) {
-            this.actions.stopContinuousJog();
-            return;
-        }
-
         if (!payload) {
             this.joggingHelper && this.joggingHelper.onKeyUp({ F: feedrate });
             return;

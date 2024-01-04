@@ -32,10 +32,15 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
         seconds = parseInt(seconds, 10);
         return `${String(hours).padStart(2, 0)}:${String(minutes).padStart(2, 0)}:${String(seconds).padStart(2, 0)}`;
     }
+
     return null;
 };
 
-export const convertSecondsToTimeStamp = (seconds) => {
+export const convertSecondsToTimeStamp = (seconds, startTime) => {
+    if (startTime === 0 || !seconds || seconds < 0) {
+        return '-';
+    }
+
     return convertMillisecondsToTimeStamp(seconds * 1000);
 };
 

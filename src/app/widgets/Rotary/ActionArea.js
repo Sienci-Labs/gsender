@@ -13,7 +13,7 @@ import { SET_ACTIVE_DIALOG } from './Context/actions';
 
 const ActionArea = ({ actions }) => {
     const { dispatch } = useContext(RotaryContext);
-    const controllerState = useSelector(store => get(store, 'controller.state'));
+    const { state: controllerState } = useSelector(store => get(store, 'controller'));
 
     const showUnitSetup = () => {
         dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.PHYSICAL_UNIT_SETUP });
@@ -28,8 +28,8 @@ const ActionArea = ({ actions }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '1rem' }}>
-            <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode}>Rotary Surfacing</FunctionButton>
-            <FunctionButton onClick={() => actions.runProbing('Z-axis', runZAxisProbing())} disabled={!isInRotaryMode || isFileRunning}>Probe Rotary Z-Axis</FunctionButton>
+            <FunctionButton onClick={handleStockTurningClick}>Rotary Surfacing</FunctionButton>
+            <FunctionButton onClick={() => actions.runProbing('Z-axis', runZAxisProbing())} disabled={isFileRunning}>Probe Rotary Z-Axis</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Y-axis alignment', runYAxisAlignmentProbing())} disabled={isInRotaryMode || isFileRunning}>Y-axis Alignment</FunctionButton>
             <FunctionButton onClick={showUnitSetup} disabled={isInRotaryMode || isFileRunning}>Rotary Mounting Setup</FunctionButton>
         </div>

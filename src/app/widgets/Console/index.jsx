@@ -25,13 +25,14 @@ import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
+import { throttle } from 'lodash';
+import isElectron from 'is-electron';
+import color from 'cli-color';
+
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 
-import isElectron from 'is-electron';
-
-import color from 'cli-color';
 import { GREY } from './variables';
 
 import WidgetConfig from '../WidgetConfig';
@@ -71,6 +72,8 @@ class ConsoleWidget extends PureComponent {
     hasSetState = false;
 
     name = this.props.widgetId.split(':')[0];
+
+    throttledRefitTerminal = throttle(() => this.terminal.refitTerminal(), 3000);
 
     actions = {
         toggleFullscreen: () => {
@@ -145,6 +148,8 @@ class ConsoleWidget extends PureComponent {
             }
 
             this.terminal.updateTerminalHistory(this.terminal.prompt + data);
+
+            this.throttledRefitTerminal();
         },
         'serialport:read': (data) => {
             if (!this.terminal) {

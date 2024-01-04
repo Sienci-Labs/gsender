@@ -73,7 +73,6 @@ const wizard = {
             '%global.toolchange.DISTANCE=modal.distance',
             '%global.toolchange.FEEDRATE=programFeedrate',
             'M5',
-            '([JSON.stringify(global.toolchange)])',
             '%wait',
             'G91 G21',
             'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',

@@ -592,7 +592,7 @@ export const shortcuts = [
         isActive: true,
         category: SPINDLE_LASER_CATEGORY,
     },
-    { // Soft Reset
+    {
         id: 71,
         title: 'Mist Coolant',
         keys: '',

@@ -40,7 +40,6 @@ const HalSettings = ({ descriptions }) => {
             </div>
             {
                 settings.map((setting, index) => {
-                    console.log(setting);
                     const settingKey = setting.setting.replace('$', '');
                     const { message, dataType, ...info } = descriptionLookup(settingKey, descriptions);
                     const description = filterNewlines(setting.details);
