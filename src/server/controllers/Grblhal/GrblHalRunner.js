@@ -219,7 +219,7 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultSpindle) {
             delete payload.raw;
-            console.log(payload);
+            this.emit('spindle:add', payload);
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
