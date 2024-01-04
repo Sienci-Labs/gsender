@@ -82,12 +82,13 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const postHookRef = useRef();
 
     const setBitsetterPosition = () => {
+        console.log('set called');
         const newPosition = {
-            x: mpos.x,
-            y: mpos.y,
-            z: mpos.z
+            x: Number(mpos.x),
+            y: Number(mpos.y),
+            z: Number(mpos.z)
         };
-        let newPositionMetric = newPosition;
+        let newPositionMetric = { ...newPosition };
         if ($13) {
             newPositionMetric = {
                 x: (Number(mpos.x) * 25.4).toFixed(3),
@@ -96,12 +97,11 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
             };
         }
 
-        setToolChangePosition(newPosition);
         store.replace('workspace.toolChangePosition', newPositionMetric);
+        setToolChangePosition(newPosition);
     };
 
-    const handlePositionChange = (event, axis) => {
-        const value = event.target.value;
+    const handlePositionChange = (value, axis) => {
         const newPosition = {
             ...toolChangePosition,
             [axis]: Number(value)
@@ -178,19 +178,19 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                                 label="Sensor X position"
                                 units=""
                                 value={toolChangePosition.x}
-                                onChange={(e) => handlePositionChange(e, 'x')}
+                                onChange={(e) => handlePositionChange(e.target.value, 'x')}
                             />
                             <Input
                                 label="Sensor Y position"
                                 units=""
                                 value={toolChangePosition.y}
-                                onChange={(e) => handlePositionChange(e, 'y')}
+                                onChange={(e) => handlePositionChange(e.target.value, 'y')}
                             />
                             <Input
                                 label="Sensor Z position"
                                 units=""
                                 value={toolChangePosition.z}
-                                onChange={(e) => handlePositionChange(e, 'z')}
+                                onChange={(e) => handlePositionChange(e.target.value, 'z')}
                             />
                             <div>
                                 <FunctionButton primary onClick={setBitsetterPosition}>Grab Current Position</FunctionButton>
