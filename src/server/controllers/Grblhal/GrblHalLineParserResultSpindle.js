@@ -12,8 +12,6 @@ class GrblHalLineParserResultSpindle {
 
         const parts = r[3].split(',');
 
-        console.log(parts);
-
         payload.label = parts[0];
 
         // We have more info, we can assume some of it - this will be easier with $spindleESH report

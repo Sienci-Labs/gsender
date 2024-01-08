@@ -695,6 +695,11 @@ export function* initialize() {
         }
     });
 
+    controller.addListener('spindle:add', (spindle) => {
+        console.info('Added spindle');
+        console.log(spindle);
+    });
+
     yield null;
 }
 

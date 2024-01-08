@@ -564,6 +564,10 @@ class GrblHalController {
 
         this.runner.on('raw', noop);
 
+        this.runner.on('spindle:add', (spindle) => {
+            this.emit('spindle:add', spindle);
+        });
+
         this.runner.on('status', (res) => {
             //
             if (this.homingStarted) {
@@ -865,7 +869,6 @@ class GrblHalController {
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
-                console.log('not ready');
                 return;
             }
 
