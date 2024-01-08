@@ -249,8 +249,6 @@ function generateSupportFile() {
     api.alarmList.fetch().then(data => {
         const grblAlarmsAndErrors = get(data, 'body.list', []);
         [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
-        console.log(alarms);
-        console.log(errors);
     });
 
     let eepromData = [];
