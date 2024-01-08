@@ -1440,7 +1440,7 @@ class GrblController {
                 const delay = _.get(preferences, 'spindle.delay', false);
 
                 if (delay) {
-                    gcode = gcode.replace(/(S[0-9]* M[3-4])|(M[3-4] S[0-9]*)/g, '$& G4 P1');
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, '$& G4 P1');
                 }
 
                 const gcodeWithoutComments = gcode.replace(bracketCommentLine, '');

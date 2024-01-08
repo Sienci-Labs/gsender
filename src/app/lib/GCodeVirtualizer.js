@@ -865,16 +865,19 @@ class GCodeVirtualizer extends EventEmitter {
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
 
-        const { xAccel, yAccel, zAccel } = accelerations;
-        this.xAccel = xAccel;
-        this.yAccel = yAccel;
-        this.zAccel = zAccel;
+        if (accelerations) {
+            const { xAccel, yAccel, zAccel } = accelerations;
+            this.xAccel = xAccel;
+            this.yAccel = yAccel;
+            this.zAccel = zAccel;
+        }
 
-        const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
-        this.xMaxFeed = xMaxFeed;
-        this.yMaxFeed = yMaxFeed;
-        this.zMaxFeed = zMaxFeed;
-
+        if (maxFeedrates) {
+            const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
+            this.xMaxFeed = xMaxFeed;
+            this.yMaxFeed = yMaxFeed;
+            this.zMaxFeed = zMaxFeed;
+        }
 
         if (this.collate) {
             this.vmState.feedrates = new Set();

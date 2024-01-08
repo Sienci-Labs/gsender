@@ -220,6 +220,10 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
+        if (!this.term) {
+            return;
+        }
+
         this.term.write('\r');
         if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
