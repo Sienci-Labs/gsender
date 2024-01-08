@@ -383,6 +383,7 @@ class ProbeWidget extends PureComponent {
 
     getInitialState() {
         const units = store.get('workspace.units');
+        const defaultToolDiameter = units === METRIC_UNITS ? 6.35 : 0.25;
         const availableTools = store.get('workspace.tools', []);
 
         const touchplateType = store.get('workspace.probeProfile.touchplateType');
@@ -391,7 +392,7 @@ class ProbeWidget extends PureComponent {
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
             toolDiameter = PROBE_TYPE_AUTO;
         } else {
-            toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
+            toolDiameter = availableTools.length === 0 ? defaultToolDiameter : availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
         }
 
         return {
