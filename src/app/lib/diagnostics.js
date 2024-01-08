@@ -320,15 +320,15 @@ function generateSupportFile() {
                                                 <Text style={styles.textItalic}>
                                                     {'    X Max: '}
                                                     <Text style={styles.text}>
-                                                        {machineProfile.limits.xmax + '\n'}
+                                                        {get(machineProfile, 'limits.xmax', '0') + '\n'}
                                                     </Text>
                                                     {'    Y Max: '}
                                                     <Text style={styles.text}>
-                                                        {machineProfile.limits.ymax + '\n'}
+                                                        {get(machineProfile, 'limits.ymax', '0') + '\n'}
                                                     </Text>
                                                     {'    Z Max: '}
                                                     <Text style={styles.text}>
-                                                        {machineProfile.limits.zmax + '\n'}
+                                                        {get(machineProfile, 'limits.zmax', '0') + '\n'}
                                                     </Text>
                                                 </Text>
                                             </Text>
