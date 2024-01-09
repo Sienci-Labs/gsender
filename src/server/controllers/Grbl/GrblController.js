@@ -486,7 +486,7 @@ class GrblController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            commentString = `(${tool[0]}) ` + commentString;
+                            commentString = `(${tool?.[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
@@ -498,8 +498,8 @@ class GrblController {
 
                             setTimeout(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool[2]); // set tool in runner state
-                                this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
+                                this.runner.setTool(tool?.[2]); // set tool in runner state
+                                this.emit('controller:state', GRBL, this.state, tool?.[2]); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
@@ -515,7 +515,7 @@ class GrblController {
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
+                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
