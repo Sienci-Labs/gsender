@@ -101,7 +101,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### 1.4.0 (January X, 2024)
 - Added Rotary Mode
-  - gSender is now able to run 4 axis files on both GRBL and grblHAL
+  - gSender is now able to run 2+1 axis files on grbl and 4 axis files on grblHAL
   - Visualizer updated to support 4 axis rotations
   - A-axis DRO and jogging
   - Rotary probing
