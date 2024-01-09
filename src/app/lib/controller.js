@@ -118,6 +118,7 @@ class Controller {
         'connection:new': [],
 
         'requestEstimateData': [],
+        'firmwareSettings:end': [],
     };
 
     context = {

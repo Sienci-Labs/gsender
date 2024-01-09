@@ -196,6 +196,13 @@ class GrblHalController {
     // Toolchange
     toolChanger = null;
 
+    // Firmware Settings
+    firmwareSettingsApplying = false;
+
+    firmwareSettingsToApply = [];
+
+    firmwareSettingsToApplyIndex = 0;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -616,6 +623,8 @@ class GrblHalController {
                 return;
             }
 
+            this.command('firmwareSettings:continue');
+
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -689,12 +698,12 @@ class GrblHalController {
                 type: ERROR,
                 code: `${code}`,
                 description: error.description || '',
-                line: line,
+                line: this.firmwareSettingsApplying ? this.firmwareSettingsToApply[this.firmwareSettingsToApplyIndex] : line, // get firmware setting if applicable
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
                 controller: GRBLHAL,
                 fileRunning: isRunning
-            });
+            }, this.firmwareSettingsApplying);
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -945,7 +954,7 @@ class GrblHalController {
 
             // Feeder
             if (this.feeder.peek()) {
-                this.emit('feeder:status', this.feeder.toJSON());
+                this.emit('feeder:status', this.feeder.toJSON(), this.state.status.activeState);
             }
 
             // Sender
@@ -2031,6 +2040,46 @@ class GrblHalController {
                 const [estimateData] = args;
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
+            },
+            'firmwareSettings:start': () => {
+                const [commands, context] = args;
+                const data = ensureArray(commands)
+                    .join('\n')
+                    .split(/\r?\n/)
+                    .filter(line => {
+                        if (typeof line !== 'string') {
+                            return false;
+                        }
+
+                        return line.trim().length > 0;
+                    });
+
+                // start sending firmware changes one at a time
+                this.firmwareSettingsApplying = true;
+                this.firmwareSettingsToApply = data;
+                this.firmwareSettingsToApplyIndex = 0;
+                this.feeder.feed(data[0], context);
+
+                if (!this.feeder.isPending()) {
+                    this.feeder.next();
+                }
+            },
+            'firmwareSettings:continue': () => {
+                // if we are sending firmware changes, continue
+                if (this.firmwareSettingsApplying) {
+                    this.firmwareSettingsToApplyIndex++;
+                    // if there are no more changes, send $$ and pop up toast
+                    if (this.firmwareSettingsToApplyIndex >= this.firmwareSettingsToApply.length) {
+                        this.firmwareSettingsApplying = false;
+                        this.emit('firmwareSettings:end');
+                        this.command('gcode', '$$'); // Needed so next time wizard is opened changes are reflected
+                    } else {
+                        this.feeder.feed(this.firmwareSettingsToApply[this.firmwareSettingsToApplyIndex]);
+                        if (!this.feeder.isPending()) {
+                            this.feeder.next();
+                        }
+                    }
+                }
             }
         }[cmd];
 
