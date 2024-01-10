@@ -4,7 +4,7 @@ const { execSync } = require('child_process');
 /**
  * Custom signing utility
  * Required environment variables:
- *      KEYPAIR_ALIAS - KSP keypair from digicert
+ *      KEYPAIR_ALIAS - KSP keypair from Digicert
  * @param config
  * @returns {Promise<void>}
  */
