@@ -1216,7 +1216,7 @@ class AxesWidget extends PureComponent {
 
     convertPresetUnits(units, preset) {
         const conversionFunc = units === METRIC_UNITS ? convertToMetric : convertToImperial;
-        let convertedPreset = preset;
+        let convertedPreset = JSON.parse(JSON.stringify(preset));
         for (const key of Object.keys(preset)) {
             convertedPreset[key] = conversionFunc(preset[key]);
             if (key === 'feedrate') {
