@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Select from 'react-select';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, set, get } from 'lodash';
 
 import { Checkbox } from 'app/components/Checkbox';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
@@ -53,11 +53,11 @@ const JoystickOptions = () => {
 
     const { joystickOptions: { stick1, stick2, zeroThreshold = 15 } } = profile;
 
-    const stick1PrimaryActionIsUsingMPG = stick1.mpgMode.primaryAction !== null;
-    const stick1SecondaryActionIsUsingMPG = stick1.mpgMode.secondaryAction !== null;
+    const stick1PrimaryActionIsUsingMPG = get(stick1, 'mpgMode.primaryAction', null) !== null;
+    const stick1SecondaryActionIsUsingMPG = get(stick1, 'mpgMode.secondaryAction', null) !== null;
 
-    const stick2PrimaryActionIsUsingMPG = stick2.mpgMode.primaryAction !== null;
-    const stick2SecondaryActionIsUsingMPG = stick2.mpgMode.secondaryAction !== null;
+    const stick2PrimaryActionIsUsingMPG = get(stick2, 'mpgMode.primaryAction', null) !== null;
+    const stick2SecondaryActionIsUsingMPG = get(stick2, 'mpgMode.secondaryAction', null) !== null;
 
     const selectOverrideStyle = {
         valueContainer: provided => ({ ...provided, padding: 2, justifyContent: 'center' }),
