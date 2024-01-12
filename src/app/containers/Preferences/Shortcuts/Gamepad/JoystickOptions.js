@@ -325,27 +325,31 @@ const JoystickOptions = () => {
                 </Tooltip>
             </div>
 
-            <div className={styles.joystickOption}>
-                <div>Zero Threshold</div>
-                <Input
-                    value={zeroThreshold}
-                    additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
-                    onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
-                    className={styles['joystick-option-input']}
-                    units="%"
-                />
-            </div>
+            <Tooltip content="Provide a threshold percentage before a joystick movement is recognized" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <div className={styles.joystickOption}>
+                    <div>Zero Threshold</div>
+                    <Input
+                        value={zeroThreshold}
+                        additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
+                        onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
+                        className={styles['joystick-option-input']}
+                        units="%"
+                    />
+                </div>
+            </Tooltip>
 
-            <div className={styles.joystickOption}>
-                <div>Movement Distance Override</div>
-                <Input
-                    value={movementDistanceOverride}
-                    additionalProps={{ min: 50, max: 150, step: 1, type: 'number' }}
-                    onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
-                    className={styles['joystick-option-input']}
-                    units="%"
-                />
-            </div>
+            <Tooltip content="Adjust the computed movement distance values for dynamic joystick jogging" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <div className={styles.joystickOption}>
+                    <div>Movement Distance Override</div>
+                    <Input
+                        value={movementDistanceOverride}
+                        additionalProps={{ min: 50, max: 150, step: 1, type: 'number' }}
+                        onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
+                        className={styles['joystick-option-input']}
+                        units="%"
+                    />
+                </div>
+            </Tooltip>
         </div>
     );
 };
