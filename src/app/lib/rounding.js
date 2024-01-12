@@ -114,7 +114,7 @@ export const round = (val, units) => {
     }
 };
 
-// determine whether value needs to be rounded or not
+// rounds applicable values
 // recursive, looks through object properties
 export const determineRoundedValue = (key, value) => {
     const isObject = value instanceof Object;
