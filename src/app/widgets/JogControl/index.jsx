@@ -36,7 +36,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
-import { mapPositionToUnits } from 'app/lib/units';
+import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction, checkButtonHold } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -80,7 +80,6 @@ import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
 import { JoystickLoop, checkThumbsticskAreIdle } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
-import { convertToImperial, convertToMetric } from '../../containers/Preferences/calculate';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -210,20 +209,29 @@ class AxesWidget extends PureComponent {
         getJogDistance: () => {
             const { units } = this.state;
 
-            const step = units === IMPERIAL_UNITS ? this.config.get('jog.step') : convertToImperial(this.config.get('jog.step'));
-            let jogDistances = ensureArray(this.config.get('jog.distances', []));
             if (units === IMPERIAL_UNITS) {
-                jogDistances.forEach((el, index) => {
-                    jogDistances[index] = convertToImperial(el);
-                });
+                const step = this.config.get('jog.imperial.step');
+                const imperialJogDistances = ensureArray(this.config.get('jog.imperial.distances', []));
+                const imperialJogSteps = [
+                    ...imperialJogDistances,
+                    ...IMPERIAL_STEPS
+                ];
+                const distance = Number(imperialJogSteps[step]) || 0;
+                return distance;
             }
-            const unitSteps = units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-            const jogSteps = [
-                ...jogDistances,
-                ...unitSteps
-            ];
-            const distance = Number(jogSteps[step]) || 0;
-            return distance;
+
+            if (units === METRIC_UNITS) {
+                const step = this.config.get('jog.metric.step');
+                const metricJogDistances = ensureArray(this.config.get('jog.metric.distances', []));
+                const metricJogSteps = [
+                    ...metricJogDistances,
+                    ...METRIC_STEPS
+                ];
+                const distance = Number(metricJogSteps[step]) || 0;
+                return distance;
+            }
+
+            return 0;
         },
         getWorkCoordinateSystem: () => {
             const controllerState = this.props.state;
@@ -255,7 +263,7 @@ class AxesWidget extends PureComponent {
         },
         jog: (params = {}) => {
             const { units } = this.state;
-            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+            const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
@@ -320,54 +328,103 @@ class AxesWidget extends PureComponent {
             this.setState(state => ({
                 jog: {
                     ...state.jog,
-                    step: (state.units === METRIC_UNITS) ? step : state.jog.step
+                    imperial: {
+                        ...state.jog.imperial,
+                        step: (state.units === IMPERIAL_UNITS) ? step : state.jog.imperial.step,
+                    },
+                    metric: {
+                        ...state.jog.metric,
+                        step: (state.units === METRIC_UNITS) ? step : state.jog.metric.step
+                    }
                 }
             }));
         },
         stepForward: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: limit(state.jog.step + 1, 0, jogSteps.length - 1)
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? limit(state.jog.imperial.step + 1, 0, imperialJogSteps.length - 1)
+                                : state.jog.imperial.step
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? limit(state.jog.metric.step + 1, 0, metricJogSteps.length - 1)
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
         },
         stepBackward: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: limit(state.jog.step - 1, 0, jogSteps.length - 1)
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? limit(state.jog.imperial.step - 1, 0, imperialJogSteps.length - 1)
+                                : state.jog.imperial.step,
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? limit(state.jog.metric.step - 1, 0, metricJogSteps.length - 1)
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
         },
         stepNext: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: (state.jog.step + 1) % jogSteps.length
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? (state.jog.imperial.step + 1) % imperialJogSteps.length
+                                : state.jog.imperial.step,
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? (state.jog.metric.step + 1) % metricJogSteps.length
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
@@ -422,8 +479,8 @@ class AxesWidget extends PureComponent {
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
         setJogFromPreset: (presetKey) => {
-            const { jog } = this.state;
-            const jogObj = jog[presetKey];
+            const { jog, units } = this.state;
+            const jogObj = jog[presetKey][units];
 
             this.setState({
                 jog: {
@@ -513,24 +570,40 @@ class AxesWidget extends PureComponent {
             const shouldIncrement = speed === 'increase';
 
             for (const preset of presets) {
-                const keys = Object.keys(preset);
+                const metricKeys = Object.keys(preset[METRIC_UNITS]);
+                const imperialKeys = Object.keys(preset[IMPERIAL_UNITS]);
 
-                const newJog = {};
+                const newMetricJog = {};
+                const newImperialJog = {};
 
                 const fixedAmount = 3;
 
-                for (const key of keys) {
-                    const presetVal = preset[key];
+                for (const key of metricKeys) {
+                    const presetVal = preset[METRIC_UNITS][key];
                     const newVal = Number((presetVal - getStep({ value: presetVal, increment: shouldIncrement })).toFixed(fixedAmount));
 
-                    newJog[key] = newVal;
+                    newMetricJog[key] = newVal;
 
                     if (newVal !== 0 || newVal > 0) {
-                        newJog[key] = newVal;
+                        newMetricJog[key] = newVal;
                     }
                 }
 
-                newJogSpeeds.push(newJog);
+                for (const key of imperialKeys) {
+                    const presetVal = preset[IMPERIAL_UNITS][key];
+                    const newVal = Number((presetVal - getStep({ value: presetVal, increment: shouldIncrement })).toFixed(fixedAmount));
+
+                    newImperialJog[key] = newVal;
+
+                    if (newVal !== 0 || newVal > 0) {
+                        newImperialJog[key] = newVal;
+                    }
+                }
+
+                newJogSpeeds.push({
+                    mm: newMetricJog,
+                    in: newImperialJog
+                });
             }
 
             this.setState((prev) => ({
@@ -1218,40 +1291,16 @@ class AxesWidget extends PureComponent {
         this.config.set('minimized', minimized);
         this.config.set('axes', axes);
         this.config.set('jog.keypad', jog.keypad);
-        if (units !== prevState.units) {
-            if (units === METRIC_UNITS) {
-                this.config.set('jog.step', Number(jog.step) || 0);
-            } else {
-                this.config.set('jog.step', convertToMetric(jog.step) || 0);
-            }
+        if (units === IMPERIAL_UNITS) {
+            this.config.set('jog.imperial.step', Number(jog.imperial.step) || 0);
         }
-    }
-
-    convertPresetUnits(units, preset) {
-        const conversionFunc = units === METRIC_UNITS ? convertToMetric : convertToImperial;
-        let convertedPreset = JSON.parse(JSON.stringify(preset));
-        for (const key of Object.keys(preset)) {
-            convertedPreset[key] = conversionFunc(preset[key]);
-            if (key === 'feedrate') {
-                convertedPreset[key] = Number(convertedPreset[key]).toFixed(0);
-            }
+        if (units === METRIC_UNITS) {
+            this.config.set('jog.metric.step', Number(jog.metric.step) || 0);
         }
-        return convertedPreset;
-    }
-
-    convertAllPresetsUnits(units, initJog) {
-        const jog = initJog || this.state.jog;
-        const { rapid, normal, precise } = jog;
-        const convertedRapid = this.convertPresetUnits(units, rapid);
-        const convertedNormal = this.convertPresetUnits(units, normal);
-        const convertedPrecise = this.convertPresetUnits(units, precise);
-
-        return { convertedRapid, convertedNormal, convertedPrecise };
     }
 
     getInitialState() {
-        const initialUnits = store.get('workspace.units', METRIC_UNITS);
-        let { rapid, normal, precise } = initialUnits === IMPERIAL_UNITS ? this.convertAllPresetsUnits(initialUnits, store.get('widgets.axes.jog')) : store.get('widgets.axes.jog');
+        const { rapid, normal, precise } = store.get('widgets.axes.jog');
 
         return {
             minimized: this.config.get('minimized', false),
@@ -1293,8 +1342,14 @@ class AxesWidget extends PureComponent {
                 precise,
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
-                step: this.config.get('jog.step'),
-                distances: ensureArray(this.config.get('jog.distances', []))
+                imperial: {
+                    step: this.config.get('jog.imperial.step'),
+                    distances: ensureArray(this.config.get('jog.imperial.distances', []))
+                },
+                metric: {
+                    step: this.config.get('jog.metric.step'),
+                    distances: ensureArray(this.config.get('jog.metric.distances', []))
+                }
             },
             prevJog: null,
             prevDirection: null,
@@ -1305,35 +1360,35 @@ class AxesWidget extends PureComponent {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
-        return (units === METRIC_UNITS) ? speeds.xyStep : convertToImperial(speeds.xyStep);
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xyStep') : get(speeds, 'in.xyStep');
     }
 
     getInitialXAStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
-        return (units === METRIC_UNITS) ? speeds.xaStep : convertToImperial(speeds.xaStep);
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xaStep') : get(speeds, 'in.xaStep');
     }
 
     getInitialZStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
-        return (units === METRIC_UNITS) ? speeds.zStep : convertToImperial(speeds.zStep);
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.zStep') : get(speeds, 'in.zStep');
     }
 
     getInitialAStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
-        return (units === METRIC_UNITS) ? speeds.aStep : convertToImperial(speeds.aStep);
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.aStep') : get(speeds, 'in.aStep');
     }
 
     getInitialFeedRate() {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
-        return (units === METRIC_UNITS) ? speeds.feedrate : convertToImperial(speeds.feedrate);
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.feedrate') : get(speeds, 'in.feedrate');
     }
 
     changeUnits(units) {
@@ -1341,17 +1396,16 @@ class AxesWidget extends PureComponent {
         const { jog } = this.state;
         let { zStep, xyStep, aStep, feedrate } = jog;
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
-            zStep = convertToImperial(zStep);
-            xyStep = convertToImperial(xyStep);
-            aStep = convertToImperial(aStep);
-            feedrate = Number(convertToImperial(feedrate).toFixed(0));
+            zStep = mm2in(zStep).toFixed(3);
+            xyStep = mm2in(xyStep).toFixed(3);
+            aStep = mm2in(aStep).toFixed(3);
+            feedrate = mm2in(feedrate).toFixed(2);
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
-            zStep = convertToMetric(zStep);
-            xyStep = convertToMetric(xyStep);
-            aStep = convertToMetric(aStep);
-            feedrate = Number(convertToMetric(feedrate).toFixed(0));
+            zStep = in2mm(zStep).toFixed(2);
+            xyStep = in2mm(xyStep).toFixed(2);
+            aStep = in2mm(aStep).toFixed(2);
+            feedrate = in2mm(feedrate).toFixed(0);
         }
-        const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
 
         this.setState({
             units: units,
@@ -1360,10 +1414,7 @@ class AxesWidget extends PureComponent {
                 zStep: zStep,
                 xyStep: xyStep,
                 aStep: aStep,
-                feedrate,
-                rapid,
-                normal,
-                precise
+                feedrate
             }
         });
     }

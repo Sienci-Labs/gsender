@@ -22,6 +22,7 @@
  */
 
 import {
+    IMPERIAL_STEPS,
     METRIC_STEPS,
     METRIC_UNITS,
     SPINDLE_MODE,
@@ -81,10 +82,22 @@ const defaultState = {
         },
         machineProfile: machineProfiles[0],
         probeProfile: {
-            xyThickness: 10,
-            zThickness: 15,
-            plateWidth: 50,
-            plateLength: 50,
+            xyThickness: {
+                mm: 10,
+                in: 0.393
+            },
+            zThickness: {
+                mm: 15,
+                in: 0.590
+            },
+            plateWidth: {
+                mm: 50,
+                in: 1.968
+            },
+            plateLength: {
+                mm: 50,
+                in: 1.968
+            },
             functions: {
                 x: true,
                 y: true,
@@ -151,22 +164,49 @@ const defaultState = {
                 feedrate: 3000,
                 keypad: false,
                 rapid: {
-                    xyStep: 20,
-                    zStep: 10,
-                    feedrate: 5000,
+                    mm: {
+                        xyStep: 20,
+                        zStep: 10,
+                        feedrate: 5000,
+                    },
+                    in: {
+                        xyStep: 1,
+                        zStep: 0.5,
+                        feedrate: 196.85,
+                    }
                 },
                 normal: {
-                    xyStep: 5,
-                    zStep: 2,
-                    feedrate: 3000,
+                    mm: {
+                        xyStep: 5,
+                        zStep: 2,
+                        feedrate: 3000,
+                    },
+                    in: {
+                        xyStep: 0.2,
+                        zStep: 0.04,
+                        feedrate: 118.11,
+                    },
                 },
                 precise: {
-                    xyStep: 0.5,
-                    zStep: 0.1,
-                    feedrate: 1000,
+                    mm: {
+                        xyStep: 0.5,
+                        zStep: 0.1,
+                        feedrate: 1000,
+                    },
+                    in: {
+                        xyStep: 0.02,
+                        zStep: 0.004,
+                        feedrate: 39.37,
+                    },
                 },
-                step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
-                distances: []
+                imperial: {
+                    step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
+                    distances: []
+                },
+                metric: {
+                    step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
+                    distances: []
+                }
             },
             mdi: {
                 disabled: false
@@ -224,8 +264,14 @@ const defaultState = {
             axes: ['x', 'y', 'z'],
             jog: {
                 keypad: true,
-                step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
-                distances: [],
+                imperial: {
+                    step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
+                    distances: []
+                },
+                metric: {
+                    step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
+                    distances: []
+                },
                 speeds: {
                     xyStep: 5,
                     zStep: 0.5,
@@ -251,10 +297,22 @@ const defaultState = {
             connectivityTest: true,
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 75,
-            probeFastFeedrate: 150,
-            retractionDistance: 4,
-            zProbeDistance: 30,
+            probeFeedrate: {
+                mm: 75,
+                in: 2.95
+            },
+            probeFastFeedrate: {
+                mm: 150,
+                in: 5.9
+            },
+            retractionDistance: {
+                mm: 4,
+                in: 0.15
+            },
+            zProbeDistance: {
+                mm: 30,
+                in: 1.5
+            },
             touchPlateHeight: 10,
             probeType: 'Auto',
             direction: 0,

@@ -37,8 +37,6 @@ import ShuttleXpress from './ShuttleXpress';
 import {
     DEFAULT_AXES
 } from '../constants';
-import { IMPERIAL_UNITS } from '../../../constants';
-import { convertToMetric } from '../../../containers/Preferences/calculate';
 
 const TabContent = styled.div`
     padding: 10px 15px;
@@ -76,7 +74,12 @@ class Settings extends PureComponent {
         general: {
             axes: this.config.get('axes', DEFAULT_AXES),
             jog: {
-                distances: ensureArray(this.config.get('jog.distances', []))
+                imperial: {
+                    distances: ensureArray(this.config.get('jog.imperial.distances', []))
+                },
+                metric: {
+                    distances: ensureArray(this.config.get('jog.metric.distances', []))
+                }
             }
         },
 
@@ -86,9 +89,7 @@ class Settings extends PureComponent {
             feedrateMax: this.config.get('shuttle.feedrateMax'),
             hertz: this.config.get('shuttle.hertz'),
             overshoot: this.config.get('shuttle.overshoot')
-        },
-
-        units: this.props.units
+        }
     };
 
     save = () => {
@@ -105,18 +106,13 @@ class Settings extends PureComponent {
         // General
         const {
             axes = DEFAULT_AXES,
-            jogDistances
+            imperialJogDistances,
+            metricJogDistances
         } = this.node.general.value;
 
-        let convertedJogDistances = jogDistances;
-        if (this.state.units === IMPERIAL_UNITS) {
-            convertedJogDistances.forEach((el, index) => {
-                convertedJogDistances[index] = convertToMetric(el);
-            });
-        }
-
         this.config.replace('axes', ensureArray(axes));
-        this.config.replace('jog.distances', ensureArray(convertedJogDistances));
+        this.config.replace('jog.imperial.distances', ensureArray(imperialJogDistances));
+        this.config.replace('jog.metric.distances', ensureArray(metricJogDistances));
 
         // ShuttleXpress
         const { feedrateMin, feedrateMax, hertz, overshoot } = this.node.shuttleXpress.state;
@@ -161,7 +157,8 @@ class Settings extends PureComponent {
                                     this.node.general = node;
                                 }}
                                 axes={general.axes}
-                                jogDistances={general.jog.distances}
+                                imperialJogDistances={general.jog.imperial.distances}
+                                metricJogDistances={general.jog.metric.distances}
                             />
                         </TabPane>
                         <TabPane active={this.state.activeKey === 'mdi'}>

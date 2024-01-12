@@ -28,7 +28,7 @@ import ControlledNumberInput from 'app/components/ControlledNumberInput';
 
 import styles from '../index.styl';
 
-const Input = ({ value, label, units, onChange, additionalProps, className, isNumber, hasRounding }) => {
+const Input = ({ value, label, units, onChange, additionalProps, className, isNumber }) => {
     return (
         <div className={classNames(styles.input, 'form-group', className)} style={{ gridTemplateColumns: !label ? '1fr' : '' }}>
             {label && <label htmlFor="">{label}</label>}
@@ -39,7 +39,6 @@ const Input = ({ value, label, units, onChange, additionalProps, className, isNu
                     externalOnChange={onChange}
                     className={classNames('form-control', styles.inputText)}
                     style={{ zIndex: '0', textAlign: 'center', color: '#3e85c7' }}
-                    hasRounding={hasRounding}
                 />
                 {units && <span className="input-group-addon">{units}</span>}
             </div>
