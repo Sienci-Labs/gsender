@@ -50,7 +50,7 @@ import {
 import StatsPage from './Stats';
 import SafetySettings from './Safety';
 //from '../../widgets/Visualizer/constants';
-import { roundMetric } from '../../lib/rounding';
+import { convertValuesToMetric, convertValuesToImperial } from '../Surfacing/utils';
 
 
 class PreferencesPage extends PureComponent {
@@ -343,12 +343,16 @@ class PreferencesPage extends PureComponent {
 
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : Math.abs(convertToMetric(value));
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        retractionDistance: metricValue,
+                        retractionDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             },
@@ -357,12 +361,16 @@ class PreferencesPage extends PureComponent {
                 const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : Math.abs(convertToMetric(value));
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        normalFeedrate: metricValue,
+                        normalFeedrate: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             },
@@ -371,12 +379,16 @@ class PreferencesPage extends PureComponent {
                 const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : Math.abs(convertToMetric(value));
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        fastFeedrate: metricValue,
+                        fastFeedrate: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             },
@@ -385,12 +397,16 @@ class PreferencesPage extends PureComponent {
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : Math.abs(convertToMetric(value));
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probe: {
                         ...probe,
-                        xyThickness: metricValue,
+                        xyThickness: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
                 pubsub.publish('probe:updated');
@@ -400,12 +416,16 @@ class PreferencesPage extends PureComponent {
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : convertToMetric(value);
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
 
                 this.setState({
                     probe: {
                         ...probe,
-                        zThickness: metricValue,
+                        zThickness: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
                 pubsub.publish('probe:updated');
@@ -416,12 +436,16 @@ class PreferencesPage extends PureComponent {
 
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : convertToMetric(value);
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
 
                 this.setState({
                     probe: {
                         ...probe,
-                        plateWidth: metricValue,
+                        plateWidth: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
@@ -431,12 +455,16 @@ class PreferencesPage extends PureComponent {
 
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : convertToMetric(value);
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
 
                 this.setState({
                     probe: {
                         ...probe,
-                        plateLength: metricValue,
+                        plateLength: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
@@ -456,12 +484,16 @@ class PreferencesPage extends PureComponent {
 
                 const { units } = this.state;
 
-                const metricValue = units === METRIC_UNITS ? value : Math.abs(convertToMetric(value));
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        zProbeDistance: metricValue,
+                        zProbeDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             }
@@ -473,8 +505,6 @@ class PreferencesPage extends PureComponent {
                 let value = Number(e.target.value) || 0;
                 if (units === IMPERIAL_UNITS) {
                     value = convertToMetric(value);
-                } else {
-                    value = roundMetric(value, units);
                 }
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
@@ -878,17 +908,18 @@ class PreferencesPage extends PureComponent {
             return;
         }
 
-        // if (units !== prevState.units) {
-        //     const surfacingValues = store.get('widgets.surfacing');
+        if (units !== prevState.units) {
+            const surfacingValues = store.get('widgets.surfacing');
 
-        //     if (units === 'mm') {
-        //         store.replace('widgets.surfacing', convertValuesToMetric(surfacingValues));
-        //     }
+            if (units === 'mm') {
+                store.replace('widgets.surfacing', convertValuesToMetric(surfacingValues));
+            }
 
-        //     if (units === 'in') {
-        //         store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
-        //     }
-        // }
+            if (units === 'in') {
+                store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
+            }
+        }
+
 
         if (this.shouldShowToast) {
             this.showToast();

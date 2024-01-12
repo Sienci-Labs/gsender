@@ -98,17 +98,42 @@ class Keypad extends PureComponent {
         );
     }
 
-    renderMenuItems() {
+    renderImperialMenuItems() {
         const { jog } = this.props;
-        const jogDistances = ensureArray(jog.distances);
-        const unitSteps = this.state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-        const jogSteps = [
-            ...jogDistances,
-            ...unitSteps
+        const imperialJogDistances = ensureArray(jog.imperial.distances);
+        const imperialJogSteps = [
+            ...imperialJogDistances,
+            ...IMPERIAL_STEPS
         ];
-        const step = jog.step;
+        const step = jog.imperial.step;
 
-        return jogSteps.map((value, key) => {
+        return imperialJogSteps.map((value, key) => {
+            const active = (key === step);
+
+            return (
+                <MenuItem
+                    key={_uniqueId()}
+                    eventKey={key}
+                    active={active}
+                >
+                    {value}
+                    <Space width="4" />
+                    <sub>{i18n._('in')}</sub>
+                </MenuItem>
+            );
+        });
+    }
+
+    renderMetricMenuItems() {
+        const { jog } = this.props;
+        const metricJogDistances = ensureArray(jog.metric.distances);
+        const metricJogSteps = [
+            ...metricJogDistances,
+            ...METRIC_STEPS
+        ];
+        const step = jog.metric.step;
+
+        return metricJogSteps.map((value, key) => {
             const active = (key === step);
 
             return (

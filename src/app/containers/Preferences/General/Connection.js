@@ -51,7 +51,6 @@ const Connection = ({ state, actions }) => {
                                             max: 255,
                                         }}
                                         className={styles.ipInput}
-                                        hasRounding={false}
                                     />
                                     { index !== 3 && <strong className={styles.dot}>.</strong> }
                                 </React.Fragment>

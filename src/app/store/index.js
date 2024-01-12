@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 // import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
-import { isEmpty, isNumber, isString } from 'lodash';
+import { isEmpty } from 'lodash';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
@@ -160,25 +160,18 @@ const normalizeState = (state) => {
 };
 
 const merge = (base, saved) => {
-    const numberRegex = /^-?\d+.?\d*$/;
-
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
     const savedIsObject = saved instanceof Object;
     const savedIsArray = Array.isArray(saved);
 
-    const fromStringToNumber = isNumber(base) && isString(saved) && numberRegex.test(saved);
-    const fromNumberToString = isNumber(saved) && isString(base) && numberRegex.test(base);
-
     if (
         (!(baseIsObject) || baseIsArray) &&
         (!(savedIsObject) || savedIsArray)
     ) {
         // if they are the same type, use saved
-        // when numbers are rounded, they become strings
-        // so if it changes between those two types, and the string is a number, keep saved
-        if ((typeof base === typeof saved) || fromStringToNumber || fromNumberToString) {
+        if (typeof base === typeof saved) {
             return saved;
         }
         // if they are not, default structure changed, so use base
@@ -240,7 +233,7 @@ try {
     log.error(e);
 }
 
-store.state = normalizeState(merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {}));
+store.state = normalizeState(merge(defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on('change', debounce((state) => {
@@ -253,60 +246,6 @@ store.on('change', debounce((state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
-    }
-    console.log(cnc.version);
-    if (semver.lt(cnc.version, '1.3.10') || semver.lt(cnc.version, '1.3.10-EDGE')) {
-        const settings = store.get();
-
-        if (settings.workspace.probeProfile.xyThickness.mm) {
-            store.replace('workspace.probeProfile', {
-                ...settings.workspace.probeProfile,
-                xyThickness: settings.workspace.probeProfile.xyThickness.mm,
-                zThickness: settings.workspace.probeProfile.zThickness.mm,
-                plateWidth: settings.workspace.probeProfile.plateWidth.mm
-            });
-        }
-
-        if (settings.widgets.axes.jog.rapid.mm) {
-            store.replace('widgets.axes.jog', {
-                ...settings.widgets.axes.jog,
-                rapid: {
-                    xyStep: settings.widgets.axes.jog.rapid.mm.xyStep,
-                    zStep: settings.widgets.axes.jog.rapid.mm.zStep,
-                    feedrate: settings.widgets.axes.jog.rapid.mm.feedrate,
-                },
-                normal: {
-                    xyStep: settings.widgets.axes.jog.normal.mm.xyStep,
-                    zStep: settings.widgets.axes.jog.normal.mm.zStep,
-                    feedrate: settings.widgets.axes.jog.normal.mm.feedrate,
-                },
-                precise: {
-                    xyStep: settings.widgets.axes.jog.precise.mm.xyStep,
-                    zStep: settings.widgets.axes.jog.precise.mm.zStep,
-                    feedrate: settings.widgets.axes.jog.precise.mm.feedrate,
-                },
-                step: settings.widgets.axes.jog.metric.step,
-                distances: settings.widgets.axes.jog.metric.distances
-            });
-        }
-
-        if (settings.widgets.location.jog.metric) {
-            store.replace('widgets.axes.location', {
-                ...settings.widgets.axes.location,
-                step: settings.widgets.location.jog.metric.step,
-                distances: settings.widgets.location.jog.metric.distances
-            });
-        }
-
-        if (settings.widgets.probe.probeFeedrate.mm) {
-            store.replace('widgets.probe', {
-                ...settings.widgets.probe,
-                probeFeedrate: settings.widgets.probe.probeFeedrate.mm,
-                probeFastFeedrate: settings.widgets.probe.probeFastFeedrate.mm,
-                retractionDistance: settings.widgets.probe.retractionDistance.mm,
-                zProbeDistance: settings.widgets.probe.zProbeDistance.mm
-            });
-        }
     }
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
