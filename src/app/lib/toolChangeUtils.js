@@ -7,13 +7,13 @@ export const getProbeSettings = () => {
     const probeSettings = store.get('widgets.probe');
     const probeType = store.get('workspace.probeProfile.touchplateType');
 
-    const probeThickness = (probeType === TOUCHPLATE_TYPE_AUTOZERO) ? '5' : probeSettings.zProbeDistance;
+    const probeThickness = (probeType === TOUCHPLATE_TYPE_AUTOZERO) ? '5' : probeSettings.zProbeDistance.mm;
 
     return {
-        slowSpeed: probeSettings.probeFeedrate,
-        fastSpeed: probeSettings.probeFastFeedrate,
-        retract: probeSettings.retractionDistance,
-        zProbeDistance: probeSettings.zProbeDistance,
+        slowSpeed: probeSettings.probeFeedrate.mm,
+        fastSpeed: probeSettings.probeFastFeedrate.mm,
+        retract: probeSettings.retractionDistance.mm,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
         zProbeThickness: probeThickness,
     };
 };
