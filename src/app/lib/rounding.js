@@ -117,12 +117,21 @@ export const round = (val, units) => {
 // determine whether value needs to be rounded or not
 // recursive, looks through object properties
 export const determineRoundedValue = (key, value) => {
-    if (value instanceof Object) {
+    const isObject = value instanceof Object;
+    const isArray = Array.isArray(value);
+
+    // if object, recurse
+    if (isObject && !isArray) {
+        let newVal = {};
         Object.keys(value).forEach((el, index) => {
-            value[el] = determineRoundedValue(key + '.' + el, value[el]);
+            newVal[el] = determineRoundedValue(key + '.' + el, value[el]);
         });
-    }
-    if (storeValuesThatNeedRounding.has(key)) {
+        return newVal;
+    // if array and is something we should round, iterate through the values and round
+    } else if (isArray && storeValuesThatNeedRounding.has(key)) {
+        return value.map((el) => roundMetric(el));
+    // if a single value, round
+    } else if (storeValuesThatNeedRounding.has(key)) {
         return roundMetric(value);
     }
     return value;
