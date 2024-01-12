@@ -343,7 +343,7 @@ const JoystickOptions = () => {
                     <div>Movement Distance Override</div>
                     <Input
                         value={movementDistanceOverride}
-                        additionalProps={{ min: 50, max: 150, step: 1, type: 'number' }}
+                        additionalProps={{ min: 10, max: 99999, step: 1, type: 'number' }}
                         onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
                         className={styles['joystick-option-input']}
                         units="%"
