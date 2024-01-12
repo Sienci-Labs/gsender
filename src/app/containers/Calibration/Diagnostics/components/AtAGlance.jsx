@@ -35,6 +35,10 @@ import styles from '../index.styl';
 
 const AtAGlance = ({ homing, softLimits, homingLocation, reportInches, stepperMotors }) => {
     const handleStepperMotorToggle = (value) => {
+        if (!controller.settings?.settings) {
+            return;
+        }
+
         if (value) {
             store.replace('workspace.diagnostics.stepperMotor.storedValue', controller.settings.settings.$1);
             controller.command('gcode', ['$1=255', '$$']);

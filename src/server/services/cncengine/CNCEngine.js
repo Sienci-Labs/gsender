@@ -402,7 +402,7 @@ class CNCEngine {
 
             // Close serial port
             socket.on('close', (port, callback = noop) => {
-                const numClients = socket.adapter.rooms.get(port).size;
+                const numClients = socket.adapter.rooms?.get(port)?.size;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }

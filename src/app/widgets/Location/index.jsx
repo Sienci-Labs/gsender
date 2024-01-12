@@ -78,7 +78,6 @@ import {
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
 import { Confirm } from 'Components/ConfirmationDialog/ConfirmationDialogLib';
-import { convertToImperial, convertToMetric } from '../../containers/Preferences/calculate';
 
 class LocationWidget extends PureComponent {
     static propTypes = {
@@ -187,20 +186,29 @@ class LocationWidget extends PureComponent {
         getJogDistance: () => {
             const { units } = this.state;
 
-            const step = units === IMPERIAL_UNITS ? this.config.get('jog.step') : convertToImperial(this.config.get('jog.step'));
-            let jogDistances = ensureArray(this.config.get('jog.distances', []));
             if (units === IMPERIAL_UNITS) {
-                jogDistances.forEach((el, index) => {
-                    jogDistances[index] = convertToImperial(el);
-                });
+                const step = this.config.get('jog.imperial.step');
+                const imperialJogDistances = ensureArray(this.config.get('jog.imperial.distances', []));
+                const imperialJogSteps = [
+                    ...imperialJogDistances,
+                    ...IMPERIAL_STEPS
+                ];
+                const distance = Number(imperialJogSteps[step]) || 0;
+                return distance;
             }
-            const unitSteps = units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-            const jogSteps = [
-                ...jogDistances,
-                ...unitSteps
-            ];
-            const distance = Number(jogSteps[step]) || 0;
-            return distance;
+
+            if (units === METRIC_UNITS) {
+                const step = this.config.get('jog.metric.step');
+                const metricJogDistances = ensureArray(this.config.get('jog.metric.distances', []));
+                const metricJogSteps = [
+                    ...metricJogDistances,
+                    ...METRIC_STEPS
+                ];
+                const distance = Number(metricJogSteps[step]) || 0;
+                return distance;
+            }
+
+            return 0;
         },
         getWorkCoordinateSystem: this.getWorkCoordinateSystem,
         setWorkOffsets: (axis, value) => {
@@ -233,54 +241,103 @@ class LocationWidget extends PureComponent {
             this.setState(state => ({
                 jog: {
                     ...state.jog,
-                    step: (state.units === METRIC_UNITS) ? step : state.jog.step
+                    imperial: {
+                        ...state.jog.imperial,
+                        step: (state.units === IMPERIAL_UNITS) ? step : state.jog.imperial.step,
+                    },
+                    metric: {
+                        ...state.jog.metric,
+                        step: (state.units === METRIC_UNITS) ? step : state.jog.metric.step
+                    }
                 }
             }));
         },
         stepForward: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: limit(state.jog.step + 1, 0, jogSteps.length - 1)
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? limit(state.jog.imperial.step + 1, 0, imperialJogSteps.length - 1)
+                                : state.jog.imperial.step
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? limit(state.jog.metric.step + 1, 0, metricJogSteps.length - 1)
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
         },
         stepBackward: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: limit(state.jog.step - 1, 0, jogSteps.length - 1)
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? limit(state.jog.imperial.step - 1, 0, imperialJogSteps.length - 1)
+                                : state.jog.imperial.step,
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? limit(state.jog.metric.step - 1, 0, metricJogSteps.length - 1)
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
         },
         stepNext: () => {
             this.setState(state => {
-                const unitSteps = state.units === METRIC_UNITS ? METRIC_STEPS : IMPERIAL_STEPS;
-                const jogSteps = [
-                    ...state.jog.distances,
-                    ...unitSteps
+                const imperialJogSteps = [
+                    ...state.jog.imperial.distances,
+                    ...IMPERIAL_STEPS
+                ];
+                const metricJogSteps = [
+                    ...state.jog.metric.distances,
+                    ...METRIC_STEPS
                 ];
 
                 return {
                     jog: {
                         ...state.jog,
-                        step: (state.jog.step + 1) % jogSteps.length
+                        imperial: {
+                            ...state.jog.imperial,
+                            step: (state.units === IMPERIAL_UNITS)
+                                ? (state.jog.imperial.step + 1) % imperialJogSteps.length
+                                : state.jog.imperial.step,
+                        },
+                        metric: {
+                            ...state.jog.metric,
+                            step: (state.units === METRIC_UNITS)
+                                ? (state.jog.metric.step + 1) % metricJogSteps.length
+                                : state.jog.metric.step
+                        }
                     }
                 };
             });
@@ -577,10 +634,10 @@ class LocationWidget extends PureComponent {
         this.config.set('axes', axes);
         this.config.set('jog.keypad', jog.keypad);
         if (units === IMPERIAL_UNITS) {
-            this.config.set('jog.step', convertToMetric(jog.step) || 0);
+            this.config.set('jog.imperial.step', Number(jog.imperial.step) || 0);
         }
         if (units === METRIC_UNITS) {
-            this.config.set('jog.step', Number(jog.step) || 0);
+            this.config.set('jog.metric.step', Number(jog.metric.step) || 0);
         }
     }
 
@@ -620,7 +677,12 @@ class LocationWidget extends PureComponent {
             jog: {
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
-                step: this.config.get('jog.step'),
+                imperial: {
+                    step: this.config.get('jog.imperial.step'),
+                },
+                metric: {
+                    step: this.config.get('jog.metric.step'),
+                },
                 speeds: {
                     xyStep: this.config.get('jog.speeds.xyStep'),
                     zStep: this.config.get('jog.speeds.zStep'),
@@ -815,25 +877,27 @@ class LocationWidget extends PureComponent {
                             config={config}
                             onSave={() => {
                                 const axes = config.get('axes', DEFAULT_AXES);
-                                let jogDistances = ensureArray(this.config.get('jog.distances', []));
-                                if (units === IMPERIAL_UNITS) {
-                                    jogDistances.forEach((el, index) => {
-                                        jogDistances[index] = convertToImperial(el);
-                                    });
-                                }
+                                const imperialJogDistances = ensureArray(config.get('jog.imperial.distances', []));
+                                const metricJogDistances = ensureArray(config.get('jog.metric.distances', []));
 
                                 this.setState(state => ({
                                     axes: axes,
                                     jog: {
                                         ...state.jog,
-                                        distances: jogDistances
+                                        imperial: {
+                                            ...state.jog.imperial,
+                                            distances: imperialJogDistances
+                                        },
+                                        metric: {
+                                            ...state.jog.metric,
+                                            distances: metricJogDistances
+                                        }
                                     }
                                 }));
 
                                 actions.closeModal();
                             }}
                             onCancel={actions.closeModal}
-                            units={this.state.units}
                         />
                     )}
                     <Location config={config} state={state} actions={actions} />

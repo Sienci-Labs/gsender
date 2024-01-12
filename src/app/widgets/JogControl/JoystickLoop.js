@@ -76,6 +76,8 @@ export class JoystickLoop {
     _computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
         const { settings } = controller.settings;
 
+        const { joystickOptions: { movementDistanceOverride = 100 } } = this.gamepadProfile;
+
         const axisMaxFeedrate = Number(
             {
                 x: settings.$110,
@@ -89,9 +91,9 @@ export class JoystickLoop {
 
         const feedrateInMMPerSec = Math.round(feedrate / 60);
 
-        const executionTimeOfSingleCommand = 0.06;
+        const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
 
-        const incrementalDistance = feedrateInMMPerSec * executionTimeOfSingleCommand;
+        const incrementalDistance = (feedrateInMMPerSec * COMMAND_EXECUTION_TIME_IN_SECONDS) * (movementDistanceOverride / 100);
 
         return +(incrementalDistance.toFixed(2));
     };

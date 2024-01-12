@@ -1,7 +1,6 @@
 import objtools from 'objtools';
 import Interpreter from 'gcode-interpreter';
 import GCodeBlock from 'app/lib/gcodeProcessor/GCodeBlock';
-import { METRIC_UNITS } from '../../constants';
 
 
 export const INVALID_GCODE_REGEX = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
@@ -161,7 +160,7 @@ export class GCodeProcessor {
             vmState.storedPositions = objtools.deepCopy(controller.storedPositions || [this.zerocoord(), this.zerocoord()]);
         }
         if (shouldInclude('units')) {
-            vmState.units = controller.units || METRIC_UNITS;
+            vmState.units = controller.units || 'mm';
         }
         if (shouldInclude('feed')) {
             vmState.feed = controller.feed || (Array.isArray(this.options.maxFeed) ? this.options.maxFeed[0] : this.options.maxFeed);
@@ -281,7 +280,7 @@ export class GCodeProcessor {
                 vmState.units = 'in';
             }
             if (gline.has('G21')) {
-                vmState.units = METRIC_UNITS;
+                vmState.units = 'mm';
             }
             for (let i = 0; i < 6; i++) {
                 if (gline.has('G' + (54 + i))) {
@@ -314,7 +313,7 @@ export class GCodeProcessor {
                 vmState.spindle = false;
                 vmState.motionMode = null;
                 vmState.coolant = false;
-                vmState.units = METRIC_UNITS;
+                vmState.units = 'mm';
                 changedCoordOffsets = true;
             }
             let wordS = gline.get('S');

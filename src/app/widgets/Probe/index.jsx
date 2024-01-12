@@ -53,7 +53,6 @@ import {
 } from './constants';
 import styles from './index.styl';
 import { getProbeCode } from 'app/lib/Probing';
-import { convertToImperial } from '../../containers/Preferences/calculate';
 
 
 class ProbeWidget extends PureComponent {
@@ -83,13 +82,13 @@ class ProbeWidget extends PureComponent {
     PROBE_DISTANCE_METRIC = {
         X: 50,
         Y: 50,
-        Z: this.state.zProbeDistance ? this.state.zProbeDistance : 30
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.mm : 30
     };
 
     PROBE_DISTANCE_IMPERIAL = {
         X: 2,
         Y: 2,
-        Z: this.state.zProbeDistance ? convertToImperial(this.state.zProbeDistance) : 1.2
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.in : 1.2
     };
 
 
@@ -384,6 +383,7 @@ class ProbeWidget extends PureComponent {
 
     getInitialState() {
         const units = store.get('workspace.units');
+        const defaultToolDiameter = units === METRIC_UNITS ? 6.35 : 0.25;
         const availableTools = store.get('workspace.tools', []);
 
         const touchplateType = store.get('workspace.probeProfile.touchplateType');
@@ -392,7 +392,7 @@ class ProbeWidget extends PureComponent {
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
             toolDiameter = PROBE_TYPE_AUTO;
         } else {
-            toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
+            toolDiameter = availableTools.length === 0 ? defaultToolDiameter : availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
         }
 
         return {
@@ -1134,17 +1134,17 @@ class ProbeWidget extends PureComponent {
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = (units === METRIC_UNITS) ? '21' : '20';
         if (units === METRIC_UNITS) {
-            zThickness = touchplate.zThickness;
-            xyThickness = touchplate.xyThickness;
-            feedrate = probeFeedrate;
-            fastFeedrate = probeFastFeedrate;
-            retractDistance = retractionDistance;
+            zThickness = touchplate.zThickness.mm;
+            xyThickness = touchplate.xyThickness.mm;
+            feedrate = probeFeedrate.mm;
+            fastFeedrate = probeFastFeedrate.mm;
+            retractDistance = retractionDistance.mm;
         } else {
-            zThickness = convertToImperial(touchplate.zThickness);
-            xyThickness = convertToImperial(touchplate.xyThickness);
-            feedrate = convertToImperial(probeFeedrate);
-            fastFeedrate = convertToImperial(probeFastFeedrate);
-            retractDistance = convertToImperial(retractionDistance);
+            zThickness = touchplate.zThickness.in;
+            xyThickness = touchplate.xyThickness.in;
+            feedrate = probeFeedrate.in;
+            fastFeedrate = probeFastFeedrate.in;
+            retractDistance = retractionDistance.in;
         }
 
         const options = {
@@ -1224,8 +1224,8 @@ class ProbeWidget extends PureComponent {
         }, () => {
             const { zProbeDistance } = this.state;
             if (zProbeDistance) {
-                this.PROBE_DISTANCE_METRIC.Z = zProbeDistance;
-                this.PROBE_DISTANCE_IMPERIAL.Z = convertToImperial(zProbeDistance);
+                this.PROBE_DISTANCE_METRIC.Z = zProbeDistance.mm;
+                this.PROBE_DISTANCE_IMPERIAL.Z = zProbeDistance.in;
             }
         });
     }

@@ -32,8 +32,8 @@ import Tools from './Tools';
 import GeneralArea from '../components/GeneralArea';
 import SettingWrapper from '../components/SettingWrapper';
 import { collectUserUsageData } from '../../../lib/heatmap';
-import { METRIC_UNITS, USAGE_TOOL_NAME } from '../../../constants';
-import { convertToImperial } from '../calculate';
+import { USAGE_TOOL_NAME } from '../../../constants';
+
 
 const Probe = ({ active, state, actions }) => {
     const [type, setType] = useState(store.get('workspace.probeProfile.touchplateType'));
@@ -52,14 +52,14 @@ const Probe = ({ active, state, actions }) => {
     const probeActions = actions.probe;
 
     const values = {
-        length: units === METRIC_UNITS ? probe.plateLength : convertToImperial(probe.plateLength),
-        width: units === METRIC_UNITS ? probe.plateWidth : convertToImperial(probe.plateWidth),
-        xyThickness: units === METRIC_UNITS ? probe.xyThickness : convertToImperial(probe.xyThickness),
-        zThickness: units === METRIC_UNITS ? probe.zThickness : convertToImperial(probe.zThickness),
-        fastFeedrate: units === METRIC_UNITS ? probeSettings.fastFeedrate : convertToImperial(probeSettings.fastFeedrate),
-        normalFeedrate: units === METRIC_UNITS ? probeSettings.normalFeedrate : convertToImperial(probeSettings.normalFeedrate),
-        retractionDistance: units === METRIC_UNITS ? probeSettings.retractionDistance : convertToImperial(probeSettings.retractionDistance),
-        zProbeDistance: units === METRIC_UNITS ? probeSettings.zProbeDistance : convertToImperial(probeSettings.zProbeDistance),
+        length: units === 'mm' ? probe.plateLength.mm : probe.plateLength.in,
+        width: units === 'mm' ? probe.plateWidth.mm : probe.plateWidth.in,
+        xyThickness: units === 'mm' ? probe.xyThickness.mm : probe.xyThickness.in,
+        zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in,
+        fastFeedrate: units === 'mm' ? probeSettings.fastFeedrate.mm : probeSettings.fastFeedrate.in,
+        normalFeedrate: units === 'mm' ? probeSettings.normalFeedrate.mm : probeSettings.normalFeedrate.in,
+        retractionDistance: units === 'mm' ? probeSettings.retractionDistance.mm : probeSettings.retractionDistance.in,
+        zProbeDistance: units === 'mm' ? probeSettings.zProbeDistance.mm : probeSettings.zProbeDistance.in,
     };
 
     const handleTouchplateTypeChange = (option) => {

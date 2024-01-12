@@ -24,7 +24,6 @@ const Spindle = ({ state, actions }) => {
                         value={spindleMin}
                         onChange={(e) => spindleActions.setSpeed(e.target.value, 'spindleMin')}
                         additionalProps={{ type: 'number' }}
-                        hasRounding={false}
                     />
                 </TooltipCustom>
                 <TooltipCustom content="Maximum spindle speed" location="default">
@@ -34,7 +33,6 @@ const Spindle = ({ state, actions }) => {
                         value={spindleMax}
                         onChange={(e) => spindleActions.setSpeed(e.target.value, 'spindleMax')}
                         additionalProps={{ type: 'number' }}
-                        hasRounding={false}
                     />
                 </TooltipCustom>
             </Fieldset>
