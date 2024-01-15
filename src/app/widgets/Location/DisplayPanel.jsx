@@ -343,7 +343,7 @@ class DisplayPanel extends PureComponent {
         const { homingSetting } = this.props;
         const binary = parseInt(homingSetting, 10).toString(2);
         const singleAxis = binary.charAt(binary.length - 2);
-        return singleAxis;
+        return Number(singleAxis);
     }
 
     handleMovementSwitch(newValue) {
