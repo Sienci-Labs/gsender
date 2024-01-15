@@ -32,7 +32,8 @@ export const BACK_RIGHT = 'BR';
 export const BACK_LEFT = 'BL';
 export const OTHER = 'OT';
 
-const OFFSET_DISTANCE = 0.95;
+const OFFSET_DISTANCE = 1;
+const PULLOFF_DISTANCE = 5;
 
 export const getHomingLocation = (setting) => {
     if (setting === '0') {
@@ -53,8 +54,9 @@ const getMachineMovementLimits = () => {
     const settings = get(store, 'controller.settings.settings');
     const { $130: xMax, $131: yMax } = settings;
 
-    const xLimit = (Number(xMax) * OFFSET_DISTANCE).toFixed(3);
-    const yLimit = (Number(yMax) * OFFSET_DISTANCE).toFixed(3);
+    // Limits are PULLOFF_DISTANCE away from reported limits
+    const xLimit = (Number(xMax) - PULLOFF_DISTANCE).toFixed(3);
+    const yLimit = (Number(yMax) - PULLOFF_DISTANCE).toFixed(3);
 
     return [xLimit, yLimit];
 };
@@ -71,7 +73,7 @@ export function getBit(number, bitPosition) {
 const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pullOff) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
 
-    pullOff = Number(pullOff) || 2;
+    pullOff = PULLOFF_DISTANCE;
     // If homing flag not set, we treat all movements as negative space
     if (!homingFlag) {
         homingPosition = BACK_RIGHT;
