@@ -62,10 +62,9 @@ const getMachineMovementLimits = () => {
 };
 
 
-// Get a single bit from integer at position
-export function getBit(number, bitPosition) {
+// Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
+export function isBitSetInNumber(number, bitPosition) {
     number = Number(number);
-    console.log(number);
     // eslint-disable-next-line no-bitwise
     return (number & (1 << bitPosition)) !== 0;
 }
@@ -145,7 +144,7 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
         const store = reduxStore.getState();
         const settings = get(store, 'controller.settings.settings');
         const { $22: homingValue } = settings;
-        homingFlag = getBit(homingValue, 3);
+        homingFlag = isBitSetInNumber(homingValue, 3);
     }
 
     const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
