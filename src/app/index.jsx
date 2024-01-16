@@ -62,6 +62,8 @@ import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import Space from './components/Space';
 import PopUpWidget from './containers/PopUpWidget';
+import pkg from '../package.json';
+
 import './styles/vendor.styl';
 import './styles/app.styl';
 
@@ -72,6 +74,7 @@ if (process.env.NODE_ENV === 'production') {
             new Sentry.BrowserTracing(),
             new Sentry.Replay()
         ],
+        release: pkg.version
     });
 }
 
