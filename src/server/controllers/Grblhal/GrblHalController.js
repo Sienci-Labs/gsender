@@ -199,6 +199,9 @@ class GrblHalController {
     // Toolchange
     toolChanger = null;
 
+    // Rotary
+    isInRotaryMode = false;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -339,19 +342,21 @@ class GrblHalController {
                     line = line.replace('M6', '(M6)');
                 }
 
-                const containsACommand = A_AXIS_COMMANDS.test(line);
-                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
 
-                if (containsACommand && !containsYCommand) {
-                    const isUsingImperialUnits = context.modal.units === 'G20';
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
 
-                    line = translateGcode({
-                        gcode: line,
-                        from: 'A',
-                        to: 'Y',
-                        regex: A_AXIS_COMMANDS,
-                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
-                    });
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
                 }
 
                 return line;
@@ -501,19 +506,21 @@ class GrblHalController {
                  * Rotary Logic
                  * Need to change the A-axis movements to Y-movements to emulate the rotary axis on grbl
                  */
-                const containsACommand = A_AXIS_COMMANDS.test(line);
-                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
 
-                if (containsACommand && !containsYCommand) {
-                    const isUsingImperialUnits = context.modal.units === 'G20';
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
 
-                    line = translateGcode({
-                        gcode: line,
-                        from: 'A',
-                        to: 'Y',
-                        regex: A_AXIS_COMMANDS,
-                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
-                    });
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
                 }
                 /**
                  * End of Rotary Logic
@@ -2071,6 +2078,10 @@ class GrblHalController {
                 const [estimateData] = args;
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
+            },
+            'updateRotaryMode': () => {
+                const [isInRotaryMode] = args;
+                this.isInRotaryMode = isInRotaryMode;
             }
         }[cmd];
 
