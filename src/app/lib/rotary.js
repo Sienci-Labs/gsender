@@ -124,13 +124,13 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                     const newAAxisSettings = [
                         `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
                         `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
-                        `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`
+                        `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`,
                         `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
                     ];
                     const newYAxisSettings = [
                         `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
                         `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
-                        `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`
+                        `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`,
                         `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
                     ];
 
