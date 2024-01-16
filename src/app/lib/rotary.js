@@ -106,7 +106,6 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
                         <ol>
                             <li style={{ marginBottom: '1rem' }}>Zero the Y-Axis in it&apos;s current position</li>
-                            <li style={{ marginBottom: '1rem' }}>Turn soft and hard limits off, if they are on</li>
                             <li>
                                 <span>Switch these A and Y axis settings:</span>
 
