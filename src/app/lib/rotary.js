@@ -113,6 +113,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                                     <li>$101 and $103 (travel resolution)</li>
                                     <li>$111 and $113 (maximum rate)</li>
                                     <li>$121 and $123 (acceleration)</li>
+                                    <li>$131 and $133 (travel amount)</li>
                                 </ul>
                             </li>
                         </ol>
@@ -124,11 +125,13 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                         `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
                         `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
                         `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`
+                        `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
                     ];
                     const newYAxisSettings = [
                         `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
                         `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
                         `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`
+                        `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
                     ];
 
                     // zero y and enable rotary
