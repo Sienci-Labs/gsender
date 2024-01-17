@@ -414,5 +414,8 @@
   },
   "overrides": {
     "@react-pdf/layout": "3.6.4"
+  },
+  "resolutions": {
+    "@react-pdf/layout": "3.6.4"
   }
 }
