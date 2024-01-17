@@ -411,5 +411,8 @@
     "webpack-manifest-plugin": "~2.0.4",
     "webpack-node-externals": "~1.7.2",
     "write-file-webpack-plugin": "~4.5.0"
+  },
+  "overrides": {
+    "@react-pdf/layout": "3.6.4"
   }
 }
