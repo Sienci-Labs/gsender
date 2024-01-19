@@ -582,6 +582,7 @@ class GrblController {
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.stopCountdown();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -594,6 +595,7 @@ class GrblController {
             }
 
             this.timePaused = new Date().getTime();
+            this.sender.pauseCountdown();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -605,6 +607,8 @@ class GrblController {
 
             // Resume program execution
             this.sender.unhold();
+
+            this.sender.resumeCountdown();
 
             // subtract time paused
             this.sender.next({ timePaused: pauseTime });
@@ -1617,6 +1621,7 @@ class GrblController {
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger(PROGRAM_END);
+                this.sender.stopCountdown();
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);

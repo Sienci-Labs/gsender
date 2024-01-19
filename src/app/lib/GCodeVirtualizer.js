@@ -1020,6 +1020,11 @@ class GCodeVirtualizer extends EventEmitter {
             }
         }
 
+        // if the line didnt hav time calcs involved, push 0 time
+        if (this.estimates.length < this.data.length) {
+            this.estimates.push(0);
+        }
+
         // add new data structure
         this.data.push({
             Scode: null,
