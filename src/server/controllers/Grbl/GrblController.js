@@ -248,7 +248,8 @@ class GrblController {
                         }
                     }
                 }
-                return data;
+                // remove inline comments before forwarding on to the machine
+                return data.replace(/\([^\)]*\)/gm, '').trim();
             }
         });
 
