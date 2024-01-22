@@ -39,6 +39,10 @@ export class JoystickLoop {
     _getCurrentGamepad = () => {
         const currentHandler = gamepad.handlers.find(handler => this.gamepadProfile.id.includes(handler?.gamepad?.id));
 
+        if (!currentHandler) {
+            throw new Error('Could not find current gamepad');
+        }
+
         return currentHandler?.gamepad;
     }
 
