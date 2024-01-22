@@ -1048,7 +1048,7 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
@@ -1112,7 +1112,7 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
