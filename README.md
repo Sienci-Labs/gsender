@@ -26,7 +26,7 @@ gSender is available for the following systems and does not yet support headless
 |  |  |                                                                                                                   |                                                                                                                   |                                                                                                                                   |
 | ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-1.4.0-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-1.4.0-Mac-Intel-64Bit.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-PI-64Bit.deb) |
      
-                                                                                                            |                                                                                                                   |                                                                                                                   |
+
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 
