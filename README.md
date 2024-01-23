@@ -20,10 +20,13 @@ Some things that we’re looking to accomplish with this sender:
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (ARM64) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (32) | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64) | 
-|-|-|-|-|-|-|-
- ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x32.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_bullseye.deb)
 
+| Windows (x64) | Mac (Intel) | Linux (Intel)                                                                                                     | Linux (ARM)                                                                                                       | Pi (64 bit)                                                                                                                       |
+|---|---|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|  |  |                                                                                                                   |                                                                                                                   |                                                                                                                                   |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-1.4.0-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-1.4.0-Mac-Intel-64Bit.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.0/gSender-Edge-1.4.0-Linux-PI-64Bit.deb) |
+     
+                                                                                                            |                                                                                                                   |                                                                                                                   |
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 
@@ -131,7 +134,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Files are now parsed once per run time
 - Fix for DRO precision in some situations
 - Improved job stats area - now tracks jobs per com port, more information about each job run and the number of problems encountered
-- Maintenance reminders - set up and customize maintenance reminders to prompt tasks after specific run time totals have occurred
+- Maintenance reminders - set up and customize maintenance reminders to prompt tasks after specific run time totals have occured
 - Improved alarm and error recording
 
 ### 1.2.2 (Jul 6, 2023)
