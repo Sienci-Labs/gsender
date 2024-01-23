@@ -99,7 +99,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.4.0 (January X, 2024)
+### 1.4.0 (January 23, 2024)
 - Added Rotary Mode
   - gSender is now able to run 2+1 axis files on grbl and 4 axis files on grblHAL
   - Visualizer updated to support 4 axis rotations
@@ -131,7 +131,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Files are now parsed once per run time
 - Fix for DRO precision in some situations
 - Improved job stats area - now tracks jobs per com port, more information about each job run and the number of problems encountered
-- Maintenance reminders - set up and customize maintenance reminders to prompt tasks after specific run time totals have occured
+- Maintenance reminders - set up and customize maintenance reminders to prompt tasks after specific run time totals have occurred
 - Improved alarm and error recording
 
 ### 1.2.2 (Jul 6, 2023)
