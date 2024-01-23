@@ -353,7 +353,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
@@ -437,7 +438,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
