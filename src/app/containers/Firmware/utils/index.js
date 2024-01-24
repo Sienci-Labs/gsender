@@ -4,7 +4,7 @@ import download from 'downloadjs';
 
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
-import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 // import store from 'app/store';
 import { GRBL } from 'app/constants';
 
@@ -163,13 +163,8 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
         changedSettings[index2021] = setting22;
     }
 
-    controller.command('gcode', changedSettings);
-    controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
+    controller.command('firmwareSettings:start', changedSettings);
     setSettingsToApply(false);
-    Toaster.pop({
-        msg: 'Firmware Settings Updated',
-        type: TOASTER_SUCCESS
-    });
 };
 
 export const importFirmwareSettings = (file, callback) => {

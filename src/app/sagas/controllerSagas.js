@@ -615,14 +615,44 @@ export function* initialize() {
         pubsub.publish('firmware:update', status);
     });
 
-    controller.addListener('error', (error) => {
+    controller.addListener('error', (error, isFirmwareSettingsError) => {
         if (ALARM_ERROR_TYPES.includes(error.type)) {
             updateAlarmsErrors(error);
+        }
+        if (isFirmwareSettingsError) {
+            Confirm({
+                title: 'Firmware Settings Error',
+                content:
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'left !important', alignmentItems: 'left !important' }}>
+                        <span style={{ color: '#9b1919' }}>One of your settings was unable to be applied.</span>
+                        <span>
+                            <span style={{ fontWeight: 'bold' }}>Setting:</span>
+                            {` ${error.line}`}
+                        </span>
+                        <span>
+                            <span style={{ fontWeight: 'bold' }}>Error Code</span>
+                            <span style={{ color: '#dc2626', fontWeight: 'bold' }}>{` ${error.code}: `}</span>
+                            { `${error.description}`}
+                        </span>
+                    </div>,
+                confirmLabel: 'Continue',
+                cancelLabel: null,
+                onConfirm: () => {
+                    controller.command('firmwareSettings:continue');
+                }
+            });
         }
         // if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
         //     window.ipcRenderer.send('logError:electron', error);
         // }
         pubsub.publish('error', error);
+    });
+
+    controller.addListener('firmwareSettings:end', () => {
+        Toaster.pop({
+            msg: 'Firmware Settings Updated',
+            type: TOASTER_SUCCESS
+        });
     });
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {

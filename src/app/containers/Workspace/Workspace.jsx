@@ -33,7 +33,8 @@ import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
     WORKFLOW_STATE_IDLE,
-    USER_DATA_COLLECTION
+    USER_DATA_COLLECTION,
+    ACTIVE_STATE_IDLE
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -210,7 +211,7 @@ class Workspace extends PureComponent {
             this.setState({ disabled: true });
             this.setState({ port: '' });
         },
-        'feeder:status': (status) => {
+        'feeder:status': (status, activeState) => {
             const { modal } = this.state;
             const { hold, holdReason } = { ...status };
             if (!hold) {
@@ -255,7 +256,7 @@ class Workspace extends PureComponent {
                 ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{commentString}</b></p></div>
                 : 'Press Resume to continue operation.';
 
-            if (hold && strategy !== 'Manual' && strategy !== 'Pause') {
+            if (hold && strategy !== 'Manual' && strategy !== 'Pause' && activeState !== ACTIVE_STATE_IDLE) {
                 Confirm({
                     title,
                     content,
