@@ -1048,7 +1048,7 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
@@ -1072,9 +1072,9 @@ class AxesWidget extends PureComponent {
 
             const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
-            const activeAxis = joystickOptions[activeStick].mpgMode[actionType];
+            const activeAxis = get(joystickOptions, [activeStick, 'mpgMode', actionType], 0);
 
-            const isReversed = joystickOptions[activeStick].mpgMode.isReversed;
+            const isReversed = get(joystickOptions, [activeStick, 'mpgMode', 'isReversed'], false);
 
             const isUsingMPGMode = !!activeAxis;
 
@@ -1112,7 +1112,7 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
@@ -1247,6 +1247,19 @@ class AxesWidget extends PureComponent {
 
             if (thumbsticksAreIdle) {
                 this.joystickLoop.stop();
+                return;
+            }
+
+            const { isRunning, activeAxis } = this.joystickLoop;
+
+            const isUsingSameThumbstick =
+                (activeAxis === axis) ||
+                (activeAxis === 0 && axis === 1) ||
+                (activeAxis === 1 && axis === 0) ||
+                (activeAxis === 2 && axis === 3) ||
+                (activeAxis === 3 && axis === 2);
+
+            if (!isUsingSameThumbstick && isRunning) {
                 return;
             }
 

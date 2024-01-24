@@ -255,7 +255,7 @@ class GrblController {
                         }
                     }
                 }
-                return data;
+                return data.replace(/\([^\)]*\)/gm, '');
             }
         });
 
@@ -277,7 +277,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
                     .replace(';', '') : '';
                 line = line.replace(commentMatcher, '')
-                    .replace('/uFEFF', '')
                     .trim();
                 context = this.populateContext(context);
 
@@ -427,7 +426,7 @@ class GrblController {
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;

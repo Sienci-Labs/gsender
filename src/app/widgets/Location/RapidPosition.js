@@ -32,7 +32,8 @@ export const BACK_RIGHT = 'BR';
 export const BACK_LEFT = 'BL';
 export const OTHER = 'OT';
 
-const OFFSET_DISTANCE = 0.95;
+const OFFSET_DISTANCE = 1;
+const PULLOFF_DISTANCE = 5;
 
 export const getHomingLocation = (setting) => {
     if (setting === '0') {
@@ -53,17 +54,17 @@ const getMachineMovementLimits = () => {
     const settings = get(store, 'controller.settings.settings');
     const { $130: xMax, $131: yMax } = settings;
 
-    const xLimit = (Number(xMax) * OFFSET_DISTANCE).toFixed(3);
-    const yLimit = (Number(yMax) * OFFSET_DISTANCE).toFixed(3);
+    // Limits are PULLOFF_DISTANCE away from reported limits
+    const xLimit = (Number(xMax) - PULLOFF_DISTANCE).toFixed(3);
+    const yLimit = (Number(yMax) - PULLOFF_DISTANCE).toFixed(3);
 
     return [xLimit, yLimit];
 };
 
 
-// Get a single bit from integer at position
-export function getBit(number, bitPosition) {
+// Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
+export function isBitSetInNumber(number, bitPosition) {
     number = Number(number);
-    console.log(number);
     // eslint-disable-next-line no-bitwise
     return (number & (1 << bitPosition)) !== 0;
 }
@@ -71,7 +72,7 @@ export function getBit(number, bitPosition) {
 const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pullOff) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
 
-    pullOff = Number(pullOff) || 2;
+    pullOff = PULLOFF_DISTANCE;
     // If homing flag not set, we treat all movements as negative space
     if (!homingFlag) {
         homingPosition = BACK_RIGHT;
@@ -143,7 +144,7 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
         const store = reduxStore.getState();
         const settings = get(store, 'controller.settings.settings');
         const { $22: homingValue } = settings;
-        homingFlag = getBit(homingValue, 3);
+        homingFlag = isBitSetInNumber(homingValue, 3);
     }
 
     const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
