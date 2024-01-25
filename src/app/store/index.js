@@ -24,7 +24,7 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
 
     userData = {
-        path: path.join(app.getPath('userData'), 'preferences.json')
+        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
     };
 }
 

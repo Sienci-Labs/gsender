@@ -39,6 +39,10 @@ export class JoystickLoop {
     _getCurrentGamepad = () => {
         const currentHandler = gamepad.handlers.find(handler => this.gamepadProfile.id.includes(handler?.gamepad?.id));
 
+        if (!currentHandler) {
+            throw new Error('Could not find current gamepad');
+        }
+
         return currentHandler?.gamepad;
     }
 
@@ -212,6 +216,7 @@ export class JoystickLoop {
 
         const axesValues = currentGamepad?.axes;
 
+        const movementDistanceOverride = this.gamepadProfile.joystickOptions.movementDistanceOverride;
         const lockoutButton = this.gamepadProfile.lockout.button;
         const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
 
@@ -243,6 +248,14 @@ export class JoystickLoop {
             return acc;
         }, {});
 
+        const updatedAxesWithOverride = Object.entries(updatedAxes).reduce((acc, curr) => {
+            const [axis, value] = curr;
+
+            acc[axis] = +((value * (movementDistanceOverride / 100)).toFixed(3));
+
+            return acc;
+        }, {});
+
         const largestAxisMovement = Object.entries(updatedAxes).reduce((acc, [key, value]) => {
             const val = Math.abs(value);
             if (acc === null || val > acc?.value) {
@@ -265,7 +278,7 @@ export class JoystickLoop {
             return;
         }
 
-        this.jog({ ...updatedAxes, F: feedrate });
+        this.jog({ ...updatedAxesWithOverride, F: feedrate });
 
         this.jogMovementStartTime = new Date();
 

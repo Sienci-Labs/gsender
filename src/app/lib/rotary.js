@@ -10,6 +10,8 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     ROTARY_TOGGLE_MACRO,
     DEFAULT_FIRMWARE_SETTINGS,
+    GRBL,
+    GRBLHAL
 } from 'app/constants';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -23,17 +25,34 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
     switch (mode) {
     case DEFAULT: {
-        const defaultFirmwareSettings = store.get('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS);
+        if (firmwareType === GRBL) {
+            const defaultFirmwareSettings = store.get('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS);
 
-        const defaultFirmwareSettingsArr = Object.entries(defaultFirmwareSettings).map(([key, value]) => `${key}=${value}`);
+            const defaultFirmwareSettingsArr = Object.entries(defaultFirmwareSettings).map(([key, value]) => `${key}=${value}`);
 
-        controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
+            controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
+        } else if (firmwareType === GRBLHAL) {
+            // switch A and Y axis settings back
+            const newAAxisSettings = [
+                `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
+                `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
+                `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`
+            ];
+            const newYAxisSettings = [
+                `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
+                `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
+                `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`
+            ];
+
+            // zero y and enable rotary
+            controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
+        }
         return;
     }
 
     case ROTARY: {
         // We only need to update the firmware settings on grbl machines
-        if (firmwareType === 'Grbl') {
+        if (firmwareType === GRBL) {
             // Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
             const rotaryFirmwareSettingsArr = Object.entries(rotaryFirmwareSettings).map(([key, value]) => `${key}=${value}`);
 
@@ -64,6 +83,59 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                 onConfirm: () => {
                     // zero y and enable rotary
                     controller.command('gcode', ['G10 L20 P1 Y0', ...rotaryFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
+
+                    pubsub.publish('visualizer:updateposition', { y: 0 });
+
+                    Toaster.pop({
+                        msg: 'Rotary Mode Enabled',
+                        type: TOASTER_INFO,
+                    });
+                },
+                onClose: () => {
+                    store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
+                }
+            });
+        } else if (firmwareType === GRBLHAL) {
+            Confirm({
+                title: 'Enable Rotary Mode',
+                cancelLabel: 'Cancel',
+                confirmLabel: 'OK',
+                content: (
+                    <div style={{ textAlign: 'left', width: '90%', margin: 'auto', fontSize: '1.25rem' }}>
+                        <p>Enabling rotary mode will perform the following actions:</p>
+
+                        <ol>
+                            <li style={{ marginBottom: '1rem' }}>Zero the Y-Axis in it&apos;s current position</li>
+                            <li>
+                                <span>Switch these A and Y axis settings:</span>
+
+                                <ul style={{ marginTop: '0.5rem' }}>
+                                    <li>$101 and $103 (travel resolution)</li>
+                                    <li>$111 and $113 (maximum rate)</li>
+                                    <li>$121 and $123 (acceleration)</li>
+                                    <li>$131 and $133 (travel amount)</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                ),
+                onConfirm: () => {
+                    // switch A and Y axis settings, will look something like this: ["$101=26.667", ...]
+                    const newAAxisSettings = [
+                        `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
+                        `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
+                        `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`,
+                        `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
+                    ];
+                    const newYAxisSettings = [
+                        `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
+                        `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
+                        `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`,
+                        `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
+                    ];
+
+                    // zero y and enable rotary
+                    controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 

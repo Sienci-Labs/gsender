@@ -46,9 +46,11 @@ import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
 import store from '../../store';
 import {
+    A_AXIS_COMMANDS,
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
-    WRITE_SOURCE_FEEDER
+    WRITE_SOURCE_FEEDER,
+    Y_AXIS_COMMANDS
 } from '../constants';
 import GrblHalRunner from './GrblHalRunner';
 import {
@@ -82,6 +84,7 @@ import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocati
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
 import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
+import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -195,6 +198,9 @@ class GrblHalController {
 
     // Toolchange
     toolChanger = null;
+
+    // Rotary
+    isInRotaryMode = false;
 
     constructor(engine, options) {
         if (!engine) {
@@ -334,6 +340,23 @@ class GrblHalController {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
                     line = line.replace('M6', '(M6)');
+                }
+
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
+
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
                 }
 
                 return line;
@@ -478,6 +501,30 @@ class GrblHalController {
                     }
                     line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
+
+                /**
+                 * Rotary Logic
+                 * Need to change the A-axis movements to Y-movements to emulate the rotary axis on grbl
+                 */
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
+
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
+                }
+                /**
+                 * End of Rotary Logic
+                 */
 
                 return line;
             }
@@ -2036,6 +2083,10 @@ class GrblHalController {
                 const [estimateData] = args;
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
+            },
+            'updateRotaryMode': () => {
+                const [isInRotaryMode] = args;
+                this.isInRotaryMode = isInRotaryMode;
             }
         }[cmd];
 

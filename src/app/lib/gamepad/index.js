@@ -121,6 +121,10 @@ export const checkButtonHold = (buttonType, currentProfile) => {
 
     const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad?.id));
 
+    if (!currentGamepad) {
+        return false;
+    }
+
     const isHoldingButton = currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
 
     return isHoldingButton;
