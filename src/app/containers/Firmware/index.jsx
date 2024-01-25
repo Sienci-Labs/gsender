@@ -19,7 +19,7 @@ import styles from './index.styl';
 import { collectUserUsageData } from '../../lib/heatmap';
 
 const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroups = {}) => {
-    return Object.keys(eeprom).map((setting) => {
+    return Object.keys(eeprom).map((setting, index) => {
         const properties = settings.find(obj => {
             return obj.setting === setting;
         });
@@ -29,6 +29,7 @@ const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroup
 
         return {
             ...properties || {},
+            globalIndex: index,
             setting: setting,
             value: eeprom[setting],
             ...halData,
