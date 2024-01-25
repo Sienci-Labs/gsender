@@ -1295,7 +1295,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.lastF = f;
         this.totalTime += moveDuration;
-        this.estimates.push(moveDuration);
+        this.estimates.push(Number(moveDuration.toFixed(4)));
     }
 
     // TODO: if we find something we need to account for that will make the times longer,

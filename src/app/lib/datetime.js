@@ -25,11 +25,11 @@
 export const convertMillisecondsToTimeStamp = (milliseconds) => {
     if (milliseconds) {
         let seconds = milliseconds / 1000;
-        const hours = parseInt(seconds / 3600, 10);
+        const hours = Math.floor(seconds / 3600);
         seconds %= 3600; // seconds remaining after extracting hours
-        const minutes = parseInt(seconds / 60, 10);
+        const minutes = Math.floor(seconds / 60);
         seconds %= 60; // keep only seconds not extracted to minutes
-        seconds = parseInt(seconds, 10);
+        seconds = Math.floor(seconds);
         return `${String(hours).padStart(2, 0)}:${String(minutes).padStart(2, 0)}:${String(seconds).padStart(2, 0)}`;
     }
 
