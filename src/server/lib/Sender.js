@@ -429,6 +429,7 @@ class Sender extends events.EventEmitter {
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
             this.state.countdownIsPaused = false;
+            // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
             this.checkIntervalID = setInterval(() => {
                 if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
                     this.state.queueDone = false;
@@ -465,6 +466,7 @@ class Sender extends events.EventEmitter {
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
             if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
                 if (this.state.received < this.state.estimateData.length) {
+                    // add the lines to the queue from where we left off to the current number received
                     for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
                         this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
                         this.state.totalSentToQueue++;
