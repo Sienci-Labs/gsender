@@ -145,9 +145,9 @@ export const onGamepadButtonPress = ({ detail }) => {
         return null;
     }
 
-    const foundAction = currentProfile.buttons.find(({ value }) => value === button);
+    const foundAction = currentProfile.buttons?.find(({ value }) => value === button);
 
-    if (!detail.pressed && foundAction.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
+    if (!detail.pressed && foundAction?.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
         return 'STOP_JOG';
     }
 
