@@ -750,7 +750,7 @@ class GrblController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description,
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
