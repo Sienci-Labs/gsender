@@ -108,6 +108,9 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Strip comments sent to controller to prevent buffer overflow and better support Shapeoko
 - Fix issue with firmware tool not updating values correctly if settings limited by search bar
 - Handle missing file name in recent files
+- Updated EEPROM values for travel on multiple Sienci profiles
+- Fixed issue with surfacing tool crashing in some situations
+- Fixed several bugs with gamepad support
 
 ### 1.4.0 (January 23, 2024)
 - Added Rotary Mode
