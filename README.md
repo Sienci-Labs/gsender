@@ -102,6 +102,13 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.1 (January 26, 2024)
+- Fix for black screen on application startup in some situations
+- Fix for jog buttons on UI not registering click events correctly on some operating systems
+- Strip comments sent to controller
+- Fix issue with firmware tool not updating values correctly if settings limited by search bar
+- Handle missing file name in recent files
+
 ### 1.4.0 (January 23, 2024)
 - Added Rotary Mode
   - gSender is now able to run 2+1 axis files on grbl and 4 axis files on grblHAL
