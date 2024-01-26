@@ -11,7 +11,7 @@ import { Container, GcodeContainer } from './styled';
 
 const GcodeViewer = ({ gcode }) => {
     const handleCopy = throttle(async () => {
-        await navigator.clipboard.writeText(gcode);
+        await navigator.clipboard?.writeText(gcode);
 
         Toaster.pop({
             msg: 'Copied G-code to Clipboard',

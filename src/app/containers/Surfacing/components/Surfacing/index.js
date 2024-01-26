@@ -42,7 +42,14 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
 
         const serializedFile = new File([gcode], 'surfacing.gcode');
 
-        pubsub.publish('visualizer:load', gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
+        const payload = {
+            content: gcode,
+            size: serializedFile.size,
+            name: serializedFile.name,
+            visualizer: VISUALIZER_SECONDARY
+        };
+
+        pubsub.publish('visualizer:load', payload);
 
         setGcode(gcode);
     };
@@ -154,7 +161,12 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
                             </p>
                             <InputArea />
                         </div>
-                        <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
+                        <TabArea
+                            tabs={tabs}
+                            currentTab={currentTab}
+                            onTabChange={(index) => setCurrentTab(index)}
+                            mountAllTabs
+                        />
                     </div>
 
                     <ActionArea />

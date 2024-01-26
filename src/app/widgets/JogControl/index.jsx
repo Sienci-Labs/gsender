@@ -1142,7 +1142,7 @@ class AxesWidget extends PureComponent {
 
             const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
-            const isUsingMPGMode = !!joystickOptions[activeStick].mpgMode[actionType];
+            const isUsingMPGMode = !!get(joystickOptions, `${activeStick}.mpgMode.${actionType}`, false);
 
             if (isUsingMPGMode) {
                 return;

@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { throttle, inRange } from 'lodash';
+import { throttle, inRange, get } from 'lodash';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
@@ -216,9 +215,9 @@ export class JoystickLoop {
 
         const axesValues = currentGamepad?.axes;
 
-        const movementDistanceOverride = this.gamepadProfile.joystickOptions.movementDistanceOverride;
-        const lockoutButton = this.gamepadProfile.lockout.button;
-        const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
+        const movementDistanceOverride = get(this.gamepad, 'joystickOptions.movementDistanceOverride', 100);
+        const lockoutButton = get(this.gamepadProfile, 'lockout.button');
+        const isHoldingLockoutButton = get(currentGamepad.buttons, `${lockoutButton}.pressed`, false);
 
         const thumbsticksAreIdle = checkThumbsticskAreIdle(axesValues, this.gamepadProfile);
 
