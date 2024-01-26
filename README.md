@@ -105,7 +105,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### 1.4.1 (January 26, 2024)
 - Fix for black screen on application startup in some situations
 - Fix for jog buttons on UI not registering click events correctly on some operating systems
-- Strip comments sent to controller
+- Strip comments sent to controller to prevent buffer overflow and better support Shapeoko
 - Fix issue with firmware tool not updating values correctly if settings limited by search bar
 - Handle missing file name in recent files
 
