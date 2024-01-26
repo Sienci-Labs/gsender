@@ -40,8 +40,8 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
-import WorkerOutline from '../../workers/Outline.worker';
 
+import WorkerOutline from '../../workers/Outline.worker';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import {
@@ -69,7 +69,7 @@ import {
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
-import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
+import { addRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
@@ -285,12 +285,22 @@ class WorkflowControl extends PureComponent {
 
     componentDidMount() {
         if (isElectron()) {
-            window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
+            window.ipcRenderer.on('loaded-recent-file', (_, fileMetaData) => {
+                if (!fileMetaData) {
+                    Toaster.pop({
+                        msg: 'Error loading recent file, it may have been deleted or moved to a different folder.',
+                        type: TOASTER_DANGER,
+                        duration: 5000
+                    });
+
+                    return;
+                }
+
                 this.loadRecentFile(fileMetaData);
-                const recentFile = createRecentFile(fileMetaData);
-                addRecentFile(recentFile);
+                // const recentFile = createRecentFile(fileMetaData);
+                // addRecentFile(recentFile);
             });
-            window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
+            window.ipcRenderer.on('returned-upload-dialog-data', (_, file) => {
                 this.handleElectronFileUpload(file);
             });
         }
