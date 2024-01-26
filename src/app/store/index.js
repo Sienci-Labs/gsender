@@ -248,6 +248,13 @@ const migrateStore = () => {
         return;
     }
 
+    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
+    if (semver.lt(cnc.version, '1.4.1')) {
+        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
+        console.log(defaultMachineProfile);
+        store.set('workspace.machineProfile', defaultMachineProfile);
+    }
+
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
         const currentCommandKeys = store.get('commandKeys');
         let newCommandKeysList = {};
