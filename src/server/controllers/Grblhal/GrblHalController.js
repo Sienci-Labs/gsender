@@ -735,7 +735,7 @@ class GrblHalController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description || '',
+                description: error?.description || '',
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
