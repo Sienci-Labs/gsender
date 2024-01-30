@@ -107,7 +107,9 @@ class Combokeys extends events.EventEmitter {
                 'JOG_X_P_Y_M',
                 'JOG_X_M_Y_P',
                 'JOG_X_Y_P',
-                'JOG_X_Y_M'
+                'JOG_X_Y_M',
+                'JOG_A_PLUS',
+                'JOG_A_MINUS',
             ];
             //Add keyup listeners for jogging events
             if (jogCmds.includes(cmd)) {

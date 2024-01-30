@@ -264,7 +264,7 @@ class AxesWidget extends PureComponent {
         jog: (params = {}) => {
             const { units } = this.state;
             const modal = (units === 'mm') ? 'G21' : 'G20';
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+            const s = map(params, (value, letter) => ('' + (letter === 'a' || letter === 'A' ? 'Y' : letter.toUpperCase()) + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
             ];
@@ -494,13 +494,11 @@ class AxesWidget extends PureComponent {
     shuttleControlFunctions = {
         JOG: (event, { axis = null }) => {
             const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
-            const firmwareType = this.props.type;
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
 
-            if (isGrbl && axis.a && !isInRotaryMode) {
+            if (axis.a && !isInRotaryMode) {
                 return;
             }
 
@@ -936,11 +934,12 @@ class AxesWidget extends PureComponent {
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -952,7 +951,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: xyStep
+            a: aStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -977,7 +976,7 @@ class AxesWidget extends PureComponent {
             axisList.z = axisValue.z * axis.z;
         }
         if (axis.a) {
-            axisList.A = axisValue.a * axis.a;
+            axisList.a = axisValue.a * axis.a; // convert to Y
         }
 
         this.joggingHelper.onKeyDown(axisList, feedrate);
@@ -1006,7 +1005,8 @@ class AxesWidget extends PureComponent {
                 const axisValue = {
                     X: xyStep,
                     Y: xyStep,
-                    Z: zStep
+                    Z: zStep,
+                    A: xyStep
                 }[givenAxis] * axisList[axis];
 
                 axisObj[givenAxis] = axisValue;
