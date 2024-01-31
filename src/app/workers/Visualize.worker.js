@@ -389,10 +389,12 @@ onmessage = function({ data }) {
         for (let i = 0; i < data.length; i++) {
             // update modal
             if (modalCounter === iterationsNeeded) {
-                modalIndex++;
-                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
-                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
-                modalCounter = 0; // reset counter
+                do {
+                    modalIndex++;
+                    modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
+                    iterationsNeeded = modalChanges[modalIndex].count; // update the new count
+                    modalCounter = 0; // reset counter
+                } while (iterationsNeeded === 0); // handle another modal change on same line
             }
             // update feedrate
             if (feedrateCounter === iterationsNeededF) {

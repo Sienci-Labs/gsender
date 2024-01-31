@@ -1438,8 +1438,11 @@ class GrblController {
                 const preferences = store.get('preferences', {});
                 const delay = _.get(preferences, 'spindle.delay', false);
 
-                if (delay) {
-                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, '$& G4 P1');
+                // test if there is a G4 command already
+                const delayRegex = new RegExp('(G4 ?P?[0-9]+)');
+                // only add one if there isn't
+                if (delay && !delayRegex.test(gcode)) {
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b/g, '$& G4 P1');
                 }
 
                 const gcodeWithoutComments = gcode.replace(bracketCommentLine, '');
