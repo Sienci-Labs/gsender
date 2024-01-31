@@ -359,6 +359,8 @@ class DisplayPanel extends PureComponent {
 
     handleGoToLocation() {
         const code = [];
+        const currentMovement = this.props.modalDistance;
+        const unitModal = this.props.units === METRIC_UNITS ? 'G21' : 'G20';
         const { location, relative } = this.state;
         const { ROTARY } = WORKSPACE_MODE;
         const movement = relative ? 'G91' : 'G90';
@@ -371,7 +373,8 @@ class DisplayPanel extends PureComponent {
         if (isInRotaryMode) {
             code.push('G0 A' + location.a);
         }
-        controller.command('gcode:safe', code);
+        code.push(currentMovement);
+        controller.command('gcode:safe', code, unitModal);
     }
 
     render() {
