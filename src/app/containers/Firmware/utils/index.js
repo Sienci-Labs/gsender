@@ -139,8 +139,6 @@ export const convertValueToArray = (value, possibilities) => {
 };
 
 export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
-    console.log(settings);
-
     let index22 = 200; // index of $22 - default is 200 because we have less eeprom values than that, so it will never be set to this value
     let index2021 = -1; // index of $20 or $21, whichever comes first
     let changedSettings = settings
