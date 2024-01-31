@@ -347,13 +347,17 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
+                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({
                         data: 'M6',
                         comment: commentString
                     }); // Hold reason
-                    line = line.replace('M6', '(M6)');
+
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
 
 
