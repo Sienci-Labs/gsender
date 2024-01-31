@@ -57,6 +57,8 @@ class DFUFlasher extends events.EventEmitter {
 
         log.info(`Jumping back to start address ${startAddress} to manifest`);
         await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
+        const status = await this.dfu.getStatus();
+        log.info(status);
         await this.dfu.download(new ArrayBuffer(0), 0);
         try {
             await this.dfu.pollUntil(state => (state === this.dfu.dfuMANIFEST));
