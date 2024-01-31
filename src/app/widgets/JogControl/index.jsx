@@ -1027,7 +1027,12 @@ class AxesWidget extends PureComponent {
         if (!data) {
             return;
         }
+
         const { rapid, normal, precise } = data;
+
+        if (jog.rapid === rapid && jog.normal === normal && jog.precise === precise) {
+            return;
+        }
 
         this.setState({
             jog: {
