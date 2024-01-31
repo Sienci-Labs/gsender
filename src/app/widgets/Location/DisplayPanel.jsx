@@ -358,20 +358,20 @@ class DisplayPanel extends PureComponent {
     }
 
     handleGoToLocation() {
+        const code = [];
         const { location, relative } = this.state;
         const { ROTARY } = WORKSPACE_MODE;
         const movement = relative ? 'G91' : 'G90';
-        const currentMovement = this.props.modalDistance;
         const isInRotaryMode = store.get('workspace.mode') === ROTARY;
-
-        controller.command('gcode', movement);
-        controller.command('gcode', 'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z);
+        code.push(
+            movement,
+            'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z
+        );
 
         if (isInRotaryMode) {
-            controller.command('gcode', 'G0 A' + location.a);
+            code.push('G0 A' + location.a);
         }
-
-        controller.command('gcode', currentMovement);
+        controller.command('gcode:safe', code);
     }
 
     render() {
