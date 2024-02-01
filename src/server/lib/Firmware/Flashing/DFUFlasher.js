@@ -45,6 +45,8 @@ class DFUFlasher extends events.EventEmitter {
         await this.dfu.open();
         this.map = this.parseHex(this.hex);
         let startAddress = null;
+
+
         for (let [address, dataBlock] of this.map) {
             this.emit('info', `Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`);
             if (!startAddress) {
@@ -52,8 +54,17 @@ class DFUFlasher extends events.EventEmitter {
             }
             await this.download(address, this.XFER_SIZE, dataBlock);
         }
-        log.info(`Jumping back to start address ${startAddress}`);
+
+        log.info(`Jumping back to start address ${startAddress} to manifest`);
         await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
+        const status = await this.dfu.getStatus();
+        log.info(status);
+        await this.dfu.download(new ArrayBuffer(0), 0);
+        try {
+            await this.dfu.pollUntil(state => (state === this.dfu.dfuMANIFEST));
+        } catch (error) {
+            this.emit('error', error);
+        }
 
         await this.dfu.close();
         this.emit('end');
