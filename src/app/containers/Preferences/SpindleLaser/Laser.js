@@ -42,6 +42,7 @@ const Laser = ({ state, actions }) => {
                         value={minLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'minPower')}
                         additionalProps={{ type: 'number' }}
+                        hasRounding={false}
                     />
                 </TooltipCustom>
                 <TooltipCustom content="Maximum laser amount" location="default">
@@ -51,6 +52,7 @@ const Laser = ({ state, actions }) => {
                         value={maxLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'maxPower')}
                         additionalProps={{ type: 'number' }}
+                        hasRounding={false}
                     />
                 </TooltipCustom>
             </Fieldset>

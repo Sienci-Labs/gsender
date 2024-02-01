@@ -23,6 +23,7 @@
 
 import _ from 'lodash';
 import events from 'events';
+import { determineRoundedValue } from './rounding';
 
 class ImmutableStore extends events.EventEmitter {
     state = {};
@@ -45,6 +46,9 @@ class ImmutableStore extends events.EventEmitter {
         if (value === prevValue) {
             return this.state;
         }
+
+        // round values that need to be rounded before storing
+        value = determineRoundedValue(key, value);
 
         this.state = _.merge({}, this.state, _.set({}, key, value));
         this.emit('change', this.state);

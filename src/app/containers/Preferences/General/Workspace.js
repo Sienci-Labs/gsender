@@ -58,6 +58,7 @@ const Workspace = ({ state, actions }) => {
                             min: '0',
                             max: '4',
                         }}
+                        hasRounding={false}
                     />
                 </Tooltip>
             </div>
