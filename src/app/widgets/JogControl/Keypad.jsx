@@ -66,7 +66,6 @@ class Keypad extends PureComponent {
         axes: PropTypes.array,
         jog: PropTypes.object,
         actions: PropTypes.object,
-        firmwareType: PropTypes.string,
     };
 
     handleSelect = (eventKey) => {
@@ -126,7 +125,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, canClickCancel, actions, axes, activeState, selectedSpeed, firmwareType } = this.props;
+        const { canClick, canClickCancel, actions, axes, activeState, selectedSpeed } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -164,14 +163,14 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: -xyDistance, Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: -1, Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         />
                         <JogControl
                             className={styles.btnUp}
                             jog={() => actions.jog({ Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         >
                             <KeypadText>Y</KeypadText>
                             <KeypadDirectionText>+</KeypadDirectionText>
@@ -181,7 +180,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: xyDistance, Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: 1, Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         />
 
                         <JogControl
@@ -221,14 +220,14 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: -xyDistance, Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: -1, Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         />
                         <JogControl
                             className={styles.btnDown}
                             jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         >
                             <KeypadText>Y</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>
@@ -238,7 +237,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: xyDistance, Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: 1, Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
+                            disabled={xyControlsDisabled || rotary}
                         />
                         <JogControl
                             className={cx(styles.btnDown, styles.zBottomTransform)}

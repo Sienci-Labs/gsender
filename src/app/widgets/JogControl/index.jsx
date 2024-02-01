@@ -954,7 +954,12 @@ class AxesWidget extends PureComponent {
         if (!data) {
             return;
         }
+
         const { rapid, normal, precise } = data;
+
+        if (jog.rapid === rapid && jog.normal === normal && jog.precise === precise) {
+            return;
+        }
 
         this.setState({
             jog: {
@@ -975,7 +980,7 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
@@ -1039,7 +1044,7 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            if (gamepad.shouldHold) {
+            if (gamepad.shouldHold || !this.props.isConnected) {
                 return;
             }
 
@@ -1069,7 +1074,7 @@ class AxesWidget extends PureComponent {
 
             const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
-            const isUsingMPGMode = !!joystickOptions[activeStick].mpgMode[actionType];
+            const isUsingMPGMode = !!get(joystickOptions, `${activeStick}.mpgMode.${actionType}`, false);
 
             if (isUsingMPGMode) {
                 return;

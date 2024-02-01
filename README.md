@@ -20,9 +20,12 @@ Some things that we’re looking to accomplish with this sender:
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (ARM64) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (32) | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64) | 
-|-|-|-|-|-|-|-
- ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x32.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_bullseye.deb)
+
+| Windows (x64)                                                                                                               | Mac (Intel)                                                                                                                   | Linux (Intel)                                                                                                                        | Linux (ARM)                                                                                                                        | Pi (64 bit)                                                                                                                       |
+|-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                             |                                                                                                                               |                                                                                                                                      |                                                                                                                                    |                                                                                                                                   |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-1.4.1-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-1.4.1-Mac-Intel-64Bit.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-PI-64Bit.deb) |
+     
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,7 +102,17 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.4.0 (January X, 2024)
+### 1.4.1 (January 26, 2024)
+- Fix for black screen on application startup in some situations
+- Fix for jog buttons on UI not registering click events correctly on some operating systems
+- Strip comments sent to controller to prevent buffer overflow and better support Shapeoko
+- Fix issue with firmware tool not updating values correctly if settings limited by search bar
+- Handle missing file name in recent files
+- Updated EEPROM values for travel on multiple Sienci profiles
+- Fixed issue with surfacing tool crashing in some situations
+- Fixed several bugs with gamepad support
+
+### 1.4.0 (January 23, 2024)
 - Added Rotary Mode
   - gSender is now able to run 2+1 axis files on grbl and 4 axis files on grblHAL
   - Visualizer updated to support 4 axis rotations

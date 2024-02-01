@@ -64,7 +64,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica-Bold'
     },
     lineWrapper: {
-        marginTop: 6
+        marginTop: 6,
+        marginBottom: 6
     },
     textBold: {
         fontSize: 12,
@@ -569,7 +570,8 @@ function generateSupportFile() {
                                             <Text style={[styles.error, { color: 'red' }]}>
                                                 {'    ' + log.MESSAGE + '\n'}
                                             </Text>
-                                            <Text>{'    Input:' + log.line + '\n'}</Text>
+                                            <Text>{'    Input: ' + log.line}</Text>
+                                            <Text>{'    Controller: ' + log.controller}</Text>
                                         </Text>
                                     </View>
                                 );
@@ -595,7 +597,8 @@ function generateSupportFile() {
                                             <Text style={[styles.error, { color: 'red' }]}>
                                                 {'    ' + log.MESSAGE + '\n'}
                                             </Text>
-                                            {'    Input: ' + log.line + '\n'}
+                                            <Text>{'    Input: ' + log.line}</Text>
+                                            <Text>{'    Controller: ' + log.controller}</Text>
                                         </Text>
                                     </View>
                                 );

@@ -824,12 +824,18 @@ class PreferencesPage extends PureComponent {
     componentDidMount() {
         controller.command('settings:updated', this.state);
         this.addControllerEvents();
-        gamepad.holdListener();
+
+        if (gamepad.holdListener) {
+            gamepad.holdListener();
+        }
     }
 
     componentWillUnmount() {
-        gamepad.unholdListener();
         this.removeControllerEvents();
+
+        if (gamepad.unholdListener) {
+            gamepad.unholdListener();
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {

@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { throttle, inRange } from 'lodash';
+import { throttle, inRange, get } from 'lodash';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
@@ -38,6 +37,10 @@ export class JoystickLoop {
 
     _getCurrentGamepad = () => {
         const currentHandler = gamepad.handlers.find(handler => this.gamepadProfile.id.includes(handler?.gamepad?.id));
+
+        if (!currentHandler) {
+            throw new Error('Could not find current gamepad');
+        }
 
         return currentHandler?.gamepad;
     }
@@ -212,8 +215,9 @@ export class JoystickLoop {
 
         const axesValues = currentGamepad?.axes;
 
-        const lockoutButton = this.gamepadProfile.lockout.button;
-        const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
+        const movementDistanceOverride = get(this.gamepad, 'joystickOptions.movementDistanceOverride', 100);
+        const lockoutButton = get(this.gamepadProfile, 'lockout.button');
+        const isHoldingLockoutButton = get(currentGamepad.buttons, `${lockoutButton}.pressed`, false);
 
         const thumbsticksAreIdle = checkThumbsticskAreIdle(axesValues, this.gamepadProfile);
 
@@ -243,6 +247,14 @@ export class JoystickLoop {
             return acc;
         }, {});
 
+        const updatedAxesWithOverride = Object.entries(updatedAxes).reduce((acc, curr) => {
+            const [axis, value] = curr;
+
+            acc[axis] = +((value * (movementDistanceOverride / 100)).toFixed(3));
+
+            return acc;
+        }, {});
+
         const largestAxisMovement = Object.entries(updatedAxes).reduce((acc, [key, value]) => {
             const val = Math.abs(value);
             if (acc === null || val > acc?.value) {
@@ -265,7 +277,7 @@ export class JoystickLoop {
             return;
         }
 
-        this.jog({ ...updatedAxes, F: feedrate });
+        this.jog({ ...updatedAxesWithOverride, F: feedrate });
 
         this.jogMovementStartTime = new Date();
 

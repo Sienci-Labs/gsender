@@ -248,7 +248,7 @@ class GrblController {
                         }
                     }
                 }
-                return data;
+                return data.replace(/\([^\)]*\)/gm, '');
             }
         });
 
@@ -270,7 +270,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
                     .replace(';', '') : '';
                 line = line.replace(commentMatcher, '')
-                    .replace('/uFEFF', '')
                     .trim();
                 context = this.populateContext(context);
 
@@ -420,7 +419,7 @@ class GrblController {
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -751,7 +750,7 @@ class GrblController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description,
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -1938,7 +1937,7 @@ class GrblController {
                         //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
-                    jogFeedrate = 1250;
+                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });

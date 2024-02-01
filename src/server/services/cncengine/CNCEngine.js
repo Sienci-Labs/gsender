@@ -271,7 +271,7 @@ class CNCEngine {
                             });
 
                         // Filter ports by productId to avoid non-arduino devices from appearing
-                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740'];
+                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740', '0FA7'];
                         const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0', '0483'];
                         let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
                             return validProductIDs.includes(port.productId) && validVendorIDs.includes(port.vendorId);
@@ -332,7 +332,7 @@ class CNCEngine {
             });
 
             // Open serial port
-            socket.on('open', (port, controllerType, options, callback = noop) => {
+            socket.on('open', (port, controllerType = GRBL, options, callback = noop) => {
                 //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 if (typeof callback !== 'function') {
                     callback = noop;

@@ -139,6 +139,8 @@ export const convertValueToArray = (value, possibilities) => {
 };
 
 export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
+    console.log(settings);
+
     let index22 = 200; // index of $22 - default is 200 because we have less eeprom values than that, so it will never be set to this value
     let index2021 = -1; // index of $20 or $21, whichever comes first
     let changedSettings = settings
@@ -162,9 +164,8 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
         changedSettings[index22] = changedSettings[index2021];
         changedSettings[index2021] = setting22;
     }
-
+    changedSettings.push('$$'); // Add setting refresh to end so tool updates values
     controller.command('gcode', changedSettings);
-    controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
     setSettingsToApply(false);
     Toaster.pop({
         msg: 'Firmware Settings Updated',

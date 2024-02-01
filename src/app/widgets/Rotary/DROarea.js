@@ -26,7 +26,7 @@ const DROarea = ({ canClick = true, actions }) => {
 
     const machinePosition = useSelector(state => state.controller.mpos);
     const workPosition = useSelector(state => state.controller.wpos);
-    const { type: controllerType, state: controllerState } = useSelector(state => state.controller);
+    const { state: controllerState } = useSelector(state => state.controller);
     const [positionInput] = useState({
         [AXIS_E]: false,
         [AXIS_X]: false,
@@ -39,10 +39,10 @@ const DROarea = ({ canClick = true, actions }) => {
 
     const renderAxis = (axis, label) => {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
-        const inRotaryModeAndIsGrbl = workspaceMode === WORKSPACE_MODE.ROTARY && controllerType === 'Grbl';
+        const inRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
 
         // Report the y value in the DRO since the A-axis is not reported back from the grbl controller we are simulating the rotary axis
-        axis = axis === AXIS_A && inRotaryModeAndIsGrbl ? AXIS_Y : axis;
+        axis = axis === AXIS_A && inRotaryMode ? AXIS_Y : axis;
 
         let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';

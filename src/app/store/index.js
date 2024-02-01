@@ -24,7 +24,7 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
 
     userData = {
-        path: path.join(app.getPath('userData'), 'preferences.json')
+        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
     };
 }
 
@@ -307,6 +307,12 @@ const migrateStore = () => {
                 zProbeDistance: settings.widgets.probe.zProbeDistance.mm
             });
         }
+    }
+
+    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
+    if (semver.lt(cnc.version, '1.4.1')) {
+        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
+        store.set('workspace.machineProfile', defaultMachineProfile);
     }
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {

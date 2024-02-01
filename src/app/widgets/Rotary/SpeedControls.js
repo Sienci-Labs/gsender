@@ -13,7 +13,7 @@ const SpeedControls = ({ actions, jog }) => {
         <div className={styles['speed-controls-wrapper']}>
             <div className={styles.controlGroup}>
                 <span>A move (deg)</span>
-                <TooltipCustom content="Specify Z axis jog distance" location="default">
+                <TooltipCustom content="Specify A axis jog distance" location="default">
                     <NumberInput
                         value={aStep}
                         min={0}

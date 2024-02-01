@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Select from 'react-select';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, set, get } from 'lodash';
 
 import { Checkbox } from 'app/components/Checkbox';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
@@ -53,11 +53,13 @@ const JoystickOptions = () => {
 
     const { joystickOptions: { stick1, stick2, zeroThreshold = 15, movementDistanceOverride = 100 } } = profile;
 
-    const stick1PrimaryActionIsUsingMPG = stick1.mpgMode.primaryAction !== null;
-    const stick1SecondaryActionIsUsingMPG = stick1.mpgMode.secondaryAction !== null;
+    const stick1PrimaryActionIsUsingMPG = get(stick1, 'mpgMode.primaryAction', null) !== null;
+    const stick1SecondaryActionIsUsingMPG = get(stick1, 'mpgMode.secondaryAction', null) !== null;
 
-    const stick2PrimaryActionIsUsingMPG = stick2.mpgMode.primaryAction !== null;
-    const stick2SecondaryActionIsUsingMPG = stick2.mpgMode.secondaryAction !== null;
+    const stick2PrimaryActionIsUsingMPG = get(stick2, 'mpgMode.primaryAction', null) !== null;
+    const stick2SecondaryActionIsUsingMPG = get(stick2, 'mpgMode.secondaryAction', null) !== null;
+
+    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     const selectOverrideStyle = {
         valueContainer: provided => ({ ...provided, padding: 2, justifyContent: 'center' }),
@@ -71,8 +73,6 @@ const JoystickOptions = () => {
         dropdownIndicator: (provided) => ({ ...provided, padding: 2, color: 'white' }),
         indicatorSeparator: (provided) => ({ ...provided, backgroundColor: 'white' }),
     };
-
-    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     return (
         <div style={{ fontSize: '1rem' }}>
@@ -343,7 +343,7 @@ const JoystickOptions = () => {
                     <div>Movement Distance Override</div>
                     <Input
                         value={movementDistanceOverride}
-                        additionalProps={{ min: 50, max: 150, step: 1, type: 'number' }}
+                        additionalProps={{ min: 10, max: 99999, step: 1, type: 'number' }}
                         onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
                         className={styles['joystick-option-input']}
                         units="%"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import store from 'app/store';
+import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
@@ -32,6 +33,7 @@ const RotaryToggle = () => {
     const handleToggle = (toggled) => {
         const newMode = toggled ? ROTARY : DEFAULT;
         updateWorkspaceMode(newMode);
+        controller.command('updateRotaryMode', newMode === ROTARY);
     };
 
     return (

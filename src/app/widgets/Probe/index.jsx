@@ -370,15 +370,21 @@ class ProbeWidget extends PureComponent {
         this.config.set('probeDepth', probeDepth);
         this.config.set('touchPlateHeight', touchPlateHeight);
 
-        // get updated settings
-        this.getUpdatedSettings();
+
+        const probeFeedrate = this.config.get('probeFeedrate', this.state.probeFeedrate);
+        const probeFastFeedrate = this.config.get('probeFastFeedrate', this.state.probeFastFeedrate);
+        const retractionDistance = this.config.get('retractionDistance', this.state.retractionDistance);
+
+        if (this.state.probeFeedrate !== probeFeedrate || this.state.probeFastFeedrate !== probeFastFeedrate || this.state.retractionDistance !== retractionDistance) {
+            this.getUpdatedSettings();
+        }
     }
 
     getUpdatedSettings() {
         this.setState({
-            probeFeedrate: this.config.get('probeFeedrate') || this.state.probeFeedrate,
-            probeFastFeedrate: this.config.get('probeFastFeedrate') || this.state.probeFastFeedrate,
-            retractionDistance: this.config.get('retractionDistance') || this.state.retractionDistance,
+            probeFeedrate: this.config.get('probeFeedrate', this.state.probeFeedrate),
+            probeFastFeedrate: this.config.get('probeFastFeedrate', this.state.probeFastFeedrate),
+            retractionDistance: this.config.get('retractionDistance', this.state.retractionDistance),
         });
     }
 

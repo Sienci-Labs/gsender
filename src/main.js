@@ -45,7 +45,7 @@ let grblLog = log.create('grbl');
 let logPath;
 
 if (process.env.NODE_ENV === 'production') {
-    Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
+    Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684', release: pkg.version });
 }
 
 const main = () => {
@@ -182,7 +182,9 @@ const main = () => {
             });
 
             autoUpdater.on('update-available', (info) => {
-                window.webContents.send('update_available', info);
+                setTimeout(() => {
+                    window.webContents.send('update_available', info);
+                }, 5000);
             });
 
             autoUpdater.on('error', (err) => {
@@ -344,7 +346,7 @@ const main = () => {
             }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
-            // This sets a 5 second timeout on the await.
+            // This sets a 4 second timeout on the await.
             asyncCallWithTimeout(autoUpdater.checkForUpdates(), 4000);
         }
     });

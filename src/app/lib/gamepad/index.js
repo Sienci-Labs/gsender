@@ -121,6 +121,10 @@ export const checkButtonHold = (buttonType, currentProfile) => {
 
     const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad?.id));
 
+    if (!currentGamepad) {
+        return false;
+    }
+
     const isHoldingButton = currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
 
     return isHoldingButton;
@@ -141,9 +145,9 @@ export const onGamepadButtonPress = ({ detail }) => {
         return null;
     }
 
-    const foundAction = currentProfile.buttons.find(({ value }) => value === button);
+    const foundAction = currentProfile.buttons?.find(({ value }) => value === button);
 
-    if (!detail.pressed && foundAction.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
+    if (!detail.pressed && foundAction?.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
         return 'STOP_JOG';
     }
 
