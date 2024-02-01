@@ -9,7 +9,7 @@ import store from 'app/store';
 import { RENDER_RENDERED, RENDER_RENDERING, VISUALIZER_SECONDARY } from 'app/constants';
 import { replaceParsedData } from '../lib/indexedDB';
 
-export const visualizeResponse = ({ data }) => {
+export const visualizeResponse = async ({ data }) => {
     if (isNumber(data)) {
         pubsub.publish('toolpath:progress', data);
     } else {
@@ -35,7 +35,7 @@ export const visualizeResponse = ({ data }) => {
 
         // if there's new parsed data, send to redux
         if (parsedData) {
-            replaceParsedData(parsedData).then(() => {
+            await replaceParsedData(parsedData).then(() => {
                 pubsub.publish('parsedData:stored');
             });
 

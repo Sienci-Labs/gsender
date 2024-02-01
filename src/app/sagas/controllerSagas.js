@@ -132,7 +132,7 @@ export function* initialize() {
         return store.get('widgets.visualizer.SVGEnabled', false);
     };
 
-    const parseGCode = (content, size, name, visualizer) => {
+    const parseGCode = async (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
         const accelerations = {
@@ -178,7 +178,7 @@ export function* initialize() {
             if (needsVisualization) {
                 visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
-                getParsedData().then((value) => {
+                await getParsedData().then((value) => {
                     const parsedData = value;
                     visualizeWorker.postMessage({
                         content,
@@ -242,7 +242,7 @@ export function* initialize() {
 
         visualizeWorker = new VisualizeWorker();
         visualizeWorker.onmessage = visualizeResponse;
-        getParsedData().then((value) => {
+        await getParsedData().then((value) => {
             const parsedData = value;
             visualizeWorker.postMessage({
                 content,
