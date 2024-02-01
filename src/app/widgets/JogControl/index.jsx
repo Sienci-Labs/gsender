@@ -919,10 +919,11 @@ class AxesWidget extends PureComponent {
 
         const { axis: axisList } = payload;
 
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         const axisObj = {};
 
@@ -933,7 +934,7 @@ class AxesWidget extends PureComponent {
                     X: xyStep,
                     Y: xyStep,
                     Z: zStep,
-                    A: xyStep
+                    A: aStep
                 }[givenAxis] * axisList[axis];
 
                 axisObj[givenAxis] = axisValue;

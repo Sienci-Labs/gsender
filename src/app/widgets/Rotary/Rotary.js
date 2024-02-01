@@ -78,7 +78,7 @@ const Rotary = () => {
         },
         jog: (params = {}) => {
             const modal = 'G21';
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+            const s = map(params, (value, letter) => ('' + (letter === 'a' || letter === 'A' ? 'Y' : letter.toUpperCase()) + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
             ];
