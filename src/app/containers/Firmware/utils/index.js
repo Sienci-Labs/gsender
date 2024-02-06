@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import get from 'lodash/get';
 import download from 'downloadjs';
+import ip from 'ip';
 
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -46,9 +47,12 @@ export const connectToLastDevice = (callback) => {
     const baudrate = connectionConfig.get('baudrate');
     const controllerType = connectionConfig.get('controller.type') || GRBL;
 
+    const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
+
     controller.openPort(port, controllerType, {
         baudrate,
-        rtscts: false
+        rtscts: false,
+        network: isNetwork
     }, (err) => {
         if (err) {
             return;
