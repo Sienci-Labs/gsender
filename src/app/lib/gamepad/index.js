@@ -1,7 +1,10 @@
 import { GamepadListener } from 'gamepad.js';
-
+import shuttleEvents from 'app/lib/shuttleEvents';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { debounce } from 'lodash';
+
+const macroCallbackDebounce = debounce((action) => shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }), 500);
 
 class Gamepad extends GamepadListener {
     constructor() {
@@ -169,17 +172,21 @@ export const onGamepadButtonPress = ({ detail }) => {
     return foundAction?.primaryAction;
 };
 
-export const runAction = ({ event, shuttleControlEvents }) => {
+export const runAction = ({ event }) => {
+    const shuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const action = onGamepadButtonPress(event);
 
     if (!action) {
         return;
     }
+    if (shuttleControlEvents[action]) {
+        const shuttleEvent = shuttleControlEvents[action];
 
-    const shuttleEvent = shuttleControlEvents[action];
-
-    if (shuttleEvent?.callback) {
-        shuttleEvent.callback(null, shuttleEvent.payload);
+        if (shuttleEvent?.callback) {
+            shuttleEvent.callback(null, shuttleEvent.payload);
+        }
+    } else {
+        macroCallbackDebounce(action);
     }
 };
 

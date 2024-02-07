@@ -30,12 +30,13 @@ const SetShortcut = () => {
     const {
         state: { currentProfile, currentButton, settings: { profiles } },
         dispatch,
-        actions: { getGamepadProfile },
+        actions: { getGamepadProfile, getMacros },
     } = useContext(GamepadContext);
     const [isChanged, setIsChanged] = useState(false);
 
     const { value: currentButtonValue, type: currentButtonType } = currentButton || {};
 
+    const macros = getMacros();
     const profile = getGamepadProfile(currentProfile);
     const currentShortcut = profile.buttons?.[currentButtonValue][currentButtonType];
 
@@ -105,18 +106,25 @@ const SetShortcut = () => {
         });
     };
 
-    const data = Object.values(shuttleEvents.allShuttleControlEvents)
-        .reduce((acc, value) => {
-            const hasCategory = acc.find(event => event?.category === value?.category);
+    const getData = () => {
+        let allEvents = { ...macros, ...shuttleEvents.allShuttleControlEvents };
+        delete allEvents.MACRO;
 
-            if (hasCategory) {
-                acc = acc.map(event => (event?.category === value?.category ? { ...event, actions: [...event.actions, value] } : event));
-            } else {
-                acc.push({ category: value?.category, actions: [value] });
-            }
+        const data = Object.values(allEvents)
+            .reduce((acc, value) => {
+                const hasCategory = acc.find(event => event?.category === value?.category);
 
-            return acc;
-        }, []);
+                if (hasCategory) {
+                    acc = acc.map(event => (event?.category === value?.category ? { ...event, actions: [...event.actions, value] } : event));
+                } else {
+                    acc.push({ category: value?.category, actions: [value] });
+                }
+
+                return acc;
+            }, []);
+
+        return data;
+    };
 
     const render = {
         category: (_, row) => {
@@ -166,8 +174,9 @@ const SetShortcut = () => {
         { title: 'Category', width: '25%', render: render.category },
         { title: 'Actions', width: '75%', render: render.actions },
     ];
+    const data = getData();
 
-    const currentShortcutTitle = shuttleEvents.allShuttleControlEvents[currentShortcut]?.title ?? currentShortcut;
+    const currentShortcutTitle = shuttleEvents.allShuttleControlEvents[currentShortcut]?.title || macros.find(el => el.cmd === currentShortcut)?.title || currentShortcut;
     const buttonLabel = profile?.buttons?.[currentButtonValue]?.label;
 
     const isLockoutButton = currentButtonValue === profile.lockout?.button;
