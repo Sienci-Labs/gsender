@@ -332,7 +332,7 @@ class CNCEngine {
             });
 
             // Open serial port
-            socket.on('open', (port, controllerType, options, callback = noop) => {
+            socket.on('open', (port, controllerType = GRBL, options, callback = noop) => {
                 //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 if (typeof callback !== 'function') {
                     callback = noop;

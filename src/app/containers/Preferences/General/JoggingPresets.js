@@ -37,6 +37,7 @@ import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import styles from '../index.styl';
 import { convertToImperial, convertToMetric } from '../calculate';
+import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
 
 export default class JoggingPresets extends Component {
     pubsubTokens = []
@@ -93,40 +94,19 @@ export default class JoggingPresets extends Component {
             units,
             jogSpeeds: {
                 rapid: {
-                    mm: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    },
-                    in: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    }
+                    xyStep: '',
+                    zStep: '',
+                    feedrate: ''
                 },
                 normal: {
-                    mm: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    },
-                    in: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    }
+                    xyStep: '',
+                    zStep: '',
+                    feedrate: ''
                 },
                 precise: {
-                    mm: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    },
-                    in: {
-                        xyStep: '',
-                        zStep: '',
-                        feedrate: ''
-                    }
+                    xyStep: '',
+                    zStep: '',
+                    feedrate: ''
                 }
             }
         }, () => {
@@ -152,7 +132,7 @@ export default class JoggingPresets extends Component {
         const maxIN = 354;
         const minIN = 0.001;
 
-        if (units === 'mm') {
+        if (units === METRIC_UNITS) {
             if (value >= maxMM) {
                 value = maxMM;
             } else if (value <= minMM) {
@@ -160,7 +140,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        if (units === 'in') {
+        if (units === IMPERIAL_UNITS) {
             if (value >= maxIN) {
                 value = maxIN;
             } else if (value <= minIN) {
@@ -168,8 +148,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const metricValue = units === 'mm' ? value : convertToMetric(value);
-        const imperialValue = units === 'in' ? value : convertToImperial(value);
+        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -179,14 +158,7 @@ export default class JoggingPresets extends Component {
                 ...prev.jog,
                 [selectedPreset]: {
                     ...currentPreset,
-                    mm: {
-                        ...currentPreset.mm,
-                        xyStep: metricValue
-                    },
-                    in: {
-                        ...currentPreset.in,
-                        xyStep: imperialValue
-                    }
+                    xyStep: convertedValue
                 }
             }
         };
@@ -211,7 +183,7 @@ export default class JoggingPresets extends Component {
         const maxIN = 354;
         const minIN = 0.001;
 
-        if (units === 'mm') {
+        if (units === METRIC_UNITS) {
             if (value >= maxMM) {
                 value = maxMM;
             } else if (value <= minMM) {
@@ -219,7 +191,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        if (units === 'in') {
+        if (units === IMPERIAL_UNITS) {
             if (value >= maxIN) {
                 value = maxIN;
             } else if (value <= minIN) {
@@ -227,8 +199,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const metricValue = units === 'mm' ? value : convertToMetric(value);
-        const imperialValue = units === 'in' ? value : convertToImperial(value);
+        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -238,14 +209,7 @@ export default class JoggingPresets extends Component {
                 ...prev.jog,
                 [selectedPreset]: {
                     ...currentPreset,
-                    mm: {
-                        ...currentPreset.mm,
-                        zStep: metricValue
-                    },
-                    in: {
-                        ...currentPreset.in,
-                        zStep: imperialValue
-                    },
+                    zStep: convertedValue
                 }
             }
         };
@@ -269,7 +233,7 @@ export default class JoggingPresets extends Component {
         const maxIN = 3543;
         const minIN = 2;
 
-        if (units === 'mm') {
+        if (units === METRIC_UNITS) {
             if (value >= maxMM) {
                 value = maxMM;
             } else if (value <= minMM) {
@@ -277,7 +241,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        if (units === 'in') {
+        if (units === IMPERIAL_UNITS) {
             if (value >= maxIN) {
                 value = maxIN;
             } else if (value <= minIN) {
@@ -285,8 +249,7 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const metricValue = units === 'mm' ? value : convertToMetric(value);
-        const imperialValue = units === 'in' ? value : convertToImperial(value);
+        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -296,14 +259,7 @@ export default class JoggingPresets extends Component {
                 ...prev.jog,
                 [selectedPreset]: {
                     ...currentPreset,
-                    mm: {
-                        ...currentPreset.mm,
-                        feedrate: metricValue,
-                    },
-                    in: {
-                        ...currentPreset.in,
-                        feedrate: imperialValue,
-                    },
+                    feedrate: convertedValue,
                 }
             }
         };
@@ -340,9 +296,9 @@ export default class JoggingPresets extends Component {
 
         const preset = jogSpeeds[selectedPreset];
 
-        const xyValue = preset[units]?.xyStep;
-        const zValue = preset[units]?.zStep;
-        const speedValue = preset[units]?.feedrate;
+        const xyValue = units === METRIC_UNITS ? preset?.xyStep : convertToImperial(preset?.xyStep);
+        const zValue = units === METRIC_UNITS ? preset?.zStep : convertToImperial(preset?.zStep);
+        const speedValue = preset?.feedrate;
 
         return (
             <Fieldset legend="Jogging Presets">
@@ -377,6 +333,7 @@ export default class JoggingPresets extends Component {
                             onChange={this.handleSpeedChange}
                             additionalProps={{ type: 'number', id: 'feedrate' }}
                             value={speedValue}
+                            hasRounding={false}
                         />
                     </Tooltip>
                 </div>

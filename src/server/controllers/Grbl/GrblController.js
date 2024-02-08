@@ -754,7 +754,7 @@ class GrblController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description,
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -1942,7 +1942,7 @@ class GrblController {
                         //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
-                    jogFeedrate = 1250;
+                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });

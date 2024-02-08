@@ -26,17 +26,13 @@ import { useLongPress } from 'use-long-press';
 import cx from 'classnames';
 import styles from '../index.styl';
 
-// https://www.geeksforgeeks.org/how-to-detect-touch-screen-device-using-javascript/
-const isTouchEnabled = () => ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-
 const JogControl = ({ timeout = 600, disabled = false, jog, continuousJog, stopContinuousJog, className, children }) => {
     const bind = useLongPress(() => {
         continuousJog();
     }, {
         threshold: timeout,
         onCancel: jog,
-        onFinish: stopContinuousJog,
-        detect: isTouchEnabled() ? 'touch' : 'mouse'
+        onFinish: stopContinuousJog
     });
 
     return (
