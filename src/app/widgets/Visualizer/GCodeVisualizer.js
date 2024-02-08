@@ -230,7 +230,12 @@ class GCodeVisualizer {
     getHull() {
         const hull = new ConvexHull();
         hull.setFromObject(this.group);
-        return hull.vertices;
+        const vertices = [];
+        hull.vertices.forEach((vertexNode) => {
+            vertices.push([vertexNode.point.x.toFixed(3), vertexNode.point.y.toFixed(3)]);
+        });
+
+        return vertices;
     }
 }
 
