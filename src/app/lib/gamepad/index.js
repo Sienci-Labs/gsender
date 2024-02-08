@@ -190,6 +190,22 @@ export const runAction = ({ event }) => {
     }
 };
 
+export const deleteGamepadMacro = (macroID) => {
+    const profiles = store.get('workspace.gamepad.profiles', []);
+
+    profiles.forEach(profile => {
+        const macroIndexPrimary = profile.buttons.findIndex(button => button.primaryAction === macroID);
+        if (macroIndexPrimary > -1) {
+            profile.buttons[macroIndexPrimary].primaryAction = null;
+        }
+
+        const macroIndexSecondary = profile.buttons.findIndex(button => button.secondaryAction === macroID);
+        if (macroIndexSecondary > -1) {
+            profile.buttons[macroIndexSecondary].secondaryAction = null;
+        }
+    });
+};
+
 gamepadInstance.on('gamepad:connected', ({ detail }) => {
     const { gamepad } = detail;
 
