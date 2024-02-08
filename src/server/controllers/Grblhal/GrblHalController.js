@@ -1957,7 +1957,7 @@ class GrblHalController {
                     axes.F = axes.F.toFixed(3);
                 }
 
-                const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + (letter === 'a' || letter === 'A' ? 'Y' : letter.toUpperCase()) + value)).join(' ');
+                const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.writeln(jogCommand);
             },
             'jog:stop': () => {

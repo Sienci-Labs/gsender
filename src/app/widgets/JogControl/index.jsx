@@ -256,7 +256,7 @@ class AxesWidget extends PureComponent {
         jog: (params = {}) => {
             const { units } = this.state;
             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-            const s = map(params, (value, letter) => ('' + (letter === 'a' || letter === 'A' ? 'Y' : letter.toUpperCase()) + value)).join(' ');
+            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
             ];
@@ -821,6 +821,7 @@ class AxesWidget extends PureComponent {
     };
 
     handleJoystickJog = (params, { doRegularJog } = {}) => {
+        const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
         const { getXYJogDistance, getZJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
@@ -848,7 +849,11 @@ class AxesWidget extends PureComponent {
                 axisList.z = axisValue.z * params.z;
             }
             if (params.a) {
-                axisList.A = axisValue.a * params.a;
+                if (isInRotaryMode) {
+                    axisList.y = axisValue.a * params.a;
+                } else {
+                    axisList.A = axisValue.a * params.a;
+                }
             }
 
             this.actions.jog({ ...axisList, F: feedrate });
