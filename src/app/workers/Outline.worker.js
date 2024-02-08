@@ -32,12 +32,7 @@ onmessage = ({ data }) => {
     }
 
     const getOutlineGcode = (concavity = 60) => {
-        const vertices = [];
-        console.log(vertices);
-        console.log(parsedData);
-
         const fileHull = hull(parsedData);
-        console.log(fileHull);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 
