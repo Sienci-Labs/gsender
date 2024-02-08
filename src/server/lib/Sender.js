@@ -462,8 +462,7 @@ class Sender extends events.EventEmitter {
             this.state.timeRunning -= this.state.timePaused;
         }
 
-        // Make a 1 second delay before estimating the remaining time
-        if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
+        if (this.state.received > 0) {
             if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
                 if (this.state.received < this.state.estimateData.length) {
                     // add the lines to the queue from where we left off to the current number received

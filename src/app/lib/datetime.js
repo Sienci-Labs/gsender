@@ -25,7 +25,7 @@ import moment from 'moment';
 
 // solution found here: https://stackoverflow.com/a/59948911
 export const convertMillisecondsToTimeStamp = (milliseconds) => {
-    if (milliseconds) {
+    if (milliseconds >= 0) {
         let seconds = milliseconds / 1000;
         const hours = Math.floor(seconds / 3600);
         seconds %= 3600; // seconds remaining after extracting hours
@@ -39,7 +39,7 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
 };
 
 export const convertSecondsToTimeStamp = (seconds, startTime) => {
-    if (startTime === 0 || !seconds || seconds < 0) {
+    if (startTime === 0 || seconds === undefined || seconds < 0) {
         return '-';
     }
 
