@@ -132,6 +132,8 @@ onmessage = ({ data }) => {
             modalCounter++;
         }
 
+        console.log(vertices);
+
         const fileHull = hull(vertices);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
