@@ -437,13 +437,11 @@ class AxesWidget extends PureComponent {
     shuttleControlFunctions = {
         JOG: (event, { axis = null }) => {
             const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
-            const firmwareType = this.props.type;
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
 
-            if (isGrbl && axis.a && !isInRotaryMode) {
+            if (axis.a && !isInRotaryMode) {
                 return;
             }
 
@@ -823,6 +821,7 @@ class AxesWidget extends PureComponent {
     };
 
     handleJoystickJog = (params, { doRegularJog } = {}) => {
+        const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
         const { getXYJogDistance, getZJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
@@ -850,7 +849,11 @@ class AxesWidget extends PureComponent {
                 axisList.z = axisValue.z * params.z;
             }
             if (params.a) {
-                axisList.A = axisValue.a * params.a;
+                if (isInRotaryMode) {
+                    axisList.y = axisValue.a * params.a;
+                } else {
+                    axisList.A = axisValue.a * params.a;
+                }
             }
 
             this.actions.jog({ ...axisList, F: feedrate });
@@ -863,11 +866,12 @@ class AxesWidget extends PureComponent {
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -879,7 +883,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: xyStep
+            a: aStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -904,7 +908,7 @@ class AxesWidget extends PureComponent {
             axisList.z = axisValue.z * axis.z;
         }
         if (axis.a) {
-            axisList.A = axisValue.a * axis.a;
+            axisList.a = axisValue.a * axis.a; // convert to Y
         }
 
         this.joggingHelper.onKeyDown(axisList, feedrate);
@@ -920,10 +924,11 @@ class AxesWidget extends PureComponent {
 
         const { axis: axisList } = payload;
 
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         const axisObj = {};
 
@@ -933,7 +938,8 @@ class AxesWidget extends PureComponent {
                 const axisValue = {
                     X: xyStep,
                     Y: xyStep,
-                    Z: zStep
+                    Z: zStep,
+                    A: aStep
                 }[givenAxis] * axisList[axis];
 
                 axisObj[givenAxis] = axisValue;

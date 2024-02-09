@@ -153,16 +153,22 @@ const defaultState = {
                 rapid: {
                     xyStep: 20,
                     zStep: 10,
+                    aStep: 20,
+                    xaStep: 20,
                     feedrate: 5000,
                 },
                 normal: {
                     xyStep: 5,
                     zStep: 2,
+                    aStep: 5,
+                    xaStep: 5,
                     feedrate: 3000,
                 },
                 precise: {
                     xyStep: 0.5,
                     zStep: 0.1,
+                    aStep: 0.5,
+                    xaStep: 0.5,
                     feedrate: 1000,
                 },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
