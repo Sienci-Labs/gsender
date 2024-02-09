@@ -101,7 +101,8 @@ class DFU {
     }
 
     getSegment(addr) {
-        for (let segment of this.segments) {
+        const { segments } = this.segments;
+        for (let segment of segments) {
             if (segment.start <= addr && addr < segment.end) {
                 return segment;
             }

@@ -48,7 +48,7 @@ class DFUFlasher extends events.EventEmitter {
         let startAddress = null;
         let byteSize = 0;
 
-        for (let [address, dataBlock] of this.map ) {
+        for (let [address, dataBlock] of this.map) {
             if (!startAddress) {
                 startAddress = address;
             }
@@ -59,7 +59,6 @@ class DFUFlasher extends events.EventEmitter {
         log.info('Aborted to IDLE state');
 
         // Erase chip
-        this.emit('info', `Erasing chip starting at address ${startAddress.toString(16)}`);
         await this.erase(startAddress, byteSize);
 
 
@@ -96,7 +95,7 @@ class DFUFlasher extends events.EventEmitter {
         }
     }
 
-    async download(startAddress, xferSize, data, manifestTolerant) {
+    async download(startAddress, xferSize, data) {
         log.info('Starting download to board');
 
         let bytesSent = 0;
@@ -159,14 +158,15 @@ class DFUFlasher extends events.EventEmitter {
     }
 
     async erase(startAddr, length) {
+        this.emit('info', `Erasing chip starting at address ${startAddr.toString(16)} - size ${length}`);
         let segment = this.dfu.getSegment(startAddr);
         if (!segment) {
             this.emit('error', 'Invalid segment in memory map');
             log.error(`Unable to find valid segment for address ${startAddr}`);
             return;
         }
-        let endAddr = this.getSectorStart(startAddr, segment);
-        let addr = this.getSectorEnd(startAddr + length - 1, segment);
+        let addr = this.getSectorStart(startAddr, segment);
+        let endAddr = this.getSectorEnd(startAddr + length - 1, segment);
 
         let bytesErased = 0;
         const bytesToErase = endAddr - addr;
