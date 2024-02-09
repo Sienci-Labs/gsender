@@ -21,22 +21,17 @@
  *
  */
 
-import hull from 'concaveman';
+import hull from 'hull.js';
 import chunk from 'lodash/chunk';
 
 onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
-    // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
-    function vertex(x, y) {
-        return [x.toFixed(3), y.toFixed(3)];
-    }
-
     const getOutlineGcode = (concavity = 60) => {
-        let vertices = parsedData
-            .map(data => data.toFixed(3));
+        let vertices = [];
+        parsedData.forEach(n => vertices.push(n.toFixed(3)));
         vertices = chunk(vertices, 3);
 
-        const fileHull = hull(vertices);
+        const fileHull = hull(vertices, concavity);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 
