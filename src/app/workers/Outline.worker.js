@@ -21,118 +21,17 @@
  *
  */
 
-import hull from 'concaveman';
-import GCodeVirtualizer, { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
-import * as THREE from 'three';
+import hull from 'hull.js';
+import chunk from 'lodash/chunk';
 
 onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = {} } = data;
-    // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
-    function vertex(x, y) {
-        return [x.toFixed(3), y.toFixed(3)];
-    }
-
+    const { isLaser = false, parsedData = [] } = data;
     const getOutlineGcode = (concavity = 60) => {
-        const vertices = [];
+        let vertices = [];
+        parsedData.forEach(n => vertices.push(n.toFixed(3)));
+        vertices = chunk(vertices, 3);
 
-        const addLine = ({ motion }, v1, v2) => {
-            if (motion === 'G1' || motion === 'G0') {
-                if (shouldRotate(v1.a, v2.a)) {
-                    const newV1 = rotateAxis('y', v1);
-                    v1.y = newV1.y;
-                    v1.z = newV1.z;
-
-                    const newV2 = rotateAxis('y', v2);
-                    v2.y = newV2.y;
-                    v2.z = newV2.z;
-                }
-
-                vertices.push(vertex(v2.x, v2.y));
-            }
-        };
-        const addCurve = ({ motion, plane }, v1, v2, v0) => {
-            const isClockwise = motion === 'G2';
-            const radius = Math.sqrt(
-                (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2
-            );
-            let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-            let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
-
-            // Draw full circle if startAngle and endAngle are both zero
-            if (startAngle === endAngle) {
-                endAngle += 2 * Math.PI;
-            }
-
-            const arcCurve = new THREE.ArcCurve(
-                v0.x, // aX
-                v0.y, // aY
-                radius, // aRadius
-                startAngle, // aStartAngle
-                endAngle, // aEndAngle
-                isClockwise // isClockwise
-            );
-            const divisions = 10;
-            const points = arcCurve.getPoints(divisions);
-            vertices.push(vertex(v1.x, v1.y));
-
-            for (let i = 0; i < points.length; ++i) {
-                const point = points[i];
-                const z = ((v2.z - v1.z) / points.length) * i + v1.z;
-
-                if (plane === 'G17') {
-                    // XY-plane
-                    vertices.push(vertex(point.x, point.y));
-                } else if (plane === 'G18') {
-                    // ZX-plane
-                    vertices.push(vertex(point.y, z));
-                } else if (plane === 'G19') {
-                    // YZ-plane
-                    vertices.push(vertex(z, point.x));
-                }
-            }
-        };
-
-        const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
-        const { data, modalChanges } = parsedData;
-        let modalIndex = 0; // track changes
-        let iterationsNeeded = modalChanges[modalIndex].count; // initialize
-        let modal = vm.getCurrentModal(); // get the default modal
-        let modalCounter = 0; // tracking how long until the modal change comes
-
-        for (let i = 0; i < data.length; i++) {
-            // update modal
-            if (modalCounter === iterationsNeeded) {
-                modalIndex++;
-                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
-                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
-                modalCounter = 0; // reset counter
-            }
-
-            const entry = data[i];
-            if (entry.lineData) {
-                const { v2, shouldUseAddCurve } = entry.lineData;
-                // use previous v2 as v1 unless there is no previous entry
-                let v1 = entry.lineData.v1;
-                if (!v1) {
-                    // sometimes the last line doesn't have movements, so we must search for the last line with a movement
-                    for (let x = i - 1; x >= 0; x--) {
-                        if (data[x].lineData && data[x].lineData.v2) {
-                            v1 = data[x].lineData.v2;
-                            break;
-                        }
-                    }
-                }
-                if (shouldUseAddCurve) {
-                    addCurve(modal, v1, v2);
-                } else {
-                    addLine(modal, v1, v2);
-                }
-            }
-
-            modalCounter++;
-        }
-
-        const fileHull = hull(vertices);
+        const fileHull = hull(vertices, concavity);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 

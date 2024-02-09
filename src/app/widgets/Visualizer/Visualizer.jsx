@@ -1742,6 +1742,11 @@ class Visualizer extends Component {
         (typeof callback === 'function') && callback({ bbox: bbox });
     }
 
+
+    getToolpathHull() {
+        return this.visualizer.getHull();
+    }
+
     load(name, vizualization, callback) {
         // Remove previous G-code object
         this.unload();

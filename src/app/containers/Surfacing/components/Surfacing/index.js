@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -9,6 +9,7 @@ import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY, USAGE_TOOL_NAME } from 'app/constants';
 import GcodeViewer from 'app/components/GcodeViewer';
+import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 
 import Visualizer from '../Visualizer';
 import InputArea from '../InputArea';
@@ -36,22 +37,32 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
         setCurrentTab(0);
 
-        const generator = new Generator({ surfacing, units, controller });
+        try {
+            const generator = new Generator({ surfacing, units, controller });
 
-        const gcode = generator.generate();
+            const gcode = generator.generate();
 
-        const serializedFile = new File([gcode], 'surfacing.gcode');
+            const serializedFile = new File([gcode], 'surfacing.gcode');
 
-        const payload = {
-            content: gcode,
-            size: serializedFile.size,
-            name: serializedFile.name,
-            visualizer: VISUALIZER_SECONDARY
-        };
+            const payload = {
+                content: gcode,
+                size: serializedFile.size,
+                name: serializedFile.name,
+                visualizer: VISUALIZER_SECONDARY
+            };
 
-        pubsub.publish('visualizer:load', payload);
+            pubsub.publish('visualizer:load', payload);
 
-        setGcode(gcode);
+            setGcode(gcode);
+        } catch (error) {
+            if (error.name === 'RangeError') {
+                Toaster.pop({
+                    msg: 'Exceeded surfacing limit, please decrease cut depth, max depth, or X/Y values',
+                    type: TOASTER_DANGER,
+                    duration: 5000
+                });
+            }
+        }
     };
 
     /**
@@ -116,7 +127,8 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
     }, [currentTab]);
 
     const canLoad = !!gcode; //For accessing the gcode line viewer
-    const tabs = [
+
+    const tabs = useMemo(() => [
         {
             id: 0,
             label: 'Visualizer Preview',
@@ -130,7 +142,7 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
             component: <GcodeViewer gcode={gcode} />,
             disabled: !gcode,
         },
-    ];
+    ], [gcode]);
     const contextValue = {
         surfacing,
         gcode,

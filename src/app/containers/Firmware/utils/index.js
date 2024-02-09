@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import get from 'lodash/get';
 import download from 'downloadjs';
+import ip from 'ip';
 
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -46,9 +47,12 @@ export const connectToLastDevice = (callback) => {
     const baudrate = connectionConfig.get('baudrate');
     const controllerType = connectionConfig.get('controller.type') || GRBL;
 
+    const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
+
     controller.openPort(port, controllerType, {
         baudrate,
-        rtscts: false
+        rtscts: false,
+        network: isNetwork
     }, (err) => {
         if (err) {
             return;
@@ -139,8 +143,6 @@ export const convertValueToArray = (value, possibilities) => {
 };
 
 export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
-    console.log(settings);
-
     let index22 = 200; // index of $22 - default is 200 because we have less eeprom values than that, so it will never be set to this value
     let index2021 = -1; // index of $20 or $21, whichever comes first
     let changedSettings = settings

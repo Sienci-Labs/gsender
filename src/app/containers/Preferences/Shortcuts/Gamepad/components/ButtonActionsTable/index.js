@@ -13,10 +13,11 @@ import { get } from 'lodash';
 import classNames from 'classnames';
 
 const ButtonActionsTable = () => {
-    const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile } } = useContext(GamepadContext);
+    const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile, getMacros } } = useContext(GamepadContext);
     const { buttons } = useGamepadListener({ profile: currentProfile });
 
     const profile = getGamepadProfile(currentProfile);
+    const macros = getMacros();
 
     const buttonsArr = [...profile.buttons]
         .sort(button => {
@@ -131,7 +132,7 @@ const ButtonActionsTable = () => {
                 );
             }
 
-            const event = shuttleEvents.getEvent(action);
+            const event = shuttleEvents.getEvent(action) || macros.find(el => el.cmd === action);
 
             return (
                 <div className={styles['shortcut-item']}>

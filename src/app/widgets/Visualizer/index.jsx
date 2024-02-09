@@ -614,6 +614,9 @@ class VisualizerWidget extends PureComponent {
                 msg: 'G-code File Closed',
                 icon: 'fa-exclamation'
             });
+        },
+        getHull: () => {
+            return this.visualizer.getToolpathHull();
         }
     };
 

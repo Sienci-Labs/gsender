@@ -7,16 +7,12 @@ import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
 const HalSettings = ({ descriptions }) => {
     const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
-    console.log(settings);
     const handleSettingsChange = (index) => (value) => {
         setSettingsToApply(true);
         setSettings(prev => {
-            console.log(`index: ${index}`);
             const updated = [...prev];
-            console.log(updated[index]);
 
             updated[index].value = value;
-            console.log(updated);
             return updated;
         });
     };
