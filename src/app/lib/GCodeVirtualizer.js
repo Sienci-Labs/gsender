@@ -1022,6 +1022,11 @@ class GCodeVirtualizer extends EventEmitter {
             }
         }
 
+        // if the line didnt have time calcs involved, push 0 time
+        if (this.estimates.length < this.data.length) {
+            this.estimates.push(0);
+        }
+
         // add new data structure
         this.data.push({
             Scode: null,
@@ -1292,7 +1297,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.lastF = f;
         this.totalTime += moveDuration;
-        this.estimates.push(moveDuration);
+        this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
