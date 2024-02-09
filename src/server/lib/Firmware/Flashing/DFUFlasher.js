@@ -1,7 +1,7 @@
 /* eslint no-await-in-loop: 0 */
 
 import DFU from './DFU';
-import MemoryMap from 'nrf-intel-hex';
+import hexParser from 'nrf-intel-hex';
 import logger from '../../logger';
 import events from 'events';
 
@@ -44,17 +44,31 @@ class DFUFlasher extends events.EventEmitter {
     async flash() {
         await this.dfu.open();
         this.map = this.parseHex(this.hex);
+
         let startAddress = null;
+        let byteSize = 0;
+
+        for (let [address, dataBlock] of this.map ) {
+            if (!startAddress) {
+                startAddress = address;
+            }
+            byteSize += dataBlock.byteLength;
+        }
+
+        await this.dfu.abortToIdle();
+        log.info('Aborted to IDLE state');
+
+        // Erase chip
+        this.emit('info', `Erasing chip starting at address ${startAddress.toString(16)}`);
+        await this.erase(startAddress, byteSize);
 
 
         for (let [address, dataBlock] of this.map) {
             this.emit('info', `Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`);
-            if (!startAddress) {
-                startAddress = address;
-            }
             await this.download(address, this.XFER_SIZE, dataBlock);
         }
 
+        await this.dfu.abortToIdle();
         log.info(`Jumping back to start address ${startAddress} to manifest`);
         await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
         const status = await this.dfu.getStatus();
@@ -76,7 +90,7 @@ class DFUFlasher extends events.EventEmitter {
      */
     parseHex() {
         try {
-            return MemoryMap.fromHex(this.hex);
+            return hexParser.fromHex(this.hex);
         } catch (err) {
             throw err;
         }
@@ -88,9 +102,6 @@ class DFUFlasher extends events.EventEmitter {
         let bytesSent = 0;
         let expectedSize = data.byteLength;
         let chunks = 1;
-
-        await this.dfu.abortToIdle();
-        log.info('Aborted to IDLE state');
 
         let address = startAddress;
         while (bytesSent < expectedSize) {
@@ -178,6 +189,7 @@ class DFUFlasher extends events.EventEmitter {
             bytesErased += segment.sectorSize;
             this.logProgress(bytesErased, bytesToErase);
             log.info(`Erased ${bytesErased} of ${bytesToErase} bytes`);
+            this.emit('info', `Erased ${bytesErased} of ${bytesToErase} bytes`);
         }
     }
 
