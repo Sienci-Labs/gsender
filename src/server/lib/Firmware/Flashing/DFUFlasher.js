@@ -111,10 +111,8 @@ class DFUFlasher extends events.EventEmitter {
             let dfuStatus;
             try {
                 await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
-                const status = await this.dfu.getStatus();
-                log.info(status);
+                await this.dfu.getStatus();
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
-                log.info(`Sent ${bytesWritten} bytes`);
                 this.emit('info', `Wrote chunk ${chunks} with size ${bytesWritten}b`);
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
@@ -167,15 +165,16 @@ class DFUFlasher extends events.EventEmitter {
         }
         let addr = this.getSectorStart(startAddr, segment);
         let endAddr = this.getSectorEnd(startAddr + length - 1, segment);
+        log.info(`Starting erase at ${addr.toString(16)} and erasing until ${endAddr.toString(16)}`);
 
         let bytesErased = 0;
         const bytesToErase = endAddr - addr;
 
         while (addr < endAddr) {
             if (segment.end <= addr) {
-                segment = this.getSegment(addr);
+                segment = this.dfu.getSegment(addr);
             }
-            if (!segment.eraseable) {
+            if (!segment.erasable) {
                 bytesErased = Math.min(bytesErased - segment.end - addr, bytesToErase);
                 addr = segment.end;
                 this.logProgress(bytesErased, bytesToErase);
@@ -191,6 +190,7 @@ class DFUFlasher extends events.EventEmitter {
             log.info(`Erased ${bytesErased} of ${bytesToErase} bytes`);
             this.emit('info', `Erased ${bytesErased} of ${bytesToErase} bytes`);
         }
+        log.info('Erase finished');
     }
 
     async sendDFUCommand(command, param = 0x00, len = 1) {
