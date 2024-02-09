@@ -22,7 +22,7 @@
  */
 
 import hull from 'concaveman';
-import { parse } from 'esprima';
+import chunk from 'lodash/chunk';
 
 onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
@@ -32,7 +32,11 @@ onmessage = ({ data }) => {
     }
 
     const getOutlineGcode = (concavity = 60) => {
-        const fileHull = hull(parsedData);
+        let vertices = parsedData
+            .map(data => data.toFixed(3));
+        vertices = chunk(vertices, 3);
+
+        const fileHull = hull(vertices);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 

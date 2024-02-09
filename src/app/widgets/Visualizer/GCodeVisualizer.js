@@ -24,7 +24,6 @@
 // import colornames from 'colornames';
 import * as THREE from 'three';
 import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART, PLANNED_PART } from './constants';
-import { ConvexHull } from 'three/examples/jsm/math/ConvexHull';
 
 class GCodeVisualizer {
     constructor(theme) {
@@ -228,14 +227,8 @@ class GCodeVisualizer {
     }
 
     getHull() {
-        const hull = new ConvexHull();
-        hull.setFromObject(this.group);
-        const vertices = [];
-        hull.vertices.forEach((vertexNode) => {
-            vertices.push([vertexNode.point.x.toFixed(3), vertexNode.point.y.toFixed(3)]);
-        });
-
-        return vertices;
+        const vertices = this.geometry.getAttribute('position');
+        return vertices.array;
     }
 }
 
