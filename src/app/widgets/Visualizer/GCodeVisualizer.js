@@ -225,6 +225,11 @@ class GCodeVisualizer {
         this.oldV1s = Array(16).fill(null);
         this.countdown = 16;
     }
+
+    getHull() {
+        const vertices = this.geometry.getAttribute('position');
+        return vertices.array;
+    }
 }
 
 export default GCodeVisualizer;

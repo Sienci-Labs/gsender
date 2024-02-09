@@ -76,7 +76,6 @@ import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import Tooltip from '../../components/TooltipCustom/ToolTip';
 import { storeUpdate } from '../../lib/storeUpdate';
 import { convertMillisecondsToTimeStamp } from '../../lib/datetime';
-import { getParsedData } from '../../lib/indexedDB';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -241,6 +240,10 @@ class WorkflowControl extends PureComponent {
         if (this.state.outlineRunning) {
             return;
         }
+
+        const { actions } = this.props;
+        const vertices = actions.getHull();
+
         this.setState({ outlineRunning: true });
 
         this.workerOutline = new WorkerOutline();
@@ -259,10 +262,16 @@ class WorkflowControl extends PureComponent {
             // Enable the outline button again
             this.setState({ outlineRunning: false });
         };
+
+        this.workerOutline.postMessage({
+            isLaser,
+            parsedData: vertices
+        });
+        /*
         getParsedData().then((value) => {
             const parsedData = value;
             this.workerOutline.postMessage({ isLaser, parsedData });
-        }); // data from GCodeVirtualizer
+        }); // data from GCodeVirtualizer*/
     };
 
     startRun = () => {
