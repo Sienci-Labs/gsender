@@ -1540,6 +1540,7 @@ class GrblHalController {
                     if (modalWcs !== wcs && modalWcs !== 'G54') {
                         modalWcs = wcs;
                     }
+                    const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;
 
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
@@ -1549,7 +1550,7 @@ class GrblHalController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
-                    modalGCode.push(`${modal.motion}`);
+                    modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
 
