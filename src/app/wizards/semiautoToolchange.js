@@ -124,7 +124,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Jog your machine to a palce you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to {moveAmount} above the probe location, attach the magnet, and prepare to probe</div>,
+                    description: () => <div>Jog your machine to a place you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to {moveAmount} above the probe location, attach the magnet, and prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {
