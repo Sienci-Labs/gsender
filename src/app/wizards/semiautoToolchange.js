@@ -137,9 +137,9 @@ const wizard = {
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     '(Set Z to Tool offset and wait)',
-                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,
+                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET]`,
+                                    'G0 Z[global.toolchange.RETRACT]',
                                 ]);
                             }
                         }
