@@ -55,19 +55,23 @@ export const replaceParsedData = (parsedData) => {
         request.onupgradeneeded = onupgradeneeded;
         request.onsuccess = (event) => {
             db = event.target.result;
-
-            // delete previous data
-            const replaceReq = db
-                .transaction([OBJECT_STORE], 'readwrite')
+            db
+                .transaction(OBJECT_STORE, 'readwrite')
                 .objectStore(OBJECT_STORE)
-                .put({ id: DATA_ID, ...parsedData });
-            replaceReq.onsuccess = (event) => {
-                console.log('Finished replacing parsed data');
-                return resolve('Finished replacing parsed data');
-            };
-            replaceReq.onerror = (event) => {
-                console.error('Error replacing parsed data from indexedDB');
-            };
+                .delete(DATA_ID).onsuccess = (event) => {
+                    // delete previous data
+                    const replaceReq = db
+                        .transaction([OBJECT_STORE], 'readwrite')
+                        .objectStore(OBJECT_STORE)
+                        .put({ id: DATA_ID, ...parsedData });
+                    replaceReq.onsuccess = (event) => {
+                        console.log('Finished replacing parsed data');
+                        return resolve('Finished replacing parsed data');
+                    };
+                    replaceReq.onerror = (event) => {
+                        console.error('Error replacing parsed data from indexedDB');
+                    };
+                };
         };
     });
 };
