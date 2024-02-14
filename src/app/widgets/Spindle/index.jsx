@@ -215,7 +215,7 @@ class SpindleWidget extends PureComponent {
         handleHALSpindleSelect: (spindle) => {
             console.log(spindle);
             controller.command('gcode', [
-                `M104 P${spindle.value}`
+                `M104 Q${spindle.value}`
             ]);
             this.setState({
                 spindle
