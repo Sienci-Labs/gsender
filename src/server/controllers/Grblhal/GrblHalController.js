@@ -1078,7 +1078,7 @@ class GrblHalController {
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
         await delay(100);
-        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n');
+        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
     }
 
     populateContext(context = {}) {
