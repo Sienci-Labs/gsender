@@ -46,9 +46,11 @@ import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
 import store from '../../store';
 import {
+    A_AXIS_COMMANDS,
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
-    WRITE_SOURCE_FEEDER
+    WRITE_SOURCE_FEEDER,
+    Y_AXIS_COMMANDS
 } from '../constants';
 import GrblHalRunner from './GrblHalRunner';
 import {
@@ -82,6 +84,7 @@ import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocati
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
 import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
+import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -195,6 +198,9 @@ class GrblHalController {
 
     // Toolchange
     toolChanger = null;
+
+    // Rotary
+    isInRotaryMode = false;
 
     constructor(engine, options) {
         if (!engine) {
@@ -336,6 +342,23 @@ class GrblHalController {
                     line = line.replace('M6', '(M6)');
                 }
 
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
+
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
+                }
+
                 return line;
             }
         });
@@ -447,7 +470,7 @@ class GrblHalController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            commentString = `(${tool[0]}) ` + commentString;
+                            commentString = `(${tool?.[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
@@ -459,8 +482,8 @@ class GrblHalController {
 
                             setTimeout(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool[2]); // set tool in runner state
-                                this.emit('controller:state', GRBLHAL, this.state, tool[2]); // set tool in redux
+                                this.runner.setTool(tool?.[2]); // set tool in runner state
+                                this.emit('controller:state', GRBLHAL, this.state, tool?.[2]); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
@@ -476,8 +499,32 @@ class GrblHalController {
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
+                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
+
+                /**
+                 * Rotary Logic
+                 * Need to change the A-axis movements to Y-movements to emulate the rotary axis on grbl
+                 */
+                if (this.isInRotaryMode) {
+                    const containsACommand = A_AXIS_COMMANDS.test(line);
+                    const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                    if (containsACommand && !containsYCommand) {
+                        const isUsingImperialUnits = context.modal.units === 'G20';
+
+                        line = translateGcode({
+                            gcode: line,
+                            from: 'A',
+                            to: 'Y',
+                            regex: A_AXIS_COMMANDS,
+                            type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                        });
+                    }
+                }
+                /**
+                 * End of Rotary Logic
+                 */
 
                 return line;
             }
@@ -527,6 +574,7 @@ class GrblHalController {
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.stopCountdown();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -539,6 +587,7 @@ class GrblHalController {
             }
 
             this.timePaused = new Date().getTime();
+            this.sender.pauseCountdown();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -554,6 +603,8 @@ class GrblHalController {
 
             // Resume program execution
             this.sender.unhold();
+
+            this.sender.resumeCountdown();
 
             // subtract time paused
             this.sender.next({ timePaused: pauseTime });
@@ -692,7 +743,7 @@ class GrblHalController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description || '',
+                description: error?.description || '',
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -1394,7 +1445,7 @@ class GrblHalController {
                 const delay = _.get(preferences, 'spindle.delay', false);
 
                 if (delay) {
-                    gcode = gcode.replace(/(S[0-9]* M[3-4])|(M[3-4] S[0-9]*)/g, '$& G4 P1');
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, '$& G4 P1');
                 }
 
                 const ok = this.sender.load(name, gcode + '\n', context);
@@ -1492,6 +1543,7 @@ class GrblHalController {
                     if (modalWcs !== wcs && modalWcs !== 'G54') {
                         modalWcs = wcs;
                     }
+                    const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;
 
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
@@ -1501,7 +1553,7 @@ class GrblHalController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
-                    modalGCode.push(`${modal.motion}`);
+                    modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
 
@@ -1561,6 +1613,7 @@ class GrblHalController {
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger(PROGRAM_END);
+                this.sender.stopCountdown();
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
@@ -1901,7 +1954,7 @@ class GrblHalController {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                 } else {
-                    jogFeedrate = 1250;
+                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });
@@ -2034,6 +2087,10 @@ class GrblHalController {
                 const [estimateData] = args;
                 this.sender.setEstimateData(estimateData.estimates);
                 this.sender.setEstimatedTime(estimateData.estimatedTime);
+            },
+            'updateRotaryMode': () => {
+                const [isInRotaryMode] = args;
+                this.isInRotaryMode = isInRotaryMode;
             }
         }[cmd];
 

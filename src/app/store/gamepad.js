@@ -37,6 +37,7 @@ export const defaultOptions = {
             },
         },
         zeroThreshold: 15,
+        movementDistanceOverride: 100,
     },
     buttons: []
 };

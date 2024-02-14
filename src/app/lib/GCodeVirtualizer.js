@@ -353,7 +353,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
@@ -437,7 +438,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
@@ -865,16 +867,19 @@ class GCodeVirtualizer extends EventEmitter {
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
 
-        const { xAccel, yAccel, zAccel } = accelerations;
-        this.xAccel = xAccel;
-        this.yAccel = yAccel;
-        this.zAccel = zAccel;
+        if (accelerations) {
+            const { xAccel, yAccel, zAccel } = accelerations;
+            this.xAccel = xAccel;
+            this.yAccel = yAccel;
+            this.zAccel = zAccel;
+        }
 
-        const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
-        this.xMaxFeed = xMaxFeed;
-        this.yMaxFeed = yMaxFeed;
-        this.zMaxFeed = zMaxFeed;
-
+        if (maxFeedrates) {
+            const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
+            this.xMaxFeed = xMaxFeed;
+            this.yMaxFeed = yMaxFeed;
+            this.zMaxFeed = zMaxFeed;
+        }
 
         if (this.collate) {
             this.vmState.feedrates = new Set();
@@ -1015,6 +1020,11 @@ class GCodeVirtualizer extends EventEmitter {
                 const func = this.handlers[cmd];
                 func(args);
             }
+        }
+
+        // if the line didnt have time calcs involved, push 0 time
+        if (this.estimates.length < this.data.length) {
+            this.estimates.push(0);
         }
 
         // add new data structure
@@ -1287,7 +1297,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.lastF = f;
         this.totalTime += moveDuration;
-        this.estimates.push(moveDuration);
+        this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
     }
 
     // TODO: if we find something we need to account for that will make the times longer,

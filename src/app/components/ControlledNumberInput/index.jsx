@@ -22,18 +22,38 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { METRIC_UNITS } from '../../constants';
+import store from '../../store';
+import { round } from '../../lib/rounding';
 
 // default max value is the highest number consisting only of 9s that is below the safe integer value
 // it's more aesthetic than 9007199254740991 lol
-const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnChange = null, max = 999999999999999, min = -999999999999999, ...props }) => {
+const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnChange = null, max = 999999999999999, min = -999999999999999, hasRounding = true, ...props }) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);
+    const units = store.get('workspace.units', METRIC_UNITS);
+
+    const updateLocalValue = (value) => {
+        if (hasRounding) {
+            setLocalValue(round(value, units));
+        } else {
+            setLocalValue(value);
+        }
+    };
+
+    const updateOriginalValue = (value) => {
+        if (hasRounding) {
+            setOriginalValue(round(value, units));
+        } else {
+            setOriginalValue(value);
+        }
+    };
 
     /* If the value is changed up the tree, update both displayed and original value stored in component */
     useEffect(() => {
-        setOriginalValue(value);
-        setLocalValue(value);
+        updateOriginalValue(value);
+        updateLocalValue(value);
     }, [value]);
 
     const onFocus = () => {
@@ -45,22 +65,22 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
         if (localValue && localValue !== originalValue) {
             if (current < min) {
                 inputRef.current.value = min;
-                setLocalValue(min);
+                updateLocalValue(min);
             } else if (current > max) {
                 inputRef.current.value = max;
-                setLocalValue(max);
+                updateLocalValue(max);
             } else {
-                setLocalValue(current);
+                updateLocalValue(current);
             }
             onChange(e);
         } else {
-            setLocalValue(originalValue);
+            updateLocalValue(originalValue);
         }
     };
 
     const onKeyDown = (e) => {
         if (e.key === 'Escape') {
-            setLocalValue(originalValue);
+            updateLocalValue(originalValue);
             inputRef.current.blur();
         } else if (e.key === 'Enter') {
             inputRef.current.blur();
@@ -68,14 +88,14 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
     };
 
     const onChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        updateLocalValue(inputRef.current.value);
         if (externalOnChange) {
             externalOnChange(e);
         }
     };
 
     const localChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        setLocalValue(inputRef.current.value); // no rounding on change
     };
 
     return (

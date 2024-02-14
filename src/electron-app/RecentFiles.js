@@ -47,6 +47,7 @@ export const parseAndReturnGCode = async ({ filePath }) => {
 
     try {
         const fileExists = await fileExistsAtPath(filePath);
+
         if (!fileExists) {
             return null; // TODO: Handle null as FILENOTFOUND error
         }
@@ -55,6 +56,7 @@ export const parseAndReturnGCode = async ({ filePath }) => {
         const { size } = stats;
 
         const data = await fs.readFile(filePath, 'utf-8');
+
         return {
             result: data,
             size: size,

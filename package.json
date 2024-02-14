@@ -1,6 +1,6 @@
 {
-  "name": "gSender-Edge",
-  "version": "1.3.10-EDGE",
+  "name": "gSender",
+  "version": "1.4.2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -58,11 +58,11 @@
     "build:linux-ia32": "bash -c 'scripts/electron-builder.sh --linux --ia32'",
     "build:linux-x64": "bash -c 'scripts/electron-builder.sh --linux --x64'",
     "build:linux-armv7l": "bash -c 'scripts/electron-builder.sh --linux --armv7l'",
-    "build:linux": "bash -c 'scripts/electron-builder.sh --linux --x64 --arm64 --armv7l'",
+    "build:linux": "bash -c 'scripts/electron-builder.sh --linux --x64 --arm64'",
     "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-    "build:windows": "bash -c 'scripts/electron-builder.sh --windows --ia32 --x64'",
+    "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "start": "cross-env ./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
@@ -79,11 +79,11 @@
     "cypress:open": "cypress open"
   },
   "build": {
-    "appId": "org.sienci.gsender-edge",
+    "appId": "org.sienci.gsender",
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender Edge",
+    "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "extraResources": [
@@ -202,7 +202,6 @@
     "colornames": "~1.1.1",
     "commander": "^10.0.0",
     "compression": "~1.7.4",
-    "concaveman": "^1.2.1",
     "connect-multiparty": "~2.2.0",
     "connect-restreamer": "~1.0.3",
     "consolidate": "~0.15.1",
@@ -240,6 +239,7 @@
     "gsap": "^3.11.5",
     "hogan.js": "~3.0.2",
     "http-proxy": "~1.18.1",
+    "hull.js": "^1.0.5",
     "humanize-duration": "^3.31.0",
     "i18next": "~15.0.9",
     "i18next-browser-languagedetector": "~3.0.1",
@@ -411,5 +411,11 @@
     "webpack-manifest-plugin": "~2.0.4",
     "webpack-node-externals": "~1.7.2",
     "write-file-webpack-plugin": "~4.5.0"
+  },
+  "overrides": {
+    "@react-pdf/layout": "3.6.4"
+  },
+  "resolutions": {
+    "@react-pdf/layout": "3.6.4"
   }
 }

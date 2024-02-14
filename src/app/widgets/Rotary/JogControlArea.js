@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import store from '../../store';
+import { WORKSPACE_MODE } from '../../constants';
 import JogControl from '../JogControl/components/JogControl';
 
 import styles from './index.styl';
@@ -18,13 +20,21 @@ const KeypadDirectionText = styled(KeypadText)`
 const JogControlArea = ({ actions, jog, disabled = false }) => {
     const { aStep, feedrate } = jog;
 
+    // convert to Y if necessary
+    const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
+    const jogPlus = isInRotaryMode ? { Y: aStep, F: feedrate } : { A: aStep, F: feedrate };
+    const continuousPlus = isInRotaryMode ? { Y: 1 } : { A: 1 };
+    const jogMinus = isInRotaryMode ? { Y: -aStep, F: feedrate } : { A: -aStep, F: feedrate };
+    const continousMinus = isInRotaryMode ? { Y: -1 } : { A: -1 };
+
+
     return (
         <div className={styles['jog-control-wrapper']}>
             <JogControl
                 className={styles.btnUp}
                 disabled={disabled}
-                jog={() => actions.jog({ A: aStep, F: feedrate })}
-                continuousJog={() => actions.startContinuousJog({ A: 1 }, feedrate)}
+                jog={() => actions.jog(jogPlus)}
+                continuousJog={() => actions.startContinuousJog(continuousPlus, feedrate)}
                 stopContinuousJog={() => actions.stopContinuousJog()}
             >
                 <KeypadText>A</KeypadText>
@@ -33,8 +43,8 @@ const JogControlArea = ({ actions, jog, disabled = false }) => {
             <JogControl
                 className={styles.btnDown}
                 disabled={disabled}
-                jog={() => actions.jog({ A: -aStep, F: feedrate })}
-                continuousJog={() => actions.startContinuousJog({ A: -1 }, feedrate)}
+                jog={() => actions.jog(jogMinus)}
+                continuousJog={() => actions.startContinuousJog(continousMinus, feedrate)}
                 stopContinuousJog={() => actions.stopContinuousJog()}
             >
                 <KeypadText>A</KeypadText>

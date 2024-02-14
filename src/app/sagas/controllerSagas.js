@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -552,7 +553,7 @@ export function* initialize() {
     });
 
     // for when you don't want to send file to backend
-    pubsub.subscribe('visualizer:load', (msg, content, size, name, visualizer) => {
+    pubsub.subscribe('visualizer:load', (_, { content, size, name, visualizer }) => {
         parseGCode(content, size, name, visualizer);
     });
 

@@ -21,15 +21,17 @@
  *
  */
 
+import moment from 'moment';
+
 // solution found here: https://stackoverflow.com/a/59948911
 export const convertMillisecondsToTimeStamp = (milliseconds) => {
-    if (milliseconds) {
+    if (milliseconds >= 0) {
         let seconds = milliseconds / 1000;
-        const hours = parseInt(seconds / 3600, 10);
+        const hours = Math.floor(seconds / 3600);
         seconds %= 3600; // seconds remaining after extracting hours
-        const minutes = parseInt(seconds / 60, 10);
+        const minutes = Math.floor(seconds / 60);
         seconds %= 60; // keep only seconds not extracted to minutes
-        seconds = parseInt(seconds, 10);
+        seconds = Math.floor(seconds);
         return `${String(hours).padStart(2, 0)}:${String(minutes).padStart(2, 0)}:${String(seconds).padStart(2, 0)}`;
     }
 
@@ -37,7 +39,7 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
 };
 
 export const convertSecondsToTimeStamp = (seconds, startTime) => {
-    if (startTime === 0 || !seconds || seconds < 0) {
+    if (startTime === 0 || seconds === undefined || seconds < 0) {
         return '-';
     }
 
@@ -45,8 +47,14 @@ export const convertSecondsToTimeStamp = (seconds, startTime) => {
 };
 
 export const convertISOStringToDateAndTime = (ISOString) => {
-    const dateTime = new Date(ISOString);
-    const date = `${String(dateTime.getFullYear())}-${String(dateTime.getMonth()).padStart(2, 0)}-${String(dateTime.getDate()).padStart(2, 0)}`;
-    const time = `${String(dateTime.getHours()).padStart(2, 0)}:${String(dateTime.getMinutes()).padStart(2, 0)}:${String(dateTime.getSeconds()).padStart(2, 0)}`;
+    const dateFromString = moment(ISOString);
+
+    if (!dateFromString.isValid()) {
+        return ['-', '-'];
+    }
+
+    const date = dateFromString.format('YYYY-MM-DD');
+    const time = dateFromString.format('HH:mm:ss');
+
     return [date, time];
 };

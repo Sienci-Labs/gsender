@@ -99,7 +99,7 @@ class TerminalWrapper extends PureComponent {
 
                 // Ctrl-C copy - ctrl + c on windows/linux, meta-c on mac
                 if ((event.ctrlKey || event.metaKey) && (event.code === 'KeyC')) {
-                    await navigator.clipboard.writeText(line);
+                    await navigator.clipboard?.writeText(line);
                     return;
                 }
             };
@@ -220,6 +220,10 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
+        if (!this.term) {
+            return;
+        }
+
         this.term.write('\r');
         if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
@@ -282,9 +286,8 @@ class TerminalWrapper extends PureComponent {
         if (isElectron()) {
             window.ipcRenderer.send('clipboard', text);
         } else {
-            await navigator.clipboard.writeText(text);
+            await navigator.clipboard?.writeText(text);
         }
-
 
         Toaster.pop({
             msg: `Copied Last ${selection.length} Lines from the Terminal to Clipboard`,
