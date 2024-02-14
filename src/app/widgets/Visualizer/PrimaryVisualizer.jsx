@@ -31,7 +31,6 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
     const showUnlockButton = isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
     const { handleLiteModeToggle, handleRun, reset } = actions;
 
-    console.log(controller);
 
     const containerID = 'visualizer_container';
 
