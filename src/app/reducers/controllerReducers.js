@@ -78,7 +78,7 @@ const initialState = {
         context: null
     },
     terminalHistory: [],
-    spindles: {}
+    spindles: []
 };
 
 /**
@@ -270,10 +270,10 @@ const reducer = createReducer(initialState, {
     },
     [ADD_SPINDLE]: (payload, reducerState) => {
         return {
-            spindles: {
+            spindles: [
                 ...reducerState.spindles,
-                [payload.id]: payload
-            }
+                payload
+            ]
         };
     }
 });

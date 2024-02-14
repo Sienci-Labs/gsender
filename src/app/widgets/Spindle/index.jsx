@@ -593,7 +593,7 @@ export default connect((store) => {
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
-    const availableSpindles = [];
+    const availableSpindles = get(store, 'controller.spindles', []);
     const $13 = get(store, 'controller.settings.settings.$13', '0');
 
     return {
