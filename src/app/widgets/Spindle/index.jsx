@@ -211,6 +211,15 @@ class SpindleWidget extends PureComponent {
                     active: false
                 });
             }, laser.duration);
+        },
+        handleHALSpindleSelect: (spindle) => {
+            console.log(spindle);
+            controller.command('gcode', [
+                `M104 P${spindle.value}`
+            ]);
+            this.setState({
+                spindle
+            });
         }
     };
 
@@ -319,7 +328,11 @@ class SpindleWidget extends PureComponent {
             spindleSpeed: this.config.get('speed', 1000),
             laser: this.config.get('laser'),
             spindleMax: this.config.get('spindleMax'),
-            spindleMin: this.config.get('spindleMin')
+            spindleMin: this.config.get('spindleMin'),
+            spindle: {
+                label: 'Default Spindle',
+                value: 0
+            }
         };
     }
 
@@ -561,7 +574,7 @@ class SpindleWidget extends PureComponent {
                             {
                                 (controllerType === GRBLHAL) && (
                                     <div className={styles.modalRow}>
-                                        <SpindleSelector spindles={availableSpindles}/>
+                                        <SpindleSelector spindles={availableSpindles} onChange={actions.handleHALSpindleSelect} spindle={state.spindle}/>
                                     </div>
                                 )
                             }

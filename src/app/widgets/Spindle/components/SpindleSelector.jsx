@@ -16,7 +16,7 @@ const formatSpindles = (spindles = []) => {
     return formattedSpindles;
 };
 
-const SpindleSelector = ({ spindles }) => {
+const SpindleSelector = ({ spindles, onChange, spindle }) => {
     spindles = formatSpindles(spindles);
     return (
         <div className={styles.spindleWrapper}>
@@ -24,8 +24,8 @@ const SpindleSelector = ({ spindles }) => {
             <Select
                 options={spindles}
                 placeholder="Default Spindle"
-                value={0}
-                onChange={() => {}}
+                value={spindle}
+                onChange={onChange}
             />
         </div>
     );
