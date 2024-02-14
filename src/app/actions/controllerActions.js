@@ -37,6 +37,7 @@ export const {
     UPDATE_TERMINAL_HISTORY,
     UPDATE_SETTINGS_DESCRIPTIONS,
     UPDATE_ALARM_DESCRIPTIONS,
+    ADD_SPINDLE,
 } = constants('controller', [
     'UPDATE_CONTROLLER_STATE',
     'UPDATE_CONTROLLER_SETTINGS',
@@ -49,7 +50,8 @@ export const {
     'UPDATE_PARTIAL_CONTROLLER_SETTINGS',
     'UPDATE_TERMINAL_HISTORY',
     'UPDATE_SETTINGS_DESCRIPTIONS',
-    'UPDATE_ALARM_DESCRIPTIONS'
+    'UPDATE_ALARM_DESCRIPTIONS',
+    'ADD_SPINDLE'
 ]);
 
 export const updateControllerState = createAction(UPDATE_CONTROLLER_STATE);
@@ -63,3 +65,5 @@ export const resetHoming = createAction(RESET_HOMING);
 export const partialSettingsUpdate = createAction(UPDATE_PARTIAL_CONTROLLER_SETTINGS);
 export const updateTerminalHistory = createAction(UPDATE_TERMINAL_HISTORY);
 export const updateSettingsDescriptions = createAction(UPDATE_SETTINGS_DESCRIPTIONS);
+
+export const addSpindle = createAction(ADD_SPINDLE);

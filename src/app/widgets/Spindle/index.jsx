@@ -610,7 +610,6 @@ export default connect((store) => {
         wpos,
         units,
         availableSpindles,
-        units,
         $13
     };
 })(SpindleWidget);

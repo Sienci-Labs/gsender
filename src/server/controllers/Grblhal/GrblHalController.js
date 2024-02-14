@@ -615,7 +615,7 @@ class GrblHalController {
 
         this.runner.on('raw', noop);
 
-        this.runner.on('spindle:add', (spindle) => {
+        this.runner.on('spindle', (spindle) => {
             this.emit('spindle:add', spindle);
         });
 
