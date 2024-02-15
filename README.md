@@ -106,9 +106,11 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Added ability to assign macros to gamepad buttons
 - Controller type is now annotated in the Errors and Alarms report and diagnostic file
 - Go To function on UI now accounts for preferred units
+- Add spindle selector to Laser/Spindle tab when using grblHAL firmware
 - Unlock button now only shows 100% of the time when using grblHAL controller
 - Fixed machine profiles missing in some situations
 - Remote mode UI jog controls are once again properly contained within their widget container
+- Fix for remote mode settings crashing on Firefox
 - Fixed toggling laser offsets with inches enabled
 - Various improvements to time estimation
 - "Use Last Port" button in firmware tool should now properly connect when the last connection was over Ethernet
