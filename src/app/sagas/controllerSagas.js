@@ -59,6 +59,7 @@ import {
     ERROR,
     JOB_TYPES,
     JOB_STATUS,
+    GRBL,
 } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
@@ -616,7 +617,9 @@ export function* initialize() {
         pubsub.publish('firmware:update', status);
     });
 
-    controller.addListener('error', (error) => {
+    controller.addListener('error', (error, wasRunning) => {
+        const homingEnabled = _get(reduxStore.getState(), 'controller.settings.settings.$22');
+
         if (ALARM_ERROR_TYPES.includes(error.type)) {
             updateAlarmsErrors(error);
         }
@@ -624,6 +627,12 @@ export function* initialize() {
         //     window.ipcRenderer.send('logError:electron', error);
         // }
         pubsub.publish('error', error);
+
+        // set need recovery for start from line when alarm happens
+        if (error.type === ALARM && wasRunning) {
+            console.log(error.lineNumber);
+            pubsub.publish('disconnect:recovery', error.lineNumber, homingEnabled);
+        }
     });
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {
@@ -647,7 +656,7 @@ export function* initialize() {
             }
         }
 
-        if (type === FILE_TYPE.FOUR_AXIS && controller.type === 'Grbl') {
+        if (type === FILE_TYPE.FOUR_AXIS && controller.type === GRBL) {
             Confirm({
                 title: '4 Axis File Loaded',
                 content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
