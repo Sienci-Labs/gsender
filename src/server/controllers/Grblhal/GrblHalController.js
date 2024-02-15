@@ -88,7 +88,7 @@ import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translat
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
-const POSTHOOK_COMPLETE = '%post_complete';
+const POSTHOOK_COMPLETE = '%toolchange_complete';
 const PAUSE_START = '%pause_start';
 
 const log = logger('controller:grblHAL');
@@ -287,7 +287,7 @@ class GrblHalController {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 1500);
+                        }, 500);
                         return 'G4 P0.5';
                     }
                     if (line === PAUSE_START) {
