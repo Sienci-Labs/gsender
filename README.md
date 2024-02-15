@@ -123,7 +123,6 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Start-From-Line should now better starting G2/G3 commands and clear errors on grblHAL controller
 - Fix for toolchange wizard not resuming correctly on grblHAL controller
 - Verify job should behave more consistently like grbl controller on grblHAL firmware
-- 
 
 ### 1.4.1 (January 26, 2024)
 - Fix for black screen on application startup in some situations
