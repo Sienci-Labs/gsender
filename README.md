@@ -106,7 +106,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Added ability to assign macros to gamepad buttons
 - Controller type is now annotated in the Errors and Alarms report and diagnostic file
 - Go To function on UI now accounts for preferred units
-- Add spindle selector to Laser/Spindle tab when using grblHAL firmware
+- Added spindle selector to Laser/Spindle tab when using grblHAL firmware
 - Unlock button now only shows 100% of the time when using grblHAL controller
 - Fixed machine profiles missing in some situations
 - Remote mode UI jog controls are once again properly contained within their widget container
@@ -120,7 +120,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Various rotary fixes
 - Fix for pass-through toolchanging in macros
 - Fix for spindle delay being added when the line already had a delay from the post-processor
-- Start-From-Line should now better starting G2/G3 commands and clear errors on grblHAL controller
+- Start-From-Line should now better handle starting G2/G3 commands and clear errors on grblHAL controller
 - Fix for toolchange wizard not resuming correctly on grblHAL controller
 - Verify job should behave more consistently like grbl controller on grblHAL firmware
 
