@@ -1087,7 +1087,13 @@ class AxesWidget extends PureComponent {
             }
 
             const computeAxesAndDirection = (degrees) => {
-                const { horizontal, vertical } = joystickOptions[activeStick];
+                const stick = get(joystickOptions, activeStick, null);
+
+                if (!stick) {
+                    return [];
+                }
+
+                const { horizontal, vertical } = stick;
 
                 const getDirection = (isReversed) => (!isReversed ? 1 : -1);
 
@@ -1450,8 +1456,7 @@ class AxesWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, canJog, isSecondary, type } = this.props;
-        const { minimized, isFullscreen } = this.state;
-        const { units } = this.state;
+        const { minimized, units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
         const activeState = get(this.props.state, 'status.activeState', GRBL_ACTIVE_STATE_IDLE);
@@ -1483,7 +1488,7 @@ class AxesWidget extends PureComponent {
         }
 
         return (
-            <Widget fullscreen={isFullscreen}>
+            <Widget style={{ minHeight: '250px' }}>
                 <Widget.Header>
                     <Widget.Title>
                         {isForkedWidget &&
