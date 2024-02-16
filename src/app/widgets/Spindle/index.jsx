@@ -44,7 +44,6 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     IMPERIAL_UNITS,
     LASER_MODE,
-    METRIC_UNITS,
     SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING
@@ -405,12 +404,16 @@ class SpindleWidget extends PureComponent {
     }
 
     // Take into account the current wpos when setting offsets
-    calculateAdjustedOffsets(xOffset, yOffset) {
+    calculateAdjustedOffsets(xOffset, yOffset, units) {
         const { wpos, $13 } = this.props;
-        const { x, y } = wpos;
-        let units = METRIC_UNITS;
-        if ($13 === '1') {
-            units = IMPERIAL_UNITS;
+        let { x, y } = wpos;
+
+        console.log(units);
+
+        if ($13 === '1' || units === 'G20') {
+            units = 'G20';
+            x /= 25.4;
+            y /= 25.4;
         }
         return [round(Number(x) + Number(xOffset), units), round(Number(y) + Number(yOffset), units)];
     }
@@ -422,14 +425,15 @@ class SpindleWidget extends PureComponent {
             laser
         });
         let { xOffset, yOffset } = laser;
-        if (preferredUnits === IMPERIAL_UNITS) {
+        if (preferredUnits === 'G20') {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
         } else {
             xOffset = roundMetric(xOffset);
             yOffset = roundMetric(yOffset);
         }
-        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset, preferredUnits);
+        console.log(`x: ${xoffsetAdjusted}, y: ${yOffsetAdjusted}`);
 
         let offsetQuery = [];
         if (xOffset === 0 && yOffset !== 0) {
@@ -457,14 +461,14 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
-        if (preferredUnits === IMPERIAL_UNITS) {
+        if (preferredUnits === 'G20') {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
         } else {
             xOffset = roundMetric(xOffset);
             yOffset = roundMetric(yOffset);
         }
-        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset, preferredUnits);
         if (xOffset === 0 && yOffset !== 0) {
             offsetQuery = [
                 `G10 L20 P${this.getWCS()} Y${yOffsetAdjusted}`
