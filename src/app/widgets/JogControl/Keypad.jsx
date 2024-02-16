@@ -258,6 +258,7 @@ class Keypad extends PureComponent {
                                 actions.setSelectedSpeed(SPEED_RAPID);
                                 actions.setJogFromPreset('rapid');
                             }}
+                            style={{ marginTop: 0 }}
                         >
                             { rapidActive && <div className={styles.activeIndicator} /> }
                             Rapid

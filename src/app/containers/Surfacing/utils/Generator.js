@@ -448,7 +448,7 @@ export default class Generator {
         const zValue = toFixedValue(safeHeight - (depth - this.surfacing.skimDepth));
 
         //Used to check if where ramp should enter from for center position, depends on if the cut direction is flipped too
-        const spiralEndsInXPos = spirals[spirals.length - 2].includes('X');
+        const spiralEndsInXPos = spirals[spirals.length - 2]?.includes('X');
 
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
