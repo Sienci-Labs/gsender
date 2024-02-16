@@ -554,12 +554,12 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            /*if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
-            }*/
+            }
         });
         this.sender.on('requestData', () => {
             this.emit('requestEstimateData');
