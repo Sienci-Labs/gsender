@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { get } from 'lodash';
+import { useSelector } from 'react-redux';
 
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-import { WORKSPACE_MODE } from 'app/constants';
+import { WORKSPACE_MODE, GRBLHAL } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
-import { get } from 'lodash';
 
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
 const RotaryToggle = () => {
     const [workspaceMode, setWorkspaceMode] = useState(store.get('workspace.mode', DEFAULT));
+    const { type: controllerType } = useSelector(state => state.controller);
 
     useEffect(() => {
         const updateWorkspaceMode = (data) => {
@@ -38,7 +40,7 @@ const RotaryToggle = () => {
 
     return (
         <ToggleSwitch
-            label="4th Axis"
+            label={controllerType === GRBLHAL ? '4th Axis' : undefined}
             secondaryLabel="Rotary"
             checked={workspaceMode === ROTARY}
             onChange={handleToggle}
