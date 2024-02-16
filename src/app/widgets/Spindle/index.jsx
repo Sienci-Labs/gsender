@@ -358,7 +358,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getSpindleOffsetCode(),
+            ...this.getSpindleOffsetCode(preferredUnits),
             `$30=${spindleMax}`,
             `$31=${spindleMin}`,
             '$32=0',
@@ -415,15 +415,14 @@ class SpindleWidget extends PureComponent {
         return [round(Number(x) + Number(xOffset), units), round(Number(y) + Number(yOffset), units)];
     }
 
-    getLaserOffsetCode() {
+    getLaserOffsetCode(preferredUnits) {
         const laser = this.config.get('laser');
-        const { units } = this.props;
 
         this.setState({
             laser
         });
         let { xOffset, yOffset } = laser;
-        if (units === IMPERIAL_UNITS) {
+        if (preferredUnits === IMPERIAL_UNITS) {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
         } else {
@@ -449,8 +448,7 @@ class SpindleWidget extends PureComponent {
         return offsetQuery;
     }
 
-    getSpindleOffsetCode() {
-        const { units } = this.props;
+    getSpindleOffsetCode(preferredUnits) {
         const laser = this.config.get('laser');
         this.setState({
             laser
@@ -459,7 +457,7 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
-        if (units === IMPERIAL_UNITS) {
+        if (preferredUnits === IMPERIAL_UNITS) {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
         } else {
@@ -501,7 +499,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getLaserOffsetCode(),
+            ...this.getLaserOffsetCode(preferredUnits),
             `$30=${maxPower}`,
             `$31=${minPower}`,
             '$32=1',
