@@ -40,7 +40,7 @@ const HelpCard = ({ title, text, link, icon, linkText }) => {
             </div>
             <h2>{ title }</h2>
             <div className={styles.cardIcon}>
-                <i className={`fa ${icon}`} />
+                <i className={`${icon}`} />
             </div>
             <div className={styles.cardText}>
                 { text }
