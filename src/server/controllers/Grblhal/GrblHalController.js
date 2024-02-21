@@ -743,7 +743,7 @@ class GrblHalController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error?.description || '',
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -756,7 +756,7 @@ class GrblHalController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
