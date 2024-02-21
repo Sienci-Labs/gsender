@@ -97,11 +97,17 @@ class NavbarConnection extends PureComponent {
 
     addResizeEventListener() {
         this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        }
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        }
+
         this.onResizeThrottled = null;
     }
 
