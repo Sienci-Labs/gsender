@@ -923,7 +923,7 @@ class GrblController {
             isIdle: () => {
                 if (!this.runner) {
                     return false;
-                };
+                }
                 return this.runner.isIdle();
             },
             intervalTimer: 200
