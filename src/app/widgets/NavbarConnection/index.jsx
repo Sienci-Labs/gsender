@@ -26,7 +26,7 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import includes from 'lodash/includes';
+//import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
