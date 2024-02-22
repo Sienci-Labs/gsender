@@ -254,7 +254,24 @@ const migrateStore = () => {
     if (!cnc.version) {
         return;
     }
-    console.log(cnc.version);
+
+    if (semver.lt(cnc.version, '1.4.3')) {
+        const storeProbe = store.get('workspace.probeProfile');
+        const defaultProbe = get(defaultState, 'workspace.probeProfile');
+
+        console.log(storeProbe);
+        console.log(defaultProbe);
+
+        if (storeProbe.xyThickness.mm) {
+            store.replace('workspace.probeProfile', {
+                ...defaultProbe,
+                xyThickness: settings.workspace.probeProfile.xyThickness.mm,
+                zThickness: settings.workspace.probeProfile.zThickness.mm,
+                plateWidth: settings.workspace.probeProfile.plateWidth.mm
+            });
+        }
+    }
+
     if (semver.lt(cnc.version, '1.3.10') || semver.lt(cnc.version, '1.3.10-EDGE')) {
         const settings = store.get();
 
