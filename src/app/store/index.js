@@ -262,12 +262,11 @@ const migrateStore = () => {
         console.log(storeProbe);
         console.log(defaultProbe);
 
-        if (storeProbe.xyThickness.mm) {
+        if (typeof storeProbe.xyThickness === 'object' && storeProbe.xyThickness.mm) {
             store.replace('workspace.probeProfile', {
                 ...defaultProbe,
                 xyThickness: settings.workspace.probeProfile.xyThickness.mm,
                 zThickness: settings.workspace.probeProfile.zThickness.mm,
-                plateWidth: settings.workspace.probeProfile.plateWidth.mm
             });
         }
     }

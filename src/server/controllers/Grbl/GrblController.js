@@ -921,6 +921,9 @@ class GrblController {
 
         this.toolChanger = new ToolChanger({
             isIdle: () => {
+                if (!this.runner) {
+                    return false;
+                };
                 return this.runner.isIdle();
             },
             intervalTimer: 200
@@ -1175,6 +1178,10 @@ class GrblController {
         if (this.queryTimer) {
             clearInterval(this.queryTimer);
             this.queryTimer = null;
+        }
+
+        if (this.toolChanger) {
+            this.toolChanger.clearInterval();
         }
 
         if (this.runner) {

@@ -901,6 +901,9 @@ class GrblHalController {
 
         this.toolChanger = new ToolChanger({
             isIdle: () => {
+                if (!this.runner) {
+                    return false;
+                }
                 return this.runner.isIdle();
             },
             intervalTimer: 200
@@ -1184,6 +1187,10 @@ class GrblHalController {
         if (this.runner) {
             this.runner.removeAllListeners();
             this.runner = null;
+        }
+
+        if (this.toolChanger) {
+            this.toolChanger.clearInterval();
         }
 
         this.sockets = {};
