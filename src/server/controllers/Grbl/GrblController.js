@@ -770,7 +770,7 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
