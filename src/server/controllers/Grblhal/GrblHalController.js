@@ -270,7 +270,6 @@ class GrblHalController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
-                console.log(context);
 
                 if (line[0] === '%') {
                     // %wait

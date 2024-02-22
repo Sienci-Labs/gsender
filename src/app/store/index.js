@@ -274,15 +274,6 @@ const migrateStore = () => {
     if (semver.lt(cnc.version, '1.3.10') || semver.lt(cnc.version, '1.3.10-EDGE')) {
         const settings = store.get();
 
-        if (settings.workspace.probeProfile.xyThickness.mm) {
-            store.replace('workspace.probeProfile', {
-                ...settings.workspace.probeProfile,
-                xyThickness: settings.workspace.probeProfile.xyThickness.mm,
-                zThickness: settings.workspace.probeProfile.zThickness.mm,
-                plateWidth: settings.workspace.probeProfile.plateWidth.mm
-            });
-        }
-
         if (settings.widgets.axes.jog.rapid.mm) {
             store.replace('widgets.axes.jog', {
                 ...settings.widgets.axes.jog,
