@@ -181,9 +181,9 @@ class NavbarConnectionWidget extends PureComponent {
 
     getInitialState() {
         let controllerType = this.config.get('controller.type');
-        if (!includes(controller.loadedControllers, controllerType)) {
+        /*if (!includes(controller.loadedControllers, controllerType)) {
             controllerType = controller.loadedControllers[0];
-        }
+        }*/
 
         // Common baud rates
         const defaultBaudrates = [
