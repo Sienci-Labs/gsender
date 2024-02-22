@@ -422,8 +422,18 @@ class AxesWidget extends PureComponent {
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
         setJogFromPreset: (presetKey) => {
-            const { jog } = this.state;
+            const { jog, units, needsConversion } = this.state;
             const jogObj = jog[presetKey];
+
+            const presetNeedsConversion = needsConversion[presetKey];
+
+            if (units === IMPERIAL_UNITS && presetNeedsConversion) {
+                jogObj.zStep = convertToImperial(jogObj.zStep);
+                jogObj.xyStep = convertToImperial(jogObj.xyStep);
+                jogObj.aStep = convertToImperial(jogObj.aStep);
+                jogObj.feedrate = Number(convertToImperial(jogObj.feedrate).toFixed(0));
+                this.setState(prev => ({ needsConversion: { ...prev.needsConversion, [presetKey]: false } }));
+            }
 
             this.setState({
                 jog: {
@@ -1315,6 +1325,9 @@ class AxesWidget extends PureComponent {
             },
             prevJog: null,
             prevDirection: null,
+            needsConversion: initialUnits === IMPERIAL_UNITS
+                ? { rapid: true, normal: true, precise: true, }
+                : { rapid: false, normal: false, precise: false, }
         };
     }
 
@@ -1357,6 +1370,7 @@ class AxesWidget extends PureComponent {
         const oldUnits = this.state.units;
         const { jog } = this.state;
         let { zStep, xyStep, aStep, feedrate } = jog;
+
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
             zStep = convertToImperial(zStep);
             xyStep = convertToImperial(xyStep);
@@ -1368,6 +1382,7 @@ class AxesWidget extends PureComponent {
             aStep = convertToMetric(aStep);
             feedrate = Number(convertToMetric(feedrate).toFixed(0));
         }
+
         const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
 
         this.setState({
@@ -1381,7 +1396,8 @@ class AxesWidget extends PureComponent {
                 rapid,
                 normal,
                 precise
-            }
+            },
+            needsConversion: units === IMPERIAL_UNITS ? { rapid: true, normal: true, precise: true, } : { rapid: false, normal: false, precise: false, }
         });
     }
 
