@@ -102,6 +102,13 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.3 (February 22, 2024)
+- Fix for probe migration values not running
+- Fix for jog value migration not running
+- Spindles on HAL no longer duplicate when running the spindle command multiple times
+- Connection widget should no longer zero out selected controller in some situations
+- Toolchanger should no longer error out in situations when the user has connected then disconnected
+
 ### 1.4.2 (February 16, 2024)
 - Added ability to assign macros to gamepad buttons
 - Controller type is now annotated in the Errors and Alarms report and diagnostic file
