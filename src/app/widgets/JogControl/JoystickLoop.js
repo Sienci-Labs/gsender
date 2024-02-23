@@ -39,7 +39,7 @@ export class JoystickLoop {
         const currentHandler = gamepad.handlers.find(handler => this.gamepadProfile.id.includes(handler?.gamepad?.id));
 
         if (!currentHandler) {
-            throw new Error('Could not find current gamepad');
+            return null;
         }
 
         return currentHandler?.gamepad;
@@ -67,7 +67,11 @@ export class JoystickLoop {
 
     _computeFeedrate = (stickValue) => {
         const givenFeedrate = this.feedrate;
-        const { settings } = controller.settings;
+        const settings = get(controller.settings, 'settings', null);
+
+        if (!settings) {
+            return 0;
+        }
 
         const maxFeedrate = Math.max(...[Number(settings.$110), Number(settings.$111), Number(settings.$112)]);
 
@@ -212,6 +216,10 @@ export class JoystickLoop {
         }
 
         const currentGamepad = this._getCurrentGamepad();
+
+        if (!currentGamepad) {
+            return;
+        }
 
         const axesValues = currentGamepad?.axes;
 

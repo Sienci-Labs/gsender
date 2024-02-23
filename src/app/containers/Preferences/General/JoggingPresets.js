@@ -298,7 +298,7 @@ export default class JoggingPresets extends Component {
 
         const xyValue = units === METRIC_UNITS ? preset?.xyStep : convertToImperial(preset?.xyStep);
         const zValue = units === METRIC_UNITS ? preset?.zStep : convertToImperial(preset?.zStep);
-        const speedValue = preset?.feedrate;
+        const speedValue = units === METRIC_UNITS ? preset?.feedrate : convertToImperial(preset?.feedrate);
 
         return (
             <Fieldset legend="Jogging Presets">

@@ -97,16 +97,23 @@ class NavbarConnection extends PureComponent {
 
     addResizeEventListener() {
         this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        }
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        }
+
         this.onResizeThrottled = null;
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window?.visualViewport?.width <= 599;
+
         this.setState({
             mobile: isMobile
         });
@@ -150,7 +157,7 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window?.visualViewport?.width <= 599;
         const ip = this.getIPString();
 
         return (

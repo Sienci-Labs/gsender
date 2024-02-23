@@ -14,7 +14,11 @@ export const GamepadContextProvider = ({ children }) => {
         return { ...defaultOptions, ...profile };
     };
 
-    const actions = { getGamepadProfile };
+    const getMacros = () => {
+        return state.macros;
+    };
+
+    const actions = { getGamepadProfile, getMacros };
 
     return (
         <GamepadContext.Provider value={{ state, dispatch, actions }}>

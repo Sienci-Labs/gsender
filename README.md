@@ -102,6 +102,35 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.3 (February 22, 2024)
+- Fix for probe migration values not running
+- Fix for jog value migration not running
+- Spindles on HAL no longer duplicate when running the spindle command multiple times
+- Connection widget should no longer zero out selected controller in some situations
+- Toolchanger should no longer error out in situations when the user has connected then disconnected
+
+### 1.4.2 (February 16, 2024)
+- Added ability to assign macros to gamepad buttons
+- Controller type is now annotated in the Errors and Alarms report and diagnostic file
+- Go To function on UI now accounts for preferred units
+- Added spindle selector to Laser/Spindle tab when using grblHAL firmware
+- Unlock button now only shows 100% of the time when using grblHAL controller
+- Fixed machine profiles missing in some situations
+- Remote mode UI jog controls are once again properly contained within their widget container
+- Fix for remote mode settings crashing on Firefox
+- Fixed toggling laser offsets with inches enabled
+- Various improvements to time estimation
+- "Use Last Port" button in firmware tool should now properly connect when the last connection was over Ethernet
+- Alterations to outline behaviour - should move in a consistent direction and more accurately outline the toolpath
+- Fixed tool change offsets being concatenated as strings instead of added
+- Surfacing tool better handles extreme values by warning the user instead of exceeding the call stack
+- Various rotary fixes
+- Fix for pass-through toolchanging in macros
+- Fix for spindle delay being added when the line already had a delay from the post-processor
+- Start-From-Line should now better handle starting G2/G3 commands and clear errors on grblHAL controller
+- Fix for toolchange wizard not resuming correctly on grblHAL controller
+- Verify job should behave more consistently like grbl controller on grblHAL firmware
+
 ### 1.4.1 (January 26, 2024)
 - Fix for black screen on application startup in some situations
 - Fix for jog buttons on UI not registering click events correctly on some operating systems

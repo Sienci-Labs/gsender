@@ -696,6 +696,16 @@ export function* initialize() {
         }
     });
 
+    controller.addListener('spindle:add', (spindle) => {
+        if (Object.hasOwn(spindle, 'id')) {
+            reduxStore.dispatch({
+                type: controllerActions.ADD_SPINDLE,
+                payload: spindle
+            });
+        }
+    });
+
+
     yield null;
 }
 

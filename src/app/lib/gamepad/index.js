@@ -1,7 +1,10 @@
 import { GamepadListener } from 'gamepad.js';
-
+import shuttleEvents from 'app/lib/shuttleEvents';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { debounce } from 'lodash';
+
+const macroCallbackDebounce = debounce((action) => shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }), 500);
 
 class Gamepad extends GamepadListener {
     constructor() {
@@ -147,7 +150,7 @@ export const onGamepadButtonPress = ({ detail }) => {
 
     const foundAction = currentProfile.buttons?.find(({ value }) => value === button);
 
-    if (!detail.pressed && foundAction?.primaryAction?.includes('JOG') || foundAction.secondaryAction?.includes('JOG')) {
+    if (!detail.pressed && foundAction?.primaryAction?.includes('JOG') || foundAction?.secondaryAction?.includes('JOG')) {
         return 'STOP_JOG';
     }
 
@@ -169,18 +172,38 @@ export const onGamepadButtonPress = ({ detail }) => {
     return foundAction?.primaryAction;
 };
 
-export const runAction = ({ event, shuttleControlEvents }) => {
+export const runAction = ({ event }) => {
+    const shuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const action = onGamepadButtonPress(event);
 
     if (!action) {
         return;
     }
+    if (shuttleControlEvents[action]) {
+        const shuttleEvent = shuttleControlEvents[action];
 
-    const shuttleEvent = shuttleControlEvents[action];
-
-    if (shuttleEvent?.callback) {
-        shuttleEvent.callback(null, shuttleEvent.payload);
+        if (shuttleEvent?.callback) {
+            shuttleEvent.callback(null, shuttleEvent.payload);
+        }
+    } else {
+        macroCallbackDebounce(action);
     }
+};
+
+export const deleteGamepadMacro = (macroID) => {
+    const profiles = store.get('workspace.gamepad.profiles', []);
+
+    profiles.forEach(profile => {
+        const macroIndexPrimary = profile.buttons.findIndex(button => button.primaryAction === macroID);
+        if (macroIndexPrimary > -1) {
+            profile.buttons[macroIndexPrimary].primaryAction = null;
+        }
+
+        const macroIndexSecondary = profile.buttons.findIndex(button => button.secondaryAction === macroID);
+        if (macroIndexSecondary > -1) {
+            profile.buttons[macroIndexSecondary].secondaryAction = null;
+        }
+    });
 };
 
 gamepadInstance.on('gamepad:connected', ({ detail }) => {

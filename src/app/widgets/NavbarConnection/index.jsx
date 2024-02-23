@@ -26,7 +26,7 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import includes from 'lodash/includes';
+//import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
@@ -181,9 +181,9 @@ class NavbarConnectionWidget extends PureComponent {
 
     getInitialState() {
         let controllerType = this.config.get('controller.type');
-        if (!includes(controller.loadedControllers, controllerType)) {
+        /*if (!includes(controller.loadedControllers, controllerType)) {
             controllerType = controller.loadedControllers[0];
-        }
+        }*/
 
         // Common baud rates
         const defaultBaudrates = [

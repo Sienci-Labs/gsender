@@ -49,6 +49,7 @@ import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/Gr
 import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
+import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 
 const log = logger('controller:grblHAL');
 
@@ -214,6 +215,12 @@ class GrblHalRunner extends events.EventEmitter {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultSpindle) {
+            delete payload.raw;
+            console.log(payload);
+            this.emit('spindle', payload);
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {

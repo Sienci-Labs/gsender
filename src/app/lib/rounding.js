@@ -107,7 +107,7 @@ export const roundMetric = (val) => {
 };
 
 export const round = (val, units) => {
-    if (units === METRIC_UNITS) {
+    if (units === METRIC_UNITS || units === 'G21') {
         return roundMetric(val);
     } else {
         return roundImperial(val);

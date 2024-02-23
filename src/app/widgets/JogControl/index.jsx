@@ -422,8 +422,18 @@ class AxesWidget extends PureComponent {
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
         setJogFromPreset: (presetKey) => {
-            const { jog } = this.state;
+            const { jog, units, needsConversion } = this.state;
             const jogObj = jog[presetKey];
+
+            const presetNeedsConversion = needsConversion[presetKey];
+
+            if (units === IMPERIAL_UNITS && presetNeedsConversion) {
+                jogObj.zStep = convertToImperial(jogObj.zStep);
+                jogObj.xyStep = convertToImperial(jogObj.xyStep);
+                jogObj.aStep = convertToImperial(jogObj.aStep);
+                jogObj.feedrate = Number(convertToImperial(jogObj.feedrate).toFixed(0));
+                this.setState(prev => ({ needsConversion: { ...prev.needsConversion, [presetKey]: false } }));
+            }
 
             this.setState({
                 jog: {
@@ -437,13 +447,11 @@ class AxesWidget extends PureComponent {
     shuttleControlFunctions = {
         JOG: (event, { axis = null }) => {
             const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
-            const firmwareType = this.props.type;
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
 
-            if (isGrbl && axis.a && !isInRotaryMode) {
+            if (axis.a && !isInRotaryMode) {
                 return;
             }
 
@@ -823,6 +831,7 @@ class AxesWidget extends PureComponent {
     };
 
     handleJoystickJog = (params, { doRegularJog } = {}) => {
+        const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
         const { getXYJogDistance, getZJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
@@ -850,7 +859,11 @@ class AxesWidget extends PureComponent {
                 axisList.z = axisValue.z * params.z;
             }
             if (params.a) {
-                axisList.A = axisValue.a * params.a;
+                if (isInRotaryMode) {
+                    axisList.y = axisValue.a * params.a;
+                } else {
+                    axisList.A = axisValue.a * params.a;
+                }
             }
 
             this.actions.jog({ ...axisList, F: feedrate });
@@ -863,11 +876,12 @@ class AxesWidget extends PureComponent {
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -879,7 +893,7 @@ class AxesWidget extends PureComponent {
             x: xyStep,
             y: xyStep,
             z: zStep,
-            a: xyStep
+            a: aStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -904,7 +918,7 @@ class AxesWidget extends PureComponent {
             axisList.z = axisValue.z * axis.z;
         }
         if (axis.a) {
-            axisList.A = axisValue.a * axis.a;
+            axisList.a = axisValue.a * axis.a; // convert to Y
         }
 
         this.joggingHelper.onKeyDown(axisList, feedrate);
@@ -920,10 +934,11 @@ class AxesWidget extends PureComponent {
 
         const { axis: axisList } = payload;
 
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         const axisObj = {};
 
@@ -933,7 +948,8 @@ class AxesWidget extends PureComponent {
                 const axisValue = {
                     X: xyStep,
                     Y: xyStep,
-                    Z: zStep
+                    Z: zStep,
+                    A: aStep
                 }[givenAxis] * axisList[axis];
 
                 axisObj[givenAxis] = axisValue;
@@ -1081,7 +1097,13 @@ class AxesWidget extends PureComponent {
             }
 
             const computeAxesAndDirection = (degrees) => {
-                const { horizontal, vertical } = joystickOptions[activeStick];
+                const stick = get(joystickOptions, activeStick, null);
+
+                if (!stick) {
+                    return [];
+                }
+
+                const { horizontal, vertical } = stick;
 
                 const getDirection = (isReversed) => (!isReversed ? 1 : -1);
 
@@ -1303,6 +1325,9 @@ class AxesWidget extends PureComponent {
             },
             prevJog: null,
             prevDirection: null,
+            needsConversion: initialUnits === IMPERIAL_UNITS
+                ? { rapid: true, normal: true, precise: true, }
+                : { rapid: false, normal: false, precise: false, }
         };
     }
 
@@ -1345,6 +1370,7 @@ class AxesWidget extends PureComponent {
         const oldUnits = this.state.units;
         const { jog } = this.state;
         let { zStep, xyStep, aStep, feedrate } = jog;
+
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
             zStep = convertToImperial(zStep);
             xyStep = convertToImperial(xyStep);
@@ -1356,6 +1382,7 @@ class AxesWidget extends PureComponent {
             aStep = convertToMetric(aStep);
             feedrate = Number(convertToMetric(feedrate).toFixed(0));
         }
+
         const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
 
         this.setState({
@@ -1369,7 +1396,8 @@ class AxesWidget extends PureComponent {
                 rapid,
                 normal,
                 precise
-            }
+            },
+            needsConversion: units === IMPERIAL_UNITS ? { rapid: true, normal: true, precise: true, } : { rapid: false, normal: false, precise: false, }
         });
     }
 
@@ -1444,8 +1472,7 @@ class AxesWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, canJog, isSecondary, type } = this.props;
-        const { minimized, isFullscreen } = this.state;
-        const { units } = this.state;
+        const { minimized, units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
         const activeState = get(this.props.state, 'status.activeState', GRBL_ACTIVE_STATE_IDLE);
@@ -1477,7 +1504,7 @@ class AxesWidget extends PureComponent {
         }
 
         return (
-            <Widget fullscreen={isFullscreen}>
+            <Widget style={{ minHeight: '250px' }}>
                 <Widget.Header>
                     <Widget.Title>
                         {isForkedWidget &&

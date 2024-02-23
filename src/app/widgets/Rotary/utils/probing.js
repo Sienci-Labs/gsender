@@ -22,7 +22,7 @@ export const runZAxisProbing = () => {
 
         G91 ; Relative positioning
 
-        G${unitModal}
+        ${unitModal}
 
         G38.2 Z[-Z_AXIS_LONG_MOVEMENT] F[PROBE_FAST_FEEDRATE]
 
@@ -69,7 +69,7 @@ export const runYAxisAlignmentProbing = () => {
 
         G91 ; Relative positioning
 
-        G${unitModal}
+        ${unitModal}
 
         G38.2 Z[-Z_AXIS_LONG_MOVEMENT] F[PROBE_FAST_FEEDRATE]
 

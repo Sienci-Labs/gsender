@@ -90,6 +90,9 @@ class GCodeVisualizer {
         this.geometry.setAttribute('position', this.vertices);
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
+        //this.geometry.computeBoundingBox();
+        //console.log(this.geometry.boundingBox);
+
         const workpiece = new THREE.Line(
             this.geometry,
             new THREE.LineBasicMaterial({

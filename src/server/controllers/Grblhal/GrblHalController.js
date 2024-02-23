@@ -88,7 +88,7 @@ import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translat
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
-const POSTHOOK_COMPLETE = '%post_complete';
+const POSTHOOK_COMPLETE = '%toolchange_complete';
 const PAUSE_START = '%pause_start';
 
 const log = logger('controller:grblHAL');
@@ -287,7 +287,7 @@ class GrblHalController {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 1500);
+                        }, 500);
                         return 'G4 P0.5';
                     }
                     if (line === PAUSE_START) {
@@ -554,12 +554,12 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            /*if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
-            }*/
+            }
         });
         this.sender.on('requestData', () => {
             this.emit('requestEstimateData');
@@ -574,6 +574,7 @@ class GrblHalController {
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.stopCountdown();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -586,6 +587,7 @@ class GrblHalController {
             }
 
             this.timePaused = new Date().getTime();
+            this.sender.pauseCountdown();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -602,6 +604,8 @@ class GrblHalController {
             // Resume program execution
             this.sender.unhold();
 
+            this.sender.resumeCountdown();
+
             // subtract time paused
             this.sender.next({ timePaused: pauseTime });
         });
@@ -610,6 +614,10 @@ class GrblHalController {
         this.runner = new GrblHalRunner();
 
         this.runner.on('raw', noop);
+
+        this.runner.on('spindle', (spindle) => {
+            this.emit('spindle:add', spindle);
+        });
 
         this.runner.on('status', (res) => {
             //
@@ -735,7 +743,7 @@ class GrblHalController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error?.description || '',
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -748,7 +756,7 @@ class GrblHalController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
@@ -892,6 +900,9 @@ class GrblHalController {
 
         this.toolChanger = new ToolChanger({
             isIdle: () => {
+                if (!this.runner) {
+                    return false;
+                }
                 return this.runner.isIdle();
             },
             intervalTimer: 200
@@ -912,7 +923,6 @@ class GrblHalController {
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
-                console.log('not ready');
                 return;
             }
 
@@ -1071,7 +1081,7 @@ class GrblHalController {
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
         await delay(100);
-        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n');
+        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
     }
 
     populateContext(context = {}) {
@@ -1176,6 +1186,10 @@ class GrblHalController {
         if (this.runner) {
             this.runner.removeAllListeners();
             this.runner = null;
+        }
+
+        if (this.toolChanger) {
+            this.toolChanger.clearInterval();
         }
 
         this.sockets = {};
@@ -1536,6 +1550,7 @@ class GrblHalController {
                     if (modalWcs !== wcs && modalWcs !== 'G54') {
                         modalWcs = wcs;
                     }
+                    const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;
 
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
@@ -1545,7 +1560,7 @@ class GrblHalController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
-                    modalGCode.push(`${modal.motion}`);
+                    modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
 
@@ -1605,6 +1620,7 @@ class GrblHalController {
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger(PROGRAM_END);
+                this.sender.stopCountdown();
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);

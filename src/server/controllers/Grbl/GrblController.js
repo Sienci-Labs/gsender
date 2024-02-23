@@ -585,6 +585,7 @@ class GrblController {
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.stopCountdown();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -597,6 +598,7 @@ class GrblController {
             }
 
             this.timePaused = new Date().getTime();
+            this.sender.pauseCountdown();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -608,6 +610,8 @@ class GrblController {
 
             // Resume program execution
             this.sender.unhold();
+
+            this.sender.resumeCountdown();
 
             // subtract time paused
             this.sender.next({ timePaused: pauseTime });
@@ -766,7 +770,7 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
@@ -917,6 +921,9 @@ class GrblController {
 
         this.toolChanger = new ToolChanger({
             isIdle: () => {
+                if (!this.runner) {
+                    return false;
+                }
                 return this.runner.isIdle();
             },
             intervalTimer: 200
@@ -1171,6 +1178,10 @@ class GrblController {
         if (this.queryTimer) {
             clearInterval(this.queryTimer);
             this.queryTimer = null;
+        }
+
+        if (this.toolChanger) {
+            this.toolChanger.clearInterval();
         }
 
         if (this.runner) {
@@ -1623,6 +1634,7 @@ class GrblController {
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger(PROGRAM_END);
+                this.sender.stopCountdown();
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
