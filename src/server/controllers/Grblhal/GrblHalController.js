@@ -679,7 +679,7 @@ class GrblHalController {
                     this.sender.unhold();
                 }
                 this.sender.ack();
-                this.sender.next();
+                this.sender.next({ isOk: true });
                 return;
             }
 
@@ -692,7 +692,7 @@ class GrblHalController {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
                 this.sender.ack();
-                this.sender.next();
+                this.sender.next({ isOk: true });
                 return;
             }
 
@@ -1633,7 +1633,7 @@ class GrblHalController {
                 } else {
                     this.workflow.pause();
                     await delay(100);
-                    this.write('!');
+                    this.write(GRBLHAL_REALTIME_COMMANDS.FEED_HOLD);
                 }
             },
             'resume': () => {
@@ -1642,24 +1642,15 @@ class GrblHalController {
             },
             'gcode:resume': async () => {
                 log.debug('gcode:resume called - program to continue sending');
-                const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
-                        if (type === GRBLHAL) {
-                            this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
-                        } else {
-                            this.write('~');
-                        }
+                        this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
                         this.workflow.resume();
                         this.feederCB = null;
                     };
                     this.event.trigger(PROGRAM_RESUME);
                 } else {
-                    if (type === GRBLHAL) {
-                        this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
-                    } else {
-                        this.write('~');
-                    }
+                    this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
                     await delay(1000);
                     this.workflow.resume();
                 }

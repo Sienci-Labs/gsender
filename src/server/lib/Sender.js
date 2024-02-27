@@ -85,8 +85,8 @@ class SPCharCounting {
         }
     }
 
-    process() {
-        this.callback && this.callback(this);
+    process(isOk) {
+        this.callback && this.callback(this, isOk);
     }
 
     reset() {
@@ -195,8 +195,8 @@ class Sender extends events.EventEmitter {
 
         // character-counting
         if (type === SP_TYPE_CHAR_COUNTING) {
-            this.sp = new SPCharCounting(options, (sp) => {
-                if (sp.queue.length > 0) {
+            this.sp = new SPCharCounting(options, (sp, isOk) => {
+                if (sp.queue.length > 0 && isOk) { // only remove line length from buffer if ok was sent
                     const lineLength = sp.queue.shift();
                     sp.dataLength -= lineLength;
                 }
@@ -410,7 +410,7 @@ class Sender extends events.EventEmitter {
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
     next(options = {}) {
-        const { startFromLine, timePaused, forceEnd } = options;
+        const { startFromLine, timePaused, forceEnd, isOk } = options;
 
         if (!this.state.gcode) {
             return false;
@@ -451,7 +451,7 @@ class Sender extends events.EventEmitter {
         }
 
         if (this.sp) {
-            this.sp.process();
+            this.sp.process(isOk);
         }
 
         // Elapsed Time
