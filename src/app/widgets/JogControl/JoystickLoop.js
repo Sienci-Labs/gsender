@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { throttle, inRange } from 'lodash';
+import { throttle, inRange, get } from 'lodash';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
@@ -39,6 +38,10 @@ export class JoystickLoop {
     _getCurrentGamepad = () => {
         const currentHandler = gamepad.handlers.find(handler => this.gamepadProfile.id.includes(handler?.gamepad?.id));
 
+        if (!currentHandler) {
+            return null;
+        }
+
         return currentHandler?.gamepad;
     }
 
@@ -64,7 +67,11 @@ export class JoystickLoop {
 
     _computeFeedrate = (stickValue) => {
         const givenFeedrate = this.feedrate;
-        const { settings } = controller.settings;
+        const settings = get(controller.settings, 'settings', null);
+
+        if (!settings) {
+            return 0;
+        }
 
         const maxFeedrate = Math.max(...[Number(settings.$110), Number(settings.$111), Number(settings.$112)]);
 
@@ -75,6 +82,8 @@ export class JoystickLoop {
 
     _computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
         const { settings } = controller.settings;
+
+        const { joystickOptions: { movementDistanceOverride = 100 } } = this.gamepadProfile;
 
         const axisMaxFeedrate = Number(
             {
@@ -89,9 +98,9 @@ export class JoystickLoop {
 
         const feedrateInMMPerSec = Math.round(feedrate / 60);
 
-        const executionTimeOfSingleCommand = 0.06;
+        const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
 
-        const incrementalDistance = feedrateInMMPerSec * executionTimeOfSingleCommand;
+        const incrementalDistance = (feedrateInMMPerSec * COMMAND_EXECUTION_TIME_IN_SECONDS) * (movementDistanceOverride / 100);
 
         return +(incrementalDistance.toFixed(2));
     };
@@ -208,10 +217,15 @@ export class JoystickLoop {
 
         const currentGamepad = this._getCurrentGamepad();
 
+        if (!currentGamepad) {
+            return;
+        }
+
         const axesValues = currentGamepad?.axes;
 
-        const lockoutButton = this.gamepadProfile.lockout.button;
-        const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
+        const movementDistanceOverride = get(this.gamepad, 'joystickOptions.movementDistanceOverride', 100);
+        const lockoutButton = get(this.gamepadProfile, 'lockout.button');
+        const isHoldingLockoutButton = get(currentGamepad.buttons, `${lockoutButton}.pressed`, false);
 
         const thumbsticksAreIdle = checkThumbsticskAreIdle(axesValues, this.gamepadProfile);
 
@@ -241,6 +255,14 @@ export class JoystickLoop {
             return acc;
         }, {});
 
+        const updatedAxesWithOverride = Object.entries(updatedAxes).reduce((acc, curr) => {
+            const [axis, value] = curr;
+
+            acc[axis] = +((value * (movementDistanceOverride / 100)).toFixed(3));
+
+            return acc;
+        }, {});
+
         const largestAxisMovement = Object.entries(updatedAxes).reduce((acc, [key, value]) => {
             const val = Math.abs(value);
             if (acc === null || val > acc?.value) {
@@ -263,7 +285,7 @@ export class JoystickLoop {
             return;
         }
 
-        this.jog({ ...updatedAxes, F: feedrate });
+        this.jog({ ...updatedAxesWithOverride, F: feedrate });
 
         this.jogMovementStartTime = new Date();
 

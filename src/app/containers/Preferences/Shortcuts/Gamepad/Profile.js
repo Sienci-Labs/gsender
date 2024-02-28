@@ -7,7 +7,7 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
 import { GamepadContext } from './utils/context';
-import { setCurrentGamepadProfile, setGamepadProfileList, setCurrentModal } from './utils/actions';
+import { setCurrentGamepadProfile, setGamepadProfileList, setCurrentModal, setMacros } from './utils/actions';
 
 import styles from '../index.styl';
 import Fieldset from '../../components/Fieldset';
@@ -27,6 +27,10 @@ const Profile = ({ data }) => {
         gamepad.on('gamepad:button', checkGamepadConnection);
 
         checkGamepadConnection();
+
+        setMacros().then((state) => {
+            dispatch(state);
+        });
 
         return () => {
             gamepad.removeEventListener('gamepad:connected', checkGamepadConnection);

@@ -101,7 +101,9 @@ class DFU {
     }
 
     getSegment(addr) {
-        for (let segment of this.segments) {
+        const { segments } = this.segments;
+        console.log(segments);
+        for (let segment of segments) {
             if (segment.start <= addr && addr < segment.end) {
                 return segment;
             }
@@ -124,10 +126,6 @@ class DFU {
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;
                 this.interface = this.interfaces[0];
-
-                console.log(this.interfaces);
-                console.log(this.device);
-                console.log(this.configurations);
 
                 const alternate = this.interface.alternates[0];
                 this.parseMemorySegments(alternate.interfaceName);

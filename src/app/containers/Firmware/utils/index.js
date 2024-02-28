@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import get from 'lodash/get';
 import download from 'downloadjs';
+import ip from 'ip';
 
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -46,9 +47,12 @@ export const connectToLastDevice = (callback) => {
     const baudrate = connectionConfig.get('baudrate');
     const controllerType = connectionConfig.get('controller.type') || GRBL;
 
+    const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
+
     controller.openPort(port, controllerType, {
         baudrate,
-        rtscts: false
+        rtscts: false,
+        network: isNetwork
     }, (err) => {
         if (err) {
             return;
@@ -85,7 +89,7 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
-    console.log(`${port} - ${imageType} - ${isHal}`);
+
     controller.flashFirmware(port, imageType, isHal, hex);
 };
 
@@ -162,9 +166,8 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
         changedSettings[index22] = changedSettings[index2021];
         changedSettings[index2021] = setting22;
     }
-
+    changedSettings.push('$$'); // Add setting refresh to end so tool updates values
     controller.command('gcode', changedSettings);
-    controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
     setSettingsToApply(false);
     Toaster.pop({
         msg: 'Firmware Settings Updated',

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Select from 'react-select';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, set, get } from 'lodash';
 
 import { Checkbox } from 'app/components/Checkbox';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
@@ -51,13 +51,15 @@ const JoystickOptions = () => {
 
     const profile = getGamepadProfile(currentProfile);
 
-    const { joystickOptions: { stick1, stick2, zeroThreshold = 15 } } = profile;
+    const { joystickOptions: { stick1, stick2, zeroThreshold = 15, movementDistanceOverride = 100 } } = profile;
 
-    const stick1PrimaryActionIsUsingMPG = stick1.mpgMode.primaryAction !== null;
-    const stick1SecondaryActionIsUsingMPG = stick1.mpgMode.secondaryAction !== null;
+    const stick1PrimaryActionIsUsingMPG = get(stick1, 'mpgMode.primaryAction', null) !== null;
+    const stick1SecondaryActionIsUsingMPG = get(stick1, 'mpgMode.secondaryAction', null) !== null;
 
-    const stick2PrimaryActionIsUsingMPG = stick2.mpgMode.primaryAction !== null;
-    const stick2SecondaryActionIsUsingMPG = stick2.mpgMode.secondaryAction !== null;
+    const stick2PrimaryActionIsUsingMPG = get(stick2, 'mpgMode.primaryAction', null) !== null;
+    const stick2SecondaryActionIsUsingMPG = get(stick2, 'mpgMode.secondaryAction', null) !== null;
+
+    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     const selectOverrideStyle = {
         valueContainer: provided => ({ ...provided, padding: 2, justifyContent: 'center' }),
@@ -71,8 +73,6 @@ const JoystickOptions = () => {
         dropdownIndicator: (provided) => ({ ...provided, padding: 2, color: 'white' }),
         indicatorSeparator: (provided) => ({ ...provided, backgroundColor: 'white' }),
     };
-
-    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     return (
         <div style={{ fontSize: '1rem' }}>
@@ -94,8 +94,10 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.horizontal.primaryAction ? String(stick1.horizontal.primaryAction).toUpperCase() : 'None',
-                        value: stick1.horizontal.primaryAction
+                        label: get(stick1, 'horizontal.primaryAction', null)
+                            ? String(get(stick1, 'horizontal.primaryAction')).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'horizontal.primaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.horizontal.primaryAction', value)}
                     isDisabled={stick1PrimaryActionIsUsingMPG}
@@ -109,8 +111,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.horizontal.secondaryAction ? String(stick1.horizontal.secondaryAction).toUpperCase() : 'None',
-                        value: stick1.horizontal.secondaryAction
+                        label: get(stick1, 'horizontal.secondaryAction', null) ? String(get(stick1, 'horizontal.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick1, 'horizontal.secondaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.horizontal.secondaryAction', value)}
                     isDisabled={stick1SecondaryActionIsUsingMPG}
@@ -135,8 +137,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.vertical.primaryAction ? String(stick1.vertical.primaryAction).toUpperCase() : 'None',
-                        value: stick1.vertical.primaryAction
+                        label: get(stick1, 'vertical.primaryAction', null) ? String(get(stick1, 'vertical.primaryAction')).toUpperCase() : 'None',
+                        value: get(stick1, 'vertical.primaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.vertical.primaryAction', value)}
                     isDisabled={stick1PrimaryActionIsUsingMPG}
@@ -150,8 +152,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.vertical.secondaryAction ? String(stick1.vertical.secondaryAction).toUpperCase() : 'None',
-                        value: stick1.vertical.secondaryAction
+                        label: get(stick1, 'vertical.secondaryAction', null) ? String(get(stick1, 'vertical.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick1, 'vertical.secondaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.vertical.secondaryAction', value)}
                     isDisabled={stick1SecondaryActionIsUsingMPG}
@@ -176,8 +178,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.mpgMode.primaryAction ? String(stick1.mpgMode.primaryAction).toUpperCase() : 'None',
-                        value: stick1.mpgMode.primaryAction
+                        label: get(stick1, 'mpgMode.primaryAction', null) ? String(get(stick1, 'mpgMode.primaryAction')).toUpperCase() : 'None',
+                        value: get(stick1, 'mpgMode.primaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.mpgMode.primaryAction', value)}
                 />
@@ -190,8 +192,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick1.mpgMode.secondaryAction ? String(stick1.mpgMode.secondaryAction).toUpperCase() : 'None',
-                        value: stick1.mpgMode.secondaryAction
+                        label: get(stick1, 'mpgMode.secondaryAction', null) ? String(get(stick1, 'mpgMode.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick1, 'mpgMode.secondaryAction', null)
                     }}
                     onChange={({ value }) => handleChange('stick1.mpgMode.secondaryAction', value)}
                 />
@@ -214,8 +216,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.horizontal.primaryAction ? String(stick2.horizontal.primaryAction).toUpperCase() : 'None',
-                        value: stick2.horizontal.primaryAction
+                        label: get(stick2, 'horizontal.primaryAction', null) ? String(get(stick2, 'horizontal.primaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'horizontal.primaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.horizontal.primaryAction', value)}
                     isDisabled={stick2PrimaryActionIsUsingMPG}
@@ -229,8 +231,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.horizontal.secondaryAction ? String(stick2.horizontal.secondaryAction).toUpperCase() : 'None',
-                        value: stick2.horizontal.secondaryAction
+                        label: get(stick2, 'horizontal.secondaryAction', null) ? String(get(stick2, 'horizontal.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'horizontal.secondaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.horizontal.secondaryAction', value)}
                     isDisabled={stick2SecondaryActionIsUsingMPG}
@@ -255,8 +257,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.vertical.primaryAction ? String(stick2.vertical.primaryAction).toUpperCase() : 'None',
-                        value: stick2.vertical.primaryAction
+                        label: get(stick2, 'vertical.primaryAction', null) ? String(get(stick2, 'vertical.primaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'vertical.primaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.vertical.primaryAction', value)}
                     isDisabled={stick2PrimaryActionIsUsingMPG}
@@ -270,8 +272,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.vertical.secondaryAction ? String(stick2.vertical.secondaryAction).toUpperCase() : 'None',
-                        value: stick2.vertical.secondaryAction
+                        label: get(stick2, 'vertical.secondaryAction', null) ? String(get(stick2, 'vertical.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'vertical.secondaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.vertical.secondaryAction', value)}
                     isDisabled={stick2SecondaryActionIsUsingMPG}
@@ -297,8 +299,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.mpgMode.primaryAction ? String(stick2.mpgMode.primaryAction).toUpperCase() : 'None',
-                        value: stick2.mpgMode.primaryAction
+                        label: get(stick2, 'mpgMode.primaryAction', null) ? String(get(stick2, 'mpgMode.primaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'mpgMode.primaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.mpgMode.primaryAction', value)}
                 />
@@ -312,8 +314,8 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: stick2.mpgMode.secondaryAction ? String(stick2.mpgMode.secondaryAction).toUpperCase() : 'None',
-                        value: stick2.mpgMode.secondaryAction
+                        label: get(stick2, 'mpgMode.secondaryAction', null) ? String(get(stick2, 'mpgMode.secondaryAction')).toUpperCase() : 'None',
+                        value: get(stick2, 'mpgMode.secondaryAction')
                     }}
                     onChange={({ value }) => handleChange('stick2.mpgMode.secondaryAction', value)}
                 />
@@ -325,16 +327,31 @@ const JoystickOptions = () => {
                 </Tooltip>
             </div>
 
-            <div className={styles.joystickOption}>
-                <div>Zero Threshold</div>
-                <Input
-                    value={zeroThreshold.toFixed(1)}
-                    additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
-                    onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
-                    className={styles['joystick-option-zero-threshold']}
-                    units="%"
-                />
-            </div>
+            <Tooltip content="Provide a threshold percentage before a joystick movement is recognized" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <div className={styles.joystickOption}>
+                    <div>Zero Threshold</div>
+                    <Input
+                        value={zeroThreshold}
+                        additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
+                        onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
+                        className={styles['joystick-option-input']}
+                        units="%"
+                    />
+                </div>
+            </Tooltip>
+
+            <Tooltip content="Adjust the computed movement distance values for dynamic joystick jogging" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <div className={styles.joystickOption}>
+                    <div>Movement Distance Override</div>
+                    <Input
+                        value={movementDistanceOverride}
+                        additionalProps={{ min: 10, max: 99999, step: 1, type: 'number' }}
+                        onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
+                        className={styles['joystick-option-input']}
+                        units="%"
+                    />
+                </div>
+            </Tooltip>
         </div>
     );
 };

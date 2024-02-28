@@ -99,7 +99,7 @@ class TerminalWrapper extends PureComponent {
 
                 // Ctrl-C copy - ctrl + c on windows/linux, meta-c on mac
                 if ((event.ctrlKey || event.metaKey) && (event.code === 'KeyC')) {
-                    await navigator.clipboard.writeText(line);
+                    await navigator.clipboard?.writeText(line);
                     return;
                 }
             };
@@ -115,7 +115,6 @@ class TerminalWrapper extends PureComponent {
         this.term.loadAddon(this.fitAddon);
         this.term.prompt = () => {
             this.term.write('\r\n');
-            //this.term.write(color.white(this.prompt));
         };
 
         const el = ReactDOM.findDOMNode(this.terminalContainer);
@@ -143,11 +142,9 @@ class TerminalWrapper extends PureComponent {
     }
 
     componentDidUpdate(_, prevState) {
-        if (this.props.active) {
-            setTimeout(() => {
-                this.refitTerminal();
-            }, 150);
-        }
+        setTimeout(() => {
+            this.refitTerminal();
+        }, 150);
 
         if (this.state.terminalInputIndex !== prevState.terminalInputIndex) {
             const { terminalInputHistory } = this.state;
@@ -155,8 +152,6 @@ class TerminalWrapper extends PureComponent {
             if (terminalInputHistory.length === 0) {
                 return;
             }
-
-            // const inputSize = [...terminalInputHistory[this.state.terminalInputIndex] || ''].length;
 
             this.inputRef.current.focus();
             this.inputRef.current.value = terminalInputHistory[this.state.terminalInputIndex] || '';
@@ -203,7 +198,7 @@ class TerminalWrapper extends PureComponent {
     }
 
     refitTerminal() {
-        if (this.fitAddon) {
+        if (this.fitAddon && this.props.active) {
             this.fitAddon.fit();
         }
     }
@@ -225,6 +220,10 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
+        if (!this.term) {
+            return;
+        }
+
         this.term.write('\r');
         if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
@@ -283,16 +282,12 @@ class TerminalWrapper extends PureComponent {
         const rs = reduxStore.getState();
         const selection = get(rs, 'controller.terminalHistory');
         const text = selection.slice(-LINES_TO_COPY).join('\n');
-        //this.term.selectAll();
-        //const selection = this.term.getSelection().split('\n');
-        //this.term.clearSelection();
 
         if (isElectron()) {
             window.ipcRenderer.send('clipboard', text);
         } else {
-            await navigator.clipboard.writeText(text);
+            await navigator.clipboard?.writeText(text);
         }
-
 
         Toaster.pop({
             msg: `Copied Last ${selection.length} Lines from the Terminal to Clipboard`,

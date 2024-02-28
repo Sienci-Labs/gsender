@@ -197,6 +197,14 @@ class GCodeVirtualizer extends EventEmitter {
     ];
     modalCounter = 0;
 
+    feedrateChanges = [
+        {
+            change: null,
+            count: 0
+        }
+    ];
+    feedrateCounter = 0;
+
     hasSetV1 = false;
 
     handlers = {
@@ -345,7 +353,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
@@ -429,7 +438,8 @@ class GCodeVirtualizer extends EventEmitter {
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
+                a: this.translateA(params.A),
             };
             const v0 = { // fixed point
                 x: this.translateI(params.I),
@@ -505,12 +515,22 @@ class GCodeVirtualizer extends EventEmitter {
         // Example
         //   G4 P200
         'G4': (params) => {
+            if (this.modal.motion !== 'G4') {
+                this.setModal({ motion: 'G4' });
+                this.saveModal({ motion: 'G4' });
+            }
+            let dwellTime = 0;
             if (params.P) {
-                this.totalTime += params.P / 1000;
+                dwellTime = params.P / 1000;
             }
             if (params.S) {
-                this.totalTime += params.S;
+                dwellTime = params.S;
             }
+            this.totalTime += dwellTime;
+
+            this.data[this.totalLines].lineData = {
+                dwellTime: dwellTime
+            };
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
         'G10': (params) => {
@@ -847,16 +867,19 @@ class GCodeVirtualizer extends EventEmitter {
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
 
-        const { xAccel, yAccel, zAccel } = accelerations;
-        this.xAccel = xAccel;
-        this.yAccel = yAccel;
-        this.zAccel = zAccel;
+        if (accelerations) {
+            const { xAccel, yAccel, zAccel } = accelerations;
+            this.xAccel = xAccel;
+            this.yAccel = yAccel;
+            this.zAccel = zAccel;
+        }
 
-        const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
-        this.xMaxFeed = xMaxFeed;
-        this.yMaxFeed = yMaxFeed;
-        this.zMaxFeed = zMaxFeed;
-
+        if (maxFeedrates) {
+            const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
+            this.xMaxFeed = xMaxFeed;
+            this.yMaxFeed = yMaxFeed;
+            this.zMaxFeed = zMaxFeed;
+        }
 
         if (this.collate) {
             this.vmState.feedrates = new Set();
@@ -931,6 +954,7 @@ class GCodeVirtualizer extends EventEmitter {
             if (letter === 'F') {
                 this.feed = code;
                 this.vmState.feedrates.add(`F${code}`);
+                this.saveFeedrate(code);
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
@@ -998,12 +1022,18 @@ class GCodeVirtualizer extends EventEmitter {
             }
         }
 
+        // if the line didnt have time calcs involved, push 0 time
+        if (this.estimates.length < this.data.length) {
+            this.estimates.push(0);
+        }
+
         // add new data structure
         this.data.push({
             Scode: null,
             lineData: null
         });
         this.modalCounter++;
+        this.feedrateCounter++;
 
         this.totalLines += 1;
         this.fn.callback();
@@ -1053,6 +1083,11 @@ class GCodeVirtualizer extends EventEmitter {
             ...modal
         };
         return this.modal;
+    }
+
+    setFeedrate(feed) {
+        this.feed = feed;
+        return this.feed;
     }
 
     isMetricUnits() { // mm
@@ -1204,12 +1239,13 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    calculateMachiningTime(endPos) {
+    calculateMachiningTime(endPos, v1) {
         let moveDuration = 0;
+        let currentPos = v1 || this.position;
 
-        const dx = endPos.x - this.position.x;
-        const dy = endPos.y - this.position.y;
-        const dz = endPos.z - this.position.z;
+        const dx = endPos.x - currentPos.x;
+        const dy = endPos.y - currentPos.y;
+        const dz = endPos.z - currentPos.z;
 
         let travelXY = Math.hypot(dx, dy);
         if (Number.isNaN(travelXY)) {
@@ -1261,7 +1297,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.lastF = f;
         this.totalTime += moveDuration;
-        this.estimates.push(moveDuration);
+        this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
@@ -1301,6 +1337,12 @@ class GCodeVirtualizer extends EventEmitter {
         return this.modalChanges;
     }
 
+    getFeedrateChanges() {
+        this.feedrateChanges[this.feedrateChanges.length - 1].count = this.feedrateCounter;
+        this.feedrateCounter = 0;
+        return this.feedrateChanges;
+    }
+
     getCurrentModal() {
         return this.modal;
     }
@@ -1309,6 +1351,19 @@ class GCodeVirtualizer extends EventEmitter {
         this.modalChanges[this.modalChanges.length - 1].count = this.modalCounter;
         this.modalCounter = 0;
         this.modalChanges.push({ change: change, count: 0 });
+    }
+
+    saveFeedrate(change) {
+        this.feedrateChanges[this.feedrateChanges.length - 1].count = this.feedrateCounter;
+        this.feedrateCounter = 0;
+        this.feedrateChanges.push({ change: change, count: 0 });
+    }
+
+    addToTotalTime(time) {
+        if (!Number(time)) {
+            return;
+        }
+        this.totalTime += time;
     }
 }
 

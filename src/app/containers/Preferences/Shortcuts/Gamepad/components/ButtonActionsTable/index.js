@@ -13,10 +13,11 @@ import { get } from 'lodash';
 import classNames from 'classnames';
 
 const ButtonActionsTable = () => {
-    const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile } } = useContext(GamepadContext);
+    const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile, getMacros } } = useContext(GamepadContext);
     const { buttons } = useGamepadListener({ profile: currentProfile });
 
     const profile = getGamepadProfile(currentProfile);
+    const macros = getMacros();
 
     const buttonsArr = [...profile.buttons]
         .sort(button => {
@@ -80,15 +81,40 @@ const ButtonActionsTable = () => {
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
+    const handleButtonLabelChange = (currentButtonValue, label) => {
+        const updatedProfiles =
+            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
+                ? ({
+                    ...profile,
+                    buttons: profile.buttons.map(button => (button.value === currentButtonValue ? { ...button, label } : button))
+                })
+                : profile
+            ));
+
+        dispatch(setGamepadProfileList(updatedProfiles));
+    };
+
     const render = {
         button: (_, row) => {
             const buttonIsPressed = buttons[row.value]?.pressed;
 
             if (buttonIsPressed) {
-                return <input defaultValue={row.label} className={styles['button-render-active']} />;
+                return (
+                    <input
+                        defaultValue={row.label}
+                        className={styles['button-render-active']}
+                        onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                    />
+                );
             }
 
-            return <input defaultValue={row.label} className={styles['button-render']} />;
+            return (
+                <input
+                    defaultValue={row.label}
+                    className={styles['button-render']}
+                    onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                />
+            );
         },
         action: (action, value, type) => {
             if (!action) {
@@ -106,7 +132,7 @@ const ButtonActionsTable = () => {
                 );
             }
 
-            const event = shuttleEvents.getEvent(action);
+            const event = shuttleEvents.getEvent(action) || macros.find(el => el.cmd === action);
 
             return (
                 <div className={styles['shortcut-item']}>

@@ -112,9 +112,11 @@ class Controller {
         'flash:end': [],
         'flash:message': [],
         'flash:progress': [],
+        'spindle:add': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
+        'updateRotaryMode': [],
         'connection:new': [],
 
         'requestEstimateData': [],

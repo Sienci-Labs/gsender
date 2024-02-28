@@ -26,6 +26,7 @@ import classNames from 'classnames';
 import includes from 'lodash/includes';
 import reduxStore from 'app/store/redux';
 import * as controllerActions from 'app/actions/controllerActions';
+import SpindleSelector from 'app/widgets/Spindle/components/SpindleSelector';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
@@ -54,6 +55,7 @@ import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
 import useKeybinding from '../../lib/useKeybinding';
 import { convertToImperial } from '../../containers/Preferences/calculate';
+import { roundMetric, round } from '../../lib/rounding';
 
 
 class SpindleWidget extends PureComponent {
@@ -208,6 +210,15 @@ class SpindleWidget extends PureComponent {
                     active: false
                 });
             }, laser.duration);
+        },
+        handleHALSpindleSelect: (spindle) => {
+            console.log(spindle);
+            controller.command('gcode', [
+                `M104 Q${spindle.value}`
+            ]);
+            this.setState({
+                spindle
+            });
         }
     };
 
@@ -316,7 +327,11 @@ class SpindleWidget extends PureComponent {
             spindleSpeed: this.config.get('speed', 1000),
             laser: this.config.get('laser'),
             spindleMax: this.config.get('spindleMax'),
-            spindleMin: this.config.get('spindleMin')
+            spindleMin: this.config.get('spindleMin'),
+            spindle: {
+                label: 'Default Spindle',
+                value: 0
+            }
         };
     }
 
@@ -342,7 +357,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getSpindleOffsetCode(),
+            ...this.getSpindleOffsetCode(preferredUnits),
             `$30=${spindleMax}`,
             `$31=${spindleMin}`,
             '$32=0',
@@ -389,25 +404,36 @@ class SpindleWidget extends PureComponent {
     }
 
     // Take into account the current wpos when setting offsets
-    calculateAdjustedOffsets(xOffset, yOffset) {
-        const { wpos } = this.props;
-        const { x, y } = wpos;
-        return [Number(x) + Number(xOffset), Number(y) + Number(yOffset)];
+    calculateAdjustedOffsets(xOffset, yOffset, units) {
+        const { wpos, $13 } = this.props;
+        let { x, y } = wpos;
+
+        console.log(units);
+
+        if ($13 === '1' || units === 'G20') {
+            units = 'G20';
+            x /= 25.4;
+            y /= 25.4;
+        }
+        return [round(Number(x) + Number(xOffset), units), round(Number(y) + Number(yOffset), units)];
     }
 
-    getLaserOffsetCode() {
+    getLaserOffsetCode(preferredUnits) {
         const laser = this.config.get('laser');
-        const { units } = this.props;
 
         this.setState({
             laser
         });
         let { xOffset, yOffset } = laser;
-        if (units === IMPERIAL_UNITS) {
+        if (preferredUnits === 'G20') {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
+        } else {
+            xOffset = roundMetric(xOffset);
+            yOffset = roundMetric(yOffset);
         }
-        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset, preferredUnits);
+        console.log(`x: ${xoffsetAdjusted}, y: ${yOffsetAdjusted}`);
 
         let offsetQuery = [];
         if (xOffset === 0 && yOffset !== 0) {
@@ -426,8 +452,7 @@ class SpindleWidget extends PureComponent {
         return offsetQuery;
     }
 
-    getSpindleOffsetCode() {
-        const { units } = this.props;
+    getSpindleOffsetCode(preferredUnits) {
         const laser = this.config.get('laser');
         this.setState({
             laser
@@ -436,11 +461,14 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
-        if (units === IMPERIAL_UNITS) {
+        if (preferredUnits === 'G20') {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
+        } else {
+            xOffset = roundMetric(xOffset);
+            yOffset = roundMetric(yOffset);
         }
-        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset, preferredUnits);
         if (xOffset === 0 && yOffset !== 0) {
             offsetQuery = [
                 `G10 L20 P${this.getWCS()} Y${yOffsetAdjusted}`
@@ -475,7 +503,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getLaserOffsetCode(),
+            ...this.getLaserOffsetCode(preferredUnits),
             `$30=${maxPower}`,
             `$31=${minPower}`,
             '$32=1',
@@ -512,8 +540,10 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles } = this.props;
         const { minimized, isFullscreen } = this.state;
+        const controllerType = store.get('widgets.connection.controller.type', '-');
+
         const state = {
             ...this.state,
             spindleModal,
@@ -538,9 +568,18 @@ class SpindleWidget extends PureComponent {
                     )}
                 >
                     <div className={styles.modalWrapper}>
-                        <div className={styles.modalRow}>
-                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
-                            <ActiveIndicator canClick={this.canClick()} active={active} />
+                        <div>
+                            <div className={styles.modalRow}>
+                                <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
+                                <ActiveIndicator canClick={this.canClick()} active={active} />
+                            </div>
+                            {
+                                (controllerType === GRBLHAL) && (
+                                    <div className={styles.modalRow}>
+                                        <SpindleSelector spindles={availableSpindles} onChange={actions.handleHALSpindleSelect} spindle={state.spindle}/>
+                                    </div>
+                                )
+                            }
                         </div>
                         <div>
                             {
@@ -569,6 +608,8 @@ export default connect((store) => {
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
+    const availableSpindles = get(store, 'controller.spindles', []);
+    const $13 = get(store, 'controller.settings.settings.$13', '0');
 
     return {
         workflow,
@@ -582,6 +623,8 @@ export default connect((store) => {
         laserAsSpindle,
         wcs,
         wpos,
-        units
+        units,
+        availableSpindles,
+        $13
     };
 })(SpindleWidget);

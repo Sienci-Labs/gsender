@@ -74,7 +74,6 @@ const wizard = {
             '%global.toolchange.SPINDLE=modal.spindle',
             '%global.toolchange.DISTANCE=modal.distance',
             '%global.toolchange.FEEDRATE=programFeedrate',
-            '([JSON.stringify(global.toolchange)])',
             'M5',
             'G91 G21',
             '(Toolchange Initiated)',
@@ -125,7 +124,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Jog your machine to a palce you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to {moveAmount} above the probe location, attach the magnet, and prepare to probe</div>,
+                    description: () => <div>Jog your machine to a place you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to {moveAmount} above the probe location, attach the magnet, and prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {
@@ -138,9 +137,9 @@ const wizard = {
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     '(Set Z to Tool offset and wait)',
-                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,
+                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET]`,
+                                    'G0 Z[global.toolchange.RETRACT]',
                                 ]);
                             }
                         }

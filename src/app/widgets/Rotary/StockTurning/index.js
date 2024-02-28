@@ -77,7 +77,14 @@ const StockTurning = () => {
 
         const serializedFile = new File([stockTurningGenerator.gcode], 'rotary_surfacing.gcode');
 
-        pubsub.publish('visualizer:load', stockTurningGenerator.gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
+        const payload = {
+            content: stockTurningGenerator.gcode,
+            size: serializedFile.size,
+            name: serializedFile.name,
+            visualizer: VISUALIZER_SECONDARY
+        };
+
+        pubsub.publish('visualizer:load', payload);
     };
 
     const loadGcode = () => {
@@ -125,6 +132,7 @@ const StockTurning = () => {
                         tabs={tabs}
                         currentTab={activeTab}
                         onTabChange={(index) => dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: index })}
+                        mountAllTabs
                     />
                 </div>
             </div>

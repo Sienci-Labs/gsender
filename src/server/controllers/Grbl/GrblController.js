@@ -248,7 +248,7 @@ class GrblController {
                         }
                     }
                 }
-                return data;
+                return data.replace(/\([^\)]*\)/gm, '');
             }
         });
 
@@ -270,7 +270,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
                     .replace(';', '') : '';
                 line = line.replace(commentMatcher, '')
-                    .replace('/uFEFF', '')
                     .trim();
                 context = this.populateContext(context);
 
@@ -348,13 +347,17 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
+                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({
                         data: 'M6',
                         comment: commentString
                     }); // Hold reason
-                    line = line.replace('M6', '(M6)');
+
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
 
 
@@ -420,7 +423,7 @@ class GrblController {
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -472,6 +475,13 @@ class GrblController {
                 /* Emit event to UI for toolchange handler */
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+
+                    // No toolchange in check mode
+                    const currentState = _.get(this.state, 'status.activeState', '');
+                    if (currentState === 'Check') {
+                        return line.replace('M6', '(M6)');
+                    }
+
                     const { toolChangeOption } = this.toolChangeContext;
 
                     let tool = line.match(toolCommand);
@@ -479,7 +489,7 @@ class GrblController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            commentString = `(${tool[0]}) ` + commentString;
+                            commentString = `(${tool?.[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
@@ -491,8 +501,8 @@ class GrblController {
 
                             setTimeout(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool[2]); // set tool in runner state
-                                this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
+                                this.runner.setTool(tool?.[2]); // set tool in runner state
+                                this.emit('controller:state', GRBL, this.state, tool?.[2]); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
@@ -508,7 +518,7 @@ class GrblController {
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
+                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -575,6 +585,7 @@ class GrblController {
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.stopCountdown();
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -587,6 +598,7 @@ class GrblController {
             }
 
             this.timePaused = new Date().getTime();
+            this.sender.pauseCountdown();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -598,6 +610,8 @@ class GrblController {
 
             // Resume program execution
             this.sender.unhold();
+
+            this.sender.resumeCountdown();
 
             // subtract time paused
             this.sender.next({ timePaused: pauseTime });
@@ -744,7 +758,7 @@ class GrblController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description,
+                description: _.get(error, 'description', ''),
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -756,7 +770,7 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
@@ -907,6 +921,9 @@ class GrblController {
 
         this.toolChanger = new ToolChanger({
             isIdle: () => {
+                if (!this.runner) {
+                    return false;
+                }
                 return this.runner.isIdle();
             },
             intervalTimer: 200
@@ -1161,6 +1178,10 @@ class GrblController {
         if (this.queryTimer) {
             clearInterval(this.queryTimer);
             this.queryTimer = null;
+        }
+
+        if (this.toolChanger) {
+            this.toolChanger.clearInterval();
         }
 
         if (this.runner) {
@@ -1432,8 +1453,11 @@ class GrblController {
                 const preferences = store.get('preferences', {});
                 const delay = _.get(preferences, 'spindle.delay', false);
 
-                if (delay) {
-                    gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
+                // test if there is a G4 command already
+                const delayRegex = new RegExp('(G4 ?P?[0-9]+)');
+                // only add one if there isn't
+                if (delay && !delayRegex.test(gcode)) {
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b/g, '$& G4 P1');
                 }
 
                 const gcodeWithoutComments = gcode.replace(bracketCommentLine, '');
@@ -1610,6 +1634,7 @@ class GrblController {
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger(PROGRAM_END);
+                this.sender.stopCountdown();
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
@@ -1931,7 +1956,7 @@ class GrblController {
                         //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
-                    jogFeedrate = 1250;
+                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });

@@ -21,21 +21,29 @@ const restoreSettings = (state, isSync) => {
 };
 
 export const storeUpdate = async (content, isSync) => {
-    const { settings, events = [], state } = JSON.parse(content);
+    try {
+        const { settings, events = [], state } = JSON.parse(content);
 
-    await new Promise((resolve, reject) => {
-        // delete all old events
-        const res = api.events.clearAll();
-        resolve(res);
-    }).then((result) => {
-        Promise.all([
-            Object.entries(events).map(([key, event]) => api.events.create(event))
-        ]);
-    });
+        await new Promise((resolve, reject) => {
+            // delete all old events
+            const res = api.events.clearAll();
+            resolve(res);
+        }).then((result) => {
+            Promise.all([
+                Object.entries(events).map(([key, event]) => api.events.create(event))
+            ]);
+        });
 
-    if (settings) {
-        restoreSettings(settings, isSync);
-    } else {
-        restoreSettings(state, isSync);
+        if (settings) {
+            restoreSettings(settings, isSync);
+        } else {
+            restoreSettings(state, isSync);
+        }
+    } catch (error) {
+        /**
+         *  Possible errors:
+         *  1. JSON.parse(content) could not execute
+         */
+        return;
     }
 };

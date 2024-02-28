@@ -35,6 +35,7 @@ const Laser = ({ state, actions }) => {
             </Fieldset>
 
             <Fieldset legend="Laser Power">
+                <p style={{ fontSize: '0.9rem', color: '#737373' }}>Note that these values will not be applied to EEPROM until the next time laser mode is toggled.</p>
                 <TooltipCustom content="Minimum laser amount" location="default">
                     <Input
                         label="Min Power"
@@ -42,6 +43,7 @@ const Laser = ({ state, actions }) => {
                         value={minLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'minPower')}
                         additionalProps={{ type: 'number' }}
+                        hasRounding={false}
                     />
                 </TooltipCustom>
                 <TooltipCustom content="Maximum laser amount" location="default">
@@ -51,6 +53,7 @@ const Laser = ({ state, actions }) => {
                         value={maxLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'maxPower')}
                         additionalProps={{ type: 'number' }}
+                        hasRounding={false}
                     />
                 </TooltipCustom>
             </Fieldset>

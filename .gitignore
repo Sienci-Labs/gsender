@@ -18,3 +18,8 @@ gsender_server_log.txt
 # Sentry Auth Token
 .env.sentry-build-plugin
 cypress.env.json
+# Sentry Config File
+.env.sentry-build-plugin
+
+# Sentry Config File
+.env.sentry-build-plugin

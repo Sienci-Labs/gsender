@@ -374,20 +374,34 @@ onmessage = function({ data }) {
     const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true, accelerations, maxFeedrates });
 
     if (!isEmpty(parsedData) && !isNewFile) {
-        const { data, info, modalChanges } = parsedData;
+        const { data, info, modalChanges, feedrateChanges } = parsedData;
         fileInfo = info;
+
         let modalIndex = 0; // track changes
         let iterationsNeeded = modalChanges[modalIndex].count; // initialize
         let modal = vm.getCurrentModal(); // get the default modal
         let modalCounter = 0; // tracking how long until the modal change comes
 
+        let feedrateIndex = 0; // track changes
+        let iterationsNeededF = feedrateChanges[feedrateIndex].count; // initialize
+        let feedrateCounter = 0; // tracking how long until the feed change comes
+
         for (let i = 0; i < data.length; i++) {
             // update modal
             if (modalCounter === iterationsNeeded) {
-                modalIndex++;
-                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
-                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
-                modalCounter = 0; // reset counter
+                do {
+                    modalIndex++;
+                    modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
+                    iterationsNeeded = modalChanges[modalIndex].count; // update the new count
+                    modalCounter = 0; // reset counter
+                } while (iterationsNeeded === 0); // handle another modal change on same line
+            }
+            // update feedrate
+            if (feedrateCounter === iterationsNeededF) {
+                feedrateIndex++;
+                vm.setFeedrate(feedrateChanges[feedrateIndex].change); // change the feed
+                iterationsNeededF = feedrateChanges[feedrateIndex].count; // update the new count
+                feedrateCounter = 0; // reset counter
             }
 
             const entry = data[i];
@@ -404,14 +418,22 @@ onmessage = function({ data }) {
                         }
                     }
                 }
-                if (modal.motion === 'G1' || modal.motion === 'G0') {
-                    if (shouldUseAddCurve) {
-                        addCurve(modal, v1, v2);
-                    } else {
-                        addLine(modal, v1, v2);
-                    }
+
+                if (modal.motion === 'G4') {
+                    vm.addToTotalTime(entry.lineData.dwellTime);
                 } else {
-                    addArcCurve(modal, v1, v2, v0);
+                    const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
+                    if (modal.motion === 'G1' || modal.motion === 'G0') {
+                        if (shouldUseAddCurve) {
+                            addCurve(modal, v1, v2);
+                        } else {
+                            addLine(modal, v1, v2);
+                        }
+                        vm.calculateMachiningTime(targetPosition, v1);
+                    } else {
+                        addArcCurve(modal, v1, v2, v0);
+                        vm.calculateMachiningTime(targetPosition, v1);
+                    }
                 }
             }
 
@@ -434,7 +456,19 @@ onmessage = function({ data }) {
             onData(entry.parsedLine);
 
             modalCounter++;
+            feedrateCounter++;
         }
+
+        let newFileInfo = vm.generateFileStats();
+        fileInfo.estimatedTime = newFileInfo.estimatedTime;
+        // update estimated time
+        parsedDataToSend = {
+            data: parsedData.data,
+            estimates: parsedData.estimates,
+            info: fileInfo,
+            modalChanges,
+            feedrateChanges,
+        };
     } else {
         vm.on('data', (data) => {
             let spindleValues = {};
@@ -461,12 +495,14 @@ onmessage = function({ data }) {
 
         const data = vm.getData();
         const modalChanges = vm.getModalChanges();
+        const feedrateChanges = vm.getFeedrateChanges();
         fileInfo = vm.generateFileStats();
         parsedDataToSend = {
             data: data.data,
             estimates: data.estimates,
             info: fileInfo,
-            modalChanges
+            modalChanges,
+            feedrateChanges,
         };
     }
 

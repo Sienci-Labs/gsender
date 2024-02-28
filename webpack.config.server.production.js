@@ -6,7 +6,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-// const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
+const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
 
 const babelConfig = require('./babel.config');
 const pkg = require('./package.json');
@@ -30,7 +30,8 @@ const buildVersion = pkg.version;
 
 module.exports = {
     mode: 'production',
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
+    // devtool: 'cheap-module-source-map',
     target: 'node', // ignore built-in modules like path, fs, etc.
     context: path.resolve(__dirname, 'src/server'),
     entry: {
@@ -62,12 +63,12 @@ module.exports = {
             template: path.resolve(__dirname, 'index.html'),
             chunksSortMode: 'dependency' // Sort chunks by dependency
         }),
-        // sentryWebpackPlugin({
-        //     org: process.env.SENTRY_ORG,
-        //     project: process.env.SENTRY_PROJECT,
-        //     authToken: process.env.SENTRY_AUTH_TOKEN,
-        //     telemetry: false
-        // }),
+        sentryWebpackPlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            telemetry: false
+        }),
     ],
     module: {
         rules: [

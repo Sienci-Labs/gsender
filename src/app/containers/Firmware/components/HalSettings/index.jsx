@@ -7,14 +7,21 @@ import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
 const HalSettings = ({ descriptions }) => {
     const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
-
     const handleSettingsChange = (index) => (value) => {
         setSettingsToApply(true);
         setSettings(prev => {
             const updated = [...prev];
+
             updated[index].value = value;
             return updated;
         });
+    };
+
+    const filterNewlines = (data = '') => {
+        if (!data) {
+            return '';
+        }
+        return data.replace(/\\n/gmi, '\n');
     };
 
 
@@ -33,10 +40,9 @@ const HalSettings = ({ descriptions }) => {
             </div>
             {
                 settings.map((setting, index) => {
-                    console.log(setting);
                     const settingKey = setting.setting.replace('$', '');
                     const { message, dataType, ...info } = descriptionLookup(settingKey, descriptions);
-                    const description = setting.details.replace(/\\n/gmi, '\n');
+                    const description = filterNewlines(setting.details);
                     const InputElement = getDatatypeInput(dataType);
 
                     const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
@@ -60,7 +66,7 @@ const HalSettings = ({ descriptions }) => {
                                     </div>
                                 </div>
                                 <div className={styles.settingsControl}>
-                                    <InputElement info={info} setting={setting} onChange={handleSettingsChange(index)} />
+                                    <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} />
                                 </div>
                             </div>
                         </div>

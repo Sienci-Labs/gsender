@@ -343,7 +343,7 @@ class DisplayPanel extends PureComponent {
         const { homingSetting } = this.props;
         const binary = parseInt(homingSetting, 10).toString(2);
         const singleAxis = binary.charAt(binary.length - 2);
-        return singleAxis;
+        return Number(singleAxis);
     }
 
     handleMovementSwitch(newValue) {
@@ -358,24 +358,27 @@ class DisplayPanel extends PureComponent {
     }
 
     handleGoToLocation() {
+        const code = [];
+        const currentMovement = this.props.modalDistance;
+        const unitModal = this.props.units === METRIC_UNITS ? 'G21' : 'G20';
         const { location, relative } = this.state;
         const { ROTARY } = WORKSPACE_MODE;
         const movement = relative ? 'G91' : 'G90';
-        const currentMovement = this.props.modalDistance;
         const isInRotaryMode = store.get('workspace.mode') === ROTARY;
-
-        controller.command('gcode', movement);
-        controller.command('gcode', 'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z);
+        code.push(
+            movement,
+            'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z
+        );
 
         if (isInRotaryMode) {
-            controller.command('gcode', 'G0 A' + location.a);
+            code.push('G0 A' + location.a);
         }
-
-        controller.command('gcode', currentMovement);
+        code.push(currentMovement);
+        controller.command('gcode:safe', code, unitModal);
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun, firmware } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun } = this.props;
         const { modalShow, relative, location } = this.state;
         const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
@@ -455,22 +458,11 @@ class DisplayPanel extends PureComponent {
                     <div className={styles.locationWrapper}>
                         <div className={styles.alwaysAvailable}>
                             <table className={styles.displaypanelTable}>
-                                {firmware === 'Grbl'
-                                    ? (
-                                        <tbody>
-                                            {hasAxisX && this.renderAxis(AXIS_X)}
-                                            {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
-                                            {hasAxisZ && this.renderAxis(AXIS_Z, false, isInRotaryMode)}
-                                        </tbody>
-                                    )
-                                    : (
-                                        <tbody>
-                                            {hasAxisX && this.renderAxis(AXIS_X)}
-                                            {hasAxisY && this.renderAxis(AXIS_Y)}
-                                            {hasAxisZ && this.renderAxis(AXIS_Z)}
-                                        </tbody>
-                                    )
-                                }
+                                <tbody>
+                                    {hasAxisX && this.renderAxis(AXIS_X)}
+                                    {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
+                                    {hasAxisZ && this.renderAxis(AXIS_Z, false, isInRotaryMode)}
+                                </tbody>
                             </table>
                             <div className={styles.controlButtons}>
                                 <FunctionButton
@@ -607,7 +599,6 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
-    const firmware = get(store, 'controller.type');
     const modalDistance = get(store, 'controller.state.parserstate.modal.distance');
     const $13 = get(store, 'controller.settings.settings.$13');
     return {
@@ -619,7 +610,6 @@ export default connect((store) => {
         homingRun,
         pullOff,
         mpos,
-        firmware,
         modalDistance,
         $13
     };

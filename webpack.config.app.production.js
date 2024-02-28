@@ -13,7 +13,7 @@ const stylusLoader = require('stylus-loader');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
-// const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
+const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
 
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
@@ -42,7 +42,8 @@ module.exports = {
     cache: true,
     target: 'web',
     context: path.resolve(__dirname, 'src/app'),
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
+    // devtool: 'cheap-module-source-map',
     entry: {
         polyfill: [
             path.resolve(__dirname, 'src/app/polyfill/index.js')
@@ -58,8 +59,8 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist/gsender/app'),
-        chunkFilename: `[name].[chunkhash].bundle.js?_=${timestamp}`,
-        filename: `[name].[chunkhash].bundle.js?_=${timestamp}`,
+        chunkFilename: '[name].[chunkhash].bundle.js',
+        filename: '[name].[chunkhash].bundle.js',
         publicPath: publicPath
     },
     module: {
@@ -243,14 +244,14 @@ module.exports = {
             meta: {
                 'viewport': 'width=device-width, initial-scale=1, maximum-scale=1',
             }
+        }),
+        sentryWebpackPlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            urlPrefix: publicPath,
+            telemetry: false
         })],
-    // sentryWebpackPlugin({
-    //     org: process.env.SENTRY_ORG,
-    //     project: process.env.SENTRY_PROJECT,
-    //     authToken: process.env.SENTRY_AUTH_TOKEN,
-    //     urlPrefix: publicPath,
-    //     telemetry: false
-    // })],
     resolve: {
         modules: [
             path.resolve(__dirname, 'src'),

@@ -24,9 +24,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { uniqueId } from 'lodash';
+import { GRBL } from 'app/constants';
 import styles from './Index.styl';
 
 const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
+    selectedFirmware = selectedFirmware || GRBL; // null check
     return (
         <div className={styles.firmwareSelector}>
             <div className={styles.selectorWrapper}>

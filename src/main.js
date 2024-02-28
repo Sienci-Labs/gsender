@@ -30,7 +30,7 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-// import * as Sentry from '@sentry/electron/main';
+import * as Sentry from '@sentry/electron/main';
 
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
@@ -44,7 +44,9 @@ let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
 
-// Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
+if (process.env.NODE_ENV === 'production') {
+    Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684', release: pkg.version });
+}
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -134,7 +136,7 @@ const main = () => {
                 }
             }
 
-            const { address, port, requestedHost, kiosk } = { ...res };
+            const { address, port, kiosk } = { ...res };
             log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
@@ -180,7 +182,9 @@ const main = () => {
             });
 
             autoUpdater.on('update-available', (info) => {
-                window.webContents.send('update_available', info);
+                setTimeout(() => {
+                    window.webContents.send('update_available', info);
+                }, 5000);
             });
 
             autoUpdater.on('error', (err) => {
@@ -201,12 +205,12 @@ const main = () => {
                 if ('type' in error) {
                     log.transports.file.level = 'error';
                 }
-                if(error.type.includes('GRBL_HAL')) {
+
+                if (error.type.includes('GRBL_HAL')) {
                     (error.type === 'GRBL_HAL_ERROR') ? grblLog.error(`GRBL_HAL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_HAL_ALARM:Alarm ${error.code} - ${error.description}`);
                 } else {
                     (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
                 }
-
             });
 
             ipcMain.on('clipboard', (channel, text) => {
@@ -342,7 +346,7 @@ const main = () => {
             }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
-            // This sets a 5 second timeout on the await.
+            // This sets a 4 second timeout on the await.
             asyncCallWithTimeout(autoUpdater.checkForUpdates(), 4000);
         }
     });

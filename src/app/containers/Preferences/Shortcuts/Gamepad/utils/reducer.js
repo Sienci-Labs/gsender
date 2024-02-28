@@ -7,7 +7,8 @@ import {
     SET_GAMEPAD_PROFILE_LOCKOUT_BUTTON,
     SET_GAMEPAD_PROFILE_MODIFIER_BUTTON,
     SET_CURRENT_GAMEPAD_MODAL,
-    SET_GAMEPAD_PROFILE_LIST
+    SET_GAMEPAD_PROFILE_LIST,
+    SET_MACROS,
 } from './actions';
 
 const initialState = () => {
@@ -25,6 +26,7 @@ const initialState = () => {
         currentModal: null,
         lockoutButton: null,
         modifierButton: null,
+        macros: [],
     };
 };
 
@@ -72,6 +74,13 @@ const reducer = (state, action) => {
                 ...state.settings,
                 profiles: action.payload
             },
+        };
+    }
+
+    case SET_MACROS: {
+        return {
+            ...state,
+            macros: action.payload,
         };
     }
 

@@ -1573,13 +1573,13 @@ class Visualizer extends Component {
         }
 
         // Use y-axis in grbl, a-axis in grblHal
-        const axis = isInRotaryMode && isUsingGRBL && isRotaryFile ? 'y' : 'a';
+        const axis = isInRotaryMode && isRotaryFile ? 'y' : 'a';
 
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
 
         const grblCondition = isUsingGRBL && valueHasChanged && isInRotaryMode;
-        const grblHalCondition = isUsingGRBLHal && valueHasChanged;
+        const grblHalCondition = isUsingGRBLHal && valueHasChanged || isUsingGRBLHal && isInRotaryMode;
 
         /**
          * GRBL Condition
@@ -1749,6 +1749,11 @@ class Visualizer extends Component {
         });
 
         (typeof callback === 'function') && callback({ bbox: bbox });
+    }
+
+
+    getToolpathHull() {
+        return this.visualizer.getHull();
     }
 
     load(name, vizualization, callback) {

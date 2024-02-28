@@ -42,6 +42,7 @@ import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/Gr
 import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
+import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 
 class GrblHalLineParser {
     parse(line) {
@@ -91,6 +92,9 @@ class GrblHalLineParser {
 
             // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
             GrblHalLineParserResultSettingDescription,
+
+            // 7 - SLB_LASER, enabled as spindle 0, DLIRV, current
+            GrblHalLineParserResultSpindle,
 
             // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
             GrblHalLineParserResultSettingDetails,

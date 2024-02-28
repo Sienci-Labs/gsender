@@ -214,13 +214,12 @@
     height: 100%;
     align-self: center;
     align-items: center;
-    @media (max-width: 639px), (max-device-width: 639px) {
-        flex-direction column;
-    }
+    // @media (max-width: 639px), (max-device-width: 639px) {
+    //     flex-direction column;
+    // }
 }
 
 .xy-keys {
-    width: 56%;
     display: grid;
     grid-gap: 3px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -228,10 +227,6 @@
     @media (max-height: 820px) {
         width: 43%;
     }
-    /*@media (max-width: 639px), (max-device-width: 639px) {
-        width: 91%;
-        grid-gap: 12px;
-    }*/
 }
 
 .xy-keys > div::before, .xy-keys > button::before {
@@ -258,11 +253,7 @@
     }
     @media (max-width: 639px), (max-device-width: 639px) {
         display: flex;
-        width: 89%;
-        margin: 1rem;
-        button + button {
-            margin-left: 12px;
-        }
+        flex-direction: column;
     }
 }
 

@@ -20,9 +20,12 @@ Some things that we’re looking to accomplish with this sender:
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (ARM64) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (32) | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64) | 
-|-|-|-|-|-|-|-
- ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x32.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_bullseye.deb)
+
+| Windows (x64)                                                                                                               | Mac (Intel)                                                                                                                   | Linux (Intel)                                                                                                                        | Linux (ARM)                                                                                                                        | Pi (64 bit)                                                                                                                       |
+|-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                             |                                                                                                                               |                                                                                                                                      |                                                                                                                                    |                                                                                                                                   |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-1.4.1-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-1.4.1-Mac-Intel-64Bit.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.1/gSender-Edge-1.4.1-Linux-PI-64Bit.deb) |
+     
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,6 +102,80 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.3 (February 22, 2024)
+- Fix for probe migration values not running
+- Fix for jog value migration not running
+- Spindles on HAL no longer duplicate when running the spindle command multiple times
+- Connection widget should no longer zero out selected controller in some situations
+- Toolchanger should no longer error out in situations when the user has connected then disconnected
+
+### 1.4.2 (February 16, 2024)
+- Added ability to assign macros to gamepad buttons
+- Controller type is now annotated in the Errors and Alarms report and diagnostic file
+- Go To function on UI now accounts for preferred units
+- Added spindle selector to Laser/Spindle tab when using grblHAL firmware
+- Unlock button now only shows 100% of the time when using grblHAL controller
+- Fixed machine profiles missing in some situations
+- Remote mode UI jog controls are once again properly contained within their widget container
+- Fix for remote mode settings crashing on Firefox
+- Fixed toggling laser offsets with inches enabled
+- Various improvements to time estimation
+- "Use Last Port" button in firmware tool should now properly connect when the last connection was over Ethernet
+- Alterations to outline behaviour - should move in a consistent direction and more accurately outline the toolpath
+- Fixed tool change offsets being concatenated as strings instead of added
+- Surfacing tool better handles extreme values by warning the user instead of exceeding the call stack
+- Various rotary fixes
+- Fix for pass-through toolchanging in macros
+- Fix for spindle delay being added when the line already had a delay from the post-processor
+- Start-From-Line should now better handle starting G2/G3 commands and clear errors on grblHAL controller
+- Fix for toolchange wizard not resuming correctly on grblHAL controller
+- Verify job should behave more consistently like grbl controller on grblHAL firmware
+
+### 1.4.1 (January 26, 2024)
+- Fix for black screen on application startup in some situations
+- Fix for jog buttons on UI not registering click events correctly on some operating systems
+- Strip comments sent to controller to prevent buffer overflow and better support Shapeoko
+- Fix issue with firmware tool not updating values correctly if settings limited by search bar
+- Handle missing file name in recent files
+- Updated EEPROM values for travel on multiple Sienci profiles
+- Fixed issue with surfacing tool crashing in some situations
+- Fixed several bugs with gamepad support
+
+### 1.4.0 (January 23, 2024)
+- Added Rotary Mode
+  - gSender is now able to run 2+1 axis files on grbl and 4 axis files on grblHAL
+  - Visualizer updated to support 4 axis rotations
+  - A-axis DRO and jogging
+  - Rotary probing
+- Added grblHAL controller support
+  - Connect to and run jobs as normal on any grblHAL device
+  - Connect over ethernet where hardware is supported
+  - New grblHAL specific firmware tool that is dynamically generated based on reported settings
+  - New UI elements where appropriate to support new functionality such as single axis homing 
+- Gamepad improvements
+  - Restructured logic and mapping of buttons to actions
+  - Add secondary functionality to buttons
+  - Added joystick MPG mode
+  - Added lockout button to deactivate gamepad when needed
+- Improved job time estimation
+  - Significantly improved initial time estimation algorithm based on machine acceleration and max speeds
+  - Mid-job estimation uses initial estimate per line for more accurate remaining duration
+- Multi-corner probing - touch off any corner using both standard and auto-zero touchplates
+- Added Go To UI button to quickly go to an absolute or relative workspace coordinate
+- Clearer distinction on planned lines vs cut lines - planned lines show up as a (customizable) yellow instead of the default cut gray
+- Remote mode improvements
+  - Added QR code for easier navigation to remote address on phone
+  - Added workflow controls and unit selection to remote mode UI
+- Added preference to prompt on Zero to prevent accidentally resetting zero on any axis
+- Code block toolchange again supported
+- Firmware active modals now displayed in diagnostic tab
+- PRB values available to use in macros
+- Files are now parsed once per run time
+- Fix for DRO precision in some situations
+- Improved job stats area - now tracks jobs per com port, more information about each job run and the number of problems encountered
+- Maintenance reminders - set up and customize maintenance reminders to prompt tasks after specific run time totals have occured
+- Improved alarm and error recording
+
 ### 1.2.2 (Jul 6, 2023)
 - Fix for overrides leading to gcode errors
 - Override value correctly updates with keybind usage
@@ -110,7 +187,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Jog speed properly converts through preferred unit changes
 - Larger margin on shortcut printout
 - M0 in feeder macros now displays M0 pause dialog
-- Added missing outline keybind
+- Added missing outline keybinds
 - Unlock keybind should work in more situations where a soft reset was required
 
 ### 1.2.1 (Jun 22, 2023)

@@ -1,9 +1,10 @@
-/* eslint-disable no-alert */
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import get from 'lodash/get';
-import { connect } from 'react-redux';
+import humanizeDuration from 'humanize-duration';
+
 import { in2mm, mm2in } from '../../../lib/units';
 import styles from './IdleInfo.styl';
 import FileStat from './FileStat';
@@ -97,20 +98,46 @@ const IdleInfo = ({ state, ...props }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    const formatEstimatedTime = (time) => {
+    const formatEstimatedTime = (time = 0) => {
         if (time <= 1) {
             return '-';
         }
 
-        if (time > 60 && (time / 60) < 60) {
-            return `~ ${Math.ceil((time / 60))} minute(s)`;
+        const minuteInSeconds = 60;
+        const hourInSeconds = minuteInSeconds * 60;
+        const dayInSeconds = hourInSeconds * 24;
+
+        let units = ['d', 'h', 'm', 's'];
+
+        if (time > minuteInSeconds && time < hourInSeconds) {
+            units = ['m', 's'];
         }
 
-        if ((time / 60) >= 60) {
-            return `~ ${Math.ceil((time / 3600))} hour(s)`;
+        if (time > hourInSeconds && time < dayInSeconds) {
+            units = ['h', 'm'];
         }
 
-        return `~ ${Math.ceil(time)} seconds`;
+        if (time >= dayInSeconds) {
+            units = ['d', 'h'];
+        }
+
+        const shortEnglishHumanizer = humanizeDuration.humanizer({
+            language: 'shortEn',
+            languages: {
+                shortEn: {
+                    d: () => 'd',
+                    h: () => 'h',
+                    m: () => 'm',
+                    s: () => 's',
+                },
+            },
+            round: true,
+            units,
+            delimiter: ' ',
+            spacer: ''
+        });
+
+        return shortEnglishHumanizer(time * 1000);
     };
 
     const feedString = getFeedString(movementSet, convertedFeedMin, convertedFeedMax, feedUnits);

@@ -78,28 +78,24 @@ const ProgressArea = ({ state }) => {
         return `${elapsedMinute < 10 ? `0${elapsedMinute}` : elapsedMinute}m ${formattedSeconds < 10 ? `0${formattedSeconds}` : formattedSeconds}s`;
     };
 
-    const getLocalTime = (givenTime) => {
+    const getFinishTime = (givenTime) => {
         if (startTime === 0 || !givenTime || givenTime < 0) {
             return '-';
         }
 
-        const elapsedMilliSeconds = (moment(moment(givenTime)).diff(moment.unix(0), 'ms'));
+        const now = moment();
 
-        let dateNow = new Date();
-        const dateNowTime = dateNow.getTime();
-        dateNow.setTime(dateNowTime + elapsedMilliSeconds);
+        now.add(remainingTime, 'seconds');
 
-        const formattedTime = dateNow.toLocaleTimeString('en-US');
+        const formattedTime = now.format('h:mma');
         return formattedTime;
     };
 
     const updateTime = () => {
-        return getLocalTime(remainingTime).toString();
+        return getFinishTime(remainingTime);
     };
 
-    // eslint-disable-next-line no-restricted-globals
-    const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
-
+    const percentageValue = Number.isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
     return (
         <div style={{ width: '50%', marginRight: '1rem' }}>
@@ -112,12 +108,12 @@ const ProgressArea = ({ state }) => {
                     </div>
                     <GaugeChart color="#3e85c7" value={percentageValue} />
                     <div className={styles.progressItem}>
-                        <span>Remaining</span>
+                        <span>Time Remaining</span>
                         <Tooltip
                             content={updateTime}
                             hideOnClick
                         >
-                            <span className={styles.progressItemTime}>{convertSecondsToTimeStamp(remainingTime)}</span>
+                            <span className={styles.progressItemTime}>{convertSecondsToTimeStamp(remainingTime, startTime)}</span>
                         </Tooltip>
                         <span style={{ color: 'black' }}>{total - received} Lines</span>
                     </div>

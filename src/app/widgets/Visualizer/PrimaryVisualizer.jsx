@@ -5,7 +5,7 @@ import Icon from '@mdi/react';
 import { mdiEmoticonSadOutline } from '@mdi/js';
 
 import * as WebGL from 'app/lib/three/WebGL';
-import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_DOOR } from 'app/constants';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_DOOR, GRBLHAL } from 'app/constants';
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
@@ -25,12 +25,13 @@ import LoadingAnimation from './LoadingAnimation';
 
 
 const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering, showVisualizer, visualizerRef, workflowRef, widgetContentRef }) => {
-    const { liteMode, modal, cameraPosition, invalidLine, invalidGcode, alarmCode, activeState, workflow, isConnected } = state;
+    const { liteMode, modal, cameraPosition, invalidLine, invalidGcode, alarmCode, activeState, workflow, isConnected, controller } = state;
     const isHomingAlarm = activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing'; // We are alarmed and
     const holdWithoutWorkflowPause = activeState === GRBL_ACTIVE_STATE_HOLD && workflow.state === WORKFLOW_STATE_IDLE;
     const doorOpen = activeState === GRBL_ACTIVE_STATE_DOOR;
     const showUnlockButton = isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
     const { handleLiteModeToggle, handleRun, reset } = actions;
+
 
     const containerID = 'visualizer_container';
 
@@ -78,7 +79,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                 <div className={styles.visualizerWrapper}>
                     <SoftLimitsWarningArea />
                     {
-                        (isConnected && true || showUnlockButton) && <UnlockButton />
+                        (isConnected && (controller.type === GRBLHAL) || showUnlockButton) && <UnlockButton />
                     }
                     <MachineStatusArea
                         state={state}

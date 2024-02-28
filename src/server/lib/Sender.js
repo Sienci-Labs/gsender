@@ -85,8 +85,8 @@ class SPCharCounting {
         }
     }
 
-    process() {
-        this.callback && this.callback(this);
+    process(isOk) {
+        this.callback && this.callback(this, isOk);
     }
 
     reset() {
@@ -167,11 +167,20 @@ class Sender extends events.EventEmitter {
         estimatedTime: 0,
         estimateData: [],
         ovF: 100,
+        countdownQueue: [],
+        totalSentToQueue: 0,
+        queueDone: true,
+        timer: 0,
+        countdownIsPaused: false,
     };
 
     stateChanged = false;
 
     dataFilter = null;
+
+    countDownID = null;
+
+    checkIntervalID = null;
 
     // @param {number} [type] Streaming protocol type. 0 for send-response, 1 for character-counting.
     // @param {object} [options] The options object.
@@ -186,8 +195,8 @@ class Sender extends events.EventEmitter {
 
         // character-counting
         if (type === SP_TYPE_CHAR_COUNTING) {
-            this.sp = new SPCharCounting(options, (sp) => {
-                if (sp.queue.length > 0) {
+            this.sp = new SPCharCounting(options, (sp, isOk) => {
+                if (sp.queue.length > 0 && isOk) { // only remove line length from buffer if ok was sent
                     const lineLength = sp.queue.shift();
                     sp.dataLength -= lineLength;
                 }
@@ -334,6 +343,9 @@ class Sender extends events.EventEmitter {
         this.state.toolChanges = 0;
         this.state.estimatedTime = 0;
         this.state.estimateData = [];
+        this.state.countdownQueue = [];
+        this.state.totalSentToQueue = 0;
+        this.state.queueDone = true;
 
         this.emit('load', name, gcode, context);
         log.debug('sender requesting');
@@ -365,6 +377,9 @@ class Sender extends events.EventEmitter {
         this.state.toolChanges = 0;
         this.state.estimatedTime = 0;
         this.state.estimateData = [];
+        this.state.countdownQueue = [];
+        this.state.totalSentToQueue = 0;
+        this.state.queueDone = true;
 
         this.emit('unload');
         this.emit('change');
@@ -395,7 +410,7 @@ class Sender extends events.EventEmitter {
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
     next(options = {}) {
-        const { startFromLine, timePaused, forceEnd } = options;
+        const { startFromLine, timePaused, forceEnd, isOk } = options;
 
         if (!this.state.gcode) {
             return false;
@@ -409,13 +424,25 @@ class Sender extends events.EventEmitter {
             this.state.elapsedTime = 0;
             this.state.timePaused = 0;
             this.state.timeRunning = 0;
+            this.state.remainingTime = this.state.estimatedTime;
+            this.state.countdownQueue = [];
+            this.state.totalSentToQueue = 0;
+            this.state.queueDone = true;
+            this.state.countdownIsPaused = false;
+            // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
+            this.checkIntervalID = setInterval(() => {
+                if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
+                    this.state.queueDone = false;
+                    this.fakeCountdown();
+                }
+            }, 100);
             this.emit('start', this.state.startTime);
             this.emit('change');
         };
-
         if (startFromLine) {
             handleStart();
         } else if (this.state.total > 0 && this.state.sent === 0) {
+            this.state.received = 0;
             handleStart();
         }
 
@@ -424,7 +451,7 @@ class Sender extends events.EventEmitter {
         }
 
         if (this.sp) {
-            this.sp.process();
+            this.sp.process(isOk);
         }
 
         // Elapsed Time
@@ -435,11 +462,14 @@ class Sender extends events.EventEmitter {
             this.state.timeRunning -= this.state.timePaused;
         }
 
-        // Make a 1 second delay before estimating the remaining time
-        if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
+        if (this.state.received > 0) {
             if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
                 if (this.state.received < this.state.estimateData.length) {
-                    this.state.remainingTime -= (Number(this.state.estimateData[this.state.received] || 0) / (this.state.ovF / 100));
+                    // add the lines to the queue from where we left off to the current number received
+                    for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
+                        this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
+                        this.state.totalSentToQueue++;
+                    }
                 }
             }
         }
@@ -454,6 +484,42 @@ class Sender extends events.EventEmitter {
         }
 
         return true;
+    }
+
+    fakeCountdown() {
+        // skip lines that take no time
+        while (this.state.timer === 0) {
+            if (this.state.countdownQueue.length === 0) {
+                this.stopCountdown();
+                return;
+            }
+            this.state.timer = this.state.countdownQueue.shift();
+        }
+        // if less than 1 sec left, create timeout instead of interval
+        if (this.state.timer < 1) {
+            this.countDownID = setTimeout(() => {
+                if (!this.state.countdownIsPaused) {
+                    this.state.remainingTime -= this.state.timer;
+                    this.state.remainingTime = this.state.remainingTime.toFixed(4);
+                    this.state.timer = 0;
+                    this.emit('change');
+                    this.fakeCountdown();
+                }
+            }, this.state.timer * 1000);
+        } else { // if more than one second, make interval
+            this.countDownID = setInterval(() => {
+                if (!this.state.countdownIsPaused) {
+                    this.state.timer--;
+                    this.state.remainingTime--;
+
+                    if (this.state.timer < 1) {
+                        clearInterval(this.countDownID);
+                        this.fakeCountdown();
+                    }
+                    this.emit('change');
+                }
+            }, 1000);
+        }
     }
 
     // Rewinds the internal array pointer.
@@ -471,6 +537,9 @@ class Sender extends events.EventEmitter {
         this.state.sent = 0;
         this.state.received = 0;
         this.state.toolChanges = 0;
+        this.state.countdownQueue = [];
+        this.state.totalSentToQueue = 0;
+        clearInterval(this.checkIntervalID);
         this.emit('change');
 
         return true;
@@ -505,6 +574,20 @@ class Sender extends events.EventEmitter {
         }
         this.state.remainingTime /= ovF / 100; // set to new time
         this.state.ovF = ovF;
+    }
+
+    resumeCountdown() {
+        this.state.countdownIsPaused = false;
+    }
+
+    pauseCountdown() {
+        this.state.countdownIsPaused = true;
+    }
+
+    stopCountdown() {
+        clearInterval(this.countDownID);
+        this.state.queueDone = true;
+        this.state.remainingTime -= this.state.timer;
     }
 }
 

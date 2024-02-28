@@ -65,6 +65,7 @@ import {
     MODAL_RUN_MACRO
 } from './constants';
 import styles from './index.styl';
+import { deleteGamepadMacro } from '../../lib/gamepad';
 
 class MacroWidget extends PureComponent {
     static propTypes = {
@@ -165,6 +166,7 @@ class MacroWidget extends PureComponent {
 
                 store.replace('commandKeys', filteredCommandKeys);
                 combokeys.reload();
+                deleteGamepadMacro(id);
 
                 this.toast({ msg: 'Deleted Macro', type: TOASTER_SUCCESS });
             } catch (err) {
