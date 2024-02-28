@@ -184,6 +184,7 @@ class DFUFlasher extends events.EventEmitter {
             const sectorAddr = segment.start + sectorIndex * segment.sectorSize;
             // eslint-disable-next-line no-await-in-loop
             await this.sendDFUCommand(this.ERASE_PAGE, sectorAddr, 4);
+            await this.dfu.getStatus();
             addr = sectorAddr + segment.sectorSize;
             bytesErased += segment.sectorSize;
             this.logProgress(bytesErased, bytesToErase);
