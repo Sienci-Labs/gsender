@@ -14,7 +14,6 @@ export const visualizeResponse = async ({ data }) => {
         pubsub.publish('toolpath:progress', data);
     } else {
         const { needsVisualization, parsedData } = data;
-        console.log(parsedData);
         // Update estimate worker with values
         const estimatePayload = {
             ...data.info,
