@@ -1,7 +1,7 @@
 /* eslint no-await-in-loop: 0 */
 
 import DFU from './DFU';
-import MemoryMap from 'nrf-intel-hex';
+import hexParser from 'nrf-intel-hex';
 import logger from '../../logger';
 import events from 'events';
 
@@ -44,17 +44,30 @@ class DFUFlasher extends events.EventEmitter {
     async flash() {
         await this.dfu.open();
         this.map = this.parseHex(this.hex);
+
         let startAddress = null;
+        let byteSize = 0;
+
+        for (let [address, dataBlock] of this.map) {
+            if (!startAddress) {
+                startAddress = address;
+            }
+            byteSize += dataBlock.byteLength;
+        }
+
+        await this.dfu.abortToIdle();
+        log.info('Aborted to IDLE state');
+
+        // Erase chip
+        await this.erase(startAddress, byteSize);
 
 
         for (let [address, dataBlock] of this.map) {
             this.emit('info', `Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`);
-            if (!startAddress) {
-                startAddress = address;
-            }
             await this.download(address, this.XFER_SIZE, dataBlock);
         }
 
+        await this.dfu.abortToIdle();
         log.info(`Jumping back to start address ${startAddress} to manifest`);
         await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
         const status = await this.dfu.getStatus();
@@ -76,21 +89,18 @@ class DFUFlasher extends events.EventEmitter {
      */
     parseHex() {
         try {
-            return MemoryMap.fromHex(this.hex);
+            return hexParser.fromHex(this.hex);
         } catch (err) {
             throw err;
         }
     }
 
-    async download(startAddress, xferSize, data, manifestTolerant) {
+    async download(startAddress, xferSize, data) {
         log.info('Starting download to board');
 
         let bytesSent = 0;
         let expectedSize = data.byteLength;
         let chunks = 1;
-
-        await this.dfu.abortToIdle();
-        log.info('Aborted to IDLE state');
 
         let address = startAddress;
         while (bytesSent < expectedSize) {
@@ -101,10 +111,8 @@ class DFUFlasher extends events.EventEmitter {
             let dfuStatus;
             try {
                 await this.sendDFUCommand(this.SET_ADDRESS, address, 4);
-                const status = await this.dfu.getStatus();
-                log.info(status);
+                await this.dfu.getStatus();
                 bytesWritten = await this.dfu.download(data.slice(bytesSent, bytesSent + chunkSize), 2);
-                log.info(`Sent ${bytesWritten} bytes`);
                 this.emit('info', `Wrote chunk ${chunks} with size ${bytesWritten}b`);
                 dfuStatus = await this.dfu.pollUntilIdle(this.dfu.dfuDNLOAD_IDLE);
                 address += chunkSize;
@@ -148,23 +156,25 @@ class DFUFlasher extends events.EventEmitter {
     }
 
     async erase(startAddr, length) {
+        this.emit('info', `Erasing chip starting at address ${startAddr.toString(16)} - size ${length}`);
         let segment = this.dfu.getSegment(startAddr);
         if (!segment) {
             this.emit('error', 'Invalid segment in memory map');
             log.error(`Unable to find valid segment for address ${startAddr}`);
             return;
         }
-        let endAddr = this.getSectorStart(startAddr, segment);
-        let addr = this.getSectorEnd(startAddr + length - 1, segment);
+        let addr = this.getSectorStart(startAddr, segment);
+        let endAddr = this.getSectorEnd(startAddr + length - 1, segment);
+        log.info(`Starting erase at ${addr.toString(16)} and erasing until ${endAddr.toString(16)}`);
 
         let bytesErased = 0;
         const bytesToErase = endAddr - addr;
 
         while (addr < endAddr) {
             if (segment.end <= addr) {
-                segment = this.getSegment(addr);
+                segment = this.dfu.getSegment(addr);
             }
-            if (!segment.eraseable) {
+            if (!segment.erasable) {
                 bytesErased = Math.min(bytesErased - segment.end - addr, bytesToErase);
                 addr = segment.end;
                 this.logProgress(bytesErased, bytesToErase);
@@ -174,11 +184,14 @@ class DFUFlasher extends events.EventEmitter {
             const sectorAddr = segment.start + sectorIndex * segment.sectorSize;
             // eslint-disable-next-line no-await-in-loop
             await this.sendDFUCommand(this.ERASE_PAGE, sectorAddr, 4);
+            await this.dfu.getStatus();
             addr = sectorAddr + segment.sectorSize;
             bytesErased += segment.sectorSize;
             this.logProgress(bytesErased, bytesToErase);
             log.info(`Erased ${bytesErased} of ${bytesToErase} bytes`);
+            this.emit('info', `Erased ${bytesErased} of ${bytesToErase} bytes`);
         }
+        log.info('Erase finished');
     }
 
     async sendDFUCommand(command, param = 0x00, len = 1) {
