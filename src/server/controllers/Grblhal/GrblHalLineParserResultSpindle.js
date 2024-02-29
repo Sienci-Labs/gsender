@@ -6,11 +6,14 @@ class GrblHalLineParserResultSpindle {
             return null;
         }
 
+        console.log(r);
         const payload = {};
 
         payload.order = Number(r[1]); // Order reported from firmware
 
         const parts = r[3].split(',');
+
+        console.log(parts);
 
         payload.label = parts[0];
 

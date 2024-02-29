@@ -617,6 +617,7 @@ class GrblHalController {
 
         this.runner.on('spindle', (spindle) => {
             this.emit('spindle:add', spindle);
+            this.emit('serialport:read', spindle.raw);
         });
 
         this.runner.on('status', (res) => {
