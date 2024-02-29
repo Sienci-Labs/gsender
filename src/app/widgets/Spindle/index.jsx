@@ -29,6 +29,7 @@ import * as controllerActions from 'app/actions/controllerActions';
 import SpindleSelector from 'app/widgets/Spindle/components/SpindleSelector';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
+import findIndex from 'lodash/findIndex';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
@@ -56,7 +57,6 @@ import ActiveIndicator from './components/ActiveIndicator';
 import useKeybinding from '../../lib/useKeybinding';
 import { convertToImperial } from '../../containers/Preferences/calculate';
 import { roundMetric, round } from '../../lib/rounding';
-
 
 class SpindleWidget extends PureComponent {
     static propTypes = {
@@ -214,7 +214,8 @@ class SpindleWidget extends PureComponent {
         handleHALSpindleSelect: (spindle) => {
             console.log(spindle);
             controller.command('gcode', [
-                `M104 Q${spindle.value}`
+                `M104 Q${spindle.value}`,
+                '$spindles'
             ]);
             this.setState({
                 spindle
@@ -540,7 +541,7 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles, spindle } = this.props;
         const { minimized, isFullscreen } = this.state;
         const controllerType = store.get('widgets.connection.controller.type', '-');
 
@@ -550,6 +551,7 @@ class SpindleWidget extends PureComponent {
             spindleMin,
             spindleMax,
             canClick: this.canClick(),
+            spindle
         };
         const actions = {
             ...this.actions
@@ -611,6 +613,19 @@ export default connect((store) => {
     const availableSpindles = get(store, 'controller.spindles', []);
     const $13 = get(store, 'controller.settings.settings.$13', '0');
 
+
+    let enabledSpindle;
+
+    const enabledSpindleIndex = findIndex(availableSpindles, o => o.enabled);
+    if (enabledSpindleIndex >= 0) {
+        enabledSpindle = availableSpindles[enabledSpindleIndex];
+    } else {
+        enabledSpindle = {
+            label: 'Default Spindle',
+            value: 0
+        };
+    }
+
     return {
         workflow,
         isConnected,
@@ -625,6 +640,7 @@ export default connect((store) => {
         wpos,
         units,
         availableSpindles,
-        $13
+        $13,
+        spindle: enabledSpindle
     };
 })(SpindleWidget);

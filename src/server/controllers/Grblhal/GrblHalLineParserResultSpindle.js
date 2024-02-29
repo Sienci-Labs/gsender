@@ -18,9 +18,7 @@ class GrblHalLineParserResultSpindle {
         if (parts.length > 1) {
             payload.id = Number(parts[1].slice(-1)); // Last value is ID to use, convert to number
             payload.capabilities = parts[2].trim(); // Capabilities string
-            if (parts[4]) {
-                payload.enabled = true;
-            }
+            payload.enabled = !!parts[3]; // "Current" text parsed - true if exists, false otherwise
         }
 
         return {
