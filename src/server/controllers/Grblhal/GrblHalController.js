@@ -1113,6 +1113,9 @@ class GrblHalController {
 
         const parameters = this.runner.getParameters();
 
+        // Program feedrate
+        const programFeedrate = this.runner.getCurrentFeedrate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -1160,6 +1163,9 @@ class GrblHalController {
 
             // G-code parameters
             params: parameters,
+
+            // Program Feedrate
+            programFeedrate: programFeedrate,
 
             // Global objects
             ...globalObjects,

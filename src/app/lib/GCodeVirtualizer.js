@@ -1211,7 +1211,7 @@ class GCodeVirtualizer extends EventEmitter {
         if (z > this.maxBounds[2]) {
             this.maxBounds[2] = z;
         }
-        if (z < this.minBounds[0]) {
+        if (z < this.minBounds[2]) {
             this.minBounds[2] = z;
         }
     }

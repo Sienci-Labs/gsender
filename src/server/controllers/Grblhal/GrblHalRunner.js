@@ -415,6 +415,11 @@ class GrblHalRunner extends events.EventEmitter {
         return _.get(this.settings, 'parameters', {});
     }
 
+    getCurrentFeedrate(state = this.state) {
+        const value = _.get(state, 'parserstate.feedrate');
+        return `F${value}`;
+    }
+
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_HAL_ACTIVE_STATE_ALARM;

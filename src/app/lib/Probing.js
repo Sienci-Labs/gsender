@@ -194,7 +194,7 @@ export const get3AxisStandardRoutine = (options) => {
     // Move back to original position
     code.push(
         'G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]',
-        'G90'
+        'G90 G0 X0Y0',
     );
     return code;
 };
