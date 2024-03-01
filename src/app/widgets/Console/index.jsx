@@ -75,6 +75,13 @@ class ConsoleWidget extends PureComponent {
 
     throttledRefitTerminal = throttle(() => this.terminal.refitTerminal(), 3000);
 
+    writeToTerminal = (data) => {
+        this.terminal.writeln(data);
+        this.terminal.updateTerminalHistory(data);
+    }
+
+    writeErrorToTerminal = throttle(this.writeToTerminal, 250, { trailing: false });
+
     actions = {
         toggleFullscreen: () => {
             this.setState(state => ({
@@ -156,8 +163,14 @@ class ConsoleWidget extends PureComponent {
                 return;
             }
 
-            this.terminal.writeln(data);
-            this.terminal.updateTerminalHistory(data);
+            const isAnErrorMessage = data.includes('error:');
+
+            if (isAnErrorMessage) {
+                this.writeErrorToTerminal(data);
+                return;
+            }
+
+            this.writeToTerminal(data);
         }
     };
 

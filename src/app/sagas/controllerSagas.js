@@ -23,6 +23,7 @@
  */
 import React from 'react';
 import _get from 'lodash/get';
+import throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import isElectron from 'is-electron';
 
@@ -662,9 +663,9 @@ export function* initialize() {
         pubsub.publish('store:update', content);
     });
 
-    controller.addListener('gcode_error', (error) => {
+    controller.addListener('gcode_error', throttle((error) => {
         errors.push(error);
-    });
+    }, 250, { trailing: false }));
 
     controller.addListener('settings:description', (data) => {
         reduxStore.dispatch({
