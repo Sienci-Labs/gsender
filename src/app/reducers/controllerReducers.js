@@ -269,9 +269,9 @@ const reducer = createReducer(initialState, {
         };
     },
     [ADD_SPINDLE]: (payload, reducerState) => {
-        const currentSpindles = reducerState.spindles;
+        const currentSpindles = [...reducerState.spindles];
 
-        let otherSpindles = currentSpindles.filter((spindle) => spindle.id !== payload.id);
+        let otherSpindles = currentSpindles.filter((spindle) => spindle.label !== payload.label);
 
         return {
             spindles: [
