@@ -550,8 +550,8 @@ class SpindleWidget extends PureComponent {
             spindleModal,
             spindleMin,
             spindleMax,
+            spindle,
             canClick: this.canClick(),
-            spindle
         };
         const actions = {
             ...this.actions
