@@ -761,7 +761,7 @@ class GrblHalController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received + 1} - ${error.message}`;
+                        const msg = `Error ${code} on line ${received + 1} - ${error?.message}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -780,6 +780,8 @@ class GrblHalController {
                 this.emit('serialport:read', `error:${code} (${error.message})`);
             }
 
+            const msg = `Error ${code} - ${error?.message}`;
+            this.emit('gcode_error', msg);
 
             this.feeder.ack();
             this.feeder.next();

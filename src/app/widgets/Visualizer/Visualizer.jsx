@@ -28,7 +28,6 @@ import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
-//import _tail from 'lodash/tail';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
 import pubsub from 'pubsub-js';
@@ -461,15 +460,13 @@ class Visualizer extends Component {
 
 
     controllerEvents = {
-        'gcode_error': (msg) => {
+        'gcode_error': _throttle((msg) => {
             Toaster.pop({
                 msg,
                 type: TOASTER_DANGER,
                 duration: TOASTER_UNTIL_CLOSE
             });
-            //this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
-            //this.showToast();
-        },
+        }, 250, { trailing: false }),
     };
 
     addControllerEvents() {
