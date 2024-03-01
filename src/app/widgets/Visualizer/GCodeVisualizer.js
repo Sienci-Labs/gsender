@@ -44,13 +44,13 @@ class GCodeVisualizer {
         return this;
     }
 
-    render({ vertices, frames, spindleSpeeds, isLaser = false, spindleChanges }, colorArray) {
+    render({ vertices, frames, spindleSpeeds, isLaser = false, spindleChanges }, colorArray, savedColors) {
         this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
         this.spindleChanges = spindleChanges;
-        this.colors = colorArray;
+        this.colors = savedColors;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
         this.countdown = 16;
         this.frameDifferences = Array(16).fill(null);

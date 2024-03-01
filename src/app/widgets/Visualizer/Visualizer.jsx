@@ -826,8 +826,9 @@ class Visualizer extends Component {
             pubsub.subscribe('visualizer:updateposition', (_, data) => {
                 this.updateCuttingToolPosition(data, { forceUpdateAllAxes: true });
             }),
-            pubsub.subscribe('colors:load', (_, colorArray) => {
-                this.handleSceneRender(this.vizualization, colorArray, this.renderCallback);
+            pubsub.subscribe('colors:load', (_, data) => {
+                const { colorArray, savedColors } = data;
+                this.handleSceneRender(this.vizualization, colorArray, savedColors, this.renderCallback);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1671,7 +1672,7 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    handleSceneRender(vizualization, colorArray, callback) {
+    handleSceneRender(vizualization, colorArray, savedColors, callback) {
         const { controllerType, fileType, workPosition } = this.props;
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
 
@@ -1681,7 +1682,7 @@ class Visualizer extends Component {
             return;
         }
 
-        const obj = this.visualizer.render(vizualization, colorArray);
+        const obj = this.visualizer.render(vizualization, colorArray, savedColors);
         obj.name = '';
         this.group.add(obj);
 
