@@ -10,7 +10,7 @@ import { updateWorkspaceMode } from 'app/lib/rotary';
 
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
-const RotaryToggle = () => {
+const RotaryToggle = ({ disabled }) => {
     const [workspaceMode, setWorkspaceMode] = useState(store.get('workspace.mode', DEFAULT));
     const { type: controllerType } = useSelector(state => state.controller);
 
@@ -46,6 +46,7 @@ const RotaryToggle = () => {
             onChange={handleToggle}
             size="small"
             style={{ marginBottom: '1rem' }}
+            disabled={disabled}
         />
     );
 };

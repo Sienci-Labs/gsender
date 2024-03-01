@@ -137,8 +137,10 @@ const Rotary = () => {
         }
     };
 
-    const isFileRunning = () => {
-        return controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run';
+    const isDisabled = () => {
+        const states = ['Run', 'Hold', 'Alarm'];
+
+        return states.includes(controllerState.status?.activeState);
     };
 
     const { ROTARY } = WORKSPACE_MODE;
@@ -153,7 +155,7 @@ const Rotary = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <RotaryToggle />
+                <RotaryToggle disabled={isDisabled()} />
             </div>
 
             <div className={styles['rotary-axis-wrapper']}>
@@ -161,12 +163,12 @@ const Rotary = () => {
                     <p className={styles['rotary-tab-section-title']}>
                         Jog Control
                     </p>
-                    <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
+                    <DROarea actions={actions} canClick={enableRotaryAxis && !isDisabled()} />
 
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!enableRotaryAxis || isFileRunning()}
+                            disabled={!enableRotaryAxis || isDisabled()}
                         />
                         <SpeedControls jog={jog} actions={actions} />
                     </div>
@@ -175,7 +177,7 @@ const Rotary = () => {
                 <div className={styles['rotary-tools-area']}>
                     <p className={styles['rotary-tab-section-title']}>Tools</p>
 
-                    <ActionArea actions={actions} />
+                    <ActionArea actions={actions} isDisabled={isDisabled()} />
 
                     {ActiveModal && <ActiveModal actions={actions} />}
                 </div>
