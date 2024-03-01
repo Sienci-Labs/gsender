@@ -1504,7 +1504,7 @@ class AxesWidget extends PureComponent {
         }
 
         return (
-            <Widget style={{ minHeight: '250px' }}>
+            <Widget /*style={{ minHeight: '250px' }}*/>
                 <Widget.Header>
                     <Widget.Title>
                         {isForkedWidget &&
