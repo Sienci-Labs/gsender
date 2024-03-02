@@ -81,7 +81,8 @@ onmessage = function({ data }) {
     const colorArray = getColorTypedArray(colors, motionColor);
 
     const message = {
-        colorArray: colorArray
+        colorArray: colorArray,
+        savedColors: savedColors
     };
 
     postMessage(message);
