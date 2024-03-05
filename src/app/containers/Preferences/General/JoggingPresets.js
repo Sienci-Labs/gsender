@@ -36,7 +36,7 @@ import defaultState from 'app/store/defaultState';
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import styles from '../index.styl';
-import { convertToImperial, convertToMetric } from '../calculate';
+import { convertAllPresetsUnits, convertToImperial, convertToMetric } from '../calculate';
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
 
 export default class JoggingPresets extends Component {
@@ -286,7 +286,11 @@ export default class JoggingPresets extends Component {
 
         store.replace('widgets.axes.jog', defaultJogPresets);
         this.setState({ jogSpeeds: this.getJogSpeeds() });
-        pubsub.publish('jogSpeeds', defaultJogPresets);
+
+        // convert before publishing
+        const { units } = this.state;
+        let convertedDefaults = units === IMPERIAL_UNITS ? convertAllPresetsUnits(units, defaultJogPresets) : defaultJogPresets;
+        pubsub.publish('jogSpeeds', convertedDefaults);
 
         this.showToast();
     }
