@@ -138,6 +138,8 @@ class Visualizer extends Component {
 
     vizualization = null;
 
+    colorsWorker = null;
+
     renderCallback = null;
 
     machineProfile = store.get('workspace.machineProfile');
@@ -829,6 +831,7 @@ class Visualizer extends Component {
             pubsub.subscribe('colors:load', (_, data) => {
                 const { colorArray, savedColors } = data;
                 this.handleSceneRender(this.vizualization, colorArray, savedColors, this.renderCallback);
+                this.colorsWorker.terminate();
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1764,15 +1767,16 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
+            console.log(vizualization);
             this.vizualization = vizualization;
             this.renderCallback = callback;
-            let colorsWorker = new ColorsWorker();
-            colorsWorker.onmessage = colorsResponse;
-            colorsWorker.postMessage({
+            this.colorsWorker = new ColorsWorker();
+            this.colorsWorker.onmessage = colorsResponse;
+            this.colorsWorker.postMessage({
                 colors: vizualization.colors,
                 frames: vizualization.frames,
                 spindleSpeeds: vizualization.spindleSpeeds,
-                isLazer: vizualization.isLazer,
+                isLaser: vizualization.isLaser,
                 spindleChanges: vizualization.spindleChanges,
                 theme: currentTheme
             });
