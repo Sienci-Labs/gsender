@@ -205,8 +205,6 @@ class GCodeVirtualizer extends EventEmitter {
     ];
     feedrateCounter = 0;
 
-    hasSetV1 = false;
-
     handlers = {
         // G0: Rapid Linear Move
         'G0': (params) => {
@@ -244,19 +242,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            if (!this.hasSetV1) {
-                this.data[this.totalLines].lineData = {
-                    v1: this.offsetG92(v1),
-                    v2: this.offsetG92(v2),
-                    shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-                };
-                this.hasSetV1 = true;
-            } else {
-                this.data[this.totalLines].lineData = {
-                    v2: this.offsetG92(v2),
-                    shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-                };
-            }
+            this.data[this.totalLines].lineData = {
+                v1: this.offsetG92(v1),
+                v2: this.offsetG92(v2),
+                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
+            };
         },
         // G1: Linear Move
         // Usage
@@ -307,19 +297,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            if (!this.hasSetV1) {
-                this.data[this.totalLines].lineData = {
-                    v1: this.offsetG92(v1),
-                    v2: this.offsetG92(v2),
-                    shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-                };
-                this.hasSetV1 = true;
-            } else {
-                this.data[this.totalLines].lineData = {
-                    v2: this.offsetG92(v2),
-                    shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-                };
-            }
+            this.data[this.totalLines].lineData = {
+                v1: this.offsetG92(v1),
+                v2: this.offsetG92(v2),
+                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
+            };
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -410,19 +392,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            if (!this.hasSetV1) {
-                this.data[this.totalLines].lineData = {
-                    v1: this.offsetG92(v1),
-                    v2: this.offsetG92(v2),
-                    v0: this.offsetG92(v0)
-                };
-                this.hasSetV1 = true;
-            } else {
-                this.data[this.totalLines].lineData = {
-                    v2: this.offsetG92(v2),
-                    v0: this.offsetG92(v0)
-                };
-            }
+            this.data[this.totalLines].lineData = {
+                v1: this.offsetG92(v1),
+                v2: this.offsetG92(v2),
+                v0: this.offsetG92(v0)
+            };
         },
         'G3': (params) => {
             if (this.modal.motion !== 'G3') {
@@ -494,19 +468,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            if (!this.hasSetV1) {
-                this.data[this.totalLines].lineData = {
-                    v1: this.offsetG92(v1),
-                    v2: this.offsetG92(v2),
-                    v0: this.offsetG92(v0)
-                };
-                this.hasSetV1 = true;
-            } else {
-                this.data[this.totalLines].lineData = {
-                    v2: this.offsetG92(v2),
-                    v0: this.offsetG92(v0)
-                };
-            }
+            this.data[this.totalLines].lineData = {
+                v1: this.offsetG92(v1),
+                v2: this.offsetG92(v2),
+                v0: this.offsetG92(v0)
+            };
         },
         // G4: Dwell
         // Parameters
