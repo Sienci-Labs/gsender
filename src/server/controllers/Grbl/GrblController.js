@@ -703,7 +703,7 @@ class GrblController {
                     this.sender.unhold();
                 }
                 this.sender.ack();
-                this.sender.next();
+                this.sender.next({ isOk: true });
                 return;
             }
 
@@ -716,7 +716,7 @@ class GrblController {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
                 this.sender.ack();
-                this.sender.next();
+                this.sender.next({ isOk: true });
                 return;
             }
 

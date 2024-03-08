@@ -819,6 +819,10 @@ class GrblHalController {
 
             if (alarm) {
                 // Grbl v1.1
+                const isRunning = this.workflow.isRunning();
+                if (isRunning) {
+                    this.workflow.stop();
+                }
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
                     type: ALARM,
@@ -828,7 +832,7 @@ class GrblHalController {
                     lineNumber: isFileError ? received + 1 : '',
                     origin: errorOrigin,
                     controller: GRBLHAL,
-                });
+                }, isRunning);
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
