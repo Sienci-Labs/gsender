@@ -177,7 +177,15 @@ class SpindleWidget extends PureComponent {
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
-            const { power, maxPower } = laser;
+            const { spindle, laserMax} = this.props;
+
+
+            let  { power, maxPower } = laser;
+
+            if (spindle.value === 'SLB_LASER') {
+                maxPower = laserMax;
+            }
+
             const value = Number(e.target.value);
             if (this.isLaserOn) {
                 this.debounceLaserPower(power, maxPower);
@@ -206,11 +214,8 @@ class SpindleWidget extends PureComponent {
             let { power, duration, maxPower } = laser;
 
             if (spindle.label === 'SLB_LASER') {
-                console.log('in branch');
                 maxPower = laserMax;
             }
-
-            console.log(maxPower);
 
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
