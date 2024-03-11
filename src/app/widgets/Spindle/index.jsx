@@ -177,7 +177,15 @@ class SpindleWidget extends PureComponent {
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
-            const { power, maxPower } = laser;
+            const { spindle, laserMax} = this.props;
+
+
+            let  { power, maxPower } = laser;
+
+            if (spindle.value === 'SLB_LASER') {
+                maxPower = laserMax;
+            }
+
             const value = Number(e.target.value);
             if (this.isLaserOn) {
                 this.debounceLaserPower(power, maxPower);
@@ -202,7 +210,12 @@ class SpindleWidget extends PureComponent {
         },
         runLaserTest: () => {
             const { laser } = this.state;
-            const { power, duration, maxPower } = laser;
+            const { laserMax, spindle } = this.props;
+            let { power, duration, maxPower } = laser;
+
+            if (spindle.label === 'SLB_LASER') {
+                maxPower = laserMax;
+            }
 
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
@@ -212,7 +225,6 @@ class SpindleWidget extends PureComponent {
             }, laser.duration);
         },
         handleHALSpindleSelect: (spindle) => {
-            console.log(spindle);
             controller.command('gcode', [
                 `M104 Q${spindle.value}`,
                 '$spindles'
@@ -409,8 +421,6 @@ class SpindleWidget extends PureComponent {
         const { wpos, $13 } = this.props;
         let { x, y } = wpos;
 
-        console.log(units);
-
         if ($13 === '1' || units === 'G20') {
             units = 'G20';
             x /= 25.4;
@@ -421,11 +431,20 @@ class SpindleWidget extends PureComponent {
 
     getLaserOffsetCode(preferredUnits) {
         const laser = this.config.get('laser');
+        const { controllerType, laserXOffset, laserYOffset } = this.props;
 
         this.setState({
             laser
         });
         let { xOffset, yOffset } = laser;
+
+        // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
+        if (controllerType === GRBLHAL) {
+            xOffset = laserXOffset;
+            yOffset = laserYOffset;
+        }
+
+
         if (preferredUnits === 'G20') {
             xOffset = convertToImperial(xOffset);
             yOffset = convertToImperial(yOffset);
@@ -434,7 +453,6 @@ class SpindleWidget extends PureComponent {
             yOffset = roundMetric(yOffset);
         }
         const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset, preferredUnits);
-        console.log(`x: ${xoffsetAdjusted}, y: ${yOffsetAdjusted}`);
 
         let offsetQuery = [];
         if (xOffset === 0 && yOffset !== 0) {
@@ -454,12 +472,22 @@ class SpindleWidget extends PureComponent {
     }
 
     getSpindleOffsetCode(preferredUnits) {
+        const { controllerType, laserXOffset, laserYOffset } = this.props;
+
         const laser = this.config.get('laser');
         this.setState({
             laser
         });
         let offsetQuery = [];
+
         let { xOffset, yOffset } = laser;
+
+        // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
+        if (controllerType === GRBLHAL) {
+            xOffset = laserXOffset;
+            yOffset = laserYOffset;
+        }
+
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
         if (preferredUnits === 'G20') {
@@ -541,7 +569,7 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles, spindle } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles, spindle, laserMax, laserMin } = this.props;
         const { minimized, isFullscreen } = this.state;
         const controllerType = store.get('widgets.connection.controller.type', '-');
 
@@ -550,6 +578,9 @@ class SpindleWidget extends PureComponent {
             spindleModal,
             spindleMin,
             spindleMax,
+            laserMax,
+            laserMin,
+            controllerType,
             spindle,
             canClick: this.canClick(),
         };
@@ -598,6 +629,7 @@ class SpindleWidget extends PureComponent {
 }
 
 export default connect((store) => {
+    const controllerType = get(store, 'controller.type', 'grbl');
     const workflow = get(store, 'controller.workflow');
     const state = get(store, 'controller.state');
     const isConnected = get(store, 'connection.isConnected');
@@ -612,8 +644,12 @@ export default connect((store) => {
     const units = get(store, 'controller.modal.units', {});
     const availableSpindles = get(store, 'controller.spindles', []);
     const $13 = get(store, 'controller.settings.settings.$13', '0');
-
-
+    // SLB - 730 max, 731 min laser
+    // SLB - 741 laser X offset, 742 laser Y offset
+    const laserMax = Number(get(store, 'controller.settings.settings.$730', 255));
+    const laserMin = Number(get(store, 'controller.settings.settings.$731', 0));
+    const laserXOffset = Number(get(store, 'controller.settings.settings.$741', 0));
+    const laserYOffset = Number(get(store, 'controller.settings.settings.$742', 0));
     let enabledSpindle;
 
     const enabledSpindleIndex = findIndex(availableSpindles, o => o.enabled);
@@ -641,6 +677,12 @@ export default connect((store) => {
         units,
         availableSpindles,
         $13,
-        spindle: enabledSpindle
+        spindle: enabledSpindle,
+        // SLB specific laser values
+        laserMax,
+        laserMin,
+        laserXOffset,
+        laserYOffset,
+        controllerType
     };
 })(SpindleWidget);
