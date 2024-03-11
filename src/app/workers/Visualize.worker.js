@@ -406,21 +406,10 @@ onmessage = function({ data }) {
 
             const entry = data[i];
             if (entry.lineData) {
-                const { v2, v0, shouldUseAddCurve } = entry.lineData;
-                // use previous v2 as v1 unless there is no previous entry
-                let v1 = entry.lineData.v1;
-                if (!v1) {
-                    // sometimes the last line doesn't have movements, so we must search for the last line with a movement
-                    for (let x = i - 1; x >= 0; x--) {
-                        if (data[x].lineData && data[x].lineData.v2) {
-                            v1 = data[x].lineData.v2;
-                            break;
-                        }
-                    }
-                }
+                const { v1, v2, v0, shouldUseAddCurve, dwellTime } = entry.lineData;
 
                 if (modal.motion === 'G4') {
-                    vm.addToTotalTime(entry.lineData.dwellTime);
+                    vm.addToTotalTime(dwellTime);
                 } else {
                     const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
                     if (modal.motion === 'G1' || modal.motion === 'G0') {
