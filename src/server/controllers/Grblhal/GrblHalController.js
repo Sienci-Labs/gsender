@@ -80,7 +80,7 @@ import {
     ERROR
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
-import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
+import { determineHALMachineZeroFlag, determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
 import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
@@ -623,7 +623,8 @@ class GrblHalController {
         this.runner.on('status', (res) => {
             //
             if (this.homingStarted) {
-                this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
+                // We look at bit instead of faking it with machine positions
+                this.homingFlagSet = determineHALMachineZeroFlag(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
                 this.homingStarted = false;
             }

@@ -98,3 +98,19 @@ export const determineMachineZeroFlagSet = (res, settings) => {
 
     return false;
 };
+
+// Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
+export function isBitSetInNumber(number, bitPosition) {
+    number = Number(number);
+    // eslint-disable-next-line no-bitwise
+    return (number & (1 << bitPosition)) !== 0;
+}
+
+export const determineHALMachineZeroFlag = (res, settings)=> {
+    const homingMask = get(settings, 'settings.$22', -1);
+    if (homingMask === -1) {
+        return false;
+    }
+
+    return isBitSetInNumber(homingMask, 4);
+};
