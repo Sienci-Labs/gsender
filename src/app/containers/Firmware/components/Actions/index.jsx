@@ -26,7 +26,7 @@ const ActionArea = () => {
     const inputRef = useRef();
     const controllerType = get(reduxStore.getState(), 'controller.type');
     const tooltipContent = controllerType === GRBLHAL ?
-        'Flashing is disabled for grblHAL. We are unable to detect what chip is being used and therefore cannot flash it.'
+        'Flash your board to grblHAL default values'
         : 'Flash your Arduino board to GRBL default values';
 
     const openSettingsFile = (e) => {
@@ -41,7 +41,16 @@ const ActionArea = () => {
                     type: TOASTER_INFO
                 });
 
-                setSettings(prev => prev.map(item => ({ ...item, value: uploadedSettings[item.setting] ?? item.value })));
+                let newSetting = false;
+                setSettings(prev => prev.map((item) => {
+                    let value = item.value;
+                    if (uploadedSettings[item.setting]) {
+                        newSetting = true;
+                        value = uploadedSettings[item.setting];
+                    }
+                    return { ...item, value: value };
+                }));
+                setSettingsToApply(newSetting);
             } catch (error) {
                 Toaster.pop({
                     msg: 'Unable to Load Settings From File',

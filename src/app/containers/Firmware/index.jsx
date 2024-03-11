@@ -17,6 +17,7 @@ import ActionArea from './components/Actions';
 import { addControllerEvents, controllerSettingsLoaded, FirmwareContext, removeControllerEvents } from './utils';
 import styles from './index.styl';
 import { collectUserUsageData } from '../../lib/heatmap';
+import { isEmpty } from 'lodash';
 
 const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroups = {}) => {
     return Object.keys(eeprom).map((setting, index) => {
@@ -87,7 +88,7 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
         'task:error': (error) => {
             setIsFlashing(false);
             Toaster.pop({
-                msg: JSON.stringify(error !== {} ? error : 'Process failed.').replaceAll('"', ''),
+                msg: JSON.stringify(isEmpty(error) ? error : 'Process failed.').replaceAll('"', ''),
                 type: TOASTER_UNTIL_CLOSE,
                 duration: 10000
             });
