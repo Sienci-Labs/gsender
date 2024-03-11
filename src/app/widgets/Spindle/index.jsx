@@ -202,7 +202,15 @@ class SpindleWidget extends PureComponent {
         },
         runLaserTest: () => {
             const { laser } = this.state;
-            const { power, duration, maxPower } = laser;
+            const { laserMax, spindle } = this.props;
+            let { power, duration, maxPower } = laser;
+
+            if (spindle.label === 'SLB_LASER') {
+                console.log('in branch');
+                maxPower = laserMax;
+            }
+
+            console.log(maxPower);
 
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
@@ -212,7 +220,6 @@ class SpindleWidget extends PureComponent {
             }, laser.duration);
         },
         handleHALSpindleSelect: (spindle) => {
-            console.log(spindle);
             controller.command('gcode', [
                 `M104 Q${spindle.value}`,
                 '$spindles'
@@ -557,7 +564,7 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles, spindle, laserMax, laserMin, controllerType } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax, availableSpindles, spindle, laserMax, laserMin } = this.props;
         const { minimized, isFullscreen } = this.state;
         const controllerType = store.get('widgets.connection.controller.type', '-');
 
@@ -632,8 +639,8 @@ export default connect((store) => {
     const units = get(store, 'controller.modal.units', {});
     const availableSpindles = get(store, 'controller.spindles', []);
     const $13 = get(store, 'controller.settings.settings.$13', '0');
-    // 730 max, 731 min laser
-    // 741 laser X offset, 742 laser Y offset
+    // SLB - 730 max, 731 min laser
+    // SLB - 741 laser X offset, 742 laser Y offset
     const laserMax = Number(get(store, 'controller.settings.settings.$730', 255));
     const laserMin = Number(get(store, 'controller.settings.settings.$731', 0));
     const laserXOffset = Number(get(store, 'controller.settings.settings.$741', 0));
