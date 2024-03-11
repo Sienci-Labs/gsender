@@ -177,10 +177,9 @@ class SpindleWidget extends PureComponent {
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
-            const { spindle, laserMax} = this.props;
+            const { spindle, laserMax } = this.props;
 
-
-            let  { power, maxPower } = laser;
+            let { power, maxPower } = laser;
 
             if (spindle.value === 'SLB_LASER') {
                 maxPower = laserMax;
