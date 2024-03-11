@@ -743,7 +743,11 @@ class AxesWidget extends PureComponent {
                     preventDefault(event);
                 }
 
-                this.handleShortcutStop(payload);
+                if (this.state.isContinuousJogging) {
+                    this.handleShortcutStop(payload);
+                } else {
+                    controller.command('jog:stop');
+                }
             },
         },
         SET_R_JOG_PRESET: {

@@ -2,9 +2,11 @@ import { GamepadListener } from 'gamepad.js';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import { debounce } from 'lodash';
+import { debounce, noop } from 'lodash';
 
 const macroCallbackDebounce = debounce((action) => shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }), 500);
+let buttonPressDebounce = noop;
+let currentShuttleEvent = {};
 
 class Gamepad extends GamepadListener {
     constructor() {
@@ -183,7 +185,12 @@ export const runAction = ({ event }) => {
         const shuttleEvent = shuttleControlEvents[action];
 
         if (shuttleEvent?.callback) {
-            shuttleEvent.callback(null, shuttleEvent.payload);
+            // gamepads emit many signals on button press, so this stops the shortcut from running a bunch of times
+            if (currentShuttleEvent.cmd !== shuttleEvent.cmd) {
+                currentShuttleEvent = shuttleEvent;
+                buttonPressDebounce = debounce(() => shuttleEvent.callback(null, shuttleEvent.payload));
+            }
+            buttonPressDebounce();
         }
     } else {
         macroCallbackDebounce(action);
