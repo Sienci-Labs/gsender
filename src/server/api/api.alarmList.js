@@ -7,7 +7,15 @@ const CONFIG_KEY = 'alarmList';
 
 const getAlarmList = () => {
     const alarmList = config.get(CONFIG_KEY, { list: [] });
-    return alarmList;
+
+    const list = alarmList.list.sort((a, b) => {
+        const dateA = new Date(a.time);
+        const dateB = new Date(b.time);
+
+        return dateB - dateA; // Compare in descending order
+    });
+
+    return { list };
 };
 
 export const fetch = (req, res) => {
