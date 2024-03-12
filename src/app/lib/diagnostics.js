@@ -718,13 +718,6 @@ function generateSupportFile() {
                         { gcode || 'No File Loaded' }
                     </Text>
                 </View>
-                <Text
-                    style={styles.pageNumber}
-                    render={({ pageNumber, totalPages }) => (
-                        `${pageNumber} / ${totalPages}`
-                    )}
-                    fixed
-                />
             </Page>
         </Document>
     );
