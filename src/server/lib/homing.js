@@ -106,7 +106,7 @@ export function isBitSetInNumber(number, bitPosition) {
     return (number & (1 << bitPosition)) !== 0;
 }
 
-export const determineHALMachineZeroFlag = (res, settings)=> {
+export const determineHALMachineZeroFlag = (res, settings) => {
     const homingMask = get(settings, 'settings.$22', -1);
     if (homingMask === -1) {
         return false;
