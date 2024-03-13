@@ -1926,9 +1926,9 @@ class GrblHalController {
                         }
 
                         if (direction === 1) {
-                            return Number(maxTravel - position - OFFSET).toFixed(FIXED);
+                            return Number(position - OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (position - OFFSET)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         }
                     };
 

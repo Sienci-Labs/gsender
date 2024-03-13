@@ -112,5 +112,5 @@ export const determineHALMachineZeroFlag = (res, settings) => {
         return false;
     }
 
-    return isBitSetInNumber(homingMask, 4);
+    return isBitSetInNumber(homingMask, 3);
 };
