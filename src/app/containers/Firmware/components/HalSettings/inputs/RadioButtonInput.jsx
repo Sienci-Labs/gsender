@@ -9,7 +9,7 @@ const RadioButtonInput = ({ info, setting, onChange }) => {
         let { value } = setting;
         value = Number(value);
         setLocalValue(value);
-    }, []);
+    }, [setting]);
 
     const rbOnClick = (e) => {
         const value = e.target.value;

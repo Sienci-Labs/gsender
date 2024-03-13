@@ -170,7 +170,7 @@
     "@mdi/react": "^1.6.1",
     "@mui/material": "^5.9.2",
     "@octokit/core": "^3.6.0",
-    "@react-pdf/renderer": "3.0.0",
+    "@react-pdf/renderer": "3.1.14",
     "@sentry/electron": "^4.14.0",
     "@sentry/react": "^7.72.0",
     "@serialport/parser-readline": "^11.0.0",
@@ -413,9 +413,18 @@
     "write-file-webpack-plugin": "~4.5.0"
   },
   "overrides": {
-    "@react-pdf/layout": "3.6.4"
-  },
-  "resolutions": {
-    "@react-pdf/layout": "3.6.4"
+    "@react-pdf/fns": "2.0.1",
+    "@react-pdf/font": "2.3.7",
+    "@react-pdf/image": "2.2.2",
+    "@react-pdf/layout": "3.6.3",
+    "@react-pdf/pdfkit": "3.0.2",
+    "@react-pdf/png-js": "2.2.0",
+    "@react-pdf/primitives": "3.0.1",
+    "@react-pdf/render": "3.2.7",
+    "@react-pdf/renderer": "3.1.14",
+    "@react-pdf/stylesheet": "4.1.8",
+    "@react-pdf/textkit": "4.2.0",
+    "@react-pdf/types": "2.3.4",
+    "@react-pdf/yoga": "4.1.2"
   }
 }

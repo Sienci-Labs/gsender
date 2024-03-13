@@ -12,6 +12,7 @@ const PinStatus = ({ pins }) => {
             <PinRow label="X Limit" value={pins.X} />
             <PinRow label="Y Limit" value={pins.Y} />
             <PinRow label="Z Limit" value={pins.Z} />
+            <PinRow label="A Limit" value={pins.A} />
             <PinRow label="Probe" value={pins.P} />
             <PinRow label="Door" value={pins.D} />
             <PinRow label="Cycle-Start" value={pins.S} />
@@ -24,7 +25,5 @@ const PinStatus = ({ pins }) => {
 export default connect((store) => {
     const pins = get(store, 'controller.state.status.pinState', {});
 
-    return {
-        pins
-    };
+    return { pins };
 })(PinStatus);

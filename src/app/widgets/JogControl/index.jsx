@@ -80,7 +80,7 @@ import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
 import { JoystickLoop, checkThumbsticskAreIdle } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
-import { convertToImperial, convertToMetric } from '../../containers/Preferences/calculate';
+import { convertAllPresetsUnits, convertToImperial, convertToMetric } from '../../containers/Preferences/calculate';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -422,18 +422,8 @@ class AxesWidget extends PureComponent {
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
         setJogFromPreset: (presetKey) => {
-            const { jog, units, needsConversion } = this.state;
-            const jogObj = jog[presetKey];
-
-            const presetNeedsConversion = needsConversion[presetKey];
-
-            if (units === IMPERIAL_UNITS && presetNeedsConversion) {
-                jogObj.zStep = convertToImperial(jogObj.zStep);
-                jogObj.xyStep = convertToImperial(jogObj.xyStep);
-                jogObj.aStep = convertToImperial(jogObj.aStep);
-                jogObj.feedrate = Number(convertToImperial(jogObj.feedrate).toFixed(0));
-                this.setState(prev => ({ needsConversion: { ...prev.needsConversion, [presetKey]: false } }));
-            }
+            const { jog } = this.state;
+            const jogObj = jog[presetKey]; // since the state is already converted to the correct units, we don't need to do that here
 
             this.setState({
                 jog: {
@@ -968,25 +958,27 @@ class AxesWidget extends PureComponent {
     shuttleControl = null;
 
     updateJogPresets = () => {
-        const { jog } = this.state;
+        const { jog, units, selectedSpeed } = this.state;
         const data = store.get('widgets.axes.jog');
 
         if (!data) {
             return;
         }
 
-        const { rapid, normal, precise } = data;
+        // convert store data if necessary
+        const jogObj = units === IMPERIAL_UNITS ? convertAllPresetsUnits(units, store.get('widgets.axes.jog')) : data;
 
-        if (jog.rapid === rapid && jog.normal === normal && jog.precise === precise) {
+        // if the same as our current state, dont bother changing anything
+        if (jog.rapid === jogObj.rapid && jog.normal === jogObj.normal && jog.precise === jogObj.precise) {
             return;
         }
 
+        // change rapid, normal, precise and the currently displayed values
         this.setState({
             jog: {
                 ...jog,
-                rapid,
-                normal,
-                precise
+                ...jogObj,
+                ...jogObj[selectedSpeed]
             }
         });
     }
@@ -1258,31 +1250,12 @@ class AxesWidget extends PureComponent {
         }
     }
 
-    convertPresetUnits(units, preset) {
-        const conversionFunc = units === METRIC_UNITS ? convertToMetric : convertToImperial;
-        let convertedPreset = JSON.parse(JSON.stringify(preset));
-        for (const key of Object.keys(preset)) {
-            convertedPreset[key] = conversionFunc(preset[key]);
-            if (key === 'feedrate') {
-                convertedPreset[key] = Number(convertedPreset[key]).toFixed(0);
-            }
-        }
-        return convertedPreset;
-    }
-
-    convertAllPresetsUnits(units, initJog) {
-        const jog = initJog || this.state.jog;
-        const { rapid, normal, precise } = jog;
-        const convertedRapid = this.convertPresetUnits(units, rapid);
-        const convertedNormal = this.convertPresetUnits(units, normal);
-        const convertedPrecise = this.convertPresetUnits(units, precise);
-
-        return { convertedRapid, convertedNormal, convertedPrecise };
-    }
-
     getInitialState() {
         const initialUnits = store.get('workspace.units', METRIC_UNITS);
-        let { rapid, normal, precise } = initialUnits === IMPERIAL_UNITS ? this.convertAllPresetsUnits(initialUnits, store.get('widgets.axes.jog')) : store.get('widgets.axes.jog');
+        // convert to imperial if necessary.
+        // we keep track of the current values converted to the correct units,
+        // but the store will always be metric.
+        const { rapid, normal, precise } = initialUnits === IMPERIAL_UNITS ? convertAllPresetsUnits(initialUnits, store.get('widgets.axes.jog')) : store.get('widgets.axes.jog');
 
         return {
             minimized: this.config.get('minimized', false),
@@ -1314,11 +1287,11 @@ class AxesWidget extends PureComponent {
                 c: '0.000'
             },
             jog: {
-                xyStep: this.getInitialXYStep(),
-                ayStep: this.getInitialXAStep(),
-                zStep: this.getInitialZStep(),
-                aStep: this.getInitialAStep(),
-                feedrate: this.getInitialFeedRate(),
+                xyStep: normal.xyStep, // use normal as the default display
+                ayStep: normal.ayStep,
+                zStep: normal.zStep,
+                aStep: normal.aStep,
+                feedrate: normal.feedrate,
                 rapid,
                 normal,
                 precise,
@@ -1329,46 +1302,9 @@ class AxesWidget extends PureComponent {
             },
             prevJog: null,
             prevDirection: null,
-            needsConversion: initialUnits === IMPERIAL_UNITS
-                ? { rapid: true, normal: true, precise: true, }
-                : { rapid: false, normal: false, precise: false, }
         };
     }
 
-    getInitialXYStep() {
-        const units = store.get('workspace.units', METRIC_UNITS);
-        const speeds = this.config.get('jog.normal');
-
-        return (units === METRIC_UNITS) ? speeds.xyStep : convertToImperial(speeds.xyStep);
-    }
-
-    getInitialXAStep() {
-        const units = store.get('workspace.units', METRIC_UNITS);
-        const speeds = this.config.get('jog.normal');
-
-        return (units === METRIC_UNITS) ? speeds.xaStep : convertToImperial(speeds.xaStep);
-    }
-
-    getInitialZStep() {
-        const units = store.get('workspace.units', METRIC_UNITS);
-        const speeds = this.config.get('jog.normal');
-
-        return (units === METRIC_UNITS) ? speeds.zStep : convertToImperial(speeds.zStep);
-    }
-
-    getInitialAStep() {
-        const units = store.get('workspace.units', METRIC_UNITS);
-        const speeds = this.config.get('jog.normal');
-
-        return (units === METRIC_UNITS) ? speeds.aStep : convertToImperial(speeds.aStep);
-    }
-
-    getInitialFeedRate() {
-        const units = store.get('workspace.units', METRIC_UNITS);
-        const speeds = this.config.get('jog.normal');
-
-        return (units === METRIC_UNITS) ? speeds.feedrate : convertToImperial(speeds.feedrate);
-    }
 
     changeUnits(units) {
         const oldUnits = this.state.units;
@@ -1387,7 +1323,7 @@ class AxesWidget extends PureComponent {
             feedrate = Number(convertToMetric(feedrate).toFixed(0));
         }
 
-        const { rapid, normal, precise } = this.convertAllPresetsUnits(units);
+        const { rapid, normal, precise } = convertAllPresetsUnits(units, jog);
 
         this.setState({
             units: units,

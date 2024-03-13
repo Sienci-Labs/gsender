@@ -16,7 +16,7 @@ const ErrorLog = () => {
             const res = await api.alarmList.fetch();
             const { list } = res.body;
 
-            setLogs(list.reverse() || []);
+            setLogs(list || []);
         };
         fetchLogs();
     }, []);
