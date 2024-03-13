@@ -70,7 +70,7 @@ const wizard = {
             '%global.toolchange.DISTANCE=modal.distance',
             '%global.toolchange.FEEDRATE=programFeedrate',
             'M5',
-            'G4P10',
+            '%wait',
             '%global.toolchange.XPOS=posx',
             '%global.toolchange.YPOS=posy',
             '%global.toolchange.ZPOS=posz',
@@ -100,7 +100,7 @@ const wizard = {
                                     'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=posz+global.toolchange.RETRACT',
+                                    '%global.toolchange.TOOL_OFFSET=posz+(global.toolchange.RETRACT * -1)',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
                                     'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
