@@ -422,7 +422,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
             'G4 P[PROBE_DELAY]',
             '%X_RIGHT=posx',
             '%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1',
-            'G21 G91 G0 X[X_CENTER]',
+            `${prependUnits} G91 G0 X[X_CENTER]`,
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
             'G21 G91 G0 Y2',
@@ -437,8 +437,8 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
             'G4 P[PROBE_DELAY]',
             '%Y_TOP = posy',
             '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
-            'G0 Y[Y_CENTER]',
-            'G10 L20 P0 X[X_OFF] Y[Y_OFF]',
+            `${prependUnits} G0 Y[Y_CENTER]`,
+            'G21 G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
             'G21 G0 G90 Z1'
         );
@@ -462,7 +462,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
             'G38.2 X5 F75',
             'G4 P0.15',
             `${prependUnits} G10 L20 ${p} X[posx/2]`,
-            'G21 G90 G0 X0',
+            `${prependUnits} G90 G0 X0`,
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
             'G21 G91 G0 Y2',
@@ -475,9 +475,9 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
             'G38.2 Y5 F75',
             'G4 P0.15',
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
-            'G21 G90 G0 X0 Y0',
+            `${prependUnits} G90 G0 X0 Y0`,
             'G4 P0.15',
-            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
         );
     } else if (axes.z) {
