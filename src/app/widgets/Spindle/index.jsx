@@ -348,7 +348,7 @@ class SpindleWidget extends PureComponent {
     }
 
     enableSpindleMode() {
-        const { units, spindleMax: maxPower, spindleMin: minPower } = this.props;
+        const { units, spindleMax: maxPower, spindleMin: minPower, spindle } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
 
@@ -362,6 +362,12 @@ class SpindleWidget extends PureComponent {
         laser.minPower = minPower;
         this.config.set('laser', laser);
 
+        const powerCommands = (spindle.label === 'SLB_LASER') ? []
+            : [
+                `$30=${spindleMax}`,
+                `$31=${spindleMin}`,
+            ];
+
         if (active) {
             this.isSpindleOn = false;
             controller.command('gcode', 'M5');
@@ -370,8 +376,7 @@ class SpindleWidget extends PureComponent {
         const commands = [
             preferredUnits,
             ...this.getSpindleOffsetCode(preferredUnits),
-            `$30=${spindleMax}`,
-            `$31=${spindleMin}`,
+            ...powerCommands,
             '$32=0',
             units
         ];
@@ -513,7 +518,7 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { units, spindleMax, spindleMin } = this.props;
+        const { units, spindleMax, spindleMin, spindle } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
 
@@ -525,6 +530,13 @@ class SpindleWidget extends PureComponent {
         this.config.set('spindleMin', spindleMin);
         this.config.set('spindleMax', spindleMax);
 
+        const powerCommands = (spindle.label === 'SLB_LASER') ? []
+            : [
+                `$30=${maxPower}`,
+                `$31=${minPower}`,
+            ];
+
+
         if (active) {
             this.isLaserOn = false;
             controller.command('gcode', 'M5');
@@ -532,8 +544,7 @@ class SpindleWidget extends PureComponent {
         const commands = [
             preferredUnits,
             ...this.getLaserOffsetCode(preferredUnits),
-            `$30=${maxPower}`,
-            `$31=${minPower}`,
+            ...powerCommands,
             '$32=1',
             units
         ];
