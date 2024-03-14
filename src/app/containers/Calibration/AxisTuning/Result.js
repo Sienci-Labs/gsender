@@ -71,6 +71,9 @@ const Result = ({ options, onClose, xSteps, ySteps, zSteps }) => {
         const eepromValue = getEEPROMValue(currentAxis);
         const roundedResult = result.toFixed(3);
 
+        console.log(`Rounded math result: ${roundedResult}`);
+        console.log(`Threshold difference: ${RESULT_OFFSET_THRESHOLD}`);
+
         if (requestedDistance === actualDistance) {
             return <p>Your {currentAxis} is tuned, no need to update steps/mm.</p>;
         }
@@ -87,13 +90,12 @@ const Result = ({ options, onClose, xSteps, ySteps, zSteps }) => {
                 </div>
 
                 {
-                    result > RESULT_OFFSET_THRESHOLD && (
+                    Math.abs((result - eepromValue)) > RESULT_OFFSET_THRESHOLD && (
                         <p style={{ padding: '1rem', backgroundColor: 'gold', border: '3px solid black', borderRadius: '10px' }}>
                             Warning. Your machine is off by a large amount, updating the EEPROM values for improved accuracy may cause issues.
                         </p>
                     )
                 }
-
                 <div><b><i>{ eepromValue } × ({ requestedDistance } ÷ { actualDistance }) = { roundedResult }</i></b></div>
             </>
         );

@@ -114,7 +114,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Fixed jog values reconverting and resetting on UI
 - Added A-axis limit pin indicator to diagnostics panel
 - Some tweaks to diagnostic report layout
-- Fixes for Auto-zero probing routines with $13 enabled
+- Fixes for AutoZero probing routines with $13 enabled
 - Better error reporting on UI in general for macro and console errors
 - Renamed Mac build from Intel to Universal for clarification
 - Fixed some problematic shortcut behaviours on gamepad

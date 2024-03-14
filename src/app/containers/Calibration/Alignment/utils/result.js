@@ -15,4 +15,4 @@ export const calculateHypotenuse = ({ a, b }) => {
 };
 
 export const FM_LOWER_OFFSET_THRESHOLD = 2;
-export const RESULT_OFFSET_THRESHOLD = 20;
+export const RESULT_OFFSET_THRESHOLD = 10;
