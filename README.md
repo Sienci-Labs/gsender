@@ -102,6 +102,33 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.4 (March 15, 2024)
+- Firmware selection hidden by default to avoid misclicks, and selected firmware reset to GRBL for all users.
+- Removed situations where no firmware option was selected on initial update of gSender
+- Fixed tabbed widget overlapping on some screen resolutions
+- Fixed issue with toolpath Z dimensions calculating incorrectly
+- Probe XYZ now goes to XY zero on completion of routine similar to prior behaviour
+- Errors from feeder are also now emitted to UI
+- Rotary axis toggle and other rotary tools now disabled in alarm state
+- Fixed situations where pausing and unpausing repeatedly could overflow firmware buffer
+- Fixed jog values reconverting and resetting on UI
+- Added A-axis limit pin indicator to diagnostics panel
+- Some tweaks to diagnostic report layout
+- Fixes for Auto-zero probing routines with $13 enabled
+- Better error reporting on UI in general for macro and console errors
+- Renamed Mac build from Intel to Universal for clarification
+- Fixed some problematic shortcut behaviours on gamepad
+- Fixed issue with final Z on automatic tool change being off by the retract distance
+- Visualizer no longer displays miscalculated toolpath when loading the same file twice in a row
+- Fixed continuous jogging with soft limits enabled on some EEPROM configurations on HAL
+- HAL spindle selector now uses on-board EEPROM values for SLB_LASER option
+- HAL flashing should be usable on Electron as of latest version and board should be connectable without power cycling.
+- Repeated errors in HAL should be reported to the user less often
+- Spindle selector now uses reported current spindle
+- Fixed issue where spindle selector could get duplicate entries on ID change
+- Fixed toolchange program feedrate variable on HAL
+- Setting import in HAL firmware tool now correctly updates radio button options
+
 ### 1.4.3 (February 22, 2024)
 - Fix for probe migration values not running
 - Fix for jog value migration not running
