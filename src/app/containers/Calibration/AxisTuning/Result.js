@@ -71,9 +71,6 @@ const Result = ({ options, onClose, xSteps, ySteps, zSteps }) => {
         const eepromValue = getEEPROMValue(currentAxis);
         const roundedResult = result.toFixed(3);
 
-        console.log(`Rounded math result: ${roundedResult}`);
-        console.log(`Threshold difference: ${RESULT_OFFSET_THRESHOLD}`);
-
         if (requestedDistance === actualDistance) {
             return <p>Your {currentAxis} is tuned, no need to update steps/mm.</p>;
         }
