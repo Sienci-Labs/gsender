@@ -426,5 +426,20 @@
     "@react-pdf/textkit": "4.2.0",
     "@react-pdf/types": "2.3.4",
     "@react-pdf/yoga": "4.1.2"
+  },
+  "resolutions": {
+    "@react-pdf/fns": "2.0.1",
+    "@react-pdf/font": "2.3.7",
+    "@react-pdf/image": "2.2.2",
+    "@react-pdf/layout": "3.6.3",
+    "@react-pdf/pdfkit": "3.0.2",
+    "@react-pdf/png-js": "2.2.0",
+    "@react-pdf/primitives": "3.0.1",
+    "@react-pdf/render": "3.2.7",
+    "@react-pdf/renderer": "3.1.14",
+    "@react-pdf/stylesheet": "4.1.8",
+    "@react-pdf/textkit": "4.2.0",
+    "@react-pdf/types": "2.3.4",
+    "@react-pdf/yoga": "4.1.2"
   }
 }
