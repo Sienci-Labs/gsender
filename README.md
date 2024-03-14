@@ -112,6 +112,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Rotary axis toggle and other rotary tools now disabled in alarm state
 - Fixed situations where pausing and unpausing repeatedly could overflow firmware buffer
 - Fixed jog values reconverting and resetting on UI
+- Prevented warning appearing in movement calibration tool erroneously
 - Added A-axis limit pin indicator to diagnostics panel
 - Some tweaks to diagnostic report layout
 - Fixes for AutoZero probing routines with $13 enabled
