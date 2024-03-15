@@ -6,6 +6,7 @@ import styles from './index.styl';
 
 const Number = (props) => {
     const { value, min, max, onChange, units } = props;
+
     return (
         <div className={styles.numberInputs}>
             <ControlledNumberInput
@@ -16,6 +17,7 @@ const Number = (props) => {
                 value={value}
                 min={min}
                 max={max}
+                hasRounding={false}
             />
             <span className={styles.inputGroupAddon}>{units}</span>
         </div>
