@@ -255,6 +255,10 @@ const migrateStore = () => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.4.4')) {
+        store.replace('widgets.connection.controller.type', 'Grbl');
+    }
+
     if (semver.lt(cnc.version, '1.4.3')) {
         const storeProbe = store.get('workspace.probeProfile');
         const defaultProbe = get(defaultState, 'workspace.probeProfile');
