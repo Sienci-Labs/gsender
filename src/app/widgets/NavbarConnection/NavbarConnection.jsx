@@ -33,6 +33,7 @@ import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
 import FirmwareSelector from './FirmwareSelector';
 import { GRBLHAL } from 'Constants';
+import FirmwareListing from './FirmwareListing';
 
 
 class NavbarConnection extends PureComponent {
@@ -155,10 +156,24 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const {
+            connected,
+            ports,
+            connecting,
+            scanning,
+            baudrate,
+            controllerType,
+            alertMessage,
+            port,
+            unrecognizedPorts,
+            showUnrecognized,
+            showControllers
+        } = state;
         const { isActive } = this.state;
         const isMobile = window?.visualViewport?.width <= 599;
         const ip = this.getIPString();
+
+        const firmwareList = ['Grbl', 'grblHAL'];
 
         return (
             <div
@@ -174,7 +189,7 @@ class NavbarConnection extends PureComponent {
                         actions.handleRefreshPorts();
                     }
                 }}
-                onMouseLeave={actions.hideUnrecognizedDevices}
+                onMouseLeave={actions.hideUnrecognizedDevicesAndFirmwareList}
                 onTouchEnd={actions.handleRefreshPorts}
             >
                 <div>
@@ -229,22 +244,23 @@ class NavbarConnection extends PureComponent {
                         !connected && controllerType === GRBLHAL && <h5>Network Devices</h5>
                     }
                     {
-                        !connected && controllerType === GRBLHAL &&
-                        <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
-                            <PortListing
-                                port={ip}
-                                key="network_port"
-                                network={true}
-                                onClick={() => actions.onClickPortListing({ port: ip }, true)}
-                                className={styles.scanButton}
-                            >
-                                {ip}
-                            </PortListing>
-                        </div>
+                        !connected && controllerType === GRBLHAL && (
+                            <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
+                                <PortListing
+                                    port={ip}
+                                    key="network_port"
+                                    network={true}
+                                    onClick={() => actions.onClickPortListing({ port: ip }, true)}
+                                    className={styles.scanButton}
+                                >
+                                    {ip}
+                                </PortListing>
+                            </div>
+                        )
                     }
                     {
                         !connected && !connecting && (unrecognizedPorts.length > 0) &&
-                        <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized}/>
+                        <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
                     }
                     {
                         !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
@@ -259,11 +275,19 @@ class NavbarConnection extends PureComponent {
                             )
                         )
                     }
+
+                    { !connected && <FirmwareSelector list={firmwareList} onClick={actions.toggleShowControllers} /> }
+
                     {
-                        !connected && (
-                            <>
-                                <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
-                            </>
+                        !connected && !connecting && showControllers && firmwareList.map(
+                            firmware => (
+                                <FirmwareListing
+                                    key={firmware}
+                                    firmware={firmware}
+                                    isActive={controllerType === firmware}
+                                    onClick={() => actions.onClickFirmwareButton(firmware)}
+                                />
+                            )
                         )
                     }
                 </div>

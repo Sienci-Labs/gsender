@@ -26,8 +26,6 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-//import includes from 'lodash/includes';
-//import map from 'lodash/map';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
@@ -43,7 +41,6 @@ class NavbarConnectionWidget extends PureComponent {
         disableWizardFunction: PropTypes.func,
         enableWizardFunction: PropTypes.func
     };
-
 
     pubsubTokens = [];
 
@@ -91,10 +88,14 @@ class NavbarConnectionWidget extends PureComponent {
             const { port } = this.state;
             this.closePort(port);
         },
-        hideUnrecognizedDevices: () => {
+        hideUnrecognizedDevicesAndFirmwareList: () => {
             this.setState({
-                showUnrecognized: false
+                showUnrecognized: false,
+                showControllers: false,
             });
+        },
+        toggleShowControllers: () => {
+            this.setState(prev => ({ showControllers: !prev.showControllers }));
         }
     };
 
@@ -217,6 +218,7 @@ class NavbarConnectionWidget extends PureComponent {
             alertMessage: '',
             showUnrecognized: false,
             grblExists: true,
+            showControllers: false,
         };
     }
 
