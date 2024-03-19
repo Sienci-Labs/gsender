@@ -397,7 +397,7 @@ export const GRBL_HAL_ERRORS = [
     {
         code: 70,
         message: 'Bluetooth',
-        description: 'Bluetooth initalisation failed.'
+        description: 'Bluetooth initialisation failed.'
     },
 ];
 

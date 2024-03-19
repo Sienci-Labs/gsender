@@ -792,7 +792,6 @@ class GrblHalController {
             const code = Number(res.message) || this.state.status.subState;
             //const alarm = _.find(this.settings.alarms, { id: code });
             const alarm = this.settings.alarms[code.toString()];
-            console.log(alarm);
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
