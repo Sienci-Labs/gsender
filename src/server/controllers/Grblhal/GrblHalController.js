@@ -791,7 +791,8 @@ class GrblHalController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || this.state.status.subState;
             //const alarm = _.find(this.settings.alarms, { id: code });
-            const alarm = this.settings.alarms[code];
+            const alarm = this.settings.alarms[code.toString()];
+            console.log(alarm);
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -824,7 +825,7 @@ class GrblHalController {
                 if (isRunning) {
                     this.workflow.stop();
                 }
-                this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('serialport:read', `ALARM:${code} (${alarm.description})`);
                 this.emit('error', {
                     type: ALARM,
                     code: code,
