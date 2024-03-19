@@ -1088,8 +1088,6 @@ class GrblHalController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-        await delay(100);
-        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
     }
 
     populateContext(context = {}) {
@@ -1295,10 +1293,12 @@ class GrblHalController {
 
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (this.connection) {
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
+                    await delay(100);
+                    this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                 }
                 let counter = 3;
                 const interval = setInterval(() => {
