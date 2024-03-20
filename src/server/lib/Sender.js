@@ -288,6 +288,7 @@ class Sender extends events.EventEmitter {
             dataLength: this.state.dataLength,
             estimatedTime: this.state.estimatedTime,
             ovF: this.state.ovF,
+            currentLineRunning: this.state.totalSentToQueue - this.state.countdownQueue.length,
         };
     }
 

@@ -295,6 +295,8 @@ class Visualizer extends Component {
         if (this.visualizer) {
             const frameIndex = this.props.receivedLines;
             this.visualizer.setFrameIndex(frameIndex);
+            // grey lines
+            this.visualizer.greyOutLines(this.props.senderStatus.currentLineRunning);
         }
 
         // Projection
@@ -2104,6 +2106,7 @@ export default connect((store) => {
     const fileModal = _get(store, 'file.fileModal');
     const fileType = _get(store, 'file.fileType');
     const controllerType = _get(store, 'controller.type');
+    const senderStatus = _get(store, 'controller.sender.status');
 
     return {
         machinePosition,
@@ -2119,6 +2122,7 @@ export default connect((store) => {
         bbox,
         fileModal,
         fileType,
-        controllerType
+        controllerType,
+        senderStatus
     };
 }, null, null, { forwardRef: true })(Visualizer);
