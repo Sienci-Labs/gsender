@@ -1741,7 +1741,6 @@ class GrblHalController {
                 this.feeder.reset();
                 this.write('\x18'); // ^x
                 delay(100).then(() => {
-                    console.log('Unlock');
                     this.writeln('$X');
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                 });
