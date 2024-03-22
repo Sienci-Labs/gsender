@@ -1740,7 +1740,11 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                this.writeln('$X');
+                delay(100).then(() => {
+                    console.log('Unlock');
+                    this.writeln('$X');
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                });
             },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBLHAL, this.state);

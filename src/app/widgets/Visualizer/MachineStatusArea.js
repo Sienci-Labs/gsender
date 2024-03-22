@@ -54,7 +54,7 @@ class ControlArea extends Component {
             controller.command('homing');
             return;
         } else if (alarmCode === 10) {
-            controller.command('reset');
+            controller.command('reset:limit');
         }
         controller.command('unlock');
     }
