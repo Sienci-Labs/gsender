@@ -493,15 +493,15 @@ function generateSupportFile() {
                                             {'Sender Status: \n'}
                                             <Text style={styles.text}>
                                                 {'    Modal: \n'}
-                                                    {
-                                                        grblInfo.sender.status.context ? 
-                                                            unwrapObject(grblInfo.sender.status.context.modal, 2) : 'NULL\n'
-                                                    }
+                                                {
+                                                    grblInfo.sender.status.context ?
+                                                        unwrapObject(grblInfo.sender.status.context.modal, 2) : 'NULL\n'
+                                                }
                                                 {'    Tool: '}
-                                                    {
-                                                        grblInfo.sender.status.context?.tool ?
-                                                            '        ' + grblInfo.sender.status.context.tool.toString() + '\n' : 'NULL\n'
-                                                    }
+                                                {
+                                                    grblInfo.sender.status.context?.tool ?
+                                                        '        ' + grblInfo.sender.status.context.tool.toString() + '\n' : 'NULL\n'
+                                                }
                                             </Text>
                                         </Text>
                                     ) : (
