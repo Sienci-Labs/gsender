@@ -1755,7 +1755,6 @@ class GrblHalController {
                 const [feedOV] = this.state.status.ov;
 
                 let diff = value - feedOV;
-
                 if (value === 100) {
                     this.write(String.fromCharCode(0x90));
                 } else {
@@ -1967,6 +1966,9 @@ class GrblHalController {
 
                     if (axes.Z) {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
+                    }
+                    if (axes.A) {
+                        axes.A *= 10000;
                     }
                 } else {
                     jogFeedrate = 10000;
