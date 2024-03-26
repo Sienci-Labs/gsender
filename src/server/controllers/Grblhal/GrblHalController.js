@@ -1050,10 +1050,8 @@ class GrblHalController {
                     }
                     this.programResumeTimeout = setTimeout(() => {
                         if (this.workflow.isIdle()) {
-                            console.log('workflow idle, returning early');
                             return;
                         }
-                        console.log('Gracefully resuming');
                         const as = _.get(this.state, 'status.activeState');
                         if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
                             this.command('gcode:resume');
