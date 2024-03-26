@@ -1049,6 +1049,10 @@ class GrblHalController {
                         this.programResumeTimeout = null;
                     }
                     this.programResumeTimeout = setTimeout(() => {
+                        if (this.workflow.isIdle()) {
+                            console.log('workflow idle, returning early');
+                            return;
+                        }
                         console.log('Gracefully resuming');
                         const as = _.get(this.state, 'status.activeState');
                         if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
@@ -1620,6 +1624,8 @@ class GrblHalController {
             // @param {boolean} [options.force] Whether to force stop a G-code program. Defaults to false.
             'gcode:stop': async () => {
                 this.workflow.stop();
+
+                clearInterval(this.programResumeTimeout);
 
                 const [options] = args;
                 const { force = false } = { ...options };
