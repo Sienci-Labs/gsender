@@ -202,6 +202,9 @@ class GrblHalController {
     // Rotary
     isInRotaryMode = false;
 
+    // Macro button resume
+    programResumeTimeout = null;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -1038,14 +1041,17 @@ class GrblHalController {
                     currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
                     (runnerActiveState === GRBL_HAL_ACTIVE_STATE_IDLE || runnerActiveState === GRBL_HAL_ACTIVE_STATE_RUN)
                 ) {
-                    console.log('Gracefully resuming');
-                    /*setTimeout(() => {
+                    if (this.programResumeTimeout) {
+                        clearTimeout(this.programResumeTimeout);
+                        this.programResumeTimeout = null;
+                    }
+                    this.programResumeTimeout = setTimeout(() => {
+                        console.log('Gracefully resuming');
                         const as = _.get(this.state, 'status.activeState');
                         if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
-                            console.log('resume timeout');
                             this.command('gcode:resume');
                         }
-                    }, 1000);*/
+                    }, 300);
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
