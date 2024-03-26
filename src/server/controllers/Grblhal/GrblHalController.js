@@ -901,6 +901,9 @@ class GrblHalController {
             // Set ready flag to true when a startup message has arrived
             this.ready = true;
 
+            // Rewind any files in the sender
+            this.workflow.stop();
+
             if (!this.initialized) {
                 this.initialized = true;
 
