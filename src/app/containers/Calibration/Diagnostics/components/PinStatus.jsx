@@ -13,7 +13,7 @@ const PinStatus = ({ pins }) => {
             <PinRow label="Y Limit" value={pins.Y} />
             <PinRow label="Z Limit" value={pins.Z} />
             <PinRow label="A Limit" value={pins.A} />
-            <PinRow label="Probe" value={pins.P} />
+            <PinRow label="Probe/TLS" value={pins.P} />
             <PinRow label="Door" value={pins.D} />
             <PinRow label="Cycle-Start" value={pins.S} />
             <PinRow label="Hold" value={pins.H} />

@@ -33,7 +33,8 @@ import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
     WORKFLOW_STATE_IDLE,
-    USER_DATA_COLLECTION
+    USER_DATA_COLLECTION,
+    WORKSPACE_MODE
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -202,13 +203,18 @@ class Workspace extends PureComponent {
             }
         },
         'serialport:open': (options) => {
-            this.setState({ disabled: false });
-            const { port } = options;
-            this.setState({ port: port });
+            const { controllerType, port } = options;
+            const { DEFAULT, ROTARY } = WORKSPACE_MODE;
+
+            this.setState({ disabled: false, port });
+
+            if (controllerType === 'grblHAL') {
+                const isRotaryMode = store.get('workspace.mode', DEFAULT) === ROTARY;
+                controller.command('updateRotaryMode', isRotaryMode);
+            }
         },
         'serialport:close': (options) => {
-            this.setState({ disabled: true });
-            this.setState({ port: '' });
+            this.setState({ disabled: true, port: '' });
         },
         'feeder:status': (status) => {
             const { modal } = this.state;

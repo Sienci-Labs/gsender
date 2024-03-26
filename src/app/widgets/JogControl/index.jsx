@@ -720,7 +720,7 @@ class AxesWidget extends PureComponent {
             category: JOGGING_CATEGORY,
             callback: this.shuttleControlFunctions.JOG,
         },
-        STOP_JOG: {
+        STOP_JOG: { // this one is for the shortcut. can be used at any time, even when not continuous jogging.
             title: 'Stop Jog',
             keys: '',
             cmd: 'STOP_JOG',
@@ -733,11 +733,19 @@ class AxesWidget extends PureComponent {
                     preventDefault(event);
                 }
 
-                if (this.state.isContinuousJogging) {
-                    this.handleShortcutStop(payload);
-                } else {
-                    controller.command('jog:stop');
+                controller.command('jog:stop');
+            },
+        },
+        STOP_CONT_JOG: { // this one is for other functions to call when continuous jogging
+            cmd: 'STOP_CONT_JOG',
+            payload: { force: true },
+            preventDefault: false,
+            callback: (event, payload) => {
+                if (event) {
+                    preventDefault(event);
                 }
+
+                this.handleShortcutStop(payload);
             },
         },
         SET_R_JOG_PRESET: {
