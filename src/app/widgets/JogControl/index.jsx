@@ -737,13 +737,9 @@ class AxesWidget extends PureComponent {
             },
         },
         STOP_CONT_JOG: { // this one is for other functions to call when continuous jogging
-            title: 'Stop Jog',
-            keys: '',
             cmd: 'STOP_CONT_JOG',
             payload: { force: true },
             preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
             callback: (event, payload) => {
                 if (event) {
                     preventDefault(event);
