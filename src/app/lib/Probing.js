@@ -232,7 +232,6 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }) => {
 
     let prependUnits = '';
     if ($13 === '1') {
-        console.log('Report inches');
         prependUnits = 'G20';
     }
 

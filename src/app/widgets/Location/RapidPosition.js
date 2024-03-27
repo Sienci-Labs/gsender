@@ -139,7 +139,7 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
 
     // Change homing flag for grblHal specifically
     const controllerType = prefStore.get('widgets.connection.controller.type', 'grbl');
-    console.log(controllerType);
+
     if (controllerType === 'grblHAL') {
         const store = reduxStore.getState();
         const settings = get(store, 'controller.settings.settings');

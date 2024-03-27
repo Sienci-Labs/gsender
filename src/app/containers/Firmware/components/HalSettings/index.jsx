@@ -6,7 +6,6 @@ import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
 const getCharCodeSum = (str = 'a') => {
-    console.log(str);
     return str
         .split('')
         .reduce((acc, c) => acc + c.charCodeAt(0), 0);

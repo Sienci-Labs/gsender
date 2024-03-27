@@ -65,7 +65,6 @@ export const replaceParsedData = (parsedData) => {
                         .objectStore(OBJECT_STORE)
                         .put({ id: DATA_ID, ...parsedData });
                     replaceReq.onsuccess = (event) => {
-                        console.log('Finished replacing parsed data');
                         return resolve('Finished replacing parsed data');
                     };
                     replaceReq.onerror = (event) => {
