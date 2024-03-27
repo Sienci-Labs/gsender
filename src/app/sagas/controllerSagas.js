@@ -715,6 +715,11 @@ export function* initialize() {
         }
     });
 
+    controller.addListener('job:start', () => {
+        console.log('job start');
+        errors = [];
+    });
+
 
     yield null;
 }
