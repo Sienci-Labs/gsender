@@ -82,7 +82,6 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const postHookRef = useRef();
 
     const setBitsetterPosition = () => {
-        console.log('set called');
         const newPosition = {
             x: Number(mpos.x),
             y: Number(mpos.y),

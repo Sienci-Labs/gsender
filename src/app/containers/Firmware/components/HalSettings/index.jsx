@@ -5,6 +5,12 @@ import { descriptionLookup, FirmwareContext, getDatatypeInput } from 'Containers
 import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
+const getCharCodeSum = (str = 'a') => {
+    return str
+        .split('')
+        .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+};
+
 const HalSettings = ({ descriptions }) => {
     const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
     const handleSettingsChange = (index) => (value) => {
@@ -45,9 +51,10 @@ const HalSettings = ({ descriptions }) => {
                     const description = filterNewlines(setting.details);
                     const InputElement = getDatatypeInput(dataType);
 
-                    const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
-
                     const groupLabel = setting.group || '';
+
+                    //const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
+                    const categoryClass = (getCharCodeSum(groupLabel) % 9) + 1;
 
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (

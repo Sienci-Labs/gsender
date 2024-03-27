@@ -263,9 +263,6 @@ const migrateStore = () => {
         const storeProbe = store.get('workspace.probeProfile');
         const defaultProbe = get(defaultState, 'workspace.probeProfile');
 
-        console.log(storeProbe);
-        console.log(defaultProbe);
-
         if (typeof storeProbe.xyThickness === 'object' && storeProbe.xyThickness.mm) {
             store.replace('workspace.probeProfile', {
                 ...defaultProbe,

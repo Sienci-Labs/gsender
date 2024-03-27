@@ -90,7 +90,7 @@ const SettingsList = ({ firmwareType }) => {
                                                     max={grbl.max}
                                                     step={grbl.step}
                                                     units={grbl.units}
-                                                    onChange={handleSettingsChange(index)}
+                                                    onChange={handleSettingsChange(grbl.globalIndex)}
                                                     value={grbl.value}
                                                     values={grbl.values}
                                                     maxChars={grbl.maxChars}

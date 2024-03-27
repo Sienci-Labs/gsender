@@ -109,6 +109,7 @@ const SetShortcut = () => {
     const getData = () => {
         let allEvents = { ...macros, ...shuttleEvents.allShuttleControlEvents };
         delete allEvents.MACRO;
+        delete allEvents.STOP_CONT_JOG;
 
         const data = Object.values(allEvents)
             .reduce((acc, value) => {

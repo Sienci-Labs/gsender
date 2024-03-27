@@ -3,6 +3,19 @@
 // [SETTINGGROUP:2|0|Control signals]
 // [SETTINGGROUP:3|0|Limits]
 // [SETTINGGROUP:5|0|Coolant]
+
+const relabels = {
+    'Stepper': 'Motors',
+    'Stepper driver': 'Motors',
+    'Safety Door': 'Door',
+    'Aux ports': 'Aux IO',
+    'Networking': 'Network',
+    'Control signals': 'General',
+    'Homing': 'Location',
+    'Limits': 'Location',
+    'Jogging': 'Location'
+};
+
 class GrblHalLineParserResultGroupDetail {
     static parse(line) {
         const r = line.match(/^\[SETTINGGROUP:(\d+)\|(\d+)\|(.*)]$/);
@@ -15,6 +28,11 @@ class GrblHalLineParserResultGroupDetail {
             parent: Number(r[2]),
             label: r[3]
         };
+
+        // Handle lookup for manual relabels of specific categories
+        if (Object.hasOwn(relabels, payload.label)) {
+            payload.label = relabels[payload.label];
+        }
 
         return {
             type: GrblHalLineParserResultGroupDetail,

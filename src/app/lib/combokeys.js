@@ -34,7 +34,7 @@ import { modifierKeys } from './constants';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
 
-const STOP_CMD = 'STOP_JOG';
+const STOP_CMD = 'STOP_CONT_JOG';
 const MACRO = 'MACRO';
 
 const BUGGED_KEYS = [

@@ -631,7 +631,6 @@ export function* initialize() {
 
         // set need recovery for start from line when alarm happens
         if (error.type === ALARM && wasRunning) {
-            console.log(error.lineNumber);
             pubsub.publish('disconnect:recovery', error.lineNumber, homingEnabled);
         }
     });
@@ -713,6 +712,10 @@ export function* initialize() {
                 payload: spindle
             });
         }
+    });
+
+    controller.addListener('job:start', () => {
+        errors = [];
     });
 
 

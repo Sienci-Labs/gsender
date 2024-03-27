@@ -1769,7 +1769,6 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            console.log(vizualization);
             this.vizualization = vizualization;
             this.renderCallback = callback;
             this.colorsWorker = new ColorsWorker();

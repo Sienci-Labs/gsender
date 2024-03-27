@@ -202,6 +202,9 @@ class GrblHalController {
     // Rotary
     isInRotaryMode = false;
 
+    // Macro button resume
+    programResumeTimeout = null;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -271,6 +274,9 @@ class GrblHalController {
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
+                // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
+                const looksLikeEEPROM = line.charAt(0) === '$';
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -319,11 +325,12 @@ class GrblHalController {
                 const words = ensureArray(data.words);
 
                 { // Program Mode: M0, M1
+                    // Look to check if first char is $ so we don't pause when updating an EEPROM macro.
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    if (programMode === 'M0') {
+                    if (programMode === 'M0' && !looksLikeEEPROM) {
                         log.debug('M0 Program Pause');
                         this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
-                    } else if (programMode === 'M1') {
+                    } else if (programMode === 'M1' && !looksLikeEEPROM) {
                         log.debug('M1 Program Pause');
                         this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
                     }
@@ -898,6 +905,9 @@ class GrblHalController {
             // Set ready flag to true when a startup message has arrived
             this.ready = true;
 
+            // Rewind any files in the sender
+            this.workflow.stop();
+
             if (!this.initialized) {
                 this.initialized = true;
 
@@ -1038,14 +1048,19 @@ class GrblHalController {
                     currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
                     (runnerActiveState === GRBL_HAL_ACTIVE_STATE_IDLE || runnerActiveState === GRBL_HAL_ACTIVE_STATE_RUN)
                 ) {
-                    console.log('Gracefully resuming');
-                    /*setTimeout(() => {
+                    if (this.programResumeTimeout) {
+                        clearTimeout(this.programResumeTimeout);
+                        this.programResumeTimeout = null;
+                    }
+                    this.programResumeTimeout = setTimeout(() => {
+                        if (this.workflow.isIdle()) {
+                            return;
+                        }
                         const as = _.get(this.state, 'status.activeState');
                         if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
-                            console.log('resume timeout');
                             this.command('gcode:resume');
                         }
-                    }, 1000);*/
+                    }, 300);
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
@@ -1501,6 +1516,7 @@ class GrblHalController {
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
+                this.emit('job:start');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1611,6 +1627,8 @@ class GrblHalController {
             // @param {boolean} [options.force] Whether to force stop a G-code program. Defaults to false.
             'gcode:stop': async () => {
                 this.workflow.stop();
+
+                clearInterval(this.programResumeTimeout);
 
                 const [options] = args;
                 const { force = false } = { ...options };
@@ -1740,7 +1758,10 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                this.writeln('$X');
+                delay(100).then(() => {
+                    this.writeln('$X');
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                });
             },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBLHAL, this.state);
@@ -1752,7 +1773,6 @@ class GrblHalController {
                 const [feedOV] = this.state.status.ov;
 
                 let diff = value - feedOV;
-
                 if (value === 100) {
                     this.write(String.fromCharCode(0x90));
                 } else {
@@ -1964,6 +1984,9 @@ class GrblHalController {
 
                     if (axes.Z) {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
+                    }
+                    if (axes.A) {
+                        axes.A *= 10000;
                     }
                 } else {
                     jogFeedrate = 10000;

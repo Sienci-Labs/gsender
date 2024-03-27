@@ -32,8 +32,9 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import pkg from '../../package.json';
-import { LASER_MODE } from '../constants';
+import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from 'app/api';
+import { homingString } from './eeprom';
 
 const styles = StyleSheet.create({
     body: {
@@ -196,6 +197,22 @@ const getFileInfo = () => {
     return fileInfo;
 };
 
+const getJogPresets = () => {
+    const jogPresets = store.get('widgets.axes.jog', {});
+    return jogPresets;
+};
+
+const getWorkspaceUnits = () => {
+    const workspaceUnits = store.get('workspace.units', METRIC_UNITS);
+    return workspaceUnits;
+};
+
+const getRotaryMode = () => {
+    const { DEFAULT, ROTARY } = WORKSPACE_MODE;
+    const isRotaryMode = store.get('workspace.mode', DEFAULT) === ROTARY;
+    return isRotaryMode;
+};
+
 const unwrapObject = (obj, iteration) => {
     let tabs = '';
     for (let i = 0; i < iteration; i++) {
@@ -245,6 +262,9 @@ function generateSupportFile() {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
+    const jogPresets = getJogPresets();
+    const workspaceUnits = getWorkspaceUnits();
+    const isRotaryMode = getRotaryMode();
     let alarms, errors = [];
 
     api.alarmList.fetch().then(data => {
@@ -274,6 +294,26 @@ function generateSupportFile() {
                                     {'OS: '}
                                     <Text style={styles.text}>
                                         {os + '\n'}
+                                    </Text>
+                                    {'Homing: '}
+                                    <Text style={styles.text}>
+                                        {(eeprom.$22 === '1' ? 'Enabled' : 'Disabled') + '\n'}
+                                    </Text>
+                                    {'Soft Limits: '}
+                                    <Text style={styles.text}>
+                                        {(eeprom.$20 === '1' ? 'Enabled' : 'Disabled') + '\n'}
+                                    </Text>
+                                    {'Home Location: '}
+                                    <Text style={styles.text}>
+                                        {homingString(eeprom.$23) + '\n'}
+                                    </Text>
+                                    {'Report Inches: '}
+                                    <Text style={styles.text}>
+                                        {(eeprom.$13 === '1' ? 'Enabled' : 'Disabled') + '\n'}
+                                    </Text>
+                                    {'Stepper Motors: '}
+                                    <Text style={styles.text}>
+                                        {(eeprom.$1 === '255' ? 'Locked' : 'Unlocked') + '\n'}
                                     </Text>
                                 </Text>
                             </Text>
@@ -318,19 +358,10 @@ function generateSupportFile() {
                                             </Text>
                                             <Text style={styles.textBold}>
                                                 {'Limits:\n'}
-                                                <Text style={styles.textItalic}>
-                                                    {'    X Max: '}
-                                                    <Text style={styles.text}>
-                                                        {get(machineProfile, 'limits.xmax', '0') + '\n'}
-                                                    </Text>
-                                                    {'    Y Max: '}
-                                                    <Text style={styles.text}>
-                                                        {get(machineProfile, 'limits.ymax', '0') + '\n'}
-                                                    </Text>
-                                                    {'    Z Max: '}
-                                                    <Text style={styles.text}>
-                                                        {get(machineProfile, 'limits.zmax', '0') + '\n'}
-                                                    </Text>
+                                                <Text style={styles.text}>
+                                                    {'    X Max: ' + get(machineProfile, 'limits.xmax', '0') + '\n'}
+                                                    {'    Y Max: ' + get(machineProfile, 'limits.ymax', '0') + '\n'}
+                                                    {'    Z Max: ' + get(machineProfile, 'limits.zmax', '0') + '\n'}
                                                 </Text>
                                             </Text>
                                             <Text style={styles.textBold}>
@@ -416,31 +447,13 @@ function generateSupportFile() {
                                     !isEmpty(grblInfo.mpos) ? (
                                         <Text style={styles.textBold}>
                                             {'MPos: \n'}
-                                            <Text style={styles.textItalic}>
-                                                {'    a: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.a + '\n'}
-                                                </Text>
-                                                {'    b: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.b + '\n'}
-                                                </Text>
-                                                {'    c: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.c + '\n'}
-                                                </Text>
-                                                {'    x: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.x + '\n'}
-                                                </Text>
-                                                {'    y: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.y + '\n'}
-                                                </Text>
-                                                {'    z: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.mpos.z + '\n'}
-                                                </Text>
+                                            <Text style={styles.text}>
+                                                {'    a: ' + grblInfo.mpos.a + '\n'}
+                                                {'    b: ' + grblInfo.mpos.b + '\n'}
+                                                {'    c: ' + grblInfo.mpos.c + '\n'}
+                                                {'    x: ' + grblInfo.mpos.x + '\n'}
+                                                {'    y: ' + grblInfo.mpos.y + '\n'}
+                                                {'    z: ' + grblInfo.mpos.z + '\n'}
                                             </Text>
                                         </Text>
                                     ) : (
@@ -456,31 +469,13 @@ function generateSupportFile() {
                                     !isEmpty(grblInfo.wpos) ? (
                                         <Text style={styles.textBold}>
                                             {'WPos: \n'}
-                                            <Text style={styles.textItalic}>
-                                                {'    a: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.a + '\n'}
-                                                </Text>
-                                                {'    b: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.b + '\n'}
-                                                </Text>
-                                                {'    c: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.c + '\n'}
-                                                </Text>
-                                                {'    x: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.x + '\n'}
-                                                </Text>
-                                                {'    y: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.y + '\n'}
-                                                </Text>
-                                                {'    z: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.wpos.z + '\n'}
-                                                </Text>
+                                            <Text style={styles.text}>
+                                                {'    a: ' + grblInfo.wpos.a + '\n'}
+                                                {'    b: ' + grblInfo.wpos.b + '\n'}
+                                                {'    c: ' + grblInfo.wpos.c + '\n'}
+                                                {'    x: ' + grblInfo.wpos.x + '\n'}
+                                                {'    y: ' + grblInfo.wpos.y + '\n'}
+                                                {'    z: ' + grblInfo.wpos.z + '\n'}
                                             </Text>
                                         </Text>
                                     ) : (
@@ -496,17 +491,17 @@ function generateSupportFile() {
                                     grblInfo.sender.status ? (
                                         <Text style={styles.textBold}>
                                             {'Sender Status: \n'}
-                                            <Text style={styles.textItalic}>
+                                            <Text style={styles.text}>
                                                 {'    Modal: \n'}
-                                                <Text style={styles.text}>
-                                                    {
-                                                        grblInfo.sender.status.context ? unwrapObject(grblInfo.sender.status.context.modal, 2) : 'NULL\n'
-                                                    }
-                                                </Text>
+                                                {
+                                                    grblInfo.sender.status.context ?
+                                                        unwrapObject(grblInfo.sender.status.context.modal, 2) : 'NULL\n'
+                                                }
                                                 {'    Tool: '}
-                                                <Text style={styles.text}>
-                                                    {grblInfo.sender.status.context?.tool ? '        ' + grblInfo.sender.status.context.tool.toString() + '\n' : 'NULL\n'}
-                                                </Text>
+                                                {
+                                                    grblInfo.sender.status.context?.tool ?
+                                                        '        ' + grblInfo.sender.status.context.tool.toString() + '\n' : 'NULL\n'
+                                                }
                                             </Text>
                                         </Text>
                                     ) : (
@@ -528,6 +523,67 @@ function generateSupportFile() {
                                     {'Homing Flag: '}
                                     <Text style={styles.text}>
                                         {grblInfo.homingFlag + '\n'}
+                                    </Text>
+                                </Text>
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={styles.clearTable} break>
+                    <View style={styles.clearTableRow}>
+                        <View style={styles.clearTableCol}>
+                            <Text style={styles.clearTableCell}>
+                                <Text style={styles.subtitle}>
+                                    {'Preferences\n'}
+                                </Text>
+                                <Text style={styles.textBold}>
+                                    {'Jog Presets: \n'}
+                                    <Text style={styles.text}>
+                                        {
+                                            '    Rapid: \n' +
+                                            unwrapObject(jogPresets.rapid, 2) +
+                                            '    Normal: \n' +
+                                            unwrapObject(jogPresets.normal, 2) +
+                                            '    Precise: \n' +
+                                            unwrapObject(jogPresets.precise, 2)
+                                        }
+                                    </Text>
+                                    {'Workspace Units: '}
+                                    <Text style={styles.text}>
+                                        {workspaceUnits + '\n'}
+                                    </Text>
+                                    {'Laser: '}
+                                    <Text style={styles.text}>
+                                        {mode ? 'Enabled\n' : 'Disabled\n'}
+                                    </Text>
+                                    {'Rotary: '}
+                                    <Text style={styles.text}>
+                                        {isRotaryMode ? 'Enabled\n' : 'Disabled\n'}
+                                        {
+                                            isRotaryMode &&
+                                            <Text style={styles.text}>
+                                                {'    Travel Resolution:\n'}
+                                                {'        Y: ' + eeprom.$101 + '\n'}
+                                                {
+                                                    grblInfo.type === GRBLHAL && '        A: ' + eeprom.$103 + '\n'
+                                                }
+                                                {'    Maximum Rate:\n'}
+                                                {'        Y: ' + eeprom.$111 + '\n'}
+                                                {
+                                                    grblInfo.type === GRBLHAL && '        A: ' + eeprom.$113 + '\n'
+                                                }
+                                                {
+                                                    grblInfo.type === GRBLHAL &&
+                                                        '    Acceleration:\n' +
+                                                        '        Y: ' + eeprom.$121 + '\n' +
+                                                        '        A: ' + eeprom.$123 + '\n' +
+                                                        '    Travel Amount:\n' +
+                                                        '        Y: ' + eeprom.$131 + '\n' +
+                                                        '        A: ' + eeprom.$133 + '\n'
+                                                }
+                                            </Text>
+                                        }
                                     </Text>
                                 </Text>
                             </Text>

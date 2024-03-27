@@ -40,7 +40,7 @@ class DFU {
     dfu_SET_ADDRESS = 0x21;
     dfu_ERASE_PAGE = 0x41;
 
-    DFU_TIMEOUT = 5000;
+    DFU_TIMEOUT = 8000;
 
     constructor(path, options = {}) {
         this.path = path;
@@ -102,7 +102,7 @@ class DFU {
 
     getSegment(addr) {
         const { segments } = this.segments;
-        console.log(segments);
+
         for (let segment of segments) {
             if (segment.start <= addr && addr < segment.end) {
                 return segment;

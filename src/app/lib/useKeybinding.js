@@ -31,7 +31,7 @@ function useKeybinding(shuttleControlEvents) {
 
     Object.keys(shuttleControlEvents).forEach(eventName => {
         const defaultCommand = shuttleControlEvents[eventName];
-        if (eventName !== 'MACRO') {
+        if (eventName !== 'MACRO' && eventName !== 'STOP_CONT_JOG') {
             // add keybindings
             const currentCommandKeys = store.get('commandKeys', {});
             if (_.isEmpty(currentCommandKeys) || !currentCommandKeys[defaultCommand.cmd]) {

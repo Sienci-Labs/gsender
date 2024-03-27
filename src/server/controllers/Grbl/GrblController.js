@@ -1502,6 +1502,7 @@ class GrblController {
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
+                this.emit('job:start');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;

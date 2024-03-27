@@ -46,7 +46,7 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
         zProbeDistance = maxZTravel - curZPos - 1;
     }
 
-    return zProbeDistance;
+    return zProbeDistance.toFixed(3);
 };
 
 

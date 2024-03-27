@@ -33,7 +33,7 @@ import GrbHalLineParserResultParserState from './GrblHalLineParserResultParserSt
 import GrblHalLineParserResultParameters from './GrblHalLineParserResultParameters';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
-//import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
@@ -165,6 +165,11 @@ class GrblHalRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('status', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultStartup) {
+            console.log('Startup/restart message - rewind sender');
+            this.emit('startup', payload);
             return;
         }
         if (type === GrblHalLineParserResultCompleteStatus) {

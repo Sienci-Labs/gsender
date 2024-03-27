@@ -120,6 +120,7 @@ class Controller {
         'connection:new': [],
 
         'requestEstimateData': [],
+        'job:start': [],
     };
 
     context = {
