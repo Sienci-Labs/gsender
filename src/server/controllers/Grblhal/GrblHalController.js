@@ -274,6 +274,10 @@ class GrblHalController {
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
+                // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
+                const looksLikeEEPROM = line.charAt(0) === '$';
+                console.log(looksLikeEEPROM);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -322,11 +326,12 @@ class GrblHalController {
                 const words = ensureArray(data.words);
 
                 { // Program Mode: M0, M1
+                    // Look to check if first char is $ so we don't pause when updating an EEPROM macro.
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    if (programMode === 'M0') {
+                    if (programMode === 'M0' && !looksLikeEEPROM) {
                         log.debug('M0 Program Pause');
                         this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
-                    } else if (programMode === 'M1') {
+                    } else if (programMode === 'M1' && !looksLikeEEPROM) {
                         log.debug('M1 Program Pause');
                         this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
                     }
