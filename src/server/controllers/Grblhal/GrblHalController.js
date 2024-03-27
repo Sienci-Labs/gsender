@@ -276,7 +276,6 @@ class GrblHalController {
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
-                console.log(looksLikeEEPROM);
 
                 if (line[0] === '%') {
                     // %wait
