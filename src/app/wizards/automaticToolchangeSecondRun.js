@@ -36,7 +36,7 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
     const position = store.get('workspace.toolChangePosition');
     const curZPos = Math.abs(position.z);
 
-    return maxZTravel - curZPos - 2;
+    return (maxZTravel - curZPos - 2).toFixed(3);
 };
 
 
@@ -53,7 +53,8 @@ const wizard = {
         const $13 = get(state, 'controller.settings.settings.$13', '0');
         const zSafe = ($13 === '1') ? '-0.5' : '-10';
 
-        const zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
+        let zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
+        zProbeDistance = zProbeDistance.toFixed(3);
 
         controller.command('gcode', [
             '%wait',
