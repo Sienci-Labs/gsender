@@ -1920,7 +1920,7 @@ class GrblHalController {
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate;
+                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);
@@ -1986,10 +1986,10 @@ class GrblHalController {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                     if (axes.A) {
-                        axes.A *= 10000;
+                        axes.A *= jogFeedrate;
                     }
                 } else {
-                    jogFeedrate = 10000;
+                    //jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });
