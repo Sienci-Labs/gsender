@@ -481,6 +481,8 @@ class CNCEngine {
                     });
                 }
 
+                const isInDFUmode = flashPort === 'SLB_DFU';
+
                 //Close the controller for flasher utility to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
@@ -488,6 +490,7 @@ class CNCEngine {
                     if (isHal) {
                         // Do hal flash
                         controller.writeln('$DFU');
+
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                         delay(1500).then(() => {
                             console.log('Flash started for HAL');
@@ -495,13 +498,21 @@ class CNCEngine {
                         });
                         return;
                     }
+
                     // Normal flash - close port then flash using AVRgirl
                     controller.close(
                         () => {
                             FlashingFirmware(flashPort, imageType, socket);
                         }
                     );
+
                     store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+
+                    return;
+                }
+
+                if (isInDFUmode) {
+                    halFlasher.flash(data);
                 } else {
                     FlashingFirmware(flashPort, imageType, socket);
                 }
