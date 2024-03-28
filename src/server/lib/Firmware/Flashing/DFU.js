@@ -115,8 +115,12 @@ class DFU {
         const [vid, pid] = this.IDS;
 
         const device = findByIds(vid, pid);
-        device.timeout = this.DFU_TIMEOUT;
+        if (!device) {
+            throw new Error(`Unable to find valid device using vId: ${vid} and pID: ${pid}.  Make sure the device is in DFU mode.`);
+        }
+
         if (device) {
+            device.timeout = this.DFU_TIMEOUT;
             try {
                 this.device = await WebUSBDevice.createInstance(device);
 
