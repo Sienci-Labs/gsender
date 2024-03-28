@@ -14,17 +14,17 @@ import ProgressBar from './ProgressBar';
 
 import styles from './index.styl';
 
-// const SLB_DFU_PORT = {
-//     port: 'SLB_DFU',
-//     manufacturer: '',
-//     inuse: false,
-// };
+const SLB_DFU_PORT = {
+    port: 'SLB_DFU',
+    manufacturer: '',
+    inuse: false,
+};
 
 const HalFlashModal = ({ onClose }) => {
     const [notifications, setNotifications] = useState([]);
     const [portList, setPortList] = useState([
         ..._get(reduxStore.getState(), 'connection.ports', []),
-        // SLB_DFU_PORT
+        SLB_DFU_PORT
     ]);
     const [port, setPort] = useState(controller.port);
     const [isFlashing, setIsFlashing] = useState(false);
@@ -112,7 +112,7 @@ const HalFlashModal = ({ onClose }) => {
 
         setPortList([
             ...listOfPorts,
-            // SLB_DFU_PORT
+            SLB_DFU_PORT
         ]);
 
         if (port !== '' && portList.findIndex((p) => {

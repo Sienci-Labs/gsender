@@ -90,7 +90,9 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     });
     const imageType = getMachineProfileVersion(profile);
 
-    if (isHal && (!controller.isConnected || port !== controller.port)) {
+    const isInDFUmode = port === 'SLB_DFU';
+
+    if (isHal && !isInDFUmode && (!controller.isConnected || port !== controller.port)) {
         const connectionConfig = new WidgetConfig('connection');
         const baudrate = connectionConfig.get('baudrate');
         const controllerType = isHal ? GRBLHAL : GRBL;
