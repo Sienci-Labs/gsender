@@ -296,7 +296,9 @@ class Visualizer extends Component {
             const frameIndex = this.props.receivedLines;
             this.visualizer.setFrameIndex(frameIndex);
             // grey lines
-            this.visualizer.greyOutLines(this.props.senderStatus.currentLineRunning);
+            if (this.props.senderStatus) {
+                this.visualizer.greyOutLines(this.props.senderStatus.currentLineRunning);
+            }
         }
 
         // Projection
