@@ -45,7 +45,7 @@ class DFUFlasher extends events.EventEmitter {
         try {
             await this.dfu.open();
         } catch (e) {
-            this.emit('error', e);
+            this.emit('error', e.message);
         }
 
         this.map = this.parseHex(this.hex);
@@ -64,7 +64,7 @@ class DFUFlasher extends events.EventEmitter {
             await this.dfu.abortToIdle();
             log.info('Aborted to IDLE state');
         } catch (e) {
-            this.emit('error', e);
+            this.emit('error', e.message);
         }
 
         // Erase chip
