@@ -725,8 +725,6 @@ class GrblHalController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
 
-            log.error(`Error occurred at ${Date.now()}`);
-
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
             const isFileError = lines.length !== 0;
@@ -2146,7 +2144,7 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || this.actionMask.replyStatusReport;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT)  || cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
