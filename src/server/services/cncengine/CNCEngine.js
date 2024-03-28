@@ -494,7 +494,11 @@ class CNCEngine {
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                         delay(1500).then(() => {
                             console.log('Flash started for HAL');
-                            halFlasher.flash(data);
+                            try {
+                                halFlasher.flash(data);
+                            } catch (e) {
+                                this.emit('flash:message', { type: 'Error', content: err});
+                            }
                         });
                         return;
                     }
