@@ -70,7 +70,7 @@ const HalFlashModal = ({ onClose }) => {
 
         controller.addListener('flash:end', () => {
             setNotifications([
-                'Flash completed, please reset your board',
+                'Flash completed, please reconnect to your board.',
                 ...notifications,
             ]);
             setIsFlashing(false);

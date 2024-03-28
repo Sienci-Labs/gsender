@@ -137,7 +137,7 @@ class DFU {
                 log.info('Device opened');
             } catch (e) {
                 log.error(e);
-                throw new Error(`Open failed: ${e}`);
+                throw new Error(`Open failed: ${e.message}`);
             }
         } else {
             log.error('Unable to find valid DFU device');
