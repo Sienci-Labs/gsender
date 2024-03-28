@@ -7,7 +7,7 @@ import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 // import store from 'app/store';
-import { GRBL } from 'app/constants';
+import { GRBL, GRBLHAL } from 'app/constants';
 
 import defaultGRBLSettings from '../eepromFiles/DefaultGrblSettings.json';
 import {
@@ -89,6 +89,21 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
+
+    if (isHal && (!controller.isConnected || port !== controller.port)) {
+        const connectionConfig = new WidgetConfig('connection');
+        const baudrate = connectionConfig.get('baudrate');
+        const controllerType = isHal ? GRBLHAL : GRBL;
+        const isNetwork = ip.isV4Format(port);
+
+        controller.openPort(port, controllerType, {
+            baudrate,
+            rtscts: false,
+            network: isNetwork
+        });
+
+        controller.writeln('$DFU');
+    }
 
     controller.flashFirmware(port, imageType, isHal, hex);
 };
