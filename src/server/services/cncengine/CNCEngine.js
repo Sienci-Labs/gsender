@@ -496,8 +496,8 @@ class CNCEngine {
                             console.log('Flash started for HAL');
                             try {
                                 halFlasher.flash(data);
-                            } catch (e) {
-                                this.emit('flash:message', { type: 'Error', content: err});
+                            } catch (err) {
+                                this.emit('flash:message', { type: 'Error', content: err });
                             }
                         });
                         return;
