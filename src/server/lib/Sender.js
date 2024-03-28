@@ -430,6 +430,13 @@ class Sender extends events.EventEmitter {
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
             this.state.countdownIsPaused = false;
+            // catch up time estimation for start from line
+            if (startFromLine) {
+                this.state.totalSentToQueue = this.state.received;
+                for (let i = 0; i <= this.state.received; i++) {
+                    this.state.remainingTime -= Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100);
+                }
+            }
             // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
             this.checkIntervalID = setInterval(() => {
                 if (this.state.countdownQueue.length > 0 && this.state.queueDone) {

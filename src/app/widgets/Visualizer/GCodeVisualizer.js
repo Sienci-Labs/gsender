@@ -149,6 +149,17 @@ class GCodeVisualizer {
             } else if (this.plannedDone) {
                 colorAttr.set(runColorArray, offsetIndex);
                 colorAttr.updateRange.count = runColorArray.length;
+            // start from line
+            // (also runs when start from line = 0, but it's the same as running the else bracket bc the grey and buffer won't show up yet)
+            } else if (this.plannedV1 === undefined) {
+                // this.frameIndex starts at 0, so the yellow line we just made includes every line before the current starting line.
+                // redo yellow with the starting index being the end of the grey
+                const plannedColor = new THREE.Color(this.theme.get(PLANNED_PART));
+                const defaultColorArray = [...plannedColor.toArray(), 1]; // yellow
+                const colorArray = Array.from({ length: (this.frameIndex - v2FrameIndex + 1) }, () => defaultColorArray).flat();
+
+                colorAttr.set([...runColorArray, ...colorArray], offsetIndex);
+                colorAttr.updateRange.count = runColorArray.length + colorArray.length;
             // end not reached, update everything
             } else {
                 // set grey lines, planned lines that were previously calculated, and the buffer in between
