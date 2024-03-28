@@ -389,24 +389,26 @@ class Visualizer extends Component {
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
+
             if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
                 newPos = this.visualizer.getCurrentLocation();
             }
+
             let needUpdatePosition = false;
 
             // Machine position
-            const { x: mpox0, y: mpoy0, z: mpoz0 } = this.machinePosition;
-            const { x: mpox1, y: mpoy1, z: mpoz1 } = machinePosition;
-            if (mpox0 !== mpox1 || mpoy0 !== mpoy1 || mpoz0 !== mpoz1) {
+            const { x: mpox0, y: mpoy0, z: mpoz0, a: mpoa0 } = this.machinePosition;
+            const { x: mpox1, y: mpoy1, z: mpoz1, a: mpoa1 } = machinePosition;
+            if (mpox0 !== mpox1 || mpoy0 !== mpoy1 || mpoz0 !== mpoz1 || mpoa0 !== mpoa1) {
                 this.machinePosition = machinePosition;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
 
             // Work position
-            const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = newPos;
-            if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
+            const { x: wpox0, y: wpoy0, z: wpoz0, z: wpoa0, } = this.workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1, z: wpoa1 } = newPos;
+            if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1 || wpoa0 !== wpoa1) {
                 this.workPosition = newPos;
                 needUpdatePosition = true;
                 needUpdateScene = true;
