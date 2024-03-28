@@ -1,7 +1,6 @@
 import React, { useRef, useContext } from 'react';
-import { get } from 'lodash';
-import reduxStore from 'app/store/redux';
 
+import store from 'app/store';
 import { GRBLHAL } from 'app/constants';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
@@ -24,9 +23,10 @@ const ActionArea = () => {
         setSettingsToApply
     } = useContext(FirmwareContext);
     const inputRef = useRef();
-    const controllerType = get(reduxStore.getState(), 'controller.type');
-    const tooltipContent = controllerType === GRBLHAL ?
-        'Flash your board to grblHAL default values'
+    const controllerType = store.get('widgets.connection.controller.type', 'invalid');
+
+    const tooltipContent = controllerType === GRBLHAL
+        ? 'Flash your board to grblHAL default values'
         : 'Flash your Arduino board to GRBL default values';
 
     const openSettingsFile = (e) => {
@@ -52,10 +52,7 @@ const ActionArea = () => {
                 }));
                 setSettingsToApply(newSetting);
             } catch (error) {
-                Toaster.pop({
-                    msg: 'Unable to Load Settings From File',
-                    type: TOASTER_DANGER
-                });
+                Toaster.pop({ msg: 'Unable to Load Settings From File', type: TOASTER_DANGER });
             }
 
             return null;
@@ -70,6 +67,11 @@ const ActionArea = () => {
         exportFirmwareSettings(eeprom);
     };
 
+    const flashLabel = {
+        grbl: 'Grbl',
+        grblHAL: 'grblHAL'
+    }[controllerType] ?? 'Grbl';
+
     return (
         <>
             <Notifications />
@@ -78,14 +80,18 @@ const ActionArea = () => {
                 <div>
                     <Tooltip content={tooltipContent} location="default">
                         <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true, controllerType === GRBLHAL)}>
-                            Flash GRBL
+                            Flash {flashLabel}
                         </ToolModalButton>
                     </Tooltip>
                 </div>
 
                 <div className={styles.buttonsMiddle}>
                     <Tooltip content="Import your GRBL settings file" location="default">
-                        <ToolModalButton icon="fas fa-file-import" onClick={() => inputRef.current?.click()} disabled={!canSendSettings}>
+                        <ToolModalButton
+                            icon="fas fa-file-import"
+                            onClick={() => inputRef.current?.click()}
+                            disabled={!canSendSettings}
+                        >
                             Import Settings
                         </ToolModalButton>
                     </Tooltip>
