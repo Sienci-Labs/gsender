@@ -643,7 +643,7 @@ class GrblHalController {
                 this.emit('serialport:read', res.raw);
             }
 
-            // Check if the receive buffer is available in the status report
+            // Check if the recieve buffer is available in the status report
             const rx = Number(_.get(res, 'buf.rx', 0)) || 0;
             if (rx > 0) {
                 // Do not modify the buffer size when running a G-code program
@@ -2144,7 +2144,7 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT)  || cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT || this.actionMask.replyStatusReport;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
