@@ -102,6 +102,25 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.5 (March 28, 2024)
+- Fix for jog shortcuts not sending short movement when quick pressed.
+- GRBL firmware tool correctly updates values when list shortened with search term
+- More rounding in tool changing values.
+- Various updates to diagnostic PDF to include more at-a-glance information.
+- HAL firmware categories loaded more consistently on connection
+- HAL errors/alarms list populates more consistently on connection
+- Renamed some firmware categories for clearer organization
+- Better handling of cycle start, pause, and halt macro button functionalities
+- Fixed choppiness in visualization in 4-axis mode.
+- A-axis continuous jogging works as expected with soft limits enabled in 4-axis mode
+- Feeder no longer pauses when setting EEPROM macro code block with a M0/M1 included.
+- Rotary mode status correctly set on connection.
+- Random errors no longer appear on connection
+- Error log cleared on job start to prevent errors from not sending a job aren't included in the job error report.
+- Adjust HAL jogging values
+- Added ability to flash SLB already in DFU mode
+- Flashing UX improvements for HAL
+
 ### 1.4.4 (March 15, 2024)
 - Firmware selection hidden by default to avoid misclicks, and selected firmware reset to GRBL for all users.
 - Removed situations where no firmware option was selected on initial update of gSender
