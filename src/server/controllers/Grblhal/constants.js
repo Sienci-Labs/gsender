@@ -37,8 +37,8 @@ export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 
 // Real-time Commands: ~, !, ?, and Ctrl-x
 export const GRBLHAL_REALTIME_COMMANDS = {
-    CYCLE_START: '\x81',
-    FEED_HOLD: '\x82',
+    CYCLE_START: '~',
+    FEED_HOLD: '!',
     STATUS_REPORT: '?',
     CMD_RESET: '\x18',
     COMPLETE_REALTIME_REPORT: '\x87',
