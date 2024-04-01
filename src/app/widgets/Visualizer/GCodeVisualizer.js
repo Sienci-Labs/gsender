@@ -121,7 +121,7 @@ class GCodeVisualizer {
         const v1FrameIndex = currentLineRunning - 2 >= 0 ? currentLineRunning - 2 : 0;
         const v2FrameIndex = currentLineRunning - 2 >= 0 ? currentLineRunning - 1 : 0;
         // fill from the last frame index to the current one - 2
-        const v1 = this.frames[this.oldFrameIndex || v1FrameIndex];
+        const v1 = this.frames[this.plannedV1 === undefined ? 0 : (this.oldFrameIndex || v1FrameIndex)];
         const v2 = this.frames[v2FrameIndex];
 
         if (v1 < v2) {
