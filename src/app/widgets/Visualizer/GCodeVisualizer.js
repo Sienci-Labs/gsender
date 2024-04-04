@@ -41,6 +41,7 @@ class GCodeVisualizer {
         this.plannedColorArray = null;
         this.plannedV1 = null;
         this.plannedDone = false;
+        this.resetColours = false;
 
         return this;
     }
@@ -89,6 +90,7 @@ class GCodeVisualizer {
         const v2 = this.frames[frameIndex]; // recieved lines
 
         if (v1 < v2) {
+            this.resetColours = false;
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat(); // current movement
             // cant set yet, because grey lines will also be calculated soon
             this.plannedColorArray = colorArray;
@@ -97,6 +99,8 @@ class GCodeVisualizer {
 
         // Restore the path to its original colors
         if (v2 < v1) {
+            // console.log('hi');
+            this.resetColours = true;
             // reset vars
             this.oldFrameIndex = null;
             this.plannedColorArray = null;
@@ -121,10 +125,12 @@ class GCodeVisualizer {
         const v1FrameIndex = currentLineRunning - 2 >= 0 ? currentLineRunning - 2 : 0;
         const v2FrameIndex = currentLineRunning - 2 >= 0 ? currentLineRunning - 1 : 0;
         // fill from the last frame index to the current one - 2
+        // if start from line (this.plannedv1 - 0), start at 0
         const v1 = this.frames[this.plannedV1 === undefined ? 0 : (this.oldFrameIndex || v1FrameIndex)];
         const v2 = this.frames[v2FrameIndex];
 
-        if (v1 < v2) {
+        if (v1 < v2 && !this.resetColours) {
+            // console.log('uh oh');
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
             const offsetIndex = v1 * 4;
@@ -141,17 +147,20 @@ class GCodeVisualizer {
 
             // if we have reached the end, fill in the rest of the yellow
             if (!this.plannedDone && this.frameIndex === this.frames.length - 1) {
+                // console.log('reaching end');
                 const newBufferColorArray = Array.from({ length: (this.frames[this.frames.length - 1] - this.frames[v1FrameIndex + 1]) }, () => yellowArray).flat();
                 colorAttr.set([...runColorArray, ...newBufferColorArray], offsetIndex);
                 colorAttr.updateRange.count = runColorArray.length + newBufferColorArray.length;
                 this.plannedDone = true;
             // if the end has alrdy been reached, only update grey
             } else if (this.plannedDone) {
+                // console.log('end reached');
                 colorAttr.set(runColorArray, offsetIndex);
                 colorAttr.updateRange.count = runColorArray.length;
             // start from line
             // (also runs when start from line = 0, but it's the same as running the else bracket bc the grey and buffer won't show up yet)
             } else if (this.plannedV1 === undefined) {
+                // console.log('start from line/0');
                 // this.frameIndex starts at 0, so the yellow line we just made includes every line before the current starting line.
                 // redo yellow with the starting index being the end of the grey
                 const plannedColor = new THREE.Color(this.theme.get(PLANNED_PART));
@@ -162,6 +171,7 @@ class GCodeVisualizer {
                 colorAttr.updateRange.count = runColorArray.length + colorArray.length;
             // end not reached, update everything
             } else {
+                // console.log('normal');
                 // set grey lines, planned lines that were previously calculated, and the buffer in between
                 colorAttr.set([...runColorArray, ...bufferColorArray, ...this.plannedColorArray], offsetIndex);
                 colorAttr.updateRange.count = runColorArray.length + bufferColorArray.length + this.plannedColorArray.length;
@@ -198,6 +208,7 @@ class GCodeVisualizer {
         this.plannedColorArray = null;
         this.plannedV1 = null;
         this.plannedDone = false;
+        this.resetColours = false;
     }
 
     getHull() {
