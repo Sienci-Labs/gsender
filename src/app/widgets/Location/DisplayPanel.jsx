@@ -258,10 +258,11 @@ class DisplayPanel extends PureComponent {
 
     //Only rounds values with more than 3 decimal places which begin with 9
     customMathRound(num) {
-        const { $13 } = this.props;
+        const { $13, units } = this.props;
+        console.log(units);
         const DRO = store.get('workspace.customDecimalPlaces', 0);
         const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
-        const defaultPlaces = $13 === '1' ? 3 : 2; // default places when DRO = 0
+        const defaultPlaces = ($13 === '1' || units === IMPERIAL_UNITS) ? 3 : 2; // default places when DRO = 0
         const wholeLength = num.split('.')[0].length;
 
         let result = num.slice(0, wholeLength + 1 + places); // cut off the javascript weirdness
@@ -275,8 +276,8 @@ class DisplayPanel extends PureComponent {
 
     renderAxis = (axis, disabled = false, disableGoTo = false) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
-        let mpos = !disabled ? machinePosition[axis] : '0.00';
-        const wpos = !disabled ? workPosition[axis] : '0.00';
+        let mpos = !disabled ? machinePosition[axis] : '0.000';
+        const wpos = !disabled ? workPosition[axis] : '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
 
