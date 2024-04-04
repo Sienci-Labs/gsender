@@ -259,7 +259,7 @@ class DisplayPanel extends PureComponent {
     //Only rounds values with more than 3 decimal places which begin with 9
     customMathRound(num) {
         const { $13, units } = this.props;
-        console.log(units);
+
         const DRO = store.get('workspace.customDecimalPlaces', 0);
         const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
         const defaultPlaces = ($13 === '1' || units === IMPERIAL_UNITS) ? 3 : 2; // default places when DRO = 0
