@@ -715,6 +715,8 @@ class GrblHalController {
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
             const isRunning = this.workflow.isRunning();
+            const firmwareIsAlarmed = this.runner.isAlarm();
+
             if (isRunning) {
                 this.workflow.pause();
                 this.sender.hold();
@@ -724,6 +726,11 @@ class GrblHalController {
 
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
+
+            // Don't emit errors to UI in situations where firmware is currently alarmed
+            if (firmwareIsAlarmed) {
+                return;
+            }
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
