@@ -41,7 +41,7 @@ export const GRBLHAL_REALTIME_COMMANDS = {
     FEED_HOLD: '!',
     STATUS_REPORT: '?',
     CMD_RESET: '\x18',
-    COMPLETE_REALTIME_REPORT: '\x87',
+    COMPLETE_REALTIME_REPORT: String.fromCharCode(0x87),
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',
     ERR_CLEAR: 'ErrClear'

@@ -728,8 +728,8 @@ class GrblHalController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
 
-            // Don't emit errors to UI in situations where firmware is currently alarmed
-            if (firmwareIsAlarmed) {
+            // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
+            if (firmwareIsAlarmed || code === 79) {
                 return;
             }
 
@@ -1770,6 +1770,9 @@ class GrblHalController {
                 this.write('\x18'); // ^x
                 delay(250).then(() => {
                     this.writeln('$X');
+                    delay(50).then(() => {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    });
                 });
             },
             'checkStateUpdate': () => {
