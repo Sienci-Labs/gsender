@@ -1951,16 +1951,16 @@ class GrblHalController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
-                        const OFFSET = 1;
+                        const OFFSET = -1;
 
                         if (position === 0) {
-                            return ((maxTravel) * direction).toFixed(FIXED);
+                            return ((maxTravel + OFFSET) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number(position - OFFSET).toFixed(FIXED);
+                            return Number(position + OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position + OFFSET)).toFixed(FIXED);
                         }
                     };
 
