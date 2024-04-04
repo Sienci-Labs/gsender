@@ -37,7 +37,7 @@ import { convertSecondsToTimeStamp } from '../../../lib/datetime';
  */
 const ProgressArea = ({ state }) => {
     const { senderStatus } = state;
-    const { total, received, elapsedTime, remainingTime, startTime } = senderStatus;
+    const { total, received, elapsedTime, remainingTime, estimatedTime, startTime } = senderStatus;
 
     /**
      * Format given time value to display minutes and seconds
@@ -95,7 +95,7 @@ const ProgressArea = ({ state }) => {
         return getFinishTime(remainingTime);
     };
 
-    const percentageValue = Number.isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
+    const percentageValue = Number.isNaN(((estimatedTime - remainingTime) / estimatedTime) * 100) ? 0 : (((estimatedTime - remainingTime) / estimatedTime) * 100).toFixed(0);
 
     return (
         <div style={{ width: '50%', marginRight: '1rem' }}>

@@ -455,8 +455,7 @@ class Sender extends events.EventEmitter {
         }
 
         // Elapsed Time
-        this.state.elapsedTime = now - this.state.startTime;
-        this.state.timeRunning = this.state.elapsedTime;
+        this.updateElapsedTime();
         // subtract time paused
         if (this.state.timePaused > 0) {
             this.state.timeRunning -= this.state.timePaused;
@@ -502,6 +501,7 @@ class Sender extends events.EventEmitter {
                     this.state.remainingTime -= this.state.timer;
                     this.state.remainingTime = this.state.remainingTime.toFixed(4);
                     this.state.timer = 0;
+                    this.updateElapsedTime();
                     this.emit('change');
                     this.fakeCountdown();
                 }
@@ -511,6 +511,7 @@ class Sender extends events.EventEmitter {
                 if (!this.state.countdownIsPaused) {
                     this.state.timer--;
                     this.state.remainingTime--;
+                    this.updateElapsedTime();
 
                     if (this.state.timer < 1) {
                         clearInterval(this.countDownID);
@@ -588,6 +589,13 @@ class Sender extends events.EventEmitter {
         clearInterval(this.countDownID);
         this.state.queueDone = true;
         this.state.remainingTime -= this.state.timer;
+    }
+
+    updateElapsedTime() {
+        // Elapsed Time
+        const now = new Date().getTime();
+        this.state.elapsedTime = now - this.state.startTime;
+        this.state.timeRunning = this.state.elapsedTime;
     }
 }
 
