@@ -161,7 +161,8 @@ class GrblHalController {
 
         // Respond to user input
         replyParserState: false, // $G
-        replyStatusReport: false // ?
+        replyStatusReport: false, // ?
+        alarmCompleteReport: false //0x87
     };
 
     actionTime = {
@@ -971,10 +972,14 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                if (this.runner.isAlarm()) {
+                if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    this.actionMask.alarmCompleteReport = false;
                 } else {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    if (!this.actionMask.alarmCompleteReport) {
+                        this.actionMask.alarmCompleteReport = true;
+                    }
                 }
             }
         };
