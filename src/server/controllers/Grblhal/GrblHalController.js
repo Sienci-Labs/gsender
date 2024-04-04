@@ -1768,9 +1768,8 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(100).then(() => {
+                delay(250).then(() => {
                     this.writeln('$X');
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
                 });
             },
             'checkStateUpdate': () => {
