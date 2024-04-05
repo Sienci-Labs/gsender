@@ -102,6 +102,15 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.6 (April 5, 2024)
+- Values properly convert in surfacing tool when swapping between metric and imperial preferred units
+- Fixed default UI value precision when swapping between metric and imperial preferred units
+- Handle error silently when checking for updates but no internet connection is available
+- Added default profiles for all machines when connected using grblHAL and using the 'Restore Defaults' functionality
+- No longer emit error 79 when connecting with e-stop enabled on SLB
+- Fixed issue with soft limit Z jogging when trying to jog from machine limits
+- Fixed status query mask when sending 0x87 complete status report vs ? partial status report to prevent alarm states from being slow to clear on UI
+
 ### 1.4.5 (March 28, 2024)
 - Fix for jog shortcuts not sending short movement when quick pressed.
 - GRBL firmware tool correctly updates values when list shortened with search term
