@@ -39,7 +39,7 @@ export const LONGMILL_MASTER_LIST_GRBLHAL = {
     $36: '100.0',
     $37: '0',
     $39: '1',
-    $40: '1', //Homing needs to be enabled
+    $40: '0', //Homing needs to be enabled
     $41: '1',
     $42: '2',
     $43: '1',
@@ -149,7 +149,7 @@ export const LONGMILL_MASTER_LIST_GRBLHAL = {
     $469: '60.0',
     $470: '60.0',
     $471: '100.0',
-    $478: '3', //Setting disabled
+    // $478: '3', // Setting disabled
     $479: '4',
     $481: '0',
     $484: '1',
@@ -159,7 +159,7 @@ export const LONGMILL_MASTER_LIST_GRBLHAL = {
     $513: '5',
     $520: '0',
     $521: '0',
-    $522: '0', //Setting disabled
+    // $522: '0', // Setting disabled
     $523: '0',
     $650: '1',
     $651: '1',
