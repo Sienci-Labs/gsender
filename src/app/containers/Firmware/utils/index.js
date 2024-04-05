@@ -110,8 +110,12 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     controller.flashFirmware(port, imageType, isHal, hex);
 };
 
-export const restoreDefaultSettings = (machineProfile) => {
-    const eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+export const restoreDefaultSettings = (machineProfile, controllerType) => {
+    const eepromSettings = controllerType === GRBLHAL
+        ? machineProfile?.grblHALeepromSettings
+        : machineProfile?.eepromSettings ??
+        defaultGRBLSettings;
+
     const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
     values.push('$$');
 
