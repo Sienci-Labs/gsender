@@ -399,6 +399,11 @@ export const GRBL_HAL_ERRORS = [
         message: 'Bluetooth',
         description: 'Bluetooth initialisation failed.'
     },
+    {
+        code: 79,
+        message: 'Critical Event',
+        description: 'Not allowed while critical event is active.'
+    },
 ];
 
 // Alarms
