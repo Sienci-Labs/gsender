@@ -19,6 +19,7 @@ import Generator from '../../utils/Generator';
 import TabArea from '../TabArea';
 import { SurfacingContext } from './Context';
 import { collectUserUsageData } from '../../../../lib/heatmap';
+import { convertValuesToImperial, convertValuesToMetric } from '../../utils';
 
 /**
  * @component Surfacing
@@ -76,7 +77,7 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
         onClose();
     };
 
-    const handleChange = ({ target, shouldConvert = true }) => {
+    const handleChange = ({ target }) => {
         const { id, value } = target;
 
         const val = Math.abs(Number(value));
@@ -105,6 +106,12 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
             }
         }
 
+        const units = store.get('workspace.units');
+
+        if (units === 'in' && surfacing) {
+            setSurfacing(prev => convertValuesToImperial(prev));
+        }
+
         const timeout = setTimeout(() => {
             collectUserUsageData(USAGE_TOOL_NAME.SURFACING);
         }, 5000);
@@ -116,7 +123,11 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
     }, []);
 
     useEffect(() => {
-        store.replace('widgets.surfacing', surfacing);
+        const units = store.get('workspace.units');
+
+        const surfacingData = units === 'in' && surfacing ? convertValuesToMetric(surfacing) : surfacing;
+
+        store.replace('widgets.surfacing', surfacingData);
     }, [surfacing]);
 
     useEffect(() => {
