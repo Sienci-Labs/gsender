@@ -172,6 +172,7 @@ class Sender extends events.EventEmitter {
         queueDone: true,
         timer: 0,
         countdownIsPaused: false,
+        isRotaryFile: false,
     };
 
     stateChanged = false;
@@ -288,6 +289,7 @@ class Sender extends events.EventEmitter {
             dataLength: this.state.dataLength,
             estimatedTime: this.state.estimatedTime,
             ovF: this.state.ovF,
+            isRotaryFile: this.state.isRotaryFile,
         };
     }
 
@@ -347,6 +349,13 @@ class Sender extends events.EventEmitter {
         this.state.totalSentToQueue = 0;
         this.state.queueDone = true;
 
+        // check if file is rotary
+        const commentMatcher = /\s*;.*/g;
+        const bracketCommentLine = /\([^\)]*\)/gm;
+        const content = gcode.replace(bracketCommentLine, '').trim().replace(commentMatcher, '').trim();
+        this.state.isRotaryFile = content.includes('A');
+        console.log(this.state.isRotaryFile);
+
         this.emit('load', name, gcode, context);
         log.debug('sender requesting');
         this.emit('requestData');
@@ -380,6 +389,7 @@ class Sender extends events.EventEmitter {
         this.state.countdownQueue = [];
         this.state.totalSentToQueue = 0;
         this.state.queueDone = true;
+        this.state.isRotaryFile = false;
 
         this.emit('unload');
         this.emit('change');
@@ -429,13 +439,15 @@ class Sender extends events.EventEmitter {
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
             this.state.countdownIsPaused = false;
-            // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
-            this.checkIntervalID = setInterval(() => {
-                if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
-                    this.state.queueDone = false;
-                    this.fakeCountdown();
-                }
-            }, 100);
+            if (!this.isRotaryFile) {
+                // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
+                this.checkIntervalID = setInterval(() => {
+                    if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
+                        this.state.queueDone = false;
+                        this.fakeCountdown();
+                    }
+                }, 100);
+            }
             this.emit('start', this.state.startTime);
             this.emit('change');
         };
@@ -461,13 +473,24 @@ class Sender extends events.EventEmitter {
             this.state.timeRunning -= this.state.timePaused;
         }
 
-        if (this.state.received > 0) {
-            if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
-                if (this.state.received < this.state.estimateData.length) {
-                    // add the lines to the queue from where we left off to the current number received
-                    for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
-                        this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
-                        this.state.totalSentToQueue++;
+        if (this.state.isRotaryFile) {
+            // Make a 1 second delay before estimating the remaining time
+            if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
+                // console.log('hi');
+                const timePerCode = this.state.elapsedTime / this.state.received;
+                this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
+                console.log(this.state.remainingTime);
+            }
+        } else {
+            // eslint-disable-next-line no-lonely-if
+            if (this.state.received > 0) {
+                if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
+                    if (this.state.received < this.state.estimateData.length) {
+                        // add the lines to the queue from where we left off to the current number received
+                        for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
+                            this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
+                            this.state.totalSentToQueue++;
+                        }
                     }
                 }
             }
