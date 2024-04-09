@@ -290,6 +290,7 @@ class Sender extends events.EventEmitter {
             estimatedTime: this.state.estimatedTime,
             ovF: this.state.ovF,
             isRotaryFile: this.state.isRotaryFile,
+            currentLineRunning: this.state.totalSentToQueue - this.state.countdownQueue.length,
         };
     }
 
@@ -439,6 +440,14 @@ class Sender extends events.EventEmitter {
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
             this.state.countdownIsPaused = false;
+
+            // catch up time estimation for start from line
+            if (startFromLine) {
+                this.state.totalSentToQueue = this.state.received;
+                for (let i = 0; i <= this.state.received; i++) {
+                    this.state.remainingTime -= Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100);
+                }
+            }
             if (!this.isRotaryFile) {
                 // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
                 this.checkIntervalID = setInterval(() => {
@@ -448,6 +457,7 @@ class Sender extends events.EventEmitter {
                     }
                 }, 100);
             }
+
             this.emit('start', this.state.startTime);
             this.emit('change');
         };
