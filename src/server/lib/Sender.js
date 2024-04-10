@@ -24,6 +24,7 @@
 /* eslint max-classes-per-file: 0 */
 import events from 'events';
 import logger from './logger';
+import { checkIfRotaryFile } from './rotary';
 
 export const SP_TYPE_SEND_RESPONSE = 0;
 export const SP_TYPE_CHAR_COUNTING = 1;
@@ -351,11 +352,7 @@ class Sender extends events.EventEmitter {
         this.state.queueDone = true;
 
         // check if file is rotary
-        const commentMatcher = /\s*;.*/g;
-        const bracketCommentLine = /\([^\)]*\)/gm;
-        const content = gcode.replace(bracketCommentLine, '').trim().replace(commentMatcher, '').trim();
-        this.state.isRotaryFile = content.includes('A');
-        console.log(this.state.isRotaryFile);
+        this.state.isRotaryFile = checkIfRotaryFile(gcode);
 
         this.emit('load', name, gcode, context);
         log.debug('sender requesting');
@@ -486,10 +483,8 @@ class Sender extends events.EventEmitter {
         if (this.state.isRotaryFile) {
             // Make a 1 second delay before estimating the remaining time
             if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-                // console.log('hi');
                 const timePerCode = this.state.elapsedTime / this.state.received;
                 this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
-                console.log(this.state.remainingTime);
             }
         } else {
             // eslint-disable-next-line no-lonely-if
