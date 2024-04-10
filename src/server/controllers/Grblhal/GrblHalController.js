@@ -161,7 +161,8 @@ class GrblHalController {
 
         // Respond to user input
         replyParserState: false, // $G
-        replyStatusReport: false // ?
+        replyStatusReport: false, // ?
+        alarmCompleteReport: false //0x87
     };
 
     actionTime = {
@@ -643,7 +644,7 @@ class GrblHalController {
                 this.emit('serialport:read', res.raw);
             }
 
-            // Check if the receive buffer is available in the status report
+            // Check if the recieve buffer is available in the status report
             const rx = Number(_.get(res, 'buf.rx', 0)) || 0;
             if (rx > 0) {
                 // Do not modify the buffer size when running a G-code program
@@ -715,6 +716,8 @@ class GrblHalController {
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
             const isRunning = this.workflow.isRunning();
+            const firmwareIsAlarmed = this.runner.isAlarm();
+
             if (isRunning) {
                 this.workflow.pause();
                 this.sender.hold();
@@ -725,7 +728,10 @@ class GrblHalController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
 
-            log.error(`Error occurred at ${Date.now()}`);
+            // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
+            if (firmwareIsAlarmed || code === 79) {
+                return;
+            }
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -966,10 +972,14 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                if (this.runner.isAlarm()) {
+                if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    this.actionMask.alarmCompleteReport = false;
                 } else {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    if (!this.actionMask.alarmCompleteReport) {
+                        this.actionMask.alarmCompleteReport = true;
+                    }
                 }
             }
         };
@@ -1758,9 +1768,11 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(100).then(() => {
+                delay(250).then(() => {
                     this.writeln('$X');
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                    delay(50).then(() => {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    });
                 });
             },
             'checkStateUpdate': () => {
@@ -1920,11 +1932,14 @@ class GrblHalController {
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate;
+                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);
                     $132 = Number($132);
+
+                    // Update homing flag always, not just on homing
+                    this.homingFlagSet = determineHALMachineZeroFlag({}, this.settings);
 
                     // Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
                     if (units !== METRIC_UNITS) {
@@ -1939,16 +1954,16 @@ class GrblHalController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
-                        const OFFSET = 1;
+                        const OFFSET = -1;
 
                         if (position === 0) {
-                            return ((maxTravel) * direction).toFixed(FIXED);
+                            return ((maxTravel + OFFSET) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number(position - OFFSET).toFixed(FIXED);
+                            return Number(position + OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position + OFFSET)).toFixed(FIXED);
                         }
                     };
 
@@ -1986,10 +2001,10 @@ class GrblHalController {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                     if (axes.A) {
-                        axes.A *= 10000;
+                        axes.A *= jogFeedrate;
                     }
                 } else {
-                    jogFeedrate = 10000;
+                    //jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });
@@ -2146,7 +2161,7 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || this.actionMask.replyStatusReport;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {

@@ -37,8 +37,8 @@ export const getEstimateData = () => {
                 .objectStore(OBJECT_STORE)
                 .get(DATA_ID).onsuccess = (event) => {
                     return resolve({
-                        estimates: event.target.result.estimates,
-                        estimatedTime: event.target.result.info.estimatedTime
+                        estimates: event.target.result?.estimates,
+                        estimatedTime: event.target.result?.info?.estimatedTime
                     });
                 };
         };

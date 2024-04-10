@@ -10,7 +10,6 @@ import inputStyles from 'app/containers/Surfacing/components/InputArea/input.sty
 import { Checkbox } from 'app/components/Checkbox';
 import MultiInputBlock from 'app/containers/Surfacing/components/InputArea/MultiInputBlock';
 
-// import { convertValuesToImperial } from '../../utils';
 import { RotaryContext } from '../../Context';
 import { convertValuesToImperial } from '../../../../containers/Surfacing/utils';
 import { UPDATE_STOCK_TURNING_OPTION } from '../../Context/actions';

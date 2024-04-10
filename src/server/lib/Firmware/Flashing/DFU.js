@@ -115,8 +115,12 @@ class DFU {
         const [vid, pid] = this.IDS;
 
         const device = findByIds(vid, pid);
-        device.timeout = this.DFU_TIMEOUT;
+        if (!device) {
+            throw new Error(`Unable to find valid device using vendor ID "${vid.toString(16)}" and product ID "${pid.toString(16)}".  Make sure the device is in DFU mode.`);
+        }
+
         if (device) {
+            device.timeout = this.DFU_TIMEOUT;
             try {
                 this.device = await WebUSBDevice.createInstance(device);
 
@@ -137,7 +141,7 @@ class DFU {
                 log.info('Device opened');
             } catch (e) {
                 log.error(e);
-                throw new Error(`Open failed: ${e}`);
+                throw new Error(`Open failed: ${e.message}`);
             }
         } else {
             log.error('Unable to find valid DFU device');

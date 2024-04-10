@@ -37,11 +37,11 @@ export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 
 // Real-time Commands: ~, !, ?, and Ctrl-x
 export const GRBLHAL_REALTIME_COMMANDS = {
-    CYCLE_START: '\x81',
-    FEED_HOLD: '\x82',
+    CYCLE_START: '~',
+    FEED_HOLD: '!',
     STATUS_REPORT: '?',
     CMD_RESET: '\x18',
-    COMPLETE_REALTIME_REPORT: '\x87',
+    COMPLETE_REALTIME_REPORT: String.fromCharCode(0x87),
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',
     ERR_CLEAR: 'ErrClear'
@@ -398,6 +398,11 @@ export const GRBL_HAL_ERRORS = [
         code: 70,
         message: 'Bluetooth',
         description: 'Bluetooth initialisation failed.'
+    },
+    {
+        code: 79,
+        message: 'Critical Event',
+        description: 'Not allowed while critical event is active.'
     },
 ];
 

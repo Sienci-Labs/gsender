@@ -21,10 +21,10 @@ Some things that we’re looking to accomplish with this sender:
 
 gSender is available for the following systems and does not yet support headless Pi operation
 
-| Windows (x64)                                                                                                               | Mac (Intel)                                                                                                                 | Linux (Intel)                                                                                                                        | Linux (ARM)                                                                                                                   | Pi (64 bit)                                                                                                                       |
+| Windows (x64)                                                                                                               | Mac (Universal)                                                                                                                 | Linux (Intel)                                                                                                                        | Linux (ARM)                                                                                                                   | Pi (64 bit)                                                                                                                       |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.4/gSender-1.4.4-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.4/gSender-1.4.4-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.4/gSender-1.4.4-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.4/gSender-1.4.4-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.4/gSender-1.4.4-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -32,7 +32,7 @@ gSender is available for the following systems and does not yet support headless
 
 ## 📦 Current Features
 
-* [Grbl](https://github.com/gnea/grbl/releases) controllers supported
+* [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported
 * Smart machine connection
 * 3-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
@@ -101,6 +101,34 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.4.6 (April 5, 2024)
+- Values properly convert in surfacing tool when swapping between metric and imperial preferred units
+- Fixed default UI value precision when swapping between metric and imperial preferred units
+- Handle error silently when checking for updates but no internet connection is available
+- Added default profiles for all machines when connected using grblHAL and using the 'Restore Defaults' functionality
+- No longer emit error 79 when connecting with e-stop enabled on SLB
+- Fixed issue with soft limit Z jogging when trying to jog from machine limits
+- Fixed status query mask when sending 0x87 complete status report vs ? partial status report to prevent alarm states from being slow to clear on UI
+
+### 1.4.5 (March 28, 2024)
+- Fix for jog shortcuts not sending short movement when quick pressed.
+- GRBL firmware tool correctly updates values when list shortened with search term
+- More rounding in tool changing values.
+- Various updates to diagnostic PDF to include more at-a-glance information.
+- HAL firmware categories loaded more consistently on connection
+- HAL errors/alarms list populates more consistently on connection
+- Renamed some firmware categories for clearer organization
+- Better handling of cycle start, pause, and halt macro button functionalities
+- Fixed choppiness in visualization in 4-axis mode.
+- A-axis continuous jogging works as expected with soft limits enabled in 4-axis mode
+- Feeder no longer pauses when setting EEPROM macro code block with a M0/M1 included.
+- Rotary mode status correctly set on connection.
+- Random errors no longer appear on connection
+- Error log cleared on job start to prevent errors from not sending a job aren't included in the job error report.
+- Adjust HAL jogging values
+- Added ability to flash SLB already in DFU mode
+- Flashing UX improvements for HAL
 
 ### 1.4.4 (March 15, 2024)
 - Firmware selection hidden by default to avoid misclicks, and selected firmware reset to GRBL for all users.

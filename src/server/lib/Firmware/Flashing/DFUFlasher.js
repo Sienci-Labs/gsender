@@ -42,7 +42,12 @@ class DFUFlasher extends events.EventEmitter {
     }
 
     async flash() {
-        await this.dfu.open();
+        try {
+            await this.dfu.open();
+        } catch (e) {
+            this.emit('error', e.message);
+        }
+
         this.map = this.parseHex(this.hex);
 
         let startAddress = null;
@@ -55,8 +60,12 @@ class DFUFlasher extends events.EventEmitter {
             byteSize += dataBlock.byteLength;
         }
 
-        await this.dfu.abortToIdle();
-        log.info('Aborted to IDLE state');
+        try {
+            await this.dfu.abortToIdle();
+            log.info('Aborted to IDLE state');
+        } catch (e) {
+            this.emit('error', e.message);
+        }
 
         // Erase chip
         await this.erase(startAddress, byteSize);
