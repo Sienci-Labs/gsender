@@ -46,9 +46,14 @@ const Notifications = () => {
 
     const restoreDefaults = () => {
         const controllerType = get(reduxStore.getState(), 'controller.type', 'grbl');
-        const machineProfileUpdated = { ...machineProfile, eepromSettings: machineProfile.eepromSettings ?? (controllerType === GRBLHAL ? defaultGRBLHALSettings : defaultGRBLSettings) };
-        restoreDefaultSettings(machineProfileUpdated);
-        setSettings(prev => prev.map(item => ({ ...item, value: machineProfileUpdated.eepromSettings[item.setting] })));
+        const machineProfileUpdated = {
+            ...machineProfile,
+            eepromSettings: machineProfile.eepromSettings ?? defaultGRBLSettings,
+            grblHALeepromSettings: machineProfile.grblHALeepromSettings ?? defaultGRBLHALSettings,
+        };
+
+        restoreDefaultSettings(machineProfileUpdated, controllerType);
+        setSettings(prev => prev.map(item => ({ ...item, value: machineProfileUpdated.grblHALeepromSettings[item.setting] })));
         setShouldRestoreDefault(false);
     };
 
@@ -87,10 +92,10 @@ const Notifications = () => {
 
                 {shouldRestoreDefault && (
                     <ToolsNotificationModal
-                        title="Restore Cnc Defaults"
+                        title="Restore CNC Defaults"
                         onClose={() => setShouldRestoreDefault(false)}
                         show={shouldRestoreDefault}
-                        footer="Restore your Cnc machine?"
+                        footer="Restore your CNC machine?"
                         yesFunction={restoreDefaults}
                     >
                         {message}

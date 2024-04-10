@@ -161,7 +161,8 @@ class GrblHalController {
 
         // Respond to user input
         replyParserState: false, // $G
-        replyStatusReport: false // ?
+        replyStatusReport: false, // ?
+        alarmCompleteReport: false //0x87
     };
 
     actionTime = {
@@ -715,6 +716,8 @@ class GrblHalController {
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
             const isRunning = this.workflow.isRunning();
+            const firmwareIsAlarmed = this.runner.isAlarm();
+
             if (isRunning) {
                 this.workflow.pause();
                 this.sender.hold();
@@ -724,6 +727,11 @@ class GrblHalController {
 
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
+
+            // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
+            if (firmwareIsAlarmed || code === 79) {
+                return;
+            }
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -964,10 +972,14 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                if (this.runner.isAlarm()) {
+                if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    this.actionMask.alarmCompleteReport = false;
                 } else {
                     this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    if (!this.actionMask.alarmCompleteReport) {
+                        this.actionMask.alarmCompleteReport = true;
+                    }
                 }
             }
         };
@@ -1756,9 +1768,11 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(100).then(() => {
+                delay(250).then(() => {
                     this.writeln('$X');
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                    delay(50).then(() => {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    });
                 });
             },
             'checkStateUpdate': () => {
@@ -1924,6 +1938,9 @@ class GrblHalController {
                     $131 = Number($131);
                     $132 = Number($132);
 
+                    // Update homing flag always, not just on homing
+                    this.homingFlagSet = determineHALMachineZeroFlag({}, this.settings);
+
                     // Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
                     if (units !== METRIC_UNITS) {
                         feedrate = (feedrate * 25.4).toFixed(2);
@@ -1937,16 +1954,16 @@ class GrblHalController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
-                        const OFFSET = 1;
+                        const OFFSET = -1;
 
                         if (position === 0) {
-                            return ((maxTravel) * direction).toFixed(FIXED);
+                            return ((maxTravel + OFFSET) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number(position - OFFSET).toFixed(FIXED);
+                            return Number(position + OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position + OFFSET)).toFixed(FIXED);
                         }
                     };
 
@@ -2144,7 +2161,7 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT || this.actionMask.replyStatusReport;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {

@@ -30,7 +30,6 @@ const HalSettings = ({ descriptions }) => {
         return data.replace(/\\n/gmi, '\n');
     };
 
-
     return (
         <div className={styles.settingsContainer}>
             <div className={styles.tableHeaderHal}>
@@ -56,13 +55,19 @@ const HalSettings = ({ descriptions }) => {
                     //const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
                     const categoryClass = (getCharCodeSum(groupLabel) % 9) + 1;
 
-                    //const highlighted = false; // TODO: Logic for hal defaults
+                    { /* const defaultValue = machineProfile?.grblHALeepromSettings[setting.setting];
+
+                    const isSameAsDefault = defaultValue === setting.value;
+                    const isSienciMachine = machineProfile?.company?.includes('Sienci Labs');
+
+                    const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {}; */ }
+
                     return (
                         <div key={setting.setting} className={styles.containerFluid}>
                             <div className={styles.tableRowHal}>
                                 <div className={styles.keyRow}>
                                     {settingKey}
-                                    <CategoryTag category={groupLabel} isHAL={categoryClass}/>
+                                    <CategoryTag category={groupLabel} isHAL={categoryClass} />
                                 </div>
                                 <div className={styles.settingsInformation}>
                                     <div className={styles.settingsDescription}>
