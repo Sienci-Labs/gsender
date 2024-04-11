@@ -40,7 +40,6 @@ export const getHomingLocation = (setting) => {
     setting = Number(setting);
     // eslint-disable-next-line no-bitwise
     setting &= 7;
-    console.log(setting);
 
     if (setting === 0) {
         return BACK_RIGHT;
