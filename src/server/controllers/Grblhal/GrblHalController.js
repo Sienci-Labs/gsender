@@ -564,8 +564,8 @@ class GrblHalController {
             this.actionTime.senderFinishTime = finishTime;
             if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
+                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
             }
         });
@@ -580,6 +580,7 @@ class GrblHalController {
             this.sender.rewind();
         });
         this.workflow.on('stop', (...args) => {
+            console.log('workflow stop');
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
             this.sender.stopCountdown();
@@ -919,6 +920,8 @@ class GrblHalController {
 
                 // Initialize controller
                 this.initController();
+            } else {
+                this.writeln('$$'); // $C sometimes resets board, so wake it up with this
             }
         });
 
@@ -1899,10 +1902,20 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    this.feeder.reset();
-                    this.workflow.start();
-                    this.sender.next();
-                    this.feederCB = null;
+                    const interval = setInterval(() => {
+                        // check if in check (lol)
+                        // if we aren't in check, there may be a race condition
+                        // where the verify is done before the board is in check
+                        // which makes it stay in check forever
+                        if (this.runner.isCheck()) {
+                            this.feeder.reset();
+                            this.workflow.start();
+                            this.sender.next();
+                            this.feederCB = null;
+                            clearInterval(interval);
+                            return;
+                        }
+                    }, 200);
                 };
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
