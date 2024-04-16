@@ -565,7 +565,10 @@ class GrblHalController {
             if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.workflow.stopTesting();
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
+                this.command('gcode', '$C');
+                setTimeout(() => {
+                    this.command('gcode', '[global.state.testWCS]');
+                }, 200);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
             }
         });
@@ -861,7 +864,10 @@ class GrblHalController {
             //finished searching gCode file for errors
             if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
+                this.command('gcode', '$C');
+                setTimeout(() => {
+                    this.command('gcode', '[global.state.testWCS]');
+                }, 200);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
             }
@@ -919,8 +925,6 @@ class GrblHalController {
 
                 // Initialize controller
                 this.initController();
-            } else {
-                this.writeln('$$'); // $C sometimes resets board, so wake it up with this
             }
         });
 
