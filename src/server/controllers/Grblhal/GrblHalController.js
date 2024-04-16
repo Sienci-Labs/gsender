@@ -580,7 +580,6 @@ class GrblHalController {
             this.sender.rewind();
         });
         this.workflow.on('stop', (...args) => {
-            console.log('workflow stop');
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
             this.sender.stopCountdown();
