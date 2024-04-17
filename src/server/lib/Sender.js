@@ -506,10 +506,18 @@ class Sender extends events.EventEmitter {
         // if less than 1 sec left, create timeout instead of interval
         if (this.state.timer < 1) {
             this.countDownID = setTimeout(() => {
-                if (!this.state.countdownIsPaused) {
-                    this.state.remainingTime -= this.state.timer;
-                    this.state.remainingTime = this.state.remainingTime.toFixed(4);
-                    this.state.timer = 0;
+                this.state.remainingTime -= this.state.timer;
+                this.state.remainingTime = this.state.remainingTime.toFixed(4);
+                this.state.timer = 0;
+                if (this.state.countdownIsPaused) {
+                    this.countDownID = setInterval(() => {
+                        if (!this.state.countdownIsPaused) {
+                            clearInterval(this.countDownID);
+                            this.emit('change');
+                            this.fakeCountdown();
+                        }
+                    }, 100);
+                } else {
                     this.emit('change');
                     this.fakeCountdown();
                 }
