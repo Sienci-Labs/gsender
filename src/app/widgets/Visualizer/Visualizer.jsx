@@ -837,7 +837,9 @@ class Visualizer extends Component {
             pubsub.subscribe('colors:load', (_, data) => {
                 const { colorArray, savedColors } = data;
                 this.handleSceneRender(this.vizualization, colorArray, savedColors, this.renderCallback);
-                this.colorsWorker.terminate();
+                if (this.colorsWorker) {
+                    this.colorsWorker.terminate();
+                }
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
