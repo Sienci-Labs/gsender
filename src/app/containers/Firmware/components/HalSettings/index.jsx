@@ -12,7 +12,7 @@ const getCharCodeSum = (str = 'a') => {
 };
 
 const HalSettings = ({ descriptions }) => {
-    const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
+    const { settings, setSettings, setSettingsToApply, machineProfile } = useContext(FirmwareContext);
     const handleSettingsChange = (index) => (value) => {
         setSettingsToApply(true);
         setSettings(prev => {
@@ -55,15 +55,20 @@ const HalSettings = ({ descriptions }) => {
                     //const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
                     const categoryClass = (getCharCodeSum(groupLabel) % 9) + 1;
 
-                    { /* const defaultValue = machineProfile?.grblHALeepromSettings[setting.setting];
+                    const defaultValue = machineProfile?.grblHALeepromSettings[setting.setting];
 
-                    const isSameAsDefault = defaultValue === setting.value;
+                    const settingIsNumberValue = !(Number.isNaN(defaultValue) || Number.isNaN(defaultValue));
+
+                    const isSameAsDefault = settingIsNumberValue
+                        ? `${Number(setting.value)}` === `${Number(defaultValue)}`
+                        : setting.value === defaultValue;
+
                     const isSienciMachine = machineProfile?.company?.includes('Sienci Labs');
 
-                    const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {}; */ }
+                    const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {};
 
                     return (
-                        <div key={setting.setting} className={styles.containerFluid}>
+                        <div key={setting.setting} className={styles.containerFluid} style={highlighted}>
                             <div className={styles.tableRowHal}>
                                 <div className={styles.keyRow}>
                                     {settingKey}
