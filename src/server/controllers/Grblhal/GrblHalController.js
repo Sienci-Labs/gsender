@@ -787,6 +787,7 @@ class GrblHalController {
                     this.emit('serialport:read', res.raw);
                 }
                 this.sender.ack();
+                this.sender.next({ isOk: true });
 
                 return;
             }
