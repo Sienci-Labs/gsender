@@ -379,7 +379,7 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun, workPosition } = this.props;
         const { modalShow, relative, location } = this.state;
         const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
@@ -402,7 +402,7 @@ class DisplayPanel extends PureComponent {
                             <Input
                                 label="X"
                                 units={units}
-                                value={location.x}
+                                value={relative ? 0 : location.x}
                                 onChange={(e) => this.setLocation(e.target.value, 'x')}
                                 additionalProps={{ type: 'number' }}
                             />
@@ -411,7 +411,7 @@ class DisplayPanel extends PureComponent {
                                 <Input
                                     label="Y"
                                     units={units}
-                                    value={location.y}
+                                    value={relative ? 0 : location.y}
                                     onChange={(e) => this.setLocation(e.target.value, 'y')}
                                     additionalProps={{ type: 'number' }}
                                 />
@@ -420,7 +420,7 @@ class DisplayPanel extends PureComponent {
                             <Input
                                 label="Z"
                                 units={units}
-                                value={location.z}
+                                value={relative ? 0 : location.z}
                                 onChange={(e) => this.setLocation(e.target.value, 'z')}
                                 additionalProps={{ type: 'number' }}
                             />
@@ -429,7 +429,7 @@ class DisplayPanel extends PureComponent {
                                     <Input
                                         label="A"
                                         units="deg"
-                                        value={location.a}
+                                        value={relative ? 0 : location.a}
                                         onChange={(e) => this.setLocation(e.target.value, 'a')}
                                         additionalProps={{ type: 'number' }}
                                     />
@@ -497,6 +497,7 @@ class DisplayPanel extends PureComponent {
                                 <FunctionButton
                                     onClick={() => {
                                         this.setState({
+                                            location: workPosition,
                                             modalShow: true
                                         });
                                     }}
