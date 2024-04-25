@@ -17,7 +17,7 @@ const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclu
     useEffect(() => {
         let map = getBitfieldArr(setting.value);
         setBitMap(map);
-    }, []);
+    }, [setting]);
 
     const onToggleOpt = (checked, e, id) => {
         const index = document.getElementById(id).value;
