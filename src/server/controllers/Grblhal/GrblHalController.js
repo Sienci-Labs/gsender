@@ -1498,7 +1498,7 @@ class GrblHalController {
                 const preferences = store.get('preferences', {});
                 const delay = _.get(preferences, 'spindleDelay', 0);
 
-                if (delay) {
+                if (Number(delay)) {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }
 

@@ -95,7 +95,7 @@ const SpindleLaser = ({ active, state, actions }) => {
                                 hasRounding={false}
                                 onChange={(e) => spindleActions.handleDelayChange(e.target.value)}
                             />
-                            <p style={{ fontSize: '0.9rem', color: '#737373' }}>Please reload your file if you are changing from 0 delay.</p>
+                            <p style={{ fontSize: '0.9rem', color: '#737373' }}>Please reload your file after changing delay.</p>
                         </TooltipCustom>
                     </Fieldset>
                     <Spindle state={state} actions={actions} />
