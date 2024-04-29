@@ -50,6 +50,7 @@ import {
 } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
+import SerialConnection from 'server/lib/SerialConnection';
 
 const log = logger('service:cncengine');
 
@@ -513,13 +514,31 @@ class CNCEngine {
                     store.unset(`controllers[${JSON.stringify(flashPort)}]`);
 
                     return;
+                } else if (isHal) {
+                    // This branch is if the controller is NOT connected but is HAL -  we need to connect and put into DFU with a manual serial connection
+                    // We don't need to instantiate an entire controller but we can definitely use our serialport shim
+                    if (!isInDFUmode) {
+                        // Connect and send $DFU
+                        const connect = new SerialConnection({
+                            path: flashPort
+                        });
+                        connect.open((err) => {
+                            if (err) {
+                                this.emit('flash:message', { type: 'Error', content: err });
+                            }
+                            connect.write('$DFU\n');
+                        });
+                    }
+
+                    // For both DFU and non DFU we flash
+                    delay(1250).then(() => {
+                        halFlasher.flash(data);
+                    });
+
+                    return;
                 }
 
-                if (isInDFUmode) {
-                    halFlasher.flash(data);
-                } else {
-                    FlashingFirmware(flashPort, imageType, socket);
-                }
+                FlashingFirmware(flashPort, imageType, socket);
             });
 
             socket.on('write', (port, data, context = {}) => {
