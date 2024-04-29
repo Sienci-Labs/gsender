@@ -1496,10 +1496,10 @@ class GrblHalController {
 
                 // add delay to spindle startup if enabled
                 const preferences = store.get('preferences', {});
-                const delay = _.get(preferences, 'spindle.delay', false);
+                const delay = _.get(preferences, 'spindleDelay', 0);
 
                 if (delay) {
-                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, '$& G4 P1');
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }
 
                 const ok = this.sender.load(name, gcode + '\n', context);

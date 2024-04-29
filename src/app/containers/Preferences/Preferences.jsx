@@ -177,6 +177,7 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
+            spindleDelay: store.get('widgets.spindle.delay'),
             shouldWarnZero: store.get('workspace.shouldWarnZero', false),
             ipRange: store.get('widgets.connection.ip', [192, 168, 5, 1]),
             toolChange: {
@@ -527,13 +528,9 @@ class PreferencesPage extends PureComponent {
 
                 pubsub.publish('spindle:updated', newSpindleValue);
             },
-            handleDelayToggle: (hasDelay) => {
-                const { spindle } = this.state;
+            handleDelayChange: (delay) => {
                 this.setState({
-                    spindle: {
-                        ...spindle,
-                        delay: hasDelay
-                    }
+                    spindleDelay: delay
                 });
             }
         },
@@ -851,7 +848,8 @@ class PreferencesPage extends PureComponent {
             safeRetractHeight,
             customDecimalPlaces,
             spindle,
-            toolChange
+            toolChange,
+            spindleDelay
         } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
@@ -870,7 +868,7 @@ class PreferencesPage extends PureComponent {
         store.replace('workspace[probeProfile]', probe);
         store.set('widgets.spindle.spindleMax', spindle.spindleMax);
         store.set('widgets.spindle.spindleMin', spindle.spindleMin);
-        store.set('widgets.spindle.delay', spindle.delay);
+        store.set('widgets.spindle.delay', spindleDelay);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
