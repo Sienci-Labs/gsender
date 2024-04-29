@@ -91,9 +91,9 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     });
     const imageType = getMachineProfileVersion(profile);
 
-    const isInDFUmode = port === 'SLB_DFU';
+    //const isInDFUmode = port === 'SLB_DFU';
 
-    if (isHal && !isInDFUmode && (!controller.isConnected || port !== controller.port)) {
+    /*if (isHal && !isInDFUmode && (!controller.isConnected || port !== controller.port)) {
         const connectionConfig = new WidgetConfig('connection');
         const baudrate = connectionConfig.get('baudrate');
         const controllerType = isHal ? GRBLHAL : GRBL;
@@ -106,7 +106,7 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         });
 
         controller.writeln('$DFU');
-    }
+    }*/
 
     controller.flashFirmware(port, imageType, isHal, hex);
 };
