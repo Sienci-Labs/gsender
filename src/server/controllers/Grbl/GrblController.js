@@ -581,6 +581,7 @@ class GrblController {
         this.workflow.on('start', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.resumeCountdown();
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -1287,6 +1288,7 @@ class GrblController {
                 log.debug('No start message. Waiting for status');
                 this.waitingForStatus = true;
                 this.write('?');
+                this.write('$$');
                 setTimeout(() => {
                     if (this.waitingForStatus) {
                         log.debug('No status. Soft resetting');

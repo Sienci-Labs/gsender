@@ -1,7 +1,12 @@
 import React, { useContext } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { descriptionLookup, FirmwareContext, getDatatypeInput } from 'Containers/Firmware/utils';
+import classname from 'classnames';
+import { GRBLHAL } from 'app/constants';
+import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import Button from 'app/components/FunctionButton/FunctionButton';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { descriptionLookup, FirmwareContext, getDatatypeInput, restoreSingleDefaultSetting } from 'Containers/Firmware/utils';
 import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
@@ -12,7 +17,7 @@ const getCharCodeSum = (str = 'a') => {
 };
 
 const HalSettings = ({ descriptions }) => {
-    const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
+    const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
     const handleSettingsChange = (index) => (value) => {
         setSettingsToApply(true);
         setSettings(prev => {
@@ -30,6 +35,17 @@ const HalSettings = ({ descriptions }) => {
         return data.replace(/\\n/gmi, '\n');
     };
 
+    const handleResetToDefaultValue = (setting) => (event) => {
+        Confirm({
+            title: 'Reset Single EEPROM Value',
+            content: 'Are you sure you want to reset this value to default?',
+            confirmLabel: 'Yes',
+            onConfirm: () => {
+                restoreSingleDefaultSetting(setting, machineProfile, GRBLHAL);
+            }
+        });
+    };
+
     return (
         <div className={styles.settingsContainer}>
             <div className={styles.tableHeaderHal}>
@@ -42,48 +58,81 @@ const HalSettings = ({ descriptions }) => {
                 <div className={styles.tableColumn}>
                     <span>Value</span>
                 </div>
+
+                <div className={styles.tableColumn} />
             </div>
             {
-                settings.map((setting, index) => {
-                    const settingKey = setting.setting.replace('$', '');
-                    const { message, dataType, ...info } = descriptionLookup(settingKey, descriptions);
-                    const description = filterNewlines(setting.details);
-                    const InputElement = getDatatypeInput(dataType);
+                hasSettings && (
+                    <>
+                        {
+                            settings.length > 0 ? settings.map((setting, index) => {
+                                const settingKey = setting.setting.replace('$', '');
+                                const { message, dataType, ...info } = descriptionLookup(settingKey, descriptions);
+                                const description = filterNewlines(setting.details);
+                                const InputElement = getDatatypeInput(dataType);
 
-                    const groupLabel = setting.group || '';
+                                const groupLabel = setting.group || '';
 
-                    //const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
-                    const categoryClass = (getCharCodeSum(groupLabel) % 9) + 1;
+                                //const categoryClass = (Number(setting.groupID ? setting.groupID : 0) % 9) + 1;
+                                const categoryClass = (getCharCodeSum(groupLabel) % 9) + 1;
 
-                    { /* const defaultValue = machineProfile?.grblHALeepromSettings[setting.setting];
+                                const defaultValue = machineProfile?.grblHALeepromSettings[setting.setting];
 
-                    const isSameAsDefault = defaultValue === setting.value;
-                    const isSienciMachine = machineProfile?.company?.includes('Sienci Labs');
+                                const settingIsNumberValue = !(Number.isNaN(defaultValue) || Number.isNaN(defaultValue));
 
-                    const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {}; */ }
+                                const isSameAsDefault = settingIsNumberValue
+                                    ? `${Number(setting.value)}` === `${Number(defaultValue)}`
+                                    : setting.value === defaultValue;
 
-                    return (
-                        <div key={setting.setting} className={styles.containerFluid}>
-                            <div className={styles.tableRowHal}>
-                                <div className={styles.keyRow}>
-                                    {settingKey}
-                                    <CategoryTag category={groupLabel} isHAL={categoryClass} />
-                                </div>
-                                <div className={styles.settingsInformation}>
-                                    <div className={styles.settingsDescription}>
-                                        <div className={styles.itemText}>{message}</div>
-                                        <div className={styles.descriptionRow}>
-                                            {description}
+                                const isSienciMachine = machineProfile?.company?.includes('Sienci Labs');
+
+                                const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {};
+
+                                return (
+                                    <div key={setting.setting} className={styles.containerFluid} style={highlighted}>
+                                        <div className={styles.tableRowHal}>
+                                            <div className={styles.keyRow}>
+                                                {settingKey}
+                                                <CategoryTag category={groupLabel} isHAL={categoryClass} />
+                                            </div>
+                                            <div className={styles.settingsInformation}>
+                                                <div className={styles.settingsDescription}>
+                                                    <div className={styles.itemText}>{message}</div>
+                                                    <div className={styles.descriptionRow}>
+                                                        {description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.settingsControl}>
+                                                <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} />
+                                            </div>
+                                            <div className={classname(styles['non-default-value'], (isSameAsDefault || !isSienciMachine) ? styles.hide : null)}>
+                                                <Tooltip content={`Default Value: ${defaultValue}`}>
+                                                    <i className="fas fa-info-circle" style={{ marginRight: '1rem' }} />
+                                                </Tooltip>
+
+                                                <Tooltip content={`Reset this setting to the default value (${defaultValue})`}>
+                                                    <button
+                                                        type="button"
+                                                        style={{ all: 'unset' }}
+                                                        onClick={handleResetToDefaultValue(setting.setting)}
+                                                    >
+                                                        <i className="fas fa-undo" style={{ cursor: 'pointer' }} />
+                                                    </button>
+                                                </Tooltip>
+                                            </div>
                                         </div>
                                     </div>
+                                );
+                            }) : (
+                                <div className={styles.noSettingsWrapper}>
+                                    <h5>No Settings Found, Please Refine Your Search</h5>
+                                    <Button onClick={() => setFilterText('')}>Clear Search Text</Button>
                                 </div>
-                                <div className={styles.settingsControl}>
-                                    <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} />
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })
+                            )
+                        }
+                    </>
+                )
             }
         </div>
     );

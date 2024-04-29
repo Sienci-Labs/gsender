@@ -36,13 +36,18 @@ const OFFSET_DISTANCE = 1;
 const PULLOFF_DISTANCE = 5;
 
 export const getHomingLocation = (setting) => {
-    if (setting === '0') {
+    // convert settting to number and bitmask it with 7 (000111) in order to strip out A -> C axes and just leave XYZ
+    setting = Number(setting);
+    // eslint-disable-next-line no-bitwise
+    setting &= 7;
+
+    if (setting === 0) {
         return BACK_RIGHT;
-    } else if (setting === '1') {
+    } else if (setting === 1) {
         return BACK_LEFT;
-    } else if (setting === '2') {
+    } else if (setting === 2) {
         return FRONT_RIGHT;
-    } else if (setting === '3') {
+    } else if (setting === 3) {
         return FRONT_LEFT;
     } else {
         return OTHER;

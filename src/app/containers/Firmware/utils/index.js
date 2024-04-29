@@ -10,6 +10,7 @@ import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/
 import { GRBL, GRBLHAL } from 'app/constants';
 
 import defaultGRBLSettings from '../eepromFiles/DefaultGrblSettings.json';
+import defaultGRBLHALSettings from '../eepromFiles/DefaultGrblHalSettings.json';
 import {
     AXIS_MASK_ID,
     BITFIELD_ID,
@@ -90,9 +91,9 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     });
     const imageType = getMachineProfileVersion(profile);
 
-    const isInDFUmode = port === 'SLB_DFU';
+    //const isInDFUmode = port === 'SLB_DFU';
 
-    if (isHal && !isInDFUmode && (!controller.isConnected || port !== controller.port)) {
+    /*if (isHal && !isInDFUmode && (!controller.isConnected || port !== controller.port)) {
         const connectionConfig = new WidgetConfig('connection');
         const baudrate = connectionConfig.get('baudrate');
         const controllerType = isHal ? GRBLHAL : GRBL;
@@ -105,16 +106,18 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         });
 
         controller.writeln('$DFU');
-    }
+    }*/
 
     controller.flashFirmware(port, imageType, isHal, hex);
 };
 
 export const restoreDefaultSettings = (machineProfile, controllerType) => {
-    const eepromSettings = controllerType === GRBLHAL
-        ? machineProfile?.grblHALeepromSettings
-        : machineProfile?.eepromSettings ??
-        defaultGRBLSettings;
+    let eepromSettings = null;
+    if (controllerType === GRBLHAL) {
+        eepromSettings = machineProfile?.grblHALeepromSettings ?? defaultGRBLHALSettings;
+    } else {
+        eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+    }
 
     const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
     values.push('$$');
@@ -127,8 +130,13 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     });
 };
 
-export const restoreSingleDefaultSetting = (setting, machineProfile) => {
-    const eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+export const restoreSingleDefaultSetting = (setting, machineProfile, controllerType) => {
+    let eepromSettings = null;
+    if (controllerType === GRBLHAL) {
+        eepromSettings = machineProfile?.grblHALeepromSettings ?? defaultGRBLHALSettings;
+    } else {
+        eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+    }
     const defaultValue = eepromSettings[setting];
 
     controller.command('gcode', [`${setting}=${defaultValue}`, '$$']);

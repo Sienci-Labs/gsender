@@ -198,7 +198,8 @@ class Sender extends events.EventEmitter {
         // character-counting
         if (type === SP_TYPE_CHAR_COUNTING) {
             this.sp = new SPCharCounting(options, (sp, isOk) => {
-                if (sp.queue.length > 0 && isOk) { // only remove line length from buffer if ok was sent
+                // only remove line length from buffer if ok was sent
+                if (sp.queue.length > 0 && isOk) {
                     const lineLength = sp.queue.shift();
                     sp.dataLength -= lineLength;
                 }
@@ -210,7 +211,6 @@ class Sender extends events.EventEmitter {
                     if (this.dataFilter) {
                         sp.line = this.dataFilter(sp.line, this.state.context) || '';
                     }
-
 
                     // The newline character (\n) consumed the RX buffer space
                     if ((sp.line.length > 0) && ((sp.dataLength + sp.line.length + 1) >= sp.bufferSize)) {

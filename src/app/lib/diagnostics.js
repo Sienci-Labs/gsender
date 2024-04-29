@@ -331,46 +331,32 @@ function generateSupportFile() {
                                                 <Text style={styles.text}>
                                                     {machineProfile.id + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Company: '}
                                                 <Text style={styles.text}>
                                                     {machineProfile.company + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Name: '}
                                                 <Text style={styles.text}>
                                                     {machineProfile.name + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Type: '}
                                                 <Text style={styles.text}>
                                                     {machineProfile.type + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Version: '}
                                                 <Text style={styles.text}>
                                                     {machineProfile.version + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Limits:\n'}
                                                 <Text style={styles.text}>
                                                     {'    X Max: ' + get(machineProfile, 'limits.xmax', '0') + '\n'}
                                                     {'    Y Max: ' + get(machineProfile, 'limits.ymax', '0') + '\n'}
                                                     {'    Z Max: ' + get(machineProfile, 'limits.zmax', '0') + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Spindle/Laser: '}
                                                 <Text style={styles.text}>
                                                     {machineProfile.spindle + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Laser Mode Enabled: '}
                                                 <Text style={styles.text}>
                                                     {mode + '\n'}
@@ -402,20 +388,14 @@ function generateSupportFile() {
                                                         unwrapObject(connection.ports, 1)
                                                     }
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Connected Port: '}
                                                 <Text style={styles.text}>
                                                     {connection.port + '\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Baudrate: '}
                                                 <Text style={styles.text}>
                                                     {connection.baudrate ? connection.baudrate + '\n' : 'null\n'}
                                                 </Text>
-                                            </Text>
-                                            <Text style={styles.textBold}>
                                                 {'Unrecognized Ports:\n'}
                                                 <Text style={styles.text}>
                                                     {
@@ -441,6 +421,10 @@ function generateSupportFile() {
                                     {'Type: '}
                                     <Text style={styles.text}>
                                         { grblInfo.type ? grblInfo.type + '\n' : 'NULL\n' }
+                                    </Text>
+                                    {'Firmware Version: '}
+                                    <Text style={styles.text}>
+                                        { grblInfo.settings.info?.BOARD ? grblInfo.settings.info.BOARD + '\n' : 'N/A\n' }
                                     </Text>
                                 </Text>
                                 {
@@ -518,8 +502,6 @@ function generateSupportFile() {
                                     <Text style={styles.text}>
                                         {grblInfo.workflow.state + '\n'}
                                     </Text>
-                                </Text>
-                                <Text style={styles.textBold}>
                                     {'Homing Flag: '}
                                     <Text style={styles.text}>
                                         {grblInfo.homingFlag + '\n'}

@@ -564,8 +564,11 @@ class GrblHalController {
             this.actionTime.senderFinishTime = finishTime;
             if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
+                this.command('gcode', '$C');
+                setTimeout(() => {
+                    this.command('gcode', '[global.state.testWCS]');
+                }, 200);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
             }
         });
@@ -578,6 +581,7 @@ class GrblHalController {
         this.workflow.on('start', (...args) => {
             this.emit('workflow:state', this.workflow.state);
             this.sender.rewind();
+            this.sender.resumeCountdown();
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
@@ -786,6 +790,7 @@ class GrblHalController {
                     this.emit('serialport:read', res.raw);
                 }
                 this.sender.ack();
+                this.sender.next({ isOk: true });
 
                 return;
             }
@@ -861,7 +866,10 @@ class GrblHalController {
             //finished searching gCode file for errors
             if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
-                this.command('gcode', ['$C', '[global.state.testWCS]']);
+                this.command('gcode', '$C');
+                setTimeout(() => {
+                    this.command('gcode', '[global.state.testWCS]');
+                }, 200);
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
             }
@@ -1768,9 +1776,9 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(250).then(() => {
+                delay(300).then(() => {
                     this.writeln('$X');
-                    delay(50).then(() => {
+                    delay(100).then(() => {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     });
                 });
@@ -1899,10 +1907,20 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    this.feeder.reset();
-                    this.workflow.start();
-                    this.sender.next();
-                    this.feederCB = null;
+                    const interval = setInterval(() => {
+                        // check if in check (lol)
+                        // if we aren't in check, there may be a race condition
+                        // where the verify is done before the board is in check
+                        // which makes it stay in check forever
+                        if (this.runner.isCheck()) {
+                            this.feeder.reset();
+                            this.workflow.start();
+                            this.sender.next();
+                            this.feederCB = null;
+                            clearInterval(interval);
+                            return;
+                        }
+                    }, 200);
                 };
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
