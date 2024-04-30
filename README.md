@@ -102,6 +102,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.7 (April 30, 2024)
+- Rapid position buttons work as expected with A-axis invert enabled
+- Updated defaults for SLB homing speeds
+- Added setting highlight and restore individual defaults to HAL firmware tool
+- Fixed issue where SLB flashing could fail silently if connected before flashing
+- Tweaks to finish time estimation
+- Firmware flavour for SLB now included in diagnostic file
+- Prevented soft reset on exiting check mode on SLB from getting the firmware not leaving check mode
+- Alterations to behaviour of planning line in visualizer
+- Go to button default values are now current position if absolute movement and 0 if relative movement
+- Fixed issue where error would prevent the file from resuming in some situations
+- GRBL controller now will always send $$ command eventually even if no startup message received
+
 ### 1.4.6 (April 5, 2024)
 - Values properly convert in surfacing tool when swapping between metric and imperial preferred units
 - Fixed default UI value precision when swapping between metric and imperial preferred units
