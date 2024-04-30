@@ -152,7 +152,7 @@ export const LONGMILL_MASTER_LIST_GRBLHAL = {
     // $478: '3', // Setting disabled
     $479: '4',
     $481: '0',
-    $484: '0',
+    $484: '1',
     $486: '0',
     $511: '7',
     $512: '8',
