@@ -1776,7 +1776,7 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(300).then(() => {
+                delay(350).then(() => {
                     this.writeln('$X');
                     delay(500).then(() => {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
