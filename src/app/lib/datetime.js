@@ -39,8 +39,10 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
 };
 
 export const convertSecondsToTimeStamp = (seconds, startTime) => {
-    if (startTime === 0 || seconds === undefined || seconds < 0) {
+    if (startTime === 0 || seconds === undefined) {
         return '-';
+    } else if (seconds <= 0) {
+        return 'Finishing Soon';
     }
 
     return convertMillisecondsToTimeStamp(seconds * 1000);

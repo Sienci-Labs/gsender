@@ -24,6 +24,7 @@
 /* eslint max-classes-per-file: 0 */
 import events from 'events';
 import logger from './logger';
+import { checkIfRotaryFile } from './rotary';
 
 export const SP_TYPE_SEND_RESPONSE = 0;
 export const SP_TYPE_CHAR_COUNTING = 1;
@@ -172,6 +173,7 @@ class Sender extends events.EventEmitter {
         queueDone: true,
         timer: 0,
         countdownIsPaused: false,
+        isRotaryFile: false,
     };
 
     stateChanged = false;
@@ -288,6 +290,7 @@ class Sender extends events.EventEmitter {
             dataLength: this.state.dataLength,
             estimatedTime: this.state.estimatedTime,
             ovF: this.state.ovF,
+            isRotaryFile: this.state.isRotaryFile,
             currentLineRunning: this.state.totalSentToQueue - this.state.countdownQueue.length,
         };
     }
@@ -348,6 +351,9 @@ class Sender extends events.EventEmitter {
         this.state.totalSentToQueue = 0;
         this.state.queueDone = true;
 
+        // check if file is rotary
+        this.state.isRotaryFile = checkIfRotaryFile(gcode);
+
         this.emit('load', name, gcode, context);
         log.debug('sender requesting');
         this.emit('requestData');
@@ -381,6 +387,7 @@ class Sender extends events.EventEmitter {
         this.state.countdownQueue = [];
         this.state.totalSentToQueue = 0;
         this.state.queueDone = true;
+        this.state.isRotaryFile = false;
 
         this.emit('unload');
         this.emit('change');
@@ -430,6 +437,7 @@ class Sender extends events.EventEmitter {
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
             this.state.countdownIsPaused = false;
+
             // catch up time estimation for start from line
             if (startFromLine) {
                 this.state.totalSentToQueue = this.state.received;
@@ -437,13 +445,16 @@ class Sender extends events.EventEmitter {
                     this.state.remainingTime -= Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100);
                 }
             }
-            // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
-            this.checkIntervalID = setInterval(() => {
-                if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
-                    this.state.queueDone = false;
-                    this.fakeCountdown();
-                }
-            }, 100);
+            if (!this.isRotaryFile) {
+                // used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
+                this.checkIntervalID = setInterval(() => {
+                    if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
+                        this.state.queueDone = false;
+                        this.fakeCountdown();
+                    }
+                }, 100);
+            }
+
             this.emit('start', this.state.startTime);
             this.emit('change');
         };
@@ -463,20 +474,28 @@ class Sender extends events.EventEmitter {
         }
 
         // Elapsed Time
-        this.state.elapsedTime = now - this.state.startTime;
-        this.state.timeRunning = this.state.elapsedTime;
+        this.updateElapsedTime();
         // subtract time paused
         if (this.state.timePaused > 0) {
             this.state.timeRunning -= this.state.timePaused;
         }
 
-        if (this.state.received > 0) {
-            if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
-                if (this.state.received < this.state.estimateData.length) {
-                    // add the lines to the queue from where we left off to the current number received
-                    for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
-                        this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
-                        this.state.totalSentToQueue++;
+        if (this.state.isRotaryFile) {
+            // Make a 1 second delay before estimating the remaining time
+            if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
+                const timePerCode = this.state.elapsedTime / this.state.received;
+                this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
+            }
+        } else {
+            // eslint-disable-next-line no-lonely-if
+            if (this.state.received > 0) {
+                if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
+                    if (this.state.received < this.state.estimateData.length) {
+                        // add the lines to the queue from where we left off to the current number received
+                        for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
+                            this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
+                            this.state.totalSentToQueue++;
+                        }
                     }
                 }
             }
@@ -506,18 +525,11 @@ class Sender extends events.EventEmitter {
         // if less than 1 sec left, create timeout instead of interval
         if (this.state.timer < 1) {
             this.countDownID = setTimeout(() => {
-                this.state.remainingTime -= this.state.timer;
-                this.state.remainingTime = this.state.remainingTime.toFixed(4);
-                this.state.timer = 0;
-                if (this.state.countdownIsPaused) {
-                    this.countDownID = setInterval(() => {
-                        if (!this.state.countdownIsPaused) {
-                            clearInterval(this.countDownID);
-                            this.emit('change');
-                            this.fakeCountdown();
-                        }
-                    }, 100);
-                } else {
+                if (!this.state.countdownIsPaused) {
+                    this.state.remainingTime -= this.state.timer;
+                    this.state.remainingTime = this.state.remainingTime.toFixed(4);
+                    this.state.timer = 0;
+                    this.updateElapsedTime();
                     this.emit('change');
                     this.fakeCountdown();
                 }
@@ -527,6 +539,7 @@ class Sender extends events.EventEmitter {
                 if (!this.state.countdownIsPaused) {
                     this.state.timer--;
                     this.state.remainingTime--;
+                    this.updateElapsedTime();
 
                     if (this.state.timer < 1) {
                         clearInterval(this.countDownID);
@@ -604,6 +617,13 @@ class Sender extends events.EventEmitter {
         clearInterval(this.countDownID);
         this.state.queueDone = true;
         this.state.remainingTime -= this.state.timer;
+    }
+
+    updateElapsedTime() {
+        // Elapsed Time
+        const now = new Date().getTime();
+        this.state.elapsedTime = now - this.state.startTime;
+        this.state.timeRunning = this.state.elapsedTime;
     }
 }
 
