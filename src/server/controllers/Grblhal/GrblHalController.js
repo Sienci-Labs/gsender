@@ -1778,7 +1778,7 @@ class GrblHalController {
                 this.write('\x18'); // ^x
                 delay(300).then(() => {
                     this.writeln('$X');
-                    delay(100).then(() => {
+                    delay(500).then(() => {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     });
                 });
