@@ -372,6 +372,7 @@ const appMain = () => {
         // Alarms/Errors
         app.put(urljoin(settings.route, 'api/alarmList'), api.alarmList.update);
         app.get(urljoin(settings.route, 'api/alarmList'), api.alarmList.fetch);
+        app.delete(urljoin(settings.route, 'api/alarmList'), api.alarmList.clearAll);
 
         // Files - with multer
         const storage = multer.memoryStorage();

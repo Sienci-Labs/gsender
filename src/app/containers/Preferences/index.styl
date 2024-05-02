@@ -571,6 +571,25 @@
   line-height: 1.5 !important;
 }
 
+.delete-icon {
+    $color = #f00;
+    align-self: center;
+    color: $color;
+    font-size: 1.9rem !important;
+
+    &:hover {
+        color: lighten($color, 25);
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
 .errorWrapper{
   width:100%
   min-height: 20rem;
