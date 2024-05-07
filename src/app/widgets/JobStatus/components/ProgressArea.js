@@ -37,7 +37,7 @@ import { convertMillisecondsToTimeStamp, convertSecondsToTimeStamp } from '../..
  */
 const ProgressArea = ({ state }) => {
     const { senderStatus } = state;
-    const { total, received, elapsedTime, remainingTime, estimatedTime, startTime, isRotaryFile } = senderStatus;
+    const { total, received, elapsedTime, remainingTime, estimatedTime, startTime, isRotaryFile, ovF } = senderStatus;
 
     /**
      * Format given time value to display minutes and seconds
@@ -99,7 +99,8 @@ const ProgressArea = ({ state }) => {
     if (isRotaryFile) {
         percentageValue = Number.isNaN(received / total * 100) ? 0 : (received / total * 100).toFixed(0);
     } else {
-        percentageValue = Number.isNaN(((estimatedTime - remainingTime) / estimatedTime) * 100) ? 0 : (((estimatedTime - remainingTime) / estimatedTime) * 100).toFixed(0);
+        const adjustedEstimate = estimatedTime / (ovF / 100);
+        percentageValue = Number.isNaN(((adjustedEstimate - remainingTime) / adjustedEstimate) * 100) ? 0 : (((adjustedEstimate - remainingTime) / adjustedEstimate) * 100).toFixed(0);
     }
 
     return (
