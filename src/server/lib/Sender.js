@@ -493,7 +493,7 @@ class Sender extends events.EventEmitter {
                     if (this.state.received < this.state.estimateData.length) {
                         // add the lines to the queue from where we left off to the current number received
                         for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
-                            this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100));
+                            this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0));
                             this.state.totalSentToQueue++;
                         }
                     }
@@ -520,7 +520,7 @@ class Sender extends events.EventEmitter {
                 this.stopCountdown();
                 return;
             }
-            this.state.timer = this.state.countdownQueue.shift();
+            this.state.timer = this.state.countdownQueue.shift() / (this.state.ovF / 100);
         }
         // if less than 1 sec left, create timeout instead of interval
         if (this.state.timer < 1) {
