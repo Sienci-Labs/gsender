@@ -44,7 +44,8 @@ export const GRBLHAL_REALTIME_COMMANDS = {
     COMPLETE_REALTIME_REPORT: String.fromCharCode(0x87),
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',
-    ERR_CLEAR: 'ErrClear'
+    ERR_CLEAR: 'ErrClear',
+    GCODE_REPORT: String.fromCharCode(0x83),
 };
 
 // https://github.com/grbl/grbl/wiki/Configuring-Grbl-v0.9
