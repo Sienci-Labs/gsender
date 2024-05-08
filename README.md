@@ -113,7 +113,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Alterations to behaviour of planning line in visualizer
 - Go to button default values are now current position if absolute movement and 0 if relative movement
 - Fixed issue where error would prevent the file from resuming in some situations
-- GRBL controller now will always send $$ command eventually even if no startup message received
+- GRBL controller now will always send $$ command eventually even if no startup message received`
 
 ### 1.4.6 (April 5, 2024)
 - Values properly convert in surfacing tool when swapping between metric and imperial preferred units

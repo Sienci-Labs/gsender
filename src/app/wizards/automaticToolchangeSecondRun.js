@@ -54,7 +54,9 @@ const wizard = {
         const zSafe = ($13 === '1') ? '-0.5' : '-10';
 
         let zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
-        zProbeDistance = zProbeDistance.toFixed(3);
+        console.log(zProbeDistance);
+        console.log(zProbeDistance.toFixed(2));
+        //zProbeDistance = zProbeDistance.toFixed(3);
 
         controller.command('gcode', [
             '%wait',
