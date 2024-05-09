@@ -22,7 +22,7 @@ jobs:
         node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192 --openssl-legacy-provider
+      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:
@@ -203,7 +203,7 @@ jobs:
         node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192 --openssl-legacy-provider
+      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:
