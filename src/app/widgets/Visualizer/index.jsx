@@ -842,6 +842,7 @@ class VisualizerWidget extends PureComponent {
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
             workspaceMode: store.get('workspace.mode'),
+            jobEndModal: this.config.get('jobEndModal'),
         };
     }
 
@@ -1501,7 +1502,8 @@ class VisualizerWidget extends PureComponent {
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
                     objects: this.config.get('objects'),
-                    minimizeRenders: this.config.get('minimizeRenders')
+                    minimizeRenders: this.config.get('minimizeRenders'),
+                    jobEndModal: this.config.get('jobEndModal'),
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {

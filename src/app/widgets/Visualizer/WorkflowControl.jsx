@@ -461,9 +461,10 @@ class WorkflowControl extends PureComponent {
             }),
             pubsub.subscribe('job:end', (_, data) => {
                 const { status, errors } = data;
+                const { jobEndModal } = this.props.state;
                 this.setState({
                     job: {
-                        showStats: true,
+                        showStats: jobEndModal, // if not showing job end modal, don't set to true
                         time: convertMillisecondsToTimeStamp(status.elapsedTime),
                         status: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
                         errors: errors
