@@ -139,6 +139,9 @@ jobs:
         run: |
           npm install -g yarn
           yarn global add node-gyp
+      - name: Pip setuptools
+        run: |
+          sudo -H pip install setuptools
       - name: Install necessary dependencies and perform initial checks
         run: |
           yarn install
