@@ -6,7 +6,7 @@ on:
     branches:
       - master
       - dev
-      - CI
+      - CI_update
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
@@ -110,7 +110,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
@@ -197,7 +197,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
