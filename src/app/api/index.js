@@ -947,6 +947,18 @@ alarmList.update = (options) => new Promise((resolve, reject) => {
         });
 });
 
+alarmList.clearAll = () => new Promise((resolve, reject) => {
+    authrequest
+        .delete('/api/alarmList')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     //OS
     getLatestVersion,

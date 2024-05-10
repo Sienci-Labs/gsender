@@ -1026,7 +1026,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write('$G\n'); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
             }
         }, 500);
 
@@ -1776,9 +1776,9 @@ class GrblHalController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                delay(300).then(() => {
+                delay(350).then(() => {
                     this.writeln('$X');
-                    delay(100).then(() => {
+                    delay(500).then(() => {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     });
                 });
@@ -2180,7 +2180,7 @@ class GrblHalController {
         const cmd = data.trim();
 
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,

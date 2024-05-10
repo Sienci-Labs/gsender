@@ -1260,7 +1260,6 @@ class GCodeVirtualizer extends EventEmitter {
             moveDuration = this.getAcceleratedMove(travel, f, /*this.lastF,*/ minAccel);
         }
 
-
         this.lastF = f;
         this.totalTime += moveDuration;
         this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math

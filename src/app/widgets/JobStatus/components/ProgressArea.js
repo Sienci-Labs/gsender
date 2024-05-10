@@ -28,7 +28,7 @@ import PropTypes from 'prop-types';
 import { Tooltip } from '@trendmicro/react-tooltip';
 import styles from './Overrides.styl';
 import GaugeChart from '../GaugeChart';
-import { convertSecondsToTimeStamp } from '../../../lib/datetime';
+import { convertMillisecondsToTimeStamp, convertSecondsToTimeStamp } from '../../../lib/datetime';
 
 /**
  * Progress Area component to display running job information
@@ -37,7 +37,7 @@ import { convertSecondsToTimeStamp } from '../../../lib/datetime';
  */
 const ProgressArea = ({ state }) => {
     const { senderStatus } = state;
-    const { total, received, elapsedTime, remainingTime, startTime } = senderStatus;
+    const { total, received, elapsedTime, remainingTime, startTime, isRotaryFile } = senderStatus;
 
     /**
      * Format given time value to display minutes and seconds
@@ -95,7 +95,7 @@ const ProgressArea = ({ state }) => {
         return getFinishTime(remainingTime);
     };
 
-    const percentageValue = Number.isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
+    const percentageValue = Number.isNaN(received / total * 100) ? 0 : (received / total * 100).toFixed(0);
 
     return (
         <div style={{ width: '50%', marginRight: '1rem' }}>
@@ -113,7 +113,7 @@ const ProgressArea = ({ state }) => {
                             content={updateTime}
                             hideOnClick
                         >
-                            <span className={styles.progressItemTime}>{convertSecondsToTimeStamp(remainingTime, startTime)}</span>
+                            <span className={styles.progressItemTime}>{isRotaryFile ? convertMillisecondsToTimeStamp(remainingTime) : convertSecondsToTimeStamp(remainingTime, startTime)}</span>
                         </Tooltip>
                         <span style={{ color: 'black' }}>{total - received} Lines</span>
                     </div>

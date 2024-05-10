@@ -326,6 +326,7 @@ const defaultState = {
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
             SVGEnabled: false,
+            jobEndModal: true,
             gcode: {
                 displayName: true
             },

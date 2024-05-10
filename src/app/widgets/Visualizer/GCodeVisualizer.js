@@ -23,7 +23,10 @@
 
 // import colornames from 'colornames';
 import * as THREE from 'three';
+import _get from 'lodash/get';
+import reduxStore from 'app/store/redux';
 import { CUTTING_PART, PLANNED_PART } from './constants';
+import { checkIfRotaryFile } from '../../lib/rotary';
 
 const STATES = {
     START: 0,
@@ -47,6 +50,12 @@ class GCodeVisualizer {
         this.plannedColorArray = null;
         this.plannedV1 = null;
         this.plannedState = STATES.START;
+        // --rotary
+        this.frameDifferences = Array(16).fill(null); // queue, stores up to 16 frame differences (v2 - v1)
+        this.oldV1s = Array(16).fill(null); // queue, stores up to 16 frames (v1)
+        this.countdown = 16; // counter
+        this.isRotaryFile = false;
+        // rotary--
 
         return this;
     }
@@ -59,6 +68,15 @@ class GCodeVisualizer {
         this.spindleChanges = spindleChanges;
         this.colors = savedColors;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+        // --rotary
+        this.countdown = 16;
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
+        // rotary--
+
+        // check if file is rotary
+        const gcode = _get(reduxStore.getState(), 'file.content', '');
+        this.isRotaryFile = checkIfRotaryFile(gcode);
 
         this.geometry.setAttribute('position', this.vertices);
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
@@ -95,10 +113,59 @@ class GCodeVisualizer {
         const v2 = this.frames[frameIndex]; // recieved lines
 
         if (v1 < v2) {
-            const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat(); // current movement
-            // cant set yet, because grey lines will also be calculated soon
-            this.plannedColorArray = colorArray;
-            this.plannedV1 = this.frames[this.frameIndex - 1];
+            // this is just a temporary fix for rotary, so there is some repeated code in both the if and else,
+            // but it makes it easy to take away and edit later if i organize it like this
+            if (this.isRotaryFile) {
+                // subtract countdown and advance the queue
+                this.countdown -= 1;
+                this.frameDifferences.shift();
+                this.frameDifferences.push(v2 - v1);
+                this.oldV1s.shift();
+                this.oldV1s.push(v1);
+
+                const workpiece = this.group.children[0];
+                const offsetIndex = this.oldV1s[0] * 4; // use the oldest v1, as that's where we are updating from
+                const bufferOffsetIndex = v1 * 4;
+                const colorAttr = workpiece.geometry.getAttribute('color');
+
+                const opacity = this.isLaser ? 1 : 0.3;
+                const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+                const defaultColorArray = [...defaultColor.toArray(), opacity]; // grey
+                const defaultBufferColorArray = [...plannedColor.toArray(), 1]; // yellow
+                const placeHolderColorArray = [...plannedColor.toArray(), 1]; // yellow
+
+                // add the distance between the current movement and 19 moves ago
+                let placeHolderLength = 0;
+                this.frameDifferences.forEach((num, i) => {
+                    // if first or last, skip
+                    // these are already covered by colorArray and bufferColorArray
+                    if (i === 0 || i === this.frameDifferences.length - 1) {
+                        return;
+                    }
+                    placeHolderLength += num;
+                });
+
+                const colorArray = Array.from({ length: (this.frameDifferences[0]) }, () => defaultColorArray).flat(); // grey, 16 movements ago
+                const bufferColorArray = Array.from({ length: (v2 - v1) }, () => defaultBufferColorArray).flat(); // current movement
+                const placeHolderArray = Array.from({ length: (placeHolderLength) }, () => placeHolderColorArray).flat(); // all movements in between
+
+                // if finished counting down, start greying out the old movements
+                if (this.countdown <= 0) {
+                    colorAttr.set([...colorArray, ...placeHolderArray, ...bufferColorArray], offsetIndex);
+                    colorAttr.updateRange.count = colorArray.length + placeHolderArray.length + bufferColorArray.length;
+                    colorAttr.updateRange.offset = offsetIndex;
+                } else { // if not finished, continue colouring yellow
+                    colorAttr.set([...bufferColorArray], bufferOffsetIndex);
+                    colorAttr.updateRange.count = bufferColorArray.length;
+                    colorAttr.updateRange.offset = bufferOffsetIndex;
+                }
+                colorAttr.needsUpdate = true;
+            } else {
+                const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat(); // current movement
+                // cant set yet, because grey lines will also be calculated soon
+                this.plannedColorArray = colorArray;
+                this.plannedV1 = this.frames[this.frameIndex - 1];
+            }
         }
 
         // Restore the path to its original colors
@@ -108,6 +175,11 @@ class GCodeVisualizer {
             this.plannedColorArray = null;
             this.plannedV1 = null;
             this.plannedState = STATES.START;
+            // --rotary
+            this.frameDifferences = Array(16).fill(-1);
+            this.oldV1s = Array(16).fill(-1);
+            this.countdown = 16;
+            // rotary--
 
             // reset colours
             const workpiece = this.group.children[0];
@@ -131,7 +203,7 @@ class GCodeVisualizer {
         const v1 = this.frames[this.plannedV1 === undefined ? 0 : (this.oldFrameIndex || v1FrameIndex)];
         const v2 = this.frames[v2FrameIndex];
 
-        if (v1 < v2) {
+        if (v1 < v2 && !this.isRotaryFile) {
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
             const offsetIndex = v1 * 4;
@@ -215,6 +287,11 @@ class GCodeVisualizer {
         this.plannedColorArray = null;
         this.plannedV1 = null;
         this.plannedState = STATES.START;
+        // --rotary
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
+        this.countdown = 16;
+        // rotary--
     }
 
     getHull() {
