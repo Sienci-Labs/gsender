@@ -244,7 +244,7 @@ const migrateStore = () => {
         return;
     }
 
-    if (semver.lt(cnc.version, '1.4.7')) {
+    if (semver.lt(cnc.version, '1.4.8')) {
         const delay = store.get('widgets.spindle.delay');
         if (delay) {
             store.set('widgets.spindle.delay', 1);
