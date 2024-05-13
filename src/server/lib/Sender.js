@@ -532,6 +532,8 @@ class Sender extends events.EventEmitter {
                     this.updateElapsedTime();
                     this.emit('change');
                     this.fakeCountdown();
+                } else {
+                    this.state.queueDone = true;
                 }
             }, this.state.timer * 1000);
         } else { // if more than one second, make interval
