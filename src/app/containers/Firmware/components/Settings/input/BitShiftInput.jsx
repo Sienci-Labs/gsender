@@ -6,7 +6,7 @@ import ToggleSwitch from 'app/components/ToggleSwitch';
 import { convertValueToArray } from '../../../utils';
 import styles from './index.styl';
 
-const BitShiftInput = ({ value, onChange }) => {
+const BitShiftInput = ({ value, onChange, disabled }) => {
     const [bitShiftSettings, setBitShiftSettings] = useState([false, false, false]); //X, Y, Z
 
     /*useEffect(() => {
@@ -65,15 +65,15 @@ const BitShiftInput = ({ value, onChange }) => {
         <div className={styles.controlWrapper}>
             <div className={styles.controlRow}>
                 <div className={styles.maskTwoTitles}>X: </div>
-                <ToggleSwitch checked={X} onChange={(value) => handleSwitch(value, 0)} />
+                <ToggleSwitch checked={X} onChange={(value) => handleSwitch(value, 0)} disabled={disabled} />
             </div>
             <div className={styles.controlRow}>
                 <div className={styles.maskTwoTitles}>Y: </div>
-                <ToggleSwitch checked={Y} onChange={(value) => handleSwitch(value, 1)} />
+                <ToggleSwitch checked={Y} onChange={(value) => handleSwitch(value, 1)} disabled={disabled} />
             </div>
             <div className={styles.controlRow}>
                 <div className={styles.maskTwoTitles}>Z: </div>
-                <ToggleSwitch checked={Z} onChange={(value) => handleSwitch(value, 2)} />
+                <ToggleSwitch checked={Z} onChange={(value) => handleSwitch(value, 2)} disabled={disabled} />
             </div>
         </div>
     );

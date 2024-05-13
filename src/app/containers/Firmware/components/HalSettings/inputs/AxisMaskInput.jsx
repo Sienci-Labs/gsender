@@ -3,10 +3,10 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import BitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/BitfieldInput';
 
-const AxisMaskInput = ({ info, setting, onChange, axes }) => {
+const AxisMaskInput = ({ info, setting, onChange, axes, disabled }) => {
     return (
         <>
-            <BitfieldInput info={info} setting={setting} onChange={onChange} externalFormat={axes} />
+            <BitfieldInput info={info} setting={setting} onChange={onChange} externalFormat={axes} disabled={disabled} />
         </>
     );
 };

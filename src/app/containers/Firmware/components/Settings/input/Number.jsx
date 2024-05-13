@@ -5,7 +5,7 @@ import ControlledNumberInput from 'app/components/ControlledNumberInput';
 import styles from './index.styl';
 
 const Number = (props) => {
-    const { value, min, max, onChange, units } = props;
+    const { value, min, max, onChange, units, disabled } = props;
 
     return (
         <div className={styles.numberInputs}>
@@ -18,6 +18,7 @@ const Number = (props) => {
                 min={min}
                 max={max}
                 hasRounding={false}
+                disabled={disabled}
             />
             <span className={styles.inputGroupAddon}>{units}</span>
         </div>

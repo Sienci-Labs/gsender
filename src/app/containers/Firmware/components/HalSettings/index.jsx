@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import classname from 'classnames';
-import { GRBLHAL } from 'app/constants';
+import { GRBLHAL, GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
@@ -16,7 +16,7 @@ const getCharCodeSum = (str = 'a') => {
         .reduce((acc, c) => acc + c.charCodeAt(0), 0);
 };
 
-const HalSettings = ({ descriptions }) => {
+const HalSettings = ({ descriptions, isAlarm }) => {
     const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
     const handleSettingsChange = (index) => (value) => {
         setSettingsToApply(true);
@@ -104,7 +104,7 @@ const HalSettings = ({ descriptions }) => {
                                                 </div>
                                             </div>
                                             <div className={styles.settingsControl}>
-                                                <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} />
+                                                <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} disabled={isAlarm} />
                                             </div>
                                             <div className={classname(styles['non-default-value'], (isSameAsDefault || !isSienciMachine) ? styles.hide : null)}>
                                                 <Tooltip content={`Default Value: ${defaultValue}`}>
@@ -116,6 +116,7 @@ const HalSettings = ({ descriptions }) => {
                                                         type="button"
                                                         style={{ all: 'unset' }}
                                                         onClick={handleResetToDefaultValue(setting.setting)}
+                                                        disabled={isAlarm}
                                                     >
                                                         <i className="fas fa-undo" style={{ cursor: 'pointer' }} />
                                                     </button>
@@ -140,8 +141,10 @@ const HalSettings = ({ descriptions }) => {
 
 export default connect((store) => {
     const descriptions = get(store, 'controller.settings.descriptions', {});
+    const isAlarm = get(store, 'controller.state.status.activeState') === GRBL_ACTIVE_STATE_ALARM;
 
     return {
         descriptions,
+        isAlarm,
     };
 })(HalSettings);
