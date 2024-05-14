@@ -49,7 +49,8 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
-            `G0 X0 Y0 Z${z}`,
+            `G0 Z${z}`,
+            'G0 X0 Y0',
             `G1 F${feedrate}`,
             `${spindle} S${spindleRPM}`,
             ...dwell,
@@ -286,7 +287,7 @@ export default class Generator {
             enterSpiralStartArea,
             drawSpiral,
             returnToZero,
-            rampIntoMaterial,
+            // rampIntoMaterial,
             toFixedValue,
         } = this;
         const { depth, length, width, axisFactors, stepoverAmount, cutDirectionFlipped, startPosition } = options;
@@ -448,13 +449,16 @@ export default class Generator {
         const zValue = toFixedValue(safeHeight - (depth - this.surfacing.skimDepth));
 
         //Used to check if where ramp should enter from for center position, depends on if the cut direction is flipped too
-        const spiralEndsInXPos = spirals[spirals.length - 2]?.includes('X');
+        // const spiralEndsInXPos = spirals[spirals.length - 2]?.includes('X');
 
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
             `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
             `G0 X${position.x} Y${position.y}`,
-            ...rampIntoMaterial(z, { ...direction, factor: spiralEndsInXPos && !cutDirectionFlipped ? -1 : 1 }),
+            // ...rampIntoMaterial(z, { ...direction, factor: spiralEndsInXPos && !cutDirectionFlipped ? -1 : 1 }),
+            'G91',
+            `G0 Z${(Math.abs(depth) * -1) - safeHeight}`,
+            'G90',
             '(End of Entering Start Position)',
             ''
         ];
