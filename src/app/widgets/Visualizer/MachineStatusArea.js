@@ -47,14 +47,17 @@ class ControlArea extends Component {
 
     unlock = () => {
         const { alarmCode } = this.props;
-        if (alarmCode === 1 || alarmCode === 2) {
+        if (
+            alarmCode === 1 ||
+            alarmCode === 2 ||
+            alarmCode === 10 ||
+            alarmCode === 14 ||
+            alarmCode === 17
+        ) {
             controller.command('reset:limit');
             return;
         } else if (alarmCode === 'Homing' || alarmCode === 11) {
             controller.command('homing');
-            return;
-        } else if (alarmCode === 10) {
-            controller.command('reset:limit');
             return;
         }
         controller.command('unlock');
