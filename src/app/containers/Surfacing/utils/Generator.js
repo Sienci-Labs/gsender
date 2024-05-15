@@ -193,19 +193,23 @@ export default class Generator {
     }
 
 
-    drawInitialPerimeter = (x, y, z, direction, shouldZeroAxisZ = true, startPosition) => {
+    drawInitialPerimeter = (x, y, z, direction, shouldZeroAxisZ = true, startPosition, cutDirectionFlipped) => {
         const enterMaterial = this.rampIntoMaterial(z, direction);
 
-        const mainPerimeterArea = startPosition === START_POSITION_CENTER
-            ? [
-                'G91',
-                `G1 Y${Math.abs(y) * -1}`,
-                `G1 X${Math.abs(x)}`,
-                `G1 Y${Math.abs(y)}`,
-                `G1 X${Math.abs(x) * -1}`,
-                'G90'
-            ]
-            : [`G1 Y${y}`, `G1 X${x}`, 'G1 Y0', 'G1 X0'];
+        let mainPerimeterArea = [
+            'G91',
+            `G1 Y${Math.abs(y) * -1}`,
+            `G1 X${Math.abs(x)}`,
+            `G1 Y${Math.abs(y)}`,
+            `G1 X${Math.abs(x) * -1}`,
+            'G90'
+        ];
+
+        if (startPosition !== START_POSITION_CENTER) {
+            mainPerimeterArea = cutDirectionFlipped ?
+                [`G1 X${x}`, `G1 Y${y}`, 'G1 X0', 'G1 Y0']
+                : [`G1 Y${y}`, `G1 X${x}`, 'G1 Y0', 'G1 X0'];
+        }
 
         return [
             '(Covering Surfacing Perimeter)',
@@ -413,7 +417,7 @@ export default class Generator {
             return arr;
         }
 
-        const initialPerimeter = drawInitialPerimeter(x, y, z, direction, false, startPosition);
+        const initialPerimeter = drawInitialPerimeter(x, y, z, direction, false, startPosition, cutDirectionFlipped);
         const spirals = drawSpiral(
             [],
             startPos,
