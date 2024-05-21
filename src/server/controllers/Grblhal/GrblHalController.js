@@ -2159,6 +2159,9 @@ class GrblHalController {
             'updateRotaryMode': () => {
                 const [isInRotaryMode] = args;
                 this.isInRotaryMode = isInRotaryMode;
+            },
+            'runner:resetSettings': () => {
+                this.runner.deleteSettings();
             }
         }[cmd];
 

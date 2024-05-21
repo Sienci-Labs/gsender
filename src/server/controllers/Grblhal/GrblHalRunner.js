@@ -442,6 +442,10 @@ class GrblHalRunner extends events.EventEmitter {
     forceOK() {
         this.emit('ok', { raw: 'force ok' });
     }
+
+    deleteSettings() {
+        this.settings.settings = {};
+    }
 }
 
 export default GrblHalRunner;
