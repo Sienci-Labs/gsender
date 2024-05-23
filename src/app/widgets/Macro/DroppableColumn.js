@@ -74,7 +74,7 @@ const DroppableColumn = ({ droppableId, macros, actions, disabled }) => {
                                     style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
                                 >
                                     {
-                                        macro.description
+                                        macro.description.trim() !== ''
                                             ? (
                                                 <TooltipCustom content={macro.description} location="default">
                                                     <MacroItem
