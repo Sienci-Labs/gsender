@@ -23,7 +23,7 @@
 import { createReducer } from 'redux-action';
 import { ensurePositiveNumber } from 'ensure-type';
 import _get from 'lodash/get';
-import _mapValues from 'lodash/mapValues';
+// import _mapValues from 'lodash/mapValues';
 import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import {
     TOOL_CHANGE,
@@ -97,12 +97,21 @@ function mapPosToFeedbackUnits(pos, settings) {
     };
     const $13 = ensurePositiveNumber(_get(settings, 'settings.$13'));
 
-    return _mapValues({
+    // don't convert a-c
+    let newPos = {
         ...defaultPos,
-        ...pos,
-    }, (val) => {
-        return ($13 > 0) ? in2mm(val) : val;
-    });
+        ...pos
+    };
+    if ($13) {
+        newPos = {
+            ...newPos,
+            x: in2mm(newPos.x),
+            y: in2mm(newPos.y),
+            z: in2mm(newPos.z),
+        };
+    }
+
+    return newPos;
 }
 
 function mapFeedrateToFeedbackUnits(feedrate, settings) {
