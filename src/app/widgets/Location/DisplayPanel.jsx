@@ -230,7 +230,7 @@ class DisplayPanel extends PureComponent {
             y: 0,
             z: 0,
             a: 0
-        }
+        },
     };
 
     handleSelect = (eventKey) => {
@@ -389,6 +389,8 @@ class DisplayPanel extends PureComponent {
         const { ROTARY } = WORKSPACE_MODE;
         const isInRotaryMode = store.get('workspace.mode') === ROTARY;
 
+        const isRunningGRBLHAL = controller.type === 'grblHAL';
+
         const singleAxisHoming = this.determineSingleAxisHoming();
 
         return (
@@ -402,7 +404,7 @@ class DisplayPanel extends PureComponent {
                             <Input
                                 label="X"
                                 units={units}
-                                value={relative ? 0 : location.x}
+                                value={location.x}
                                 onChange={(e) => this.setLocation(e.target.value, 'x')}
                                 additionalProps={{ type: 'number' }}
                             />
@@ -411,7 +413,7 @@ class DisplayPanel extends PureComponent {
                                 <Input
                                     label="Y"
                                     units={units}
-                                    value={relative ? 0 : location.y}
+                                    value={location.y}
                                     onChange={(e) => this.setLocation(e.target.value, 'y')}
                                     additionalProps={{ type: 'number' }}
                                 />
@@ -420,16 +422,16 @@ class DisplayPanel extends PureComponent {
                             <Input
                                 label="Z"
                                 units={units}
-                                value={relative ? 0 : location.z}
+                                value={location.z}
                                 onChange={(e) => this.setLocation(e.target.value, 'z')}
                                 additionalProps={{ type: 'number' }}
                             />
                             {
-                                isInRotaryMode && (
+                                isInRotaryMode || isRunningGRBLHAL && (
                                     <Input
                                         label="A"
                                         units="deg"
-                                        value={relative ? 0 : location.a}
+                                        value={location.a}
                                         onChange={(e) => this.setLocation(e.target.value, 'a')}
                                         additionalProps={{ type: 'number' }}
                                     />

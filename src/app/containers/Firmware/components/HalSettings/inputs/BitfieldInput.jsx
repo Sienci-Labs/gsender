@@ -4,7 +4,7 @@ import ensureArray from 'ensure-array';
 import styles from './index.styl';
 import { convertBitfieldToValue, getBitfieldArr } from 'Containers/Firmware/components/HalSettings/inputs/utils';
 
-const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclusive = false }) => {
+const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclusive = false, disabled }) => {
     let { format } = info;
     format = ensureArray(format);
 
@@ -39,7 +39,7 @@ const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclu
                     let key = `${setting.setting}-${index}-key`;
                     const notNA = opt !== 'N/A';
                     let checked = bitMap[index] === 1;
-                    let disabled = (index > 0) && isExclusive && bitMap[0] !== 1;
+                    let isDisabled = disabled || ((index > 0) && isExclusive && bitMap[0] !== 1);
                     const id = `${setting.setting}-${index}-key`;
                     return notNA && (
                         <div className={styles.row} key={key}>
@@ -50,7 +50,7 @@ const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclu
                                     onChange={onToggleOpt}
                                     checked={checked}
                                     value={index}
-                                    disabled={disabled}
+                                    disabled={isDisabled}
                                 />
                             </div>
                         </div>

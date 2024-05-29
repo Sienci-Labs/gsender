@@ -8,7 +8,7 @@ import Fieldset from '../components/Fieldset';
 import styles from '../index.styl';
 
 const VisualizerOptions = ({ state, actions }) => {
-    const { objects, disabled, disabledLite, SVGEnabled } = state.visualizer;
+    const { objects, disabled, disabledLite, SVGEnabled, jobEndModal } = state.visualizer;
     const visualizerActions = actions.visualizer;
 
     return (
@@ -67,6 +67,18 @@ const VisualizerOptions = ({ state, actions }) => {
                         checked={SVGEnabled}
                         onChange={() => visualizerActions.handleSVGEnabledToggle()}
                         size="sm"
+                    />
+                </div>
+            </Fieldset>
+            <Fieldset legend="Job Options">
+                <div className={styles.vizGrid}>
+                    <Tooltip content="Enable a modal that shows the details of the run when the job ends." location="default">
+                        <span className={styles.vizLabel}>Enable Job End Pop Up</span>
+                    </Tooltip>
+                    <ToggleSwitch
+                        checked={jobEndModal}
+                        onChange={() => visualizerActions.setJobEndModal()}
+                        size="small"
                     />
                 </div>
             </Fieldset>

@@ -5,7 +5,7 @@ import ToggleSwitch from 'app/components/ToggleSwitch';
 import { convertValueToArray } from '../../../utils';
 import styles from './index.styl';
 
-const StatusReportSwitch = ({ value, onChange }) => {
+const StatusReportSwitch = ({ value, onChange, disabled }) => {
     const [statusReportSettings, setStatusReportSettings] = useState([false, false]); //mpos/wpos, buffer
 
     useEffect(() => {
@@ -59,14 +59,14 @@ const StatusReportSwitch = ({ value, onChange }) => {
             <div className={styles.controlGrid}>
                 <span className={styles.leftLabel}>WPos</span>
                 <div className={styles.centeredControl}>
-                    <ToggleSwitch checked={pos} onChange={toggleStatusReport(0)} />
+                    <ToggleSwitch checked={pos} onChange={toggleStatusReport(0)} disabled={disabled} />
                 </div>
                 <span>MPos</span>
             </div>
             <div className={styles.controlGrid}>
                 <span className={styles.leftLabel}>Buffer</span>
                 <div className={styles.centeredControl}>
-                    <ToggleSwitch checked={buffer} onChange={toggleStatusReport(1)} />
+                    <ToggleSwitch checked={buffer} onChange={toggleStatusReport(1)} disabled={disabled} />
                 </div>
                 <span />
             </div>

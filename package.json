@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -403,7 +403,7 @@
     "text-table": "~0.2.0",
     "transform-loader": "~0.2.4",
     "url-loader": "~1.1.2",
-    "webpack": "~4.30.0",
+    "webpack": "~4.47.0",
     "webpack-cli": "~3.3.1",
     "webpack-dev-middleware": "~3.6.2",
     "webpack-dev-server": "~3.3.1",
@@ -425,7 +425,10 @@
     "@react-pdf/stylesheet": "4.1.8",
     "@react-pdf/textkit": "4.2.0",
     "@react-pdf/types": "2.3.4",
-    "@react-pdf/yoga": "4.1.2"
+    "@react-pdf/yoga": "4.1.2",
+    "webpack@4.47.0": {
+      "terser-webpack-plugin": "^4.2.3"
+    }
   },
   "resolutions": {
     "@react-pdf/fns": "2.0.1",
@@ -440,6 +443,7 @@
     "@react-pdf/stylesheet": "4.1.8",
     "@react-pdf/textkit": "4.2.0",
     "@react-pdf/types": "2.3.4",
-    "@react-pdf/yoga": "4.1.2"
+    "@react-pdf/yoga": "4.1.2",
+    "webpack@npm:4.47.0/terser-webpack-plugin": "^4.2.3"
   }
 }

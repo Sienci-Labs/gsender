@@ -11,9 +11,10 @@ import InputController from './input';
 import { FirmwareContext, restoreSingleDefaultSetting } from '../../utils';
 
 import styles from '../../index.styl';
+import { GRBL_ACTIVE_STATE_ALARM } from '../../../../constants';
 
 
-const SettingsList = ({ firmwareType }) => {
+const SettingsList = ({ firmwareType, isAlarm }) => {
     const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
 
     const handleSettingsChange = (index) => (value) => {
@@ -97,6 +98,7 @@ const SettingsList = ({ firmwareType }) => {
                                                     bits={grbl.bits}
                                                     numBits={grbl.numBits}
                                                     requiredBit={grbl.requiredBit}
+                                                    disabled={isAlarm}
                                                 />
                                             </div>
 
@@ -110,6 +112,7 @@ const SettingsList = ({ firmwareType }) => {
                                                         type="button"
                                                         style={{ all: 'unset' }}
                                                         onClick={handleResetToDefaultValue(grbl.setting)}
+                                                        disabled={isAlarm}
                                                     >
                                                         <i className="fas fa-undo" style={{ cursor: 'pointer' }} />
                                                     </button>
@@ -135,8 +138,10 @@ const SettingsList = ({ firmwareType }) => {
 
 export default connect((store) => {
     const firmwareType = get(store, 'controller.type');
+    const isAlarm = get(store, 'controller.state.status.activeState') === GRBL_ACTIVE_STATE_ALARM;
 
     return {
-        firmwareType
+        firmwareType,
+        isAlarm
     };
 })(SettingsList);

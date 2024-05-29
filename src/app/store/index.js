@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 // import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
-import { isEmpty, isNumber, isString } from 'lodash';
+import { isEmpty } from 'lodash';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
@@ -160,31 +160,20 @@ const normalizeState = (state) => {
 };
 
 const merge = (base, saved) => {
-    const numberRegex = /^-?\d+.?\d*$/;
-
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
     const savedIsObject = saved instanceof Object;
     const savedIsArray = Array.isArray(saved);
 
-    const fromStringToNumber = isNumber(base) && isString(saved) && numberRegex.test(saved);
-    const fromNumberToString = isNumber(saved) && isString(base) && numberRegex.test(base);
-
+    // if they are both not objects, use saved. migration will be made later if needed
     if (
         (!(baseIsObject) || baseIsArray) &&
         (!(savedIsObject) || savedIsArray)
     ) {
-        // if they are the same type, use saved
-        // when numbers are rounded, they become strings
-        // so if it changes between those two types, and the string is a number, keep saved
-        if ((typeof base === typeof saved) || fromStringToNumber || fromNumberToString) {
-            return saved;
-        }
-        // if they are not, default structure changed, so use base
-        return base;
+        return saved;
+    // if one is an object and the other isn't, then default structure changed, so use base
     } else if ((!(baseIsObject) || baseIsArray) || (!(savedIsObject) || savedIsArray)) {
-        // if one is an object and the other isn't, then default structure changed, so use base
         return base;
     }
 
@@ -253,6 +242,15 @@ store.on('change', debounce((state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
+    }
+
+    if (semver.lt(cnc.version, '1.4.8')) {
+        const delay = store.get('widgets.spindle.delay');
+        if (delay) {
+            store.set('widgets.spindle.delay', 1);
+        } else {
+            store.set('widgets.spindle.delay', 0);
+        }
     }
 
     if (semver.lt(cnc.version, '1.4.4')) {

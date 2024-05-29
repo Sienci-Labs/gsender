@@ -1026,7 +1026,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write('$G\n'); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
             }
         }, 500);
 
@@ -1496,10 +1496,10 @@ class GrblHalController {
 
                 // add delay to spindle startup if enabled
                 const preferences = store.get('preferences', {});
-                const delay = _.get(preferences, 'spindle.delay', false);
+                const delay = _.get(preferences, 'spindleDelay', 0);
 
-                if (delay) {
-                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, '$& G4 P1');
+                if (Number(delay)) {
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }
 
                 const ok = this.sender.load(name, gcode + '\n', context);
@@ -2164,6 +2164,9 @@ class GrblHalController {
             'updateRotaryMode': () => {
                 const [isInRotaryMode] = args;
                 this.isInRotaryMode = isInRotaryMode;
+            },
+            'runner:resetSettings': () => {
+                this.runner.deleteSettings();
             }
         }[cmd];
 
@@ -2185,7 +2188,7 @@ class GrblHalController {
         const cmd = data.trim();
 
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,

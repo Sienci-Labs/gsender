@@ -5,7 +5,7 @@ import ToggleSwitch from 'app/components/ToggleSwitch';
 
 import styles from './index.styl';
 
-const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
+const Mask = ({ value, bits, numBits, requiredBit, onChange, disabled }) => {
     const getInitialSettings = () => {
         let settings = [];
         for (let i = 0; i < numBits; i++) {
@@ -56,7 +56,11 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
                         return (
                             <div key={uniqueId()} className={styles.controlRow}>
                                 <div className={styles.maskTwoTitles}>{bits[index]}</div>
-                                <ToggleSwitch disabled={requiredBit !== undefined && index !== requiredBit && !bitShiftSettings[requiredBit]} checked={setting} onChange={(value) => handleSwitch(value, index)} />
+                                <ToggleSwitch
+                                    disabled={disabled || (requiredBit !== undefined && index !== requiredBit && !bitShiftSettings[requiredBit])}
+                                    checked={setting}
+                                    onChange={(value) => handleSwitch(value, index)}
+                                />
                             </div>
                         );
                     })

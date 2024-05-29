@@ -1134,7 +1134,7 @@ class ProbeWidget extends PureComponent {
             toolDiameter,
             direction
         } = state;
-        const { $13 } = this.props;
+        const { $13, distance } = this.props;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         let probeDistances = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC : this.PROBE_DISTANCE_IMPERIAL;
         // Grab units for correct modal
@@ -1170,6 +1170,7 @@ class ProbeWidget extends PureComponent {
         };
 
         const code = getProbeCode(options, direction);
+        code.push(distance + '\n');
 
         return code;
     }
@@ -1398,6 +1399,7 @@ class ProbeWidget extends PureComponent {
 
 export default connect((store) => {
     const state = get(store, 'controller.state');
+    const distance = get(store, 'controller.state.parserstate.modal.distance');
     const probePinStatus = get(store, 'controller.state.status.pinState.P', false);
     const type = get(store, 'controller.type');
     const workflow = get(store, 'controller.workflow');
@@ -1406,6 +1408,7 @@ export default connect((store) => {
     return {
         probePinStatus,
         state,
+        distance,
         type,
         workflow,
         isConnected,

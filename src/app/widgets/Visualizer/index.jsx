@@ -30,6 +30,8 @@ import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
+import ColorsWorker from 'app/workers/colors.worker';
+import { colorsResponse } from 'app/workers/colors.response';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
@@ -334,7 +336,16 @@ class VisualizerWidget extends PureComponent {
 
             this.setState(updater, callback);
             if (this.visualizer) {
-                this.visualizer.handleSceneRender(vizualization);
+                this.colorsWorker = new ColorsWorker();
+                this.colorsWorker.onmessage = colorsResponse;
+                this.colorsWorker.postMessage({
+                    colors: vizualization.colors,
+                    frames: vizualization.frames,
+                    spindleSpeeds: vizualization.spindleSpeeds,
+                    isLaser: vizualization.isLaser,
+                    spindleChanges: vizualization.spindleChanges,
+                    theme: this.state.currentTheme
+                });
             }
         },
         unloadGCode: () => {
@@ -831,6 +842,7 @@ class VisualizerWidget extends PureComponent {
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
             workspaceMode: store.get('workspace.mode'),
+            jobEndModal: this.config.get('jobEndModal'),
         };
     }
 
@@ -1490,7 +1502,8 @@ class VisualizerWidget extends PureComponent {
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
                     objects: this.config.get('objects'),
-                    minimizeRenders: this.config.get('minimizeRenders')
+                    minimizeRenders: this.config.get('minimizeRenders'),
+                    jobEndModal: this.config.get('jobEndModal'),
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {
