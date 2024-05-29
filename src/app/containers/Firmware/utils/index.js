@@ -174,6 +174,7 @@ export const convertValueToArray = (value, possibilities) => {
 export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
     let index22 = 200; // index of $22 - default is 200 because we have less eeprom values than that, so it will never be set to this value
     let index2021 = -1; // index of $20 or $21, whichever comes first
+    let tableNeedsReparsing = false;
     let changedSettings = settings
         .filter(item => eeprom[item.setting] !== item.value) // Only retrieve settings that have been modified
         .map((item, i) => { // Create array of set eeprom value strings (ex. "$0=1")
@@ -184,6 +185,9 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
                 // and this is the first occurence of $20 or $21,
                 // we are going to have to switch it with $20, so save the index.
                 index2021 = i;
+            }
+            if (item.setting === '$511' || item.setting === '$512' || item.setting === '$513') {
+                tableNeedsReparsing = true;
             }
             return `${item.setting}=${item.value}`;
         });
@@ -196,6 +200,13 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
         changedSettings[index2021] = setting22;
     }
     changedSettings.push('$$'); // Add setting refresh to end so tool updates values
+    if (tableNeedsReparsing) {
+        // if 511-513 have changed, reparse the table
+        changedSettings.push('$ES', '$ESH');
+        // if we disable MODVFD, there will still be the extra settings in the runner's list,
+        // so reset the list whenever 511-513 is changed
+        controller.command('runner:resetSettings');
+    }
     controller.command('gcode', changedSettings);
     setSettingsToApply(false);
     Toaster.pop({
