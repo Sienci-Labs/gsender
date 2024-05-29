@@ -36,7 +36,7 @@ export const defaultOptions = {
                 isReversed: false,
             },
         },
-        zeroThreshold: 15,
+        zeroThreshold: 30,
         movementDistanceOverride: 100,
     },
     buttons: []
