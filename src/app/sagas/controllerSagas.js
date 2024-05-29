@@ -345,6 +345,7 @@ export function* initialize() {
 
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+        const delay = store.get('widgets.spindle.delay');
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -356,6 +357,10 @@ export function* initialize() {
 
         if (showLineWarnings) {
             controller.command('settings:updated', { showLineWarnings });
+        }
+
+        if (delay !== undefined) {
+            controller.command('settings:updated', { spindleDelay: delay });
         }
         const hooks = store.get('workspace.toolChangeHooks', {});
         const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');

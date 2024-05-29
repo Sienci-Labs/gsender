@@ -1453,13 +1453,13 @@ class GrblController {
 
                 // add delay to spindle startup if enabled
                 const preferences = store.get('preferences', {});
-                const delay = _.get(preferences, 'spindle.delay', false);
+                const delay = _.get(preferences, 'spindleDelay', 0);
 
                 // test if there is a G4 command already
                 const delayRegex = new RegExp('(G4 ?P?[0-9]+)');
                 // only add one if there isn't
-                if (delay && !delayRegex.test(gcode)) {
-                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b/g, '$& G4 P1');
+                if (Number(delay) && !delayRegex.test(gcode)) {
+                    gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b/g, `$& G4 P${delay}`);
                 }
 
                 const gcodeWithoutComments = gcode.replace(bracketCommentLine, '');
