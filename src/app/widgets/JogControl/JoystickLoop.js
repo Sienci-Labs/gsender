@@ -1,7 +1,9 @@
 import { throttle, inRange, get } from 'lodash';
+import reduxStore from 'app/store/redux';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
+import { GRBLHAL } from '../../constants';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
     const deadZone = profile?.joystickOptions?.zeroThreshold && profile?.joystickOptions?.zeroThreshold / 100;
@@ -81,6 +83,8 @@ export class JoystickLoop {
     };
 
     _computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
+        const controllerType = get(reduxStore.getState(), 'controller.type');
+
         const { settings } = controller.settings;
 
         const { joystickOptions: { movementDistanceOverride = 100 } } = this.gamepadProfile;
@@ -100,7 +104,9 @@ export class JoystickLoop {
 
         const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
 
-        const incrementalDistance = (feedrateInMMPerSec * COMMAND_EXECUTION_TIME_IN_SECONDS) * (movementDistanceOverride / 100);
+        const multiplier = controllerType === GRBLHAL ? 14 : 1;
+        console.log(multiplier);
+        const incrementalDistance = (feedrateInMMPerSec * COMMAND_EXECUTION_TIME_IN_SECONDS) * (movementDistanceOverride * multiplier / 100);
 
         return +(incrementalDistance.toFixed(2));
     };
@@ -201,6 +207,8 @@ export class JoystickLoop {
     _runJog = () => {
         const { degrees, activeAxis, multiplier: { leftStick, rightStick } } = this;
 
+        const controllerType = get(reduxStore.getState(), 'controller.type');
+
         const axes = this._getAxesAndDirection({ degrees, activeAxis });
 
         const numberOfAxes = axes.reduce((acc, curr) => (curr !== null ? acc + 1 : acc), 0);
@@ -258,7 +266,9 @@ export class JoystickLoop {
         const updatedAxesWithOverride = Object.entries(updatedAxes).reduce((acc, curr) => {
             const [axis, value] = curr;
 
-            acc[axis] = +((value * (movementDistanceOverride / 100)).toFixed(3));
+            const multiplier = controllerType === GRBLHAL ? 14 : 1;
+
+            acc[axis] = +((value * (movementDistanceOverride * multiplier / 100)).toFixed(3));
 
             return acc;
         }, {});
