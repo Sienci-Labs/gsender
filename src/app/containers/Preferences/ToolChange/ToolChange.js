@@ -205,7 +205,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                                 <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
                             </div>
                             <textarea
-                                rows="9"
+                                rows="7"
                                 className="form-control"
                                 style={{ resize: 'none' }}
                                 name="preHook"
@@ -217,7 +217,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                                 <MacroVariableDropdown textarea={postHookRef} label="After change code"/>
                             </div>
                             <textarea
-                                rows="9"
+                                rows="7"
                                 className="form-control"
                                 style={{ resize: 'none' }}
                                 name="postHook"
