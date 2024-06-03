@@ -21,7 +21,6 @@
  *
  */
 
-/* eslint callback-return: 0 */
 import fs from 'fs';
 import path from 'path';
 import bodyParser from 'body-parser';
@@ -45,20 +44,21 @@ import favicon from 'serve-favicon';
 import serveStatic from 'serve-static';
 import sessionFileStore from 'session-file-store';
 import _get from 'lodash/get';
-import _noop from 'lodash/noop';
+// import _noop from 'lodash/noop';
 import rimraf from 'rimraf';
 import {
     LanguageDetector as i18nextLanguageDetector,
     handle as i18nextHandle
 } from 'i18next-http-middleware';
+
 import urljoin from './lib/urljoin';
 import logger from './lib/logger';
 import settings from './config/settings';
 import * as api from './api';
-import errclient from './lib/middleware/errclient';
-import errlog from './lib/middleware/errlog';
-import errnotfound from './lib/middleware/errnotfound';
-import errserver from './lib/middleware/errserver';
+// import errclient from './lib/middleware/errclient';
+// import errlog from './lib/middleware/errlog';
+// import errnotfound from './lib/middleware/errnotfound';
+// import errserver from './lib/middleware/errserver';
 import config from './services/configstore';
 import {
     authorizeIPAddress,
@@ -70,22 +70,22 @@ import {
 
 const log = logger('app');
 
-const renderPage = (view = 'index', cb = _noop) => (req, res, next) => {
-    // Override IE's Compatibility View Settings
-    // http://stackoverflow.com/questions/6156639/x-ua-compatible-is-set-to-ie-edge-but-it-still-doesnt-stop-compatibility-mode
-    res.set({ 'X-UA-Compatible': 'IE=edge' });
+// export const renderPage = (view = 'index', cb = _noop) => (req, res, next) => {
+//     // Override IE's Compatibility View Settings
+//     // http://stackoverflow.com/questions/6156639/x-ua-compatible-is-set-to-ie-edge-but-it-still-doesnt-stop-compatibility-mode
+//     res.set({ 'X-UA-Compatible': 'IE=edge' });
 
-    const locals = { ...cb(req, res) };
-    res.render(view, locals);
-};
+//     const locals = { ...cb(req, res) };
+//     res.render(view, locals);
+// };
 
 const appMain = () => {
     const app = express();
 
     { // Settings
         if (process.env.NODE_ENV === 'development') {
-            const webpackDevServer = require('./webpack-dev-server').default;
-            webpackDevServer(app);
+            // const webpackDevServer = require('./webpack-dev-server').default;
+            // webpackDevServer(app);
 
             // Error handler - https://github.com/expressjs/errorhandler
             // Development error handler, providing stack traces and error message responses
@@ -385,34 +385,72 @@ const appMain = () => {
         app.post(urljoin(settings.route, 'api/log'), api.logs.printLog);
     }
 
-    // page
-    app.get(urljoin(settings.route, '/'), renderPage('index.hbs', (req, res) => {
-        const webroot = _get(settings, 'assets.app.routes[0]', ''); // with trailing slash
-        const lng = req.language;
-        const t = req.t;
+    // app.get(urljoin(settings.route, '/'), async (req, res) => {
+    //     // Serve HTML
+    //     try {
+    //         const url = req.originalUrl.replace(base, '');
 
-        return {
-            webroot: webroot,
-            lang: lng,
-            title: `${t('title')} ${settings.version}`,
-            loading: t('loading')
-        };
-    }));
+    //         let template;
+    //         let render;
+    //         if (!isProduction) {
+    //             // Always read fresh template in development
+    //             template = await fs.promises.readFile(path.resolve(__dirname, '../../src/app-new/index.html'), 'utf-8');
+    //             template = await vite.transformIndexHtml(url, template);
+    //             render = (await vite.ssrLoadModule(path.resolve(__dirname, '../../src/app-new/src/entry-server.tsx'))).render;
+    //         } else {
+    //             template = templateHtml;
+    //             // eslint-disable-next-line import/extensions, import/no-unresolved
+    //             render = (await import(path.resolve(__dirname, '../../output/server/index.js'))).render;
+    //         }
+
+    //         console.log(__dirname);
+
+    //         const rendered = await render(url, ssrManifest);
+
+    //         const html = template
+    //             .replace('<!--app-head-->', rendered.head ?? '')
+    //             .replace('<!--app-html-->', rendered.html ?? '');
+
+    //         res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
+    //     } catch (e) {
+    //         // eslint-disable-next-line no-unused-expressions
+    //         vite?.ssrFixStacktrace(e);
+    //         console.log(e.stack);
+    //         res.status(500).end(e.stack);
+    //     }
+    // });
+
+    // // page
+    // app.get(urljoin(settings.route, '/'), renderPage('index.hbs', (req, res) => {
+    //     const webroot = _get(settings, 'assets.app.routes[0]', ''); // with trailing slash
+    //     const lng = req.language;
+    //     const t = req.t;
+
+    //     return {
+    //         webroot: webroot,
+    //         lang: lng,
+    //         title: `${t('title')} ${settings.version}`,
+    //         loading: t('loading')
+    //     };
+    // }));
 
     { // Error handling
-        app.use(errlog());
-        app.use(errclient({
-            error: 'XHR error'
-        }));
-        app.use(errnotfound({
-            view: path.join('common', '404.hogan'),
-            error: 'Not found'
-        }));
-        app.use(errserver({
-            view: path.join('common', '500.hogan'),
-            error: 'Internal server error'
-        }));
+        // app.use(errlog());
+        // app.use(errclient({
+        //     error: 'XHR error'
+        // }));
+        // // app.use(errnotfound({
+        // //     view: path.join('common', '404.hogan'),
+        // //     error: 'Not found'
+        // // }));
+        // app.use(errserver({
+        //     view: path.join('common', '500.hogan'),
+        //     error: 'Internal server error'
+        // }));
     }
+
+    const { viteServer } = require('./vite-server');
+    viteServer(app);
 
     return app;
 };
