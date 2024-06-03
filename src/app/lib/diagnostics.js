@@ -297,7 +297,8 @@ function generateSupportFile() {
                                     </Text>
                                     {'Homing: '}
                                     <Text style={styles.text}>
-                                        {(eeprom.$22 === '1' ? 'Enabled' : 'Disabled') + '\n'}
+                                        {/* When homing is enabled, the value of $22 will be odd. */}
+                                        {(Number(eeprom.$22) % 2 === 1 ? 'Enabled' : 'Disabled') + '\n'}
                                     </Text>
                                     {'Soft Limits: '}
                                     <Text style={styles.text}>

@@ -89,7 +89,8 @@ export default connect((store) => {
     const homingLocation = homingString($23);
 
     return {
-        homing: $22 === '1' ? 'Enabled' : 'Disabled',
+        // When homing is enabled, the value of $22 will be odd.
+        homing: Number($22) % 2 === 1 ? 'Enabled' : 'Disabled',
         reportInches: $13 === '1' ? 'Enabled' : 'Disabled',
         softLimits: $20 === '1' ? 'Enabled' : 'Disabled',
         stepperMotors: $1,
