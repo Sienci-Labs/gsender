@@ -410,8 +410,8 @@ class Visualizer extends Component {
             }
 
             // Work position
-            const { x: wpox0, y: wpoy0, z: wpoz0, z: wpoa0, } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1, z: wpoa1 } = newPos;
+            const { x: wpox0, y: wpoy0, z: wpoz0, a: wpoa0, } = this.workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1, a: wpoa1 } = newPos;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1 || wpoa0 !== wpoa1) {
                 this.workPosition = newPos;
                 needUpdatePosition = true;
