@@ -52,6 +52,7 @@ class TerminalWrapper extends PureComponent {
         rows: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
         cursorBlink: PropTypes.bool,
         scrollback: PropTypes.number,
+        smoothScrollDuration: PropTypes.number,
         tabStopWidth: PropTypes.number,
         onData: PropTypes.func,
         active: PropTypes.bool,
@@ -107,8 +108,8 @@ class TerminalWrapper extends PureComponent {
     };
 
     componentDidMount() {
-        const { scrollback, tabStopWidth } = this.props;
-        this.term = new Terminal({ scrollback, tabStopWidth, cursorStyle: 'underline' });
+        const { scrollback, tabStopWidth, smoothScrollDuration } = this.props;
+        this.term = new Terminal({ scrollback, tabStopWidth, smoothScrollDuration, cursorStyle: 'underline' });
 
         this.fitAddon = new FitAddon();
 
@@ -122,8 +123,8 @@ class TerminalWrapper extends PureComponent {
         this.term.open(el);
         this.term.focus(false);
 
-        this.term.setOption('fontFamily', 'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif');
-        this.term.setOption('fontSize', 14);
+        this.term.options.fontFamily = 'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif';
+        this.term.options.fontSize = 14;
 
         this.term.attachCustomKeyEventHandler(this.eventHandler.onKey);
 

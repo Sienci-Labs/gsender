@@ -218,6 +218,7 @@ class ConsoleWidget extends PureComponent {
                 rows: TERMINAL_ROWS,
                 cursorBlink: true,
                 scrollback: 200,
+                smoothScrollDuration: 300,
                 tabStopWidth: 4
             }
         };
