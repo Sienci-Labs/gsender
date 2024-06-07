@@ -108,8 +108,8 @@ class TerminalWrapper extends PureComponent {
     };
 
     componentDidMount() {
-        const { scrollback, tabStopWidth, smoothScrollDuration } = this.props;
-        this.term = new Terminal({ scrollback, tabStopWidth, smoothScrollDuration, cursorStyle: 'underline' });
+        const { scrollback, tabStopWidth, smoothScrollDuration, scrollSensitivity } = this.props;
+        this.term = new Terminal({ scrollback, tabStopWidth, smoothScrollDuration, scrollSensitivity, cursorStyle: 'underline' });
 
         this.fitAddon = new FitAddon();
 

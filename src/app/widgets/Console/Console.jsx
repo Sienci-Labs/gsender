@@ -59,6 +59,7 @@ class Console extends PureComponent {
                 rows={state.terminal.rows}
                 cursorBlink={state.terminal.cursorBlink}
                 scrollback={state.terminal.scrollback}
+                scrollSensitivity={state.terminal.scrollSensitivity}
                 smoothScrollDuration={state.terminal.smoothScrollDuration}
                 tabStopWidth={state.terminal.tabStopWidth}
                 onData={actions.onTerminalData}
