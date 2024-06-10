@@ -96,7 +96,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30
     },
     {
         id: 7,
