@@ -21,7 +21,7 @@
  *
  */
 
-import _ from 'lodash';
+import _, { noop } from 'lodash';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 import isElectron from 'is-electron';
@@ -54,13 +54,16 @@ import {
     MODAL_NONE,
     MODAL_FEEDER_PAUSED,
     MODAL_FEEDER_WAIT,
-    MODAL_SERVER_DISCONNECTED
+    MODAL_SERVER_DISCONNECTED,
+    MODAL_MAINTENANCE_ALERT
 } from './constants';
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
 import DataCollectionPopup from './DataCollectionPopup';
 import MobileWorkflow from './MobileWorkflow';
+import MaintenanceAlert from './modals/MaintenanceAlert';
+import maintenanceApiActions from '../Preferences/Stats/lib/maintenanceApiActions';
 
 
 const WAIT = '%wait';
@@ -102,6 +105,7 @@ class Workspace extends PureComponent {
         tablet: false,
         shouldShowRotate: true,
         serverDisconnectReason: null,
+        alertTasks: [],
     };
 
     pubsubTokens = [];
@@ -419,12 +423,29 @@ class Workspace extends PureComponent {
         }
     }
 
+    sendMaintenanceAlerts = () => {
+        maintenanceApiActions.fetch(noop).then((tasks) => {
+            let shouldAlert = false;
+            for (const task of tasks) {
+                const { rangeStart, rangeEnd, currentTime } = task;
+                if (currentTime >= rangeStart && currentTime <= rangeEnd) {
+                    shouldAlert = true;
+                    break;
+                }
+            }
+            if (shouldAlert) {
+                this.setState({ alertTasks: tasks }, () => this.action.openModal(MODAL_MAINTENANCE_ALERT));
+            }
+        });
+    }
+
     componentDidMount() {
         this.updateScreenSize();
         this.addControllerEvents();
         this.addResizeEventListener();
         this.subscribe();
         this.handleCollectUserData();
+        this.sendMaintenanceAlerts();
 
         setTimeout(() => {
             // A workaround solution to trigger componentDidUpdate on initial render
@@ -511,7 +532,8 @@ class Workspace extends PureComponent {
         const modalItem = {
             [MODAL_FEEDER_PAUSED]: <FeederPaused title={modal.params.title} onClose={this.action.closeModal} />,
             [MODAL_FEEDER_WAIT]: <FeederWait title={modal.params.title} onClose={this.action.closeModal} />,
-            [MODAL_SERVER_DISCONNECTED]: <ServerDisconnected reason={serverDisconnectReason} onClose={this.action.closeModal} />
+            [MODAL_SERVER_DISCONNECTED]: <ServerDisconnected reason={serverDisconnectReason} onClose={this.action.closeModal} />,
+            [MODAL_MAINTENANCE_ALERT]: <MaintenanceAlert tasks={this.state.alertTasks} onClose={this.action.closeModal} />
         }[modal.name];
 
         return (

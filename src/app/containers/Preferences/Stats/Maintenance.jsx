@@ -49,13 +49,14 @@ const determineTime = (task) => {
 
 const Maintenance = () => {
     const [tasks, setTasks] = useState([]);
-    const [data, setData] = useState([]);
+    const [formattedData, setFormattedData] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [currentTask, setCurrentTask] = useState(0);
 
     const updateData = () => {
         maintenanceActions.fetch(setTasks).then((tasks) => {
+            console.log(tasks);
             let formattedTasks = [];
             tasks.forEach(task => {
                 const formattedTask = {
@@ -67,7 +68,7 @@ const Maintenance = () => {
                 };
                 formattedTasks.push(formattedTask);
             });
-            setData(formattedTasks);
+            setFormattedData(formattedTasks);
         });
     };
 
@@ -88,6 +89,12 @@ const Maintenance = () => {
     };
 
     const addTask = (newTask) => {
+        const maxIDTask = tasks.reduce((prev, current) => {
+            return (prev && prev.id > current.id) ? prev : current;
+        });
+        console.log(maxIDTask.id);
+        newTask.id = maxIDTask.id + 1;
+
         tasks.push(newTask);
         updateTasks(tasks);
     };
@@ -258,7 +265,7 @@ const Maintenance = () => {
     return (
         <div>
             <div className={[styles.addMargin].join(' ')}>
-                <SortableTable data={data} columns={columns} enableSortingRemoval={false} sortBy={sortBy} onAdd={onAdd} />
+                <SortableTable data={formattedData} columns={columns} enableSortingRemoval={false} sortBy={sortBy} onAdd={onAdd} />
             </div>
             { showEditModal && (
                 <EditArea
