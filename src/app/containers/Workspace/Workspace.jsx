@@ -427,8 +427,8 @@ class Workspace extends PureComponent {
         maintenanceApiActions.fetch(noop).then((tasks) => {
             let shouldAlert = false;
             for (const task of tasks) {
-                const { rangeStart, rangeEnd, currentTime } = task;
-                if (currentTime >= rangeStart && currentTime <= rangeEnd) {
+                const { rangeStart, currentTime } = task;
+                if (currentTime >= rangeStart) {
                     shouldAlert = true;
                     break;
                 }

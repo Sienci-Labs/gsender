@@ -56,7 +56,6 @@ const Maintenance = () => {
 
     const updateData = () => {
         maintenanceActions.fetch(setTasks).then((tasks) => {
-            console.log(tasks);
             let formattedTasks = [];
             tasks.forEach(task => {
                 const formattedTask = {
@@ -92,7 +91,6 @@ const Maintenance = () => {
         const maxIDTask = tasks.reduce((prev, current) => {
             return (prev && prev.id > current.id) ? prev : current;
         });
-        console.log(maxIDTask.id);
         newTask.id = maxIDTask.id + 1;
 
         tasks.push(newTask);

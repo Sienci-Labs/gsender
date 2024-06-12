@@ -35,8 +35,8 @@ import styles from './maintenancealert.styl';
 const MaintenanceAlert = (props) => {
     let alertTasks = [];
     props.tasks.forEach((task) => {
-        const { rangeStart, rangeEnd, currentTime } = task;
-        if (currentTime >= rangeStart && currentTime <= rangeEnd) {
+        const { rangeStart, currentTime } = task;
+        if (currentTime >= rangeStart) {
             alertTasks.push(task);
         }
     });
@@ -70,8 +70,8 @@ const MaintenanceAlert = (props) => {
                     onClick={chainedFunction(
                         () => {
                             const updatedTasks = props.tasks.map((task) => {
-                                const { rangeStart, rangeEnd, currentTime } = task;
-                                if (currentTime >= rangeStart && currentTime <= rangeEnd) {
+                                const { rangeStart, currentTime } = task;
+                                if (currentTime >= rangeStart) {
                                     let newTask = task;
                                     newTask.currentTime = 0;
                                     return newTask;
