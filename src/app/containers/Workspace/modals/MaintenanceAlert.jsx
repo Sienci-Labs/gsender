@@ -31,6 +31,7 @@ import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
 import { uniqueId } from 'lodash';
 import styles from './maintenancealert.styl';
+import { Toaster, TOASTER_DANGER, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 
 const MaintenanceAlert = (props) => {
     let alertTasks = [];
@@ -78,7 +79,19 @@ const MaintenanceAlert = (props) => {
                                 }
                                 return task;
                             });
-                            api.maintenance.update(updatedTasks);
+                            api.maintenance.update(updatedTasks).then((res) => {
+                                if (res.status === 200) {
+                                    Toaster.pop({
+                                        msg: 'Reset Timers successfully',
+                                        type: TOASTER_SUCCESS
+                                    });
+                                } else {
+                                    Toaster.pop({
+                                        msg: 'Failed to Reset Timers. Please go in the Jog Stats Tab in Preferences to reset them manually.',
+                                        type: TOASTER_DANGER
+                                    });
+                                }
+                            });
                         },
                         props.onClose
                     )}
