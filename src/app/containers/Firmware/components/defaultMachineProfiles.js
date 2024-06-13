@@ -577,6 +577,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: DefaultSLBSettings,
+        grblHALeepromSettings: DefaultSLBSettings,
         isHal: true
     }
 ];
