@@ -64,7 +64,7 @@ const ProgressArea = ({ state }) => {
                 <div className={styles.progressItemsWrapper}>
                     <div className={styles.progressItem}>
                         <span>Time Cutting</span>
-                        <span className={styles.progressItemTime}>{convertMillisecondsToTimeStamp(elapsedTime + 86300000)}</span>
+                        <span className={styles.progressItemTime}>{convertMillisecondsToTimeStamp(elapsedTime)}</span>
                         <span style={{ color: 'black' }}>{received} Lines</span>
                     </div>
                     <GaugeChart color="#3e85c7" value={percentageValue} />
