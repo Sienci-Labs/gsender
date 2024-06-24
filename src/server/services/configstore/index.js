@@ -199,6 +199,13 @@ class ConfigStore extends events.EventEmitter {
 
         if (!this.config.maintenance) {
             this.config.maintenance = defaultMaintenance;
+        } else if (this.config.maintenance.find((task) => task.id === undefined)) {
+            // migration to fix id problem
+            let currID = 0;
+            this.config.maintenance.forEach((task) => {
+                task.id = currID;
+                currID++;
+            });
         }
 
         return true;
