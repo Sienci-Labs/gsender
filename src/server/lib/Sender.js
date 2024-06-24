@@ -475,16 +475,12 @@ class Sender extends events.EventEmitter {
 
         // Elapsed Time
         this.updateElapsedTime();
-        // subtract time paused
-        if (this.state.timePaused > 0) {
-            this.state.timeRunning -= this.state.timePaused;
-        }
 
         if (this.state.isRotaryFile) {
             // Make a 1 second delay before estimating the remaining time
             if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-                const timePerCode = this.state.elapsedTime / this.state.received;
-                this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
+                const timePerCode = this.state.timeRunning / this.state.received;
+                this.state.remainingTime = (timePerCode * this.state.total - this.state.timeRunning);
             }
         } else {
             // eslint-disable-next-line no-lonely-if
@@ -625,7 +621,7 @@ class Sender extends events.EventEmitter {
         // Elapsed Time
         const now = new Date().getTime();
         this.state.elapsedTime = now - this.state.startTime;
-        this.state.timeRunning = this.state.elapsedTime;
+        this.state.timeRunning = this.state.elapsedTime - this.state.timePaused;
     }
 }
 
