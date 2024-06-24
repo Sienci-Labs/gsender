@@ -389,10 +389,10 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
-        onRunClick: (type) => {
-            this.actions.handleRun(type);
+        onRunClick: () => {
+            this.actions.handleRun();
         },
-        handleRun: (type) => {
+        handleRun: () => {
             const { workflow, activeState } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
@@ -403,7 +403,7 @@ class VisualizerWidget extends PureComponent {
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED || activeState === GRBL_ACTIVE_STATE_HOLD) {
-                controller.command('gcode:resume', type);
+                controller.command('gcode:resume');
             }
         },
         handlePause: () => {
@@ -905,7 +905,7 @@ class VisualizerWidget extends PureComponent {
                 return;
             }
             if (this.workflowControl) {
-                this.workflowControl.startRun(type);
+                this.workflowControl.startRun();
             }
         },
         PAUSE_JOB: (_, { type }) => {
@@ -915,7 +915,7 @@ class VisualizerWidget extends PureComponent {
                 this.showToast();
                 return;
             }
-            this.actions.handlePause(type);
+            this.actions.handlePause();
         },
         VISUALIZER_VIEW: (_, { type }) => {
             const {
