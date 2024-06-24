@@ -1075,10 +1075,10 @@ class GrblHalController {
                             return;
                         }
                         const as = _.get(this.state, 'status.activeState');
-                        if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
+                        if ((as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) && this.sender.state.hold) {
                             this.command('gcode:resume');
                         }
-                    }, 300);
+                    }, 1000);
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
