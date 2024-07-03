@@ -579,5 +579,55 @@ export default [
         eepromSettings: DefaultSLBSettings,
         grblHALeepromSettings: DefaultSLBSettings,
         isHal: true
+    },
+    {
+        id: 54,
+        company: 'Sienci Labs',
+        name: 'Altmill 48X48',
+        type: '',
+        version: '',
+        mm: {
+            width: 1260,
+            depth: 1248,
+            height: 170
+        },
+        in: {
+            width: 31.18,
+            depth: 33.27,
+            height: 4.5
+        },
+        endstops: true,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: DefaultSLBSettings,
+        grblHALeepromSettings: DefaultSLBSettings,
+        isHal: true
+    },
+    {
+        id: 55,
+        company: 'Sienci Labs',
+        name: 'Altmill 48X48 + Spindle',
+        type: '',
+        version: '',
+        mm: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        in: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        endstops: true,
+        spindle: true,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: DefaultSLBSettings,
+        grblHALeepromSettings: DefaultSLBSettings,
+        isHal: true
     }
 ];
