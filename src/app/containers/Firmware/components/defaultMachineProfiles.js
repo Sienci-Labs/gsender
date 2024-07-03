@@ -25,6 +25,7 @@ import DefaultSLBSettings from '../eepromFiles/DefaultSLBSettings.json';
 import * as longMillGrblEEPROM from '../eeprom/grbl/longmill';
 import * as longMillGrblHALEEPROM from '../eeprom/grblHAL/longmill';
 import * as millOneGrblEEPROM from '../eeprom/grbl/millone';
+import * as altmillSettings from '../eepromFiles/Altmill';
 
 export default [
     {
@@ -601,8 +602,8 @@ export default [
         coolant: false,
         laser: false,
         laserOnOutline: false,
-        eepromSettings: DefaultSLBSettings,
-        grblHALeepromSettings: DefaultSLBSettings,
+        eepromSettings: altmillSettings.DEFAULT,
+        grblHALeepromSettings: altmillSettings.DEFAULT,
         isHal: true
     },
     {
@@ -626,8 +627,8 @@ export default [
         coolant: false,
         laser: false,
         laserOnOutline: false,
-        eepromSettings: DefaultSLBSettings,
-        grblHALeepromSettings: DefaultSLBSettings,
+        eepromSettings: altmillSettings.SPINDLE_KIT,
+        grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
         isHal: true
     }
 ];
