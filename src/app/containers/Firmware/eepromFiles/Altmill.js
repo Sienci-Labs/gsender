@@ -154,18 +154,18 @@ export const ALTMILL_DEFAULT = {
 
 export const DEFAULT = {
     ...ALTMILL_DEFAULT,
-    '$21': '1',
     '$23': '1',
     '$22': '79',
+    '$21': '1',
     '$20': '1',
 };
 
 export const SPINDLE_KIT = {
     ...ALTMILL_DEFAULT,
     '$395': '6',
-    '$21': '1',
     '$23': '1',
     '$22': '79',
+    '$21': '1',
     '$20': '1',
     '$476': '2'
 };
