@@ -152,5 +152,9 @@
     "Add New Task": "Add New Task",
     "Add Task": "Add Task",
     "Delete Task": "Delete Task",
-    "Verify Job": "Verify Job"
+    "Verify Job": "Verify Job",
+    "The following maintenance tasks are due:": "The following maintenance tasks are due:",
+    "Close": "Close",
+    "Click 'Reset Timers' to reset the timers on ALL listed tasks. Click 'Close' to close the popup and do nothing.": "Click 'Reset Timers' to reset the timers on ALL listed tasks. Click 'Close' to close the popup and do nothing.",
+    "Reset Timers": "Reset Timers"
 }
