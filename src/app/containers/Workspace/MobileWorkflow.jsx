@@ -56,10 +56,10 @@ class WorkflowControl extends PureComponent {
     workerOutline = null;
 
     actions = {
-        onRunClick: (type) => {
-            this.actions.handleRun(type);
+        onRunClick: () => {
+            this.actions.handleRun();
         },
-        handleRun: (type) => {
+        handleRun: () => {
             const { workflowState, activeState } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflowState) || activeState === GRBL_ACTIVE_STATE_HOLD);
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
@@ -70,7 +70,7 @@ class WorkflowControl extends PureComponent {
             }
 
             if (workflowState === WORKFLOW_STATE_PAUSED || activeState === GRBL_ACTIVE_STATE_HOLD) {
-                controller.command('gcode:resume', type);
+                controller.command('gcode:resume');
             }
         },
         handlePause: () => {
