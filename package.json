@@ -6,7 +6,8 @@
     "name": "Sienci Labs <hi@sienci.com>",
     "email": "hi@sienci.com"
   },
-  "main": "./dist/gsender/server-cli.js",
+  "main": "./dist/gsender/server-cli",
+  "types": "./dist/gsender/server-cli",
   "bin": {
     "cnc": "./bin/cnc",
     "gsender": "./bin/gsender"

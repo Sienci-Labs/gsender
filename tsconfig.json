@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "noEmit": true,
+      "esModuleInterop": true,
+    //   "module": "esnext",
+      "module": "CommonJS", // use this when seeding
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "preserve",
+      "incremental": true,
+      "noUncheckedIndexedAccess": true,
+      "noImplicitAny": true
+    },
+    "ts-node": {
+      "esm": true
+    },
+    "include": [
+        "index.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.cjs",
+        "**/*.mjs"
+    ],
+    "exclude": ["output"]
+  }
