@@ -110,7 +110,7 @@ const InputArea = () => {
 
             <Input
                 label="Spindle RPM"
-                additionalProps={{ type: 'number', id: 'spindleRPM', step: 1, min: 0.01, max: 1000, style: { ...inputStyles } }}
+                additionalProps={{ type: 'number', id: 'spindleRPM', step: 1, min: 0.01, max: 30000, style: { ...inputStyles } }}
                 value={spindleRPM}
                 onChange={handleChange}
                 tooltip={{ content: `Default Value: ${defaultValues.spindleRPM}` }}
