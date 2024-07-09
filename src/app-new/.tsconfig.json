@@ -8,8 +8,7 @@
       "forceConsistentCasingInFileNames": true,
       "noEmit": true,
       "esModuleInterop": true,
-    //   "module": "esnext",
-      "module": "CommonJS", // use this when seeding
+      "module": "CommonJS",
       "moduleResolution": "node",
       "resolveJsonModule": true,
       "isolatedModules": true,
@@ -17,16 +16,6 @@
       "incremental": true,
       "noUncheckedIndexedAccess": true,
       "noImplicitAny": true
-    },
-    "ts-node": {
-      "esm": true
-    },
-    "include": [
-        "index.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.cjs",
-        "**/*.mjs"
-    ],
-    "exclude": ["output"]
-  }
+    }
+
+}

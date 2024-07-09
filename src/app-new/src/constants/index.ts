@@ -370,6 +370,15 @@ export const USAGE_TOOL_NAME = {
     }
 };
 
+const HOMING_LOCATIONS = {
+    FRONT_RIGHT: 'FR',
+    FRONT_LEFT: 'FL',
+    BACK_RIGHT: 'BR',
+    BACK_LEFT: 'BL',
+    OTHER: 'OT',
+};
+export type HOMING_LOCATIONS = typeof HOMING_LOCATIONS[keyof typeof HOMING_LOCATIONS];
+
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",
 //     HUANYANG_V1: "Huanyang v1",

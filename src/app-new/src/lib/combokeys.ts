@@ -32,7 +32,7 @@ import { modifierKeys } from './constants';
 
 
 import store from '../store';
-import shuttleEvents from './shuttleEvents';
+import shuttleEvents from '../lib/shuttleEvents';
 import { CommandKey, CommandKeys, Macro, Shortcut, ShuttleEvent } from '../interfaces/interfaces';
 
 const STOP_CMD = 'STOP_CONT_JOG';
@@ -165,7 +165,7 @@ class Combokeys extends events.EventEmitter {
         const setMacrosBinds = Object.entries(setCommandKeys).filter(([key, command]) => (command as CommandKey).category === MACRO_CATEGORY);
 
         const res = await api.macros.fetch();
-        const macros = res.body.records;
+        const macros = res.data.records;
 
         const newCommandKeysList: CommandKeys = _.cloneDeep(setCommandKeys);
 

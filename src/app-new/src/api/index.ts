@@ -106,7 +106,7 @@ const getShouldInstallUpdates = (): Promise<AxiosResponse> => {
 //
 // State
 //
-const getState = (options: StateOptions): Promise<AxiosResponse> => {
+const getState = (options?: StateOptions): Promise<AxiosResponse> => {
     const { key } = { ...options };
     return authrequest.get("/api/state", { params: { key } });
 };
@@ -129,7 +129,7 @@ const loadGCode = (options: GCodeOptions): Promise<AxiosResponse> => {
     return authrequest.post("/api/gcode", { port, name, gcode, context });
 };
 
-const fetchGCode = (options: GCodeOptions): Promise<AxiosResponse> => {
+const fetchGCode = (options?: GCodeOptions): Promise<AxiosResponse> => {
     const { port = "" } = { ...options };
     return authrequest.get("/api/gcode", { params: { port } });
 };
@@ -187,7 +187,7 @@ const watch = {
 // Users
 //
 const users = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/users", { params: options });
     },
 
@@ -215,7 +215,7 @@ const users = {
 // ToolChange
 //
 const events = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/events", { params: options });
     },
 
@@ -247,7 +247,7 @@ const events = {
 // Headless Mode / Remote Mode
 //
 const remoteSetting = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/remote", { params: options });
     },
 
@@ -260,7 +260,7 @@ const remoteSetting = {
 // Job Stats
 //
 const jobStats = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/jobstats", { params: options });
     },
 
@@ -273,7 +273,7 @@ const jobStats = {
 // Maintenance
 //
 const maintenance = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/maintenance", { params: options });
     },
 
@@ -286,7 +286,7 @@ const maintenance = {
 // Macros
 //
 const macros = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/macros", { params: options });
     },
 
@@ -314,7 +314,7 @@ const macros = {
 // MDI
 //
 const mdi = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/mdi", { params: options });
     },
 
@@ -342,7 +342,7 @@ const mdi = {
 // Commands
 //
 const commands = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/commands", { params: options });
     },
 
@@ -370,7 +370,7 @@ const commands = {
 // Machines
 //
 const machines = {
-    fetch: (options: FetchOptions): Promise<AxiosResponse> => {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get("/api/machines", { params: options });
     },
 
@@ -403,7 +403,7 @@ const file = {
     },
 };
 
-export {
+export default {
     signin,
     getLatestVersion,
     getShouldInstallUpdates,

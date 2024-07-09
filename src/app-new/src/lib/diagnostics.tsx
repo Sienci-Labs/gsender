@@ -21,12 +21,12 @@
  *
  */
 
-import React, { ElementType } from 'react';
+import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
-import ReactPDF, { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
+import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import store from '../store';
 import reduxStore from '../store/redux';
@@ -34,7 +34,7 @@ import ToolModalButton from '../components/ToolModalButton/ToolModalButton';
 import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from '../api';
-import { homingString } from './eeprom';
+import { homingString } from '../lib/eeprom';
 import { AlarmsErrors, ConnectionInfo, ControllerInfo, EEPROMSettings, FileInfo, JogSpeeds, MachineProfile } from '../interfaces/interfaces';
 
 const styles = StyleSheet.create({
@@ -268,7 +268,7 @@ function generateSupportFile() {
     const isRotaryMode = getRotaryMode();
     let alarms: Array<AlarmsErrors>, errors: Array<AlarmsErrors> = [];
 
-    api.alarmList.fetch().then(data => {
+    api.alarmList.fetch().then((data: Array<AlarmsErrors>) => {
         const grblAlarmsAndErrors = get(data, 'body.list', []);
         [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
     });
@@ -307,7 +307,7 @@ function generateSupportFile() {
                                     </Text>
                                     {'Home Location: '}
                                     <Text style={styles.text}>
-                                        {homingString(eeprom.$23) + '\n'}
+                                        {homingString(eeprom.$23 as string) + '\n'}
                                     </Text>
                                     {'Report Inches: '}
                                     <Text style={styles.text}>
