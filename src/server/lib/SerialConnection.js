@@ -152,13 +152,20 @@ class SerialConnection extends EventEmitter {
 
     // @param {function} callback The error-first callback.
     open(callback) {
-        if (this.port) {
+        const { path, baudRate, network, ...rest } = this.settings;
+
+        if (this.port && !network) {
             const err = new Error(`Cannot open serial port "${this.settings.path}"`);
             callback(err);
             return;
         }
 
-        const { path, baudRate, network, ...rest } = this.settings;
+        // Single telnet - don't return early, just close it and reopen it
+        if (this.port && network) {
+            if (this.port.writable) {
+                this.port.destroy();
+            }
+        }
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
