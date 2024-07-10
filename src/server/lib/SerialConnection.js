@@ -58,6 +58,9 @@ class SerialConnection extends EventEmitter {
     // Readline parser
     port = null;
 
+    // callback on state
+    callback = null;
+
     // SerialPort
     writeFilter = (data) => data;
 
@@ -73,6 +76,14 @@ class SerialConnection extends EventEmitter {
         },
         error: (err) => {
             console.error('Serialport Error');
+            console.log(err);
+            if (err.code === 'ECONNRESET') {
+                console.log('reset error, attempting to destroy');
+                this.port.destroy();
+                if (this.callback) {
+                    this.callback(err);
+                }
+            }
             this.emit('error', err);
         }
     };
@@ -152,24 +163,32 @@ class SerialConnection extends EventEmitter {
 
     // @param {function} callback The error-first callback.
     open(callback) {
+        this.callback = callback;
         const { path, baudRate, network, ...rest } = this.settings;
 
-        if (this.port && !network) {
+        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
+        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
+        const looksLikeIP = path.match(expr);
+
+        if (this.port && !looksLikeIP) {
             const err = new Error(`Cannot open serial port "${this.settings.path}"`);
             callback(err);
             return;
         }
 
         // Single telnet - don't return early, just close it and reopen it
-        if (this.port && network) {
+        if (this.port && (network || looksLikeIP)) {
             if (this.port.writable) {
                 this.port.destroy();
+                this.port = null;
+                const err = new Error('Serial port connection reset');
+                callback(err);
+                return;
             }
         }
 
-        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
-        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
-        if (network || path.match(expr)) {
+
+        if (network || looksLikeIP) {
             console.log('telnet');
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {

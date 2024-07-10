@@ -128,6 +128,8 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
+            console.log('connection error:');
+            console.log(err);
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
