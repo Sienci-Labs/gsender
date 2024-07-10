@@ -291,7 +291,7 @@ class TerminalWrapper extends PureComponent {
         }
 
         Toaster.pop({
-            msg: `Copied Last ${selection.length} Lines from the Terminal to Clipboard`,
+            msg: `Copied Last ${LINES_TO_COPY} Lines from the Terminal to Clipboard`,
             type: TOASTER_INFO
         });
     }
