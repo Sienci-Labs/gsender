@@ -63,7 +63,7 @@ export const connectToLastDevice = (callback) => {
 };
 
 export const getResetToDefaultMessage = ({ name, type } = {}) => {
-    const supportedMachines = ['Mill One', 'LongMill', 'LongMill MK2', 'SLB', 'Altmill', 'Altmill + Spindle'];
+    const supportedMachines = ['Mill One', 'LongMill', 'LongMill MK2', 'SLB', 'Altmill 48X48', 'Altmill 48X48 + Spindle'];
     const message = supportedMachines.includes(name)
         ? `Are you sure you want to restore your ${name} ${type} back to its default state?`
         : `We dont have the default settings for your ${name} ${type}. Would you like to Restore your machine to the Grbl defaults?`;
