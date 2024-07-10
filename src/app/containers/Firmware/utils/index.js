@@ -63,7 +63,7 @@ export const connectToLastDevice = (callback) => {
 };
 
 export const getResetToDefaultMessage = ({ name, type } = {}) => {
-    const supportedMachines = ['Mill One', 'LongMill', 'LongMill MK2'];
+    const supportedMachines = ['Mill One', 'LongMill', 'LongMill MK2', 'SLB', 'Altmill', 'Altmill + Spindle'];
     const message = supportedMachines.includes(name)
         ? `Are you sure you want to restore your ${name} ${type} back to its default state?`
         : `We dont have the default settings for your ${name} ${type}. Would you like to Restore your machine to the Grbl defaults?`;
@@ -119,7 +119,16 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
         eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
     }
 
+    console.log(eepromSettings);
+
     const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
+    if (Object.hasOwn(machineProfile, 'orderedSettings')) {
+        console.log(machineProfile.orderedSettings);
+        for (const [k, v] of machineProfile.orderedSettings) {
+            values.push(`${k}=${v}`);
+        }
+    }
+    console.log(values);
     values.push('$$');
 
     controller.command('gcode', values);

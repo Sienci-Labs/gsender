@@ -33,7 +33,6 @@ export const ALTMILL_DEFAULT = {
     '$36': '100.0',
     '$37': '0',
     '$39': '1',
-    '$40': '1',
     '$41': '0',
     '$42': '2',
     '$43': '1',
@@ -154,18 +153,25 @@ export const ALTMILL_DEFAULT = {
 
 export const DEFAULT = {
     ...ALTMILL_DEFAULT,
-    '$23': '1',
-    '$22': '79',
-    '$21': '1',
-    '$20': '1',
 };
 
 export const SPINDLE_KIT = {
     ...ALTMILL_DEFAULT,
-    '$395': '6',
-    '$23': '1',
-    '$22': '79',
-    '$21': '1',
-    '$20': '1',
-    '$476': '2'
 };
+
+
+export const ALTMILL_ORDERED = new Map();
+ALTMILL_ORDERED.set('$23', 1);
+ALTMILL_ORDERED.set('$22', 79);
+ALTMILL_ORDERED.set('$21', 1);
+ALTMILL_ORDERED.set('$20', 1);
+ALTMILL_ORDERED.set('$40', 1);
+
+export const SPINDLE_ORDERED = new Map();
+SPINDLE_ORDERED.set('$395', 6);
+SPINDLE_ORDERED.set('$23', 1);
+SPINDLE_ORDERED.set('$22', 79);
+SPINDLE_ORDERED.set('$21', 1);
+SPINDLE_ORDERED.set('$20', 1);
+SPINDLE_ORDERED.set('$476', 2);
+ALTMILL_ORDERED.set('$40', 1);

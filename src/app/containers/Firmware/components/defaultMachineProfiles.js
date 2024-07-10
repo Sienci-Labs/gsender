@@ -604,6 +604,7 @@ export default [
         laserOnOutline: false,
         eepromSettings: altmillSettings.DEFAULT,
         grblHALeepromSettings: altmillSettings.DEFAULT,
+        orderedSettings: altmillSettings.ALTMILL_ORDERED,
         isHal: true
     },
     {
@@ -629,6 +630,7 @@ export default [
         laserOnOutline: false,
         eepromSettings: altmillSettings.SPINDLE_KIT,
         grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
+        orderedSettings: altmillSettings.SPINDLE_ORDERED,
         isHal: true
     }
 ];
