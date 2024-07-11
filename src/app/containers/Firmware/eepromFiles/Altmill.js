@@ -149,7 +149,11 @@ export const ALTMILL_DEFAULT = {
     '$742': '0.000',
     '$743': '0',
     '$744': '15',
-    '$745': '0'
+    '$745': '0',
+    '$23': '1',
+    '$22': '79',
+    '$21': '1',
+    '$20': '1',
 };
 
 export const DEFAULT = {
@@ -169,3 +173,37 @@ export const SPINDLE_KIT = {
     '$20': '1',
     '$476': '2'
 };
+
+
+export const ALTMILL_ORDERED = new Map();
+ALTMILL_ORDERED.set('$462', '8192');
+ALTMILL_ORDERED.set('$463', '8193');
+ALTMILL_ORDERED.set('$464', '8451');
+ALTMILL_ORDERED.set('$23', '1');
+ALTMILL_ORDERED.set('$22', '79');
+ALTMILL_ORDERED.set('$21', '1');
+ALTMILL_ORDERED.set('$20', '1');
+ALTMILL_ORDERED.set('$40', '1');
+ALTMILL_ORDERED.set('$744', '15');
+ALTMILL_ORDERED.set('$170', '0');
+ALTMILL_ORDERED.set('$171', '0');
+ALTMILL_ORDERED.set('$172', '0');
+ALTMILL_ORDERED.set('$173', '0');
+
+
+export const SPINDLE_ORDERED = new Map();
+SPINDLE_ORDERED.set('$462', '8192');
+SPINDLE_ORDERED.set('$463', '8193');
+SPINDLE_ORDERED.set('$464', '8451');
+SPINDLE_ORDERED.set('$23', '1');
+SPINDLE_ORDERED.set('$22', '79');
+SPINDLE_ORDERED.set('$21', '1');
+SPINDLE_ORDERED.set('$20', '1');
+SPINDLE_ORDERED.set('$476', '2');
+SPINDLE_ORDERED.set('$40', '1');
+SPINDLE_ORDERED.set('$395', '6');
+SPINDLE_ORDERED.set('$744', '15');
+SPINDLE_ORDERED.set('$170', '0');
+SPINDLE_ORDERED.set('$171', '0');
+SPINDLE_ORDERED.set('$172', '0');
+SPINDLE_ORDERED.set('$173', '0');
