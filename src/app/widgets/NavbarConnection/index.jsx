@@ -23,6 +23,7 @@
 
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
+import ip from 'ip';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
@@ -238,7 +239,9 @@ class NavbarConnectionWidget extends PureComponent {
     attemptAutoConnect() {
         const { autoReconnect, hasReconnected, port, baudrate, controllerType } = this.state;
         const { ports } = this.props;
-
+        if (ip.isV4Format(port)) {
+            return; // No auto reconnect on ethernet for now
+        }
         if (autoReconnect && !hasReconnected) {
             setTimeout(() => {
                 this.setState(state => ({

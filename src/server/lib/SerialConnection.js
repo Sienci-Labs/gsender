@@ -80,7 +80,9 @@ class SerialConnection extends EventEmitter {
             if (err.code === 'ECONNRESET') {
                 console.log('reset error, attempting to destroy');
                 this.port.destroy();
+                this.port = null;
                 if (this.callback) {
+                    console.log('callback');
                     this.callback(err);
                 }
             }
@@ -178,13 +180,11 @@ class SerialConnection extends EventEmitter {
 
         // Single telnet - don't return early, just close it and reopen it
         if (this.port && (network || looksLikeIP)) {
-            if (this.port.writable) {
-                this.port.destroy();
-                this.port = null;
-                const err = new Error('Serial port connection reset');
-                callback(err);
-                return;
-            }
+            this.port.destroy();
+            this.port = null;
+            const err = new Error('Serial port connection reset');
+            callback(err);
+            return;
         }
 
 
