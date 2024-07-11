@@ -108,7 +108,8 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Fixed situation where progress bar could be greater than 100%
 - Some time estimation alterations specifically when pausing jobs
 - Fixed issue where console copy prompt stated limit other than 50
-- Changes to ethernet behaviour to allow reconnection in cases the board closes the connection early
+- Spindle delay on start is now a configurable value in ms
+- Changes to ethernet behaviour to allow reconnection in more cases the board closes the connection early
 - Maintenance tasks that are due now prompt the user to take care of them on application start
 - Changed max value for spindle RPM in rotary surfacing tool
 - Fix for rotary tab gaining focus and preventing keybinds from working
