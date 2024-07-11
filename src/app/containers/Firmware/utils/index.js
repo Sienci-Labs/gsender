@@ -29,6 +29,8 @@ import DecimalInput from 'Containers/Firmware/components/HalSettings/inputs/Deci
 import StringInput from 'Containers/Firmware/components/HalSettings/inputs/StringInput';
 import PasswordInput from 'Containers/Firmware/components/HalSettings/inputs/PasswordInput';
 import Ipv4Input from 'Containers/Firmware/components/HalSettings/inputs/Ipv4Input';
+import machineProfiles from '../components/defaultMachineProfiles';
+
 
 export const FirmwareContext = createContext({ });
 
@@ -111,23 +113,41 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     controller.flashFirmware(port, imageType, isHal, hex);
 };
 
+
+const getOrderedSettings = (id) => {
+    const profile = machineProfiles.find(profile => profile.id === id);
+
+    if (!profile) {
+        return null;
+    }
+
+    if (Object.hasOwn(profile, 'orderedSettings')) {
+        return profile.orderedSettings;
+    }
+
+    return null;
+};
+
+
 export const restoreDefaultSettings = (machineProfile, controllerType) => {
     let eepromSettings = null;
+
     if (controllerType === GRBLHAL) {
         eepromSettings = machineProfile?.grblHALeepromSettings ?? defaultGRBLHALSettings;
     } else {
         eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
     }
 
-    const hasOrderedSettings = Object.hasOwn(machineProfile, 'orderedSettings');
+    const orderedSettings = getOrderedSettings(machineProfile.id);
+    console.log(orderedSettings);
+    const hasOrderedSettings = orderedSettings !== null;
 
     const values = [];
     //const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
 
-    console.log(eepromSettings);
     for (let [key, value] of Object.entries(eepromSettings)) {
         console.log(`${key}=${value}`);
-        if (hasOrderedSettings && machineProfile.orderedSettings.has(key)) {
+        if (hasOrderedSettings && orderedSettings.has(key)) {
             // Skip if it's getting added later
             continue;
         }
@@ -136,8 +156,7 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     }
 
     if (hasOrderedSettings) {
-        console.log(machineProfile.orderedSettings);
-        for (const [k, v] of machineProfile.orderedSettings) {
+        for (const [k, v] of orderedSettings) {
             values.push(`${k}=${v}`);
         }
     }
