@@ -119,10 +119,23 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
         eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
     }
 
-    console.log(eepromSettings);
+    const hasOrderedSettings = Object.hasOwn(machineProfile, 'orderedSettings');
 
-    const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
-    if (Object.hasOwn(machineProfile, 'orderedSettings')) {
+    const values = [];
+    //const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
+
+    console.log(eepromSettings);
+    for (let [key, value] of Object.entries(eepromSettings)) {
+        console.log(`${key}=${value}`);
+        if (hasOrderedSettings && machineProfile.orderedSettings.has(key)) {
+            // Skip if it's getting added later
+            continue;
+        }
+
+        values.push(`${key}=${value}`);
+    }
+
+    if (hasOrderedSettings) {
         console.log(machineProfile.orderedSettings);
         for (const [k, v] of machineProfile.orderedSettings) {
             values.push(`${k}=${v}`);
