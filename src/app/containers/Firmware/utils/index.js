@@ -148,7 +148,7 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     for (let [key, value] of Object.entries(eepromSettings)) {
         console.log(`${key}=${value}`);
         if (hasOrderedSettings && orderedSettings.has(key)) {
-            // Skip if it's getting added later
+            console.log(`skipping to add later: ${key}`);
             continue;
         }
 
