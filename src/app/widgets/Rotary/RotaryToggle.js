@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { get } from 'lodash';
 import { useSelector } from 'react-redux';
 
@@ -11,6 +11,7 @@ import { updateWorkspaceMode } from 'app/lib/rotary';
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
 const RotaryToggle = ({ disabled }) => {
+    const focusedEl = useRef(null);
     const [workspaceMode, setWorkspaceMode] = useState(store.get('workspace.mode', DEFAULT));
     const { type: controllerType } = useSelector(state => state.controller);
 
@@ -31,6 +32,14 @@ const RotaryToggle = ({ disabled }) => {
             store.removeListener('change', updateWorkspaceMode);
         };
     }, []);
+
+    useEffect(() => {
+        // for some reason react-switch forces focus on a nested "input" component that i am unable to access the ref for
+        // the only way to get out of that focus is to click within the rotary widget
+        // or... do this :)
+        focusedEl.current = document.activeElement;
+        focusedEl.current.blur();
+    }, [workspaceMode]); // whenever the workspace mode updates (when the switch is toggled), change the active element to the document body
 
     const handleToggle = (toggled) => {
         const newMode = toggled ? ROTARY : DEFAULT;

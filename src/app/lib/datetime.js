@@ -32,6 +32,13 @@ export const convertMillisecondsToTimeStamp = (milliseconds) => {
         const minutes = Math.floor(seconds / 60);
         seconds %= 60; // keep only seconds not extracted to minutes
         seconds = Math.floor(seconds);
+
+        if (hours >= 24) {
+            const days = Math.floor(hours / 24);
+            const newHours = Math.floor(hours % 24); // get remaining hours
+            return `${String(days).padStart(2, 0)}d ${String(newHours).padStart(2, 0)}h`;
+        }
+
         return `${String(hours).padStart(2, 0)}:${String(minutes).padStart(2, 0)}:${String(seconds).padStart(2, 0)}`;
     }
 

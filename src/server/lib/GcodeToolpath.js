@@ -275,11 +275,13 @@ class GcodeToolpath {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
+                a: this.position.a
             };
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
+                a: this.translateA(params.A)
             };
             const v0 = {
                 // fixed point
@@ -288,7 +290,7 @@ class GcodeToolpath {
                 z: this.translateK(params.K),
             };
             const isClockwise = true;
-            const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
+            const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
             if (this.isXYPlane()) {
                 // XY-plane
@@ -337,7 +339,8 @@ class GcodeToolpath {
             this.setPosition(
                 targetPosition.x,
                 targetPosition.y,
-                targetPosition.z
+                targetPosition.z,
+                targetPosition.a
             );
         },
         'G3': (params) => {
@@ -349,11 +352,13 @@ class GcodeToolpath {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
+                a: this.position.a
             };
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
+                a: this.translateA(params.A)
             };
             const v0 = {
                 // fixed point
@@ -362,7 +367,7 @@ class GcodeToolpath {
                 z: this.translateK(params.K),
             };
             const isClockwise = false;
-            const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
+            const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
             if (this.isXYPlane()) {
                 // XY-plane
@@ -411,7 +416,8 @@ class GcodeToolpath {
             this.setPosition(
                 targetPosition.x,
                 targetPosition.y,
-                targetPosition.z
+                targetPosition.z,
+                targetPosition.a
             );
         },
         // G4: Dwell
@@ -734,8 +740,8 @@ class GcodeToolpath {
 
         // Position
         if (position) {
-            const { x, y, z } = { ...position };
-            this.setPosition(x, y, z);
+            const { x, y, z, a } = { ...position };
+            this.setPosition(x, y, z, a);
         }
 
         // Modal

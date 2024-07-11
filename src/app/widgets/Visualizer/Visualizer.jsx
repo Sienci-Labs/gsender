@@ -410,8 +410,8 @@ class Visualizer extends Component {
             }
 
             // Work position
-            const { x: wpox0, y: wpoy0, z: wpoz0, z: wpoa0, } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1, z: wpoa1 } = newPos;
+            const { x: wpox0, y: wpoy0, z: wpoz0, a: wpoa0, } = this.workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1, a: wpoa1 } = newPos;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1 || wpoa0 !== wpoa1) {
                 this.workPosition = newPos;
                 needUpdatePosition = true;
@@ -1519,7 +1519,6 @@ class Visualizer extends Component {
             return;
         }
 
-        const { fileType } = this.props;
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
         let duration = 0.24;
 
@@ -1535,7 +1534,7 @@ class Visualizer extends Component {
         }
 
         // The force parameter will skip here and update the positioning of all axes
-        if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
+        if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY)) {
             const yFixed = 0 - pivotPoint.y;
             gsap.to(this.cuttingTool.position, {
                 x: x0,

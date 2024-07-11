@@ -24,9 +24,9 @@
 
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
-import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
+import GcodeToolpath from '../../lib/GcodeToolpath';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -1523,7 +1523,7 @@ class GrblController {
                         return 0;
                     };
 
-                    const toolpath = new Toolpath();
+                    const toolpath = new GcodeToolpath();
                     toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
                         const { words, line } = data;
                         if (line.includes('F')) {
@@ -1556,6 +1556,7 @@ class GrblController {
                         x: xVal,
                         y: yVal,
                         z: zVal,
+                        a: aVal
                     } = position;
 
                     const modalGCode = [];
@@ -1573,6 +1574,9 @@ class GrblController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
+                    if (aVal) {
+                        modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
+                    }
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);

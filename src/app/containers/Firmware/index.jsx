@@ -59,7 +59,7 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
         addControllerEvents(controllerEvents);
 
         const timeout = setTimeout(() => {
-            collectUserUsageData(USAGE_TOOL_NAME.MOVEMENT_TUNING);
+            collectUserUsageData(USAGE_TOOL_NAME.FIRMWARE);
         }, 5000);
 
         return () => {

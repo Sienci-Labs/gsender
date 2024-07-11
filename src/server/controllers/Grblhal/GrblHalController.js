@@ -24,9 +24,9 @@
 
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
-import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
+import GcodeToolpath from '../../lib/GcodeToolpath';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -128,6 +128,8 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
+            console.log('connection error:');
+            console.log(err);
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
@@ -1075,10 +1077,10 @@ class GrblHalController {
                             return;
                         }
                         const as = _.get(this.state, 'status.activeState');
-                        if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
+                        if ((as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) && this.sender.state.hold) {
                             this.command('gcode:resume');
                         }
-                    }, 300);
+                    }, 1000);
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
@@ -1553,7 +1555,7 @@ class GrblHalController {
                         return 0;
                     };
 
-                    const toolpath = new Toolpath();
+                    const toolpath = new GcodeToolpath();
                     toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
                         const { words, line } = data;
                         if (line.includes('F')) {
@@ -1586,6 +1588,7 @@ class GrblHalController {
                         x: xVal,
                         y: yVal,
                         z: zVal,
+                        a: aVal
                     } = position;
 
                     const modalGCode = [];
@@ -1604,6 +1607,9 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
+                    if (aVal) {
+                        modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
+                    }
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
@@ -1611,6 +1617,7 @@ class GrblHalController {
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
+                    // console.log(modalGCode);
 
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);

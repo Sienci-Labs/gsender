@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.4.8",
+  "version": "1.4.8-internal2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -347,8 +347,8 @@
     "webappengine": "~1.2.0",
     "winston": "~3.2.1",
     "worker-loader": "^3.0.8",
-    "xterm": "^4.13.0",
-    "xterm-addon-fit": "^0.5.0"
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
     "@babel/cli": "~7.4.3",
