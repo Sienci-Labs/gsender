@@ -26,7 +26,6 @@ if (isElectron()) {
     userData = {
         path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
     };
-    };
 }
 
 const getConfig = () => {

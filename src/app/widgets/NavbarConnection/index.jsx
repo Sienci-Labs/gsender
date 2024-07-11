@@ -240,12 +240,14 @@ class NavbarConnectionWidget extends PureComponent {
         const { ports } = this.props;
 
         if (autoReconnect && !hasReconnected) {
-            this.setState(state => ({
-                hasReconnected: true
-            }));
-            this.openPort(port, controllerType, {
-                baudrate: baudrate
-            });
+            setTimeout(() => {
+                this.setState(state => ({
+                    hasReconnected: true
+                }));
+                this.openPort(port, controllerType, {
+                    baudrate: baudrate
+                });
+            }, 1000);
         } else {
             this.setState(state => ({
                 alertMessage: '',
