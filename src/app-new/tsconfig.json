@@ -20,8 +20,9 @@
 
     /* Linting */
     "strict": true,
+    "strictNullChecks": false, // this is so we can assign variables as null before defining them
     "noUnusedLocals": true,
-    // "noUnusedParameters": true,
+    "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,

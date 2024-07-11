@@ -21,7 +21,7 @@
  *
  */
 
-export const preventDefault = (e) => {
+export const preventDefault = (e: Event): void => {
     if (typeof e.preventDefault !== 'undefined') {
         e.preventDefault();
     } else {
@@ -29,7 +29,7 @@ export const preventDefault = (e) => {
     }
 };
 
-export const stopPropagation = (e) => {
+export const stopPropagation = (e: Event): void => {
     if (typeof e.stopPropagation !== 'undefined') {
         e.stopPropagation();
     } else {
@@ -38,21 +38,23 @@ export const stopPropagation = (e) => {
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Compatibility
-export const addEventListener = (target, type, listener) => {
+export const addEventListener = (target: EventTarget, type: string, listener: EventListener): void => {
     if (target.addEventListener) { // Standard
         target.addEventListener(type, listener, false);
-    } else if (target.attachEvent) { // IE8
-        // In Internet Explorer versions before IE 9, you have to use attachEvent rather than the standard addEventListener.
-        target.attachEvent('on' + type, listener);
     }
+    // } else if (target.attachEvent) { // IE8
+    //     // In Internet Explorer versions before IE 9, you have to use attachEvent rather than the standard addEventListener.
+    //     target.attachEvent('on' + type, listener);
+    // }
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
-export const removeEventListener = (target, type, listener) => {
+export const removeEventListener = (target: EventTarget, type: string, listener: EventListener): void => {
     if (target.removeEventListener) { // Standard
         target.removeEventListener(type, listener, false);
-    } else if (target.detachEvent) { // IE8
-        // In Internet Explorer versions before IE 9, you have to use detachEvent rather than the standard removeEventListener.
-        target.detachEvent('on' + type, listener);
     }
+    // } else if (target.detachEvent) { // IE8
+    //     // In Internet Explorer versions before IE 9, you have to use detachEvent rather than the standard removeEventListener.
+    //     target.detachEvent('on' + type, listener);
+    // }
 };
