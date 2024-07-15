@@ -22,6 +22,8 @@
  */
 
 import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import { MachineProfile } from "../definitions/interfaces";
+import { USER_DATA_COLLECTION_T } from "../definitions/types";
 
 // import store from "../store";
 
@@ -403,6 +405,24 @@ const file = {
     },
 };
 
+//
+// Metrics
+//
+const metrics = {
+    sendData: (machineProfile: MachineProfile): Promise<AxiosResponse> => {
+        return authrequest.post('/api/metrics/sendData', machineProfile);
+    },
+    getCollectDataStatus: (options?: FetchOptions): Promise<AxiosResponse> => {
+        return authrequest.get('/api/metrics/collectUserData', { params: options });
+    },
+    toggleCollectDataStatus: (options: USER_DATA_COLLECTION_T): Promise<AxiosResponse> => {
+        return authrequest.post('/api/metrics/collectUserData', options);
+    },
+    sendUsageData: (options: Record<string, any>): Promise<AxiosResponse> => {
+        return authrequest.post('/api/metrics/sendUsageData', options);
+    },
+};
+
 export default {
     signin,
     getLatestVersion,
@@ -425,4 +445,5 @@ export default {
     commands,
     machines,
     file,
+    metrics
 };

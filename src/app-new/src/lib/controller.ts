@@ -22,7 +22,7 @@
  */
 import isElectron from 'is-electron';
 import io, { Socket } from 'socket.io-client';
-import { ControllerListeners } from '../interfaces/interfaces';
+import { ControllerListeners } from '../definitions/interfaces';
 
 const ensureArray = (...args: Array<any>) => {
     if (args.length === 0 || args[0] === undefined || args[0] === null) {

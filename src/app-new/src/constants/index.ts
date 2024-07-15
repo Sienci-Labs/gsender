@@ -29,6 +29,15 @@ export const AXIS_Z = 'z';
 export const AXIS_A = 'a';
 export const AXIS_B = 'b';
 export const AXIS_C = 'c';
+export const AXES = {
+    AXIS_E: 'e',
+    AXIS_X: 'x',
+    AXIS_Y: 'y',
+    AXIS_Z: 'z',
+    AXIS_A: 'a',
+    AXIS_B: 'b',
+    AXIS_C: 'c',
+};
 
 // Imperial System
 export const IMPERIAL_UNITS = 'in';
@@ -97,12 +106,11 @@ export const TINYG = 'TinyG';
 export const WORKFLOW_STATE_IDLE = 'idle';
 export const WORKFLOW_STATE_PAUSED = 'paused';
 export const WORKFLOW_STATE_RUNNING = 'running';
-const WORKFLOW_STATES = {
+export const WORKFLOW_STATES = {
     WORKFLOW_STATE_IDLE: 'idle',
     WORKFLOW_STATE_PAUSED: 'paused',
     WORKFLOW_STATE_RUNNING: 'running',
 };
-export type WORKFLOW_STATES = typeof WORKFLOW_STATES[keyof typeof WORKFLOW_STATES];
 
 // Grbl Active State
 export const GRBL_ACTIVE_STATE_IDLE = 'Idle';
@@ -115,7 +123,7 @@ export const GRBL_ACTIVE_STATE_ALARM = 'Alarm';
 export const GRBL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBL_ACTIVE_STATE_JOG = 'Jog';
 export const GRBL_ACTIVE_STATE_TESTING = 'Testing File';
-const GRBL_ACTIVE_STATES = {
+export const GRBL_ACTIVE_STATES = {
     GRBL_ACTIVE_STATE_IDLE: 'Idle',
     GRBL_ACTIVE_STATE_RUN: 'Run',
     GRBL_ACTIVE_STATE_HOLD: 'Hold',
@@ -127,7 +135,6 @@ const GRBL_ACTIVE_STATES = {
     GRBL_ACTIVE_STATE_JOG: 'Jog',
     GRBL_ACTIVE_STATE_TESTING: 'Testing File',
 };
-export type GRBL_ACTIVE_STATES = typeof GRBL_ACTIVE_STATES[keyof typeof GRBL_ACTIVE_STATES];
 
 // grblHal Active State
 export const GRBL_HAL_ACTIVE_STATE_IDLE = 'Idle';
@@ -140,7 +147,7 @@ export const GRBL_HAL_ACTIVE_STATE_ALARM = 'Alarm';
 export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBL_HAL_ACTIVE_STATE_JOG = 'Jog';
 export const GRBL_HAL_ACTIVE_STATE_TESTING = 'Testing File';
-const GRBL_HAL_ACTIVE_STATES = {
+export const GRBL_HAL_ACTIVE_STATES = {
     GRBL_HAL_ACTIVE_STATE_IDLE: 'Idle',
     GRBL_HAL_ACTIVE_STATE_RUN: 'Run',
     GRBL_HAL_ACTIVE_STATE_HOLD: 'Hold',
@@ -152,7 +159,6 @@ const GRBL_HAL_ACTIVE_STATES = {
     GRBL_HAL_ACTIVE_STATE_JOG: 'Jog',
     GRBL_HAL_ACTIVE_STATE_TESTING: 'Testing File',
 };
-export type GRBL_HAL_ACTIVE_STATES = typeof GRBL_HAL_ACTIVE_STATES[keyof typeof GRBL_HAL_ACTIVE_STATES];
 
 export const LASER_MODE = 'laser';
 export const SPINDLE_MODE = 'spindle';
@@ -183,7 +189,7 @@ export const ALL_CATEGORIES = [ // keep in alphabetical order
     TOOLBAR_CATEGORY,
     VISUALIZER_CATEGORY,
 ];
-const SHORTCUT_CATEGORY = { // keep in alphabetical order
+export const SHORTCUT_CATEGORY = { // keep in alphabetical order
     ALL_CATEGORY: 'All',
     CARVING_CATEGORY: 'Carving',
     OVERRIDES_CATEGORY: 'Overrides',
@@ -197,19 +203,17 @@ const SHORTCUT_CATEGORY = { // keep in alphabetical order
     TOOLBAR_CATEGORY: 'Toolbar',
     COOLANT_CATEGORY: 'Coolant',
 };
-export type SHORTCUT_CATEGORY = typeof SHORTCUT_CATEGORY[keyof typeof SHORTCUT_CATEGORY];
 
 export const RENDER_NO_FILE = 'RENDER_NO_FILE';
 export const RENDER_LOADING = 'RENDER_LOADING';
 export const RENDER_RENDERING = 'RENDER_RENDERING';
 export const RENDER_RENDERED = 'RENDER_RENDERED';
-const RENDER_STATE = {
+export const RENDER_STATE = {
     RENDER_NO_FILE: 'RENDER_NO_FILE',
     RENDER_LOADING: 'RENDER_LOADING',
     RENDER_RENDERING: 'RENDER_RENDERING',
     RENDER_RENDERED: 'RENDER_RENDERED',
 };
-export type RENDER_STATE = typeof RENDER_STATE[keyof typeof RENDER_STATE];
 
 export const SPIRAL_MOVEMENT = 'SPIRAL_MOVEMENT';
 export const ZIG_ZAG_MOVEMENT = 'ZIG_ZAG_MOVEMENT';
@@ -370,14 +374,13 @@ export const USAGE_TOOL_NAME = {
     }
 };
 
-const HOMING_LOCATIONS = {
+export const HOMING_LOCATIONS = {
     FRONT_RIGHT: 'FR',
     FRONT_LEFT: 'FL',
     BACK_RIGHT: 'BR',
     BACK_LEFT: 'BL',
     OTHER: 'OT',
 };
-export type HOMING_LOCATIONS = typeof HOMING_LOCATIONS[keyof typeof HOMING_LOCATIONS];
 
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",

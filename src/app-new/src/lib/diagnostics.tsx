@@ -35,7 +35,7 @@ import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from '../api';
 import { homingString } from '../lib/eeprom';
-import { AlarmsErrors, ConnectionInfo, ControllerInfo, EEPROMSettings, FileInfo, JogSpeeds, MachineProfile } from '../interfaces/interfaces';
+import { AlarmsErrors, ConnectionInfo, ControllerInfo, EEPROMSettings, FileInfo, JogSpeeds, MachineProfile } from '../definitions/interfaces';
 
 const styles = StyleSheet.create({
     body: {

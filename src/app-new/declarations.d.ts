@@ -8,3 +8,5 @@ declare module 'mousetrap';
 declare module 'events';
 declare module 'universal-logger';
 declare module 'universal-logger-browser';
+declare module 'gcode-parser';
+declare module 'sha1';

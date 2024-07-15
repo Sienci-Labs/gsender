@@ -1,4 +1,8 @@
-import { RENDER_STATE, SHORTCUT_CATEGORY, WORKFLOW_STATES } from "../constants"
+import { WORKFLOW_STATES_T, SHORTCUT_CATEGORY_T, RENDER_STATE_T, EEPROM } from "./types";
+
+export interface BasicObject {
+    [key: string]: string | number | Array<any> | BasicObject,
+};
 
 export interface AlarmsErrors {
     type: string,
@@ -9,7 +13,7 @@ export interface AlarmsErrors {
     lineNumber: number,
     line: string,
     controller: "GRBL" | "grblHAL",
-}
+};
 
 export interface CommandKey {
     cmd: string
@@ -18,13 +22,13 @@ export interface CommandKey {
     title: string,
     payload: object,
     preventDefault: false,
-    category: SHORTCUT_CATEGORY,
+    category: SHORTCUT_CATEGORY_T,
     callback: Function
 };
 
 export interface CommandKeys {
     [key: string]: CommandKey | undefined
-}
+};
 
 export interface ShuttleEvent {
     title: string,
@@ -35,14 +39,14 @@ export interface ShuttleEvent {
     payload: object,
     preventDefault: false,
     isActive: true,
-    category: SHORTCUT_CATEGORY,
+    category: SHORTCUT_CATEGORY_T,
     callback: Function
-}
+};
 
 export interface ShuttleControlEvents {
     [key: string]: ShuttleEvent | Function,
     MACRO: Function
-}
+};
 
 export interface Macro {
     id: string,
@@ -52,18 +56,16 @@ export interface Macro {
     description: string,
     column: string,
     rowIndex: number
-}
+};
 
 export interface Shortcut {
     keys: string,
     callback: Function
-}
-
-type EEPROM = `$${string}`;
+};
 
 export interface EEPROMSettings {
     [key: EEPROM]: string
-}
+};
 
 export interface MachineProfile {
     id: number,
@@ -87,7 +89,7 @@ export interface MachineProfile {
     laser: boolean,
     eepromSettings?: EEPROMSettings,
     grblHALeepromSettings?: EEPROMSettings
-}
+};
 
 // export interface Spindles {
 //     order: number
@@ -108,7 +110,7 @@ export interface FeederStatus {
     queue: number,
     pending: boolean,
     changed: boolean,
-}
+};
 
 export interface SenderStatus {
     sp: number,
@@ -168,7 +170,7 @@ export interface SenderStatus {
     ovF: number,
     isRotaryFile: boolean,
     currentLineRunning: number,
-}
+};
 
 export interface FirmwareOptions {
     OPT: string,
@@ -194,7 +196,7 @@ export interface EEPROMDescriptions {
     format: string,
     unitString: string,
     details: string,
-}
+};
 
 export interface ControllerSettings { //TODO
     parameters: object,
@@ -203,7 +205,7 @@ export interface ControllerSettings { //TODO
     descriptions: EEPROMDescriptions
     groups: object,
     alarms: object,
-}
+};
 
 export interface ControllerInfo { // TODO
     type: string,
@@ -235,20 +237,20 @@ export interface ControllerInfo { // TODO
         status: SenderStatus
     },
     workflow: {
-        state: WORKFLOW_STATES
+        state: WORKFLOW_STATES_T
     },
     tool: {
         context: object
     },
     terminalHistory: Array<string>,
     spindles: Array<object>
-}
+};
 
 export interface PortInfo {
     port: string,
     manufacturer?: string,
     inuse: boolean
-}
+};
 
 export interface ConnectionInfo {
     isConnected: boolean,
@@ -259,12 +261,12 @@ export interface ConnectionInfo {
     unrecognizedPorts: Array<PortInfo>,
     networkPorts: Array<PortInfo>,
     err: string,
-}
+};
 
 export interface FileInfo {
     fileLoaded: boolean,
     fileProcessing: boolean,
-    renderState: RENDER_STATE,
+    renderState: RENDER_STATE_T,
     name: string,
     path: string,
     size: number,
@@ -293,7 +295,7 @@ export interface FileInfo {
         }
     },
     content: string,
-}
+};
 
 export interface JogSpeeds {
     rapid: {
@@ -311,7 +313,7 @@ export interface JogSpeeds {
         zStep: string,
         feedrate: string,
     }
-}
+};
 
 export interface ControllerListeners {
     [key: string]: Array<Function>,
@@ -395,4 +397,67 @@ export interface ControllerListeners {
 
     'requestEstimateData': Array<Function>,
     'job:start': Array<Function>,
-}
+};
+
+export interface i18n__Options {
+    context: object,
+    count: number,
+    defaultValue: string,
+};
+
+// export interface BasicPosition {
+//     x: number,
+//     y: number,
+//     z: number,
+//     a: number
+// }
+
+// export interface Modal {
+//     // Motion Mode
+//     // G0, G1, G2, G3, G80
+//     motion: 'G0' | 'G1' | 'G2' | 'G3' | 'G80',
+
+//     // Coordinate System Select
+//     // G54, G55, G56, G57, G58, G59
+//     wcs: 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59',
+
+//     // Plane Select
+//     // G17: XY-plane, G18: ZX-plane, G19: YZ-plane
+//     plane: 'G17' | 'G18' | 'G19',
+
+//     // Units Mode
+//     // G20: Inches, G21: Millimeters
+//     units: 'G20' | 'G21',
+
+//     // Distance Mode
+//     // G90: Absolute, G91: Relative
+//     distance: 'G90' | 'G91',
+
+//     // Arc IJK distance mode
+//     arc: `G${string}`,
+
+//     // Feed Rate Mode
+//     // G93: Inverse time mode, G94: Units per minute mode, G95: Units per rev mode
+//     feedrate: 'G93' | 'G94' | 'G95',
+
+//     // Cutter Radius Compensation
+//     cutter: `G${string}`,
+
+//     // Tool Length Offset
+//     // G43.1, G49
+//     tlo: 'G43.1' | 'G49',
+
+//     // Program Mode
+//     // M0, M1, M2, M30
+//     program: 'M0' | 'M1' | 'M2' | 'M30',
+
+//     // Spingle State
+//     // M3, M4, M5
+//     spindle: 'M3' | 'M4' | 'M5',
+//     // Coolant State
+//     // M7, M8, M9
+//     coolant: 'M7' | 'M8' | 'M7' | 'M8' | 'M9',
+
+//     // Tool Select
+//     tool: number
+// }
