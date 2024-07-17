@@ -76,7 +76,7 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
                     location="default"
                 >
                     <ToggleSwitch
-                        onChange={(value) => actions.rotary.updateFirmwareSetting('$20', (+value).toString())}
+                        onChange={(value) => actions.rotary.updateDefaultFirmwareSetting('$20', (+value).toString())}
                         checked={$20}
                         label="Force Soft Limits"
                         size="small"
