@@ -75,14 +75,10 @@ class SerialConnection extends EventEmitter {
             this.emit('close', err);
         },
         error: (err) => {
-            console.error('Serialport Error');
-            console.log(err);
             if (err.code === 'ECONNRESET') {
-                console.log('reset error, attempting to destroy');
                 this.port.destroy();
                 this.port = null;
                 if (this.callback) {
-                    console.log('callback');
                     this.callback(err);
                 }
             }

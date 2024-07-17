@@ -1331,8 +1331,9 @@ class GrblHalController {
             setTimeout(async () => {
                 if (this.connection) {
                     this.connection.writeImmediate(String.fromCharCode(0x87));
-                    this.connection.write('$I\n');
                     await delay(100);
+                    this.connection.write('$I\n');
+                    await delay(250);
                     this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                 }
                 let counter = 3;
