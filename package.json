@@ -414,6 +414,7 @@
     "terser-webpack-plugin": "^4",
     "text-table": "~0.2.0",
     "transform-loader": "~0.2.4",
+    "typescript-eslint": "^7.16.1",
     "url-loader": "~1.1.2",
     "webpack": "~4.47.0",
     "webpack-cli": "~3.3.1",
