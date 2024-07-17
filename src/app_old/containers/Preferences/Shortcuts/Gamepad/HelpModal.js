@@ -20,7 +20,6 @@ const HelpModal = () => {
                     Your gamepad setup needs to work correctly for shortcuts to behave as expected.{' '}
                     If you are experiencing issues, use this online diagnostics tool to verify its stability:
                 </p>
-
                 <a href="https://hardwaretester.com/gamepad" target="_blank" rel="noopener noreferrer">
                     Hardware Tester
                 </a>

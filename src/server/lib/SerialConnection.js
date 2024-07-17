@@ -58,6 +58,9 @@ class SerialConnection extends EventEmitter {
     // Readline parser
     port = null;
 
+    // callback on state
+    callback = null;
+
     // SerialPort
     writeFilter = (data) => data;
 
@@ -72,7 +75,13 @@ class SerialConnection extends EventEmitter {
             this.emit('close', err);
         },
         error: (err) => {
-            console.error('Serialport Error');
+            if (err.code === 'ECONNRESET') {
+                this.port.destroy();
+                this.port = null;
+                if (this.callback) {
+                    this.callback(err);
+                }
+            }
             this.emit('error', err);
         }
     };
@@ -152,17 +161,30 @@ class SerialConnection extends EventEmitter {
 
     // @param {function} callback The error-first callback.
     open(callback) {
-        if (this.port) {
+        this.callback = callback;
+        const { path, baudRate, network, ...rest } = this.settings;
+
+        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
+        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
+        const looksLikeIP = path.match(expr);
+
+        if (this.port && !looksLikeIP) {
             const err = new Error(`Cannot open serial port "${this.settings.path}"`);
             callback(err);
             return;
         }
 
-        const { path, baudRate, network, ...rest } = this.settings;
+        // Single telnet - don't return early, just close it and reopen it
+        if (this.port && (network || looksLikeIP)) {
+            this.port.destroy();
+            this.port = null;
+            const err = new Error('Serial port connection reset');
+            callback(err);
+            return;
+        }
 
-        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
-        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
-        if (network || path.match(expr)) {
+
+        if (network || looksLikeIP) {
             console.log('telnet');
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {

@@ -102,6 +102,29 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.8 (July 11, 2024)
+- Added Altmill profiles
+- Start from line now also accounts for A axis if file contains those movements
+- Fixed situation where progress bar could be greater than 100%
+- Some time estimation alterations specifically when pausing jobs
+- Fixed issue where console copy prompt stated limit other than 50
+- Spindle delay on start is now a configurable value in ms
+- Changes to ethernet behaviour to allow reconnection in more cases the board closes the connection early
+- Maintenance tasks that are due now prompt the user to take care of them on application start
+- Changed max value for spindle RPM in rotary surfacing tool
+- Fix for rotary tab gaining focus and preventing keybinds from working
+- Changes to console scrollbar size and sensitivity
+- Setting A-axis zero now updates visualizer rotation correctly
+- Homing enabled in diagnostics now correct for SLB
+- A-axis DRO with $13 enabled now no longer converts incorrectly
+- Relative Go To now correctly uses input values for all 3 axes
+- Alarm 14 and 17 now reset and unlock instead of just unlock using UI buttons
+- Firmware tool inputs now disabled in Alarm state
+- Added preference for end of job modal to not appear
+- Fixed crash on toggling lightweight mode
+- End of probe code now correctly restore G90/G91 to previous state
+
+
 ### 1.4.7 (April 30, 2024)
 - Rapid position buttons work as expected with A-axis invert enabled
 - Updated defaults for SLB homing speeds

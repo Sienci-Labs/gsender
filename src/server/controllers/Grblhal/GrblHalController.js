@@ -78,7 +78,7 @@ import {
     FILE_UNLOAD,
     ALARM,
     ERROR
-} from '../../../app/constants';
+} from '../../../app_old/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
@@ -128,6 +128,8 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
+            console.log('connection error:');
+            console.log(err);
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
@@ -1075,10 +1077,10 @@ class GrblHalController {
                             return;
                         }
                         const as = _.get(this.state, 'status.activeState');
-                        if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
+                        if ((as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) && this.sender.state.hold) {
                             this.command('gcode:resume');
                         }
-                    }, 300);
+                    }, 1000);
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
@@ -1329,8 +1331,9 @@ class GrblHalController {
             setTimeout(async () => {
                 if (this.connection) {
                     this.connection.writeImmediate(String.fromCharCode(0x87));
-                    this.connection.write('$I\n');
                     await delay(100);
+                    this.connection.write('$I\n');
+                    await delay(250);
                     this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                 }
                 let counter = 3;

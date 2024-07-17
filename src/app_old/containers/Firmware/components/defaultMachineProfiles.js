@@ -25,6 +25,7 @@ import DefaultSLBSettings from '../eepromFiles/DefaultSLBSettings.json';
 import * as longMillGrblEEPROM from '../eeprom/grbl/longmill';
 import * as longMillGrblHALEEPROM from '../eeprom/grblHAL/longmill';
 import * as millOneGrblEEPROM from '../eeprom/grbl/millone';
+import * as altmillSettings from '../eepromFiles/Altmill';
 
 export default [
     {
@@ -578,6 +579,58 @@ export default [
         laserOnOutline: false,
         eepromSettings: DefaultSLBSettings,
         grblHALeepromSettings: DefaultSLBSettings,
+        isHal: true
+    },
+    {
+        id: 54,
+        company: 'Sienci Labs',
+        name: 'Altmill 48X48',
+        type: '',
+        version: '',
+        mm: {
+            width: 1260,
+            depth: 1248,
+            height: 170
+        },
+        in: {
+            width: 31.18,
+            depth: 33.27,
+            height: 4.5
+        },
+        endstops: true,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.DEFAULT,
+        grblHALeepromSettings: altmillSettings.DEFAULT,
+        orderedSettings: altmillSettings.ALTMILL_ORDERED,
+        isHal: true
+    },
+    {
+        id: 55,
+        company: 'Sienci Labs',
+        name: 'Altmill 48X48 + Spindle',
+        type: '',
+        version: '',
+        mm: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        in: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        endstops: true,
+        spindle: true,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.SPINDLE_KIT,
+        grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
+        orderedSettings: altmillSettings.SPINDLE_ORDERED,
         isHal: true
     }
 ];
