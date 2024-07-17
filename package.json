@@ -81,7 +81,7 @@
     "vite:build:client": "vite build --ssrManifest",
     "vite:build:server": "vite build --ssr ./src/entry-server.tsx --outDir ../../dist/gsender/app-server",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,i18n,images,assets} dist/gsender/app/\"",
-    "install:packages": "yarn install && yarn install --prefix /src/app-new"
+    "install:packages": "yarn install && yarn install --prefix /src/app"
   },
   "build": {
     "appId": "org.sienci.gsender",

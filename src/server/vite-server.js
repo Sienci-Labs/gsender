@@ -40,9 +40,9 @@ export const viteServer = async (app) => {
             let render;
             if (!isProduction) {
                 // Always read fresh template in development
-                template = await fs.promises.readFile('../../src/app-new/index.html', 'utf-8');
+                template = await fs.promises.readFile('../../src/app/index.html', 'utf-8');
                 template = await vite.transformIndexHtml(url, template);
-                render = (await vite.ssrLoadModule('../../src/app-new/src/entry-server.tsx')).render;
+                render = (await vite.ssrLoadModule('../../src/app/src/entry-server.tsx')).render;
             } else {
                 template = templateHtml;
                 render = (await import('../../dist/gsender/app-server/entry-server')).render;

@@ -394,9 +394,9 @@ const appMain = () => {
     //         let render;
     //         if (!isProduction) {
     //             // Always read fresh template in development
-    //             template = await fs.promises.readFile(path.resolve(__dirname, '../../src/app-new/index.html'), 'utf-8');
+    //             template = await fs.promises.readFile(path.resolve(__dirname, '../../src/app/index.html'), 'utf-8');
     //             template = await vite.transformIndexHtml(url, template);
-    //             render = (await vite.ssrLoadModule(path.resolve(__dirname, '../../src/app-new/src/entry-server.tsx'))).render;
+    //             render = (await vite.ssrLoadModule(path.resolve(__dirname, '../../src/app/src/entry-server.tsx'))).render;
     //         } else {
     //             template = templateHtml;
     //             // eslint-disable-next-line import/extensions, import/no-unresolved
