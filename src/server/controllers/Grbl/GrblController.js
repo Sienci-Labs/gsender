@@ -82,7 +82,7 @@ import {
     FILE_TYPE,
     ALARM,
     ERROR
-} from '../../../app/constants';
+} from '../../../app_old/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
