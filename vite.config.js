@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-    root: path.resolve(__dirname, './src/app-new'), // Set root to the directory containing index.html
+    root: path.resolve(__dirname, './src/app'), // Set root to the directory containing index.html
     base: './',
     build: {
         outDir: path.resolve(__dirname, './dist/gsender/app'), // Output directly to /output/app
         rollupOptions: {
             input: {
-                main: path.resolve(__dirname, './src/app-new/index.html'), // Main entry point
+                main: path.resolve(__dirname, './src/app/index.html'), // Main entry point
             },
             // output: {
             //     entryFileNames: 'assets/[name].[hash].js', // Adjusted output path for JS files
