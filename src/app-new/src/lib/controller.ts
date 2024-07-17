@@ -234,7 +234,7 @@ class Controller {
                     this.state = { ...args[1] };
                 }
 
-                const listeners: Array<Function> = ensureArray(this.listeners[eventName]);
+                const listeners: Array<Function> = ensureArray(this.listeners[eventName as keyof typeof this.listeners]);
                 listeners.forEach((listener)  => {
                     listener(...args);
                 });
@@ -281,7 +281,7 @@ class Controller {
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
     addListener(eventName: string, listener: Function): boolean {
-        const listeners = this.listeners[eventName];
+        const listeners = this.listeners[eventName as keyof typeof this.listeners];
         if (!listeners || typeof listener !== 'function') {
             return false;
         }
@@ -293,7 +293,7 @@ class Controller {
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
     removeListener(eventName: string, listener: Function): boolean {
-        const listeners = this.listeners[eventName];
+        const listeners = this.listeners[eventName as keyof typeof this.listeners];
         if (!listeners || typeof listener !== 'function') {
             return false;
         }

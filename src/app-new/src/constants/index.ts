@@ -101,6 +101,13 @@ export const GRBLHAL = 'grblHAL';
 export const MARLIN = 'Marlin';
 export const SMOOTHIE = 'Smoothie';
 export const TINYG = 'TinyG';
+export const FIRMWARE_TYPES = {
+    GRBL: 'Grbl',
+    GRBLHAL: 'grblHAL',
+    MARLIN: 'Marlin',
+    SMOOTHIE: 'Smoothie',
+    TINYG: 'TinyG',
+}
 
 // Workflow State
 export const WORKFLOW_STATE_IDLE = 'idle';
@@ -162,6 +169,10 @@ export const GRBL_HAL_ACTIVE_STATES = {
 
 export const LASER_MODE = 'laser';
 export const SPINDLE_MODE = 'spindle';
+export const SPINDLE_LASER = {
+    LASER_MODE: 'laser',
+    SPINDLE_MODE: 'spindle',
+}
 
 export const ALL_CATEGORY = 'All';
 export const CARVING_CATEGORY = 'Carving';

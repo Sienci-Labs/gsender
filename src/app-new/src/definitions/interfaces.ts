@@ -1,4 +1,4 @@
-import { WORKFLOW_STATES_T, SHORTCUT_CATEGORY_T, RENDER_STATE_T, EEPROM } from "./types";
+import { WORKFLOW_STATES_T, SHORTCUT_CATEGORY_T, RENDER_STATE_T, EEPROM, MOTION, WCS, PLANE, UNITS_GCODE, DISTANCE, ARC, FEEDRATE, CUTTER, TLO, PROGRAM, SPINDLE, COOLANT, TOOL, PROBE_DIRECTIONS, UNITS_EN, FIRMWARE_TYPES_T } from "./types";
 
 export interface BasicObject {
     [key: string]: string | number | Array<any> | BasicObject,
@@ -316,7 +316,6 @@ export interface JogSpeeds {
 };
 
 export interface ControllerListeners {
-    [key: string]: Array<Function>,
     // Socket.IO Events
     // Fired upon a connection including a successful reconnection.
     'connect': Array<Function>,
@@ -405,59 +404,89 @@ export interface i18n__Options {
     defaultValue: string,
 };
 
-// export interface BasicPosition {
-//     x: number,
-//     y: number,
-//     z: number,
-//     a: number
-// }
+export interface BasicPosition {
+    x: number,
+    y: number,
+    z: number,
+    a: number
+};
 
-// export interface Modal {
-//     // Motion Mode
-//     // G0, G1, G2, G3, G80
-//     motion: 'G0' | 'G1' | 'G2' | 'G3' | 'G80',
+export interface LineData {
+    v0?: BasicPosition,
+    v1: BasicPosition,
+    v2: BasicPosition,
+    shouldUseAddCurve: boolean
+};
 
-//     // Coordinate System Select
-//     // G54, G55, G56, G57, G58, G59
-//     wcs: 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59',
+export interface PDData {
+    Scode: string,
+    lineData: LineData
+};
 
-//     // Plane Select
-//     // G17: XY-plane, G18: ZX-plane, G19: YZ-plane
-//     plane: 'G17' | 'G18' | 'G19',
+export interface FeedrateChanges {
+    change: number,
+    count: number
+};
 
-//     // Units Mode
-//     // G20: Inches, G21: Millimeters
-//     units: 'G20' | 'G21',
+export interface Modal {
+    motion?: MOTION,
+    wcs?: WCS,
+    plane?: PLANE,
+    units?: UNITS_GCODE,
+    distance?: DISTANCE,
+    arc?: ARC,
+    feedrate?: FEEDRATE,
+    cutter?: CUTTER,
+    tlo?: TLO,
+    program?: PROGRAM,
+    spindle?: SPINDLE,
+    coolant?: COOLANT,
+    tool?: TOOL
+}
 
-//     // Distance Mode
-//     // G90: Absolute, G91: Relative
-//     distance: 'G90' | 'G91',
+export interface ModalChanges {
+    change: Modal,
+    count: number
+};
 
-//     // Arc IJK distance mode
-//     arc: `G${string}`,
+export interface ParsedData {
+    id: string,
+    data: Array<PDData>,
+    estimates: Array<number>
+    feedrateChanges: Array<FeedrateChanges>,
+    modalChanges: Array<ModalChanges>,
+    info: FileInfo
+};
 
-//     // Feed Rate Mode
-//     // G93: Inverse time mode, G94: Units per minute mode, G95: Units per rev mode
-//     feedrate: 'G93' | 'G94' | 'G95',
+export interface EstimateData {
+    estimates: Array<number>,
+    estimatedTime: number
+};
 
-//     // Cutter Radius Compensation
-//     cutter: `G${string}`,
+export interface ProbingOptions {
+    modal: string,
+    units: UNITS_EN,
+    toolDiameter: number,
+    xRetractModifier: number,
+    yRetractModifier: number,
+    xRetract: number,
+    yRetract: number,
+    zRetract: number,
+    retract: number,
+    axes: BasicPosition,
+    xProbeDistance: number,
+    yProbeDistance: number,
+    zProbeDistance: number,
+    probeDistances: BasicPosition,
+    probeFast: number,
+    probeSlow: number,
+    zThickness: number,
+    xThickness: number,
+    yThickness: number,
+    xyThickness: number,
+    firmware: FIRMWARE_TYPES_T,
+    xyPositionAdjust: number,
+    zPositionAdjust: number,
+    direction: PROBE_DIRECTIONS,
+};
 
-//     // Tool Length Offset
-//     // G43.1, G49
-//     tlo: 'G43.1' | 'G49',
-
-//     // Program Mode
-//     // M0, M1, M2, M30
-//     program: 'M0' | 'M1' | 'M2' | 'M30',
-
-//     // Spingle State
-//     // M3, M4, M5
-//     spindle: 'M3' | 'M4' | 'M5',
-//     // Coolant State
-//     // M7, M8, M9
-//     coolant: 'M7' | 'M8' | 'M7' | 'M8' | 'M9',
-
-//     // Tool Select
-//     tool: number
-// }
