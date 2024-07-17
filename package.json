@@ -362,6 +362,7 @@
     "@babel/register": "~7.4.0",
     "@sentry/webpack-plugin": "^2.7.1",
     "@trendmicro/babel-config": "~1.0.0-alpha",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
     "babel-core": "~7.0.0-bridge.0",
     "babel-eslint": "~10.0.1",
     "babel-loader": "~8.0.5",
