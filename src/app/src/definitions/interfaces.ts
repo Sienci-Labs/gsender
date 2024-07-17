@@ -1,4 +1,25 @@
-import { WORKFLOW_STATES_T, SHORTCUT_CATEGORY_T, RENDER_STATE_T, EEPROM, MOTION, WCS, PLANE, UNITS_GCODE, DISTANCE, ARC, FEEDRATE, CUTTER, TLO, PROGRAM, SPINDLE, COOLANT, TOOL, PROBE_DIRECTIONS, UNITS_EN, FIRMWARE_TYPES_T } from "./types";
+import {
+    WORKFLOW_STATES_T,
+    SHORTCUT_CATEGORY_T,
+    RENDER_STATE_T,
+    EEPROM,
+    MOTION,
+    WCS,
+    PLANE,
+    UNITS_GCODE,
+    DISTANCE,
+    ARC,
+    FEEDRATE,
+    CUTTER,
+    TLO,
+    PROGRAM,
+    SPINDLE,
+    COOLANT,
+    TOOL,
+    // PROBE_DIRECTIONS,
+    UNITS_EN,
+    FIRMWARE_TYPES_T
+} from "./types";
 
 export interface BasicObject {
     [key: string]: string | number | Array<any> | BasicObject,
@@ -463,30 +484,30 @@ export interface EstimateData {
     estimatedTime: number
 };
 
-export interface ProbingOptions {
-    modal: string,
-    units: UNITS_EN,
-    toolDiameter: number,
-    xRetractModifier: number,
-    yRetractModifier: number,
-    xRetract: number,
-    yRetract: number,
-    zRetract: number,
-    retract: number,
-    axes: BasicPosition,
-    xProbeDistance: number,
-    yProbeDistance: number,
-    zProbeDistance: number,
-    probeDistances: BasicPosition,
-    probeFast: number,
-    probeSlow: number,
-    zThickness: number,
-    xThickness: number,
-    yThickness: number,
-    xyThickness: number,
-    firmware: FIRMWARE_TYPES_T,
-    xyPositionAdjust: number,
-    zPositionAdjust: number,
-    direction: PROBE_DIRECTIONS,
-};
+// export interface ProbingOptions {
+//     modal: string,
+//     units: UNITS_EN,
+//     toolDiameter: number,
+//     xRetractModifier: number,
+//     yRetractModifier: number,
+//     xRetract: number,
+//     yRetract: number,
+//     zRetract: number,
+//     retract: number,
+//     axes: BasicPosition,
+//     xProbeDistance: number,
+//     yProbeDistance: number,
+//     zProbeDistance: number,
+//     probeDistances: BasicPosition,
+//     probeFast: number,
+//     probeSlow: number,
+//     zThickness: number,
+//     xThickness: number,
+//     yThickness: number,
+//     xyThickness: number,
+//     firmware: FIRMWARE_TYPES_T,
+//     xyPositionAdjust: number,
+//     zPositionAdjust: number,
+//     direction: PROBE_DIRECTIONS,
+// };
 
