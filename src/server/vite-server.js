@@ -49,7 +49,6 @@ export const viteServer = async (app) => {
             }
 
             const rendered = await render(url, ssrManifest);
-
             const html = template
                 .replace('<!--app-head-->', rendered.head ?? '')
                 .replace('<!--app-html-->', rendered.html ?? '');
