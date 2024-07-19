@@ -73,8 +73,8 @@ const main = () => {
         if (window) {
             if (window.isMinimized()) {
                 window.restore();
+                window.focus();
             }
-            window.focus();
         }
     });
 
@@ -236,11 +236,12 @@ const main = () => {
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
+                    let gSenderWindow = windowManager.getWindow();
 
                     if (prevDirectory) {
                         additionalOptions.defaultPath = prevDirectory;
                     }
-                    const file = await dialog.showOpenDialog(window,
+                    const file = await dialog.showOpenDialog(gSenderWindow,
                         {
                             properties: ['openFile'],
                             filters: [
