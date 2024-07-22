@@ -24,7 +24,7 @@
 import { ReactComponentLike } from 'prop-types';
 import ReactDOM from 'react-dom';
 
-export default (Component: ReactComponentLike, node: Element = null) => new Promise((resolve, _reject): void => {
+export default (Component: ReactComponentLike, node: Element = null) => new Promise<void>((resolve, _reject): void => {
     let defaultNode: Element = null;
 
     if (!node) {
@@ -45,7 +45,7 @@ export default (Component: ReactComponentLike, node: Element = null) => new Prom
                         defaultNode = null;
                     }
 
-                    resolve('');
+                    resolve();
                 }, 0);
             }}
         />,

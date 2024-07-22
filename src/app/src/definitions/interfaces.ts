@@ -16,9 +16,14 @@ import {
     SPINDLE,
     COOLANT,
     TOOL,
-    // PROBE_DIRECTIONS,
+    PROBE_DIRECTIONS,
     UNITS_EN,
-    FIRMWARE_TYPES_T
+    FIRMWARE_TYPES_T,
+    TOUCHPLATE_TYPES_T,
+    PROBE_TYPES_T,
+    FILE_TYPE_T,
+    VISUALIZER_TYPES_T,
+    TOGGLE_STATUS_T
 } from "./types";
 
 export interface BasicObject {
@@ -316,6 +321,28 @@ export interface FileInfo {
         }
     },
     content: string,
+    fileType: FILE_TYPE_T,
+};
+
+export interface PreferencesInfo {
+    shortcuts: {
+        list: CommandKeys,
+        shouldHold: boolean,
+    },
+    ipList: Array<number>,
+}
+
+export interface VisualizerInfo {
+    activeVisualizer: VISUALIZER_TYPES_T,
+    jobOverrides: { isChecked: boolean, toggleStatus: TOGGLE_STATUS_T }
+}
+
+export interface ReduxState {
+    controller: ControllerInfo,
+    connection: ConnectionInfo,
+    file: FileInfo,
+    visualizer: VisualizerInfo,
+    preferences: PreferencesInfo,
 };
 
 export interface JogSpeeds {
@@ -484,30 +511,73 @@ export interface EstimateData {
     estimatedTime: number
 };
 
-// export interface ProbingOptions {
-//     modal: string,
-//     units: UNITS_EN,
-//     toolDiameter: number,
-//     xRetractModifier: number,
-//     yRetractModifier: number,
-//     xRetract: number,
-//     yRetract: number,
-//     zRetract: number,
-//     retract: number,
-//     axes: BasicPosition,
-//     xProbeDistance: number,
-//     yProbeDistance: number,
-//     zProbeDistance: number,
-//     probeDistances: BasicPosition,
-//     probeFast: number,
-//     probeSlow: number,
-//     zThickness: number,
-//     xThickness: number,
-//     yThickness: number,
-//     xyThickness: number,
-//     firmware: FIRMWARE_TYPES_T,
-//     xyPositionAdjust: number,
-//     zPositionAdjust: number,
-//     direction: PROBE_DIRECTIONS,
-// };
+export interface ProbingOptions {
+    modal: string,
+    units: UNITS_EN,
+    toolDiameter: PROBE_TYPES_T | number,
+    xRetractModifier: number,
+    yRetractModifier: number,
+    xRetract: number,
+    yRetract: number,
+    zRetract: number,
+    retract: number,
+    axes: BasicPosition,
+    xProbeDistance: number,
+    yProbeDistance: number,
+    zProbeDistance: number,
+    probeDistances: BasicPosition,
+    probeFast: number,
+    probeSlow: number,
+    zThickness: number,
+    xThickness: number,
+    yThickness: number,
+    xyThickness: number,
+    firmware: FIRMWARE_TYPES_T,
+    xyPositionAdjust: number,
+    zPositionAdjust: number,
+    direction: PROBE_DIRECTIONS,
+    $13: '0' | '1',
+    plateType: TOUCHPLATE_TYPES_T,
+};
 
+export interface RotaryModeFirmwareSettings {
+    $101: string,
+    $111: string,
+    $20: string,
+    $21: string,
+};
+
+export interface ProbeWidgetSettings {
+    slowSpeed: number,
+    fastSpeed: number,
+    retract: number,
+    zProbeDistance: number,
+    zProbeThickness: number,
+};
+
+export interface SignInParams {
+    token: string,
+    name?: string,
+    password?: string,
+};
+
+export interface ValidationProps {
+    type: string,
+    name: string
+    checked: boolean
+}
+
+export interface ValidationComponent {
+    blurred: boolean,
+    changed: boolean,
+    value: string,
+}
+
+export interface ValidationComponents {
+    password: Array<ValidationComponent>,
+    confirm: Array<ValidationComponent>,
+}
+
+export interface RequiredComponent {
+    [key: string]: Array<{checked: boolean, props: ValidationProps}>
+}

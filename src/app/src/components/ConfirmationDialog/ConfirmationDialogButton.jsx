@@ -21,30 +21,24 @@
  *
  */
 
-export const modifierKeys = [
-    'shift',
-    'alt',
-    'ctrl',
-    'meta',
-];
+import React from 'react';
+import cx from 'classnames';
+import styles from './index.styl';
+import { DIALOG_CANCEL, DIALOG_CONFIRM } from './ConfirmationDialogLib';
 
-export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
 
-export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
-export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero Touchplate';
-export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
-export const TOUCHPLATE_TYPES = {
-    TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
-    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero Touchplate',
-    TOUCHPLATE_TYPE_ZERO: 'Z Probe',
+const ConfirmationDialogButton = ({ children, onClick, variant = DIALOG_CONFIRM }) => {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cx(styles.confirmationDialogButton,
+                { [styles.confirmationDialogButtonConfirm]: variant === DIALOG_CONFIRM },
+                { [styles.confirmationDialogButtonCancel]: variant === DIALOG_CANCEL })}
+        >
+            {children}
+        </button>
+    );
 };
 
-export const PROBE_TYPE_AUTO = 'Auto';
-export const PROBE_TYPE_TIP = 'Tip';
-export const PROBE_TYPES = {
-    PROBE_TYPE_AUTO: 'Auto',
-    PROBE_TYPE_TIP: 'Tip',
-};
-
-export const END_MILL = 'End Mill';
-export const DRILL = 'Drill';
+export default ConfirmationDialogButton;

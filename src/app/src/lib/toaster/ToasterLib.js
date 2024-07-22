@@ -21,30 +21,25 @@
  *
  */
 
-export const modifierKeys = [
-    'shift',
-    'alt',
-    'ctrl',
-    'meta',
-];
+import pubsub from 'pubsub-js';
 
-export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
+// Styling choices
+export const TOASTER_INFO = 'info';
+export const TOASTER_WARNING = 'warning';
+export const TOASTER_DANGER = 'danger';
+export const TOASTER_SUCCESS = 'success';
 
-export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
-export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero Touchplate';
-export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
-export const TOUCHPLATE_TYPES = {
-    TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
-    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero Touchplate',
-    TOUCHPLATE_TYPE_ZERO: 'Z Probe',
+// Durations
+export const TOASTER_SHORT = 2000;
+export const TOASTER_DEFAULT = 5000;
+export const TOASTER_LONG = 10000;
+export const TOASTER_UNTIL_CLOSE = -1;
+
+export const Toaster = {
+    pop: (options) => {
+        pubsub.publish('toast:new', options);
+    },
+    clear: () => {
+        pubsub.publish('toast:clear');
+    }
 };
-
-export const PROBE_TYPE_AUTO = 'Auto';
-export const PROBE_TYPE_TIP = 'Tip';
-export const PROBE_TYPES = {
-    PROBE_TYPE_AUTO: 'Auto',
-    PROBE_TYPE_TIP: 'Tip',
-};
-
-export const END_MILL = 'End Mill';
-export const DRILL = 'Drill';

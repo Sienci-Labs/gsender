@@ -423,6 +423,23 @@ const metrics = {
     },
 };
 
+//
+// AlarmList
+//
+const alarmList = {
+    fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
+        return authrequest.get("/api/alarmList", { params: options });
+    },
+    update: (
+        options: Record<string, any>
+    ): Promise<AxiosResponse> => {
+        return authrequest.put("/api/alarmList/", options);
+    },
+    clearAll: (): Promise<AxiosResponse> => {
+        return authrequest.delete("/api/alarmList");
+    },
+};
+
 export default {
     signin,
     getLatestVersion,
@@ -445,5 +462,6 @@ export default {
     commands,
     machines,
     file,
-    metrics
+    metrics,
+    alarmList
 };

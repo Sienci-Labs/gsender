@@ -21,30 +21,31 @@
  *
  */
 
-export const modifierKeys = [
-    'shift',
-    'alt',
-    'ctrl',
-    'meta',
-];
+import pubsub from 'pubsub-js';
 
-export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
+export const DIALOG_CONFIRM = 'confirm';
+export const DIALOG_CANCEL = 'cancel';
+export const DIALOG_INVERT = 'invert';
 
-export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
-export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero Touchplate';
-export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
-export const TOUCHPLATE_TYPES = {
-    TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
-    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero Touchplate',
-    TOUCHPLATE_TYPE_ZERO: 'Z Probe',
+export const Confirm = (options = {}) => {
+    const {
+        title = 'Confirm',
+        buttons = [],
+        content = 'Are you sure you want to do this?',
+        onClose = null,
+        onConfirm = null,
+        confirmLabel = 'Confirm',
+        cancelLabel = 'Cancel',
+        show = true,
+    } = options;
+    pubsub.publish('dialog:new', {
+        title: title,
+        buttons: buttons,
+        content: content,
+        onClose: onClose,
+        onConfirm: onConfirm,
+        confirmLabel: confirmLabel,
+        cancelLabel: cancelLabel,
+        show: show
+    });
 };
-
-export const PROBE_TYPE_AUTO = 'Auto';
-export const PROBE_TYPE_TIP = 'Tip';
-export const PROBE_TYPES = {
-    PROBE_TYPE_AUTO: 'Auto',
-    PROBE_TYPE_TIP: 'Tip',
-};
-
-export const END_MILL = 'End Mill';
-export const DRILL = 'Drill';

@@ -37,7 +37,7 @@ const t = (...args: Array<any>): string => {
     return text;
 };
 
-const _ = (value: string, options: i18n__Options): string => {
+const _ = (value: string, options?: i18n__Options): string => {
     const key = ((value, options) => {
         const { context = {}, count = 0} = { ...options };
         const containsContext = (context !== undefined) && (context !== null);

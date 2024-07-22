@@ -21,7 +21,7 @@
  *
  */
 
-import _ from 'lodash';
+import _, { noop } from 'lodash';
 import events from 'events';
 import { determineRoundedValue } from './rounding';
 
@@ -88,6 +88,9 @@ class ImmutableStore extends events.EventEmitter {
         this.emit('change', this.state);
         return this.state;
     }
+
+    persist = noop;
+    getConfig = noop;
 }
 
 export default ImmutableStore;

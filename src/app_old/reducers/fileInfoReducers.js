@@ -45,7 +45,6 @@ const initialState = {
     },
     content: '',
     fileType: null,
-    parsedData: {},
 };
 
 const normalizeBBox = (bbox) => {

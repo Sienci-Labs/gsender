@@ -11,3 +11,4 @@ declare module 'universal-logger-browser';
 declare module 'gcode-parser';
 declare module 'sha1';
 declare module 'react-dom';
+declare module 'pubsub-js';

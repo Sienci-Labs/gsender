@@ -36,6 +36,7 @@ import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants'
 import api from '../api';
 import { homingString } from '../lib/eeprom';
 import { AlarmsErrors, ConnectionInfo, ControllerInfo, EEPROMSettings, FileInfo, JogSpeeds, MachineProfile } from '../definitions/interfaces';
+import { SPINDLE_LASER_T, UNITS_EN } from '../definitions/types';
 
 const styles = StyleSheet.create({
     body: {
@@ -184,7 +185,7 @@ const getGCodeFile = (): string => {
 };
 
 const getMode = (): boolean => {
-    const mode: string = store.get('widgets.spindle.mode');
+    const mode: SPINDLE_LASER_T = store.get('widgets.spindle.mode');
     return mode === LASER_MODE;
 };
 
@@ -204,7 +205,7 @@ const getJogPresets = (): JogSpeeds => {
 };
 
 const getWorkspaceUnits = (): string => {
-    const workspaceUnits: string = store.get('workspace.units', METRIC_UNITS);
+    const workspaceUnits: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
     return workspaceUnits;
 };
 
@@ -268,8 +269,8 @@ function generateSupportFile() {
     const isRotaryMode = getRotaryMode();
     let alarms: Array<AlarmsErrors>, errors: Array<AlarmsErrors> = [];
 
-    api.alarmList.fetch().then((data: Array<AlarmsErrors>) => {
-        const grblAlarmsAndErrors = get(data, 'body.list', []);
+    api.alarmList.fetch().then((value) => {
+        const grblAlarmsAndErrors = get(value, 'data.list', []);
         [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
     });
 

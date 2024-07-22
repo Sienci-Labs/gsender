@@ -9,9 +9,14 @@ import {
     USER_DATA_COLLECTION,
     WORKFLOW_STATES,
     SPINDLE_LASER,
-    FIRMWARE_TYPES
+    FIRMWARE_TYPES,
+    WORKSPACE_MODE,
+    FILE_TYPE,
+    VISUALIZER_TYPES,
+    TOGGLE_STATUS
 } from "../constants";
-// import { probeDirections } from "../lib/Probing";
+import { PROBE_TYPES, TOUCHPLATE_TYPES } from "../lib/constants";
+import { probeDirections } from "../lib/Probing";
 
 export type UNITS_GCODE = 'G20' | 'G21'; // G20: Inches, G21: Millimeters
 export type UNITS_EN = 'mm' | 'in';
@@ -27,8 +32,14 @@ export type RENDER_STATE_T = typeof RENDER_STATE[keyof typeof RENDER_STATE];
 export type USER_DATA_COLLECTION_T = typeof USER_DATA_COLLECTION[keyof typeof USER_DATA_COLLECTION];
 export type USAGE_TOOL_NAME_T = typeof USAGE_TOOL_NAME[keyof typeof USAGE_TOOL_NAME];
 export type HOMING_LOCATIONS_T = typeof HOMING_LOCATIONS[keyof typeof HOMING_LOCATIONS];
-// export type PROBE_DIRECTIONS = typeof probeDirections[keyof typeof probeDirections];
+export type PROBE_DIRECTIONS = typeof probeDirections[keyof typeof probeDirections];
 export type FIRMWARE_TYPES_T = typeof FIRMWARE_TYPES[keyof typeof FIRMWARE_TYPES];
+export type WORKSPACE_MODE_T = typeof WORKSPACE_MODE[keyof typeof WORKSPACE_MODE];
+export type PROBE_TYPES_T = typeof PROBE_TYPES[keyof typeof PROBE_TYPES];
+export type TOUCHPLATE_TYPES_T = typeof TOUCHPLATE_TYPES[keyof typeof TOUCHPLATE_TYPES];
+export type FILE_TYPE_T = typeof FILE_TYPE[keyof typeof FILE_TYPE];
+export type VISUALIZER_TYPES_T = typeof VISUALIZER_TYPES[keyof typeof VISUALIZER_TYPES];
+export type TOGGLE_STATUS_T = typeof TOGGLE_STATUS[keyof typeof TOGGLE_STATUS];
 
 // Motion Mode
 export type MOTION = 'G0' | 'G1' | 'G2' | 'G3' | 'G80';
