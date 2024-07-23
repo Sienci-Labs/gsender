@@ -28,7 +28,7 @@ import PropTypes from 'prop-types';
 import { Tooltip } from '@trendmicro/react-tooltip';
 import styles from './Overrides.styl';
 import GaugeChart from '../GaugeChart';
-import { convertMillisecondsToTimeStamp } from '../../../lib/datetime';
+import { convertMillisecondsToTimeStamp, convertSecondsToTimeStamp } from '../../../lib/datetime';
 
 /**
  * Progress Area component to display running job information
@@ -74,7 +74,7 @@ const ProgressArea = ({ state }) => {
                             content={updateTime}
                             hideOnClick
                         >
-                            <span className={styles.progressItemTime}>{convertMillisecondsToTimeStamp(remainingTime)}</span>
+                            <span className={styles.progressItemTime}>{convertSecondsToTimeStamp(remainingTime, startTime)}</span>
                         </Tooltip>
                         <span style={{ color: 'black' }}>{total - received} Lines</span>
                     </div>
