@@ -12,3 +12,5 @@ declare module 'gcode-parser';
 declare module 'sha1';
 declare module 'react-dom';
 declare module 'pubsub-js';
+// declare module 'three';
+declare module 'memoize-one';
