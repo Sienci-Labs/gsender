@@ -15,7 +15,7 @@ import {
 import { Confirm } from '../components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO } from './toaster/ToasterLib';
 import { FIRMWARE_TYPES_T, WORKSPACE_MODE_T } from '../definitions/types';
-import { RotaryModeFirmwareSettings } from '../definitions/interfaces';
+import { RotaryModeFirmwareSettings } from '../definitions/interfaces/firmware';
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T = WORKSPACE_MODE.DEFAULT): void => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;

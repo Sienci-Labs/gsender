@@ -22,7 +22,7 @@
  */
 
 import api from '../api';
-import { SignInParams } from '../definitions/interfaces';
+import { SignInParams } from '../definitions/interfaces/validation';
 import config from '../store';
 
 let _authenticated = false;

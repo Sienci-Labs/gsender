@@ -2,7 +2,8 @@ import objtools from 'objtools';
 import Interpreter from 'gcode-interpreter';
 import GCodeBlock from '../gcodeProcessor/GCodeBlock';
 import { METRIC_UNITS } from '../../constants';
-import { BBox, GCodeLine, GcodeProcessorOptions, SyncMachineOptions, VMState, VMStateInfo } from '../../definitions/interfaces';
+import { BBox } from '../../definitions/interfaces/general';
+import { GCodeLine, GcodeProcessorOptions, SyncMachineOptions, VMState, VMStateInfo } from '../../definitions/interfaces/gcode_processor';
 import { AXES_T, BasicType } from '../../definitions/types';
 
 

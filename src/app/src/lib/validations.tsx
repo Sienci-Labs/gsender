@@ -23,7 +23,7 @@
 
 /* eslint react/prop-types: 0 */
 import { ReactElement } from 'react';
-import { RequiredComponent, ValidationComponents, ValidationProps } from '../definitions/interfaces';
+import { RequiredComponent, ValidationComponents, ValidationProps } from '../definitions/interfaces/validation';
 import i18n from './i18n';
 
 const Error = (props: any): ReactElement => (

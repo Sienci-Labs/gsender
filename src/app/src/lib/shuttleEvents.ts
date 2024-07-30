@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShuttleControlEvents, ShuttleEvent } from '../definitions/interfaces';
+import { ShuttleControlEvents, ShuttleEvent } from '../definitions/interfaces/shortcuts';
 
 class ShuttleEvents extends React.PureComponent {
     allShuttleControlEvents: ShuttleControlEvents = { MACRO: function(){} };

@@ -35,7 +35,11 @@ import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from '../api';
 import { homingString } from '../lib/eeprom';
-import { AlarmsErrors, ConnectionInfo, ControllerInfo, EEPROMSettings, FileInfo, JogSpeeds, MachineProfile } from '../definitions/interfaces';
+import { AlarmsErrors } from '../definitions/interfaces/alarms_errors';
+import { ConnectionInfo, ControllerInfo, FileInfo } from '../definitions/interfaces/store';
+import { MachineProfile } from '../definitions/interfaces/general';
+import { JogSpeeds } from '../definitions/interfaces/jogging';
+import { EEPROMSettings } from '../definitions/interfaces/firmware';
 import { SPINDLE_LASER_T, UNITS_EN } from '../definitions/types';
 
 const styles = StyleSheet.create({

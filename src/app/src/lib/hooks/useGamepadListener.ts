@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import gamepad from '../gamepad';
-import { GamepadDetail, GamepadProfile } from '../../definitions/interfaces';
+import { GamepadDetail, GamepadProfile } from '../../definitions/interfaces/gamepad';
 
 export const useGamepadListener = ({ profile, axisThreshold }: { profile: GamepadProfile, axisThreshold: number }) => {
     const [buttons, setButtons] = useState<Array<GamepadButton>>([]);

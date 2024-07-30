@@ -3,7 +3,8 @@ import store from '../store';
 import reduxStore from '../store/redux';
 import { TOUCHPLATE_TYPE_AUTOZERO } from '../lib/constants';
 import { UNITS_GCODE } from '../definitions/types';
-import { ProbeWidgetSettings, ReduxState } from '../definitions/interfaces';
+import { ProbeWidgetSettings } from '../definitions/interfaces/probing';
+import { ReduxState } from '../definitions/interfaces/store';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeSettings = store.get('widgets.probe');

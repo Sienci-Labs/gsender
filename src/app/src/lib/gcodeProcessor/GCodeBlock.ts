@@ -21,7 +21,7 @@
  *
  */
 
-import { BasicObject } from "../../definitions/interfaces";
+import { BasicObject } from "../../definitions/interfaces/general";
 import { BasicType } from "../../definitions/types";
 
 class GCodeBlock {

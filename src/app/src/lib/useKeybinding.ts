@@ -3,7 +3,7 @@ import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
 import { MACRO_CATEGORY } from '../constants';
-import { CommandKeys, ShuttleControlEvents, ShuttleEvent } from '../definitions/interfaces';
+import { CommandKeys, ShuttleControlEvents, ShuttleEvent } from '../definitions/interfaces/shortcuts';
 
 const TARGET_NUM_CALLS = 10; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called

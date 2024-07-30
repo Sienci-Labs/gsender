@@ -3,7 +3,8 @@ import shuttleEvents from '../shuttleEvents';
 import store from '../../store';
 import { Toaster, TOASTER_INFO } from '../toaster/ToasterLib';
 import { debounce, noop } from 'lodash';
-import { GamepadConfig, GamepadDetail, GamepadProfile, ShuttleEvent } from '../../definitions/interfaces';
+import { GamepadConfig, GamepadDetail, GamepadProfile } from '../../definitions/interfaces/gamepad';
+import { ShuttleEvent } from '../../definitions/interfaces/shortcuts';
 
 const macroCallbackDebounce = debounce((action: string) => shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }), 500);
 let buttonPressDebounce = noop;

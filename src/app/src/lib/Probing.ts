@@ -2,7 +2,7 @@ import { PROBE_TYPES, TOUCHPLATE_TYPE_AUTOZERO } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
 import { AXES_T, PROBE_DIRECTIONS, PROBE_TYPES_T, UNITS_GCODE } from '../definitions/types';
-import { ProbingOptions } from '../definitions/interfaces';
+import { ProbingOptions } from '../definitions/interfaces/probing';
 
 export const BL = 0;
 export const TL = 1;

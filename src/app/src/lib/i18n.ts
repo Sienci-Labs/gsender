@@ -23,7 +23,7 @@
 
 import sha1 from 'sha1';
 import i18next from 'i18next';
-import { i18n__Options } from '../definitions/interfaces';
+import { i18n__Options } from '../definitions/interfaces/i18n';
 
 const t = (...args: Array<any>): string => {
     const key = args[0];

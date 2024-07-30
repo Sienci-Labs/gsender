@@ -1,9 +1,9 @@
-import { HOMING_LOCATIONS } from '../constants';
+import { HOMING_LOCATIONS_T } from '../definitions/types';
 import { getHomingLocation, FRONT_RIGHT, FRONT_LEFT, BACK_LEFT } from '../widgets/Location/RapidPosition';
 
 export const homingString = (mask: string): string => {
     let location = '';
-    const placement: HOMING_LOCATIONS = getHomingLocation(mask);
+    const placement: HOMING_LOCATIONS_T = getHomingLocation(mask);
     if (placement === FRONT_LEFT) {
         location = 'Front Left';
     } else if (placement === FRONT_RIGHT) {

@@ -22,7 +22,7 @@
  */
 
 import { METRIC_UNITS } from '../constants';
-import { BasicObject } from '../definitions/interfaces';
+import { BasicObject } from '../definitions/interfaces/general';
 import { UNITS_EN, UNITS_GCODE } from '../definitions/types';
 
 const storeValuesThatNeedRounding = new Set([
@@ -118,7 +118,7 @@ export const round = (val: number | string, units: UNITS_GCODE | UNITS_EN): numb
 
 // rounds applicable values
 // recursive, looks through object properties
-export const determineRoundedValue = (key: string, value: number | string | BasicObject | Array<any>): number | string | BasicObject | Array<any> => {
+export const determineRoundedValue = (key: string, value: number | string | boolean | BasicObject | Array<any>): number | string | boolean | BasicObject | Array<any> => {
     const isObject = value instanceof Object;
     const isArray = Array.isArray(value);
 

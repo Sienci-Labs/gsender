@@ -22,7 +22,7 @@
  */
 
 import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
-import { MachineProfile } from "../definitions/interfaces";
+import { MachineProfile } from "../definitions/interfaces/general";
 import { USER_DATA_COLLECTION_T } from "../definitions/types";
 
 // import store from "../store";

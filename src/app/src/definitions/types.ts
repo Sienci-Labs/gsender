@@ -17,7 +17,7 @@ import {
 } from "../constants";
 import { PROBE_TYPES, TOUCHPLATE_TYPES } from "../lib/constants";
 import { probeDirections } from "../lib/Probing";
-import { BasicObject } from "./interfaces";
+import { BasicObject } from "./interfaces/general";
 
 export type BasicType = string | number | boolean | Array<any> | BasicObject;
 
