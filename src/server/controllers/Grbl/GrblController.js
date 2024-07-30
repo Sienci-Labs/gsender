@@ -83,7 +83,6 @@ import {
     ALARM,
     ERROR
 } from '../../../app_old/constants';
-import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
@@ -1426,10 +1425,6 @@ class GrblController {
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);
-            },
-            'firmware:applyProfileSettings': () => {
-                let [nameOfMachine, typeOfMachine, port] = args;
-                ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
                 const machineProfile = store.get('machineProfile');

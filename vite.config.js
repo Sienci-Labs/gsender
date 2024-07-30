@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import tailwindcss from 'tailwindcss'
 
 export default defineConfig({
     root: path.resolve(__dirname, './src/app'), // Set root to the directory containing index.html
@@ -9,13 +10,16 @@ export default defineConfig({
         outDir: path.resolve(__dirname, './dist/gsender/app'), // Output directly to /output/app
         rollupOptions: {
             input: {
-                main: path.resolve(__dirname, './src/app/index.html'), // Main entry point
+                main: path.resolve(__dirname, './src/app/src/entry-client.tsx'), // Main entry point
             },
-            // output: {
-            //     entryFileNames: 'assets/[name].[hash].js', // Adjusted output path for JS files
-            //     chunkFileNames: 'assets/[name].[hash].js', // Adjusted output path for chunks
-            //     assetFileNames: 'assets/[name].[hash].[ext]', // Adjusted output path for assets
-            // },
+            output: {
+                assetFileNames: 'assets/[name].[ext]'
+            }
+        },
+    },
+    css: {
+        postcss: {
+            plugins: [tailwindcss()],
         },
     },
     plugins: [react()],
