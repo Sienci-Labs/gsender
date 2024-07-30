@@ -198,7 +198,6 @@
     "@types/events": "^3.0.3",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.17.7",
-    "@types/memoize-one": "^5.0.4",
     "@types/mousetrap": "^1.6.3",
     "@types/objtools": "^2.0.0",
     "@types/pubsub-js": "^1.8.6",

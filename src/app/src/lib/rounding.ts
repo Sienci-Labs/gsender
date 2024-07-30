@@ -125,7 +125,7 @@ export const determineRoundedValue = (key: string, value: number | string | bool
     // if object, recurse
     if (isObject && !isArray) {
         let newVal: BasicObject = {};
-        Object.keys(value as BasicObject).forEach((el, index) => {
+        Object.keys(value as BasicObject).forEach((el, _index) => {
             newVal[el] = determineRoundedValue(key + '.' + el, value[el]);
         });
         return newVal;
