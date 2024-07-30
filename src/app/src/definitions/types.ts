@@ -17,6 +17,9 @@ import {
 } from "../constants";
 import { PROBE_TYPES, TOUCHPLATE_TYPES } from "../lib/constants";
 import { probeDirections } from "../lib/Probing";
+import { BasicObject } from "./interfaces";
+
+export type BasicType = string | number | boolean | Array<any> | BasicObject;
 
 export type UNITS_GCODE = 'G20' | 'G21'; // G20: Inches, G21: Millimeters
 export type UNITS_EN = 'mm' | 'in';

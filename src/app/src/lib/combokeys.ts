@@ -162,7 +162,7 @@ class Combokeys extends events.EventEmitter {
 
     async getCommandKeys(): Promise<CommandKeys> {
         const setCommandKeys: CommandKeys = store.get('commandKeys', {});
-        const setMacrosBinds = Object.entries(setCommandKeys).filter(([key, command]) => (command as CommandKey).category === MACRO_CATEGORY);
+        const setMacrosBinds = Object.entries(setCommandKeys).filter(([_key, command]) => (command as CommandKey).category === MACRO_CATEGORY);
 
         const res = await api.macros.fetch();
         const macros = res.data.records;
@@ -174,7 +174,7 @@ class Combokeys extends events.EventEmitter {
         const macroCallback = allShuttleControlEvents[MACRO]! as Function;
 
         macros.forEach((macro: Macro) => {
-            const existingBind = setMacrosBinds.find(([key, bind]) => key === macro.id);
+            const existingBind = setMacrosBinds.find(([key, _bind]) => key === macro.id);
             if (!existingBind) {
                 newCommandKeysList[macro.id] = {
                     keys: '',
@@ -198,8 +198,8 @@ class Combokeys extends events.EventEmitter {
             return;
         }
         this.list.forEach((o) => {
-            const { keys, callback } = o;
-            Mousetrap.unbind(keys, callback);
+            const { keys } = o;
+            Mousetrap.unbind(keys);
         });
         this.state.didBindEvents = false;
     }

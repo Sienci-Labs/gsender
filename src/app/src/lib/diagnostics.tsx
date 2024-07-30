@@ -225,7 +225,7 @@ const unwrapObject = (obj: object, iteration: number): string => {
     }
     // .join('') is used to solve an issue where unwanted commas appeared: https://stackoverflow.com/a/45812277
     return (
-        Object.keys(obj).map((key, i) => (
+        Object.keys(obj).map((key, _i) => (
             typeof obj[key as keyof typeof obj] === 'object'
                 ? tabs + key + ': \n' + unwrapObject(obj[key as keyof typeof obj], iteration + 1)
                 : tabs + key + ': ' + obj[key as keyof typeof obj] + '\n'
@@ -235,7 +235,7 @@ const unwrapObject = (obj: object, iteration: number): string => {
 
 const createTableRows = (array: object): React.JSX.Element[] => {
     return (
-        Object.keys(array).map((key, i) => (
+        Object.keys(array).map((key, _i) => (
             // from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
             <View style={styles.tableRow} key={uniqueId()}>
                 <View style={styles.tableCol}>

@@ -23,12 +23,32 @@ import {
     PROBE_TYPES_T,
     FILE_TYPE_T,
     VISUALIZER_TYPES_T,
-    TOGGLE_STATUS_T
+    TOGGLE_STATUS_T,
+    AXES_T,
+    BasicType
 } from "./types";
 
 export interface BasicObject {
-    [key: string]: string | number | Array<any> | BasicObject,
+    [key: string]: string | number | boolean | Array<any> | BasicObject,
 };
+
+export interface BBox {
+    min: {
+        x: number,
+        y: number,
+        z: number,
+    },
+    max: {
+        x: number,
+        y: number,
+        z: number,
+    },
+    delta: {
+        x: number,
+        y: number,
+        z: number,
+    }
+}
 
 export interface AlarmsErrors {
     type: string,
@@ -303,23 +323,7 @@ export interface FileInfo {
     invalidGcode: Array<string>,
     estimatedTime: number,
     fileModal: string,
-    bbox: {
-        min: {
-            x: number,
-            y: number,
-            z: number,
-        },
-        max: {
-            x: number,
-            y: number,
-            z: number,
-        },
-        delta: {
-            x: number,
-            y: number,
-            z: number,
-        }
-    },
+    bbox: BBox,
     content: string,
     fileType: FILE_TYPE_T,
 };
@@ -580,4 +584,165 @@ export interface ValidationComponents {
 
 export interface RequiredComponent {
     [key: string]: Array<{checked: boolean, props: ValidationProps}>
+}
+
+
+export interface GamepadDetail {
+    detail: {
+        index: number,// Gamepad index: Number [0-3].
+        button: number, // Button index: Number [0-N].
+        axis: number, // Axis index: Number [0-N].
+        value: number, // Current value: Number between 0 and 1. Float in analog mode, integer otherwise.
+        pressed: boolean, // Native GamepadButton pressed value: Boolean.
+        gamepad: globalThis.Gamepad, // Native Gamepad object
+    }
+};
+
+export interface GamepadConfig {
+    deadZone: number,
+    precision: number,
+};
+
+export interface GamepadButton {
+    label: string;
+    value: number;
+    primaryAction: string;
+    secondaryAction: string;
+};
+
+export interface Stick {
+    primaryAction: AXES_T,
+    secondaryAction: AXES_T,
+    isReversed: boolean,
+}
+export interface JoystickOptions {
+    stick1: {
+        horizontal: Stick,
+        vertical: Stick,
+        mpgMode: Stick,
+    },
+    stick2: {
+        horizontal: Stick,
+        vertical: Stick,
+        mpgMode: Stick,
+    },
+    zeroThreshold: number,
+    movementDistanceOverride: number,
+};
+export interface GamepadProfile {
+    id: Array<string>,
+    icon: string,
+    active: boolean,
+    profileName: string,
+    shortcuts: CommandKey,
+    name: string,
+    mapping: 'standard',
+    buttons: Array<GamepadButton>,
+    axes: [number, number, number, number],
+    joystickOptions: JoystickOptions,
+    lockout: {
+        button: number | null,
+        active: boolean,
+    },
+    modifier: {
+        button: boolean,
+    },
+};
+
+export interface GcodeProcessorController {
+    mpos: Array<number>,
+    getPos: Function,
+    pos: Array<number>,
+    activeCoordSys: number,
+    coordSysOffsets: Array<number>
+    offset: Array<number>,
+    offsetEnabled: boolean,
+    storedPositions: Array<number>,
+    units: UNITS_EN,
+    feed: number,
+    incremental: boolean,
+    coolant: number,
+    spindle: boolean,
+    line: number,
+    spindleDirection: number,
+    spindleSpeed: number,
+    inverseFeed: boolean,
+    motionMode: `G${string}`,
+    arcPlane: number,
+    tool: string,
+    axisLabels: Array<number>
+};
+
+export interface GcodeProcessorOptions {
+    maxFeed: number,
+    acceleration: number,
+    noInit: boolean,
+    controller: GcodeProcessorController,
+    tightcnc: {
+        controller: GcodeProcessorController,
+    },
+    axisLabels: Array<string>,
+    minMoveTime: number,
+};
+
+export interface GCodeLine {
+    line: string,
+    words: Array<Array<string>>
+};
+
+export interface SeenWordSet {
+    [key: string]: boolean
+};
+
+export interface VMStateInfo {
+    state: VMState, // VM state after executing line
+    isMotion: boolean, // whether the line represents motion
+    motionCode: BasicType, // If motion, the G code associated with the motion
+    changedCoordOffsets: boolean, // whether or not anything was changed with coordinate systems
+    time: number // estimated duration of instruction execution, in seconds
+};
+
+export interface VMState {
+    feedrates: Set<string>,
+    tools: Set<string>,
+    spindleRates: Set<string>,
+    invalidGcode: Set<string>,
+
+    coord: Function,
+    totalTime: number; // seconds
+    bounds: [Array<number>, Array<number>], // min and max points
+    mbounds: [Array<number>, Array<number>], // bounds for machine coordinates
+    lineCounter: number,
+    hasMovedToAxes: Array<boolean>, // true for each axis that we've moved on, and have a definite position for
+    seenWordSet: SeenWordSet, // a mapping from word letters to boolean true if that word has been seen at least once
+    usedAxes: Set<AXES_T>,
+    tool: string,
+    countT: number;
+    countM6: number;
+    axisLabels: Array<AXES_T>,
+    mpos: Array<number>,
+    pos: Array<number>,
+    activeCoordSys: number,
+    coordSysOffsets: Array<Array<number>>,
+    offset: Array<number>,
+    offsetEnabled: boolean,
+    storedPositions: [Array<number>, Array<number>],
+    units: UNITS_EN,
+    feed: number,
+    incremental: boolean,
+    coolant: number,
+    spindle: boolean,
+    line: number,
+    spindleDirection: number,
+    spindleSpeed: number,
+    inverseFeed: boolean,
+    motionMode: `G${string}`,
+    arcPlane: number,
+};
+
+export interface SyncMachineOptions {
+    include: string,
+    exclude: string,
+    controller: GcodeProcessorController,
+    vmState: VMState,
 }
