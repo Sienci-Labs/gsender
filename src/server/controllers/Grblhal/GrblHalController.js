@@ -911,7 +911,7 @@ class GrblHalController {
             this.emit('grblHal:info', res);
         });
 
-        this.runner.on('startup', (res) => {
+        this.runner.on('startup', async (res) => {
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -923,6 +923,9 @@ class GrblHalController {
 
             // Rewind any files in the sender
             this.workflow.stop();
+
+            await delay(250);
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
 
             if (!this.initialized) {
                 this.initialized = true;
@@ -1333,8 +1336,6 @@ class GrblHalController {
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     await delay(100);
                     this.connection.write('$I\n');
-                    await delay(250);
-                    this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                 }
                 let counter = 3;
                 const interval = setInterval(() => {
