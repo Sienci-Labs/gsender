@@ -89,6 +89,7 @@ class Controller {
         'controller:state': [],
         'settings:description': [],
         'settings:alarm': [],
+        'settings:group': [],
         'message': [],
         'toolchange:start': [],
         'hPong': [],

@@ -699,8 +699,12 @@ export function* initialize() {
     });
 
     controller.addListener('settings:group', (data) => {
-        console.log('in group');
-        console.log(data);
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_GROUPS,
+            payload: {
+                groups: data
+            }
+        });
     });
 
     controller.addListener('networkScan:status', (isScanning) => {

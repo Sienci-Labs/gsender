@@ -128,8 +128,6 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
-            console.log('connection error:');
-            console.log(err);
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
@@ -954,7 +952,6 @@ class GrblHalController {
         });
 
         this.runner.on('alarmDetail', (payload) => {
-            console.log(payload);
             this.emit('settings:alarms', this.runner.settings.alarms);
         });
 
@@ -1337,7 +1334,6 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(async () => {
-                console.log(this.connection);
                 if (this.connection) {
                     await delay(100);
                     this.connection.writeImmediate(String.fromCharCode(0x87));

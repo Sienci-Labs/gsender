@@ -139,16 +139,13 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     }
 
     const orderedSettings = getOrderedSettings(machineProfile.id);
-    console.log(orderedSettings);
     const hasOrderedSettings = orderedSettings !== null;
 
     const values = [];
     //const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
 
     for (let [key, value] of Object.entries(eepromSettings)) {
-        console.log(`${key}=${value}`);
         if (hasOrderedSettings && orderedSettings.has(key)) {
-            console.log(`skipping to add later: ${key}`);
             continue;
         }
 
@@ -160,7 +157,6 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
             values.push(`${k}=${v}`);
         }
     }
-    console.log(values);
     values.push('$$');
 
     controller.command('gcode', values);

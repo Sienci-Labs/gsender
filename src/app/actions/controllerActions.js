@@ -38,6 +38,7 @@ export const {
     UPDATE_SETTINGS_DESCRIPTIONS,
     UPDATE_ALARM_DESCRIPTIONS,
     ADD_SPINDLE,
+    UPDATE_GROUPS
 } = constants('controller', [
     'UPDATE_CONTROLLER_STATE',
     'UPDATE_CONTROLLER_SETTINGS',
@@ -51,7 +52,8 @@ export const {
     'UPDATE_TERMINAL_HISTORY',
     'UPDATE_SETTINGS_DESCRIPTIONS',
     'UPDATE_ALARM_DESCRIPTIONS',
-    'ADD_SPINDLE'
+    'ADD_SPINDLE',
+    'UPDATE_GROUPS'
 ]);
 
 export const updateControllerState = createAction(UPDATE_CONTROLLER_STATE);
