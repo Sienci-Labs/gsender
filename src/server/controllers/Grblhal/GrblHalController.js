@@ -924,15 +924,15 @@ class GrblHalController {
             // Rewind any files in the sender
             this.workflow.stop();
 
-            await delay(250);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
-
             if (!this.initialized) {
                 this.initialized = true;
 
                 // Initialize controller
                 this.initController();
             }
+
+            await delay(300);
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
         });
 
         this.toolChanger = new ToolChanger({
@@ -955,6 +955,10 @@ class GrblHalController {
 
         this.runner.on('alarmDetail', (payload) => {
             this.emit('settings:alarms', this.runner.settings.alarms);
+        });
+
+        this.runner.on('groupDetail', (payload) => {
+            this.emit('settings:group', this.runner.settings.groups);
         });
 
         const queryStatusReport = () => {
@@ -1332,9 +1336,10 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(async () => {
+                console.log(this.connection);
                 if (this.connection) {
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
                     await delay(100);
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
                 let counter = 3;
