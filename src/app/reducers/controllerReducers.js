@@ -291,7 +291,7 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_GROUPS]: (payload, reducerState) => {
-        const { groups } = payload;log
+        const { groups } = payload;
         return {
             settings: {
                 ...reducerState.settings,
