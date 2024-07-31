@@ -954,6 +954,7 @@ class GrblHalController {
         });
 
         this.runner.on('alarmDetail', (payload) => {
+            console.log(payload);
             this.emit('settings:alarms', this.runner.settings.alarms);
         });
 

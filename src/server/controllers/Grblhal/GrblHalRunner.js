@@ -299,6 +299,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultGroupDetail) {
+            console.log('detail hit');
             delete payload.raw;
             this.settings.groups[payload.group] = payload;
             this.emit('groupDetail', payload);

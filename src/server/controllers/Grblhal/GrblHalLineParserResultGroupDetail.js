@@ -29,8 +29,6 @@ class GrblHalLineParserResultGroupDetail {
             label: r[3]
         };
 
-        console.log(payload);
-
         // Handle lookup for manual relabels of specific categories
         if (Object.hasOwn(relabels, payload.label)) {
             payload.label = relabels[payload.label];

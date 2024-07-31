@@ -698,6 +698,11 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('settings:group', (data) => {
+        console.log('in group');
+        console.log(data);
+    });
+
     controller.addListener('networkScan:status', (isScanning) => {
         reduxStore.dispatch({
             type: connectionActions.SCAN_NETWORK,
