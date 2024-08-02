@@ -1,12 +1,11 @@
 import React from 'react';
-import noop from 'lodash';
 
 export const WidgetConfigContext = React.createContext({
     widgetId: '',
     actions: {
-        get: noop,
-        set: noop,
-        unset: noop,
-        replace: noop
+        get: (_key: string, _defaultValue: any): void => {},
+        set: (_key: string, _value: any): boolean => { return false; },
+        unset: (_key: string): object => { return {} },
+        replace: (_key: string, _value: any): object => { return {} },
     }
 });

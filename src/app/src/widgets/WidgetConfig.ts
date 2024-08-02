@@ -47,7 +47,7 @@ class WidgetConfig {
         return store.set(key, value);
     }
 
-    unset(key: string): boolean {
+    unset(key: string): object {
         if (!this.widgetId) {
             throw new Error('The widget id cannot be an empty string');
         }
@@ -55,7 +55,7 @@ class WidgetConfig {
         return store.unset(key);
     }
 
-    replace(key: string, value: any): boolean {
+    replace(key: string, value: any): object {
         if (!this.widgetId) {
             throw new Error('The widget id cannot be an empty string');
         }

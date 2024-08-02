@@ -8,8 +8,8 @@ export const WidgetConfigProvider = ({ widgetId, children }: { widgetId: string,
 
     const get = (key: string, defaultValue: any): void => config.get(key, defaultValue);
     const set = (key: string, value: any): boolean => config.set(translateKey(key, widgetId), value);
-    const unset = (key: string): boolean => config.unset(translateKey(key, widgetId));
-    const replace = (key: string, value: any): boolean => config.replace(translateKey(key, widgetId), value);
+    const unset = (key: string): object => config.unset(translateKey(key, widgetId));
+    const replace = (key: string, value: any): object => config.replace(translateKey(key, widgetId), value);
 
     const actions = { get, set, unset, replace };
 
@@ -28,7 +28,7 @@ export const WidgetConfigProvider = ({ widgetId, children }: { widgetId: string,
 export const getWidgetConfigContext = () => {
     const context = useContext(WidgetConfigContext);
     if (!context) {
-        throw new Error('Context unavailable - make sure this is being used within the wizard context provider');
+        throw new Error('Context unavailable - make sure this is being used within the widget config context provider');
     }
     return context;
 };
