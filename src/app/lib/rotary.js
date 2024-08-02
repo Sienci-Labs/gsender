@@ -18,7 +18,8 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;
-    const firmwareType = get(reduxStore.getState(), 'controller.type');
+    const reduxStoreState = store.getState()
+    const firmwareType = get(reduxStoreState, 'controller.type');
     const rotaryFirmwareSettings = store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS);
 
     store.replace('workspace.mode', mode);
@@ -34,16 +35,16 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
         } else if (firmwareType === GRBLHAL) {
             // switch A and Y axis settings back
             const newAAxisSettings = [
-                `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
-                `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
-                `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`,
-                `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
+                `$103=${get(reduxStoreState, 'controller.settings.settings.$101')}`,
+                `$113=${get(reduxStoreState, 'controller.settings.settings.$111')}`,
+                `$123=${get(reduxStoreState, 'controller.settings.settings.$121')}`,
+                `$133=${get(reduxStoreState, 'controller.settings.settings.$131')}`
             ];
             const newYAxisSettings = [
-                `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
-                `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
-                `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`,
-                `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
+                `$101=${get(reduxStoreState, 'controller.settings.settings.$103')}`,
+                `$111=${get(reduxStoreState, 'controller.settings.settings.$113')}`,
+                `$121=${get(reduxStoreState, 'controller.settings.settings.$123')}`,
+                `$131=${get(reduxStoreState, 'controller.settings.settings.$133')}`
             ];
 
             // zero y and enable rotary
