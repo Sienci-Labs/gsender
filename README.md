@@ -105,9 +105,11 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### 1.4.9 (August 1, 2024)
 - Fix for time remaining converting timestamps incorrectly
 - Firmware groups now always emitted to UI on connection
-- Reduced situations where error 1 should appear on connection
-- Alterations to Almill default profile for Z speeds
-- 
+- Reduced situations where error 1 should appear on connection or homing
+- Alterations to Altmill default profile for Z acceleration
+- Enabling rotary mode for grblHAL now disables homing, and disabling rotary mode restores your previous homing value
+- Updated Longmill HAL A axis travel resolution for compiled microstepping value
+- Main window should no longer be focused on load file dialog
 
 ### 1.4.8 (July 11, 2024)
 - Added Altmill profiles
