@@ -105,7 +105,6 @@ export class JoystickLoop {
         const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
 
         const multiplier = controllerType === GRBLHAL ? 14 : 1;
-        console.log(multiplier);
         const incrementalDistance = (feedrateInMMPerSec * COMMAND_EXECUTION_TIME_IN_SECONDS) * (movementDistanceOverride * multiplier / 100);
 
         return +(incrementalDistance.toFixed(2));
