@@ -51,7 +51,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
             ];
 
             // zero y and enable rotary
-            controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO, homingString]);
+            controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, ROTARY_TOGGLE_MACRO, 'G4 P0.4', homingString, '$$']);
         }
         return;
     }
@@ -128,8 +128,9 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                 onConfirm: () => {
                     console.log('Enabling rotary - store homing and turn it off if needed');
                     const reduxStoreState = reduxStore.getState();
-                    const homingValue = Number(store.get('controller.settings.settings.$22', 0));
-                    const homingString = (homingValue !== 0) ? '$22=0' : '';
+                    const homingValue = Number(get(reduxStoreState, 'controller.settings.settings.$22', -1));
+                    console.log(`found value - ${homingValue}`);
+                    const homingString = (homingValue > 0) ? '$22=0' : '';
                     store.set('workspace.rotaryAxis.homingValue', homingValue);
                     // switch A and Y axis settings, will look something like this: ["$101=26.667", ...]
                     const newAAxisSettings = [
@@ -146,7 +147,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                     ];
 
                     // zero y and enable rotary
-                    controller.command('gcode', ['G10 L20 P1 Y0', homingString, ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
+                    controller.command('gcode', [homingString, 'G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 
