@@ -33,7 +33,6 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
             controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
         } else if (firmwareType === GRBLHAL) {
-            console.log('reverting');
             const previousHoming = Number(store.get('workspace.rotaryAxis.homingValue', 0));
             const homingString = (previousHoming !== 0) ? `$22=${previousHoming}` : '';
             // switch A and Y axis settings back
@@ -126,10 +125,8 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                     </div>
                 ),
                 onConfirm: () => {
-                    console.log('Enabling rotary - store homing and turn it off if needed');
                     const reduxStoreState = reduxStore.getState();
                     const homingValue = Number(get(reduxStoreState, 'controller.settings.settings.$22', -1));
-                    console.log(`found value - ${homingValue}`);
                     const homingString = (homingValue > 0) ? '$22=0' : '';
                     store.set('workspace.rotaryAxis.homingValue', homingValue);
                     // switch A and Y axis settings, will look something like this: ["$101=26.667", ...]
