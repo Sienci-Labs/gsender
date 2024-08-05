@@ -102,7 +102,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.4.9 (August 1, 2024)
+### 1.4.9 (August 5, 2024)
 - Fix for time remaining converting timestamps incorrectly
 - Firmware groups now always emitted to UI on connection
 - Reduced situations where error 1 should appear on connection or homing
