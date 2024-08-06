@@ -76,7 +76,7 @@ export const profiles = [
             active: false,
         },
         modifier: {
-            button: false,
+            button: null,
         },
     },
     {
@@ -117,7 +117,7 @@ export const profiles = [
             active: false,
         },
         modifier: {
-            button: false,
+            button: null,
         },
     }
 ];
