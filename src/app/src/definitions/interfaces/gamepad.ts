@@ -59,6 +59,6 @@ export interface GamepadProfile {
         active: boolean,
     },
     modifier: {
-        button: boolean,
+        button: number | null,
     },
 };
