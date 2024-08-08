@@ -1,10 +1,25 @@
+import { useState } from 'react';
+import RangeSlider from './components/RangeSlider';
 import './index.css';
+// import TestSlider from './TestSlider';
 
 function App() {
+    const [value, setValue] = useState(0);
     return (
-        <>
-            <span className="text-3xl font-bold underline text-center text-red-500">Edit <code>src/App.tsx</code> and save to test HMR - test</span>
-        </>
+        <div className="flex w-full h-full justify-center items-center mt-10">
+            <RangeSlider 
+                min={0}
+                max={100}
+                value={value}
+                unitString="mm"
+                step={10}
+                onChange={(e) => {
+                    setValue(Number(e.target.value));
+                }}
+                onMouseUp={() => {}}
+            />
+            {/* <TestSlider /> */}
+        </div>
     );
 }
 

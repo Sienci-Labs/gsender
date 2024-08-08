@@ -4,3 +4,4 @@ declare module 'gcode-parser';
 declare module 'memoize-one';
 declare module 'gamepad.js';
 declare module 'gcode-interpreter';
+declare module 'classnames';
