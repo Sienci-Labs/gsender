@@ -29,6 +29,82 @@ import * as altmillSettings from '../eepromFiles/Altmill';
 
 export default [
     {
+        id: 54,
+        company: 'Sienci Labs',
+        name: 'Altmill 48x48',
+        type: '',
+        version: '',
+        mm: {
+            width: 1260,
+            depth: 1248,
+            height: 170
+        },
+        in: {
+            width: 31.18,
+            depth: 33.27,
+            height: 4.5
+        },
+        endstops: true,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.DEFAULT,
+        grblHALeepromSettings: altmillSettings.DEFAULT,
+        orderedSettings: altmillSettings.ALTMILL_ORDERED,
+        isHal: true
+    },
+    {
+        id: 55,
+        company: 'Sienci Labs',
+        name: 'Altmill 48x48 + Spindle',
+        type: '',
+        version: '',
+        mm: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        in: {
+            width: 49.6,
+            depth: 49.1,
+            height: 6.6
+        },
+        endstops: true,
+        spindle: true,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.SPINDLE_KIT,
+        grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
+        orderedSettings: altmillSettings.SPINDLE_ORDERED,
+        isHal: true
+    },
+    {
+        id: 2,
+        company: 'Sienci Labs',
+        name: 'LongMill MK2',
+        type: '12x30',
+        version: 'MK2',
+        mm: {
+            width: 792,
+            depth: 345,
+            height: 114.3
+        },
+        in: {
+            width: 31.18,
+            depth: 13.58,
+            height: 4.5
+        },
+        endstops: false,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30
+    },
+    {
         id: 0,
         company: 'Sienci Labs',
         name: 'LongMill MK2',
@@ -74,99 +150,6 @@ export default [
         laser: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_48x30,
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_48x30
-    },
-    {
-        id: 2,
-        company: 'Sienci Labs',
-        name: 'LongMill MK2',
-        type: '12x30',
-        version: 'MK2',
-        mm: {
-            width: 792,
-            depth: 345,
-            height: 114.3
-        },
-        in: {
-            width: 31.18,
-            depth: 13.58,
-            height: 4.5
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30
-    },
-    {
-        id: 7,
-        company: 'Sienci Labs',
-        name: 'Mill One',
-        type: 'V1',
-        version: 'MK1',
-        mm: {
-            width: 234,
-            depth: 185,
-            height: 90
-        },
-        in: {
-            width: 9.21,
-            depth: 7.28,
-            height: 3.54
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
-    },
-    {
-        id: 8,
-        company: 'Sienci Labs',
-        name: 'Mill One',
-        type: 'V2',
-        version: 'MK1',
-        mm: {
-            width: 234,
-            depth: 185,
-            height: 90
-        },
-        in: {
-            width: 9.21,
-            depth: 7.28,
-            height: 3.54
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
-    },
-    {
-        id: 9,
-        company: 'Sienci Labs',
-        name: 'Mill One',
-        type: 'V3',
-        version: 'MK1',
-        mm: {
-            width: 258,
-            depth: 185,
-            height: 90
-        },
-        in: {
-            width: 10.16,
-            depth: 7.28,
-            height: 3.54
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: millOneGrblEEPROM.MILL_ONE_V3,
     },
     {
         id: 3,
@@ -262,6 +245,96 @@ export default [
         laser: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK1_48x30,
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_48x30
+    },
+    {
+        id: 7,
+        company: 'Sienci Labs',
+        name: 'Mill One',
+        type: 'V1',
+        version: 'MK1',
+        mm: {
+            width: 234,
+            depth: 185,
+            height: 90
+        },
+        in: {
+            width: 9.21,
+            depth: 7.28,
+            height: 3.54
+        },
+        endstops: false,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
+    },
+    {
+        id: 8,
+        company: 'Sienci Labs',
+        name: 'Mill One',
+        type: 'V2',
+        version: 'MK1',
+        mm: {
+            width: 234,
+            depth: 185,
+            height: 90
+        },
+        in: {
+            width: 9.21,
+            depth: 7.28,
+            height: 3.54
+        },
+        endstops: false,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
+    },
+    {
+        id: 9,
+        company: 'Sienci Labs',
+        name: 'Mill One',
+        type: 'V3',
+        version: 'MK1',
+        mm: {
+            width: 258,
+            depth: 185,
+            height: 90
+        },
+        in: {
+            width: 10.16,
+            depth: 7.28,
+            height: 3.54
+        },
+        endstops: false,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: millOneGrblEEPROM.MILL_ONE_V3,
+    },
+    {
+        id: 52,
+        company: '',
+        name: 'Generic CNC',
+        type: '',
+        mm: {
+            width: 530,
+            depth: 450,
+            height: 465
+        },
+        in: {
+            width: 20.8,
+            depth: 17.7,
+            height: 18.3
+        },
+        endstops: false,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
     },
     {
         id: 10,
@@ -534,103 +607,5 @@ export default [
         coolant: false,
         laser: false,
         laserOnOutline: false,
-    },
-    {
-        id: 52,
-        company: '',
-        name: 'Generic CNC',
-        type: '',
-        mm: {
-            width: 530,
-            depth: 450,
-            height: 465
-        },
-        in: {
-            width: 20.8,
-            depth: 17.7,
-            height: 18.3
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-    },
-    {
-        id: 53,
-        company: 'Sienci Labs',
-        name: 'SLB',
-        type: '',
-        version: '',
-        mm: {
-            width: 792,
-            depth: 845,
-            height: 114.3
-        },
-        in: {
-            width: 31.18,
-            depth: 33.27,
-            height: 4.5
-        },
-        endstops: false,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: DefaultSLBSettings,
-        grblHALeepromSettings: DefaultSLBSettings,
-        isHal: true
-    },
-    {
-        id: 54,
-        company: 'Sienci Labs',
-        name: 'Altmill 48X48',
-        type: '',
-        version: '',
-        mm: {
-            width: 1260,
-            depth: 1248,
-            height: 170
-        },
-        in: {
-            width: 31.18,
-            depth: 33.27,
-            height: 4.5
-        },
-        endstops: true,
-        spindle: false,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: altmillSettings.DEFAULT,
-        grblHALeepromSettings: altmillSettings.DEFAULT,
-        orderedSettings: altmillSettings.ALTMILL_ORDERED,
-        isHal: true
-    },
-    {
-        id: 55,
-        company: 'Sienci Labs',
-        name: 'Altmill 48X48 + Spindle',
-        type: '',
-        version: '',
-        mm: {
-            width: 49.6,
-            depth: 49.1,
-            height: 6.6
-        },
-        in: {
-            width: 49.6,
-            depth: 49.1,
-            height: 6.6
-        },
-        endstops: true,
-        spindle: true,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: altmillSettings.SPINDLE_KIT,
-        grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
-        orderedSettings: altmillSettings.SPINDLE_ORDERED,
-        isHal: true
     }
 ];
