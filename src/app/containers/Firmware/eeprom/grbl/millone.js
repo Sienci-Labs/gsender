@@ -31,7 +31,7 @@ const MILL_ONE_MASTER_LIST = {
     $121: '30.000',
     $122: '15.000',
     $131: '185.000',
-    $132: '100.000',
+    $132: '100.000'
 };
 
 export const MILL_ONE_V1_AND_V2 = {
