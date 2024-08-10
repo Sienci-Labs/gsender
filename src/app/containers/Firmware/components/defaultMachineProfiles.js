@@ -21,7 +21,6 @@
  *
  */
 
-import DefaultSLBSettings from '../eepromFiles/DefaultSLBSettings.json';
 import * as longMillGrblEEPROM from '../eeprom/grbl/longmill';
 import * as longMillGrblHALEEPROM from '../eeprom/grblHAL/longmill';
 import * as millOneGrblEEPROM from '../eeprom/grbl/millone';
