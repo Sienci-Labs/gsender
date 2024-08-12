@@ -28,7 +28,7 @@ import * as altmillSettings from '../eepromFiles/Altmill';
 
 export default [
     {
-        id: 54,
+        id: 10,
         company: 'Sienci Labs',
         name: 'Altmill 48x48',
         type: '',
@@ -54,7 +54,7 @@ export default [
         isHal: true
     },
     {
-        id: 55,
+        id: 11,
         company: 'Sienci Labs',
         name: 'Altmill 48x48 + Spindle',
         type: '',
@@ -336,7 +336,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 10,
+        id: 12,
         company: '',
         name: 'Shapeoko',
         type: '',
