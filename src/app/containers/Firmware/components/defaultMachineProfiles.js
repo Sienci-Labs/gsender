@@ -28,7 +28,7 @@ import * as altmillSettings from '../eepromFiles/Altmill';
 
 export default [
     {
-        id: 10,
+        id: 0,
         company: 'Sienci Labs',
         name: 'Altmill 48x48',
         type: '',
@@ -54,7 +54,7 @@ export default [
         isHal: true
     },
     {
-        id: 11,
+        id: 1,
         company: 'Sienci Labs',
         name: 'Altmill 48x48 + Spindle',
         type: '',
@@ -80,7 +80,7 @@ export default [
         isHal: true
     },
     {
-        id: 2,
+        id: 5,
         company: 'Sienci Labs',
         name: 'LongMill MK2',
         type: '12x30',
@@ -104,7 +104,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30
     },
     {
-        id: 0,
+        id: 6,
         company: 'Sienci Labs',
         name: 'LongMill MK2',
         type: '30x30',
@@ -128,7 +128,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_30x30
     },
     {
-        id: 1,
+        id: 7,
         company: 'Sienci Labs',
         name: 'LongMill MK2',
         type: '48x30',
@@ -151,7 +151,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_48x30
     },
     {
-        id: 3,
+        id: 10,
         company: 'Sienci Labs',
         name: 'LongMill MK1',
         type: '12x12',
@@ -175,7 +175,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x12
     },
     {
-        id: 4,
+        id: 11,
         company: 'Sienci Labs',
         name: 'LongMill MK1',
         type: '12x30',
@@ -199,7 +199,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x30
     },
     {
-        id: 5,
+        id: 12,
         company: 'Sienci Labs',
         name: 'LongMill MK1',
         type: '30x30',
@@ -223,7 +223,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_30x30
     },
     {
-        id: 6,
+        id: 13,
         company: 'Sienci Labs',
         name: 'LongMill MK1',
         type: '48x30',
@@ -246,7 +246,7 @@ export default [
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_48x30
     },
     {
-        id: 7,
+        id: 15,
         company: 'Sienci Labs',
         name: 'Mill One',
         type: 'V1',
@@ -269,7 +269,7 @@ export default [
         eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
     },
     {
-        id: 8,
+        id: 16,
         company: 'Sienci Labs',
         name: 'Mill One',
         type: 'V2',
@@ -292,7 +292,7 @@ export default [
         eepromSettings: millOneGrblEEPROM.MILL_ONE_V1_AND_V2,
     },
     {
-        id: 9,
+        id: 17,
         company: 'Sienci Labs',
         name: 'Mill One',
         type: 'V3',
@@ -315,7 +315,7 @@ export default [
         eepromSettings: millOneGrblEEPROM.MILL_ONE_V3,
     },
     {
-        id: 52,
+        id: 30,
         company: '',
         name: 'Generic CNC',
         type: '',
@@ -336,7 +336,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 12,
+        id: 31,
         company: '',
         name: 'Shapeoko',
         type: '',
@@ -356,7 +356,7 @@ export default [
         laser: false
     },
     {
-        id: 18,
+        id: 32,
         company: '',
         name: 'X-Carve',
         type: '',
@@ -377,7 +377,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 19,
+        id: 33,
         company: '',
         name: 'Nomad',
         type: '',
@@ -398,7 +398,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 22,
+        id: 34,
         company: '',
         name: 'Onefinity',
         type: '',
@@ -419,7 +419,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 23,
+        id: 35,
         company: '',
         name: 'OpenBuilds',
         type: '',
@@ -440,7 +440,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 33,
+        id: 36,
         company: '',
         name: 'Ooznest',
         type: '',
@@ -461,7 +461,7 @@ export default [
         laserOnOutline: false,
     },
     {
-        id: 34,
+        id: 37,
         company: '',
         name: 'MillRight',
         type: '',
