@@ -79,7 +79,6 @@ import {
     ALARM,
     ERROR
 } from '../../../app/constants';
-import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
@@ -1478,10 +1477,6 @@ class GrblHalController {
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);
-            },
-            'firmware:applyProfileSettings': () => {
-                let [nameOfMachine, typeOfMachine, port] = args;
-                ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
                 const machineProfile = store.get('machineProfile');
