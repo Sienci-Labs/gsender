@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.tool-modal-button {
+  width: 100%;
+  background: #fff;
+  border: solid 1px #3e85c7;
+  --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  border-radius: 0.25rem;
+  color: #3e85c7;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  align-items: stretch;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:hover {
+    background: #F3F4F6;
+  }
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: rgba(0, 0, 0, 0.3);
+    border: solid 1px rgba(0, 0, 0, 0.15);
+    cursor: not-allowed;
+  }
+}
+
+.tool-modal-button-content {
+  padding: 1rem 0;
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.tool-modal-button-icon {
+  width: 3rem;
+  background: #3e85c7;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  margin-right: 0.5rem;
+  flex-direction column;
+
+  i {
+    color: #FFFFFF;
+    font-size: 1.6rem;
+  }
+}
