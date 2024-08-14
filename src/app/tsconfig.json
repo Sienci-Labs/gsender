@@ -9,7 +9,6 @@
     "esModuleInterop": true,
     "incremental": true,
     "allowJs": true,
-
     /* Bundler mode */
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
@@ -17,8 +16,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
-    /* Linting */
     "strict": true,
     "strictNullChecks": false, // this is so we can assign variables as null before defining them
     "noUnusedLocals": true,
@@ -33,7 +30,6 @@
       "./src/declarations.d.ts"
     ],
   },
-
   "ts-node": {
     "esm": true
   },

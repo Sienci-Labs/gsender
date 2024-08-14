@@ -21,7 +21,7 @@ export const viteServer = async (app) => {
             server: { middlewareMode: true },
             appType: 'custom',
             base,
-            configFile: '../../vite.config.js'
+            configFile: '../../src/app/vite.config.js'
         });
         app.use(vite.middlewares);
     } else {
@@ -45,7 +45,8 @@ export const viteServer = async (app) => {
                 render = (await vite.ssrLoadModule('../../src/app/src/entry-server.tsx')).render;
             } else {
                 template = templateHtml;
-                render = (await import('../../dist/gsender/app-server/entry-server')).render;
+                // eslint-disable-next-line import/no-unresolved
+                // render = (await import('../../dist/gsender/app/entry-server')).render;
             }
 
             const rendered = await render(url, ssrManifest);
