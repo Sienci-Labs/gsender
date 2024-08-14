@@ -1,13 +1,15 @@
-import { ChangeEventHandler, MouseEventHandler } from "react";
+import { PointerEventHandler } from "react";
 
 export interface RangeSliderProps {
     [key: string]: any,
-    sliderName?: string,
+    title?: string,
     step?: number,
     min?: number,
     max?: number,
-    value: string | number | Array<string>,
-    onChange?: ChangeEventHandler<HTMLInputElement>,
-    onMouseUp?: MouseEventHandler<HTMLInputElement>,
+    value: number[],
+    defaultValue?: number[],
+    showValues: boolean // optional parameter to show text representations of the value and to show title
+    onChange?: (value: number[]) => void,
+    onPointerUp?: PointerEventHandler<HTMLInputElement>,
     unitString?: string,
 }

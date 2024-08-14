@@ -4,19 +4,23 @@ import './index.css';
 // import TestSlider from './TestSlider';
 
 function App() {
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState([50]);
     return (
-        <div className="flex w-full h-full justify-center items-center mt-10">
-            <RangeSlider 
-                min={0}
+        <div className="flex w-96 h-full justify-center items-center mt-10">
+            <RangeSlider
+                title='Feed'
+                min={10}
                 max={100}
                 value={value}
-                unitString="mm"
+                defaultValue={[50]}
+                colour='red'
+                unitString="mm/min"
                 step={10}
-                onChange={(e) => {
-                    setValue(Number(e.target.value));
+                onChange={(values) => {
+                    setValue(values);
                 }}
                 onMouseUp={() => {}}
+                showValues={true}
             />
             {/* <TestSlider /> */}
         </div>

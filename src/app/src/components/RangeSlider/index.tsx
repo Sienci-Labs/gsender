@@ -21,61 +21,89 @@
  *
  */
 
-// import cx from 'classnames';
 import React from 'react';
-// import Slider from 'rc-slider';
 import { RangeSliderProps } from '../../definitions/interfaces/range_slider';
-// import 'rc-slider/assets/index.css';
+import * as Slider from '@radix-ui/react-slider';
 
 const RangeSlider = ({
-    sliderName = 'stepper',
+    title,
     step = 1,
     min = 0,
     max = 100,
     value,
+    defaultValue = [...value],
+    showValues,
+    colour = 'blue',
     onChange = null,
-    onMouseUp = null,
+    onPointerUp = null,
     unitString = 'unit',
     ...props
 }: RangeSliderProps): React.JSX.Element => {
+    const textComponent = showValues ? (
+            <div className="flex flex-row items-center justify-between w-full px-4">
+                <span className="min-w-4 text-right">{title}</span>
+                <span className="min-w-4 text-right text-blue-500">{`${value[0]} ${unitString}`}</span>
+                <span className="min-w-4 text-right">{`${(((value[0] - min) / (max - min)) * 100).toFixed(0)}%`}</span>
+            </div>
+        ) : <div></div>;
     return (
-        <div className="flex grid-cols-[4fr_1fr] items-center gap-2 justify-center w-full">
-            <input
-                type="range" min={min} max={max}
-                list={sliderName + 'list'}
-                id={sliderName}
-                name={sliderName}
-                // className={cx("h-2.5 rounded outline-0 duration-75",
-                //     "[&::-webkit-slider-thumb]: appearance-none [&::-webkit-slider-thumb]: w-6 [&::-webkit-slider-thumb]: [height:24px] [&::-webkit-slider-thumb]: rounded-md [&::-webkit-slider-thumb]: cursor-pointer [&::-webkit-slider-thumb]: -mt-2 [&::-webkit-slider-thumb]: relative [&::-webkit-slider-thumb]: z-1 [&::-webkit-slider-thumb]: opacity-80 [&::-webkit-slider-thumb]: duration-75",
-                //     "[&::-moz-range-thumb]: w-6 [&::-moz-range-thumb]: h-6 [&::-webkit-slider-thumb]: cursor-pointer",
-                //     "[&::-webkit-slider-runnable-track]: min-w-20 [&::-webkit-slider-runnable-track]: h-2 [&::-webkit-slider-runnable-track]: rounded-md [&::-webkit-slider-runnable-track]: bg-slate-500 [&::-webkit-slider-runnable-track]: bg-[linear-gradient(135deg,_rgba(255,_255,_255,_.15)_25%,_transparent_25%,_transparent_50%,_rgba(255,_255,_255,_.15)_50%,_rgba(255,_255,_255,_.15)_75%,_transparent_75%,_transparent)]"
-                // )}
-                className="slider slider-progress"
-                value={value}
-                onMouseUp={onMouseUp}
-                onChange={onChange}
-                step={step}
-                {...props}
-            />
-            {/* <Slider
-                range
-                value={value}
-                min={min}
-                max={max}
-                step={step}
-                onChange={onChange}
-                onChangeComplete={onChangeComplete}
-                styles={{
-                    rail: {
-                        backgroundImage: 'linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent)' 
-                    },
-                    track: {
-                        background: 'blue'
-                    }
-                }}
-                {...props}
-            /> */}
-            <span className="min-w-4 text-right">{value}{unitString}</span>
+        <div className="flex flex-col items-center gap-2 justify-center w-full">
+            {textComponent}
+            <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 shadow-inner">
+                <button
+                    type="button"
+                    className="flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
+                    onClick={() => onChange(defaultValue)}
+                >
+                    <i className="fas fa-redo"></i>
+                </button>
+                <Slider.Root
+                    className="flex relative items-center w-full h-6"
+                    defaultValue={defaultValue}
+                    value={value}
+                    step={step}
+                    min={min}
+                    max={max}
+                    onValueChange={onChange}
+                    onPointerUp={onPointerUp}
+                    {...props}
+                >
+                    <Slider.Track
+                        className="h-4 bg-gray-400 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
+                    >
+                        <Slider.Range className={`absolute h-full rounded-full bg-[${colour}]`}/>
+                    </Slider.Track>
+                    <Slider.Thumb 
+                        className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none"
+                    />
+                </Slider.Root>
+                <button
+                    type="button"
+                    className="flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
+                    onClick={() => {
+                        if (value[0] - step < min) {
+                            return;
+                        }
+                        const newValue = value[0] - step;
+                        onChange([newValue]);
+                    }}
+                >
+                    <i className="fas fa-minus"></i>
+                </button>
+                <button
+                    type="button"
+                    className="flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
+                    onClick={() => {
+                        if (value[0] + step > max) {
+                            return;
+                        }
+                        const newValue = value[0] + step;
+                        onChange([newValue]);
+                    }}
+                >
+                    <i className="fas fa-plus"></i>
+                </button>
+            </div>
         </div>
     );
 };
