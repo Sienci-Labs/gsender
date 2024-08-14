@@ -11,8 +11,8 @@ interface NavbarLinkProps {
 
 export function NavbarLink(props: NavbarLinkProps) {
     return (
-        <div className="flex flex-col items-center justify-center text-sm text-gray-500">
-            <a className="flex flex-col gap-0.5" href={props.href}>
+        <div className="flex flex-col">
+            <a className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500" href={props.href}>
                 <props.icon className="text-4xl text-gray-800"/>
                 { props.label }
             </a>
