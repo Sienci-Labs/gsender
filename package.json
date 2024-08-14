@@ -750,4 +750,5 @@
     "webpack@4.47.0": {
       "terser-webpack-plugin": "^4.2.3"
     }
+  }
 }
