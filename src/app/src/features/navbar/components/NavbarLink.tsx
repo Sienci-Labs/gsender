@@ -1,4 +1,5 @@
 import React from "react";
+import { Link} from '@tanstack/react-router';
 
 interface NavbarLinkProps {
     href: string;
@@ -12,10 +13,10 @@ interface NavbarLinkProps {
 export function NavbarLink(props: NavbarLinkProps) {
     return (
         <div className="flex flex-col">
-            <a className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500" href={props.href}>
+            <Link className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500" to={props.href}>
                 <props.icon className="text-4xl text-gray-800"/>
                 { props.label }
-            </a>
+            </Link>
         </div>
     )
 }
