@@ -12,11 +12,11 @@ function Index() {
     return (
         <>
             <div className="flex h-[80%]">
-                <div className="flex w-2/3">
+                <div className="flex w-full">
                     <PrimaryArea />
                 </div>
 
-                <div className="flex w-1/3">
+                <div className="flex min-w-96 max-w-xs">
                     <Column />
                 </div>
             </div>
