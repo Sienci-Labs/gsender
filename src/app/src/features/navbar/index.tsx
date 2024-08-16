@@ -3,6 +3,7 @@ import { FaTasks } from "react-icons/fa";
 import { HiOutlineChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import { GiNeedleDrill } from "react-icons/gi";
 import { MdKeyboardCommandKey } from "react-icons/md";
+import {MinimizeHandle} from "./components/MinimizeHandle.tsx";
 
 
 export function Navbar() {
@@ -12,6 +13,7 @@ export function Navbar() {
             <NavbarLink href="/configuration" icon={FaTasks} label="Config" />
             <NavbarLink href="/stats" icon={HiOutlineChatBubbleOvalLeftEllipsis} label="Info" />
             <NavbarLink href="/tools" icon={GiNeedleDrill} label="Tools" />
+            <MinimizeHandle />
         </div>
     )
 }

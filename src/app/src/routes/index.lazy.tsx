@@ -3,6 +3,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { Column } from "../workspace/Column";
 import { PrimaryArea } from "../workspace/PrimaryArea";
 import { ToolArea } from "../workspace/ToolArea";
+import {Visualizer} from "../features/Visualizer";
 
 export const Route = createLazyFileRoute("/")({
     component: Index,
@@ -13,7 +14,7 @@ function Index() {
         <>
             <div className="flex h-[80%]">
                 <div className="flex w-full">
-                    <PrimaryArea />
+                    <Visualizer />
                 </div>
 
                 <div className="flex min-w-96 max-w-xs">
