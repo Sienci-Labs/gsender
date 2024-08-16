@@ -1,7 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 import { Column } from "../workspace/Column";
-import { PrimaryArea } from "../workspace/PrimaryArea";
 import { ToolArea } from "../workspace/ToolArea";
 import {Visualizer} from "../features/Visualizer";
 
