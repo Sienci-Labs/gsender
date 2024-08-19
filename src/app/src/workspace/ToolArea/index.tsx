@@ -4,7 +4,7 @@ import {Tools} from "../../features/Tools";
 
 export const ToolArea = () => {
     return (
-        <div className="border p-1 flex-1 flex gap-2 box-border">
+        <div className="p-1 flex-1 flex gap-2 box-border">
             <div className="w-full p-1 box-border">
                 <FileControl />
             </div>

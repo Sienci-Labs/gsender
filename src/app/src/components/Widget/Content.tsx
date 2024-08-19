@@ -29,8 +29,8 @@ const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
         {...props}
         className={classNames(
             className,
-            "border-solid border-[1px] border-gray-200 relative rounded-lg " +
-            "h-[calc(100% - 2rem)] p-4 min-w-80 bg-gray-100 " +
+            "flex items-stretch border-solid border-[1px] border-gray-200 relative rounded-lg " +
+            "p-4 h-full min-w-80 bg-gray-100 " +
             "[@media(max-width: 639px),(max-device-width: 639px)]: p-2"
         )}
     />
@@ -38,3 +38,4 @@ const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
 
 export default Content;
 // export default forwardRef((props, ref) => <Content {...props} reference={ref} />);
+//h-[calc(100% - 2rem)]

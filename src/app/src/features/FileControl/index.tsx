@@ -7,7 +7,9 @@ export function FileControl() {
                 className=""
                 style={{ width: '100%' }}
             >
-                <div>File Control Feature</div>
+                    <div>
+                        File Control Feature
+                    </div>
             </Widget.Content>
         </Widget>
     )
