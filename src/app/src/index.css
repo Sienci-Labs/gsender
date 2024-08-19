@@ -6,4 +6,7 @@ body,
 html,
 #app {
     height: 100%;
+    * {
+        @apply box-border;
+    }
 }

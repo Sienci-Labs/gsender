@@ -1,6 +1,4 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-
 import Workspace from "../workspace";
 
 export const Route = createRootRoute({
@@ -9,7 +7,6 @@ export const Route = createRootRoute({
             <Workspace>
                 <Outlet />
             </Workspace>
-            <TanStackRouterDevtools />
         </>
     ),
 });
