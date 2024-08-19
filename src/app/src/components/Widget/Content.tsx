@@ -22,7 +22,6 @@
  */
 
 import classNames from 'classnames';
-// import { forwardRef } from 'react';
 import { WidgetProps } from '../../definitions/interfaces/widget_wrapper';
 
 const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
@@ -30,9 +29,9 @@ const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
         {...props}
         className={classNames(
             className,
-            "border-solid border-[1px] border-gray-400 relative " +
+            "border-solid border-[1px] border-gray-200 relative rounded-lg " +
             "h-[calc(100% - 2rem)] p-4 min-w-80 bg-gray-100 " +
-            "[@media(max-width: 639px),(max-device-width: 639px)]: p-3"
+            "[@media(max-width: 639px),(max-device-width: 639px)]: p-2"
         )}
     />
 );

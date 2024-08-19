@@ -1,7 +1,7 @@
-import {Navbar} from "../../features/navbar";
+import {NavBar} from "../../features/NavBar";
 
 export const Sidebar = () => {
-    return <div className="border w-20 flex flex-col justify-end box-border">
-        <Navbar />
+    return <div className="border flex flex-col justify-end box-border">
+        <NavBar />
     </div>;
 };
