@@ -1505,7 +1505,7 @@ class GrblHalController {
                     callback(new Error(`Invalid G-code: name=${name}`));
                     return;
                 }
-
+                this.emit('gcode:load', name, gcode, context);
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
