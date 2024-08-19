@@ -6,13 +6,13 @@ import { MdKeyboardCommandKey } from "react-icons/md";
 import {MinimizeHandle} from "./components/MinimizeHandle.tsx";
 
 
-export function Navbar() {
+export function NavBar() {
     return (
-        <div className="flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch">
+        <div className="w-20 flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch">
             <NavbarLink href="/" icon={MdKeyboardCommandKey} label="Control" />
             <NavbarLink href="/configuration" icon={FaTasks} label="Config" />
             <NavbarLink href="/stats" icon={HiOutlineChatBubbleOvalLeftEllipsis} label="Info" />
-            <NavbarLink href="/tools" icon={GiNeedleDrill} label="Tools" />
+            <NavbarLink href="/tools" icon={GiNeedleDrill} label="Tools" minimized/>
             <MinimizeHandle />
         </div>
     )

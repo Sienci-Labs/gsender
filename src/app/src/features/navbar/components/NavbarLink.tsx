@@ -8,6 +8,7 @@ interface NavbarLinkProps {
     }>;
     label: string;
     isActive?: boolean
+    minimized?: boolean;
 }
 
 export function NavbarLink(props: NavbarLinkProps) {
@@ -15,7 +16,7 @@ export function NavbarLink(props: NavbarLinkProps) {
         <div className="flex flex-col">
             <Link className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500" to={props.href}>
                 <props.icon className="text-4xl text-gray-800"/>
-                { props.label }
+                { !props.minimized && props.label }
             </Link>
         </div>
     )
