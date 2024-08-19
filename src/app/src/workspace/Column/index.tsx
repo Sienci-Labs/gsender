@@ -3,7 +3,7 @@ import { Location } from "../../features/Location";
 
 export const Column = () => {
     return (
-        <div className="border p-1 flex-1 box-border">
+        <div className="p-1 flex-1 box-border">
             <Widget>
                 <Widget.Content
                     className=""
