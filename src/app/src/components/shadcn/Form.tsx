@@ -14,7 +14,7 @@ import {
     useFormContext,
 } from "react-hook-form"
 
-import { cx } from "classnames"
+import cx from "classnames"
 import { Label } from "./Label"
 
 const Form = FormProvider

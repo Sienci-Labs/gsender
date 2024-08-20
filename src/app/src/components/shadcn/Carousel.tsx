@@ -8,7 +8,7 @@ import useEmblaCarousel, {
 } from "embla-carousel-react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
-import { cx } from "classnames"
+import cx from "classnames"
 import { Button } from "./Button"
 
 type CarouselApi = UseEmblaCarouselType[1]

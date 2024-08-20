@@ -5,7 +5,7 @@
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
-import { cx } from "classnames"
+import cx from "classnames"
 
 const Drawer = ({
     shouldScaleBackground = true,
