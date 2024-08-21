@@ -1,12 +1,14 @@
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store } from './store/redux';
 
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from './routeTree.gen';
 
-import "./index.css";
+import './index.css';
 
 const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
     interface Register {
         router: typeof router;
     }
@@ -15,7 +17,9 @@ declare module "@tanstack/react-router" {
 function App() {
     return (
         <>
-            <RouterProvider router={router} />
+            <ReduxProvider store={store}>
+                <RouterProvider router={router} />
+            </ReduxProvider>
         </>
     );
 }
