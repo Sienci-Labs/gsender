@@ -11,12 +11,14 @@ export default defineConfig({
         outDir: path.resolve(__dirname, "../../dist/gsender/app"), // Output directly to /output/app
         rollupOptions: {
             input: {
-                main: path.resolve(__dirname, "./src/entry-client.tsx"), // Main entry point
+                main: path.resolve(__dirname, "./src/entry-client.tsx"),
+                server: path.resolve(__dirname, './src/entry-server.tsx')// Main entry point
             },
             output: {
                 assetFileNames: "assets/[name].[ext]",
             },
         },
+        ssr: true,
     },
     css: {
         postcss: {

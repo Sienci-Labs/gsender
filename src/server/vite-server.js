@@ -20,6 +20,10 @@ export const viteServer = async (app) => {
         vite = await createServer({
             server: { middlewareMode: true },
             appType: 'custom',
+            build: {
+                ssr: true,
+                ssrEmitAssets: true
+            },
             base,
             configFile: '../../src/app/vite.config.js'
         });
