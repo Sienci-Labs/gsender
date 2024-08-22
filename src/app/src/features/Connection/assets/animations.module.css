@@ -1,0 +1,13 @@
+@keyframes steam {
+    from {
+        background-position: -3000px;
+    }
+    to {
+        background-position: 0px;
+    }
+}
+
+
+.steam {
+    animation: steam 15s linear infinite;
+}
