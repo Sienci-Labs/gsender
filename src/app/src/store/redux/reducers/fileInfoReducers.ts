@@ -95,7 +95,7 @@ const normalizeBBox = (bbox: Partial<BBox>): BBox => {
 };
 
 const reducer = createReducer<FileInfoState>(initialState, {
-    [UNLOAD_FILE_INFO]: (state) => {
+    [UNLOAD_FILE_INFO]: () => {
         return {
             ...initialState,
         };
@@ -126,25 +126,22 @@ const reducer = createReducer<FileInfoState>(initialState, {
             size,
         };
     },
-    [UPDATE_FILE_PROCESSING]: (state, { value }: { value: boolean }) => {
+    [UPDATE_FILE_PROCESSING]: (state, { fileProcessing }) => {
         return {
             ...state,
-            fileProcessing: value,
+            fileProcessing,
         };
     },
-    [UPDATE_FILE_RENDER_STATE]: (
-        state,
-        { state: renderState }: { state: string },
-    ) => {
+    [UPDATE_FILE_RENDER_STATE]: (state, { renderState }) => {
         return {
             ...state,
             renderState,
         };
     },
-    [UPDATE_FILE_PARSED_DATA]: (state, { value }: { value: any }) => {
+    [UPDATE_FILE_PARSED_DATA]: (state, { parsedData }) => {
         return {
             ...state,
-            parsedData: value,
+            parsedData,
         };
     },
 });
