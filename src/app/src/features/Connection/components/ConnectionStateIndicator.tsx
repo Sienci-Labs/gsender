@@ -30,11 +30,11 @@ function getIcon(type: ConnectionType): ReactElement {
 function getStateColour(state: ConnectionState) {
     switch (state) {
         case ConnectionState.DISCONNECTED:
-            return "text-yellow-700"
+            return "text-blue-700"
         case ConnectionState.CONNECTED:
             return "text-green-700"
         case ConnectionState.CONNECTING:
-            return "text-blue-600"
+            return "text-yellow-600"
         case ConnectionState.ERROR:
             return "text-red-600"
         default:

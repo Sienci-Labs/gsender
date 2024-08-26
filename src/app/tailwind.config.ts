@@ -8,10 +8,10 @@ export default {
     theme: {
         extend: {
             animation: {
-                rotato: "rotate 10s linear infinite",
+                rotation: "rotation 10s linear infinite",
             },
             keyframes: {
-                rotato: {
+                rotation: {
                     "0%": {transform: "rotate(0deg) scale(10)"},
                     "100%": {transform: "rotate(-360deg) scale(5)"},
                 },

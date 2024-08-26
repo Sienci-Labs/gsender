@@ -337,7 +337,7 @@ class Controller {
 
     // Retrieves a list of available serial ports with metadata.
     // @param {function} [callback] Called once completed.
-    listPorts(callback: Function): void {
+    listPorts(callback?: Function): void {
         this.socket && this.socket.emit('list', callback);
     }
 

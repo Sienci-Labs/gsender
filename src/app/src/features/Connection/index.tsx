@@ -1,8 +1,11 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ConnectionStateIndicator} from "./components/ConnectionStateIndicator.tsx";
 import {ConnectionInfo} from "./components/ConnectionInfo.tsx";
-import styles from './assets/animations.module.css';
+//import styles from './assets/animations.module.css';
 import cn from 'classnames';
+import controller from '../../lib/controller.ts';
+import {Port, refreshPorts} from './utils/connection.ts';
+import {PortListings} from "app/features/Connection/components/PortListings.tsx";
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -12,23 +15,32 @@ export enum ConnectionState {
 }
 
 export enum ConnectionType {
-    DISCONNECTED,
-    ETHERNET,
-    USB,
-    REMOTE
+    DISCONNECTED= "DISCONNECTED",
+    ETHERNET="ETHERNET",
+    USB =  "USB",
+    REMOTE=  "REMOTE",
 }
 
 
 export function Connection() {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED)
     const [connectionType, setConnectionType] = useState(ConnectionType.DISCONNECTED)
+    const [ports, setPorts] = useState([]);
+
+    useEffect(() => {
+        refreshPorts();
+        controller.addListener('serialport:list', (data: Port[]) => {
+            setPorts(data);
+            console.log(data);
+        });
+    }, []);
 
     return (
         <div className="relative group cursor-pointer">
             {
                 connectionState !== ConnectionState.CONNECTED &&
                 <div className={
-                    cn(styles.steam,
+                    cn(
                         "absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"
                     )
                 }
@@ -48,6 +60,9 @@ export function Connection() {
                 }
                 {
                     connectionState == ConnectionState.CONNECTED && <ConnectionInfo port="COM7" firmwareType="grblHAL" />
+                }
+                {
+                    connectionState == ConnectionState.DISCONNECTED && <PortListings ports={ports} />
                 }
             </div>
         </div>
