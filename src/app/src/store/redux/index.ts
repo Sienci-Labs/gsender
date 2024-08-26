@@ -1,10 +1,11 @@
-import controller from './reducers/controllerReducers';
-import connection from './reducers/connectionReducers';
-import file from './reducers/fileInfoReducers';
-import visualizer from './reducers/visualizerReducers';
-import preferences from './reducers/preferencesReducer';
-
 import { configureStore } from '@reduxjs/toolkit';
+
+import controller from './slices/controller.slice';
+import connection from './slices/connection.slice';
+import file from './slices/fileInfo.slice';
+import visualizer from './slices/visualizer.slice';
+import preferences from './slices/preferences.slice';
+import { sagaMiddleware } from './sagas';
 
 export const store = configureStore({
     reducer: {
@@ -14,6 +15,8 @@ export const store = configureStore({
         visualizer,
         preferences,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(sagaMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
