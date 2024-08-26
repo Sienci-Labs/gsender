@@ -38,6 +38,8 @@ function App() {
                     // @see "src/web/containers/Login/Login.jsx"
                 });
                 return;
+            } else {
+                console.log('no auth');
             }
         });
 

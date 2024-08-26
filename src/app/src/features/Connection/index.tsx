@@ -6,6 +6,8 @@ import cn from 'classnames';
 import controller from '../../lib/controller.ts';
 import {Port, refreshPorts} from './utils/connection.ts';
 import {PortListings} from "app/features/Connection/components/PortListings.tsx";
+import {connect} from 'react-redux'
+import get from 'lodash/get';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -21,18 +23,17 @@ export enum ConnectionType {
     REMOTE=  "REMOTE",
 }
 
+interface ConnectionProps {
+    ports: Port[]
+}
 
-export function Connection() {
+
+function Connection(props: ConnectionProps) {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED)
     const [connectionType, setConnectionType] = useState(ConnectionType.DISCONNECTED)
-    const [ports, setPorts] = useState([]);
 
     useEffect(() => {
         refreshPorts();
-        controller.addListener('serialport:list', (data: Port[]) => {
-            setPorts(data);
-            console.log(data);
-        });
     }, []);
 
     return (
@@ -62,9 +63,20 @@ export function Connection() {
                     connectionState == ConnectionState.CONNECTED && <ConnectionInfo port="COM7" firmwareType="grblHAL" />
                 }
                 {
-                    connectionState == ConnectionState.DISCONNECTED && <PortListings ports={ports} />
+                    connectionState == ConnectionState.DISCONNECTED && <PortListings ports={props.ports} />
                 }
             </div>
         </div>
     )
 }
+
+
+export default connect((store) => {
+    const connection = get(store, 'connection', {});
+    const ports = get(connection, 'ports', []);
+    console.log(connection);
+
+    return {
+        ports
+    };
+})(Connection);
