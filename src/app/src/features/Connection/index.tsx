@@ -18,20 +18,6 @@ export enum ConnectionType {
     REMOTE
 }
 
-function getBarStyling(state: ConnectionState): string {
-    switch (state) {
-        case ConnectionState.ERROR:
-            return ''
-        case ConnectionState.CONNECTED:
-            return ''
-        case ConnectionState.DISCONNECTED:
-            return ''
-        case ConnectionState.CONNECTING:
-            return ''
-        default:
-            return ''
-    }
-}
 
 export function Connection() {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED)
