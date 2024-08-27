@@ -21,14 +21,15 @@
  *
  */
 
-import { createAction } from 'redux-action';
+import createSagaMiddleware from 'redux-saga';
+import { all, call } from 'redux-saga/effects';
 
-export const OPEN_CONNECTION = 'OPEN_CONNECTION' as const;
-export const CLOSE_CONNECTION = 'CLOSE_CONNECTION' as const;
-export const LIST_PORTS = 'LIST_PORTS' as const;
-export const SCAN_NETWORK = 'SCAN_NETWORK' as const;
+import * as controller from './controllerSagas';
 
-export const openConnection = createAction<void>(OPEN_CONNECTION);
-export const closeConnection = createAction<void>(CLOSE_CONNECTION);
-export const listPorts = createAction<void>(LIST_PORTS);
-export const scanNetwork = createAction<void>(SCAN_NETWORK);
+const sagas = [controller];
+
+export const sagaMiddleware = createSagaMiddleware();
+
+export default function* root() {
+    yield all(sagas.map((saga) => call(saga.initialize)));
+}
