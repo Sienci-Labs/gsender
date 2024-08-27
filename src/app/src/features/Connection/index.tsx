@@ -84,7 +84,7 @@ function Connection(props: ConnectionProps) {
 
     return (
         <div
-            className="relative group cursor-pointer"
+            className="relative group cursor-pointer dropdown"
             onMouseEnter={refreshPortsOnParentEntry}
         >
             {

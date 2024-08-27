@@ -9,7 +9,7 @@ interface PortListingsProps {
 
 export function PortListings(props: PortListingsProps): JSX.Element {
     return (
-        <div className="absolute left-0 top-full z-10 bg-white border border-gray w-full p4 rounded mt-1 divide-y divide-dotted hover:divide-solid divide-blue-300 shadow-lg">
+        <div className="absolute left-0 top-full z-10 bg-white border border-gray w-full p4 rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible">
             {
                 props.ports.map(port =>
                     <button
