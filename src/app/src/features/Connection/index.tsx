@@ -3,8 +3,7 @@ import {ConnectionStateIndicator} from "./components/ConnectionStateIndicator.ts
 import {ConnectionInfo} from "./components/ConnectionInfo.tsx";
 //import styles from './assets/animations.module.css';
 import cn from 'classnames';
-import controller from '../../lib/controller.ts';
-import {Port, refreshPorts} from './utils/connection.ts';
+import {Port, refreshPorts, refreshPortsOnParentEntry} from './utils/connection.ts';
 import {PortListings} from "app/features/Connection/components/PortListings.tsx";
 import {connect} from 'react-redux'
 import get from 'lodash/get';
@@ -36,8 +35,24 @@ function Connection(props: ConnectionProps) {
         refreshPorts();
     }, []);
 
+    function onConnectClick(port: string, type: ConnectionType) {
+        if (!port) {
+            console.assert("Connect called with empty port");
+        }
+
+        // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
+        setConnectionState(ConnectionState.CONNECTING);
+        setConnectionType(type);
+
+        // Attempt connect with callback
+
+    }
+
     return (
-        <div className="relative group cursor-pointer">
+        <div
+            className="relative group cursor-pointer"
+            onMouseEnter={refreshPortsOnParentEntry}
+        >
             {
                 connectionState !== ConnectionState.CONNECTED &&
                 <div className={
@@ -63,7 +78,7 @@ function Connection(props: ConnectionProps) {
                     connectionState == ConnectionState.CONNECTED && <ConnectionInfo port="COM7" firmwareType="grblHAL" />
                 }
                 {
-                    connectionState == ConnectionState.DISCONNECTED && <PortListings ports={props.ports} />
+                    connectionState == ConnectionState.DISCONNECTED && <PortListings connectHandler={onConnectClick} ports={props.ports} />
                 }
             </div>
         </div>
@@ -74,7 +89,6 @@ function Connection(props: ConnectionProps) {
 export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
-    console.log(connection);
 
     return {
         ports

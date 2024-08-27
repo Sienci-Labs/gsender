@@ -1,9 +1,10 @@
 import {Port} from "app/features/Connection/utils/connection.ts";
-import { BsUsbPlug } from "react-icons/bs";
-import { BsEthernet } from "react-icons/bs";
+import {BsEthernet, BsUsbPlug} from "react-icons/bs";
+import {ConnectionType} from "app/features/Connection";
 
 interface PortListingsProps {
-    ports: Port[]
+    ports: Port[];
+    connectHandler: (p: string, c: ConnectionType) => void;
 }
 
 export function PortListings(props: PortListingsProps): JSX.Element {
@@ -11,7 +12,11 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         <div className="absolute left-0 top-full z-10 bg-white border border-gray w-full p4 rounded mt-1 divide-y divide-dotted hover:divide-solid divide-blue-300 shadow-lg">
             {
                 props.ports.map(port =>
-                    <div className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-100">
+                    <button
+                        type="button"
+                        className="w-full m-0 px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-100"
+                        onClick={() => props.connectHandler(port.port, ConnectionType.USB)}
+                    >
                         <span className="text-4xl">
                             <BsUsbPlug />
                         </span>
@@ -20,7 +25,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                             <span className="text-sm text-gray-600 font-normal">USB at 115200 baud</span>
                         </div>
 
-                    </div>
+                    </button>
                 )
             }
             <div className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1">
