@@ -8,6 +8,7 @@ import {PortListings} from "app/features/Connection/components/PortListings.tsx"
 import {connect} from 'react-redux'
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
+import {DisconnectButton} from "app/features/Connection/components/DisconnectButton.tsx";
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -31,6 +32,7 @@ interface ConnectionProps {
 function Connection(props: ConnectionProps) {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED)
     const [connectionType, setConnectionType] = useState(ConnectionType.DISCONNECTED)
+    const [activePort, setActivePort] = useState('');
 
     useEffect(() => {
         refreshPorts();
@@ -55,10 +57,29 @@ function Connection(props: ConnectionProps) {
                 baudrate: 115200,
                 network
             },
-            () => {
+            (err) => {
+                if (err) {
+                    setConnectionState(ConnectionState.ERROR);
+                }
 
+                setConnectionState(ConnectionState.CONNECTED);
+                setActivePort(port);
             }
         )
+    }
+
+    function onDisconnectClick() {
+        setConnectionState(ConnectionState.DISCONNECTED);
+        setConnectionType(ConnectionType.DISCONNECTED);
+
+        controller.closePort(
+            activePort,
+            (err) => {
+                if (err) {
+                    console.error(err);
+                }
+                refreshPorts();
+            });
     }
 
     return (
@@ -88,11 +109,15 @@ function Connection(props: ConnectionProps) {
                     connectionState === ConnectionState.ERROR && <span>Unable to connect.</span>
                 }
                 {
-                    connectionState == ConnectionState.CONNECTED && <ConnectionInfo port="COM7" firmwareType="grblHAL" />
+                    connectionState == ConnectionState.CONNECTED && <ConnectionInfo port={activePort} firmwareType="grblHAL" />
                 }
                 {
                     connectionState == ConnectionState.DISCONNECTED && <PortListings connectHandler={onConnectClick} ports={props.ports} />
                 }
+                {
+                    connectionState == ConnectionState.CONNECTED && <DisconnectButton disconnectHandler={onDisconnectClick}/>
+                }
+
             </div>
         </div>
     )
