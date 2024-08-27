@@ -57,7 +57,7 @@ function Connection(props: ConnectionProps) {
                 baudrate: 115200,
                 network
             },
-            (err) => {
+            (err: string) => {
                 if (err) {
                     setConnectionState(ConnectionState.ERROR);
                 }
@@ -74,7 +74,7 @@ function Connection(props: ConnectionProps) {
 
         controller.closePort(
             activePort,
-            (err) => {
+            (err: string) => {
                 if (err) {
                     console.error(err);
                 }

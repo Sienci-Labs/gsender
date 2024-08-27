@@ -1,4 +1,3 @@
-import React from 'react';
 import controller from 'app/lib/controller';
 
 export interface Port {
@@ -16,6 +15,6 @@ export function refreshPorts() {
 }
 
 
-export function refreshPortsOnParentEntry(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+export function refreshPortsOnParentEntry() {
         refreshPorts();
 }
