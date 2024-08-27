@@ -16,6 +16,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                         type="button"
                         className="w-full m-0 px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-100"
                         onClick={() => props.connectHandler(port.port, ConnectionType.USB)}
+                        key={`port-${port.port}`}
                     >
                         <span className="text-4xl">
                             <BsUsbPlug />
