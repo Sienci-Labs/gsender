@@ -1,5 +1,11 @@
+import {DRO} from "app/features/DRO";
+import {Jogging} from "app/features/Jogging";
+
 export function Location() {
     return (
-        <div>DRO and Jogging area</div>
+        <div className="flex flex-col">
+            <DRO />
+            <Jogging />
+        </div>
     )
 }
