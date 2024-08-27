@@ -415,7 +415,9 @@ class Controller {
         if (!port) {
             return;
         }
-        this.socket && this.socket.emit.apply(this.socket, ['command', [port, cmd].concat(args)]);
+
+        const socketArgs = [port, cmd, ...args];
+        this.socket && this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
     }
 
     // Writes data to the serial port.

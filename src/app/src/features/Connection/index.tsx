@@ -7,6 +7,7 @@ import {Port, refreshPorts, refreshPortsOnParentEntry} from './utils/connection.
 import {PortListings} from "app/features/Connection/components/PortListings.tsx";
 import {connect} from 'react-redux'
 import get from 'lodash/get';
+import controller from 'app/lib/controller';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -40,12 +41,24 @@ function Connection(props: ConnectionProps) {
             console.assert("Connect called with empty port");
         }
 
+        const network = type === ConnectionType.ETHERNET;
+
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
 
         // Attempt connect with callback
+        controller.openPort(
+            port,
+            'grblHAL',
+            {
+                baudrate: 115200,
+                network
+            },
+            () => {
 
+            }
+        )
     }
 
     return (

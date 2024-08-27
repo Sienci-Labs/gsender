@@ -1,5 +1,5 @@
 import React from 'react';
-import controller from '../../../lib/controller';
+import controller from 'app/lib/controller';
 
 export interface Port {
     port: string,
