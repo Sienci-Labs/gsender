@@ -89,3 +89,5 @@ export type TOOL = number;
 export type FirmwareSetting = {
     [key: `$${number}`]: string;
 };
+
+export type ALARM_CODE = number | 'Homing';
