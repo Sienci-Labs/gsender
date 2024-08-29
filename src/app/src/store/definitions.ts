@@ -1,5 +1,5 @@
 import { FILE_TYPE, WORKFLOW_STATES, RENDER_STATE, TOGGLE_STATUS } from "../constants";
-import { EEPROMSettings, FirmwareOptions, EEPROMDescriptions } from "definitions/firmware";
+import { EEPROMSettings, EEPROMDescriptions } from "definitions/firmware";
 import { BasicObject, BasicPosition, BBox } from "definitions/general";
 import { Axes } from "features/Axes/definitions";
 import { Connection } from "features/Connection/definitions";
@@ -30,6 +30,22 @@ export type TOGGLE_STATUS_T =
 
 // Interfaces
 // Redux States
+
+export interface FirmwareOptions {
+    OPT: string,
+    NEWOPT: string,
+    FIRMWARE: string,
+    NVS_STORAGE: string,
+    FREE_MEMORY: string,
+    DRIVER: string,
+    DRIVER_VERSION: string,
+    BOARD: string,
+    AUX_IO: string,
+    WIZCHIP: string,
+    IP: string,
+    PLUGIN: string,
+    SPINDLE: string,
+};
 
 export interface ControllerSettings { //TODO
     parameters: BasicObject,
