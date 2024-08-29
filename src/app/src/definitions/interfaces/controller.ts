@@ -1,12 +1,13 @@
 import { EEPROMDescriptions, EEPROMSettings, FirmwareOptions } from "./firmware"
+import { BasicObject } from "./general"
 
 export interface ControllerSettings { //TODO
-    parameters: object,
+    parameters: BasicObject,
     settings: EEPROMSettings,
-    info: FirmwareOptions,
-    descriptions: EEPROMDescriptions
-    groups: object,
-    alarms: object,
+    info?: FirmwareOptions,
+    descriptions?: EEPROMDescriptions
+    groups: BasicObject,
+    alarms: BasicObject,
 };
 
 export interface ControllerListeners {

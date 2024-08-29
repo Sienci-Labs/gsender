@@ -1,3 +1,4 @@
+import { CommandKey } from 'app/definitions/interfaces/shortcuts';
 import {
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,
@@ -9,6 +10,9 @@ import {
     COOLANT_CATEGORY,
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
 } from '../../constants';
 
 // TODO: reintroduce these shortcuts
@@ -21,22 +25,7 @@ import {
 // } from 'app/containers/NavSidebar/constants';
 // import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from 'app/widgets/JogControl/constants';
 
-const AXIS_X = 'x';
-const AXIS_Y = 'y';
-const AXIS_Z = 'z';
-
-interface Shortcut {
-    id: number;
-    title: string;
-    keys: string;
-    cmd: string;
-    payload?: Record<string, any>;
-    preventDefault: boolean;
-    isActive: boolean;
-    category: string;
-}
-
-export const shortcuts: Shortcut[] = [
+export const shortcuts: CommandKey[] = [
     {
         // Load File
         id: 0,
@@ -46,6 +35,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Unload Load File
@@ -56,6 +47,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Test Run
@@ -66,6 +59,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Start Job
@@ -76,6 +71,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Pause Job
@@ -86,6 +83,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Stop Job
@@ -96,6 +95,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: CARVING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Feed +
@@ -107,6 +108,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Feed ++
@@ -118,6 +120,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Feed -
@@ -129,6 +132,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Feed --
@@ -140,6 +144,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Feed Reset
@@ -151,6 +156,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Spindle/Laser +
@@ -162,6 +168,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Spindle/Laser ++
@@ -173,6 +180,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Spindle/Laser -
@@ -184,6 +192,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Spindle/Laser --
@@ -195,6 +204,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // Spindle/Laser Reset
@@ -206,6 +216,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: OVERRIDES_CATEGORY,
+        callback: undefined
     },
     {
         // 3D / Isometric
@@ -217,6 +228,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // TOP
@@ -228,6 +240,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // FRONT
@@ -239,6 +252,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // RIGHT
@@ -250,6 +264,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // LEFT
@@ -261,6 +276,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // Reset View
@@ -272,6 +288,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        callback: undefined
     },
     {
         // Lightweight Mode
@@ -282,6 +299,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: VISUALIZER_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // ZERO X AXIS
@@ -293,6 +312,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axis: AXIS_X },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // ZERO Y AXIS
@@ -304,6 +324,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axis: AXIS_Y },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // ZERO Y AXIS
@@ -315,6 +336,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axis: AXIS_Z },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Zero All Axis
@@ -326,6 +348,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Go to X Zero
@@ -337,6 +360,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axisList: [AXIS_X] },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Go to Y Zero
@@ -348,6 +372,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axisList: [AXIS_Y] },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Go to Z Zero
@@ -359,6 +384,7 @@ export const shortcuts: Shortcut[] = [
         payload: { axisList: [AXIS_Z] },
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Go to All Zero
@@ -370,6 +396,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Homing
@@ -383,6 +410,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: LOCATION_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X+
@@ -396,6 +424,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X-
@@ -409,6 +438,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog Y+
@@ -422,6 +452,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog Y-
@@ -435,6 +466,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog Z+
@@ -448,6 +480,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog Z-
@@ -461,6 +494,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X+ Y-
@@ -474,6 +508,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X- Y+
@@ -487,6 +522,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X+ Y+
@@ -500,6 +536,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Jog X- Y-
@@ -513,6 +550,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Stop Jog
@@ -524,6 +562,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Change Jog Speed
@@ -537,6 +576,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     {
         // Change Jog Speed
@@ -550,6 +590,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        callback: undefined
     },
     // { // Select Rapid Jog Preset
     //     id: 45,
@@ -596,6 +637,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: JOGGING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Confirm Probe
@@ -606,6 +649,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: PROBING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Start Probing
@@ -616,6 +661,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: PROBING_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Toggle Mode
@@ -626,6 +673,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: SPINDLE_LASER_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // CW / Laser On
@@ -636,6 +685,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: SPINDLE_LASER_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // CCW / Laser Test
@@ -646,6 +697,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: SPINDLE_LASER_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Stop / Laser Off
@@ -656,6 +709,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: SPINDLE_LASER_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         id: 71,
@@ -665,6 +720,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: COOLANT_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         id: 72,
@@ -674,6 +731,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: COOLANT_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         id: 73,
@@ -683,6 +742,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: COOLANT_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Cut
@@ -693,6 +754,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Copy
@@ -703,6 +766,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Paste
@@ -713,6 +778,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Undo
@@ -723,6 +790,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: true,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Close Dialog
@@ -733,6 +802,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Toggle Tab Widgets
@@ -743,6 +814,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
     {
         // Unlock
@@ -756,6 +829,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: GENERAL_CATEGORY,
+        callback: undefined
     },
     {
         // Soft Reset
@@ -769,6 +843,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: GENERAL_CATEGORY,
+        callback: undefined
     },
     {
         // Toggle Shortcuts
@@ -779,6 +854,8 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: GENERAL_CATEGORY,
+        payload: undefined,
+        callback: undefined
     },
 
     {
@@ -791,6 +868,7 @@ export const shortcuts: Shortcut[] = [
         preventDefault: false,
         isActive: true,
         category: TOOLBAR_CATEGORY,
+        callback: undefined
     },
     // { // Surfacing
     //     id: 65,

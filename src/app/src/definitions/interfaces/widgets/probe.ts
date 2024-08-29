@@ -4,8 +4,21 @@ import {
     PROBE_TYPES_T,
     TOUCHPLATE_TYPES_T,
     UNITS_EN
-} from "../types";
-import { BasicPosition } from "./general";
+} from "../../types";
+import { BasicPosition } from "../general";
+
+export interface ProbeProfile {
+    xyThickness: number,
+    zThickness: number,
+    plateWidth: number,
+    plateLength: number,
+    functions: {
+        x: boolean,
+        y: boolean,
+        z: boolean
+    },
+    touchplateType: string,
+}
 
 export interface ProbingOptions {
     modal: string,
@@ -42,4 +55,20 @@ export interface ProbeWidgetSettings {
     retract: number,
     zProbeDistance: number,
     zProbeThickness: number,
+};
+
+export interface Probe {
+    minimized: boolean,
+    probeCommand: string,
+    connectivityTest: boolean,
+    useTLO: boolean,
+    probeDepth: number,
+    probeFeedrate: number,
+    probeFastFeedrate: number,
+    retractionDistance: number,
+    zProbeDistance: number,
+    touchPlateHeight: number,
+    probeType: string,
+    probeAxis: string,
+    direction: number,
 };

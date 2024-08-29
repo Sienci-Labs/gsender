@@ -1,21 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import store from '../..';
-
-interface ShortcutList {
-    [key: string]: string;
-}
-
-interface PreferencesState {
-    shortcuts: {
-        list: ShortcutList;
-        shouldHold: boolean;
-    };
-    ipList: string[];
-}
+import { PreferencesState } from 'app/definitions/interfaces/store';
+import { CommandKeys } from 'app/definitions/interfaces/shortcuts';
 
 const initialState: PreferencesState = {
     shortcuts: {
-        list: store.get('commandKeys', {} as ShortcutList),
+        list: store.get('commandKeys', {} as CommandKeys),
         shouldHold: false,
     },
     ipList: [],
@@ -25,7 +15,7 @@ const preferencesSlice = createSlice({
     name: 'preferences',
     initialState,
     reducers: {
-        setShortcutsList(state, action: PayloadAction<ShortcutList>) {
+        setShortcutsList(state, action: PayloadAction<CommandKeys>) {
             state.shortcuts.list = action.payload;
         },
         holdShortcuts(state) {

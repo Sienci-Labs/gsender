@@ -1,5 +1,5 @@
 import { AXES_T } from "../types";
-import { CommandKey } from "./shortcuts";
+import { CommandKeys } from "./shortcuts";
 
 export interface GamepadDetail {
     detail: {
@@ -15,40 +15,46 @@ export interface GamepadDetail {
 export interface GamepadConfig {
     deadZone: number,
     precision: number,
+    profiles?: GamepadProfile[]
 };
 
 export interface GamepadButton {
-    label: string;
-    value: number;
-    primaryAction: string;
-    secondaryAction: string;
+    label: string,
+    value: number,
+    primaryAction: string,
+    secondaryAction: string,
 };
 
-export interface Stick {
+export interface StickActions {
     primaryAction: AXES_T,
     secondaryAction: AXES_T,
     isReversed: boolean,
+};
+
+export interface StickOptions {
+    horizontal: StickActions,
+    vertical: StickActions,
+    mpgMode: StickActions,
 }
+
 export interface JoystickOptions {
-    stick1: {
-        horizontal: Stick,
-        vertical: Stick,
-        mpgMode: Stick,
-    },
-    stick2: {
-        horizontal: Stick,
-        vertical: Stick,
-        mpgMode: Stick,
-    },
+    stick1: StickOptions,
+    stick2: StickOptions,
     zeroThreshold: number,
     movementDistanceOverride: number,
 };
+
+export interface DefaultGamepadOptions {
+    joystickOptions: JoystickOptions,
+    buttons: any[],
+}
+
 export interface GamepadProfile {
     id: Array<string>,
     icon: string,
     active: boolean,
     profileName: string,
-    shortcuts: CommandKey,
+    shortcuts: CommandKeys,
     name: string,
     mapping: 'standard',
     buttons: Array<GamepadButton>,

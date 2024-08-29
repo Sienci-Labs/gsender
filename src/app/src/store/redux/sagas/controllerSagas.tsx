@@ -64,6 +64,12 @@ import {
     updateFeederStatus,
     updateWorkflowState,
 } from '../slices/controller.slice';
+import { PortInfo } from 'app/definitions/interfaces/store';
+import { ControllerSettings } from 'app/definitions/interfaces/controller';
+import { GRBL_ACTIVE_STATES_T, TOOL, WORKFLOW_STATES_T } from 'app/definitions/types';
+import { FeederStatus } from 'app/definitions/interfaces/sender_feeder';
+import { MachineProfile } from 'app/definitions/interfaces/machine_profile';
+import { SerialPortOptions } from 'app/definitions/interfaces/widgets/connection';
 // import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 // import { updateWorkspaceMode } from 'app/lib/rotary';
 // import api from 'app/api';
@@ -71,7 +77,7 @@ import {
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker = null;
     // let estimateWorker = null;
-    let currentState = GRBL_ACTIVE_STATE_IDLE;
+    let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     // let errors = [];
     // let finishLoad = false;
 
@@ -252,7 +258,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'controller:settings',
-        (type: string, settings: any) => {
+        (type: string, settings: ControllerSettings) => {
             reduxStore.dispatch(
                 updateControllerSettings({
                     type,
@@ -264,7 +270,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'controller:state',
-        (type: string, state: any, tool: any) => {
+        (type: string, state: any, tool: TOOL) => {
             // if state is the same, don't update the prev and current state
             if (currentState !== state.status.activeState) {
                 currentState = state.status.activeState;
@@ -276,7 +282,7 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('feeder:status', (status: any) => {
+    controller.addListener('feeder:status', (status: FeederStatus) => {
         reduxStore.dispatch(updateFeederStatus({ status }));
     });
 
@@ -295,7 +301,7 @@ export function* initialize(): Generator<any, void, any> {
     //     reduxStore.dispatch(controllerSlice.actions.updateSenderStatus({ status }));
     // });
 
-    controller.addListener('workflow:state', (state: any) => {
+    controller.addListener('workflow:state', (state: WORKFLOW_STATES_T) => {
         reduxStore.dispatch(updateWorkflowState({ state }));
     });
 
@@ -312,11 +318,11 @@ export function* initialize(): Generator<any, void, any> {
                 ipcRenderer.send('reconnect-main', options);
             }
 
-            const machineProfile = store.get('workspace.machineProfile');
-            const showLineWarnings = store.get(
+            const machineProfile: MachineProfile = store.get('workspace.machineProfile');
+            const showLineWarnings: boolean = store.get(
                 'widgets.visualizer.showLineWarnings',
             );
-            const delay = store.get('widgets.spindle.delay');
+            const delay: number = store.get('widgets.spindle.delay');
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
 
@@ -356,7 +362,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'serialport:close',
-        (options: any, received: any) => {
+        (options: SerialPortOptions, received: number) => {
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             reduxStore.dispatch(closeConnection({ port: options.port }));
@@ -368,7 +374,7 @@ export function* initialize(): Generator<any, void, any> {
             // create a pop up so the user can connect to the last active port
             // and resume from the last line
             if (received) {
-                const homingEnabled = _get(
+                const homingEnabled: string = _get(
                     reduxStore.getState(),
                     'controller.settings.settings.$22',
                 );
@@ -406,9 +412,9 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:list',
         (
-            ports: string[],
-            unrecognizedPorts: string[],
-            networkPorts: string[],
+            ports: PortInfo[],
+            unrecognizedPorts: PortInfo[],
+            networkPorts: PortInfo[],
         ) => {
             reduxStore.dispatch(
                 listPorts({ ports, unrecognizedPorts, networkPorts }),
@@ -652,7 +658,7 @@ export function* initialize(): Generator<any, void, any> {
     //     }
     // });
 
-    controller.addListener('connection:new', (content: any) => {
+    controller.addListener('connection:new', (content: string) => {
         console.log('connection:new', content);
     });
 

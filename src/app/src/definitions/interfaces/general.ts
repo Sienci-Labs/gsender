@@ -1,5 +1,3 @@
-import { EEPROMSettings } from "./firmware"
-
 export interface BasicObject {
     [key: string]: string | number | boolean | Array<any> | BasicObject,
 };
@@ -8,7 +6,9 @@ export interface BasicPosition {
     x: number,
     y: number,
     z: number,
-    a: number
+    a?: number,
+    b?: number;
+    c?: number;
 };
 
 export interface BBox {
@@ -29,26 +29,25 @@ export interface BBox {
     }
 };
 
-export interface MachineProfile {
-    id: number,
-    company: string,
-    name: string,
+export interface Shuttle {
+    feedrateMin: number;
+    feedrateMax: number;
+    hertz: number;
+    overshoot: number;
+}
+
+export interface MDI {
+    disabled: boolean;
+}
+
+export interface Tool {
+    metricDiameter: number,
+    imperialDiameter: number,
     type: string,
-    version: string,
-    mm: {
-        width: number,
-        depth: number,
-        height: number
-    },
-    in: {
-        width: number,
-        depth: number,
-        height: number
-    },
-    endstops: boolean,
-    spindle: boolean,
-    coolant: boolean,
-    laser: boolean,
-    eepromSettings?: EEPROMSettings,
-    grblHALeepromSettings?: EEPROMSettings
+};
+
+export interface i18n__Options {
+    context: object,
+    count: number,
+    defaultValue: string,
 };

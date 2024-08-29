@@ -22,17 +22,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface ConnectionState {
-    isConnected: boolean;
-    isScanning: boolean;
-    port: string | null;
-    baudrate: string;
-    ports: string[];
-    unrecognizedPorts: string[];
-    networkPorts: string[];
-    err: string;
-}
+import { ConnectionState, PortInfo } from 'app/definitions/interfaces/store';
 
 const initialState: ConnectionState = {
     isConnected: false,
@@ -69,9 +59,9 @@ const connectionSlice = createSlice({
         listPorts: (
             state,
             action: PayloadAction<{
-                ports: string[];
-                unrecognizedPorts: string[];
-                networkPorts: string[];
+                ports: Array<PortInfo>;
+                unrecognizedPorts: Array<PortInfo>;
+                networkPorts: Array<PortInfo>;
             }>,
         ) => {
             const { ports, unrecognizedPorts, networkPorts } = action.payload;

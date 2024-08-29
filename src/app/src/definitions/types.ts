@@ -14,6 +14,8 @@ import {
     FILE_TYPE,
     VISUALIZER_TYPES,
     TOGGLE_STATUS,
+    CAMERA_MODES,
+    THEMES,
 } from '../constants';
 import { PROBE_TYPES, TOUCHPLATE_TYPES } from '../lib/constants';
 import { probeDirections } from '../lib/Probing';
@@ -89,3 +91,5 @@ export type TOOL = number;
 export type FirmwareSetting = {
     [key: `$${number}`]: string;
 };
+export type CAMERA_MODES_T = (typeof CAMERA_MODES)[keyof typeof CAMERA_MODES];
+export type THEMES_T = (typeof THEMES)[keyof typeof THEMES]

@@ -1,13 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VISUALIZER_PRIMARY } from 'app/constants';
-
-interface VisualizerState {
-    activeVisualizer: string;
-    jobOverrides: {
-        isChecked: boolean;
-        toggleStatus: string;
-    };
-}
+import { VisualizerState } from 'app/definitions/interfaces/store';
 
 const initialState: VisualizerState = {
     activeVisualizer: VISUALIZER_PRIMARY,

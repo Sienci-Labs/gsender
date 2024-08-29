@@ -1,31 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { METRIC_UNITS, RENDER_NO_FILE } from 'app/constants';
-
-interface BBox {
-    min: { x: number; y: number; z: number };
-    max: { x: number; y: number; z: number };
-    delta: { x: number; y: number; z: number };
-}
-
-interface FileInfoState {
-    fileLoaded: boolean;
-    fileProcessing: boolean;
-    renderState: string;
-    name: string | null;
-    path: string;
-    size: number;
-    total: number;
-    toolSet: any[];
-    spindleSet: any[];
-    movementSet: any[];
-    invalidGcode: any[];
-    estimatedTime: number;
-    fileModal: string;
-    bbox: BBox;
-    content: string;
-    fileType: string | null;
-    parsedData?: any;
-}
+import { BBox } from 'app/definitions/interfaces/general';
+import { FileInfoState } from 'app/definitions/interfaces/store';
 
 const initialState: FileInfoState = {
     fileLoaded: false,
@@ -109,13 +85,7 @@ const fileInfoSlice = createSlice({
             action: PayloadAction<{ renderState: string }>,
         ) => {
             state.renderState = action.payload.renderState;
-        },
-        updateFileParsedData: (
-            state,
-            action: PayloadAction<{ parsedData: any }>,
-        ) => {
-            state.parsedData = action.payload.parsedData;
-        },
+        }
     },
 });
 
@@ -125,7 +95,6 @@ export const {
     updateFileContent,
     updateFileProcessing,
     updateFileRenderState,
-    updateFileParsedData,
 } = fileInfoSlice.actions;
 
 export default fileInfoSlice.reducer;
