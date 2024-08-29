@@ -22,7 +22,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConnectionState, PortInfo } from 'app/definitions/interfaces/store';
+import { ConnectionState, PortInfo } from '../../definitions';
 
 const initialState: ConnectionState = {
     isConnected: false,

@@ -1,11 +1,21 @@
-import {
-    FIRMWARE_TYPES_T,
-    PROBE_DIRECTIONS,
-    PROBE_TYPES_T,
-    TOUCHPLATE_TYPES_T,
-    UNITS_EN
-} from "../../types";
-import { BasicPosition } from "../general";
+import { FIRMWARE_TYPES_T } from "definitions/firmware";
+import { UNITS_EN, BasicPosition } from "definitions/general";
+import { PROBE_TYPES, TOUCHPLATE_TYPES } from "lib/constants";
+import { probeDirections } from "lib/Probing";
+
+
+// Types
+
+export type PROBE_DIRECTIONS =
+(typeof probeDirections)[keyof typeof probeDirections];
+
+export type PROBE_TYPES_T = (typeof PROBE_TYPES)[keyof typeof PROBE_TYPES];
+
+export type TOUCHPLATE_TYPES_T =
+(typeof TOUCHPLATE_TYPES)[keyof typeof TOUCHPLATE_TYPES];
+
+
+// Interfaces
 
 export interface ProbeProfile {
     xyThickness: number,

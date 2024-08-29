@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { METRIC_UNITS, RENDER_NO_FILE } from 'app/constants';
-import { BBox } from 'app/definitions/interfaces/general';
-import { FileInfoState } from 'app/definitions/interfaces/store';
+import { METRIC_UNITS, RENDER_NO_FILE } from '../../../constants';
+import { FileInfoState } from '../../definitions';
+import { BBox } from 'definitions/general';
 
 const initialState: FileInfoState = {
     fileLoaded: false,

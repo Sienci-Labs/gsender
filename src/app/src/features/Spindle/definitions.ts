@@ -1,6 +1,14 @@
-import { SPINDLE_LASER_T } from "app/definitions/types";
+import { SPINDLE_LASER } from "../../constants";
 
-export interface Spindle {
+// Types
+
+export type SPINDLE_LASER_T =
+(typeof SPINDLE_LASER)[keyof typeof SPINDLE_LASER];
+
+
+// Interfaces
+
+export interface SpindleState {
     minimized: boolean;
     mode: SPINDLE_LASER_T;
     speed: number;
@@ -15,4 +23,8 @@ export interface Spindle {
         minPower: number;
         maxPower: number;
     };
+}
+
+export interface Spindle {
+    label: string
 }

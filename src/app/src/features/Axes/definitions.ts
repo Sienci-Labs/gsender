@@ -1,6 +1,8 @@
-import { AXES_T } from "app/definitions/types";
-import { JogSpeed } from "../jogging";
-import { MDI, Shuttle } from "../general";
+import { AXES } from "../../constants";
+import { MDI, Shuttle } from "definitions/general";
+import { JogSpeed } from "../Jogging/definitions";
+
+export type AXES_T = (typeof AXES)[keyof typeof AXES];
 
 export interface Axes {
     minimized: boolean;

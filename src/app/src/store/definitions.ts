@@ -1,30 +1,45 @@
-import {
-    FILE_TYPE_T,
-    RENDER_STATE_T,
-    TOGGLE_STATUS_T,
-    VISUALIZER_TYPES_T,
-    WORKFLOW_STATES_T,
-} from "../types"
-import { ControllerSettings } from "./controller"
-import { FeedrateChanges, Modal, ModalChanges, PDData } from "./gcode_virtualization"
-import { BasicObject, BasicPosition, BBox } from "./general"
-import { Feeder, Sender } from "./sender_feeder"
-import { CommandKeys } from "./shortcuts"
-import { Axes } from "./widgets/axes"
-import { Connection } from "./widgets/connection"
-import { Console } from "./widgets/console"
-import { GRBL } from "./widgets/grbl"
-import { JobStatus } from "./widgets/job_status"
-import { Location } from "./widgets/location"
-import { Macro } from "./widgets/macro"
-import { Probe } from "./widgets/probe"
-import { Rotary } from "./widgets/rotary"
-import { Spindle } from "./widgets/spindle"
-import { Surfacing } from "./widgets/surfacing"
-import { Visualizer } from "./widgets/visualizer"
-import { Workspace } from "./workspace"
+import { FILE_TYPE, WORKFLOW_STATES, RENDER_STATE, TOGGLE_STATUS } from "../constants";
+import { EEPROMSettings, FirmwareOptions, EEPROMDescriptions } from "definitions/firmware";
+import { BasicObject, BasicPosition, BBox } from "definitions/general";
+import { Axes } from "features/Axes/definitions";
+import { Connection } from "features/Connection/definitions";
+import { Console } from "features/Console/definitions";
+import { JobStatus } from "features/JobControl/definitions";
+import { Location } from "features/Location/definitions";
+import { Macro } from "features/Macro/definitions";
+import { Probe } from "features/Probe/definitions";
+import { Rotary } from "features/Rotary/definitions";
+import { Spindle, SpindleState } from "features/Spindle/definitions";
+import { Surfacing } from "features/Surfacing/definitions";
+import { VISUALIZER_TYPES_T, Visualizer } from "features/Visualizer/definitions";
+import { Modal, PDData, FeedrateChanges, ModalChanges } from "lib/definitions/gcode_virtualization";
+import { Feeder, Sender } from "lib/definitions/sender_feeder";
+import { CommandKeys } from "lib/definitions/shortcuts";
+import { Workspace } from "workspace/definitions";
 
+
+// Types
+
+export type FILE_TYPE_T = (typeof FILE_TYPE)[keyof typeof FILE_TYPE];
+export type WORKFLOW_STATES_T =
+(typeof WORKFLOW_STATES)[keyof typeof WORKFLOW_STATES];
+export type RENDER_STATE_T = (typeof RENDER_STATE)[keyof typeof RENDER_STATE];
+export type TOGGLE_STATUS_T =
+(typeof TOGGLE_STATUS)[keyof typeof TOGGLE_STATUS];
+
+
+// Interfaces
 // Redux States
+
+export interface ControllerSettings { //TODO
+    parameters: BasicObject,
+    settings: EEPROMSettings,
+    info?: FirmwareOptions,
+    descriptions?: EEPROMDescriptions
+    groups: BasicObject,
+    alarms: BasicObject,
+};
+
 export interface ControllerState {
     type: string,
     settings: ControllerSettings,
@@ -43,7 +58,7 @@ export interface ControllerState {
         context: BasicObject
     },
     terminalHistory: Array<string>,
-    spindles: Array<BasicObject>
+    spindles: Array<Spindle>
 };
 
 export interface PortInfo {
@@ -108,6 +123,7 @@ export interface ReduxState {
 
 
 // Indexed DB
+
 export interface ParsedData {
     id: string,
     data: Array<PDData>,
@@ -124,6 +140,21 @@ export interface EstimateData {
 
 
 // Front-end State
+
+export interface GRBL {
+    minimized: boolean,
+    panel: {
+        queueReports: {
+            expanded: boolean,
+        },
+        statusReports: {
+            expanded: boolean,
+        },
+        modalGroups: {
+            expanded: boolean,
+        },
+    }
+};
 
 export interface Session {
     name: string,
@@ -143,9 +174,14 @@ export interface DefaultState {
         macro: Macro,
         probe: Probe,
         rotary: Rotary,
-        spindle: Spindle,
+        spindle: SpindleState,
         surfacing: Surfacing,
         visualizer: Visualizer
     };
     commandKeys: CommandKeys;
 }
+
+export interface SerialPortOptions {
+    port: string,
+    inuse: boolean,
+};

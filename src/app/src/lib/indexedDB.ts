@@ -1,5 +1,5 @@
 import { DB_NAME, OBJECT_STORE, DATA_ID } from '../constants';
-import { EstimateData, ParsedData } from '../definitions/interfaces/store';
+import { EstimateData, ParsedData } from 'store/definitions';
 
 const onupgradeneeded = (event: Event): void => {
     const db = (event.target as IDBRequest).result;

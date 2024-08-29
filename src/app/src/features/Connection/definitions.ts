@@ -15,7 +15,8 @@ export interface Connection {
     ip: number[];
 };
 
-export interface SerialPortOptions {
+export interface Port {
     port: string,
     inuse: boolean,
-};
+    manufacturer: string,
+}

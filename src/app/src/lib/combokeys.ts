@@ -33,7 +33,7 @@ import { modifierKeys } from './constants';
 
 import store from '../store';
 import shuttleEvents from '../lib/shuttleEvents';
-import { CommandKey, CommandKeys, Macro, Shortcut, ShuttleEvent } from '../definitions/interfaces/shortcuts';
+import { CommandKey, CommandKeys, Macro, Shortcut, ShuttleEvent } from './definitions/shortcuts';
 
 const STOP_CMD = 'STOP_CONT_JOG';
 const MACRO = 'MACRO';

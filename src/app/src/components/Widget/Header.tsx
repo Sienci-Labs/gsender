@@ -23,7 +23,7 @@
 
 import classNames from 'classnames';
 import React from 'react';
-import { WidgetProps } from '../../definitions/interfaces/widget_wrapper';
+import { WidgetProps } from './definitions';
 
 const Header: React.FC<WidgetProps> = ({ fixed, className, embedded = false, ...props }) => (
     <div

@@ -1,8 +1,16 @@
-import { SHORTCUT_CATEGORY_T } from "../types"
-import { BasicObject } from "./general"
+import { SHORTCUT_CATEGORY } from "../../constants";
+import { BasicObject } from "definitions/general";
+
+
+// Types
+
+export type SHORTCUT_CATEGORY_T =
+(typeof SHORTCUT_CATEGORY)[keyof typeof SHORTCUT_CATEGORY];
+
+
+// Interfaces
 
 export interface CommandKey {
-    id: number,
     cmd: string
     keys: string,
     isActive: boolean

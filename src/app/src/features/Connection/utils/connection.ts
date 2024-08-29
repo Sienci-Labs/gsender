@@ -1,11 +1,4 @@
-import controller from 'app/lib/controller';
-
-export interface Port {
-    port: string,
-    inuse: boolean,
-    manufacturer: string,
-}
-
+import controller from "lib/controller";
 
 export function refreshPorts() {
     if (!controller.connected) {

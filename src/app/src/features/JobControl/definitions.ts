@@ -1,3 +1,5 @@
+// Interfaces
+
 export interface JobStatus {
     minimized: boolean;
     speed: string;

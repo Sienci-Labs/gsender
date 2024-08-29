@@ -23,7 +23,12 @@
 
 import sha1 from 'sha1';
 import i18next from 'i18next';
-import { i18n__Options } from '../definitions/interfaces/i18n';
+
+export interface i18n__Options {
+    context: object,
+    count: number,
+    defaultValue: string,
+};
 
 const t = (...args: Array<any>): string => {
     const key = args[0];

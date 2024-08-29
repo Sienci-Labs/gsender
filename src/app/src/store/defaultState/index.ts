@@ -31,13 +31,13 @@ import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
-} from 'app/constants';
+} from '../../constants';
 
 import machineProfiles from './machineProfiles';
 import { profiles } from './gamepad';
-import { DefaultState } from 'app/definitions/interfaces/store';
-import { SPINDLE } from 'app/definitions/types';
-import { MachineProfile } from 'app/definitions/interfaces/machine_profile';
+import { DefaultState } from '../definitions';
+import { MachineProfile } from 'definitions/firmware';
+import { SPINDLE } from 'lib/definitions/gcode_virtualization';
 
 const [M3] = SPINDLE_MODES;
 

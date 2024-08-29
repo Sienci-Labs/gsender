@@ -1,14 +1,15 @@
 import {useEffect, useState} from "react";
-import {ConnectionStateIndicator} from "./components/ConnectionStateIndicator.tsx";
-import {ConnectionInfo} from "./components/ConnectionInfo.tsx";
+import {ConnectionStateIndicator} from "./components/ConnectionStateIndicator";
+import {ConnectionInfo} from "./components/ConnectionInfo";
 //import styles from './assets/animations.module.css';
 import cn from 'classnames';
-import {Port, refreshPorts, refreshPortsOnParentEntry} from './utils/connection.ts';
-import {PortListings} from "app/features/Connection/components/PortListings.tsx";
+import {refreshPorts, refreshPortsOnParentEntry} from './utils/connection';
+import {PortListings} from "./components/PortListings";
 import {connect} from 'react-redux'
 import get from 'lodash/get';
-import controller from 'app/lib/controller';
-import {DisconnectButton} from "app/features/Connection/components/DisconnectButton.tsx";
+import controller from 'lib/controller';
+import {DisconnectButton} from "./components/DisconnectButton";
+import { Port } from "./definitions";
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -24,10 +25,9 @@ export enum ConnectionType {
     REMOTE=  "REMOTE",
 }
 
-interface ConnectionProps {
+export interface ConnectionProps {
     ports: Port[]
 }
-
 
 function Connection(props: ConnectionProps) {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED)

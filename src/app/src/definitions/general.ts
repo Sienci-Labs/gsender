@@ -1,3 +1,20 @@
+import { GRBL_ACTIVE_STATES, GRBL_HAL_ACTIVE_STATES } from "../constants";
+
+
+// Types
+
+export type BasicType = string | number | boolean | Array<any> | BasicObject;
+
+export type UNITS_GCODE = 'G20' | 'G21'; // G20: Inches, G21: Millimeters
+export type UNITS_EN = 'mm' | 'in';
+export type GRBL_ACTIVE_STATES_T =
+    (typeof GRBL_ACTIVE_STATES)[keyof typeof GRBL_ACTIVE_STATES];
+export type GRBL_HAL_ACTIVE_STATES_T =
+    (typeof GRBL_HAL_ACTIVE_STATES)[keyof typeof GRBL_HAL_ACTIVE_STATES];
+
+
+// Inerfaces
+
 export interface BasicObject {
     [key: string]: string | number | boolean | Array<any> | BasicObject,
 };
@@ -39,15 +56,3 @@ export interface Shuttle {
 export interface MDI {
     disabled: boolean;
 }
-
-export interface Tool {
-    metricDiameter: number,
-    imperialDiameter: number,
-    type: string,
-};
-
-export interface i18n__Options {
-    context: object,
-    count: number,
-    defaultValue: string,
-};

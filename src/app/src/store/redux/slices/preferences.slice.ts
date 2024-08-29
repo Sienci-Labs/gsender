@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import store from '../..';
-import { PreferencesState } from 'app/definitions/interfaces/store';
-import { CommandKeys } from 'app/definitions/interfaces/shortcuts';
+import store from 'store';
+import { PreferencesState } from '../../definitions';
+import { CommandKeys } from 'lib/definitions/shortcuts';
 
 const initialState: PreferencesState = {
     shortcuts: {

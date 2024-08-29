@@ -1,5 +1,5 @@
-import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from 'app/constants';
-import { DefaultGamepadOptions, GamepadProfile } from 'app/definitions/interfaces/gamepad';
+import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from '../../constants';
+import { DefaultGamepadOptions, GamepadProfile } from '../../lib/gamepad/definitions';
 
 export const defaultOptions: DefaultGamepadOptions = {
     joystickOptions: {

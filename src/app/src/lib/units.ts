@@ -22,7 +22,7 @@
  */
 
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
-import { UNITS_EN } from '../definitions/types';
+import { UNITS_EN } from 'definitions/general';
 import store from '../store';
 
 //Function to set custom decimal places for VALUES

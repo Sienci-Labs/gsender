@@ -23,7 +23,7 @@
 
 import classNames from 'classnames';
 import Anchor from '../Anchor';
-import { WidgetProps } from '../../definitions/interfaces/widget_wrapper';
+import { WidgetProps } from './definitions';
 
 const Button: React.FC<WidgetProps> = ({ className, inverted, disabled, ...props }) => {
     return (

@@ -1,9 +1,19 @@
-import { UNITS_EN, WORKSPACE_MODE_T } from "../types";
-import { GamepadConfig } from "./gamepad";
-import { BasicPosition, Tool } from "./general";
-import { MachineProfile } from "./machine_profile";
-import { ProbeProfile } from "./widgets/probe";
-import { RotarySettings } from "./widgets/rotary";
+import { WORKSPACE_MODE } from "../constants";
+import { MachineProfile } from "definitions/firmware";
+import { UNITS_EN, BasicPosition } from "definitions/general";
+import { ProbeProfile } from "features/Probe/definitions";
+import { RotarySettings } from "features/Rotary/definitions";
+import { Tool } from "features/Tools/definitions";
+import { GamepadConfig } from "lib/gamepad/definitions";
+
+
+// Types
+
+export type WORKSPACE_MODE_T =
+(typeof WORKSPACE_MODE)[keyof typeof WORKSPACE_MODE];
+
+
+// Interfaces
 
 export interface Workspace {
     units: UNITS_EN,

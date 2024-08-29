@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import _get from 'lodash/get';
 
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
-import { WORKFLOW_STATE_IDLE } from 'app/constants';
-import { in2mm, mm2in } from 'app/lib/units';
-import store from 'app/store';
-import { ControllerState } from 'app/definitions/interfaces/store';
-import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/interfaces/firmware';
-import { BasicObject, BasicPosition } from 'app/definitions/interfaces/general';
-import { Modal } from 'app/definitions/interfaces/gcode_virtualization';
-import { Feeder, Sender } from 'app/definitions/interfaces/sender_feeder';
-import { ControllerSettings } from 'app/definitions/interfaces/controller';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'lib/constants';
+import { WORKFLOW_STATE_IDLE } from '../../../constants';
+import { in2mm, mm2in } from 'lib/units';
+import store from 'store';
+import { ControllerSettings, ControllerState } from '../../definitions';
+import { EEPROMDescriptions, EEPROMSettings } from 'definitions/firmware';
+import { Modal } from 'lib/definitions/gcode_virtualization';
+import { Feeder, Sender } from 'lib/definitions/sender_feeder';
+import { Spindle } from 'features/Spindle/definitions';
+import { BasicPosition, BasicObject } from 'definitions/general';
 
 const initialState: ControllerState = {
     type: '',
@@ -273,9 +273,9 @@ const controllerSlice = createSlice({
         ) => {
             state.settings.alarms = action.payload.alarms;
         },
-        addSpindle: (state, action: PayloadAction<BasicObject>) => {
+        addSpindle: (state, action: PayloadAction<Spindle>) => {
             const otherSpindles = state.spindles.filter(
-                (spindle) => spindle.label !== action.payload.label,
+                (spindle: Spindle) => spindle.label !== action.payload.label,
             );
             state.spindles = [...otherSpindles, action.payload];
         },

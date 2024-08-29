@@ -25,15 +25,15 @@ import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import isElectron from 'is-electron';
 
-import store from 'app/store';
-import { store as reduxStore } from 'app/store/redux';
-import controller from 'app/lib/controller';
+import store from 'store';
+import { store as reduxStore } from 'store/redux';
+import controller from 'lib/controller';
 // import manualToolChange from 'app/wizards/manualToolchange';
 // import semiautoToolChange from 'app/wizards/semiautoToolchange';
 // import automaticToolChange from 'app/wizards/automaticToolchange';
 // import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
 // import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from 'components/ConfirmationDialog/ConfirmationDialogLib';
 // import { Toaster, TOASTER_INFO, TOASTER_SUCCESS, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 // import VisualizeWorker from 'app/workers/Visualize.worker';
 // import { shouldVisualize, visualizeResponse } from 'app/workers/Visualize.response';
@@ -54,7 +54,7 @@ import {
     // JOB_TYPES,
     // JOB_STATUS,
     // GRBL,
-} from 'app/constants';
+} from '../../../constants';
 import { closeConnection, openConnection } from '../slices/connection.slice';
 import { listPorts } from '../slices/connection.slice';
 import {
@@ -64,12 +64,12 @@ import {
     updateFeederStatus,
     updateWorkflowState,
 } from '../slices/controller.slice';
-import { PortInfo } from 'app/definitions/interfaces/store';
-import { ControllerSettings } from 'app/definitions/interfaces/controller';
-import { GRBL_ACTIVE_STATES_T, TOOL, WORKFLOW_STATES_T } from 'app/definitions/types';
-import { FeederStatus } from 'app/definitions/interfaces/sender_feeder';
-import { MachineProfile } from 'app/definitions/interfaces/machine_profile';
-import { SerialPortOptions } from 'app/definitions/interfaces/widgets/connection';
+import { PortInfo, SerialPortOptions, WORKFLOW_STATES_T } from '../../definitions';
+import { ControllerSettings } from '../../definitions';
+import { FeederStatus } from 'lib/definitions/sender_feeder';
+import { MachineProfile } from 'definitions/firmware';
+import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
+import { TOOL } from 'lib/definitions/gcode_virtualization';
 // import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 // import { updateWorkspaceMode } from 'app/lib/rotary';
 // import api from 'app/api';
