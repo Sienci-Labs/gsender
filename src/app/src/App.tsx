@@ -1,16 +1,16 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { Provider as ReduxProvider } from 'react-redux';
-import { store as reduxStore } from './store/redux';
-import rootSaga from './store/redux/sagas';
-import { sagaMiddleware } from './store/redux/sagas';
-import store from 'app/store';
-import * as user from 'app/lib/user';
+import { store as reduxStore } from 'store/redux';
+import rootSaga from 'store/redux/sagas';
+import { sagaMiddleware } from 'store/redux/sagas';
+import store from 'store';
+import * as user from 'lib/user';
 
 import { routeTree } from './routeTree.gen';
 
 import './index.css';
 import { useEffect } from 'react';
-import controller from './lib/controller';
+import controller from 'lib/controller';
 
 const router = createRouter({ routeTree });
 

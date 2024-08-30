@@ -22,7 +22,7 @@
  */
 
 import classNames from 'classnames';
-import { WidgetProps } from '../../definitions/interfaces/widget_wrapper';
+import { WidgetProps } from './definitions';
 
 const Footer: React.FC<WidgetProps> = ({ className, ...props }) => (
     <div

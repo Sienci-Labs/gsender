@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import { FirmwareSetting } from 'app/definitions/types';
+import { EEPROMSettings } from "definitions/firmware";
 
-export const LONGMILL_MASTER_LIST_GRBLHAL: FirmwareSetting = {
+export const LONGMILL_MASTER_LIST_GRBLHAL: EEPROMSettings = {
     $0: '5.0',
     $1: '254',
     $2: '0',
@@ -191,7 +191,7 @@ export const LONGMILL_MASTER_LIST_GRBLHAL: FirmwareSetting = {
     $743: '0',
 };
 
-export const LONGMILL_MK1_12x12: FirmwareSetting = {
+export const LONGMILL_MK1_12x12: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '2',
     $130: '285.000',
@@ -199,7 +199,7 @@ export const LONGMILL_MK1_12x12: FirmwareSetting = {
     $132: '110.000',
 };
 
-export const LONGMILL_MK1_12x30: FirmwareSetting = {
+export const LONGMILL_MK1_12x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '2',
     $130: '770.000',
@@ -207,7 +207,7 @@ export const LONGMILL_MK1_12x30: FirmwareSetting = {
     $132: '110.000',
 };
 
-export const LONGMILL_MK1_30x30: FirmwareSetting = {
+export const LONGMILL_MK1_30x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '2',
     $130: '770.000',
@@ -215,7 +215,7 @@ export const LONGMILL_MK1_30x30: FirmwareSetting = {
     $132: '110.000',
 };
 
-export const LONGMILL_MK1_48x30: FirmwareSetting = {
+export const LONGMILL_MK1_48x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '2',
     $130: '1230.000',
@@ -223,7 +223,7 @@ export const LONGMILL_MK1_48x30: FirmwareSetting = {
     $132: '110.000',
 };
 
-export const LONGMILL_MK2_12x30: FirmwareSetting = {
+export const LONGMILL_MK2_12x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '6',
     $130: '810.000',
@@ -231,7 +231,7 @@ export const LONGMILL_MK2_12x30: FirmwareSetting = {
     $132: '120.000',
 };
 
-export const LONGMILL_MK2_30x30: FirmwareSetting = {
+export const LONGMILL_MK2_30x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '6',
     $130: '810.000',
@@ -239,7 +239,7 @@ export const LONGMILL_MK2_30x30: FirmwareSetting = {
     $132: '120.000',
 };
 
-export const LONGMILL_MK2_48x30: FirmwareSetting = {
+export const LONGMILL_MK2_48x30: EEPROMSettings = {
     ...LONGMILL_MASTER_LIST_GRBLHAL,
     $3: '6',
     $130: '1270.000',

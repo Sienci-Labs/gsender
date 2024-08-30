@@ -1,12 +1,22 @@
-import { SHORTCUT_CATEGORY_T } from "../types"
+import { SHORTCUT_CATEGORY } from "../../constants";
+import { BasicObject } from "definitions/general";
+
+
+// Types
+
+export type SHORTCUT_CATEGORY_T =
+(typeof SHORTCUT_CATEGORY)[keyof typeof SHORTCUT_CATEGORY];
+
+
+// Interfaces
 
 export interface CommandKey {
     cmd: string
     keys: string,
     isActive: boolean
     title: string,
-    payload: object,
-    preventDefault: false,
+    payload: BasicObject,
+    preventDefault: boolean,
     category: SHORTCUT_CATEGORY_T,
     callback: Function
 };
@@ -21,7 +31,7 @@ export interface ShuttleEvent {
     gamepadKeys: string,
     keysName: string,
     cmd: string,
-    payload: object,
+    payload: BasicObject,
     preventDefault: false,
     isActive: true,
     category: SHORTCUT_CATEGORY_T,

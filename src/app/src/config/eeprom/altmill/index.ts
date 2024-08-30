@@ -1,6 +1,6 @@
-import { FirmwareSetting } from 'app/definitions/types';
+import { EEPROMSettings } from "definitions/firmware";
 
-export const ALTMILL_DEFAULT: FirmwareSetting = {
+export const ALTMILL_DEFAULT: EEPROMSettings = {
     $0: '5.0',
     $1: '255',
     $2: '0',
@@ -158,7 +158,7 @@ export const ALTMILL_DEFAULT: FirmwareSetting = {
     $20: '1',
 };
 
-export const DEFAULT: FirmwareSetting = {
+export const DEFAULT: EEPROMSettings = {
     ...ALTMILL_DEFAULT,
     $23: '1',
     $22: '79',
@@ -166,7 +166,7 @@ export const DEFAULT: FirmwareSetting = {
     $20: '1',
 };
 
-export const SPINDLE_KIT: FirmwareSetting = {
+export const SPINDLE_KIT: EEPROMSettings = {
     ...ALTMILL_DEFAULT,
     $395: '6',
     $23: '1',

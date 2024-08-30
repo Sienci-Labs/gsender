@@ -1,7 +1,7 @@
 // https://ui.shadcn.com/docs/components/alert
 
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, VariantProps } from "class-variance-authority"
 
 import cx from "classnames"
 

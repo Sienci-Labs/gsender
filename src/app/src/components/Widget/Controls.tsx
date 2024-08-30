@@ -22,7 +22,7 @@
  */
 
 import classNames from 'classnames';
-import { WidgetProps } from '../../definitions/interfaces/widget_wrapper';
+import { WidgetProps } from './definitions';
 import '../../index.css';
 
 const Controls: React.FC<WidgetProps> = ({ className, ...props }) => {

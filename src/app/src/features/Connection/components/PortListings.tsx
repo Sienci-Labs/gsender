@@ -1,8 +1,9 @@
-import {Port} from "app/features/Connection/utils/connection.ts";
-import {BsEthernet, BsUsbPlug} from "react-icons/bs";
-import {ConnectionType} from "app/features/Connection";
 
-interface PortListingsProps {
+import {BsEthernet, BsUsbPlug} from "react-icons/bs";
+import {ConnectionType} from "../index";
+import { Port } from "../definitions";
+
+export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
 }

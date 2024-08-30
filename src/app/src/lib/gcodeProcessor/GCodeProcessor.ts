@@ -2,9 +2,10 @@ import objtools from 'objtools';
 import Interpreter from 'gcode-interpreter';
 import GCodeBlock from '../gcodeProcessor/GCodeBlock';
 import { METRIC_UNITS } from '../../constants';
-import { BBox } from '../../definitions/interfaces/general';
-import { GCodeLine, GcodeProcessorOptions, SyncMachineOptions, VMState, VMStateInfo } from '../../definitions/interfaces/gcode_processor';
-import { AXES_T, BasicType } from '../../definitions/types';
+import { BasicType, BBox } from 'definitions/general';
+import { GCodeLine, GcodeProcessorOptions, SyncMachineOptions, VMState, VMStateInfo } from './definitions';
+import { MOTION_MODAL } from './definitions';
+import { AXES_T } from 'features/Axes/definitions';
 
 
 export const INVALID_GCODE_REGEX = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
@@ -270,7 +271,7 @@ export class GCodeProcessor {
             motionCode = gline.getLetter('G');
             if (typeof motionCode === 'number') {
                 motionCode = ('G' + motionCode);
-                vmState.motionMode = motionCode  as `G${string}`;
+                vmState.motionMode = motionCode  as MOTION_MODAL;
             }
         }
 

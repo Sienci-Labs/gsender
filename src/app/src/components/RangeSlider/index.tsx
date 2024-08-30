@@ -21,9 +21,22 @@
  *
  */
 
-import React from 'react';
-import { RangeSliderProps } from '../../definitions/interfaces/range_slider';
+import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
+
+export interface RangeSliderProps {
+    [key: string]: any,
+    title?: string,
+    step?: number,
+    min?: number,
+    max?: number,
+    value: number[],
+    defaultValue?: number[],
+    showValues: boolean // optional parameter to show text representations of the value and to show title
+    onChange?: (value: number[]) => void,
+    onPointerUp?: PointerEventHandler<HTMLInputElement>,
+    unitString?: string,
+}
 
 const RangeSlider = ({
     title,

@@ -1,11 +1,10 @@
-import {ConnectionState, ConnectionType} from "../index.tsx";
+import {ConnectionState, ConnectionType} from "../index";
 import { PiPlugLight } from "react-icons/pi";
 import { BsEthernet } from "react-icons/bs";
 import { BsUsbPlug } from "react-icons/bs";
 import { GrSatellite } from "react-icons/gr";
 import {ReactElement} from "react";
 import cn from 'classnames';
-
 
 interface ConnectionStateIndicatorProps {
     state: ConnectionState
