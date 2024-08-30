@@ -6,7 +6,7 @@ export const buttonStyle = tv({
     variants: {
         color: {
             primary: 'border-blue-500 text-white bg-blue-500',
-            secondary: 'border-steel-500 hover:bg-gray-200 text-gray-500',
+            secondary: 'border-robin-500 hover:bg-gray-200 text-gray-500',
         }
     },
     defaultVariants: {

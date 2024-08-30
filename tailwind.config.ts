@@ -1,13 +1,11 @@
 import type { Config } from 'tailwindcss';
 
+
 export default {
-    content: [
-        './index.html',
-        './src/**/*.{html,js,ts,jsx,tsx}',
-    ],
+    content: ["./src/app/src/**/*.{js,ts,jsx,tsx}", "./src/app/index.html", './index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
         colors: {
-            steel: {
+            robin: {
                 50: '#f6f9fc',
                 100: '#ecf2f8',
                 200: '#c7d9eb',

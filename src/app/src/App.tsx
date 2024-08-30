@@ -5,10 +5,7 @@ import rootSaga from './store/redux/sagas';
 import { sagaMiddleware } from './store/redux/sagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
-
 import { routeTree } from './routeTree.gen';
-
-import './index.css';
 import { useEffect } from 'react';
 import controller from './lib/controller';
 

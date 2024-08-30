@@ -14,7 +14,7 @@ export function AxisRow({axis}: AxisRowProps) {
                 </span>
             </Button>
 
-            <span className="text-xl flex items-center text-blue-500 font-normal font-mono">0.000</span>
+            <span className="text-xl flex items-center text-blue-500 font-bold font-mono">0.000</span>
 
             <span className="font-mono flex items-center text-gray-600">0.000</span>
 

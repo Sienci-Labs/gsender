@@ -1,4 +1,4 @@
-import {ButtonProps} from "app/components/Button";
+import {ButtonProps, buttonStyle} from "app/components/Button";
 
 export interface IconButtonProps extends ButtonProps {
     icon: JSX.Element
@@ -6,6 +6,11 @@ export interface IconButtonProps extends ButtonProps {
 
 export function IconButton(props: IconButtonProps): JSX.Element {
     return (
-        <button></button>
+        <button className={buttonStyle(props)}>
+            <span className="flex flex-row gap-1 items-center">
+                            {props.icon}
+                {props.children}
+            </span>
+        </button>
     )
 }
