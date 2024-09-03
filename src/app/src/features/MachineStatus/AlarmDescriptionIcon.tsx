@@ -50,7 +50,7 @@ const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
                     <i className={cx("fas fa-question", "text-xl text-gray-600")} />
                 </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="max-w-64">
                 {alarmDescription}
             </TooltipContent>
           </Tooltip>
