@@ -9,7 +9,7 @@ export function AxisRow({axis}: AxisRowProps) {
     return (
         <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
             <Button>
-                <span className="font-bold text-3xl text-slate-800">
+                <span className="font-bold font-mono text-2xl text-slate-800">
                     {axis}
                 </span>
             </Button>
