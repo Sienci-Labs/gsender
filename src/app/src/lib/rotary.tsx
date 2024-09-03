@@ -3,7 +3,7 @@ import pubsub from 'pubsub-js';
 
 import store from '../store';
 import controller from './controller';
-import reduxStore from '../store/redux';
+import { store as reduxStore } from '../store/redux';
 import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,
@@ -14,8 +14,8 @@ import {
 } from '../constants';
 import { Confirm } from '../components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO } from './toaster/ToasterLib';
-import { FIRMWARE_TYPES_T, WORKSPACE_MODE_T } from '../definitions/types';
-import { RotaryModeFirmwareSettings } from '../definitions/interfaces/firmware';
+import { FIRMWARE_TYPES_T, RotaryModeFirmwareSettings } from 'definitions/firmware';
+import { WORKSPACE_MODE_T } from 'workspace/definitions';
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T = WORKSPACE_MODE.DEFAULT): void => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;

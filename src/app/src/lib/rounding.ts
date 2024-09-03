@@ -22,8 +22,7 @@
  */
 
 import { METRIC_UNITS } from '../constants';
-import { BasicObject } from '../definitions/interfaces/general';
-import { UNITS_EN, UNITS_GCODE } from '../definitions/types';
+import { BasicObject, UNITS_EN, UNITS_GCODE } from 'definitions/general';
 
 const storeValuesThatNeedRounding = new Set([
     'workspace.safeRetractHeight',

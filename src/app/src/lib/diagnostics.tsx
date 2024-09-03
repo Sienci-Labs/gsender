@@ -29,18 +29,18 @@ import uniqueId from 'lodash/uniqueId';
 import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import store from '../store';
-import reduxStore from '../store/redux';
+import { store as reduxStore } from '../store/redux';
 import ToolModalButton from '../components/ToolModalButton/ToolModalButton';
 import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from '../api';
 import { homingString } from '../lib/eeprom';
-import { AlarmsErrors } from '../definitions/interfaces/alarms_errors';
-import { ConnectionInfo, ControllerInfo, FileInfo } from '../definitions/interfaces/store';
-import { MachineProfile } from '../definitions/interfaces/general';
-import { JogSpeeds } from '../definitions/interfaces/jogging';
-import { EEPROMSettings } from '../definitions/interfaces/firmware';
-import { SPINDLE_LASER_T, UNITS_EN } from '../definitions/types';
+import { AlarmsErrors } from 'definitions/alarms_errors';
+import { EEPROMSettings, MachineProfile } from 'definitions/firmware';
+import { UNITS_EN } from 'definitions/general';
+import { JogSpeeds } from 'features/Jogging/definitions';
+import { SPINDLE_LASER_T } from 'features/Spindle/definitions';
+import { ConnectionState, ControllerState, FileInfoState } from 'store/definitions';
 
 const styles = StyleSheet.create({
     body: {
@@ -170,8 +170,8 @@ const getGSenderVersion = (): string => {
     return version;
 };
 
-const getGRBLInformation = (): ControllerInfo => {
-    const grblInfo: ControllerInfo = get(reduxStore.getState(), 'controller', {});
+const getGRBLInformation = (): ControllerState => {
+    const grblInfo: ControllerState = get(reduxStore.getState(), 'controller');
     return grblInfo;
 };
 
@@ -193,13 +193,13 @@ const getMode = (): boolean => {
     return mode === LASER_MODE;
 };
 
-const getConnection = (): ConnectionInfo => {
-    const connection: ConnectionInfo = get(reduxStore.getState(), 'connection', '');
+const getConnection = (): ConnectionState => {
+    const connection: ConnectionState = get(reduxStore.getState(), 'connection');
     return connection;
 };
 
-const getFileInfo = (): FileInfo => {
-    const fileInfo: FileInfo = get(reduxStore.getState(), 'file', '');
+const getFileInfo = (): FileInfoState => {
+    const fileInfo: FileInfoState = get(reduxStore.getState(), 'file');
     return fileInfo;
 };
 

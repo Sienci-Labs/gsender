@@ -1,8 +1,9 @@
 import { PROBE_TYPES, TOUCHPLATE_TYPE_AUTOZERO } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
-import { AXES_T, PROBE_DIRECTIONS, PROBE_TYPES_T, UNITS_GCODE } from '../definitions/types';
-import { ProbingOptions } from '../definitions/interfaces/probing';
+import { UNITS_GCODE } from 'definitions/general';
+import { AXES_T } from 'features/Axes/definitions';
+import { PROBE_DIRECTIONS, ProbingOptions, PROBE_TYPES_T } from 'features/Probe/definitions';
 
 export const BL = 0;
 export const TL = 1;

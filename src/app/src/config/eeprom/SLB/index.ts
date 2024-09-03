@@ -1,6 +1,6 @@
-import { FirmwareSetting } from 'app/definitions/types';
+import { EEPROMSettings } from "definitions/firmware";
 
-export const SLB_DEFAULT: FirmwareSetting = {
+export const SLB_DEFAULT: EEPROMSettings = {
     $0: '5',
     $1: '254',
     $2: '0',

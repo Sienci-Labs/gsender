@@ -1,3 +1,11 @@
+export interface Feeder {
+    status: FeederStatus
+};
+
+export interface Sender {
+    status: SenderStatus
+};
+
 export interface FeederStatus {
     hold: boolean,
     holdReason: {

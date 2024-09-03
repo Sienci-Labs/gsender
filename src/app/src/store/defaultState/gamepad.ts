@@ -1,55 +1,7 @@
-import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from 'app/constants';
+import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from '../../constants';
+import { DefaultGamepadOptions, GamepadProfile } from '../../lib/gamepad/definitions';
 
-interface JoystickOptions {
-    primaryAction: string | null;
-    secondaryAction: string | null;
-    isReversed: boolean;
-}
-
-interface StickOptions {
-    horizontal: JoystickOptions;
-    vertical: JoystickOptions;
-    mpgMode: JoystickOptions;
-}
-
-interface DefaultOptions {
-    joystickOptions: {
-        stick1: StickOptions;
-        stick2: StickOptions;
-        zeroThreshold: number;
-        movementDistanceOverride: number;
-    };
-    buttons: any[];
-}
-
-interface Button {
-    label: string;
-    value: number;
-    primaryAction: any;
-    secondaryAction: any;
-}
-
-interface Profile {
-    id: string[];
-    icon: string;
-    active: boolean;
-    profileName: string;
-    shortcuts: object;
-    name: string;
-    mapping: string;
-    buttons: Button[];
-    axes: number[];
-    joystickOptions: DefaultOptions['joystickOptions'];
-    lockout: {
-        button: any;
-        active: boolean;
-    };
-    modifier: {
-        button: any;
-    };
-}
-
-export const defaultOptions: DefaultOptions = {
+export const defaultOptions: DefaultGamepadOptions = {
     joystickOptions: {
         stick1: {
             horizontal: {
@@ -91,7 +43,7 @@ export const defaultOptions: DefaultOptions = {
     buttons: [],
 };
 
-export const profiles: Profile[] = [
+export const profiles: GamepadProfile[] = [
     {
         id: [
             'Logitech Cordless RumblePad 2 (STANDARD GAMEPAD Vendor: 046d Product: c219)',

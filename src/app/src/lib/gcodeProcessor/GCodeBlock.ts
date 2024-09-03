@@ -21,8 +21,7 @@
  *
  */
 
-import { BasicObject } from "../../definitions/interfaces/general";
-import { BasicType } from "../../definitions/types";
+import { BasicObject, BasicType } from "definitions/general";
 
 class GCodeBlock {
     words: Array<Array<string>> = null;

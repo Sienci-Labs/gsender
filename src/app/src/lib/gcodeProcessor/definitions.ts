@@ -1,8 +1,13 @@
-import {
-    AXES_T,
-    BasicType,
-    UNITS_EN
-} from "../types"
+import { UNITS_EN, BasicType } from "definitions/general";
+import { AXES_T } from "features/Axes/definitions";
+
+
+// Types
+
+export type MOTION_MODAL = `G${string}`;
+
+
+// Interfaces
 
 export interface GcodeProcessorController {
     mpos: Array<number>,
@@ -22,7 +27,7 @@ export interface GcodeProcessorController {
     spindleDirection: number,
     spindleSpeed: number,
     inverseFeed: boolean,
-    motionMode: `G${string}`,
+    motionMode: MOTION_MODAL,
     arcPlane: number,
     tool: string,
     axisLabels: Array<number>
@@ -91,7 +96,7 @@ export interface VMState {
     spindleDirection: number,
     spindleSpeed: number,
     inverseFeed: boolean,
-    motionMode: `G${string}`,
+    motionMode: MOTION_MODAL,
     arcPlane: number,
 };
 

@@ -1,6 +1,6 @@
-import {FileControl} from "../../features/FileControl";
-import {JobControl} from "../../features/JobControl";
-import {Tools} from "../../features/Tools";
+import {FileControl} from "features/FileControl";
+import {JobControl} from "features/JobControl";
+import {Tools} from "features/Tools";
 
 export const ToolArea = () => {
     return (

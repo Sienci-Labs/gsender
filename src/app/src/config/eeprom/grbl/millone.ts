@@ -1,6 +1,6 @@
-import { FirmwareSetting } from 'app/definitions/types';
+import { EEPROMSettings } from "definitions/firmware";
 
-const MILL_ONE_MASTER_LIST: FirmwareSetting = {
+const MILL_ONE_MASTER_LIST: EEPROMSettings = {
     $0: '10',
     $1: '100',
     $2: '1',
@@ -36,12 +36,12 @@ const MILL_ONE_MASTER_LIST: FirmwareSetting = {
     $132: '500.000',
 };
 
-export const MILL_ONE_V1_AND_V2: FirmwareSetting = {
+export const MILL_ONE_V1_AND_V2: EEPROMSettings = {
     ...MILL_ONE_MASTER_LIST,
     $130: '235.000',
 };
 
-export const MILL_ONE_V3: FirmwareSetting = {
+export const MILL_ONE_V3: EEPROMSettings = {
     ...MILL_ONE_MASTER_LIST,
     $130: '257.000',
 };

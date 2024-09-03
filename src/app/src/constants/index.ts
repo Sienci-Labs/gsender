@@ -402,6 +402,30 @@ export const TOGGLE_STATUS = {
     overrides: 'overrides',
 };
 
+export const CAMERA_MODE_PAN = 'pan';
+export const CAMERA_MODE_ROTATE = 'rotate';
+export const CAMERA_MODES = {
+    CAMERA_MODE_PAN: 'CAMERA_MODE_PAN',
+    CAMERA_MODE_ROTATE: 'CAMERA_MODE_ROTATE'
+};
+
+export const DARK_THEME = 'Dark';
+export const LIGHT_THEME = 'Light';
+export const CUST_THEME = 'Custom';
+export const THEMES = {
+    DARK_THEME: DARK_THEME,
+    LIGHT_THEME: LIGHT_THEME,
+    CUST_THEME: CUST_THEME
+};
+export const ALL_THEMES = [
+    DARK_THEME,
+    LIGHT_THEME,
+    CUST_THEME,
+];
+export const CUSTOMIZABLE_THEMES = [
+    CUST_THEME,
+];
+
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",
 //     HUANYANG_V1: "Huanyang v1",
