@@ -21,12 +21,18 @@
  *
  */
 
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import cx from 'classnames';
 
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from '../../constants';
-import { UnlockProps } from '../../definitions/interfaces/machine_status';
+import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
+import { ALARM_CODE } from './definitions';
 
+export interface UnlockProps {
+    activeState: GRBL_ACTIVE_STATES_T,
+    alarmCode: ALARM_CODE,
+    onClick: MouseEventHandler<HTMLButtonElement>,
+};
 
 const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }) => {
     const getButtonText = (): string => {
@@ -43,7 +49,7 @@ const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }
             <button
                 type="button"
                 className={cx(
-                    "max-w-56 w-10/12 flex flex-row items-center justify-center p-4 rounded-[2rem] font-bold text-white border-solid border-[1px] opacity-90 hover:opacity-70",
+                    "max-w-40 w-10/12 flex flex-row items-center justify-center p-4 rounded-[2rem] font-bold text-white border-solid border-[1px] opacity-90 hover:opacity-70",
                     {
                         "border-red-800 bg-red-600 grow [animation:grow_2s_infinite]": activeState === GRBL_ACTIVE_STATE_ALARM,
                         "border-yellow-800 bg-yellow-600": activeState !== GRBL_ACTIVE_STATE_ALARM,

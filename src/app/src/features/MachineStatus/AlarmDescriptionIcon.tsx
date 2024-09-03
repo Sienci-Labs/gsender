@@ -22,12 +22,13 @@
  */
 
 import get from 'lodash/get';
+import cx from 'classnames';
 import { store as reduxStore } from '../../store/redux';
 import { GRBLHAL } from '../../constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../shadcn/Tooltip';
-import { ALARM_CODE } from '../../definitions/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/shadcn/Tooltip';
+import { ALARM_CODE } from './definitions';
 
 const getCodeDescription = (code: number | 'Homing' = 1): string => {
     const controllerType: string = get(reduxStore.getState(), 'controller.type');
@@ -45,8 +46,8 @@ const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-                <div className="bg-black opacity-80 rounded-full w-10 h-10 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
-                    <i className="fa fa-question text-3xl text-gray-600" />
+                <div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
+                    <i className={cx("fas fa-question", "text-xl text-gray-600")} />
                 </div>
             </TooltipTrigger>
             <TooltipContent>
