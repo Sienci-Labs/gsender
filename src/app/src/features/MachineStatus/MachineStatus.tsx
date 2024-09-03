@@ -47,8 +47,6 @@ interface Message {
  * @param {Object} actions Actions object given from parent component
  */
 const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, isConnected }) => {
-    console.log(activeState);
-
     const unlock = (): void => {
         if (
             alarmCode === 1 ||
@@ -113,7 +111,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, i
                     }
                 </div>
                 <div className="mt-4">
-                    { activeState === GRBL_ACTIVE_STATE_ALARM && <UnlockButton onClick={unlock} alarmCode={alarmCode} activeState={activeState} /> }
+                    { (activeState === GRBL_ACTIVE_STATE_ALARM || activeState === GRBL_ACTIVE_STATE_HOLD) && <UnlockButton onClick={unlock} alarmCode={alarmCode} activeState={activeState} /> }
                 </div>
             </div>
         )
