@@ -8,6 +8,7 @@ html,
     height: 100%;
     * {
         @apply box-border;
+        @apply select-none;
     }
 }
 

@@ -9,5 +9,9 @@ export function zeroWCS (axis: Axis, value: number = 0) {
 }
 
 export function gotoZero(axis: Axis) {
+    const commands: string[] = []
 
+    commands.push(`G90 G0 ${axis}0`);
+
+    controller.commands('gcode:safe', commands);
 }
