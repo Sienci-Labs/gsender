@@ -1,7 +1,7 @@
 import {connect} from "react-redux";
-import {AxesArray} from "features/DRO/utils/DRO.ts";
-import {AxisRow} from "features/DRO/component/AxisRow.tsx";
-import {IconButton} from "components/IconButton";
+import {AxesArray} from "app/features/DRO/utils/DRO.ts";
+import {AxisRow} from "app/features/DRO/component/AxisRow.tsx";
+import {IconButton} from "app/components/IconButton";
 import { VscTarget } from "react-icons/vsc";
 import {Button} from "app/components/Button";
 import { FaPaperPlane } from "react-icons/fa6";
