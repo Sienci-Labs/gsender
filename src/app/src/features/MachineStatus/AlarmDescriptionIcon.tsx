@@ -22,7 +22,7 @@
  */
 
 import get from 'lodash/get';
-import cx from 'classnames';
+import { FaQuestion } from "react-icons/fa6";
 import { store as reduxStore } from '../../store/redux';
 import { GRBLHAL } from '../../constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
@@ -47,7 +47,7 @@ const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
           <Tooltip>
             <TooltipTrigger asChild>
                 <div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
-                    <i className={cx("fas fa-question", "text-xl text-gray-600")} />
+                    <FaQuestion className="text-xl text-gray-600" />
                 </div>
             </TooltipTrigger>
             <TooltipContent className="max-w-64">

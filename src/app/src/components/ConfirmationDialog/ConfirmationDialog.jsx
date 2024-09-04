@@ -24,6 +24,7 @@
 import React, { useState, useEffect } from 'react';
 import pubsub from 'pubsub-js';
 import cx from 'classnames';
+import { FaExclamationTriangle } from "react-icons/fa";
 import styles from './index.styl';
 import ConfirmationDialogButton from './ConfirmationDialogButton';
 import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
@@ -61,7 +62,7 @@ const ConfirmationDialog = () => {
             <div className={styles.confirmationDialog}>
                 <div className={styles.confirmationBar} />
                 <div className={styles.confirmationDialogTitle}>
-                    <i className="fas fa-exclamation-triangle" />
+                    <FaExclamationTriangle />
                     <span>{ title }</span>
                 </div>
                 <div className={styles.confirmationDialogContent}>
