@@ -1,25 +1,33 @@
 import {connect} from "react-redux";
-import {AxesArray} from "app/features/DRO/utils/DRO.ts";
+import {AxesArray, defaultDROPosition, DROPosition} from "app/features/DRO/utils/DRO";
 import {AxisRow} from "app/features/DRO/component/AxisRow.tsx";
 import {IconButton} from "app/components/IconButton";
 import { VscTarget } from "react-icons/vsc";
 import {Button} from "app/components/Button";
-import { FaPaperPlane } from "react-icons/fa6";
+
 import { LuParkingSquare } from "react-icons/lu";
-import {Axis} from "./utils/DRO";
-import {Label} from "app/components/Label";
+import { Axis } from "./utils/DRO";
+import { Label } from "app/components/Label";
+import get from 'lodash/get';
+import { GoTo } from "app/features/Connection/components/GoTo";
 
 interface DROProps {
-    axes: AxesArray
+    axes: AxesArray,
+    mpos: DROPosition,
+    wpos: DROPosition
+    homingEnabled: boolean
 }
 
-function DRO({axes}: DROProps): JSX.Element {
+function DRO({ axes, mpos, wpos, homingEnabled}: DROProps): JSX.Element {
 
     return (
         <>
-            <div className="w-full min-h-10 flex flex-row justify-between mb-2 px-4">
-                <IconButton icon={<LuParkingSquare/>} color="primary"/>
-                <IconButton icon={<FaPaperPlane/>} color="primary"/>
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
+                <GoTo />
+                {
+                    homingEnabled && <IconButton icon={<LuParkingSquare/>} color="primary"/>
+                }
+
             </div>
             <div className="w-full flex flex-row justify-between px-3">
                 <Label>Set</Label>
@@ -27,7 +35,7 @@ function DRO({axes}: DROProps): JSX.Element {
             </div>
             <div className="flex flex-col w-full gap-1 space-between">
                 {
-                    axes.map((axis: Axis) => <AxisRow axis={axis} key={axis}/>)
+                    axes.map((axis: Axis) => <AxisRow axis={axis} key={axis} mpos={mpos[axis.toLowerCase()]} wpos={wpos[axis.toLowerCase()]}/>)
                 }
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
@@ -38,9 +46,24 @@ function DRO({axes}: DROProps): JSX.Element {
     )
 }
 
-export default connect(() => {
+export default connect((store) => {
+    const mposController = get(store, 'controller.mpos', defaultDROPosition);
+    const wposController = get(store, 'controller.wpos', defaultDROPosition);
+    const axes = get(store, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
+    const settings = get(store, 'controller.settings.settings', {});
+    const homingValue = Number(get(settings, '$22', 0));
+    const homingEnabled = homingValue > 0;
+
+    console.log(mposController);
+
+    const wpos = wposController;
+    const mpos = mposController;
+
     return {
-        axes: ['X', 'Y', 'Z', 'A']
+        homingEnabled,
+        axes,
+        wpos,
+        mpos
     }
 })(DRO);
 

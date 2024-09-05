@@ -4,9 +4,11 @@ import {zeroWCS,  gotoZero} from "../utils/DRO.ts";
 
 interface AxisRowProps {
     axis: Axis
+    mpos: number,
+    wpos: number
 }
 
-export function AxisRow({axis}: AxisRowProps) {
+export function AxisRow({axis, mpos, wpos}: AxisRowProps) {
     return (
         <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
             <Button
@@ -17,9 +19,9 @@ export function AxisRow({axis}: AxisRowProps) {
                 </span>
             </Button>
 
-            <span className="text-xl flex items-center text-blue-500 font-bold font-mono">0.000</span>
+            <span className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] text-center">{wpos}</span>
 
-            <span className="font-mono flex items-center text-gray-600">0.000</span>
+            <span className="font-mono flex items-center text-gray-600 w-[9ch] text-center">{mpos}</span>
 
             <Button
                 onClick={() => gotoZero(axis)}

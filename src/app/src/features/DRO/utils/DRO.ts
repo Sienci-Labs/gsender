@@ -1,12 +1,33 @@
 import controller from "app/lib/controller";
 import store from 'app/store';
 import get from 'lodash/get';
-export type Axis = 'A' | 'B' | 'C' | 'X' | 'Y' | 'Z';
+export type Axis = 'A' | 'B' | 'C' | 'X' | 'Y' | 'Z' | 'a' | 'b' | 'c' | 'x' | 'y' | 'z';
 export type AxesArray = Axis[]
 
 
+export const defaultAxes: AxesArray = ['X', 'Y', 'Z'];
+
+export interface DROPosition {
+    x: number | string;
+    y: number | string;
+    z: number | string;
+    a?: number | string;
+    b?: number | string;
+    c?: number | string;
+}
+
+export const defaultDROPosition = {
+    x: "0.00",
+    y: "0.00",
+    z: "0.00",
+    a: "0.00",
+    b: "0.00",
+    c: "0.00"
+}
+
 export function zeroWCS (axis: Axis, value: number = 0) {
-    controller.command('gcode', `G10 L20 P0 ${axis}${value}`);
+    let axisCode = axis.toUpperCase();
+    controller.command('gcode', `G10 L20 P0 ${axisCode}${value}`);
 }
 
 export function gotoZero(axis: Axis) {
