@@ -28,7 +28,7 @@ import controller from '../../lib/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import UnlockButton from './UnlockButton';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_HOLD, GRBL_ACTIVE_STATE_HOME, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG, GRBL_ACTIVE_STATE_RUN } from '../../constants';
-import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
 
 interface MachineStatusProps {

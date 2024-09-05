@@ -1,6 +1,6 @@
 import {Axis} from "app/features/DRO/utils/DRO.ts";
 import {Button} from "app/components/Button";
-import {zeroWCS} from "../utils/DRO.ts";
+import {zeroWCS,  gotoZero} from "../utils/DRO.ts";
 
 interface AxisRowProps {
     axis: Axis
@@ -21,7 +21,10 @@ export function AxisRow({axis}: AxisRowProps) {
 
             <span className="font-mono flex items-center text-gray-600">0.000</span>
 
-            <Button color="primary">
+            <Button
+                onClick={() => gotoZero(axis)}
+                color="primary"
+            >
                 <span className="text-lg font-mono">{axis}0</span>
             </Button>
         </div>

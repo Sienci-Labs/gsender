@@ -1,5 +1,5 @@
-import { Widget } from "components/Widget";
-import { Location } from "features/Location";
+import { Widget } from "app/components/Widget";
+import { Location } from "app/features/Location";
 
 export const Column = () => {
     return (

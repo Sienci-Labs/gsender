@@ -24,8 +24,8 @@
 import React, { MouseEventHandler } from 'react';
 import cx from 'classnames';
 
-import { GRBL_ACTIVE_STATE_ALARM } from '../../constants';
-import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
+import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
 
 export interface UnlockProps {
@@ -41,7 +41,7 @@ const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }
         }
         return 'Click to Unlock Machine';
     };
-    
+
     return (
         <div className="flex items-center justify-center pointer-events-auto">
             <button

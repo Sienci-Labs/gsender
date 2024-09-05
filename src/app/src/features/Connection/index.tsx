@@ -7,7 +7,7 @@ import {refreshPorts, refreshPortsOnParentEntry} from './utils/connection';
 import {PortListings} from "./components/PortListings";
 import {connect} from 'react-redux'
 import get from 'lodash/get';
-import controller from 'lib/controller';
+import controller from 'app/lib/controller';
 import {DisconnectButton} from "./components/DisconnectButton";
 import { Port } from "./definitions";
 

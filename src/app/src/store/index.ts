@@ -7,8 +7,8 @@ import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
 import semver from 'semver';
 import settings from '../config/settings';
-import ImmutableStore from 'lib/immutable-store';
-import log from 'lib/log';
+import ImmutableStore from 'app/lib/immutable-store';
+import log from 'app/lib/log';
 import defaultState from './defaultState';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
 
