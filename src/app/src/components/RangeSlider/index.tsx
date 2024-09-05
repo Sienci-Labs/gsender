@@ -23,6 +23,8 @@
 
 import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
+import { CiRedo } from "react-icons/ci";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 export interface RangeSliderProps {
     [key: string]: any,
@@ -68,7 +70,7 @@ const RangeSlider = ({
                     className="flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
                     onClick={() => onChange(defaultValue)}
                 >
-                    <i className="fas fa-redo"></i>
+                    <CiRedo />
                 </button>
                 <Slider.Root
                     className="flex relative items-center w-full h-6"
@@ -101,7 +103,7 @@ const RangeSlider = ({
                         onChange([newValue]);
                     }}
                 >
-                    <i className="fas fa-minus"></i>
+                    <FaMinus />
                 </button>
                 <button
                     type="button"
@@ -114,7 +116,7 @@ const RangeSlider = ({
                         onChange([newValue]);
                     }}
                 >
-                    <i className="fas fa-plus"></i>
+                    <FaPlus />
                 </button>
             </div>
         </div>

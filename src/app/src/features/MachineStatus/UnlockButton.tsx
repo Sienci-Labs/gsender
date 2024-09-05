@@ -23,6 +23,7 @@
 
 import React, { MouseEventHandler } from 'react';
 import cx from 'classnames';
+import { FaHome, FaUnlock } from "react-icons/fa";
 
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
@@ -42,6 +43,12 @@ const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }
         return 'Click to Unlock Machine';
     };
 
+    const SymbolComponent = activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 'Homing' || alarmCode === 11) ? (
+        <FaHome className="text-9xl h-16 mr-1" role="button" tabIndex={-1} />
+    ) : (
+        <FaUnlock className="text-9xl h-16 mr-1" role="button" tabIndex={-1} />
+    );
+
     return (
         <div className="flex items-center justify-center pointer-events-auto">
             <button
@@ -51,20 +58,12 @@ const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }
                     {
                         "border-red-800 bg-red-600 grow [animation:grow_2s_infinite]": activeState === GRBL_ACTIVE_STATE_ALARM,
                         "border-yellow-800 bg-yellow-600": activeState !== GRBL_ACTIVE_STATE_ALARM,
-                        "pr-1": alarmCode !== 'Homing' && alarmCode !== 11 // this is for adjusting the position of the text
+                        // "pr-1": alarmCode !== 'Homing' && alarmCode !== 11 // this is for adjusting the position of the text
                     }
                 )}
                 onClick={onClick}
             >
-                <i
-                    className={cx(
-                        "text-5xl",
-                        "fas",
-                        activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 'Homing' || alarmCode === 11) ? 'fa-home' : 'fa-unlock'
-                    )}
-                    role="button"
-                    tabIndex={-1}
-                />
+                {SymbolComponent}
                 {getButtonText()}
             </button>
         </div>
