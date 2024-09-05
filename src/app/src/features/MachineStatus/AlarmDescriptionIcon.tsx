@@ -22,12 +22,9 @@
  */
 
 import get from 'lodash/get';
-import cx from 'classnames';
-import { store as reduxStore } from 'app/store/redux';
-import { GRBLHAL } from 'app/constants';
 import { FaQuestion } from "react-icons/fa6";
 import { store as reduxStore } from '../../store/redux';
-import { GRBLHAL } from '../../constants';
+import { GRBLHAL } from 'app/constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip';
