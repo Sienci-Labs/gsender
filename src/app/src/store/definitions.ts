@@ -4,7 +4,7 @@ import { BasicObject, BasicPosition, BBox } from "definitions/general";
 import { Axes } from "features/Axes/definitions";
 import { Connection } from "features/Connection/definitions";
 import { Console } from "features/Console/definitions";
-import { JobStatus } from "features/JobControl/definitions";
+import { JobStatus } from "features/FileControl/definitions";
 import { Location } from "features/Location/definitions";
 import { Macro } from "features/Macro/definitions";
 import { Probe } from "features/Probe/definitions";
