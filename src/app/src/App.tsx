@@ -1,16 +1,17 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { Provider as ReduxProvider } from 'react-redux';
+
 import { store as reduxStore } from 'store/redux';
 import rootSaga from 'store/redux/sagas';
 import { sagaMiddleware } from 'store/redux/sagas';
-import store from 'store';
 import * as user from 'lib/user';
+import { useEffect } from 'react';
+import controller from 'lib/controller';
+import store from 'store';
 
 import { routeTree } from './routeTree.gen';
 
 import './index.css';
-import { useEffect } from 'react';
-import controller from 'lib/controller';
 
 const router = createRouter({ routeTree });
 
@@ -34,9 +35,7 @@ function App() {
                 const options = {
                     query: 'token=' + token,
                 };
-                controller.connect(host, options, () => {
-                    // @see "src/web/containers/Login/Login.jsx"
-                });
+                controller.connect(host, options);
                 return;
             } else {
                 console.log('no auth');
