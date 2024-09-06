@@ -24,4 +24,13 @@ export default defineConfig({
         tsconfigPaths(),
         react(),
     ],
+    resolve: {
+        alias: {
+            app: path.resolve(__dirname, './src'),
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
+    define: {
+        'process.env': {},
+    },
 });
