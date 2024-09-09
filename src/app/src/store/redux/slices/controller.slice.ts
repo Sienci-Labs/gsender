@@ -18,7 +18,7 @@ const initialState: ControllerState = {
         parameters: {},
         settings: {},
         groups: {},
-        alarms: {}
+        alarms: {},
     },
     state: {},
     modal: {
@@ -66,7 +66,10 @@ const initialState: ControllerState = {
     spindles: [],
 };
 
-function mapPosToFeedbackUnits(pos: BasicPosition, settings: ControllerSettings): BasicPosition {
+function mapPosToFeedbackUnits(
+    pos: BasicPosition,
+    settings: ControllerSettings,
+): BasicPosition {
     const defaultPos: BasicPosition = {
         x: 0.0,
         y: 0.0,
@@ -158,7 +161,10 @@ const controllerSlice = createSlice({
     reducers: {
         updateControllerSettings: (
             state,
-            action: PayloadAction<{ type: string; settings: ControllerSettings }>,
+            action: PayloadAction<{
+                type: string;
+                settings: ControllerSettings;
+            }>,
         ) => {
             const { type, settings } = action.payload;
             const wpos = mapPosToFeedbackUnits(
