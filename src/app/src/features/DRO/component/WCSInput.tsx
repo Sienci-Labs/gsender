@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 export interface WCSInputProps {
     value: number;
@@ -13,9 +13,9 @@ export function WCSInput({
 }: WCSInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const onKeyPress = (e) => {
+    const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            const inputValue = Number(e.target.value);
+            const inputValue = Number(inputRef.current.value);
             if (Number.isNaN(inputValue)) {
                 movementHandler(value);
             }
