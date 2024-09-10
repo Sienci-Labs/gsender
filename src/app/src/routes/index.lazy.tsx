@@ -1,17 +1,17 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from '@tanstack/react-router';
 
-import { Column } from "../workspace/Column";
-import { ToolArea } from "../workspace/ToolArea";
-import {Visualizer} from "../features/Visualizer";
+import { Column } from '../workspace/Column';
+import { ToolArea } from '../workspace/ToolArea';
+import { Visualizer } from '../features/Visualizer';
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createLazyFileRoute('/')({
     component: Index,
 });
 
 function Index() {
     return (
         <>
-            <div className="flex h-[80%]">
+            <div className="flex h-[80%] pb-10">
                 <div className="flex w-full">
                     <Visualizer />
                 </div>
