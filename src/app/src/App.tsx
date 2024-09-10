@@ -32,9 +32,7 @@ function App() {
                 const options = {
                     query: 'token=' + token,
                 };
-                controller.connect(host, options, () => {
-                    // @see "src/web/containers/Login/Login.jsx"
-                });
+                controller.connect(host, options);
                 return;
             } else {
                 console.log('no auth');

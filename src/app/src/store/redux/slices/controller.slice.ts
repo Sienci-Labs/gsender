@@ -207,17 +207,24 @@ const controllerSlice = createSlice({
                 _get(newState, 'status.mpos'),
                 state.settings,
             );
-            newState.status.feedrate = mapFeedrateToFeedbackUnits(
+            const mappedFeedrate = mapFeedrateToFeedbackUnits(
                 _get(newState, 'status.feedrate'),
                 state.settings,
             );
 
             state.type = type;
-            state.state = newState;
+            state.state = {
+                ...newState,
+                status: {
+                    ...newState.status,
+                    feedrate: mappedFeedrate,
+                },
+            };
             state.modal = modal;
             state.wpos = wpos;
             state.mpos = mpos;
         },
+
         updateFeederStatus: (state, action: PayloadAction<Feeder>) => {
             state.feeder.status = _get(
                 action.payload,

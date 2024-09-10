@@ -8,6 +8,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
     base: './',
+    css: {
+        postcss: {
+            plugins: [tailwindcss()],
+        },
+    },
     plugins: [
         TanStackRouterVite({
             routesDirectory: path.resolve(__dirname, './src/routes'),
@@ -22,7 +27,11 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            'app': path.resolve(__dirname, './src'),
-        }
-    }
+            app: path.resolve(__dirname, './src'),
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
+    define: {
+        'process.env': {},
+    },
 });
