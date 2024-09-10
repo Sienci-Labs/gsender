@@ -30,7 +30,7 @@ interface DROProps {
 
 function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
     return (
-        <>
+        <div>
             <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
                 <GoTo />
                 {/*homingEnabled && (
@@ -63,7 +63,7 @@ function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
-        </>
+        </div>
     );
 }
 
