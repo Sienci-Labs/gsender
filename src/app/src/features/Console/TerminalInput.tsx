@@ -1,10 +1,10 @@
 import { useRef } from 'react';
+import { LuCopy } from 'react-icons/lu';
 
 import { Button } from 'components/shadcn/Button';
 import { Input } from 'components/shadcn/Input';
 
 import controller from 'lib/controller';
-import { CopyIcon } from 'lucide-react';
 
 const TerminalInput = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +33,7 @@ const TerminalInput = () => {
                             handleCommandExecute();
                             break;
                         }
+                        // TODO: add these back in
                         // case 'Backspace': {
                         //     const { value } = e.target;
                         //     //If there is only one character left and the user has pressed the backspace,
@@ -62,8 +63,9 @@ const TerminalInput = () => {
                 }}
             />
 
-            <Button variant="default" className="border">
-                <CopyIcon />
+            {/* TODO: add copy to clipboard functionality back in */}
+            <Button className="border">
+                <LuCopy />
             </Button>
 
             <Button
