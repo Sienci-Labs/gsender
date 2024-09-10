@@ -28,7 +28,7 @@ import controller from '../../lib/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import UnlockButton from './UnlockButton';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_HOLD, GRBL_ACTIVE_STATE_HOME, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG, GRBL_ACTIVE_STATE_RUN } from '../../constants';
-import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
 
 interface MachineStatusProps {
@@ -98,12 +98,12 @@ const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, i
                             <>
                                 {
                                     activeState === GRBL_ACTIVE_STATE_ALARM ? (
-                                        <div className="flex w-full flex-row justify-center align-middle items-center font-light text-3xl mb-1">
-                                            <div className="flex justify-center">{activeState}</div>
-                                            <div className="absolute right-3 flex float-right"><AlarmDescriptionIcon code={alarmCode} /></div>
-                                        </div>
+                                    <div className="flex w-full flex-row justify-center align-middle items-center font-light text-3xl mb-1">
+                                        <div className="flex justify-center">{activeState}</div>
+                                        <div className="absolute right-3 flex float-right"><AlarmDescriptionIcon code={alarmCode} /></div>
+                                    </div>
                                     ) : (
-                                        <span className="flex w-full font-light text-3xl mb-1 justify-center">{message[activeState]}</span>
+                                         <span className="flex w-full font-light text-3xl mb-1 justify-center">{message[activeState]}</span>
                                     )
                                 }
                             </>
@@ -111,7 +111,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, i
                     }
                 </div>
                 <div className="mt-4">
-                    { (activeState === GRBL_ACTIVE_STATE_ALARM || activeState === GRBL_ACTIVE_STATE_HOLD) && <UnlockButton onClick={unlock} alarmCode={alarmCode} activeState={activeState} />}
+                    { (activeState === GRBL_ACTIVE_STATE_ALARM || activeState === GRBL_ACTIVE_STATE_HOLD) && <UnlockButton onClick={unlock} alarmCode={alarmCode} activeState={activeState} /> }
                 </div>
             </div>
         )
@@ -127,9 +127,9 @@ const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, i
 
 export default connect((store) => {
     const $22 = get(store, 'controller.settings.settings.$22', '0');
-    const alarmCode = get(store, 'controller.state.status.alarmCode');
-    const activeState = get(store, 'controller.state.status.activeState');
-    const isConnected = get(store, 'connection.isConnected');
+    const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
+    const activeState = get(store, 'controller.state.status.activeState', GRBL_ACTIVE_STATE_IDLE);
+    const isConnected = get(store, 'connection.isConnected', false);
     return {
         $22,
         alarmCode,

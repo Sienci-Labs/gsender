@@ -25,26 +25,26 @@ import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import isElectron from 'is-electron';
 
-import store from 'store';
-import { store as reduxStore } from 'store/redux';
-import controller from 'lib/controller';
-import manualToolChange from 'wizards/manualToolchange';
-import semiautoToolChange from 'wizards/semiautoToolchange';
-import automaticToolChange from 'wizards/automaticToolchange';
-import semiautoToolchangeSecondRun from 'wizards/semiautoToolchangeSecondRun';
-import automaticToolchangeSecondRun from 'wizards/automaticToolchangeSecondRun';
-import { Confirm } from 'components/ConfirmationDialog/ConfirmationDialogLib';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import controller from 'app/lib/controller';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
+import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
+import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
     Toaster,
     TOASTER_INFO,
     TOASTER_SUCCESS,
     TOASTER_UNTIL_CLOSE,
-} from 'lib/toaster/ToasterLib';
+} from 'app/lib/toaster/ToasterLib';
 // TODO: add worker types
 // @ts-ignore
 // import VisualizeWorker from 'workers/Visualize.worker';
 // import { shouldVisualize, visualizeResponse } from 'workers/Visualize.response';
-import { isLaserMode } from 'lib/laserMode';
+import { isLaserMode } from 'app/lib/laserMode';
 import {
     RENDER_LOADING,
     RENDER_RENDERED,
@@ -61,7 +61,7 @@ import {
     JOB_TYPES,
     JOB_STATUS,
     GRBL,
-} from '../../../constants';
+} from 'app/constants';
 import {
     closeConnection,
     openConnection,
@@ -87,21 +87,21 @@ import {
     WORKFLOW_STATES_T,
 } from '../../definitions';
 import { ControllerSettings } from '../../definitions';
-import { FeederStatus } from 'lib/definitions/sender_feeder';
-import { EEPROMDescriptions, MachineProfile } from 'definitions/firmware';
-import { BasicObject, GRBL_ACTIVE_STATES_T } from 'definitions/general';
-import { TOOL } from 'lib/definitions/gcode_virtualization';
-import { WORKSPACE_MODE_T } from 'workspace/definitions';
+import { FeederStatus } from 'app/lib/definitions/sender_feeder';
+import { EEPROMDescriptions, MachineProfile } from 'app/definitions/firmware';
+import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { TOOL } from 'app/lib/definitions/gcode_virtualization';
+import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 // import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
-import { updateWorkspaceMode } from 'lib/rotary';
-import api from 'api';
+import { updateWorkspaceMode } from 'app/lib/rotary';
+import api from 'app/api';
 import {
     unloadFileInfo,
     updateFileContent,
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
-import { getEstimateData, getParsedData } from 'lib/indexedDB';
+import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 

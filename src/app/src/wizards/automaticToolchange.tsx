@@ -20,14 +20,14 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import controller from 'lib/controller';
-import store from 'store';
+import controller from 'app/lib/controller';
+import store from 'app/store';
 import {
     getProbeSettings,
     getUnitModal,
     getToolString,
-} from 'lib/toolChangeUtils';
-import { store as reduxStore } from 'store/redux';
+} from 'app/lib/toolChangeUtils';
+import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits

@@ -1,6 +1,6 @@
-import MachineStatus from 'features/MachineStatus/MachineStatus';
+import MachineStatus from 'app/features/MachineStatus/MachineStatus';
 import gSenderIcon from './assets/icon-round.png';
-import Connection from "features/Connection";
+import Connection from "app/features/Connection";
 
 export const TopBar = () => {
     return <div className="border p-3 h-16 box-borde flex gap-4 items-center bg-gray-50">

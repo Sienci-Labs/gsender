@@ -1,4 +1,4 @@
-import {Widget} from "components/Widget";
+import {Widget} from "app/components/Widget";
 
 export function JobControl() {
     return (

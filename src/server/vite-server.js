@@ -4,6 +4,25 @@ import path from 'path';
 const devDir = path.resolve(__dirname, '../../src/app');
 const prodDir = path.resolve(__dirname, '../../dist/gsender/app');
 
+
+/*const getStylesheets = async() => {
+    try {
+        const assetpath = devDir;
+        const files = await fs.readdir(assetpath);
+        const cssAssets = files.filter(l => l.endsWith('.css'));
+        const allContent = [];
+        for (const asset of cssAssets) {
+            console.log(asset);
+            // eslint-disable-next-line no-await-in-loop
+            const content = await fs.readFile(path.join(assetpath, asset), 'utf-8');
+            allContent.push(`<style type="text/css">${content}</style>`);
+        }
+        return allContent.join('\n');
+    } catch {
+        return '';
+    }
+};*/
+
 export const viteServer = async (app) => {
     // Constants
     const isProduction = process.env.NODE_ENV === 'production';
@@ -46,6 +65,7 @@ export const viteServer = async (app) => {
 
             let template;
             let render;
+
             if (!isProduction) {
                 // Always read fresh template in development
                 template = await fs.promises.readFile(path.resolve(devDir, 'index.html'), 'utf-8');

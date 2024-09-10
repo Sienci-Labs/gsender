@@ -20,12 +20,12 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import controller from 'lib/controller';
+import controller from 'app/lib/controller';
 import {
     getProbeSettings,
     getUnitModal,
     getToolString,
-} from 'lib/toolChangeUtils';
+} from 'app/lib/toolChangeUtils';
 
 const wizard = {
     intro: {

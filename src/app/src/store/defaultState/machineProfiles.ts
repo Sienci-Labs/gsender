@@ -21,11 +21,11 @@
  *
  */
 
-import { SLB_DEFAULT } from 'config/eeprom/SLB';
-import * as longMillGrblEEPROM from 'config/eeprom/grbl/longmill';
-import * as longMillGrblHALEEPROM from 'config/eeprom/grblHAL/longmill';
-import * as millOneGrblEEPROM from 'config/eeprom/grbl/millone';
-import * as altmillSettings from 'config/eeprom/altmill';
+import { SLB_DEFAULT } from 'app/config/eeprom/SLB';
+import * as longMillGrblEEPROM from 'app/config/eeprom/grbl/longmill';
+import * as longMillGrblHALEEPROM from 'app/config/eeprom/grblHAL/longmill';
+import * as millOneGrblEEPROM from 'app/config/eeprom/grbl/millone';
+import * as altmillSettings from 'app/config/eeprom/altmill';
 
 export default [
     {

@@ -23,6 +23,7 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         react(),
+        tailwindcss()
     ],
     resolve: {
         alias: {

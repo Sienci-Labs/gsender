@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import _get from 'lodash/get';
 
-import store from 'store';
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'lib/constants';
-import { in2mm, mm2in } from 'lib/units';
-import { EEPROMDescriptions, EEPROMSettings } from 'definitions/firmware';
-import { Modal } from 'lib/definitions/gcode_virtualization';
-import { Feeder, Sender } from 'lib/definitions/sender_feeder';
-import { Spindle } from 'features/Spindle/definitions';
-import { BasicPosition, BasicObject } from 'definitions/general';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+import { WORKFLOW_STATE_IDLE } from 'app/constants';
+import { in2mm, mm2in } from 'app/lib/units';
+import store from 'app/store';
 import { ControllerSettings, ControllerState } from '../../definitions';
-import { WORKFLOW_STATE_IDLE } from '../../../constants';
+import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/firmware';
+import { Modal } from 'app/lib/definitions/gcode_virtualization';
+import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
+import { Spindle } from 'app/features/Spindle/definitions';
+import { BasicPosition, BasicObject } from 'app/definitions/general';
 
 const initialState: ControllerState = {
     type: '',
