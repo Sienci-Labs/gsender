@@ -3,17 +3,23 @@ import {
     AxesArray,
     defaultDROPosition,
     DROPosition,
+    gotoZero,
+    zeroWCS,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { IconButton } from 'app/components/IconButton';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
 
-import { LuParkingSquare } from 'react-icons/lu';
+//import { LuParkingSquare } from 'react-icons/lu';
 import { Axis } from './utils/DRO';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/Connection/components/GoTo';
+import store from 'app/store';
+import { METRIC_UNITS } from 'app/constants';
+import { mapValues } from 'lodash';
+import { mapPositionToUnits } from 'app/lib/units.ts';
 
 interface DROProps {
     axes: AxesArray;
@@ -27,9 +33,10 @@ function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
         <>
             <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
                 <GoTo />
-                {homingEnabled && (
+                {/*homingEnabled && (
                     <IconButton icon={<LuParkingSquare />} color="primary" />
-                )}
+                    // Leaving this commented out for the time being since parking is not implemented as a feature yet
+                )*/}
             </div>
             <div className="w-full flex flex-row justify-between px-3">
                 <Label>Set</Label>
@@ -46,8 +53,13 @@ function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
                 ))}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
-                <IconButton icon={<VscTarget />}>Zero</IconButton>
-                <Button color="primary">
+                <IconButton
+                    icon={<VscTarget />}
+                    onClick={() => zeroWCS('XYZ', 0)}
+                >
+                    Zero
+                </IconButton>
+                <Button color="primary" onClick={() => gotoZero('XY')}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
@@ -55,18 +67,32 @@ function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
     );
 }
 
-export default connect((store) => {
-    const mposController = get(store, 'controller.mpos', defaultDROPosition);
-    const wposController = get(store, 'controller.wpos', defaultDROPosition);
-    const axes = get(store, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
-    const settings = get(store, 'controller.settings.settings', {});
+export default connect((reduxStore) => {
+    const mposController = get(
+        reduxStore,
+        'controller.mpos',
+        defaultDROPosition,
+    );
+    const wposController = get(
+        reduxStore,
+        'controller.wpos',
+        defaultDROPosition,
+    );
+    const axes = get(reduxStore, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
+    const settings = get(reduxStore, 'controller.settings.settings', {});
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
 
     console.log(mposController);
+    const preferredUnits = store.get('workspace.units', METRIC_UNITS);
 
-    const wpos = wposController;
-    const mpos = mposController;
+    const wpos = mapValues(wposController, (pos) => {
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
+
+    const mpos = mapValues(mposController, (pos) => {
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
 
     return {
         homingEnabled,

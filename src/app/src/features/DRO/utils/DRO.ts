@@ -28,20 +28,20 @@ export interface DROPosition {
 }
 
 export const defaultDROPosition = {
-    x: '0.00',
-    y: '0.00',
-    z: '0.00',
-    a: '0.00',
-    b: '0.00',
-    c: '0.00',
+    x: '0.000',
+    y: '0.000',
+    z: '0.000',
+    a: '0.000',
+    b: '0.000',
+    c: '0.000',
 };
 
-export function zeroWCS(axis: Axis, value: number = 0) {
+export function zeroWCS(axis: string, value: number = 0) {
     let axisCode = axis.toUpperCase();
     controller.command('gcode', `G10 L20 P0 ${axisCode}${value}`);
 }
 
-export function gotoZero(axis: Axis) {
+export function gotoZero(axis: string) {
     const commands: string[] = [];
     const settings = get(controller.settings, 'settings', {});
     const homingSetting = Number(get(settings, '$22', 0));

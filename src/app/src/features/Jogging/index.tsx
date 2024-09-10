@@ -6,7 +6,7 @@ import aLabels from './assets/aLabels.svg';
 
 export function Jogging() {
     return (
-        <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center">
+        <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center select-none">
             <div className="min-w-[200px] relative">
                 <img className="" src={jogWheel} alt="Jog wheel" />
                 <img

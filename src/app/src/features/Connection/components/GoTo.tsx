@@ -1,13 +1,16 @@
-import {Popover, PopoverContent, PopoverTrigger} from "app/components/shadcn/Popover.tsx";
-import {IconButton} from "app/components/IconButton";
-import { FaPaperPlane } from "react-icons/fa6";
-import {Button} from "app/components/Button";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover.tsx';
+import { FaPaperPlane } from 'react-icons/fa6';
+import { Button } from 'app/components/Button';
 
 export function GoTo() {
     return (
         <Popover>
-            <PopoverTrigger>
-                <IconButton icon={<FaPaperPlane />}></IconButton>
+            <PopoverTrigger className="border rounded hover:opacity-90 py-1 px-3 shadow border-blue-500 text-white bg-blue-500">
+                <FaPaperPlane />
             </PopoverTrigger>
             <PopoverContent sideOffset={30} className="bg-white">
                 <div className="">
@@ -17,5 +20,5 @@ export function GoTo() {
                 </div>
             </PopoverContent>
         </Popover>
-    )
+    );
 }
