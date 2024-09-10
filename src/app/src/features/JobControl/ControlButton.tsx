@@ -18,6 +18,7 @@ import { WORKFLOW_STATES_T } from "store/definitions";
 import { PiPause } from "react-icons/pi";
 import { FiOctagon } from "react-icons/fi";
 import { IoPlayOutline } from "react-icons/io5";
+import { useEffect, useState } from "react";
 
 type MACHINE_CONTROL_BUTTONS_T = (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
 
@@ -42,6 +43,25 @@ interface OnClick {
 };
 
 const ControlButton: React.FC<ControlButtonProps> = ({ type, workflow, activeState, isConnected, fileLoaded }) => {
+    const isDisabled = (): boolean => {
+        if (!isConnected || !fileLoaded) {
+            return true;
+        } else if (
+            (type === START && (activeState === GRBL_ACTIVE_STATE_IDLE)) ||
+            (type === PAUSE && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD)) ||
+            (type === STOP && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD || activeState === GRBL_ACTIVE_STATE_ALARM))
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    const [disabled, setDisabled] = useState(isDisabled());
+
+    useEffect(() => {
+        setDisabled(isDisabled());
+    });
+
     const handleRun = (): void => {
         console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
 
@@ -60,18 +80,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({ type, workflow, activeSta
     const handleStop = (): void => {
         controller.command('gcode:stop', { force: true });
     };
-    const isDisabled = (): boolean => {
-        if (
-            !isConnected ||
-            !fileLoaded ||
-            (type === START && (activeState === GRBL_ACTIVE_STATE_IDLE)) ||
-            (type === PAUSE && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD)) ||
-            (type === STOP && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD || activeState === GRBL_ACTIVE_STATE_ALARM))
-        ) {
-            return false;
-        }
-        return true;
-    }
 
     const message: Message = {
         START: "Start",
@@ -92,25 +100,27 @@ const ControlButton: React.FC<ControlButtonProps> = ({ type, workflow, activeSta
     };
 
     return (
-        <button
-            type="button"
-            className={cx(
-                "grid grid-cols-[1fr_2fr] gap-[1px] items-center h-12 w-24 px-2 rounded border-solid border-gray-600 duration-150 ease-in-out",
-                "[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500",
-                {
-                    "bg-gray-300 text-gray-600": !isConnected,
-                    "bg-green-600 text-white": type === START,
-                    "bg-orange-400 text-white": type === PAUSE,
-                    "bg-red-500 text-white": type === STOP
-                }
-            )}
-            title={type}
-            onClick={onClick[type]}
-            disabled={isDisabled()}
-        >
-            {icons[type]}
-            {message[type]}
-        </button>
+        <div className="flex justify-center items-center">
+            <button
+                type="button"
+                className={cx(
+                    "grid grid-cols-[1fr_2fr] gap-[1px] items-center h-12 w-24 px-2 rounded border-solid border-gray-600 duration-150 ease-in-out",
+                    "[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500",
+                    {
+                        "bg-gray-300 text-gray-600": disabled,
+                        "bg-green-600 text-white": !disabled && type === START,
+                        "bg-orange-400 text-white": !disabled && type === PAUSE,
+                        "bg-red-500 text-white": !disabled && type === STOP
+                    }
+                )}
+                title={type}
+                onClick={onClick[type]}
+                disabled={disabled}
+            >
+                {icons[type]}
+                {message[type]}
+            </button>
+        </div>
     );
 }
 

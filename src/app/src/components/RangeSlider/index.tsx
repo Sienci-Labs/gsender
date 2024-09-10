@@ -23,8 +23,8 @@
 
 import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
-import { CiRedo } from "react-icons/ci";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import { FaMinus, FaPlus, FaRedo } from "react-icons/fa";
+import cx from 'classnames';
 
 export interface RangeSliderProps {
     [key: string]: any,
@@ -32,10 +32,12 @@ export interface RangeSliderProps {
     step?: number,
     min?: number,
     max?: number,
-    value: number[],
-    defaultValue?: number[],
-    showValues: boolean // optional parameter to show text representations of the value and to show title
-    onChange?: (value: number[]) => void,
+    percentage: number[],
+    defaultPercentage?: number[],
+    value: string
+    showText: boolean // optional parameter to show text representations of the percentage and to show title
+    onChange?: (percentage: number[]) => void,
+    onButtonPress?: (percentage: number[]) => void,
     onPointerUp?: PointerEventHandler<HTMLInputElement>,
     unitString?: string,
 }
@@ -45,20 +47,23 @@ const RangeSlider = ({
     step = 1,
     min = 0,
     max = 100,
+    percentage,
     value,
-    defaultValue = [...value],
-    showValues,
+    defaultPercentage = [...percentage],
+    showText,
     colour = 'blue',
     onChange = null,
+    onButtonPress = null,
     onPointerUp = null,
     unitString = 'unit',
+    disabled,
     ...props
 }: RangeSliderProps): React.JSX.Element => {
-    const textComponent = showValues ? (
+    const textComponent = showText ? (
             <div className="flex flex-row items-center justify-between w-full px-4">
                 <span className="min-w-4 text-right">{title}</span>
-                <span className="min-w-4 text-right text-blue-500">{`${value[0]} ${unitString}`}</span>
-                <span className="min-w-4 text-right">{`${(((value[0] - min) / (max - min)) * 100).toFixed(0)}%`}</span>
+                { !disabled && <span className="min-w-4 text-right text-blue-500">{`${value} ${unitString}`}</span> }
+                <span className="min-w-4 text-right">{`${percentage[0]}%`}</span>
             </div>
         ) : <div></div>;
     return (
@@ -67,20 +72,28 @@ const RangeSlider = ({
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 shadow-inner">
                 <button
                     type="button"
-                    className="flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
-                    onClick={() => onChange(defaultValue)}
+                    className={cx(
+                        "flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        {
+                            "border-blue-400 bg-white": !disabled,
+                            "border-gray-400 bg-gray-300": disabled
+                        }
+                    )}
+                    onClick={() => onButtonPress(defaultPercentage)}
+                    disabled={disabled}
                 >
-                    <CiRedo />
+                    <FaRedo />
                 </button>
                 <Slider.Root
                     className="flex relative items-center w-full h-6"
-                    defaultValue={defaultValue}
-                    value={value}
+                    defaultValue={defaultPercentage}
+                    value={percentage}
                     step={step}
                     min={min}
                     max={max}
                     onValueChange={onChange}
                     onPointerUp={onPointerUp}
+                    disabled={disabled}
                     {...props}
                 >
                     <Slider.Track
@@ -94,27 +107,41 @@ const RangeSlider = ({
                 </Slider.Root>
                 <button
                     type="button"
-                    className="flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
+                    className={cx(
+                        "flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        {
+                            "border-blue-400 bg-white": !disabled,
+                            "border-gray-400 bg-gray-300": disabled
+                        }
+                    )}
                     onClick={() => {
-                        if (value[0] - step < min) {
+                        if (percentage[0] - step < min) {
                             return;
                         }
-                        const newValue = value[0] - step;
-                        onChange([newValue]);
+                        const newValue = percentage[0] - step;
+                        onButtonPress([newValue]);
                     }}
+                    disabled={disabled}
                 >
                     <FaMinus />
                 </button>
                 <button
                     type="button"
-                    className="flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border-[1px] border-blue-400 bg-white bg-opacity-60 text-black"
+                    className={cx(
+                        "flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        {
+                            "border-blue-400 bg-white": !disabled,
+                            "border-gray-400 bg-gray-300": disabled
+                        }
+                    )}
                     onClick={() => {
-                        if (value[0] + step > max) {
+                        if (percentage[0] + step > max) {
                             return;
                         }
-                        const newValue = value[0] + step;
-                        onChange([newValue]);
+                        const newValue = percentage[0] + step;
+                        onButtonPress([newValue]);
                     }}
+                    disabled={disabled}
                 >
                     <FaPlus />
                 </button>
