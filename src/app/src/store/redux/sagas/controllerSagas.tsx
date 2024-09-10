@@ -190,49 +190,29 @@ export function* initialize(): Generator<any, void, any> {
         name: string,
         visualizer: string,
     ) => {
+        const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
         const accelerations = {
-            xAccel: _get(
-                reduxStore.getState(),
-                'controller.settings.settings.$120',
-            ),
-            yAccel: _get(
-                reduxStore.getState(),
-                'controller.settings.settings.$121',
-            ),
-            zAccel: _get(
-                reduxStore.getState(),
-                'controller.settings.settings.$122',
-            ),
+            xAccel: _get(reduxState, 'controller.settings.settings.$120'),
+            yAccel: _get(reduxState, 'controller.settings.settings.$121'),
+            zAccel: _get(reduxState, 'controller.settings.settings.$122'),
         };
         const maxFeedrates = {
             xMaxFeed: Number(
-                _get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$110',
-                    4000.0,
-                ),
+                _get(reduxState, 'controller.settings.settings.$110', 4000.0),
             ),
             yMaxFeed: Number(
-                _get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$111',
-                    4000.0,
-                ),
+                _get(reduxState, 'controller.settings.settings.$111', 4000.0),
             ),
             zMaxFeed: Number(
-                _get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$112',
-                    3000.0,
-                ),
+                _get(reduxState, 'controller.settings.settings.$112', 3000.0),
             ),
         };
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
-        const fileData = _get(reduxStore.getState(), 'file');
+        const fileData = _get(reduxState, 'file');
         const {
             content: prevContent,
             size: prevSize,
@@ -247,10 +227,7 @@ export function* initialize(): Generator<any, void, any> {
                 updateFileRenderState({ renderState: RENDER_NO_FILE }),
             );
             setTimeout(() => {
-                const renderState = _get(
-                    reduxStore.getState(),
-                    'file.renderState',
-                );
+                const renderState = _get(reduxState, 'file.renderState');
                 if (renderState === RENDER_NO_FILE) {
                     reduxStore.dispatch(
                         updateFileRenderState({ renderState: RENDER_LOADING }),
