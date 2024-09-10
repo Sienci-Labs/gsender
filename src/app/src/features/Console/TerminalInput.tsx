@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import { LuCopy } from 'react-icons/lu';
 
-import { Button } from 'components/shadcn/Button';
-import { Input } from 'components/shadcn/Input';
+import { Button } from 'app/components/shadcn/Button';
+import { Input } from 'app/components/shadcn/Input';
 
-import controller from 'lib/controller';
+import controller from 'app/lib/controller';
 
 const TerminalInput = () => {
     const inputRef = useRef<HTMLInputElement>(null);

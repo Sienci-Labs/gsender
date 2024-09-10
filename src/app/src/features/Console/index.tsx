@@ -1,4 +1,4 @@
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import Terminal from './Terminal';
 import TerminalInput from './TerminalInput';
