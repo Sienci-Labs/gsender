@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import _get from 'lodash/get';
 
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'lib/constants';
-import { WORKFLOW_STATE_IDLE } from '../../../constants';
-import { in2mm, mm2in } from 'lib/units';
-import store from 'store';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+import { WORKFLOW_STATE_IDLE } from 'app/constants';
+import { in2mm, mm2in } from 'app/lib/units';
+import store from 'app/store';
 import { ControllerSettings, ControllerState } from '../../definitions';
-import { EEPROMDescriptions, EEPROMSettings } from 'definitions/firmware';
-import { Modal } from 'lib/definitions/gcode_virtualization';
-import { Feeder, Sender } from 'lib/definitions/sender_feeder';
-import { Spindle } from 'features/Spindle/definitions';
-import { BasicPosition, BasicObject } from 'definitions/general';
+import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/firmware';
+import { Modal } from 'app/lib/definitions/gcode_virtualization';
+import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
+import { Spindle } from 'app/features/Spindle/definitions';
+import { BasicPosition, BasicObject } from 'app/definitions/general';
 
 const initialState: ControllerState = {
     type: '',
@@ -18,7 +18,7 @@ const initialState: ControllerState = {
         parameters: {},
         settings: {},
         groups: {},
-        alarms: {}
+        alarms: {},
     },
     state: {},
     modal: {
@@ -66,7 +66,10 @@ const initialState: ControllerState = {
     spindles: [],
 };
 
-function mapPosToFeedbackUnits(pos: BasicPosition, settings: ControllerSettings): BasicPosition {
+function mapPosToFeedbackUnits(
+    pos: BasicPosition,
+    settings: ControllerSettings,
+): BasicPosition {
     const defaultPos: BasicPosition = {
         x: 0.0,
         y: 0.0,
@@ -158,7 +161,10 @@ const controllerSlice = createSlice({
     reducers: {
         updateControllerSettings: (
             state,
-            action: PayloadAction<{ type: string; settings: ControllerSettings }>,
+            action: PayloadAction<{
+                type: string;
+                settings: ControllerSettings;
+            }>,
         ) => {
             const { type, settings } = action.payload;
             const wpos = mapPosToFeedbackUnits(
@@ -201,17 +207,24 @@ const controllerSlice = createSlice({
                 _get(newState, 'status.mpos'),
                 state.settings,
             );
-            newState.status.feedrate = mapFeedrateToFeedbackUnits(
+            const mappedFeedrate = mapFeedrateToFeedbackUnits(
                 _get(newState, 'status.feedrate'),
                 state.settings,
             );
 
             state.type = type;
-            state.state = newState;
+            state.state = {
+                ...newState,
+                status: {
+                    ...newState.status,
+                    feedrate: mappedFeedrate,
+                },
+            };
             state.modal = modal;
             state.wpos = wpos;
             state.mpos = mpos;
         },
+
         updateFeederStatus: (state, action: PayloadAction<Feeder>) => {
             state.feeder.status = _get(
                 action.payload,

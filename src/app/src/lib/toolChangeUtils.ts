@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
 import { TOUCHPLATE_TYPE_AUTOZERO } from '../lib/constants';
@@ -10,7 +10,10 @@ export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeSettings = store.get('widgets.probe');
     const probeType = store.get('workspace.probeProfile.touchplateType');
 
-    const probeThickness = (probeType === TOUCHPLATE_TYPE_AUTOZERO) ? '5' : probeSettings.zProbeDistance;
+    const probeThickness =
+        probeType === TOUCHPLATE_TYPE_AUTOZERO
+            ? '5'
+            : probeSettings.zProbeDistance;
 
     return {
         slowSpeed: probeSettings.probeFeedrate,
@@ -20,7 +23,6 @@ export const getProbeSettings = (): ProbeWidgetSettings => {
         zProbeThickness: probeThickness,
     };
 };
-
 
 export const getToolString = (): string => {
     const state = reduxStore.getState();

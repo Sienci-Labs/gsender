@@ -1,0 +1,12 @@
+.xterm-viewport::-webkit-scrollbar {
+    width: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+}

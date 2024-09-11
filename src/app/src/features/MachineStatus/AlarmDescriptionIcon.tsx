@@ -24,10 +24,10 @@
 import get from 'lodash/get';
 import { FaQuestion } from "react-icons/fa6";
 import { store as reduxStore } from '../../store/redux';
-import { GRBLHAL } from '../../constants';
+import { GRBLHAL } from 'app/constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/shadcn/Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip';
 import { ALARM_CODE } from './definitions';
 
 const getCodeDescription = (code: number | 'Homing' = 1): string => {

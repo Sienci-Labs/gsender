@@ -26,86 +26,85 @@ import io, { Socket } from 'socket.io-client';
 export interface ControllerListeners {
     // Socket.IO Events
     // Fired upon a connection including a successful reconnection.
-    'connect': Array<Function>,
+    connect: Array<Function>;
     // Fired upon a connection error.
-    'connect_error': Array<Function>,
+    connect_error: Array<Function>;
     // Fired upon a connection timeout.
-    'connect_timeout': Array<Function>,
+    connect_timeout: Array<Function>;
     // Fired when an error occurs.
-    'error': Array<Function>,
+    error: Array<Function>;
     // Fired upon a disconnection.
-    'disconnect': Array<Function>,
+    disconnect: Array<Function>;
     // Fired upon a successful reconnection.
-    'reconnect': Array<Function>,
+    reconnect: Array<Function>;
     // Fired upon an attempt to reconnect.
-    'reconnect_attempt': Array<Function>,
+    reconnect_attempt: Array<Function>;
     // Fired upon an attempt to reconnect.
-    'reconnecting': Array<Function>,
+    reconnecting: Array<Function>;
     // Fired upon a reconnection attempt error.
-    'reconnect_error': Array<Function>,
+    reconnect_error: Array<Function>;
     // Fired when couldn't reconnect within reconnectionAttempts.
-    'reconnect_failed': Array<Function>,
+    reconnect_failed: Array<Function>;
     // Fired when gcode errors are found in files...
-    'gcode_error': Array<Function>,
-    'gcode_error_checking_file': Array<Function>,
+    gcode_error: Array<Function>;
+    gcode_error_checking_file: Array<Function>;
 
     // System ToolChange
-    'startup': Array<Function>,
-    'config:change': Array<Function>,
-    'task:start': Array<Function>,
-    'task:finish': Array<Function>,
-    'task:error': Array<Function>,
-    'serialport:list': Array<Function>,
-    'serialport:change': Array<Function>,
-    'serialport:open': Array<Function>,
-    'serialport:close': Array<Function>,
-    'serialport:error': Array<Function>,
-    'serialport:read': Array<Function>,
-    'serialport:write': Array<Function>,
-    'gcode:loaded': Array<Function>, // TO BE DEPRECATED
-    'gcode:toolChange': Array<Function>,
-    'feeder:status': Array<Function>,
-    'workflow:pause': Array<Function>,
-    'sender:status': Array<Function>,
-    'workflow:state': Array<Function>,
-    'controller:settings': Array<Function>,
-    'controller:state': Array<Function>,
-    'settings:description': Array<Function>,
-    'settings:alarm': Array<Function>,
-    'message': Array<Function>,
-    'toolchange:start': Array<Function>,
-    'hPong': Array<Function>,
-    'outline:start': Array<Function>,
-    'file:load': Array<Function>,
-    'file:unload': Array<Function>,
-    'homing:flag': Array<Function>,
-    'electronErrors:errorList': Array<Function>,
-    'firmware:ready': Array<Function>,
-    'sender:M0M1': Array<Function>,
-    'ip:list': Array<Function>,
-    'wizard:next': Array<Function>,
-    'realtime_report': Array<Function>,
-    'error_clear': Array<Function>,
-    'toolchange:acknowledge': Array<Function>,
-    'cyclestart_alt': Array<Function>,
-    'feedhold_alt': Array<Function>,
-    'virtual_stop_toggle': Array<Function>,
-    'filetype': Array<Function>,
-    'toolchange:preHookComplete': Array<Function>,
-    'flash:end': Array<Function>,
-    'flash:message': Array<Function>,
-    'flash:progress': Array<Function>,
-    'spindle:add': Array<Function>,
+    startup: Array<Function>;
+    'config:change': Array<Function>;
+    'task:start': Array<Function>;
+    'task:finish': Array<Function>;
+    'task:error': Array<Function>;
+    'serialport:list': Array<Function>;
+    'serialport:change': Array<Function>;
+    'serialport:open': Array<Function>;
+    'serialport:close': Array<Function>;
+    'serialport:error': Array<Function>;
+    'serialport:read': Array<Function>;
+    'serialport:write': Array<Function>;
+    'gcode:loaded': Array<Function>; // TO BE DEPRECATED
+    'gcode:toolChange': Array<Function>;
+    'feeder:status': Array<Function>;
+    'workflow:pause': Array<Function>;
+    'sender:status': Array<Function>;
+    'workflow:state': Array<Function>;
+    'controller:settings': Array<Function>;
+    'controller:state': Array<Function>;
+    'settings:description': Array<Function>;
+    'settings:alarm': Array<Function>;
+    message: Array<Function>;
+    'toolchange:start': Array<Function>;
+    hPong: Array<Function>;
+    'outline:start': Array<Function>;
+    'file:load': Array<Function>;
+    'file:unload': Array<Function>;
+    'homing:flag': Array<Function>;
+    'electronErrors:errorList': Array<Function>;
+    'firmware:ready': Array<Function>;
+    'sender:M0M1': Array<Function>;
+    'ip:list': Array<Function>;
+    'wizard:next': Array<Function>;
+    realtime_report: Array<Function>;
+    error_clear: Array<Function>;
+    'toolchange:acknowledge': Array<Function>;
+    cyclestart_alt: Array<Function>;
+    feedhold_alt: Array<Function>;
+    virtual_stop_toggle: Array<Function>;
+    filetype: Array<Function>;
+    'toolchange:preHookComplete': Array<Function>;
+    'flash:end': Array<Function>;
+    'flash:message': Array<Function>;
+    'flash:progress': Array<Function>;
+    'spindle:add': Array<Function>;
 
     //A-Axis A.K.A Rotary-Axis events
-    'rotaryAxis:updateState': Array<Function>,
-    'updateRotaryMode': Array<Function>,
-    'connection:new': Array<Function>,
+    'rotaryAxis:updateState': Array<Function>;
+    updateRotaryMode: Array<Function>;
+    'connection:new': Array<Function>;
 
-    'requestEstimateData': Array<Function>,
-    'job:start': Array<Function>,
-};
-
+    requestEstimateData: Array<Function>;
+    'job:start': Array<Function>;
+}
 
 const ensureArray = (...args: Array<any>) => {
     if (args.length === 0 || args[0] === undefined || args[0] === null) {
@@ -127,31 +126,31 @@ class Controller {
     listeners: ControllerListeners = {
         // Socket.IO Events
         // Fired upon a connection including a successful reconnection.
-        'connect': [],
+        connect: [],
         // Fired upon a connection error.
-        'connect_error': [],
+        connect_error: [],
         // Fired upon a connection timeout.
-        'connect_timeout': [],
+        connect_timeout: [],
         // Fired when an error occurs.
-        'error': [],
+        error: [],
         // Fired upon a disconnection.
-        'disconnect': [],
+        disconnect: [],
         // Fired upon a successful reconnection.
-        'reconnect': [],
+        reconnect: [],
         // Fired upon an attempt to reconnect.
-        'reconnect_attempt': [],
+        reconnect_attempt: [],
         // Fired upon an attempt to reconnect.
-        'reconnecting': [],
+        reconnecting: [],
         // Fired upon a reconnection attempt error.
-        'reconnect_error': [],
+        reconnect_error: [],
         // Fired when couldn't reconnect within reconnectionAttempts.
-        'reconnect_failed': [],
+        reconnect_failed: [],
         // Fired when gcode errors are found in files...
-        'gcode_error': [],
-        'gcode_error_checking_file': [],
+        gcode_error: [],
+        gcode_error_checking_file: [],
 
         // System ToolChange
-        'startup': [],
+        startup: [],
         'config:change': [],
         'task:start': [],
         'task:finish': [],
@@ -173,9 +172,9 @@ class Controller {
         'controller:state': [],
         'settings:description': [],
         'settings:alarm': [],
-        'message': [],
+        message: [],
         'toolchange:start': [],
-        'hPong': [],
+        hPong: [],
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
@@ -185,13 +184,13 @@ class Controller {
         'sender:M0M1': [],
         'ip:list': [],
         'wizard:next': [],
-        'realtime_report': [],
-        'error_clear': [],
+        realtime_report: [],
+        error_clear: [],
         'toolchange:acknowledge': [],
-        'cyclestart_alt': [],
-        'feedhold_alt': [],
-        'virtual_stop_toggle': [],
-        'filetype': [],
+        cyclestart_alt: [],
+        feedhold_alt: [],
+        virtual_stop_toggle: [],
+        filetype: [],
         'toolchange:preHookComplete': [],
         'flash:end': [],
         'flash:message': [],
@@ -200,10 +199,10 @@ class Controller {
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
-        'updateRotaryMode': [],
+        updateRotaryMode: [],
         'connection:new': [],
 
-        'requestEstimateData': [],
+        requestEstimateData: [],
         'job:start': [],
     };
 
@@ -213,7 +212,7 @@ class Controller {
         ymin: 0,
         ymax: 0,
         zmin: 0,
-        zmax: 0
+        zmax: 0,
     };
 
     // User-defined baud rates and ports
@@ -232,7 +231,7 @@ class Controller {
     state = {};
 
     workflow = {
-        state: 'idle' // running|paused|idle
+        state: 'idle', // running|paused|idle
     };
 
     // Connection options
@@ -245,7 +244,9 @@ class Controller {
     // @param {object} io The socket.io-client module.
     constructor(io: Function) {
         if (!io) {
-            throw new Error(`Expected the socket.io-client module, but got: ${io}`);
+            throw new Error(
+                `Expected the socket.io-client module, but got: ${io}`,
+            );
         }
 
         this.io = io;
@@ -268,9 +269,9 @@ class Controller {
 
         options = {
             ...options,
-            'reconnection': true,
-            'reconnectionDelay': 500,
-            'reconnectionAttempts': 10
+            reconnection: true,
+            reconnectionDelay: 500,
+            reconnectionAttempts: 10,
         };
 
         this.host = host;
@@ -281,11 +282,10 @@ class Controller {
         this.socket = this.io(host, options).connect();
 
         this.socket.on('disconnect', (reason) => {
-            if (reason !== "io client disconnect") {
+            if (reason !== 'io client disconnect') {
                 this.reconnect();
             }
         });
-
 
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
@@ -294,7 +294,7 @@ class Controller {
 
             this.socket.on(eventName, (...args) => {
                 if (eventName === 'serialport:open') {
-                    const { controllerType = '', port = ''} = { ...args[0] };
+                    const { controllerType = '', port = '' } = { ...args[0] };
                     this.port = port;
                     this.type = controllerType;
                 }
@@ -317,15 +317,21 @@ class Controller {
                     this.state = { ...args[1] };
                 }
 
-                const listeners: Array<Function> = ensureArray(this.listeners[eventName as keyof typeof this.listeners]);
-                listeners.forEach((listener)  => {
+                const listeners: Array<Function> = ensureArray(
+                    this.listeners[eventName as keyof typeof this.listeners],
+                );
+                listeners.forEach((listener) => {
                     listener(...args);
                 });
             });
         });
 
         this.socket.on('startup', (data) => {
-            const { loadedControllers = [], baudrates = [], ports = []} = { ...data };
+            const {
+                loadedControllers = [],
+                baudrates = [],
+                ports = [],
+            } = { ...data };
 
             this.loadedControllers = ensureArray(loadedControllers);
 
@@ -364,7 +370,8 @@ class Controller {
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
     addListener(eventName: string, listener: Function): boolean {
-        const listeners = this.listeners[eventName as keyof typeof this.listeners];
+        const listeners =
+            this.listeners[eventName as keyof typeof this.listeners];
         if (!listeners || typeof listener !== 'function') {
             return false;
         }
@@ -376,7 +383,8 @@ class Controller {
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
     removeListener(eventName: string, listener: Function): boolean {
-        const listeners = this.listeners[eventName as keyof typeof this.listeners];
+        const listeners =
+            this.listeners[eventName as keyof typeof this.listeners];
         if (!listeners || typeof listener !== 'function') {
             return false;
         }
@@ -390,7 +398,12 @@ class Controller {
     // @param {string} [options.controllerType] One of: 'Grbl', 'Smoothe', 'TinyG'. Defaults to 'Grbl'.
     // @param {number} [options.baudrate] Defaults to 115200.
     // @param {function} [callback] Called after a connection is opened.
-    openPort(port: string, controllerType: string, options: object, callback: Function): void {
+    openPort(
+        port: string,
+        controllerType: string,
+        options: object,
+        callback: Function,
+    ): void {
         // if (typeof options !== 'object') {
         //     options = {};
         //     callback = options;
@@ -398,7 +411,8 @@ class Controller {
         if (typeof callback !== 'function') {
             callback = noop;
         }
-        this.socket && this.socket.emit('open', port, controllerType, options, callback);
+        this.socket &&
+            this.socket.emit('open', port, controllerType, options, callback);
     }
 
     // Closes an open connection.
@@ -414,8 +428,15 @@ class Controller {
     //Sends an event to start flashing
     //@param {string} flashPort The port to be flashed
     //@param {string} imageType The type of image to be flashed to the port
-    flashFirmware(flashPort: string, imageType: string, isHal: boolean, hex: string): void { //TODO: not sure what type imageType is
-        this.socket && this.socket.emit('flash:start', flashPort, imageType, isHal, hex);
+    flashFirmware(
+        flashPort: string,
+        imageType: string,
+        isHal: boolean,
+        hex: string,
+    ): void {
+        //TODO: not sure what type imageType is
+        this.socket &&
+            this.socket.emit('flash:start', flashPort, imageType, isHal, hex);
     }
 
     // Retrieves a list of available serial ports with metadata.
@@ -500,7 +521,8 @@ class Controller {
         }
 
         const socketArgs = [port, cmd, ...args];
-        this.socket && this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
+        this.socket &&
+            this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
     }
 
     // Writes data to the serial port.
@@ -538,5 +560,23 @@ class Controller {
 }
 
 const controllerInstance = new Controller(io);
+
+export const addControllerEvents = (controllerEvents: {
+    [key: string]: Function;
+}) => {
+    Object.keys(controllerEvents).forEach((eventName) => {
+        const callback = controllerEvents[eventName];
+        controllerInstance.addListener(eventName, callback);
+    });
+};
+
+export const removeControllerEvents = (controllerEvents: {
+    [key: string]: Function;
+}) => {
+    Object.keys(controllerEvents).forEach((eventName) => {
+        const callback = controllerEvents[eventName];
+        controllerInstance.removeListener(eventName, callback);
+    });
+};
 
 export default controllerInstance;

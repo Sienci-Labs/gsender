@@ -24,7 +24,7 @@
 import React, { useState, useEffect } from 'react';
 import pubsub from 'pubsub-js';
 import cx from 'classnames';
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle } from 'react-icons/fa';
 import styles from './index.styl';
 import ConfirmationDialogButton from './ConfirmationDialogButton';
 import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
@@ -55,18 +55,22 @@ const ConfirmationDialog = () => {
             setCancelLabel(options.cancelLabel);
             setShow(options.show);
         });
-    });
+    }, []);
 
     return (
-        <div className={cx(styles.confirmationDialogWrapper, { [styles.hidden]: hideModal })}>
+        <div
+            className={cx(styles.confirmationDialogWrapper, {
+                [styles.hidden]: hideModal,
+            })}
+        >
             <div className={styles.confirmationDialog}>
                 <div className={styles.confirmationBar} />
                 <div className={styles.confirmationDialogTitle}>
                     <FaExclamationTriangle />
-                    <span>{ title }</span>
+                    <span>{title}</span>
                 </div>
                 <div className={styles.confirmationDialogContent}>
-                    { content }
+                    {content}
                 </div>
                 <div className={styles.confirmationDialogButtons}>
                     {cancelLabel && (
@@ -79,7 +83,7 @@ const ConfirmationDialog = () => {
                             }}
                             variant={DIALOG_CANCEL}
                         >
-                            { cancelLabel }
+                            {cancelLabel}
                         </ConfirmationDialogButton>
                     )}
 
@@ -93,7 +97,7 @@ const ConfirmationDialog = () => {
                             }}
                             variant={DIALOG_CONFIRM}
                         >
-                            { confirmLabel }
+                            {confirmLabel}
                         </ConfirmationDialogButton>
                     )}
                 </div>

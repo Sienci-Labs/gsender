@@ -1,8 +1,8 @@
-import { Widget } from "components/Widget";
-import { GRBL_ACTIVE_STATES_T, UNITS_EN } from "definitions/general";
+import {Widget} from "app/components/Widget";
+import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
 import { get } from "lodash";
 import { connect } from "react-redux";
-import { WORKFLOW_STATES_T } from "store/definitions";
+import { WORKFLOW_STATES_T } from "app/store/definitions";
 import ControlButton from "./ControlButton";
 import { PAUSE, START, STOP } from "../../constants";
 import Overrides from "./FeedOverride";

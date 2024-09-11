@@ -21,41 +21,52 @@
  *
  */
 import _get from 'lodash/get';
-// import throttle from 'lodash/throttle';
+import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import isElectron from 'is-electron';
 
-import store from 'store';
-import { store as reduxStore } from 'store/redux';
-import controller from 'lib/controller';
-// import manualToolChange from 'app/wizards/manualToolchange';
-// import semiautoToolChange from 'app/wizards/semiautoToolchange';
-// import automaticToolChange from 'app/wizards/automaticToolchange';
-// import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
-// import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
-import { Confirm } from 'components/ConfirmationDialog/ConfirmationDialogLib';
-// import { Toaster, TOASTER_INFO, TOASTER_SUCCESS, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
-// import VisualizeWorker from 'app/workers/Visualize.worker';
-// import { shouldVisualize, visualizeResponse } from 'app/workers/Visualize.response';
-// import { isLaserMode } from 'app/lib/laserMode';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import controller from 'app/lib/controller';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
+import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
+import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
-    // RENDER_LOADING,
-    // RENDER_RENDERED,
-    // VISUALIZER_SECONDARY,
-    // GRBL_ACTIVE_STATE_RUN,
+    Toaster,
+    TOASTER_INFO,
+    TOASTER_SUCCESS,
+    TOASTER_UNTIL_CLOSE,
+} from 'app/lib/toaster/ToasterLib';
+// TODO: add worker types
+// @ts-ignore
+// import VisualizeWorker from 'workers/Visualize.worker';
+// import { shouldVisualize, visualizeResponse } from 'workers/Visualize.response';
+import { isLaserMode } from 'app/lib/laserMode';
+import {
+    RENDER_LOADING,
+    RENDER_RENDERED,
+    VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_IDLE,
-    // GRBL_ACTIVE_STATE_HOLD,
-    // FILE_TYPE,
-    // WORKSPACE_MODE,
-    // RENDER_NO_FILE,
-    // ALARM_ERROR_TYPES,
-    // ALARM,
-    // ERROR,
-    // JOB_TYPES,
-    // JOB_STATUS,
-    // GRBL,
-} from '../../../constants';
-import { closeConnection, openConnection } from '../slices/connection.slice';
+    GRBL_ACTIVE_STATE_HOLD,
+    FILE_TYPE,
+    WORKSPACE_MODE,
+    RENDER_NO_FILE,
+    ALARM_ERROR_TYPES,
+    ALARM,
+    ERROR,
+    JOB_TYPES,
+    JOB_STATUS,
+    GRBL,
+} from 'app/constants';
+import {
+    closeConnection,
+    openConnection,
+    scanNetwork,
+} from '../slices/connection.slice';
 import { listPorts } from '../slices/connection.slice';
 import {
     resetHoming,
@@ -63,23 +74,44 @@ import {
     updateControllerState,
     updateFeederStatus,
     updateWorkflowState,
+    addSpindle,
+    updateAlarmDescriptions,
+    updateSettingsDescriptions,
+    updateHomingFlag,
+    updateSenderStatus,
 } from '../slices/controller.slice';
-import { PortInfo, SerialPortOptions, WORKFLOW_STATES_T } from '../../definitions';
+import {
+    FILE_TYPE_T,
+    PortInfo,
+    SerialPortOptions,
+    WORKFLOW_STATES_T,
+} from '../../definitions';
 import { ControllerSettings } from '../../definitions';
-import { FeederStatus } from 'lib/definitions/sender_feeder';
-import { MachineProfile } from 'definitions/firmware';
-import { GRBL_ACTIVE_STATES_T } from 'definitions/general';
-import { TOOL } from 'lib/definitions/gcode_virtualization';
+import { FeederStatus } from 'app/lib/definitions/sender_feeder';
+import { EEPROMDescriptions, MachineProfile } from 'app/definitions/firmware';
+import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { TOOL } from 'app/lib/definitions/gcode_virtualization';
+import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 // import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
-// import { updateWorkspaceMode } from 'app/lib/rotary';
-// import api from 'app/api';
+import { updateWorkspaceMode } from 'app/lib/rotary';
+import api from 'app/api';
+import {
+    unloadFileInfo,
+    updateFileContent,
+    updateFileProcessing,
+    updateFileRenderState,
+} from '../slices/fileInfo.slice';
+import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
+import { setIpList } from '../slices/preferences.slice';
+import { updateJobOverrides } from '../slices/visualizer.slice';
 
 export function* initialize(): Generator<any, void, any> {
-    // let visualizeWorker = null;
-    // let estimateWorker = null;
+    // let visualizeWorker: VisualizeWorker | null = null;
+    // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
-    // let errors = [];
-    // let finishLoad = false;
+    let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
+    let errors: any[] = [];
+    let finishLoad = false;
 
     /* Health check - every 3 minutes */
     setInterval(
@@ -89,172 +121,215 @@ export function* initialize(): Generator<any, void, any> {
         1000 * 60 * 3,
     );
 
-    // const updateJobStats = async(status) => {
-    //     const controllerType = _get(reduxStore.getState(), 'controller.type');
-    //     const port = _get(reduxStore.getState(), 'connection.port');
-    //     const path = _get(reduxStore.getState(), 'file.path');
+    const updateJobStats = async (status: any) => {
+        const controllerType = _get(reduxStore.getState(), 'controller.type');
+        const port = _get(reduxStore.getState(), 'connection.port');
+        const path = _get(reduxStore.getState(), 'file.path');
 
-    //     try {
-    //         let res = await api.jobStats.fetch();
-    //         const jobStats = res.body;
-    //         let newJobStats = jobStats;
+        try {
+            let res = await api.jobStats.fetch();
+            const jobStats = res.data;
+            let newJobStats = jobStats;
 
-    //         if (status.finishTime) {
-    //             newJobStats.jobsFinished += 1;
-    //         } else {
-    //             newJobStats.jobsCancelled += 1;
-    //         }
-    //         newJobStats.totalRuntime += status.timeRunning;
-    //         const job = {
-    //             id: jobStats.jobs.length > 0 ? (jobStats.jobs.length).toString() : '0',
-    //             type: JOB_TYPES.JOB,
-    //             file: status.name,
-    //             path: path,
-    //             totalLines: status.total,
-    //             port: port,
-    //             controller: controllerType,
-    //             startTime: new Date(status.startTime),
-    //             endTime: status.finishTime === 0 ? null : new Date(status.finishTime),
-    //             duration: status.elapsedTime,
-    //             jobStatus: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
-    //         };
-    //         newJobStats.jobs.push(job);
-    //         api.jobStats.update(newJobStats);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+            if (status.finishTime) {
+                newJobStats.jobsFinished += 1;
+            } else {
+                newJobStats.jobsCancelled += 1;
+            }
+            newJobStats.totalRuntime += status.timeRunning;
+            const job = {
+                id:
+                    jobStats.jobs.length > 0
+                        ? jobStats.jobs.length.toString()
+                        : '0',
+                type: JOB_TYPES.JOB,
+                file: status.name,
+                path: path,
+                totalLines: status.total,
+                port: port,
+                controller: controllerType,
+                startTime: new Date(status.startTime),
+                endTime:
+                    status.finishTime === 0
+                        ? null
+                        : new Date(status.finishTime),
+                duration: status.elapsedTime,
+                jobStatus: status.finishTime
+                    ? JOB_STATUS.COMPLETE
+                    : JOB_STATUS.STOPPED,
+            };
+            newJobStats.jobs.push(job);
+            api.jobStats.update(newJobStats);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-    // const updateMaintenanceTasks = async(status) => {
-    //     try {
-    //         let res = await api.maintenance.fetch();
-    //         const tasks = res.body;
-    //         let newTasks = tasks.map((task) => {
-    //             let newTask = task;
-    //             newTask.currentTime += (status.timeRunning / 1000 / 3600);
-    //             return newTask;
-    //         });
-    //         api.maintenance.update(newTasks);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+    const updateMaintenanceTasks = async (status: any) => {
+        try {
+            let res = await api.maintenance.fetch();
+            const tasks = res.data;
+            let newTasks = tasks.map((task: any) => {
+                let newTask = task;
+                newTask.currentTime += status.timeRunning / 1000 / 3600;
+                return newTask;
+            });
+            api.maintenance.update(newTasks);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-    // const shouldVisualizeSVG = () => {
-    //     return store.get('widgets.visualizer.SVGEnabled', false);
-    // };
+    const shouldVisualizeSVG = () => {
+        return store.get('widgets.visualizer.SVGEnabled', false);
+    };
 
-    // const parseGCode = async (content, size, name, visualizer) => {
-    //     const isLaser = isLaserMode();
-    //     const shouldIncludeSVG = shouldVisualizeSVG();
-    //     const accelerations = {
-    //         xAccel: _get(reduxStore.getState(), 'controller.settings.settings.$120'),
-    //         yAccel: _get(reduxStore.getState(), 'controller.settings.settings.$121'),
-    //         zAccel: _get(reduxStore.getState(), 'controller.settings.settings.$122'),
-    //     };
-    //     const maxFeedrates = {
-    //         xMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$110', 4000.0)),
-    //         yMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$111', 4000.0)),
-    //         zMaxFeed: Number(_get(reduxStore.getState(), 'controller.settings.settings.$112', 3000.0)),
-    //     };
+    const parseGCode = async (
+        content: string,
+        size: number,
+        name: string,
+        visualizer: string,
+    ) => {
+        const reduxState = reduxStore.getState();
+        const isLaser = isLaserMode();
+        const shouldIncludeSVG = shouldVisualizeSVG();
+        const accelerations = {
+            xAccel: _get(reduxState, 'controller.settings.settings.$120'),
+            yAccel: _get(reduxState, 'controller.settings.settings.$121'),
+            zAccel: _get(reduxState, 'controller.settings.settings.$122'),
+        };
+        const maxFeedrates = {
+            xMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$110', 4000.0),
+            ),
+            yMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$111', 4000.0),
+            ),
+            zMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$112', 3000.0),
+            ),
+        };
 
-    //     // compare previous file data to see if it's a new file and we need to reparse
-    //     let isNewFile = true;
-    //     const fileData = _get(reduxStore.getState(), 'file');
-    //     const { content: prevContent, size: prevSize, name: prevName } = fileData;
-    //     if (content === prevContent && size === prevSize && name === prevName) {
-    //         isNewFile = false;
-    //     }
+        // compare previous file data to see if it's a new file and we need to reparse
+        let isNewFile = true;
+        const fileData = _get(reduxState, 'file');
+        const {
+            content: prevContent,
+            size: prevSize,
+            name: prevName,
+        } = fileData;
+        if (content === prevContent && size === prevSize && name === prevName) {
+            isNewFile = false;
+        }
 
-    //     if (visualizer === VISUALIZER_SECONDARY) {
-    //         reduxStore.dispatch(fileSlice.actions.updateFileRenderState({ state: RENDER_NO_FILE }));
-    //         setTimeout(() => {
-    //             const renderState = _get(reduxStore.getState(), 'file.renderState');
-    //             if (renderState === RENDER_NO_FILE) {
-    //                 reduxStore.dispatch(fileSlice.actions.updateFileRenderState({ state: RENDER_LOADING }));
-    //             }
-    //         }, 1000);
+        if (visualizer === VISUALIZER_SECONDARY) {
+            reduxStore.dispatch(
+                updateFileRenderState({ renderState: RENDER_NO_FILE }),
+            );
+            setTimeout(() => {
+                const renderState = _get(reduxState, 'file.renderState');
+                if (renderState === RENDER_NO_FILE) {
+                    reduxStore.dispatch(
+                        updateFileRenderState({ renderState: RENDER_LOADING }),
+                    );
+                }
+            }, 1000);
 
-    //         const needsVisualization = shouldVisualize();
+            // const needsVisualization = shouldVisualize();
 
-    //         if (needsVisualization) {
-    //             visualizeWorker = new VisualizeWorker();
-    //             visualizeWorker.onmessage = visualizeResponse;
-    //             await getParsedData().then((value) => {
-    //                 const parsedData = value;
-    //                 visualizeWorker.postMessage({
-    //                     content,
-    //                     visualizer,
-    //                     parsedData,
-    //                     isNewFile,
-    //                     accelerations,
-    //                     maxFeedrates
-    //                 });
-    //             });
-    //         } else {
-    //             reduxStore.dispatch(fileSlice.actions.updateFileRenderState({ state: RENDER_RENDERED }));
-    //         }
+            // if (needsVisualization) {
+            //     // visualizeWorker = new VisualizeWorker();
+            //     // visualizeWorker.onmessage = visualizeResponse;
+            //     await getParsedData().then((value) => {
+            //         const parsedData = value;
+            //         // visualizeWorker.postMessage({
+            //         //     content,
+            //         //     visualizer,
+            //         //     parsedData,
+            //         //     isNewFile,
+            //         //     accelerations,
+            //         //     maxFeedrates,
+            //         // });
+            //     });
+            // } else {
+            //     reduxStore.dispatch(
+            //         updateFileRenderState({
+            //             renderState: RENDER_RENDERED,
+            //         }),
+            //     );
+            // }
 
-    //         return;
-    //     }
+            return;
+        }
 
-    //     // Basic file content
-    //     reduxStore.dispatch(fileSlice.actions.updateFileContent({ content, size, name }));
-    //     // sending gcode data to the visualizer
-    //     // so it can save it and give it to the normal or svg visualizer
-    //     pubsub.publish('file:content', content, size, name);
-    //     // Processing started for gcodeProcessor
-    //     reduxStore.dispatch(fileSlice.actions.updateFileProcessing({ value: true }));
-    //     reduxStore.dispatch(fileSlice.actions.updateFileRenderState({ state: RENDER_NO_FILE }));
-    //     setTimeout(() => {
-    //         const renderState = _get(reduxStore.getState(), 'file.renderState');
-    //         if (renderState === RENDER_NO_FILE) {
-    //             reduxStore.dispatch(fileSlice.actions.updateFileRenderState({ state: RENDER_LOADING }));
-    //         }
-    //     }, 1000);
+        // Basic file content
+        reduxStore.dispatch(updateFileContent({ content, size, name }));
+        // sending gcode data to the visualizer
+        // so it can save it and give it to the normal or svg visualizer
 
-    //     const needsVisualization = shouldVisualize();
+        // TODO: ensure this is the correct way to do it, try to avoid pubsub as it's deprecated
+        // pubsub.publish('file:content', content, size, name);
+        // Processing started for gcodeProcessor
+        reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
+        reduxStore.dispatch(
+            updateFileRenderState({ renderState: RENDER_NO_FILE }),
+        );
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState === RENDER_NO_FILE) {
+                reduxStore.dispatch(
+                    updateFileRenderState({
+                        renderState: RENDER_LOADING,
+                    }),
+                );
+            }
+        }, 1000);
 
-    //     visualizeWorker = new VisualizeWorker();
-    //     visualizeWorker.onmessage = visualizeResponse;
-    //     await getParsedData().then((value) => {
-    //         const parsedData = value;
-    //         visualizeWorker.postMessage({
-    //             content,
-    //             visualizer,
-    //             isLaser,
-    //             shouldIncludeSVG,
-    //             needsVisualization,
-    //             parsedData,
-    //             isNewFile,
-    //             accelerations,
-    //             maxFeedrates
-    //         });
-    //     });
-    // };
+        // const needsVisualization = shouldVisualize();
 
-    // const updateAlarmsErrors = async (error) => {
-    //     try {
-    //         let res = await api.alarmList.fetch();
-    //         const alarmList = res.body;
+        // visualizeWorker = new VisualizeWorker();
+        // visualizeWorker.onmessage = visualizeResponse;
+        await getParsedData().then((value) => {
+            const parsedData = value;
+            // visualizeWorker.postMessage({
+            //     content,
+            //     visualizer,
+            //     isLaser,
+            //     shouldIncludeSVG,
+            //     needsVisualization,
+            //     parsedData,
+            //     isNewFile,
+            //     accelerations,
+            //     maxFeedrates,
+            // });
+        });
+    };
 
-    //         const alarmError = {
-    //             id: alarmList.list.length > 0 ? (alarmList.list.length).toString() : '0',
-    //             type: error.type.includes('ALARM') ? ALARM : ERROR,
-    //             source: error.origin,
-    //             time: new Date(),
-    //             CODE: error.code,
-    //             MESSAGE: error.description,
-    //             lineNumber: error.lineNumber,
-    //             line: error.line,
-    //             controller: error.controller,
-    //         };
-    //         alarmList.list.push(alarmError);
-    //         api.alarmList.update(alarmList);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+    const updateAlarmsErrors = async (error: any) => {
+        try {
+            let res = await api.alarmList.fetch();
+            const alarmList = res.data;
+
+            const alarmError = {
+                id:
+                    alarmList.list.length > 0
+                        ? alarmList.list.length.toString()
+                        : '0',
+                type: error.type.includes('ALARM') ? ALARM : ERROR,
+                source: error.origin,
+                time: new Date(),
+                CODE: error.code,
+                MESSAGE: error.description,
+                lineNumber: error.lineNumber,
+                line: error.line,
+                controller: error.controller,
+            };
+            alarmList.list.push(alarmError);
+            api.alarmList.update(alarmList);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     controller.addListener(
         'controller:settings',
@@ -286,20 +361,33 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(updateFeederStatus({ status }));
     });
 
-    // controller.addListener('sender:status', (status) => {
-    //     // finished job or cancelled job
-    //     // because elapsed time and time running only update on sender.next(), they may not be entirely accurate for stopped jobs
-    //     if ((status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) ||
-    //         (status.elapsedTime > 0 && status.sent === 0 && (currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD || (errors.length > 0 && prevState === GRBL_ACTIVE_STATE_RUN)))) {
-    //         updateJobStats(status);
-    //         updateMaintenanceTasks(status);
-    //         reduxStore.dispatch(visualizerSlice.actions.updateJobOverrides({ isChecked: false, toggleStatus: 'jobStatus' }));
-    //         pubsub.publish('job:end', { status, errors });
-    //         errors = [];
-    //     }
+    controller.addListener('sender:status', (status: any) => {
+        // finished job or cancelled job
+        // because elapsed time and time running only update on sender.next(), they may not be entirely accurate for stopped jobs
+        if (
+            (status.finishTime > 0 &&
+                status.sent === 0 &&
+                prevState === GRBL_ACTIVE_STATE_RUN) ||
+            (status.elapsedTime > 0 &&
+                status.sent === 0 &&
+                (currentState === GRBL_ACTIVE_STATE_RUN ||
+                    currentState === GRBL_ACTIVE_STATE_HOLD ||
+                    (errors.length > 0 && prevState === GRBL_ACTIVE_STATE_RUN)))
+        ) {
+            updateJobStats(status);
+            updateMaintenanceTasks(status);
+            reduxStore.dispatch(
+                updateJobOverrides({
+                    isChecked: false,
+                    toggleStatus: 'jobStatus',
+                }),
+            );
+            pubsub.publish('job:end', { status, errors });
+            errors = [];
+        }
 
-    //     reduxStore.dispatch(controllerSlice.actions.updateSenderStatus({ status }));
-    // });
+        reduxStore.dispatch(updateSenderStatus({ status }));
+    });
 
     controller.addListener('workflow:state', (state: WORKFLOW_STATES_T) => {
         reduxStore.dispatch(updateWorkflowState({ state }));
@@ -318,7 +406,9 @@ export function* initialize(): Generator<any, void, any> {
                 ipcRenderer.send('reconnect-main', options);
             }
 
-            const machineProfile: MachineProfile = store.get('workspace.machineProfile');
+            const machineProfile: MachineProfile = store.get(
+                'workspace.machineProfile',
+            );
             const showLineWarnings: boolean = store.get(
                 'widgets.visualizer.showLineWarnings',
             );
@@ -399,6 +489,7 @@ export function* initialize(): Generator<any, void, any> {
                     confirmLabel: 'Resume',
                     cancelLabel: 'Close',
                     onConfirm: () => {
+                        // TODO: add this back in
                         // connectToLastDevice(() => {
                         //     // prompt recovery, either with homing or a prompt to start from line
                         //     pubsub.publish('disconnect:recovery', received, homingEnabled);
@@ -422,292 +513,326 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    // controller.addListener('gcode:toolChange', (context, comment = '',) => {
-    //     const payload = {
-    //         context,
-    //         comment
-    //     };
+    controller.addListener('gcode:toolChange', (context: any, comment = '') => {
+        const payload = {
+            context,
+            comment,
+        };
 
-    //     const { option, count } = context;
-    //     if (option === 'Pause') {
-    //         const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
-    //         Toaster.pop({
-    //             msg: msg,
-    //             type: TOASTER_INFO,
-    //             duration: TOASTER_UNTIL_CLOSE
-    //         });
-    //     } else {
-    //         let title, instructions;
+        const { option, count } = context;
+        if (option === 'Pause') {
+            const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
+            Toaster.pop({
+                msg: msg,
+                type: TOASTER_INFO,
+                duration: TOASTER_UNTIL_CLOSE,
+            });
+        } else {
+            let title, instructions;
 
-    //         if (option === 'Standard Re-zero') {
-    //             title = 'Standard Re-zero Tool Change';
-    //             instructions = manualToolChange;
-    //         } else if (option === 'Flexible Re-zero') {
-    //             title = 'Flexible Re-zero Tool Change';
-    //             instructions = (count > 1) ? semiautoToolchangeSecondRun : semiautoToolChange;
-    //         } else if (option === 'Fixed Tool Sensor') {
-    //             title = 'Fixed Tool Sensor Tool Change';
-    //             instructions = (count > 1) ? automaticToolchangeSecondRun : automaticToolChange;
-    //         } else {
-    //             console.error('Invalid toolchange option passed');
-    //             return;
-    //         }
+            if (option === 'Standard Re-zero') {
+                title = 'Standard Re-zero Tool Change';
+                instructions = manualToolChange;
+            } else if (option === 'Flexible Re-zero') {
+                title = 'Flexible Re-zero Tool Change';
+                instructions =
+                    count > 1
+                        ? semiautoToolchangeSecondRun
+                        : semiautoToolChange;
+            } else if (option === 'Fixed Tool Sensor') {
+                title = 'Fixed Tool Sensor Tool Change';
+                instructions =
+                    count > 1
+                        ? automaticToolchangeSecondRun
+                        : automaticToolChange;
+            } else {
+                console.error('Invalid toolchange option passed');
+                return;
+            }
 
-    //         // Run start block on idle if exists
-    //         if (instructions.onStart) {
-    //             const onStart = instructions.onStart();
-    //             controller.command('wizard:start', onStart);
-    //         }
+            // Run start block on idle if exists
+            if (instructions.onStart) {
+                const onStart = instructions.onStart();
+                controller.command('wizard:start', onStart);
+            }
 
-    //         pubsub.publish('wizard:load', {
-    //             ...payload,
-    //             title,
-    //             instructions
-    //         });
-    //     }
-    // });
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title,
+                instructions,
+            });
+        }
+    });
 
-    // controller.addListener('toolchange:preHookComplete', (comment = '') => {
-    //     const onConfirmhandler = () => {
-    //         controller.command('toolchange:post');
-    //     };
+    controller.addListener('toolchange:preHookComplete', (comment = '') => {
+        const onConfirmhandler = () => {
+            controller.command('toolchange:post');
+        };
 
-    //     const content = (comment.length > 0)
-    //         ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
-    //         : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+        const content =
+            comment.length > 0 ? (
+                <div>
+                    <p>
+                        A toolchange command (M6) was found - click confirm to
+                        verify the tool has been changed and run your
+                        post-toolchange code.
+                    </p>
+                    <p>
+                        Comment: <b>{comment}</b>
+                    </p>
+                </div>
+            ) : (
+                'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.'
+            );
 
-    //     Confirm({
-    //         title: 'Confirm Toolchange',
-    //         content,
-    //         confirmLabel: 'Confirm toolchange',
-    //         onConfirm: onConfirmhandler
-    //     });
-    // });
+        Confirm({
+            title: 'Confirm Toolchange',
+            content,
+            confirmLabel: 'Confirm toolchange',
+            onConfirm: onConfirmhandler,
+        });
+    });
 
-    // controller.addListener('gcode:load', (name, content) => {
-    //     finishLoad = false;
-    //     const size = new Blob([content]).size;
-    //     reduxStore.dispatch({
-    //         type: fileActions.UPDATE_FILE_CONTENT,
-    //         payload: {
-    //             name,
-    //             content,
-    //             size
-    //         }
-    //     });
-    // });
+    controller.addListener('gcode:load', (name: string, content: string) => {
+        finishLoad = false;
+        const size = new Blob([content]).size;
+        reduxStore.dispatch(updateFileContent({ content, size, name }));
+    });
 
-    // controller.addListener('file:load', (content, size, name, visualizer) => {
-    //     parseGCode(content, size, name, visualizer);
-    // });
+    controller.addListener(
+        'file:load',
+        (content: string, size: number, name: string, visualizer: string) => {
+            parseGCode(content, size, name, visualizer);
+        },
+    );
 
-    // controller.addListener('gcode:unload', () => {
-    //     reduxStore.dispatch({
-    //         type: fileActions.UNLOAD_FILE_INFO,
-    //         payload: {}
-    //     });
-    // });
+    controller.addListener('gcode:unload', () => {
+        reduxStore.dispatch(unloadFileInfo());
+    });
 
-    // controller.addListener('electronErrors:errorList', (errorList) => {
-    //     store.set('electron-error-list', errorList);
-    // });
+    controller.addListener(
+        'electronErrors:errorList',
+        (errorList: string[]) => {
+            store.set('electron-error-list', errorList);
+        },
+    );
 
-    // controller.addListener('ip:list', (ipList) => {
-    //     reduxStore.dispatch({
-    //         type: preferenceActions.SET_IP_LIST,
-    //         payload: ipList,
-    //     });
-    // });
+    controller.addListener('ip:list', (ipList: string[]) => {
+        reduxStore.dispatch(setIpList(ipList));
+    });
 
-    // controller.addListener('requestEstimateData', () => {
-    //     if (finishLoad) {
-    //         finishLoad = false;
-    //         getEstimateData().then((value) => {
-    //             controller.command('updateEstimateData', value);
-    //         });
-    //     }
-    // });
+    controller.addListener('requestEstimateData', () => {
+        if (finishLoad) {
+            finishLoad = false;
+            getEstimateData().then((value) => {
+                controller.command('updateEstimateData', value);
+            });
+        }
+    });
 
     // // Need this to handle unload when machine not connected since controller event isn't sent
-    // pubsub.subscribe('gcode:unload', () => {
-    //     reduxStore.dispatch({
-    //         type: fileActions.UNLOAD_FILE_INFO,
-    //         payload: {}
-    //     });
+    pubsub.subscribe('gcode:unload', () => {
+        reduxStore.dispatch(unloadFileInfo());
+    });
+
+    // TODO: uncomment when worker types are defined
+    // pubsub.subscribe('file:load', () => {
+    //     visualizeWorker?.terminate();
     // });
 
-    // pubsub.subscribe('file:load', (msg, data) => {
-    //     visualizeWorker.terminate();
-    // });
-
-    // pubsub.subscribe('parsedData:stored', () => {
-    //     finishLoad = true;
-    //     getEstimateData().then((value) => {
-    //         controller.command('updateEstimateData', value);
-    //     });
-    // });
+    pubsub.subscribe('parsedData:stored', () => {
+        finishLoad = true;
+        getEstimateData().then((value) => {
+            controller.command('updateEstimateData', value);
+        });
+    });
 
     // // for when you don't want to send file to backend
-    // pubsub.subscribe('visualizer:load', (_, { content, size, name, visualizer }) => {
-    //     parseGCode(content, size, name, visualizer);
-    // });
+    pubsub.subscribe(
+        'visualizer:load',
+        (_, { content, size, name, visualizer }) => {
+            parseGCode(content, size, name, visualizer);
+        },
+    );
 
+    // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
     // pubsub.subscribe('estimate:done', (msg, data) => {
-    //     estimateWorker.terminate();
+    //     estimateWorker?.terminate();
     // });
 
-    // pubsub.subscribe('reparseGCode', (msg, content, size, name, visualizer) => {
-    //     parseGCode(content, size, name, visualizer);
-    // });
+    // TODO: uncomment this when reparseGCode is defined
+    // pubsub.subscribe(
+    //     'reparseGCode',
+    //     (msg: string, content: string, size: number, name: string, visualizer: string) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
-    // controller.addListener('workflow:pause', (opts) => {
-    //     const { data } = opts;
-    //     Toaster.pop({
-    //         msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
-    //         type: TOASTER_INFO,
-    //         duration: TOASTER_UNTIL_CLOSE
-    //     });
-    // });
+    controller.addListener('workflow:pause', (opts: { data: string }) => {
+        const { data } = opts;
+        Toaster.pop({
+            msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
+            type: TOASTER_INFO,
+            duration: TOASTER_UNTIL_CLOSE,
+        });
+    });
 
-    // controller.addListener('sender:M0M1', (opts) => {
-    //     const { comment = '' } = opts;
-    //     const msg = 'Hit \‘Close Window\‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard \‘Resume Job\’ button to keep cutting when you\’re ready.';
+    controller.addListener('sender:M0M1', (opts: { comment: string }) => {
+        const { comment = '' } = opts;
+        const msg =
+            'Hit ‘Close Window‘ if you want taddSpindleo do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
-    //     const content = (comment.length > 0)
-    //         ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
-    //         : msg;
+        const content =
+            comment.length > 0 ? (
+                <div>
+                    <p>{msg}</p>
+                    <p>
+                        Comment: <b>{comment}</b>
+                    </p>
+                </div>
+            ) : (
+                msg
+            );
 
-    //     Confirm({
-    //         title: 'M0/M1 Pause',
-    //         content,
-    //         confirmLabel: 'Resume Job',
-    //         cancelLabel: 'Close Window',
-    //         onConfirm: () => {
-    //             controller.command('gcode:resume');
-    //         }
-    //     });
-    // });
+        Confirm({
+            title: 'M0/M1 Pause',
+            content,
+            confirmLabel: 'Resume Job',
+            cancelLabel: 'Close Window',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            },
+        });
+    });
 
-    // controller.addListener('outline:start', () => {
-    //     Toaster.clear();
-    //     Toaster.pop({
-    //         type: TOASTER_SUCCESS,
-    //         msg: 'Running file outline'
-    //     });
-    // });
+    controller.addListener('outline:start', () => {
+        Toaster.clear();
+        Toaster.pop({
+            type: TOASTER_SUCCESS,
+            msg: 'Running file outline',
+        });
+    });
 
-    // controller.addListener('homing:flag', (flag) => {
-    //     reduxStore.dispatch({
-    //         type: controllerActions.UPDATE_HOMING_FLAG,
-    //         payload: {
-    //             homingFlag: flag
-    //         }
-    //     });
-    //     pubsub.publish('softlimits:check');
-    // });
+    controller.addListener('homing:flag', (flag: boolean) => {
+        reduxStore.dispatch(updateHomingFlag({ homingFlag: flag }));
+        pubsub.publish('softlimits:check');
+    });
 
-    // controller.addListener('firmware:ready', (status) => {
-    //     pubsub.publish('firmware:update', status);
-    // });
+    controller.addListener('firmware:ready', (status: string) => {
+        pubsub.publish('firmware:update', status);
+    });
 
-    // controller.addListener('error', (error, wasRunning) => {
-    //     const homingEnabled = _get(reduxStore.getState(), 'controller.settings.settings.$22');
+    controller.addListener(
+        'error',
+        (
+            error: { type: typeof ALARM | typeof ERROR; lineNumber: number },
+            _wasRunning: boolean,
+        ) => {
+            // const homingEnabled = _get(
+            //     reduxStore.getState(),
+            //     'controller.settings.settings.$22',
+            // );
 
-    //     if (ALARM_ERROR_TYPES.includes(error.type)) {
-    //         updateAlarmsErrors(error);
-    //     }
-    //     // if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
-    //     //     window.ipcRenderer.send('logError:electron', error);
-    //     // }
-    //     pubsub.publish('error', error);
+            if (ALARM_ERROR_TYPES.includes(error.type)) {
+                updateAlarmsErrors(error);
+            }
 
-    //     // set need recovery for start from line when alarm happens
-    //     if (error.type === ALARM && wasRunning) {
-    //         pubsub.publish('disconnect:recovery', error.lineNumber, homingEnabled);
-    //     }
-    // });
+            pubsub.publish('error', error);
 
-    // controller.addListener('wizard:next', (stepIndex, substepIndex) => {
-    //     pubsub.publish('wizard:next', { stepIndex, substepIndex });
-    // });
+            // TODO: utilize this if needed, currently not used in new app, try not to use pubsubs
+            // set need recovery for start from line when alarm happens
+            // if (error.type === ALARM && wasRunning) {
+            //     pubsub.publish(
+            //         'disconnect:recovery',
+            //         error.lineNumber,
+            //         homingEnabled,
+            //     );
+            // }
+        },
+    );
 
-    // controller.addListener('filetype', (type) => {
-    //     if (type === FILE_TYPE.ROTARY) {
-    //         const workspaceMode = store.get('workspace.mode');
+    controller.addListener(
+        'wizard:next',
+        (stepIndex: number, substepIndex: number) => {
+            pubsub.publish('wizard:next', { stepIndex, substepIndex });
+        },
+    );
 
-    //         if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
-    //             Confirm({
-    //                 title: 'Rotary File Loaded',
-    //                 content: 'G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.',
-    //                 confirmLabel: 'Enable Rotary Mode',
-    //                 cancelLabel: 'Close',
-    //                 onConfirm: () => {
-    //                     updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
-    //                 }
-    //             });
-    //         }
-    //     }
+    controller.addListener('filetype', (type: FILE_TYPE_T) => {
+        if (type === FILE_TYPE.ROTARY) {
+            const workspaceMode: WORKSPACE_MODE_T | null =
+                store.get('workspace.mode');
 
-    //     if (type === FILE_TYPE.FOUR_AXIS && controller.type === GRBL) {
-    //         Confirm({
-    //             title: '4 Axis File Loaded',
-    //             content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
-    //             confirmLabel: null,
-    //             cancelLabel: 'Close',
-    //         });
-    //     }
-    // });
+            if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
+                Confirm({
+                    title: 'Rotary File Loaded',
+                    content:
+                        'G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.',
+                    confirmLabel: 'Enable Rotary Mode',
+                    cancelLabel: 'Close',
+                    onConfirm: () => {
+                        updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
+                    },
+                });
+            }
+        }
+
+        if (type === FILE_TYPE.FOUR_AXIS && controller.type === GRBL) {
+            Confirm({
+                title: '4 Axis File Loaded',
+                content:
+                    'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
+                confirmLabel: null,
+                cancelLabel: 'Close',
+            });
+        }
+    });
 
     controller.addListener('connection:new', (content: string) => {
         console.log('connection:new', content);
     });
 
-    // controller.addListener('gcode_error', throttle((error) => {
-    //     errors.push(error);
-    // }, 250, { trailing: false }));
+    controller.addListener(
+        'gcode_error',
+        _throttle(
+            (error) => {
+                errors.push(error);
+            },
+            250,
+            { trailing: false },
+        ),
+    );
 
-    // controller.addListener('settings:description', (data) => {
-    //     reduxStore.dispatch({
-    //         type: controllerActions.UPDATE_SETTINGS_DESCRIPTIONS,
-    //         payload: {
-    //             descriptions: data
-    //         }
-    //     });
-    // });
+    controller.addListener(
+        'settings:description',
+        (data: EEPROMDescriptions) => {
+            reduxStore.dispatch(
+                updateSettingsDescriptions({ descriptions: data }),
+            );
+        },
+    );
 
-    // controller.addListener('settings:alarm', (data) => {
-    //     reduxStore.dispatch({
-    //         type: controllerActions.UPDATE_ALARM_DESCRIPTIONS,
-    //         payload: {
-    //             alarms: data
-    //         }
-    //     });
-    // });
+    controller.addListener('settings:alarm', (data: BasicObject) => {
+        reduxStore.dispatch(updateAlarmDescriptions({ alarms: data }));
+    });
 
-    // controller.addListener('networkScan:status', (isScanning) => {
-    //     reduxStore.dispatch({
-    //         type: connectionActions.SCAN_NETWORK,
-    //         payload: {
-    //             isScanning: isScanning
-    //         }
-    //     });
-    //     if (!isScanning) {
-    //         pubsub.publish('networkScan:finished');
-    //     }
-    // });
+    controller.addListener('networkScan:status', (isScanning: boolean) => {
+        reduxStore.dispatch(scanNetwork({ isScanning }));
 
-    // controller.addListener('spindle:add', (spindle) => {
-    //     if (Object.hasOwn(spindle, 'id')) {
-    //         reduxStore.dispatch({
-    //             type: controllerActions.ADD_SPINDLE,
-    //             payload: spindle
-    //         });
-    //     }
-    // });
+        if (!isScanning) {
+            pubsub.publish('networkScan:finished');
+        }
+    });
 
-    // controller.addListener('job:start', () => {
-    //     errors = [];
-    // });
+    controller.addListener('spindle:add', (spindle: any) => {
+        if (Object.hasOwn(spindle, 'id')) {
+            reduxStore.dispatch(addSpindle(spindle));
+        }
+    });
+
+    controller.addListener('job:start', () => {
+        errors = [];
+    });
 
     yield null;
 }

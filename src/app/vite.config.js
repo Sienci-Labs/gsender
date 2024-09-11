@@ -23,5 +23,15 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         react(),
+        tailwindcss()
     ],
+    resolve: {
+        alias: {
+            app: path.resolve(__dirname, './src'),
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
+    define: {
+        'process.env': {},
+    },
 });
