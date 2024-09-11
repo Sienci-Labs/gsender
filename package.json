@@ -523,6 +523,8 @@
     "@types/sha1": "^1.1.1",
     "@types/three": "^0.146.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
     "autoprefixer": "^10.4.19",
     "avrgirl-arduino": "^5.0.1",
     "axios": "^1.2.4",

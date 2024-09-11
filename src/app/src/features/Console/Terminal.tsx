@@ -9,12 +9,12 @@ import { v4 as uuidv4 } from 'uuid';
 import controller, {
     addControllerEvents,
     removeControllerEvents,
-} from 'lib/controller';
+} from 'app/lib/controller';
 import {
     TERMINAL_GREY,
     TERMINAL_RED,
     TERMINAL_ALARM_RED,
-} from 'constants/index';
+} from 'app/constants/index';
 
 import '@xterm/xterm/css/xterm.css';
 
