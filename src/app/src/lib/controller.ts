@@ -528,7 +528,7 @@ class Controller {
     // Writes data to the serial port.
     // @param {string} data The data to write.
     // @param {object} [context] The associated context information.
-    write(data: string, context: object): void {
+    write(data: string, context?: object): void {
         const { port } = this;
         if (!port) {
             return;
@@ -539,7 +539,7 @@ class Controller {
     // Writes data and a newline character to the serial port.
     // @param {string} data The data to write.
     // @param {object} [context] The associated context information.
-    writeln(data: string, context: object = {}): void {
+    writeln(data: string, context?: object): void {
         const { port } = this;
         if (!port) {
             return;

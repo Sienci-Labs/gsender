@@ -424,6 +424,15 @@ export const TERMINAL_GREY = 249;
 export const TERMINAL_RED = 196;
 export const TERMINAL_ALARM_RED = 167;
 
+export const START = "START";
+export const PAUSE = "PAUSE";
+export const STOP = "STOP";
+export const MACHINE_CONTROL_BUTTONS = {
+    START: START,
+    PAUSE: PAUSE,
+    STOP: STOP,
+};
+
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",
 //     HUANYANG_V1: "Huanyang v1",
