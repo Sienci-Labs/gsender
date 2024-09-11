@@ -1,4 +1,4 @@
-import {Widget} from "app/components/Widget";
+import { Widget } from "app/components/Widget";
 import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
 import { get } from "lodash";
 import { connect } from "react-redux";
@@ -6,6 +6,8 @@ import { WORKFLOW_STATES_T } from "app/store/definitions";
 import ControlButton from "./ControlButton";
 import { PAUSE, START, STOP } from "../../constants";
 import Overrides from "./FeedOverride";
+import OutlineButton from "./OutlineButton";
+import StartFromLine from "./StartFromLine";
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T },
@@ -19,25 +21,33 @@ interface JobControlProps {
 };
 
 const JobControl: React.FC<JobControlProps> = ({ workflow, activeState, isConnected, fileLoaded, ovF, ovS, feedrate, spindle }) => {
+    const disabled = !isConnected || !fileLoaded;
+
     return (
-        <Widget>
-            <Widget.Header
-                className="bg-transparent z-10 absolute -bottom-4"
+        <>
+            <div
+                className="bg-transparent z-10 absolute bottom-[calc(20%-3.5rem)] left-[calc(128px-50px)] right-0 flex flex-col justify-center items-center"
             >
-                <div className="flex flex-row gap-2 justify-center -mt-12">
+                <div className="flex flex-row gap-2 justify-center mb-3">
+                    <OutlineButton disabled={disabled} />
+                    <StartFromLine disabled={disabled} />
+                </div>
+                <div className="flex flex-row gap-2 justify-center ">
                     <ControlButton type={START} workflow={workflow} activeState={activeState} isConnected={isConnected} fileLoaded={fileLoaded} />
                     <ControlButton type={PAUSE} workflow={workflow} activeState={activeState} isConnected={isConnected} fileLoaded={fileLoaded} />
                     <ControlButton type={STOP} workflow={workflow} activeState={activeState} isConnected={isConnected} fileLoaded={fileLoaded} />
                 </div>
-            </Widget.Header>
-            <Widget.Content
-                className="flex justify-center items-center flex-col"
-            >
-                <div className="mt-4">
-                    <Overrides ovF={ovF} ovS={ovS} feedrate={feedrate} spindle={spindle} isConnected={isConnected} />
-                </div>
-            </Widget.Content>
-        </Widget>
+            </div>
+            <Widget>
+                <Widget.Content
+                    className="flex justify-center items-center flex-col"
+                >
+                    <div className="mt-4">
+                        <Overrides ovF={ovF} ovS={ovS} feedrate={feedrate} spindle={spindle} isConnected={isConnected} />
+                    </div>
+                </Widget.Content>
+            </Widget>
+        </>
     )
 }
 

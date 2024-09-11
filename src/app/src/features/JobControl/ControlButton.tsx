@@ -10,11 +10,11 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from "../../constants";
-import controller from "lib/controller";
+import controller from "app/lib/controller";
 import cx from "classnames";
 import { includes } from "lodash";
-import { GRBL_ACTIVE_STATES_T } from "definitions/general";
-import { WORKFLOW_STATES_T } from "store/definitions";
+import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import { WORKFLOW_STATES_T } from "app/store/definitions";
 import { PiPause } from "react-icons/pi";
 import { FiOctagon } from "react-icons/fi";
 import { IoPlayOutline } from "react-icons/io5";

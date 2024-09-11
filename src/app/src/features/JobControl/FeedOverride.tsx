@@ -1,11 +1,11 @@
-import RangeSlider from "components/RangeSlider";
+import RangeSlider from "app/components/RangeSlider";
 import { METRIC_UNITS, OVERRIDE_VALUE_RANGES, SPINDLE_MODE } from "../../constants";
-import controller from "lib/controller";
+import controller from "app/lib/controller";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
-import store from "store";
-import { UNITS_EN } from "definitions/general";
-import { mapPositionToUnits } from "lib/units";
+import store from "app/store";
+import { UNITS_EN } from "app/definitions/general";
+import { mapPositionToUnits } from "app/lib/units";
 
 interface OverridesProps {
     ovF: number,
