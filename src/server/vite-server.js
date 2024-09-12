@@ -1,4 +1,27 @@
 import fs from 'fs';
+import path from 'path';
+
+const devDir = path.resolve(__dirname, '../../src/app');
+const prodDir = path.resolve(__dirname, '../../dist/gsender/app');
+
+
+/*const getStylesheets = async() => {
+    try {
+        const assetpath = devDir;
+        const files = await fs.readdir(assetpath);
+        const cssAssets = files.filter(l => l.endsWith('.css'));
+        const allContent = [];
+        for (const asset of cssAssets) {
+            console.log(asset);
+            // eslint-disable-next-line no-await-in-loop
+            const content = await fs.readFile(path.join(assetpath, asset), 'utf-8');
+            allContent.push(`<style type="text/css">${content}</style>`);
+        }
+        return allContent.join('\n');
+    } catch {
+        return '';
+    }
+};*/
 
 export const viteServer = async (app) => {
     // Constants
@@ -7,10 +30,10 @@ export const viteServer = async (app) => {
 
     // Cached production assets
     const templateHtml = isProduction
-        ? await fs.promises.readFile('../../dist/gsender/app/index.html', 'utf-8')
+        ? await fs.promises.readFile(path.resolve(prodDir, 'index.html'), 'utf-8')
         : '';
     const ssrManifest = isProduction
-        ? await fs.promises.readFile('../../dist/gsender/app/.vite/ssr-manifest.json', 'utf-8')
+        ? await fs.promises.readFile(path.resolve(prodDir, '.vite/ssr-manifest.json'), 'utf-8')
         : undefined;
 
     // Add Vite or respective production middlewares
@@ -20,15 +43,19 @@ export const viteServer = async (app) => {
         vite = await createServer({
             server: { middlewareMode: true },
             appType: 'custom',
+            build: {
+                ssr: true,
+                ssrEmitAssets: true
+            },
             base,
-            configFile: '../../src/app/vite.config.js'
+            configFile: path.resolve(devDir, 'vite.config.js')
         });
         app.use(vite.middlewares);
     } else {
         const compression = (await import('compression')).default;
         const sirv = (await import('sirv')).default;
         app.use(compression());
-        app.use(base, sirv('../../dist/gsender/app', { extensions: [] }));
+        app.use(base, sirv(path.resolve(prodDir), { extensions: [] }));
     }
 
     // Serve HTML
@@ -38,15 +65,15 @@ export const viteServer = async (app) => {
 
             let template;
             let render;
+
             if (!isProduction) {
                 // Always read fresh template in development
-                template = await fs.promises.readFile('../../src/app/index.html', 'utf-8');
+                template = await fs.promises.readFile(path.resolve(devDir, 'index.html'), 'utf-8');
                 template = await vite.transformIndexHtml(url, template);
-                render = (await vite.ssrLoadModule('../../src/app/src/entry-server.tsx')).render;
+                render = (await vite.ssrLoadModule(path.resolve(devDir, 'src/entry-server.tsx'))).render;
             } else {
                 template = templateHtml;
-                // eslint-disable-next-line import/no-unresolved
-                // render = (await import('../../dist/gsender/app/entry-server')).render;
+                render = (await import(path.resolve(prodDir, 'entry-server'))).render;
             }
 
             const rendered = await render(url, ssrManifest);

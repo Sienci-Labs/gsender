@@ -22,8 +22,13 @@
  */
 
 import api from '../api';
-import { SignInParams } from '../definitions/interfaces/validation';
 import config from '../store';
+
+export interface SignInParams {
+    token: string,
+    name?: string,
+    password?: string,
+};
 
 let _authenticated = false;
 

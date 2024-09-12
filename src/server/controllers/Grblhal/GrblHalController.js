@@ -275,6 +275,7 @@ class GrblHalController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+                console.log(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
@@ -1027,7 +1028,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
             }
         }, 500);
 

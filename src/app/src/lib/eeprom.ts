@@ -1,4 +1,4 @@
-import { HOMING_LOCATIONS_T } from '../definitions/types';
+import { HOMING_LOCATIONS_T } from 'definitions/firmware';
 import { getHomingLocation, FRONT_RIGHT, FRONT_LEFT, BACK_LEFT } from '../widgets/Location/RapidPosition';
 
 export const homingString = (mask: string): string => {

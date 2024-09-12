@@ -17,6 +17,8 @@ import { Route as rootRoute } from './routes/__root'
 // Create Virtual Routes
 
 const ToolsLazyImport = createFileRoute('/tools')()
+const StatsLazyImport = createFileRoute('/stats')()
+const ConfigurationLazyImport = createFileRoute('/configuration')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
@@ -25,6 +27,16 @@ const ToolsLazyRoute = ToolsLazyImport.update({
   path: '/tools',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/tools.lazy').then((d) => d.Route))
+
+const StatsLazyRoute = StatsLazyImport.update({
+  path: '/stats',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/stats.lazy').then((d) => d.Route))
+
+const ConfigurationLazyRoute = ConfigurationLazyImport.update({
+  path: '/configuration',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/configuration.lazy').then((d) => d.Route))
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
@@ -42,6 +54,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/configuration': {
+      id: '/configuration'
+      path: '/configuration'
+      fullPath: '/configuration'
+      preLoaderRoute: typeof ConfigurationLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/tools': {
       id: '/tools'
       path: '/tools'
@@ -54,10 +80,53 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexLazyRoute,
-  ToolsLazyRoute,
-})
+interface FileRoutesByFullPath {
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+interface FileRoutesByTo {
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+interface FileRoutesById {
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/configuration' | '/stats' | '/tools'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/configuration' | '/stats' | '/tools'
+  id: '/' | '/configuration' | '/stats' | '/tools'
+  fileRoutesById: FileRoutesById
+}
+
+interface RootRouteChildren {
+  IndexLazyRoute: typeof IndexLazyRoute
+  ConfigurationLazyRoute: typeof ConfigurationLazyRoute
+  StatsLazyRoute: typeof StatsLazyRoute
+  ToolsLazyRoute: typeof ToolsLazyRoute
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexLazyRoute: IndexLazyRoute,
+  ConfigurationLazyRoute: ConfigurationLazyRoute,
+  StatsLazyRoute: StatsLazyRoute,
+  ToolsLazyRoute: ToolsLazyRoute,
+}
+
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 
@@ -68,11 +137,19 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/configuration",
+        "/stats",
         "/tools"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/configuration": {
+      "filePath": "configuration.lazy.tsx"
+    },
+    "/stats": {
+      "filePath": "stats.lazy.tsx"
     },
     "/tools": {
       "filePath": "tools.lazy.tsx"

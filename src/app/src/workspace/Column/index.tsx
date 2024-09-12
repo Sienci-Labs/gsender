@@ -1,10 +1,17 @@
-import { DRO } from "../../widgets/Control/DRO";
+import { Widget } from 'app/components/Widget';
+import { Location } from 'app/features/Location';
 
 export const Column = () => {
     return (
-        <div className="border p-3 flex-1">
-            <div>DRO and Jogging</div>
-            <DRO />
+        <div className="p-1 flex-1 box-border">
+            <Widget>
+                <Widget.Content
+                    className="justify-between"
+                    style={{ width: '100%' }}
+                >
+                    <Location />
+                </Widget.Content>
+            </Widget>
         </div>
     );
 };

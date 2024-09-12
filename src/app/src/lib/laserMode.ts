@@ -20,11 +20,14 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
 import { LASER_MODE, SPINDLE_MODE } from '../constants';
-import { SPINDLE_LASER_T } from '../definitions/types';
 import store from '../store';
 
 export const isLaserMode = (): boolean => {
-    const mode: SPINDLE_LASER_T = store.get('widgets.spindle.mode', SPINDLE_MODE);
+    const mode: SPINDLE_LASER_T = store.get(
+        'widgets.spindle.mode',
+        SPINDLE_MODE,
+    );
     return mode === LASER_MODE;
 };

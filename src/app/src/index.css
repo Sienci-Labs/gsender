@@ -6,4 +6,30 @@ body,
 html,
 #app {
     height: 100%;
+    * {
+        @apply box-border;
+        @apply select-none;
+    }
+    input[type='number'] {
+        appearance: none !important;
+    }
+}
+
+@layer utilities {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+}
+
+
+@property --border-angle {
+    inherits: false;
+    initial-value: 0deg;
+    syntax: '<angle>';
 }

@@ -22,36 +22,10 @@
  */
 
 import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
-import { MachineProfile } from "../definitions/interfaces/general";
-import { USER_DATA_COLLECTION_T } from "../definitions/types";
+import { MachineProfile } from "../lib/definitions/machine_profile";
+import { FetchOptions, GCodeOptions, SigninOptions, StateOptions, USER_DATA_COLLECTION_T, WatchOptions } from "./definitions";
 
 // import store from "../store";
-
-interface SigninOptions {
-    token?: string;
-    name?: string;
-    password?: string;
-}
-
-interface StateOptions {
-    key?: string;
-}
-
-interface GCodeOptions {
-    port?: string;
-    name?: string;
-    gcode?: string;
-    context?: Record<string, unknown>;
-}
-
-interface FetchOptions {
-    [key: string]: any;
-}
-
-interface WatchOptions {
-    path?: string;
-    file?: string;
-}
 
 // Create an instance of axios
 const authrequest = axios.create({
