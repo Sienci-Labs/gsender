@@ -25,14 +25,21 @@ interface DROProps {
     axes: AxesArray;
     mpos: DROPosition;
     wpos: DROPosition;
+    unitLabel: string;
     homingEnabled: boolean;
 }
 
-function DRO({ axes, mpos, wpos, homingEnabled }: DROProps): JSX.Element {
+function DRO({
+    axes,
+    mpos,
+    wpos,
+    homingEnabled,
+    unitLabel,
+}: DROProps): JSX.Element {
     return (
         <div>
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
-                <GoTo />
+            <div className="w-full min-h-10 flex flex-row align-bottom justify-between mb-2 px-4">
+                <GoTo wpos={wpos} units={unitLabel} />
                 {/*homingEnabled && (
                     <IconButton icon={<LuParkingSquare />} color="primary" />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
@@ -83,8 +90,8 @@ export default connect((reduxStore) => {
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
 
-    console.log(mposController);
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
+    const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
 
     const wpos = mapValues(wposController, (pos) => {
         return String(mapPositionToUnits(pos, preferredUnits));
@@ -99,5 +106,6 @@ export default connect((reduxStore) => {
         axes,
         wpos,
         mpos,
+        unitLabel,
     };
 })(DRO);

@@ -4,6 +4,7 @@ import jogTab from './assets/tabs.svg';
 import zLabels from './assets/zlabels.svg';
 import aLabels from './assets/aLabels.svg';
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs.tsx';
 
 export function Jogging() {
     return (
@@ -41,7 +42,19 @@ export function Jogging() {
                     <JogInput label="at" currentValue={5000} />
                     <JogInput label="A°" currentValue={10} />
                 </div>
-                <div>Selector</div>
+
+                <Tabs
+                    defaultValue="rapid"
+                    orientation="vertical"
+                    aria-orientation="vertical"
+                    className="border border-gray-200 bg-white rounded"
+                >
+                    <TabsList className="flex flex-col text-gray-500 bg-blue-50 ">
+                        <TabsTrigger value="rapid">Rapid</TabsTrigger>
+                        <TabsTrigger value="normal">Normal</TabsTrigger>
+                        <TabsTrigger value="precide">Precise</TabsTrigger>
+                    </TabsList>
+                </Tabs>
             </div>
         </>
     );
