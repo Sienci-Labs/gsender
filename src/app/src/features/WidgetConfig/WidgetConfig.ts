@@ -21,7 +21,7 @@
  *
  */
 
-import store from '../store';
+import store from 'app/store';
 import { translateKey } from './utils';
 
 class WidgetConfig {
