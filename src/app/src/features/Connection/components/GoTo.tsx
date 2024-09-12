@@ -7,6 +7,7 @@ import { FaPaperPlane } from 'react-icons/fa6';
 import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
+import { Switch } from 'app/components/shadcn/Switch.tsx';
 
 interface GotoProps {
     units: string;
@@ -22,11 +23,15 @@ export function GoTo({ units, wpos }: GotoProps) {
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
                     <h1>Go To Location</h1>
-                    <UnitInput units={units} label="X" />
-                    <UnitInput units={units} label="Y" />
-                    <UnitInput units={units} label="Z" />
-                    <UnitInput units="°" label="A" />
-
+                    <UnitInput units={units} label="X" value={wpos.x} />
+                    <UnitInput units={units} label="Y" value={wpos.y} />
+                    <UnitInput units={units} label="Z" value={wpos.z} />
+                    <UnitInput units="°" label="A" value={wpos.a} />
+                    <div className="flex flex-row text-sm text-gray-400 justify-between">
+                        <span>G90</span>
+                        <Switch />
+                        <span>G91</span>
+                    </div>
                     <Button color="primary">Go!</Button>
                 </div>
             </PopoverContent>
