@@ -3,7 +3,7 @@ import { WidgetConfigContext } from './context';
 import { translateKey } from './utils';
 import WidgetConfig from './WidgetConfig';
 
-export const WidgetConfigProvider = ({ widgetId, children }: { widgetId: string, children: React.ReactElement[] }) => {
+export const WidgetConfigProvider = ({ widgetId, children }: { widgetId: string, children: React.ReactElement }) => {
     const config = new WidgetConfig(widgetId);
 
     const get = (key: string, defaultValue: any): void => config.get(key, defaultValue);

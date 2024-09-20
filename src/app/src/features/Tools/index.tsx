@@ -1,6 +1,7 @@
 import { Widget } from '../../components/Widget';
 import { Tabs } from '../../components/Tabs';
 import { Console } from '../Console';
+import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 
 const Probe = () => {
     return <div>Probe</div>;
@@ -21,7 +22,7 @@ const tabs = [
     },
     {
         label: 'Probe',
-        content: <Probe />,
+        content: <WidgetConfigProvider widgetId="probe"><Probe /></WidgetConfigProvider>,
     },
     {
         label: 'Coolant',

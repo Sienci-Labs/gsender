@@ -1,21 +1,21 @@
 import { FILE_TYPE, WORKFLOW_STATES, RENDER_STATE, TOGGLE_STATUS } from "../constants";
-import { EEPROMSettings, EEPROMDescriptions } from "definitions/firmware";
-import { BasicObject, BasicPosition, BBox } from "definitions/general";
-import { Axes } from "features/Axes/definitions";
-import { Connection } from "features/Connection/definitions";
-import { Console } from "features/Console/definitions";
-import { JobStatus } from "features/FileControl/definitions";
-import { Location } from "features/Location/definitions";
-import { Macro } from "features/Macro/definitions";
-import { Probe } from "features/Probe/definitions";
-import { Rotary } from "features/Rotary/definitions";
-import { Spindle, SpindleState } from "features/Spindle/definitions";
-import { Surfacing } from "features/Surfacing/definitions";
-import { VISUALIZER_TYPES_T, Visualizer } from "features/Visualizer/definitions";
-import { Modal, PDData, FeedrateChanges, ModalChanges } from "lib/definitions/gcode_virtualization";
-import { Feeder, Sender } from "lib/definitions/sender_feeder";
-import { CommandKeys } from "lib/definitions/shortcuts";
-import { Workspace } from "workspace/definitions";
+import { EEPROMSettings, EEPROMDescriptions } from "app/definitions/firmware";
+import { BasicObject, BasicPosition, BBox } from "app/definitions/general";
+import { Axes } from "app/features/Axes/definitions";
+import { Connection } from "app/features/Connection/definitions";
+import { Console } from "app/features/Console/definitions";
+import { JobStatus } from "app/features/FileControl/definitions";
+import { Location } from "app/features/Location/definitions";
+import { Macro } from "app/features/Macro/definitions";
+import { Probe } from "app/features/Probe/definitions";
+import { Rotary } from "app/features/Rotary/definitions";
+import { Spindle, SpindleState } from "app/features/Spindle/definitions";
+import { Surfacing } from "app/features/Surfacing/definitions";
+import { VISUALIZER_TYPES_T, Visualizer } from "app/features/Visualizer/definitions";
+import { Modal, PDData, FeedrateChanges, ModalChanges } from "app/lib/definitions/gcode_virtualization";
+import { Feeder, Sender } from "app/lib/definitions/sender_feeder";
+import { CommandKeys } from "app/lib/definitions/shortcuts";
+import { Workspace } from "app/workspace/definitions";
 
 
 // Types

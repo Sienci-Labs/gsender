@@ -41,9 +41,11 @@ export const TOUCHPLATE_TYPES = {
 
 export const PROBE_TYPE_AUTO = 'Auto';
 export const PROBE_TYPE_TIP = 'Tip';
+export const PROBE_TYPE_DIAMETER = 'Diameter';
 export const PROBE_TYPES = {
     PROBE_TYPE_AUTO: 'Auto',
     PROBE_TYPE_TIP: 'Tip',
+    PROBE_TYPE_DIAMETER: 'Diameter',
 };
 
 export const END_MILL = 'End Mill';
