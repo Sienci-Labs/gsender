@@ -11,6 +11,7 @@
         "preview": "cross-env NODE_ENV=production node server"
     },
     "dependencies": {
+        "@radix-ui/react-switch": "^1.1.0",
         "@reduxjs/toolkit": "^2.2.7",
         "@tanstack/react-router": "^1.46.8",
         "@vitejs/plugin-react": "^4.2.1",
@@ -42,6 +43,7 @@
         "@types/redux-action": "^1.2.8",
         "@types/redux-batched-subscribe": "^0.1.7",
         "@types/redux-logger": "^3.0.13",
+        "@types/superagent": "^8.1.9",
         "@types/uuid": "^10.0.0",
         "@vitejs/plugin-react": "^4.2.1",
         "cross-env": "^7.0.3",
