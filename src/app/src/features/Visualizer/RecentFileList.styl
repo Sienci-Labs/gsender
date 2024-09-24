@@ -1,0 +1,100 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.recent-files-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-left: solid 1px #FFFFFF;
+  border-bottom: solid 1px #FFFFFF;
+  height: 50%;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: #ffffff;
+
+  i {
+    margin: 0;
+    padding: 0;
+  }
+
+  &:focus {
+    outline: none;
+  }
+  &:active {
+    outline: none;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.recent-file-list {
+  position: absolute;
+  width: 200px;
+  right: -200px;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.25rem;
+
+  h2 {
+    font-size: 1.1rem;
+    color: #3e85c7;
+    margin: 0.25rem 0 0.25rem 0;
+    padding: 0 0.25rem;
+    text-align: left;
+  }
+}
+
+.recent-file {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  color: #6c6c6c;
+  text-align: left;
+  border: none;
+  border-bottom: solid 1px #9d9d9d;
+  outline: none;
+  background: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  &:focus {
+    outline: none;
+  }
+}

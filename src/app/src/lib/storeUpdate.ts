@@ -20,7 +20,10 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
     }
 };
 
-export const storeUpdate = async (content: string, isSync?: boolean): Promise<void> => {
+export const storeUpdate = async (
+    content: string,
+    isSync?: boolean,
+): Promise<void> => {
     try {
         const { settings, events = [], state } = JSON.parse(content);
 
@@ -30,7 +33,9 @@ export const storeUpdate = async (content: string, isSync?: boolean): Promise<vo
             resolve(res);
         }).then((_result) => {
             Promise.all([
-                Object.entries(events).map(([_key, event]) => api.events.create(event))
+                Object.entries(events).map(([_key, event]) =>
+                    api.events.create(event),
+                ),
             ]);
         });
 

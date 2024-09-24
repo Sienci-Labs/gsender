@@ -42,8 +42,11 @@ import {
 } from 'app/lib/toaster/ToasterLib';
 // TODO: add worker types
 // @ts-ignore
-// import VisualizeWorker from 'workers/Visualize.worker';
-// import { shouldVisualize, visualizeResponse } from 'workers/Visualize.response';
+import VisualizeWorker from 'app/workers/Visualize.worker';
+import {
+    shouldVisualize,
+    visualizeResponse,
+} from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import {
     RENDER_LOADING,
@@ -106,7 +109,7 @@ import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 
 export function* initialize(): Generator<any, void, any> {
-    // let visualizeWorker: VisualizeWorker | null = null;
+    let visualizeWorker: typeof VisualizeWorker | null = null;
     // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
@@ -235,29 +238,36 @@ export function* initialize(): Generator<any, void, any> {
                 }
             }, 1000);
 
-            // const needsVisualization = shouldVisualize();
+            const needsVisualization = shouldVisualize();
 
-            // if (needsVisualization) {
-            //     // visualizeWorker = new VisualizeWorker();
-            //     // visualizeWorker.onmessage = visualizeResponse;
-            //     await getParsedData().then((value) => {
-            //         const parsedData = value;
-            //         // visualizeWorker.postMessage({
-            //         //     content,
-            //         //     visualizer,
-            //         //     parsedData,
-            //         //     isNewFile,
-            //         //     accelerations,
-            //         //     maxFeedrates,
-            //         // });
-            //     });
-            // } else {
-            //     reduxStore.dispatch(
-            //         updateFileRenderState({
-            //             renderState: RENDER_RENDERED,
-            //         }),
-            //     );
-            // }
+            if (needsVisualization) {
+                // visualizeWorker = new VisualizeWorker();
+                const visualizeWorker = new Worker(
+                    new URL(
+                        '../../../workers/Visualize.worker.ts',
+                        import.meta.url,
+                    ),
+                    { type: 'module' },
+                );
+                visualizeWorker.onmessage = visualizeResponse;
+                await getParsedData().then((value) => {
+                    const parsedData = value;
+                    visualizeWorker.postMessage({
+                        content,
+                        visualizer,
+                        parsedData,
+                        isNewFile,
+                        accelerations,
+                        maxFeedrates,
+                    });
+                });
+            } else {
+                reduxStore.dispatch(
+                    updateFileRenderState({
+                        renderState: RENDER_RENDERED,
+                    }),
+                );
+            }
 
             return;
         }
@@ -268,7 +278,7 @@ export function* initialize(): Generator<any, void, any> {
         // so it can save it and give it to the normal or svg visualizer
 
         // TODO: ensure this is the correct way to do it, try to avoid pubsub as it's deprecated
-        // pubsub.publish('file:content', content, size, name);
+        pubsub.publish('file:content', content, size, name);
         // Processing started for gcodeProcessor
         reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
         reduxStore.dispatch(
@@ -285,23 +295,27 @@ export function* initialize(): Generator<any, void, any> {
             }
         }, 1000);
 
-        // const needsVisualization = shouldVisualize();
+        const needsVisualization = shouldVisualize();
 
         // visualizeWorker = new VisualizeWorker();
-        // visualizeWorker.onmessage = visualizeResponse;
+        const visualizeWorker = new Worker(
+            new URL('../../../workers/Visualize.worker.ts', import.meta.url),
+            { type: 'module' },
+        );
+        visualizeWorker.onmessage = visualizeResponse;
         await getParsedData().then((value) => {
             const parsedData = value;
-            // visualizeWorker.postMessage({
-            //     content,
-            //     visualizer,
-            //     isLaser,
-            //     shouldIncludeSVG,
-            //     needsVisualization,
-            //     parsedData,
-            //     isNewFile,
-            //     accelerations,
-            //     maxFeedrates,
-            // });
+            visualizeWorker.postMessage({
+                content,
+                visualizer,
+                isLaser,
+                shouldIncludeSVG,
+                needsVisualization,
+                parsedData,
+                isNewFile,
+                accelerations,
+                maxFeedrates,
+            });
         });
     };
 
@@ -636,9 +650,14 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     // TODO: uncomment when worker types are defined
-    // pubsub.subscribe('file:load', () => {
-    //     visualizeWorker?.terminate();
-    // });
+    pubsub.subscribe('file:load', () => {
+        const visualizeWorker = new Worker(
+            new URL('../../../workers/Visualize.worker.ts', import.meta.url),
+            { type: 'module' },
+        );
+
+        visualizeWorker?.terminate();
+    });
 
     pubsub.subscribe('parsedData:stored', () => {
         finishLoad = true;
@@ -656,17 +675,22 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
-    // pubsub.subscribe('estimate:done', (msg, data) => {
-    //     estimateWorker?.terminate();
-    // });
+    pubsub.subscribe('estimate:done', (msg, data) => {
+        estimateWorker?.terminate();
+    });
 
-    // TODO: uncomment this when reparseGCode is defined
-    // pubsub.subscribe(
-    //     'reparseGCode',
-    //     (msg: string, content: string, size: number, name: string, visualizer: string) => {
-    //         parseGCode(content, size, name, visualizer);
-    //     },
-    // );
+    pubsub.subscribe(
+        'reparseGCode',
+        (
+            msg: string,
+            content: string,
+            size: number,
+            name: string,
+            visualizer: string,
+        ) => {
+            parseGCode(content, size, name, visualizer);
+        },
+    );
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;

@@ -21,18 +21,25 @@
  *
  */
 
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
-import { MachineProfile } from "../lib/definitions/machine_profile";
-import { FetchOptions, GCodeOptions, SigninOptions, StateOptions, USER_DATA_COLLECTION_T, WatchOptions } from "./definitions";
+import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import { MachineProfile } from '../lib/definitions/machine_profile';
+import {
+    FetchOptions,
+    GCodeOptions,
+    SigninOptions,
+    StateOptions,
+    USER_DATA_COLLECTION_T,
+    WatchOptions,
+} from './definitions';
 
 // import store from "../store";
 
 // Create an instance of axios
 const authrequest = axios.create({
-    baseURL: "/",
+    baseURL: '/',
     headers: {
-        "Cache-Control": "no-cache",
-        "X-Requested-With": "XMLHttpRequest",
+        'Cache-Control': 'no-cache',
+        'X-Requested-With': 'XMLHttpRequest',
     },
 });
 
@@ -41,19 +48,19 @@ authrequest.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         // const token = store.get("session.token");
 
-        const token = "";
+        const token = '';
 
         if (token) {
-            config.headers["Authorization"] = "Bearer " + token;
+            config.headers['Authorization'] = 'Bearer ' + token;
         }
-        if (config.method === "get" || config.method === "head") {
+        if (config.method === 'get' || config.method === 'head') {
             config.params = { ...config.params, _: Date.now() };
         }
         return config;
     },
     (error) => {
         return Promise.reject(error);
-    }
+    },
 );
 
 //
@@ -61,14 +68,14 @@ authrequest.interceptors.request.use(
 //
 const signin = (options: SigninOptions): Promise<AxiosResponse> => {
     const { token, name, password } = { ...options };
-    return authrequest.post("/api/signin", { token, name, password });
+    return authrequest.post('/api/signin', { token, name, password });
 };
 
 //
 // Latest Version for windows
 //
 const getLatestVersion = (): Promise<AxiosResponse> => {
-    return authrequest.get("/api/version/latest");
+    return authrequest.get('/api/version/latest');
 };
 
 //
@@ -76,7 +83,7 @@ const getLatestVersion = (): Promise<AxiosResponse> => {
 // installation package-type/file-extension
 //
 const getShouldInstallUpdates = (): Promise<AxiosResponse> => {
-    return authrequest.get("/api/version/appUpdateSupport");
+    return authrequest.get('/api/version/appUpdateSupport');
 };
 
 //
@@ -84,44 +91,44 @@ const getShouldInstallUpdates = (): Promise<AxiosResponse> => {
 //
 const getState = (options?: StateOptions): Promise<AxiosResponse> => {
     const { key } = { ...options };
-    return authrequest.get("/api/state", { params: { key } });
+    return authrequest.get('/api/state', { params: { key } });
 };
 
 const setState = (options: Record<string, any>): Promise<AxiosResponse> => {
     const data = { ...options };
-    return authrequest.post("/api/state", data);
+    return authrequest.post('/api/state', data);
 };
 
 const unsetState = (options: StateOptions): Promise<AxiosResponse> => {
     const { key } = { ...options };
-    return authrequest.delete("/api/state", { params: { key } });
+    return authrequest.delete('/api/state', { params: { key } });
 };
 
 //
 // G-code
 //
 const loadGCode = (options: GCodeOptions): Promise<AxiosResponse> => {
-    const { port = "", name = "", gcode = "", context = {} } = { ...options };
-    return authrequest.post("/api/gcode", { port, name, gcode, context });
+    const { port = '', name = '', gcode = '', context = {} } = { ...options };
+    return authrequest.post('/api/gcode', { port, name, gcode, context });
 };
 
 const fetchGCode = (options?: GCodeOptions): Promise<AxiosResponse> => {
-    const { port = "" } = { ...options };
-    return authrequest.get("/api/gcode", { params: { port } });
+    const { port = '' } = { ...options };
+    return authrequest.get('/api/gcode', { params: { port } });
 };
 
 const downloadGCode = (options: GCodeOptions): void => {
-    const { port = "" } = { ...options };
+    const { port = '' } = { ...options };
 
-    const $form = document.createElement("form");
-    $form.setAttribute("id", "export");
-    $form.setAttribute("method", "POST");
-    $form.setAttribute("enctype", "multipart/form-data");
-    $form.setAttribute("action", "api/gcode/download");
+    const $form = document.createElement('form');
+    $form.setAttribute('id', 'export');
+    $form.setAttribute('method', 'POST');
+    $form.setAttribute('enctype', 'multipart/form-data');
+    $form.setAttribute('action', 'api/gcode/download');
 
-    const $port = document.createElement("input");
-    $port.setAttribute("name", "port");
-    $port.setAttribute("value", port);
+    const $port = document.createElement('input');
+    $port.setAttribute('name', 'port');
+    $port.setAttribute('value', port);
 
     // const $token = document.createElement("input");
     // $token.setAttribute("name", "token");
@@ -140,7 +147,7 @@ const downloadGCode = (options: GCodeOptions): void => {
 //
 const controllers = {
     get: (): Promise<AxiosResponse> => {
-        return authrequest.get("/api/controllers");
+        return authrequest.get('/api/controllers');
     },
 };
 
@@ -150,12 +157,12 @@ const controllers = {
 const watch = {
     getFiles: (options: WatchOptions): Promise<AxiosResponse> => {
         const { path } = { ...options };
-        return authrequest.post("/api/watch/files", { path });
+        return authrequest.post('/api/watch/files', { path });
     },
 
     readFile: (options: WatchOptions): Promise<AxiosResponse> => {
         const { file } = { ...options };
-        return authrequest.post("/api/watch/file", { file });
+        return authrequest.post('/api/watch/file', { file });
     },
 };
 
@@ -164,26 +171,26 @@ const watch = {
 //
 const users = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/users", { params: options });
+        return authrequest.get('/api/users', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/users", options);
+        return authrequest.post('/api/users', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/users/" + id);
+        return authrequest.get('/api/users/' + id);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/users/" + id);
+        return authrequest.delete('/api/users/' + id);
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/users/" + id, options);
+        return authrequest.put('/api/users/' + id, options);
     },
 };
 
@@ -192,30 +199,30 @@ const users = {
 //
 const events = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/events", { params: options });
+        return authrequest.get('/api/events', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/events", options);
+        return authrequest.post('/api/events', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/events/" + id);
+        return authrequest.get('/api/events/' + id);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/events/" + id);
+        return authrequest.delete('/api/events/' + id);
     },
 
     clearAll: (): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/events");
+        return authrequest.delete('/api/events');
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/events/" + id, options);
+        return authrequest.put('/api/events/' + id, options);
     },
 };
 
@@ -224,11 +231,11 @@ const events = {
 //
 const remoteSetting = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/remote", { params: options });
+        return authrequest.get('/api/remote', { params: options });
     },
 
     update: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.put("/api/remote", options);
+        return authrequest.put('/api/remote', options);
     },
 };
 
@@ -237,11 +244,11 @@ const remoteSetting = {
 //
 const jobStats = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/jobstats", { params: options });
+        return authrequest.get('/api/jobstats', { params: options });
     },
 
     update: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.put("/api/jobstats", options);
+        return authrequest.put('/api/jobstats', options);
     },
 };
 
@@ -250,11 +257,11 @@ const jobStats = {
 //
 const maintenance = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/maintenance", { params: options });
+        return authrequest.get('/api/maintenance', { params: options });
     },
 
     update: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.put("/api/maintenance", options);
+        return authrequest.put('/api/maintenance', options);
     },
 };
 
@@ -263,26 +270,26 @@ const maintenance = {
 //
 const macros = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/macros", { params: options });
+        return authrequest.get('/api/macros', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/macros", options);
+        return authrequest.post('/api/macros', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/macros/" + id);
+        return authrequest.get('/api/macros/' + id);
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/macros/" + id, options);
+        return authrequest.put('/api/macros/' + id, options);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/macros/" + id);
+        return authrequest.delete('/api/macros/' + id);
     },
 };
 
@@ -291,26 +298,26 @@ const macros = {
 //
 const mdi = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/mdi", { params: options });
+        return authrequest.get('/api/mdi', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/mdi", options);
+        return authrequest.post('/api/mdi', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/mdi/" + id);
+        return authrequest.get('/api/mdi/' + id);
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/mdi/" + id, options);
+        return authrequest.put('/api/mdi/' + id, options);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/mdi/" + id);
+        return authrequest.delete('/api/mdi/' + id);
     },
 };
 
@@ -319,26 +326,26 @@ const mdi = {
 //
 const commands = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/commands", { params: options });
+        return authrequest.get('/api/commands', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/commands", options);
+        return authrequest.post('/api/commands', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/commands/" + id);
+        return authrequest.get('/api/commands/' + id);
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/commands/" + id, options);
+        return authrequest.put('/api/commands/' + id, options);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/commands/" + id);
+        return authrequest.delete('/api/commands/' + id);
     },
 };
 
@@ -347,26 +354,26 @@ const commands = {
 //
 const machines = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/machines", { params: options });
+        return authrequest.get('/api/machines', { params: options });
     },
 
     create: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.post("/api/machines", options);
+        return authrequest.post('/api/machines', options);
     },
 
     read: (id: string): Promise<AxiosResponse> => {
-        return authrequest.get("/api/machines/" + id);
+        return authrequest.get('/api/machines/' + id);
     },
 
     update: (
         id: string,
-        options: Record<string, any>
+        options: Record<string, any>,
     ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/machines/" + id, options);
+        return authrequest.put('/api/machines/' + id, options);
     },
 
     delete: (id: string): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/machines/" + id);
+        return authrequest.delete('/api/machines/' + id);
     },
 };
 
@@ -375,7 +382,9 @@ const machines = {
 //
 const file = {
     upload: (formData: FormData): Promise<AxiosResponse> => {
-        return authrequest.post("/api/gcode/file", formData);
+        return authrequest.post('/api/file', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
     },
 };
 
@@ -387,9 +396,13 @@ const metrics = {
         return authrequest.post('/api/metrics/sendData', machineProfile);
     },
     getCollectDataStatus: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get('/api/metrics/collectUserData', { params: options });
+        return authrequest.get('/api/metrics/collectUserData', {
+            params: options,
+        });
     },
-    toggleCollectDataStatus: (options: USER_DATA_COLLECTION_T): Promise<AxiosResponse> => {
+    toggleCollectDataStatus: (
+        options: USER_DATA_COLLECTION_T,
+    ): Promise<AxiosResponse> => {
         return authrequest.post('/api/metrics/collectUserData', options);
     },
     sendUsageData: (options: Record<string, any>): Promise<AxiosResponse> => {
@@ -402,15 +415,13 @@ const metrics = {
 //
 const alarmList = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
-        return authrequest.get("/api/alarmList", { params: options });
+        return authrequest.get('/api/alarmList', { params: options });
     },
-    update: (
-        options: Record<string, any>
-    ): Promise<AxiosResponse> => {
-        return authrequest.put("/api/alarmList/", options);
+    update: (options: Record<string, any>): Promise<AxiosResponse> => {
+        return authrequest.put('/api/alarmList/', options);
     },
     clearAll: (): Promise<AxiosResponse> => {
-        return authrequest.delete("/api/alarmList");
+        return authrequest.delete('/api/alarmList');
     },
 };
 
@@ -437,5 +448,5 @@ export default {
     machines,
     file,
     metrics,
-    alarmList
+    alarmList,
 };

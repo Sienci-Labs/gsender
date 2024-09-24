@@ -1,5 +1,5 @@
 import {FileControl} from "app/features/FileControl";
-import {JobControl} from "app/features/JobControl";
+import JobControl from "app/features/JobControl";
 import {Tools} from "app/features/Tools";
 
 export const ToolArea = () => {

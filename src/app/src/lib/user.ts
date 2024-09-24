@@ -25,40 +25,46 @@ import api from '../api';
 import config from '../store';
 
 export interface SignInParams {
-    token: string,
-    name?: string,
-    password?: string,
-};
+    token: string;
+    name?: string;
+    password?: string;
+}
 
 let _authenticated = false;
 
-export const signin = ({ token, name, password }: SignInParams) => new Promise((resolve, _reject): void => {
-    api.signin({ token, name, password })
-        .then((res) => {
-            const { enabled = false, token = '', name = '' } = { ...res.data };
+export const signin = ({ token, name, password }: SignInParams) =>
+    new Promise((resolve, _reject): void => {
+        api.signin({ token, name, password })
+            .then((res) => {
+                const {
+                    enabled = false,
+                    token = '',
+                    name = '',
+                } = { ...res.data };
 
-            config.set('session.enabled', enabled);
-            config.set('session.token', token);
-            config.set('session.name', name);
+                config.set('session.enabled', enabled);
+                config.set('session.token', token);
+                config.set('session.name', name);
 
-            // Persist data after successful login to prevent debounced update
-            config.persist();
+                // Persist data after successful login to prevent debounced update
+                config.persist();
 
-            _authenticated = true;
-            resolve({ authenticated: true, token: token });
-        })
-        .catch((_res) => {
-            // Do not unset session token so it won't trigger an update to the store
-            _authenticated = false;
-            resolve({ authenticated: false, token: null });
-        });
-});
+                _authenticated = true;
+                resolve({ authenticated: true, token: token });
+            })
+            .catch((_res) => {
+                // Do not unset session token so it won't trigger an update to the store
+                _authenticated = false;
+                resolve({ authenticated: false, token: null });
+            });
+    });
 
-export const signout = () => new Promise<void>((resolve, _reject): void => {
-    config.unset('session.token');
-    _authenticated = false;
-    resolve();
-});
+export const signout = () =>
+    new Promise<void>((resolve, _reject): void => {
+        config.unset('session.token');
+        _authenticated = false;
+        resolve();
+    });
 
 export const isAuthenticated = (): boolean => {
     return _authenticated;

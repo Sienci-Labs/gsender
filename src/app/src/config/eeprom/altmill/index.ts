@@ -1,4 +1,4 @@
-import { EEPROMSettings } from "definitions/firmware";
+import { EEPROMSettings } from 'app/definitions/firmware';
 
 export const ALTMILL_DEFAULT: EEPROMSettings = {
     $0: '5.0',

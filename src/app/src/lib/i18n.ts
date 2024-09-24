@@ -25,9 +25,9 @@ import sha1 from 'sha1';
 import i18next from 'i18next';
 
 export interface i18n__Options {
-    context: object,
-    count: number,
-    defaultValue: string,
+    context?: object,
+    count?: number,
+    defaultValue?: string,
 };
 
 const t = (...args: Array<any>): string => {
@@ -42,9 +42,9 @@ const t = (...args: Array<any>): string => {
     return text;
 };
 
-const _ = (value: string, options?: i18n__Options): string => {
+const _ = (value: string, options: i18n__Options = {}): string => {
     const key = ((value, options) => {
-        const { context = {}, count = 0} = { ...options };
+        const { context, count } = { ...options };
         const containsContext = (context !== undefined) && (context !== null);
         const containsPlural = (typeof count === 'number');
         if (containsContext) {
