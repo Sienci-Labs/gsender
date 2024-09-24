@@ -23,6 +23,7 @@
 
 import { ArcCurve, Vector3 } from 'three';
 import isEmpty from 'lodash/isEmpty';
+
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 
 interface WorkerData {
@@ -61,7 +62,7 @@ interface SpindleValues {
     spindleSpeed: number;
 }
 
-onmessage = function ({ data }: { data: WorkerData }) {
+self.onmessage = function ({ data }: { data: WorkerData }) {
     const {
         content,
         visualizer,
@@ -614,5 +615,5 @@ onmessage = function ({ data }: { data: WorkerData }) {
         message.spindleChanges = spindleChanges;
     }
 
-    postMessage(message);
+    self.postMessage(message);
 };

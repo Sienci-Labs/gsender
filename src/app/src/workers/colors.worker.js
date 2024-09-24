@@ -22,10 +22,25 @@
  */
 
 import * as THREE from 'three';
-import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from 'app/widgets/Visualizer/constants';
+import {
+    BACKGROUND_PART,
+    CUTTING_PART,
+    G0_PART,
+    G1_PART,
+    G2_PART,
+    G3_PART,
+    LASER_PART,
+} from 'app/features/Visualizer/constants';
 
-onmessage = function({ data }) {
-    const { colors, frames, spindleSpeeds, isLaser = false, spindleChanges, theme } = data;
+onmessage = function ({ data }) {
+    const {
+        colors,
+        frames,
+        spindleSpeeds,
+        isLaser = false,
+        spindleChanges,
+        theme,
+    } = data;
 
     let savedColors = [];
 
@@ -34,11 +49,12 @@ onmessage = function({ data }) {
         const fillColor = new THREE.Color(theme.get(BACKGROUND_PART));
         const maxSpindleValue = Math.max(...[...spindleSpeeds]);
 
-        const calculateOpacity = (speed) => ((maxSpindleValue === 0) ? 1 : (speed / maxSpindleValue));
+        const calculateOpacity = (speed) =>
+            maxSpindleValue === 0 ? 1 : speed / maxSpindleValue;
 
         for (let i = 0; i < frames.length; i++) {
             const { spindleOn, spindleSpeed } = spindleChanges[i];
-            const offsetIndex = (frames[i] * 4);
+            const offsetIndex = frames[i] * 4;
             if (spindleOn) {
                 let opacity = calculateOpacity(spindleSpeed);
                 const color = [...defaultColor.toArray(), opacity];
@@ -53,7 +69,7 @@ onmessage = function({ data }) {
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     const getColorTypedArray = (colors, motionColor) => {
         const colorArray = [];
-        colors.forEach(colorTag => {
+        colors.forEach((colorTag) => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
@@ -70,11 +86,11 @@ onmessage = function({ data }) {
     const defaultColor = new THREE.Color(theme.get(CUTTING_PART));
     // Get line colors for current theme
     const motionColor = {
-        'G0': new THREE.Color(theme.get(G0_PART)),
-        'G1': new THREE.Color(theme.get(G1_PART)),
-        'G2': new THREE.Color(theme.get(G2_PART)),
-        'G3': new THREE.Color(theme.get(G3_PART)),
-        'default': defaultColor
+        G0: new THREE.Color(theme.get(G0_PART)),
+        G1: new THREE.Color(theme.get(G1_PART)),
+        G2: new THREE.Color(theme.get(G2_PART)),
+        G3: new THREE.Color(theme.get(G3_PART)),
+        default: defaultColor,
     };
 
     //this.geometry.setFromPoints(this.vertices);
@@ -82,7 +98,7 @@ onmessage = function({ data }) {
 
     const message = {
         colorArray: colorArray,
-        savedColors: savedColors
+        savedColors: savedColors,
     };
 
     postMessage(message);
