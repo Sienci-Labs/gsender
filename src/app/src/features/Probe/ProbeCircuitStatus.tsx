@@ -24,36 +24,30 @@
 import cx from 'classnames';
 
 interface Props {
-    probeActive: boolean,
-    connected: boolean
+    probeActive: boolean;
+    connected: boolean;
 }
 
 const ProbeCircuitStatus: React.FC<Props> = ({ probeActive, connected }) => {
     return (
         <div className="w-full flex flex-col justify-center items-center sm:mt-4">
-            {
-                connected && (
-                    <div className="w-full flex flex-col justify-center items-center sm:mt-4">
-                        <div className={cx(
-                            "w-8 h-8 rounded-full bg-robin-950",
-                            {
-                                "bg-red-500": !probeActive,
-                                "bg-green-500": probeActive 
-                            }
-                        )} />
-                        <span className="mt-3">
-                            {
-                                connected && probeActive ? 'Touch detected' : 'No Touch'
-                            }
-                        </span>
-                    </div>
-                )}
-            {
-                !connected && 'No device connected'
-            }
-
+            {connected && (
+                <div className="w-full flex flex-col justify-center items-center sm:mt-4">
+                    <div
+                        className={cx('w-8 h-8 rounded-full bg-robin-950', {
+                            'bg-red-500': !probeActive,
+                            'bg-green-500': probeActive,
+                        })}
+                    />
+                    <span className="mt-3">
+                        {connected && probeActive
+                            ? 'Touch detected'
+                            : 'No Touch'}
+                    </span>
+                </div>
+            )}
+            {!connected && 'No device connected'}
         </div>
-
     );
 };
 

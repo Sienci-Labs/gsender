@@ -23,7 +23,6 @@
 
 import { useEffect, useState } from 'react';
 // import Modal from '@trendmicro/react-modal';
-import i18n from 'app/lib/i18n';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -34,28 +33,33 @@ import ProbeImage from './ProbeImage';
 import { PROBING_CATEGORY } from '../../constants';
 import useKeybinding from '../../lib/useKeybinding';
 import { Actions, State } from './definitions';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'app/components/shadcn/Dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/shadcn/Button';
-import { cx } from 'classnames';
+import cx from 'classnames';
 import { GamepadDetail } from 'app/lib/gamepad/definitions';
-import { ShuttleControlEvents, ShuttleEvent } from 'app/lib/definitions/shortcuts';
+import {
+    ShuttleControlEvents,
+    ShuttleEvent,
+} from 'app/lib/definitions/shortcuts';
 
 interface Props {
-    state: State,
-    actions: Actions,
+    state: State;
+    actions: Actions;
 }
 
-const RunProbe = ({
-    actions,
-    state
-}: Props) => {
+const RunProbe = ({ actions, state }: Props) => {
     const {
         connectionMade,
         canClick,
         show,
         availableProbeCommands,
         selectedProbeCommand,
-        touchplate
+        touchplate,
     } = state;
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
@@ -88,13 +92,13 @@ const RunProbe = ({
                     msg: 'Probe Confirmed Manually',
                     type: TOASTER_INFO,
                     duration: 5000,
-                    icon: 'fa-satellite-dish'
+                    icon: 'fa-satellite-dish',
                 });
 
                 actions.setProbeConnectivity(true);
-            }
-        }
-    }
+            },
+        },
+    };
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();
@@ -105,10 +109,10 @@ const RunProbe = ({
             msg: 'Initiated probing cycle',
             type: TOASTER_INFO,
             duration: 5000,
-            icon: 'fa-satellite-dish'
+            icon: 'fa-satellite-dish',
         });
         actions.onOpenChange(false);
-    }
+    };
 
     // const startConnectivityTest = (probeStatus: () => boolean, connectivityTest: boolean): void => {
     //     // If we disabled test, immediately set connectionMade to true and return
@@ -131,7 +135,9 @@ const RunProbe = ({
         addShuttleControlEvents();
         useKeybinding(shuttleControlEvents);
 
-        gamepad.on('gamepad:button', (event: GamepadDetail) => runAction({ event }));
+        gamepad.on('gamepad:button', (event: GamepadDetail) =>
+            runAction({ event }),
+        );
 
         return () => {
             testInterval && clearInterval(testInterval);
@@ -143,70 +149,96 @@ const RunProbe = ({
     const addShuttleControlEvents = () => {
         combokeys.reload();
 
-        Object.keys(shuttleControlEvents).forEach(eventName => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent).callback;
+        Object.keys(shuttleControlEvents).forEach((eventName) => {
+            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
+                .callback;
             combokeys.on(eventName, callback);
         });
-    }
+    };
 
     const removeShuttleControlEvents = () => {
-        Object.keys(shuttleControlEvents).forEach(eventName => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent).callback;
+        Object.keys(shuttleControlEvents).forEach((eventName) => {
+            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
+                .callback;
             combokeys.removeListener(eventName, callback);
         });
-    }
+    };
 
     const { touchplateType } = touchplate;
-    //const probeCommands = actions.generateProbeCommands();
+    // const probeCommands = actions.generateProbeCommands();
     //console.log(probeCommands.join('\n'));
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     const probeActive = actions.returnProbeConnectivity();
 
     return (
-        <Dialog
-            open={show}
-            onOpenChange={actions.onOpenChange}
-        >
-            <DialogHeader className="bg-robin-950 text-robin-600">
-                <DialogTitle>{i18n._(`Probe - ${probeCommand.id}`)}</DialogTitle>
-            </DialogHeader>
+        <Dialog open={show} onOpenChange={actions.onOpenChange}>
             <DialogContent
                 className={cx(
-                    "sm:min-w-[20%] sm:max-w-[80%]",
+                    'flex flex-col justify-center items-center bg-gray-100 w-[700px] h-[450px] sm:min-w-[20%] sm:max-w-[80%] p-4',
                     {
-                        "hidden": !show
-                    }
+                        hidden: !show,
+                    },
                 )}
             >
-                <div className="w-[600px] min-h-[200px] flex flex-row sm:w-full sm:flex-col">
-                    <div className="w-[60%] flex flex-col justify-between sm:w-full sm:order-2">
-                        <div className="text-gray-400">
-                            <p>Ensure tool is positioned as shown.</p>
-                            <p>
-                                To confirm a reliable circuit, touch your plate to the tool and look for the signal to be robustly detected
-                                (indicated by a green light) before returning the probe to the probing position.
+                <DialogHeader className="bg-robin-950 text-robin-700 flex items-start justify-center h-10 border-b-[1px] border-gray-400 mb-1">
+                    <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-[1.5fr_1fr] gap-3 w-[600px] min-h-[200px]">
+                    <div className="flex flex-col justify-between pb-4">
+                        <div className="text-black leading-snug">
+                            <p className="mb-3">
+                                Ensure tool is positioned as shown.
                             </p>
-                            <p>Probing cannot be run without confirming the circuit.</p>
-                            <p>Consider holding your touch plate in place during probing to get a more consistent measurement.</p>
+                            <p className="mb-3">
+                                To confirm a reliable circuit, touch your plate
+                                to the tool and look for the signal to be
+                                robustly detected (indicated by a green light)
+                                before returning the probe to the probing
+                                position.{'\n'}
+                            </p>
+                            <p className="mb-3">
+                                Probing cannot be run without confirming the
+                                circuit.
+                            </p>
+                            <p className="mb-3">
+                                Consider holding your touch plate in place
+                                during probing to get a more consistent
+                                measurement.
+                            </p>
                         </div>
                         <Button
                             disabled={!connectionMade}
                             onClick={startProbe}
+                            className={cx(
+                                'rounded-[0.2rem] border-solid border-2 p-2',
+                                {
+                                    'border-blue-400 bg-white [box-shadow:_2px_2px_1px_var(--tw-shadow-color)] shadow-gray-400':
+                                        connectionMade,
+                                    'border-gray-500 bg-gray-400':
+                                        !connectionMade,
+                                },
+                            )}
                         >
-                            {
-                                connectionMade ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
-                            }
+                            {connectionMade
+                                ? 'Start Probe'
+                                : 'Waiting on probe circuit confirmation...'}
                         </Button>
                     </div>
-                    <div className="w-[40%] flex flex-col sm:m-auto sm:mb-4">
-                        <ProbeImage probeCommand={probeCommand} touchplateType={touchplateType} />
-                        <ProbeCircuitStatus connected={canClick} probeActive={probeActive} />
+                    <div className="flex flex-col sm:m-auto sm:mb-4">
+                        <ProbeImage
+                            probeCommand={probeCommand}
+                            touchplateType={touchplateType}
+                        />
+                        <ProbeCircuitStatus
+                            connected={canClick}
+                            probeActive={probeActive}
+                        />
                     </div>
                 </div>
             </DialogContent>
         </Dialog>
     );
-}
+};
 
 export default RunProbe;

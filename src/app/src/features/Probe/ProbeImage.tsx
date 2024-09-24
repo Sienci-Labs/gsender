@@ -22,7 +22,11 @@
  */
 
 import React from 'react';
-import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import {
+    TOUCHPLATE_TYPE_STANDARD,
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_ZERO,
+} from 'app/lib/constants';
 import XProbe from './assets/Block-X.gif';
 import YProbe from './assets/Block-Y.gif';
 import XYProbe from './assets/Block-XY.gif';
@@ -34,11 +38,14 @@ import AutoXYZProbe from './assets/AutoZero-Rem.gif';
 import { ProbeCommand, TOUCHPLATE_TYPES_T } from './definitions';
 
 interface Props {
-    probeCommand: ProbeCommand,
-    touchplateType: TOUCHPLATE_TYPES_T,
+    probeCommand: ProbeCommand;
+    touchplateType: TOUCHPLATE_TYPES_T;
 }
 
-const ProbeImage: React.FC<Props> = ({ probeCommand, touchplateType = TOUCHPLATE_TYPE_STANDARD }) => {
+const ProbeImage: React.FC<Props> = ({
+    probeCommand,
+    touchplateType = TOUCHPLATE_TYPE_STANDARD,
+}) => {
     const getProbeImage = () => {
         const { id } = probeCommand;
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
@@ -65,7 +72,7 @@ const ProbeImage: React.FC<Props> = ({ probeCommand, touchplateType = TOUCHPLATE
 
     return (
         <div className="flex items-center justify-center">
-            <img src={imgSrc} className={"w-[15vh] my-0 mx-auto sm:w-[80%]"} />
+            <img src={imgSrc} className={'w-[15vh] my-0 mx-auto sm:w-[80%]'} />
         </div>
     );
 };
