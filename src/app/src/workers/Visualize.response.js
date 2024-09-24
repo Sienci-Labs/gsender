@@ -1,13 +1,8 @@
 import pubsub from 'pubsub-js';
-import { store as reduxStore } from 'store/redux';
+import { store as reduxStore } from 'app/store/redux';
 import _get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
-import * as fileActions from 'store/redux/actions/fileInfoActions';
-import {
-    UPDATE_FILE_INFO,
-    UPDATE_FILE_PROCESSING,
-} from 'app/actions/fileInfoActions';
 import store from 'app/store';
 import {
     RENDER_RENDERED,
@@ -15,6 +10,11 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { replaceParsedData } from '../lib/indexedDB';
+import {
+    updateFileInfo,
+    updateFileProcessing,
+    updateFileRenderState,
+} from '../store/redux/slices/fileInfo.slice';
 
 export const visualizeResponse = async ({ data }) => {
     if (isNumber(data)) {
@@ -28,17 +28,10 @@ export const visualizeResponse = async ({ data }) => {
         };
 
         if (data.visualizer !== VISUALIZER_SECONDARY) {
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: estimatePayload,
-            });
+            reduxStore.dispatch(updateFileInfo(estimatePayload));
         }
-        reduxStore.dispatch({
-            type: UPDATE_FILE_PROCESSING,
-            payload: {
-                value: false,
-            },
-        });
+
+        reduxStore.dispatch(updateFileProcessing(false));
 
         // if there's new parsed data, send to redux
         if (parsedData) {
@@ -66,21 +59,13 @@ export const visualizeResponse = async ({ data }) => {
                     'file.renderState',
                 );
                 if (renderState !== RENDER_RENDERED) {
-                    reduxStore.dispatch({
-                        type: fileActions.UPDATE_FILE_RENDER_STATE,
-                        payload: {
-                            state: RENDER_RENDERING,
-                        },
-                    });
+                    reduxStore.dispatch(
+                        updateFileRenderState(RENDER_RENDERING),
+                    );
                 }
             }, 250);
         } else {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_RENDERED,
-                },
-            });
+            reduxStore.dispatch(updateFileRenderState(RENDER_RENDERED));
         }
     }
 };
