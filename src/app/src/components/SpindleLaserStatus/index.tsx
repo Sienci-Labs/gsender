@@ -3,17 +3,13 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { SpindleLaserStatusVariant } from './SpindleLaserStatusVariant';
 
 const SpindleLaserStatus = () => {
-    const {
-        connection,
-        controller: {
-            settings: { settings },
-            modal,
-        },
-    } = useTypedSelector((state) => state);
+    const { isConnected } = useTypedSelector((state) => state.connection);
+    const { settings } = useTypedSelector((state) => state.controller.settings);
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
 
-    if (!connection.isConnected) return null;
+    if (!isConnected) return null;
 
-    const spindleOn = modal.spindle !== 'M5';
+    const spindleOn = spindle !== 'M5';
 
     const label = {
         '0': (
