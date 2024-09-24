@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
-import { parseLine } from 'gcode-parser';
+
 import { FILE_TYPE } from '../constants';
+import { parseLine } from './GCodeParser';
 
 interface Position {
     x: number;
