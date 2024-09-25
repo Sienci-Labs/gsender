@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import directionIcon from './assets/direction.svg';
+import directionIcon from './assets/arrow-direction.svg';
 
 interface Props {
     direction: number;

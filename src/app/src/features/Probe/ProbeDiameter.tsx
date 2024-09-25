@@ -68,9 +68,9 @@ const convertAvailableTools = (tools: AvailableTool[], units: UNITS_EN) => {
 
 const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
     const { _setToolDiameter, _setProbeType } = actions;
-    let { availableTools, units, toolDiameter } = state;
+    let { availableTools, units } = state;
 
-    const [value, setValue] = useState(String(toolDiameter));
+    const [value, setValue] = useState('Auto');
 
     const tools = [...availableTools];
 
@@ -109,7 +109,6 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
             <Select
                 onValueChange={handleChange}
                 value={value}
-                defaultValue={String(toolDiameter)}
                 disabled={!probeCommand.tool}
             >
                 <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border-[1px] border-gray-300">
