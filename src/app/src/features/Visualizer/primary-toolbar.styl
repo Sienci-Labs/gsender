@@ -1,0 +1,81 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.primary-toolbar {
+    .controller-type {
+        display: inline-block;
+        font-size: 14px;
+        font-weight: bold;
+        margin-right: 10px;
+        padding: 4px 0;
+    }
+    .controller-state {
+        display: none;
+        color: #222;
+        background-color: #fff;
+        border: 1px solid #e3e3e3;
+        border-radius: 3px;
+        min-width: 50px;
+        text-align: center;
+        padding: 4px 12px;
+        font-size: 12px;
+        line-height: 18px;
+
+        &.controller-state-default {
+            display: inline-block;
+            color: #222;
+            background-color: #fff;
+            border: 1px solid #e3e3e3;
+        }
+        &.controller-state-primary {
+            display: inline-block;
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+        }
+        &.controller-state-success {
+            display: inline-block;
+            color: #fff;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+        }
+        &.controller-state-info {
+            display: inline-block;
+            color: #fff;
+            background-color: #5bc0de;
+            border-color: #46b8da;
+        }
+        &.controller-state-warning {
+            display: inline-block;
+            color: #fff;
+            background-color: #f0ad4e;
+            border-color: #eea236;
+        }
+        &.controller-state-danger {
+            display: inline-block;
+            color: #fff;
+            background-color: #d9534f;
+            border-color: #d43f3a;
+        }
+    }
+}

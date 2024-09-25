@@ -1,8 +1,7 @@
 import api from '../api';
 import { USAGE_TOOL_NAME, USER_DATA_COLLECTION } from '../constants';
 
-type USAGE_TOOL_NAME_T =
-    (typeof USAGE_TOOL_NAME)[keyof typeof USAGE_TOOL_NAME];
+type USAGE_TOOL_NAME_T = (typeof USAGE_TOOL_NAME)[keyof typeof USAGE_TOOL_NAME];
 
 export const collectUserUsageData = async (toolName: USAGE_TOOL_NAME_T) => {
     const res = await api.metrics.getCollectDataStatus();

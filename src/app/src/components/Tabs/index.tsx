@@ -67,7 +67,7 @@ export const Tabs = ({ items }: TabbedProps) => {
     return (
         <div className="w-full">
             <div className="relative">
-                <div className="flex items-center absolute top-[-55px] left-0 right-0 z-10">
+                <div className="flex items-center absolute top-[-47px] left-0 right-0 z-10">
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 mr-2 ${
                             canScrollLeft
@@ -81,7 +81,7 @@ export const Tabs = ({ items }: TabbedProps) => {
                     </button>
                     <div
                         ref={tabsRef}
-                        className="flex overflow-x-auto flex-grow scrollbar-hide"
+                        className="flex overflow-x-auto flex-grow"
                         style={{
                             scrollbarWidth: 'none',
                             msOverflowStyle: 'none',
@@ -92,7 +92,7 @@ export const Tabs = ({ items }: TabbedProps) => {
                             <button
                                 key={item.label}
                                 ref={(el) => (tabRefs.current[index] = el)}
-                                className={`flex-shrink-0 px-4 py-2 text-sm font-medium ${
+                                className={`flex-grow px-4 py-2 text-sm font-medium ${
                                     activeTab === item.label
                                         ? 'text-blue-600 border-b-2 border-blue-600'
                                         : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800'
