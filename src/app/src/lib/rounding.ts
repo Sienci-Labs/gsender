@@ -22,7 +22,7 @@
  */
 
 import { METRIC_UNITS } from '../constants';
-import { BasicObject, UNITS_EN, UNITS_GCODE } from 'definitions/general';
+import { BasicObject, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
 
 const storeValuesThatNeedRounding = new Set([
     'workspace.safeRetractHeight',
@@ -117,7 +117,7 @@ export const round = (val: number | string, units: UNITS_GCODE | UNITS_EN): numb
 
 // rounds applicable values
 // recursive, looks through object properties
-export const determineRoundedValue = (key: string, value: number | string | boolean | BasicObject | Array<any>): number | string | boolean | BasicObject | Array<any> => {
+export const determineRoundedValue = (key: string, value: any): any => {
     const isObject = value instanceof Object;
     const isArray = Array.isArray(value);
 

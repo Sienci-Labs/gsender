@@ -36,8 +36,8 @@ import {
 import machineProfiles from './machineProfiles';
 import { profiles } from './gamepad';
 import { DefaultState } from '../definitions';
-import { MachineProfile } from 'definitions/firmware';
-import { SPINDLE } from 'lib/definitions/gcode_virtualization';
+import { MachineProfile } from 'app/definitions/firmware';
+import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
 
 const [M3] = SPINDLE_MODES;
 

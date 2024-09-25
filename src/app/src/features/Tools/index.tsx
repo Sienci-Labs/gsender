@@ -1,10 +1,8 @@
 import { Widget } from '../../components/Widget';
 import { Tabs } from '../../components/Tabs';
 import { Console } from '../Console';
-
-const Probe = () => {
-    return <div>Probe</div>;
-};
+import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import Probe from '../Probe';
 
 const Coolant = () => {
     return <div>Coolant</div>;
@@ -21,7 +19,11 @@ const tabs = [
     },
     {
         label: 'Probe',
-        content: <Probe />,
+        content: (
+            <WidgetConfigProvider widgetId="probe">
+                <Probe />
+            </WidgetConfigProvider>
+        ),
     },
     {
         label: 'Coolant',

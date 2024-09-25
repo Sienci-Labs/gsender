@@ -1,5 +1,5 @@
 import { SHORTCUT_CATEGORY } from "../../constants";
-import { BasicObject } from "definitions/general";
+import { BasicObject } from "app/definitions/general";
 
 
 // Types
@@ -28,19 +28,19 @@ export interface CommandKeys {
 export interface ShuttleEvent {
     title: string,
     keys: string,
-    gamepadKeys: string,
-    keysName: string,
+    gamepadKeys?: string,
+    keysName?: string,
     cmd: string,
-    payload: BasicObject,
-    preventDefault: false,
-    isActive: true,
+    payload?: BasicObject,
+    preventDefault: boolean,
+    isActive: boolean,
     category: SHORTCUT_CATEGORY_T,
-    callback: Function
+    callback: (...args: any) => void,
 };
 
 export interface ShuttleControlEvents {
     [key: string]: ShuttleEvent | Function,
-    MACRO: Function
+    MACRO?: Function
 };
 
 export interface Macro {
