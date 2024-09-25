@@ -68,7 +68,7 @@ export interface ProbingOptions {
     xyPositionAdjust?: number;
     zPositionAdjust?: number;
     direction?: PROBE_DIRECTIONS;
-    $13: '0' | '1';
+    $13: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
 }

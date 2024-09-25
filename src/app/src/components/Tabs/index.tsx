@@ -118,11 +118,12 @@ export const Tabs = ({ items }: TabbedProps) => {
                     </button>
                 </div>
             </div>
-            <div>
+            <div className="block w-full h-full">
                 {items.map((item) => (
                     <div
                         key={item.label}
                         className={classNames(
+                            'w-full h-full',
                             activeTab === item.label ? 'block' : 'hidden',
                         )}
                     >

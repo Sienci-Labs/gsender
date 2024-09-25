@@ -72,7 +72,7 @@ const ProbeImage: React.FC<Props> = ({
 
     return (
         <div className="flex items-center justify-center">
-            <img src={imgSrc} className={'w-[15vh] my-0 mx-auto sm:w-[80%]'} />
+            <img src={imgSrc} className={'max-h-full my-0 mx-auto'} />
         </div>
     );
 };

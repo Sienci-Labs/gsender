@@ -186,11 +186,11 @@ const Probe: React.FC<Props> = ({ state, actions }) => {
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     return (
-        <div>
-            <div className="grid grid-cols-[5fr_3fr] w-[95%] absolute">
+        <div className="w-full h-full">
+            <div className="grid grid-cols-[5fr_3fr] w-full h-full">
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-4 items-center justify-center">
+                <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
                     <div className="flex w-full bg-white rounded-md border-solid border-[1px] border-gray-300 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Button

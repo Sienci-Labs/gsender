@@ -487,7 +487,7 @@ const ProbeWidget = () => {
     };
 
     return (
-        <div className="relative p-3 h-full">
+        <div className="relative p-3 w-full h-full">
             <RunProbe state={state} actions={actions} />
             <Probe state={state} actions={actions} />
         </div>
