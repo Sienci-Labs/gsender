@@ -1,13 +1,14 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute } from '@tanstack/react-router';
+import Preferences from 'app/features/Preferences';
 
 export const Route = createLazyFileRoute('/configuration')({
-  component: Configuration
-})
+    component: Configuration,
+});
 
 function Configuration() {
-  return (
-      <div>
-        Configuration tools
-      </div>
-  );
+    return (
+        <div>
+            <Preferences />
+        </div>
+    );
 }
