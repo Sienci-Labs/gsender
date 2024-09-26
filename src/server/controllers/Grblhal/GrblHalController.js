@@ -2188,8 +2188,12 @@ class GrblHalController {
 
         const cmd = data.trim();
 
+        if (cmd === '$G') { // the command for grblHAL is not $G, but x83
+            data = GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT;
+        }
+
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,
