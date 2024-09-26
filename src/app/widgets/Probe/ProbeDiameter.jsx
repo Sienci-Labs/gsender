@@ -55,11 +55,12 @@ const inputStyle = {
 
 const ProbeDiameter = ({ actions, state, probeCommand }) => {
     const { setToolDiameter } = actions;
-    let { availableTools, units, toolDiameter } = state;
+    const { availableTools, units, toolDiameter } = state;
     const tools = [...availableTools];
 
+    let unitsLabel = units;
     if (toolDiameter === 'Tip' || toolDiameter === 'Auto') {
-        units = '';
+        unitsLabel = '';
     }
 
     const handleChange = (value) => {
@@ -87,7 +88,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
                 isClearable
                 styles={inputStyle}
                 onChange={handleChange}
-                value={{ label: `${toolDiameter} ${units}` }}
+                value={{ label: `${toolDiameter} ${unitsLabel}` }}
                 options={options}
                 menuPlacement="top"
                 isDisabled={!probeCommand.tool}
