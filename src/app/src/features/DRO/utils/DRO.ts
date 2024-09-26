@@ -18,6 +18,8 @@ export type AxesArray = Axis[];
 
 export const defaultAxes: AxesArray = ['X', 'Y', 'Z'];
 
+export type MovementModal = 'G90' | 'G91';
+
 export interface DROPosition {
     x: number | string;
     y: number | string;
@@ -74,4 +76,11 @@ export function gotoZero(axis: string) {
     }
 
     controller.command('gcode:safe', commands);
+}
+
+export function GoTo(pos: DROPosition, isG91: boolean) {
+    const code = [];
+    const mode = isG91 ? 'G91' : 'G90';
+    code.push(`${mode} G0 X${pos.x} Y${pos.y} Z${pos.z}`);
+    controller.command('gcode:safe', code);
 }

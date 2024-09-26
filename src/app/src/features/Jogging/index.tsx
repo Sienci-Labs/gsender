@@ -1,17 +1,17 @@
-import jogWheel from './assets/wheel.svg';
 import jogWheeelLabels from './assets/labels.svg';
 import jogTab from './assets/tabs.svg';
 import zLabels from './assets/zlabels.svg';
 import aLabels from './assets/aLabels.svg';
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs.tsx';
+import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
 
 export function Jogging() {
     return (
         <>
             <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center select-none">
                 <div className="min-w-[200px] relative">
-                    <img className="" src={jogWheel} alt="Jog wheel" />
+                    <JogWheel />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
                         src={jogWheeelLabels}
