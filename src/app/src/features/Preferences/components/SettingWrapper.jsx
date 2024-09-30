@@ -1,16 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
-
-import styles from '../index.styl';
+import styles from 'app/features/preferences/index.module.styl';
 
 const SettingWrapper = ({ children, show, title }) => {
     return (
         <div
-            className={classNames(
-                styles.hidden,
-                styles['settings-wrapper'],
-                { [styles.visible]: show }
-            )}
+            className={classNames(styles.hidden, styles['settings-wrapper'], {
+                [styles.visible]: show,
+            })}
             style={{ height: '100%' }}
         >
             {title && <h3 className={styles['settings-title']}>{title}</h3>}

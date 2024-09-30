@@ -749,7 +749,7 @@
     "style-loader": "~0.23.1",
     "stylint": "^1.5.9",
     "stylint-loader": "~1.0.0",
-    "stylus": "~0.54.5",
+    "stylus": "^0.63.0",
     "stylus-loader": "~3.0.2",
     "tap": "~12.6.2",
     "terser-webpack-plugin": "^4",

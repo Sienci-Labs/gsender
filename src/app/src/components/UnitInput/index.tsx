@@ -25,3 +25,5 @@ export function UnitInput({
         </div>
     );
 }
+
+export default UnitInput;

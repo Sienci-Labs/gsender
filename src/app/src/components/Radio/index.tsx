@@ -1,4 +1,4 @@
-export function Radio() {
+export function RadioButton() {
     return <div></div>;
 }
 

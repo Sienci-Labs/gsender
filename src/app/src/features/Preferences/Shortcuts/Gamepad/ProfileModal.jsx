@@ -10,7 +10,7 @@ import {
     TOASTER_SUCCESS,
     TOASTER_SHORT,
 } from 'app/lib/toaster/ToasterLib';
-import ToolModal from 'app/components/ToolModal/ToolModal';
+import ToolModal from 'app/components/ToolModal';
 import { Button } from 'app/components/Button';
 
 import Input from '../../components/Input';

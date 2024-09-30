@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
-import Table from 'app/components/Table';
-import Modal from 'app/components/ToolModal/ToolModal';
+import { Table } from 'app/components/Table';
+import Modal from 'app/components/ToolModal';
 import {
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,
@@ -16,7 +16,7 @@ import {
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import ToggleSwitch from 'Components/Switch';
+import ToggleSwitch from 'app/components/Switch';
 import { Button } from 'app/components/Button';
 
 import { GamepadContext } from './utils/context';

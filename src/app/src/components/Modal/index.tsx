@@ -5,3 +5,5 @@ export interface ModalProps {
 export function Modal(props: ModalProps) {
     <div>{props.children}</div>;
 }
+
+export default Modal;

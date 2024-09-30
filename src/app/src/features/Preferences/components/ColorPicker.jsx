@@ -22,17 +22,44 @@
  */
 
 import React, { useState } from 'react';
-import Modal from 'app/components/Modal';
+import { Modal } from 'app/components/Modal';
 import { SketchPicker } from 'react-color';
 import styles from '../index.styl';
 
-const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) => {
-    const [color, setColor] = useState(actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)));
+const ColorPicker = ({
+    actions,
+    theme,
+    part,
+    isOpen,
+    onClose,
+    chooseColour,
+}) => {
+    const [color, setColor] = useState(
+        actions.visualizer.getCurrentColor(
+            theme,
+            part,
+            actions.visualizer.getDefaultColour(part),
+        ),
+    );
     const [currentPart, setCurrentPart] = useState(part);
 
     const onOpen = () => {
-        if (color !== actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)) && currentPart !== part) {
-            setColor(actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)));
+        if (
+            color !==
+                actions.visualizer.getCurrentColor(
+                    theme,
+                    part,
+                    actions.visualizer.getDefaultColour(part),
+                ) &&
+            currentPart !== part
+        ) {
+            setColor(
+                actions.visualizer.getCurrentColor(
+                    theme,
+                    part,
+                    actions.visualizer.getDefaultColour(part),
+                ),
+            );
             setCurrentPart(part);
         }
         return 1;
@@ -44,7 +71,8 @@ const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) =>
     };
 
     return (
-        isOpen && onOpen() && (
+        isOpen &&
+        onOpen() && (
             <Modal
                 size="xs"
                 onClose={onCloseModal}
@@ -75,7 +103,11 @@ const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) =>
                         <button
                             className={styles.resetColour}
                             type="button"
-                            onClick={() => setColor(actions.visualizer.getDefaultColour(part))}
+                            onClick={() =>
+                                setColor(
+                                    actions.visualizer.getDefaultColour(part),
+                                )
+                            }
                         >
                             Reset to Default
                         </button>

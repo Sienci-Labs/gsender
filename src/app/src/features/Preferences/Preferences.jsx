@@ -41,7 +41,7 @@ import VisualizerSettings from './Visualizer';
 import About from './About';
 import Rotary from './Rotary';
 import store from '../../store';
-import styles from './index.styl';
+import styles from './index.module.styl';
 import {
     METRIC_UNITS,
     IMPERIAL_UNITS,
