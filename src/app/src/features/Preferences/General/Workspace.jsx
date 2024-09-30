@@ -8,7 +8,7 @@ import ToggleSwitch from 'app/components/Switch';
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Workspace = ({ state, actions }) => {
     const { units, reverseWidgets, customDecimalPlaces } = state;

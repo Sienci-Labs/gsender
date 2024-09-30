@@ -35,7 +35,7 @@ import defaultState from 'app/store/defaultState';
 
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import {
     convertAllPresetsUnits,
     convertToImperial,

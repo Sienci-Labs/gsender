@@ -5,7 +5,7 @@ import ToggleSwitch from 'app/components/Switch';
 
 import Fieldset from '../components/Fieldset';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const VisualizerOptions = ({ state, actions }) => {
     const { objects, disabled, disabledLite, SVGEnabled, jobEndModal } =

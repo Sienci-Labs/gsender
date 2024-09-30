@@ -9,7 +9,7 @@ import { WORKSPACE_MODE } from 'app/constants';
 
 import Fieldset from '../components/Fieldset';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Toggle = () => {
     const [showRotaryTab, setShowRotaryTab] = useState(

@@ -30,7 +30,7 @@ import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const ProbeSettings = ({ state, probeActions, values, type }) => {
     const { probeSettings, units } = state;

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 import Gamepad from './Gamepad';
 import { GamepadContextProvider } from './components/Context';

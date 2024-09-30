@@ -15,7 +15,7 @@ import { Button } from 'app/components/Button';
 
 import Input from '../../components/Input';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { AVAILABILITY_TYPES } from '../utils';
 import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';

@@ -25,7 +25,7 @@ import React from 'react';
 import Tooltip from 'app/components/ToolTip';
 import Select from 'react-select';
 import Input from '../../components/Input';
-import styles from '../../index.styl';
+import styles from '../../index.module.styl';
 import { DRILL, END_MILL } from '../../../../lib/constants';
 
 const AddTool = ({ actions, state }) => {

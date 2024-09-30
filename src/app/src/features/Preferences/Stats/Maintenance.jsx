@@ -29,7 +29,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import SortableTable from 'app/components/SortableTable';
 import EditArea from './EditArea';
 import AddArea from './AddArea';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import maintenanceActions from './lib/maintenanceApiActions';
 import { collectUserUsageData } from '../../../lib/heatmap';
 import { USAGE_TOOL_NAME } from '../../../constants';

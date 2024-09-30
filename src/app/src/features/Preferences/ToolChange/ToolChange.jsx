@@ -11,7 +11,7 @@ import ToggleSwitch from 'app/components/Switch';
 import { Tooltip as TooltipCustom } from 'app/components/ToolTip';
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { Button as FunctionButton } from 'app/components/Button';
 
 /*const options = [

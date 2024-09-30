@@ -26,25 +26,35 @@ import React, { useMemo } from 'react';
 import store from 'app/store';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 const PrintableShortcuts = React.forwardRef((_, ref) => {
     const shortcutsList = Object.entries(store.get('commandKeys', {}));
 
-    const keys = useMemo(() => shortcutsList
-        .filter(([, shortcut]) => (shortcut.isActive && shortcut.keys !== ''))
-        .map(([key, shortcut]) => {
-            const title = allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title;
+    const keys = useMemo(
+        () =>
+            shortcutsList
+                .filter(
+                    ([, shortcut]) => shortcut.isActive && shortcut.keys !== '',
+                )
+                .map(([key, shortcut]) => {
+                    const title = allShuttleControlEvents[key]
+                        ? allShuttleControlEvents[key].title
+                        : shortcut.title;
 
-            return (
-                <tr key={shortcut.cmd}>
-                    <td>{title}</td>
-                    <td><i>{shortcut.keys}</i></td>
-                </tr>
-            );
-        }), [shortcutsList]);
+                    return (
+                        <tr key={shortcut.cmd}>
+                            <td>{title}</td>
+                            <td>
+                                <i>{shortcut.keys}</i>
+                            </td>
+                        </tr>
+                    );
+                }),
+        [shortcutsList],
+    );
 
     return (
         <div ref={ref} className={styles.printAreaWrapper}>
@@ -52,13 +62,15 @@ const PrintableShortcuts = React.forwardRef((_, ref) => {
                 <table>
                     <thead>
                         <tr>
-                            <th><b>Action</b></th>
-                            <th><b>Shortcut</b></th>
+                            <th>
+                                <b>Action</b>
+                            </th>
+                            <th>
+                                <b>Shortcut</b>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {keys}
-                    </tbody>
+                    <tbody>{keys}</tbody>
                 </table>
             </div>
         </div>

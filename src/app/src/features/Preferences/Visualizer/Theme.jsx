@@ -18,7 +18,7 @@ import Fieldset from '../components/Fieldset';
 import ColorPicker from '../components/ColorPicker';
 import ColorCircle from '../components/ColorCircle';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Theme = ({ state, actions }) => {
     const { theme } = state.visualizer;

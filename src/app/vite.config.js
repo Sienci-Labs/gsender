@@ -12,6 +12,11 @@ export default defineConfig({
         postcss: {
             plugins: [tailwindcss()],
         },
+        preprocessorOptions: { stylus: { modules: true } },
+        modules: {
+            // Enable CSS Modules for all .scss files
+            localsConvention: 'camelCaseOnly',
+        },
     },
     plugins: [
         TanStackRouterVite({
@@ -23,7 +28,7 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         react(),
-        tailwindcss()
+        tailwindcss(),
     ],
     resolve: {
         alias: {
@@ -33,5 +38,8 @@ export default defineConfig({
     },
     define: {
         'process.env': {},
+    },
+    optimizeDeps: {
+        include: ['**/*.styl'],
     },
 });

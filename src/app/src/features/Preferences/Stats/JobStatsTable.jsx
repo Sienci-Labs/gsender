@@ -26,7 +26,7 @@ import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import SortableTable from 'app/components/SortableTable';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import jobActions from './lib/jobApiActions';
 import {
     GRBL,

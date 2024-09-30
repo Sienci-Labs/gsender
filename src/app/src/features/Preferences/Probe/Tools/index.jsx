@@ -23,30 +23,26 @@
 
 import React from 'react';
 import uniqueId from 'lodash/uniqueId';
-import styles from '../../index.styl';
+import styles from '../../index.module.styl';
 import Tool from './Tool';
 import AddTool from './AddTool';
 import Fieldset from '../../components/Fieldset';
-
 
 const ToolSettings = ({ active, state, actions }) => {
     const { tools } = state;
     const toolActions = actions.tool;
     return (
         <div className={styles.generalArea}>
-
             <Fieldset legend="Tools">
                 <div className={styles.toolWrapper}>
                     <div className={styles.tools}>
-                        {
-                            tools.map((tool, index) => (
-                                <Tool
-                                    key={`tool-${uniqueId()}`}
-                                    {...tool}
-                                    onDelete={() => toolActions.deleteTool(index)}
-                                />
-                            ))
-                        }
+                        {tools.map((tool, index) => (
+                            <Tool
+                                key={`tool-${uniqueId()}`}
+                                {...tool}
+                                onDelete={() => toolActions.deleteTool(index)}
+                            />
+                        ))}
                     </div>
                     <AddTool actions={actions} state={state} />
                 </div>

@@ -23,13 +23,14 @@
 
 import React, { useEffect } from 'react';
 import pubsub from 'pubsub-js';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const ColorCircle = ({ part, onClick, colour, index }) => {
     let pubsubTokens = [];
 
     useEffect(() => {
-        document.getElementById('colorButton' + index).style.backgroundColor = colour;
+        document.getElementById('colorButton' + index).style.backgroundColor =
+            colour;
         subscribe();
         return function cleanup() {
             unsubscribe();
@@ -41,9 +42,13 @@ const ColorCircle = ({ part, onClick, colour, index }) => {
             pubsub.subscribe('colour:change', (msg, data) => {
                 const { currentPart, newColour } = data;
                 if (currentPart === part) {
-                    document.getElementById('colorButton' + index).style.backgroundColor = newColour.hex ? newColour.hex : newColour;
+                    document.getElementById(
+                        'colorButton' + index,
+                    ).style.backgroundColor = newColour.hex
+                        ? newColour.hex
+                        : newColour;
                 }
-            })
+            }),
         ];
         pubsubTokens = pubsubTokens.concat(tokens);
     };
@@ -56,7 +61,11 @@ const ColorCircle = ({ part, onClick, colour, index }) => {
     };
 
     return (
-        <button id={'colorButton' + index} type="button" className={styles.colorButton} />
+        <button
+            id={'colorButton' + index}
+            type="button"
+            className={styles.colorButton}
+        />
     );
 };
 

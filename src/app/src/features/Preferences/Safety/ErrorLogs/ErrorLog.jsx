@@ -8,7 +8,7 @@ import api from 'app/api';
 
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import LogList from './LogList';
-import styles from '../../index.styl';
+import styles from '../../index.module.styl';
 
 const ErrorLog = () => {
     const [logs, setLogs] = useState([]);
@@ -30,7 +30,7 @@ const ErrorLog = () => {
                 await api.alarmList.clearAll().then((res) => {
                     fetchLogs();
                 });
-            }
+            },
         });
     };
 
@@ -41,10 +41,14 @@ const ErrorLog = () => {
     return (
         <div className={styles.errorWrapper}>
             <div className={styles.errorHeading}>
-                { `Errors and Alarms (${logs.length})`}
+                {`Errors and Alarms (${logs.length})`}
                 <div
                     className="flex items-center gap-1"
-                    style={{ display: 'flex', alignItems: 'center', float: 'right' }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        float: 'right',
+                    }}
                 >
                     <i
                         title="Delete History"

@@ -9,7 +9,7 @@ import KeyboardShortcuts from './Keyboard';
 import Gamepad from './Gamepad';
 
 import SettingWrapper from '../components/SettingWrapper';
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const tabs = [
     {

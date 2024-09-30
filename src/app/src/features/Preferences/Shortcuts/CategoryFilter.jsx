@@ -15,9 +15,9 @@ import {
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
     COOLANT_CATEGORY,
-    ALL_CATEGORIES
+    ALL_CATEGORIES,
 } from 'app/constants';
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const CategoryFilter = ({ onChange, filterCategory }) => {
     const getColour = (data) => {
@@ -33,30 +33,42 @@ const CategoryFilter = ({ onChange, filterCategory }) => {
             [GENERAL_CATEGORY]: chroma('grey').brighten(),
             [TOOLBAR_CATEGORY]: chroma('#778da9'),
             [MACRO_CATEGORY]: chroma('dodgerblue'),
-            [COOLANT_CATEGORY]: chroma('red').darken(2)
+            [COOLANT_CATEGORY]: chroma('red').darken(2),
         };
 
         return categories[data];
     };
 
     const colourStyles = {
-        control: (styles) => ({ ...styles, backgroundColor: 'white', color: 'black' }),
+        control: (styles) => ({
+            ...styles,
+            backgroundColor: 'white',
+            color: 'black',
+        }),
         option: (styles, { data, isDisabled, isFocused, isSelected }) => {
             const dataColour = getColour(data.value);
             // determine whether text should be white or black
-            const textValue = chroma.contrast(dataColour, 'white') > 4.5 ? 'white' : 'black';
+            const textValue =
+                chroma.contrast(dataColour, 'white') > 4.5 ? 'white' : 'black';
             // determine whether colour is black/white, and therefore needs to be the opposite, or whether it can be its colour
-            const textValue2 = chroma.deltaE(dataColour, 'white') === 0 ? textValue : dataColour.darken().saturate().css();
+            const textValue2 =
+                chroma.deltaE(dataColour, 'white') === 0
+                    ? textValue
+                    : dataColour.darken().saturate().css();
             // const focusedValue = isFocused ? dataColour.alpha(0.3).css() : undefined;
 
             return {
                 ...styles,
-                backgroundColor: isSelected ? dataColour.css() : dataColour.alpha(0.1).css(),
+                backgroundColor: isSelected
+                    ? dataColour.css()
+                    : dataColour.alpha(0.1).css(),
                 color: isSelected ? textValue : textValue2,
 
                 ':active': {
                     ...styles[':active'],
-                    backgroundColor: isSelected ? dataColour.css() : dataColour.alpha(0.3).css(),
+                    backgroundColor: isSelected
+                        ? dataColour.css()
+                        : dataColour.alpha(0.3).css(),
                     color: textValue,
                 },
 
@@ -75,10 +87,12 @@ const CategoryFilter = ({ onChange, filterCategory }) => {
             color: '#333',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
-            textTransform: 'capitalize'
+            textTransform: 'capitalize',
         };
         return (
-            <div style={style} title={option.label}>{option.label}</div>
+            <div style={style} title={option.label}>
+                {option.label}
+            </div>
         );
     };
 
@@ -97,7 +111,7 @@ const CategoryFilter = ({ onChange, filterCategory }) => {
                     }}
                     options={map(ALL_CATEGORIES, (value) => ({
                         value: value,
-                        label: value
+                        label: value,
                     }))}
                     searchable={false}
                     value={{ label: filterCategory }}

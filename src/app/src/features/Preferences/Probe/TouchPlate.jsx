@@ -33,7 +33,7 @@ import {
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const TouchPlate = ({ state, actions, values, type, onTypeChange }) => {
     const { units, probe } = state;

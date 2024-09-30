@@ -24,17 +24,9 @@
 import React from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
-const defaultBaudrates = [
-    250000,
-    115200,
-    57600,
-    38400,
-    19200,
-    9600,
-    2400
-];
+const defaultBaudrates = [250000, 115200, 57600, 38400, 19200, 9600, 2400];
 
 const Baudrates = ({ onChange, baudrate }) => {
     const renderBaudrate = (option) => {
@@ -44,7 +36,13 @@ const Baudrates = ({ onChange, baudrate }) => {
             overflow: 'hidden',
         };
         return (
-            <div className={styles.inputText} style={style} title={option.label}>{option.label}</div>
+            <div
+                className={styles.inputText}
+                style={style}
+                title={option.label}
+            >
+                {option.label}
+            </div>
         );
     };
 
@@ -60,14 +58,13 @@ const Baudrates = ({ onChange, baudrate }) => {
                 onChange={onChange}
                 options={map(defaultBaudrates, (value) => ({
                     value: value,
-                    label: Number(value).toString()
+                    label: Number(value).toString(),
                 }))}
                 searchable={false}
                 value={{ label: baudrate }}
                 valueRenderer={renderBaudrate}
             />
         </div>
-
     );
 };
 

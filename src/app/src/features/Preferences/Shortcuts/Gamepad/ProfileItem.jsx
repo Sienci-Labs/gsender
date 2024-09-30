@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
+import {
+    Toaster,
+    TOASTER_SUCCESS,
+    TOASTER_SHORT,
+} from 'app/lib/toaster/ToasterLib';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { GamepadContext } from './utils/context';
-import { removeGamepadProfileFromList, setCurrentGamepadProfile } from './utils/actions';
+import {
+    removeGamepadProfileFromList,
+    setCurrentGamepadProfile,
+} from './utils/actions';
 
 const ProfileItem = ({ title, icon, id }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -17,7 +24,7 @@ const ProfileItem = ({ title, icon, id }) => {
         Toaster.pop({
             msg: 'Removed Gamepad Profile',
             type: TOASTER_SUCCESS,
-            duration: TOASTER_SHORT
+            duration: TOASTER_SHORT,
         });
     };
 
@@ -27,7 +34,7 @@ const ProfileItem = ({ title, icon, id }) => {
         Confirm({
             content: 'Are you sure you want to delete this gamepad profile?',
             title: 'Delete Gamepad Profile',
-            onConfirm: () => deleteProfile(ommitId)
+            onConfirm: () => deleteProfile(ommitId),
         });
     };
 

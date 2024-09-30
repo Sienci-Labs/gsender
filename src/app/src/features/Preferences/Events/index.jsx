@@ -43,7 +43,7 @@ import Fieldset from '../components/Fieldset';
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { collectUserUsageData } from '../../../lib/heatmap';
 
 const Events = ({ active }) => {

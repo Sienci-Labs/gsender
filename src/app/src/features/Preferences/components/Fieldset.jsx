@@ -25,11 +25,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Fieldset = ({ children, legend, className, style }) => {
     return (
-        <fieldset className={classnames(styles.fieldset, className)} style={style}>
+        <fieldset
+            className={classnames(styles.fieldset, className)}
+            style={style}
+        >
             <legend className={styles.fieldsetLegend}>{legend}</legend>
             {children}
         </fieldset>

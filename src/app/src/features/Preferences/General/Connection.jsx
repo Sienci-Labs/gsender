@@ -5,7 +5,7 @@ import ToggleSwitch from 'app/components/Switch';
 import Fieldset from '../components/Fieldset';
 import Baudrates from './Baudrates';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import Input from '../components/Input';
 
 const Connection = ({ state, actions }) => {

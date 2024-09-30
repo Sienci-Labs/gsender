@@ -5,7 +5,7 @@ import { Button } from 'app/components/Button';
 import ProfileItem from './ProfileItem';
 import { GamepadContext } from './utils/context';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { GAMEPAD_MODAL } from './utils/constants';
 import { setCurrentModal } from './utils/actions';
 

@@ -8,7 +8,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const FirmwareConfig = ({ state = {}, actions }) => {
     const { rotary } = state;

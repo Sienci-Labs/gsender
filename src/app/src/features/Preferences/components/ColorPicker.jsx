@@ -24,7 +24,7 @@
 import React, { useState } from 'react';
 import { Modal } from 'app/components/Modal';
 import { SketchPicker } from 'react-color';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const ColorPicker = ({
     actions,
