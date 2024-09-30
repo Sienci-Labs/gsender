@@ -22,8 +22,10 @@
  */
 
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
-import { UNITS_EN } from 'definitions/general';
+import { UNITS_EN } from 'app/definitions/general';
 import store from '../store';
+
+const CALC_UNIT = 25.4;
 
 //Function to set custom decimal places for VALUES
 const setDecimalPlacesValue = (defaultPlace: number, val: string | number, conversionType: Function): string => {
@@ -138,4 +140,12 @@ export const mapPositionToPreferredUnits = (
     }
     let defaultPlace = 3;
     return setDecimalPlacesPosition(defaultPlace, pos);
+};
+
+export const convertToImperial = (val: number): number => {
+    return Number((val / CALC_UNIT).toFixed(3));
+};
+
+export const convertToMetric = (val: number): number => {
+    return Number((val * CALC_UNIT).toFixed(2));
 };

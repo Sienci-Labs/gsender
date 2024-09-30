@@ -47,16 +47,16 @@ import {
 } from '../constants';
 import api from '../api';
 import { homingString } from '../lib/eeprom';
-import { AlarmsErrors } from 'definitions/alarms_errors';
-import { EEPROMSettings, MachineProfile } from 'definitions/firmware';
-import { UNITS_EN } from 'definitions/general';
-import { JogSpeeds } from 'features/Jogging/definitions';
-import { SPINDLE_LASER_T } from 'features/Spindle/definitions';
+import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
+import { UNITS_EN } from 'app/definitions/general';
+import { JogSpeeds } from 'app/features/Jogging/definitions';
+import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
 import {
     ConnectionState,
     ControllerState,
     FileInfoState,
-} from 'store/definitions';
+} from 'app/store/definitions';
 
 const styles = StyleSheet.create({
     body: {

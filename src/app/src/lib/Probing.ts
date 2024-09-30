@@ -1,9 +1,9 @@
-import { PROBE_TYPES, TOUCHPLATE_TYPE_AUTOZERO } from './constants';
+import { PROBE_TYPE_AUTO, PROBE_TYPE_TIP, PROBE_TYPES, TOUCHPLATE_TYPE_AUTOZERO } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
-import { UNITS_GCODE } from 'definitions/general';
-import { AXES_T } from 'features/Axes/definitions';
-import { PROBE_DIRECTIONS, ProbingOptions, PROBE_TYPES_T } from 'features/Probe/definitions';
+import { UNITS_GCODE } from 'app/definitions/general';
+import { AXES_T } from 'app/features/Axes/definitions';
+import { PROBE_DIRECTIONS, ProbingOptions, PROBE_TYPES_T } from 'app/features/Probe/definitions';
 
 export const BL = 0;
 export const TL = 1;
@@ -674,18 +674,19 @@ export const getNextDirection = (direction: PROBE_DIRECTIONS): PROBE_DIRECTIONS 
 export const getProbeCode = (options: ProbingOptions, direction: PROBE_DIRECTIONS = 0): Array<string> => {
     const {
         plateType,
-        axes
+        axes,
+        probeType
     } = options;
 
     //let axesCount = Object.values(axes).reduce((a, item) => a + item, 0);
 
     if (plateType === TOUCHPLATE_TYPE_AUTOZERO) {
-        if (options.toolDiameter === 'Auto') {
+        if (probeType === PROBE_TYPE_AUTO) {
             return get3AxisAutoRoutine({
                 ...options,
                 direction
             });
-        } else if (options.toolDiameter === 'Tip') {
+        } else if (probeType === PROBE_TYPE_TIP) {
             return get3AxisAutoTipRoutine({
                 ...options,
                 direction

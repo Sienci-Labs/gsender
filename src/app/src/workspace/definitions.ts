@@ -1,10 +1,10 @@
 import { WORKSPACE_MODE } from "../constants";
-import { MachineProfile } from "definitions/firmware";
-import { UNITS_EN, BasicPosition } from "definitions/general";
-import { ProbeProfile } from "features/Probe/definitions";
-import { RotarySettings } from "features/Rotary/definitions";
-import { Tool } from "features/Tools/definitions";
-import { GamepadConfig } from "lib/gamepad/definitions";
+import { MachineProfile } from "app/definitions/firmware";
+import { UNITS_EN, BasicPosition } from "app/definitions/general";
+import { ProbeProfile } from "app/features/Probe/definitions";
+import { RotarySettings } from "app/features/Rotary/definitions";
+import { Tool } from "app/features/Tools/definitions";
+import { GamepadConfig } from "app/lib/gamepad/definitions";
 
 
 // Types
