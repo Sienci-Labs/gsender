@@ -24,10 +24,10 @@
 import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiDeleteOutline } from '@mdi/js';
-import { Button } from 'app/components/Buttons';
-import Modal from 'app/components/Modal';
+import { Button } from 'app/components/Button';
+import { Modal } from 'app/components/Modal';
 import { Form } from 'app/components/Forms';
-import ControlledNumberInput from 'app/components/ControlledNumberInput';
+import { ControlledNumberInput } from 'app/components/ControlledNumberInput';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
@@ -46,9 +46,7 @@ const EditArea = ({ task, update, closeModal, deleteTask }) => {
             className={styles.modalContainerStyle}
         >
             <Modal.Header>
-                <Modal.Title>
-                    {i18n._('Edit Task')}
-                </Modal.Title>
+                <Modal.Title>{i18n._('Edit Task')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className={styles.modalBodyStyle}>
@@ -74,7 +72,9 @@ const EditArea = ({ task, update, closeModal, deleteTask }) => {
                                 <ControlledNumberInput
                                     className="form-control"
                                     value={rangeStart}
-                                    externalOnChange={(e) => setRangeStart(Number(e.target.value))}
+                                    externalOnChange={(e) =>
+                                        setRangeStart(Number(e.target.value))
+                                    }
                                     name="rangeStart"
                                     type="number"
                                     min={1}
@@ -84,7 +84,9 @@ const EditArea = ({ task, update, closeModal, deleteTask }) => {
                                 <ControlledNumberInput
                                     className="form-control"
                                     value={rangeEnd}
-                                    externalOnChange={(e) => setRangeEnd(Number(e.target.value))}
+                                    externalOnChange={(e) =>
+                                        setRangeEnd(Number(e.target.value))
+                                    }
                                     name="rangeStart"
                                     type="number"
                                     min={1}
@@ -108,19 +110,17 @@ const EditArea = ({ task, update, closeModal, deleteTask }) => {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button
-                    onClick={deleteTask}
-                    className={styles.deleteButton}
-                >
-                    {i18n._('Delete Task')} <Icon path={mdiDeleteOutline} size={1} />
+                <Button onClick={deleteTask} className={styles.deleteButton}>
+                    {i18n._('Delete Task')}{' '}
+                    <Icon path={mdiDeleteOutline} size={1} />
                 </Button>
+                <Button onClick={closeModal}>{i18n._('Cancel')}</Button>
                 <Button
-                    onClick={closeModal}
-                >
-                    {i18n._('Cancel')}
-                </Button>
-                <Button
-                    style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
+                    style={{
+                        backgroundColor: '#3e85c7',
+                        color: 'white',
+                        backgroundImage: 'none',
+                    }}
                     onClick={() => {
                         let newTask = task;
                         newTask.name = name;

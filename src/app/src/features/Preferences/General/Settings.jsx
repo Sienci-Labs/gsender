@@ -1,7 +1,7 @@
 import React from 'react';
 
 import store from 'app/store';
-import Button from 'app/components/FunctionButton/FunctionButton';
+import { Button } from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
@@ -15,21 +15,22 @@ const Settings = () => {
     const handleRestoreDefaultClick = () => {
         Confirm({
             title: 'Restore Settings',
-            content: 'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
+            content:
+                'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
             confirmLabel: 'Restore Settings',
-            onConfirm: restoreDefault
+            onConfirm: restoreDefault,
         });
     };
-
 
     const importSettings = (e) => {
         const file = e.target.files[0];
 
         Confirm({
             title: 'Import Settings',
-            content: 'All your current settings will be replaced. Are you sure you want to import your settings on gSender?',
+            content:
+                'All your current settings will be replaced. Are you sure you want to import your settings on gSender?',
             confirmLabel: 'Import Settings',
-            onConfirm: () => onImportConfirm(file)
+            onConfirm: () => onImportConfirm(file),
         });
     };
 
@@ -43,7 +44,7 @@ const Settings = () => {
             reader.onerror = () => {
                 Toaster.pop({
                     msg: 'There was a problem importing your settings',
-                    type: TOASTER_DANGER
+                    type: TOASTER_DANGER,
                 });
             };
         }
@@ -51,7 +52,11 @@ const Settings = () => {
 
     const exportSettings = async () => {
         const settings = store.get();
-        settings.commandKeys = Object.fromEntries(Object.entries(settings.commandKeys).filter(([key, shortcut]) => shortcut.category !== 'Macros')); //Exclude macro shortcuts
+        settings.commandKeys = Object.fromEntries(
+            Object.entries(settings.commandKeys).filter(
+                ([key, shortcut]) => shortcut.category !== 'Macros',
+            ),
+        ); //Exclude macro shortcuts
         delete settings.session;
 
         const res = await api.events.fetch();
@@ -59,7 +64,7 @@ const Settings = () => {
 
         const settingsJSON = JSON.stringify({ settings, events }, null, 3);
         const data = new Blob([settingsJSON], {
-            type: 'application/json'
+            type: 'application/json',
         });
 
         const today = new Date();
@@ -81,7 +86,13 @@ const Settings = () => {
 
     return (
         <Fieldset legend="Settings">
-            <Button primary style={{ margin: 0 }} onClick={handleRestoreDefaultClick}>Restore Default gSender Settings</Button>
+            <Button
+                primary
+                style={{ margin: 0 }}
+                onClick={handleRestoreDefaultClick}
+            >
+                Restore Default gSender Settings
+            </Button>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <Button
@@ -108,7 +119,7 @@ const Settings = () => {
                 type="file"
                 onChange={importSettings}
                 onClick={(e) => {
-                    (e.target.value = null);
+                    e.target.value = null;
                 }}
                 accept=".json"
                 style={{ display: 'none' }}

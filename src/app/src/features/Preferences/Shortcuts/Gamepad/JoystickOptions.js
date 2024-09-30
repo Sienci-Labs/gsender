@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { cloneDeep, set, get } from 'lodash';
 
 import { Checkbox } from 'app/components/Checkbox';
-import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import Tooltip from 'app/components/ToolTip';
 
 import Input from '../../components/Input';
 import { GamepadContext } from './utils/context';
@@ -15,28 +15,36 @@ import styles from './index.styl';
 
 const JoystickOptions = () => {
     const {
-        state: { currentProfile, settings: { profiles } },
+        state: {
+            currentProfile,
+            settings: { profiles },
+        },
         actions: { getGamepadProfile },
-        dispatch
+        dispatch,
     } = useContext(GamepadContext);
 
-    const { axes, buttons } = useGamepadListener({ profile: currentProfile, axisThreshold: 0.4 });
+    const { axes, buttons } = useGamepadListener({
+        profile: currentProfile,
+        axisThreshold: 0.4,
+    });
 
     const handleChange = (key, value) => {
-        const updatedProfiles =
-            profiles.map(profile => {
-                const isCurrentProfile = arrayComparator(profile.id, currentProfile);
+        const updatedProfiles = profiles.map((profile) => {
+            const isCurrentProfile = arrayComparator(
+                profile.id,
+                currentProfile,
+            );
 
-                if (isCurrentProfile) {
-                    const updatedProfileItem = cloneDeep(profile);
+            if (isCurrentProfile) {
+                const updatedProfileItem = cloneDeep(profile);
 
-                    set(updatedProfileItem, `joystickOptions.${key}`, value);
+                set(updatedProfileItem, `joystickOptions.${key}`, value);
 
-                    return updatedProfileItem;
-                }
+                return updatedProfileItem;
+            }
 
-                return profile;
-            });
+            return profile;
+        });
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
@@ -51,32 +59,61 @@ const JoystickOptions = () => {
 
     const profile = getGamepadProfile(currentProfile);
 
-    const { joystickOptions: { stick1, stick2, zeroThreshold = 15, movementDistanceOverride = 100 } } = profile;
+    const {
+        joystickOptions: {
+            stick1,
+            stick2,
+            zeroThreshold = 15,
+            movementDistanceOverride = 100,
+        },
+    } = profile;
 
-    const stick1PrimaryActionIsUsingMPG = get(stick1, 'mpgMode.primaryAction', null) !== null;
-    const stick1SecondaryActionIsUsingMPG = get(stick1, 'mpgMode.secondaryAction', null) !== null;
+    const stick1PrimaryActionIsUsingMPG =
+        get(stick1, 'mpgMode.primaryAction', null) !== null;
+    const stick1SecondaryActionIsUsingMPG =
+        get(stick1, 'mpgMode.secondaryAction', null) !== null;
 
-    const stick2PrimaryActionIsUsingMPG = get(stick2, 'mpgMode.primaryAction', null) !== null;
-    const stick2SecondaryActionIsUsingMPG = get(stick2, 'mpgMode.secondaryAction', null) !== null;
+    const stick2PrimaryActionIsUsingMPG =
+        get(stick2, 'mpgMode.primaryAction', null) !== null;
+    const stick2SecondaryActionIsUsingMPG =
+        get(stick2, 'mpgMode.secondaryAction', null) !== null;
 
     const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
     const selectOverrideStyle = {
-        valueContainer: provided => ({ ...provided, padding: 2, justifyContent: 'center' }),
-        dropdownIndicator: provided => ({ ...provided, padding: 2 }),
-        container: provided => ({ ...provided, padding: 0 })
+        valueContainer: (provided) => ({
+            ...provided,
+            padding: 2,
+            justifyContent: 'center',
+        }),
+        dropdownIndicator: (provided) => ({ ...provided, padding: 2 }),
+        container: (provided) => ({ ...provided, padding: 0 }),
     };
 
     const activeStyle = {
-        control: (provided) => ({ ...provided, backgroundColor: 'rgb(75, 181, 67)', borderColor: 'rgb(75, 181, 67)' }),
+        control: (provided) => ({
+            ...provided,
+            backgroundColor: 'rgb(75, 181, 67)',
+            borderColor: 'rgb(75, 181, 67)',
+        }),
         singleValue: (provided) => ({ ...provided, color: 'white' }),
-        dropdownIndicator: (provided) => ({ ...provided, padding: 2, color: 'white' }),
-        indicatorSeparator: (provided) => ({ ...provided, backgroundColor: 'white' }),
+        dropdownIndicator: (provided) => ({
+            ...provided,
+            padding: 2,
+            color: 'white',
+        }),
+        indicatorSeparator: (provided) => ({
+            ...provided,
+            backgroundColor: 'white',
+        }),
     };
 
     return (
         <div style={{ fontSize: '1rem' }}>
-            <div className={styles.joystickOption} style={{ marginBottom: '1rem' }}>
+            <div
+                className={styles.joystickOption}
+                style={{ marginBottom: '1rem' }}
+            >
                 <div />
                 <div>Action</div>
                 <div>2nd Action</div>
@@ -87,7 +124,10 @@ const JoystickOptions = () => {
                 <div>Stick 1 Left/Right</div>
                 <Select
                     styles={
-                        !stick1PrimaryActionIsUsingMPG && axes && axes[0] !== 0 && !isHoldingModifierButton
+                        !stick1PrimaryActionIsUsingMPG &&
+                        axes &&
+                        axes[0] !== 0 &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
@@ -95,33 +135,58 @@ const JoystickOptions = () => {
                     placeholder={null}
                     value={{
                         label: get(stick1, 'horizontal.primaryAction', null)
-                            ? String(get(stick1, 'horizontal.primaryAction')).toUpperCase()
+                            ? String(
+                                  get(stick1, 'horizontal.primaryAction'),
+                              ).toUpperCase()
                             : 'None',
-                        value: get(stick1, 'horizontal.primaryAction', null)
+                        value: get(stick1, 'horizontal.primaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.horizontal.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.horizontal.primaryAction', value)
+                    }
                     isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={
-                        !stick1SecondaryActionIsUsingMPG && axes && axes[0] !== 0 && isHoldingModifierButton
+                        !stick1SecondaryActionIsUsingMPG &&
+                        axes &&
+                        axes[0] !== 0 &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'horizontal.secondaryAction', null) ? String(get(stick1, 'horizontal.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick1, 'horizontal.secondaryAction', null)
+                        label: get(stick1, 'horizontal.secondaryAction', null)
+                            ? String(
+                                  get(stick1, 'horizontal.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'horizontal.secondaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.horizontal.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.horizontal.secondaryAction', value)
+                    }
                     isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick1.horizontal.isReversed}
-                        onChange={(e) => handleChange('stick1.horizontal.isReversed', e.target.checked)}
-                        disabled={stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick1.horizontal.isReversed',
+                                e.target.checked,
+                            )
+                        }
+                        disabled={
+                            stick1PrimaryActionIsUsingMPG &&
+                            stick1SecondaryActionIsUsingMPG
+                        }
                     />
                 </Tooltip>
             </div>
@@ -130,39 +195,69 @@ const JoystickOptions = () => {
                 <div>Stick 1 Up/Down</div>
                 <Select
                     styles={
-                        !stick1PrimaryActionIsUsingMPG && axes && axes[1] !== 0 && !isHoldingModifierButton
+                        !stick1PrimaryActionIsUsingMPG &&
+                        axes &&
+                        axes[1] !== 0 &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'vertical.primaryAction', null) ? String(get(stick1, 'vertical.primaryAction')).toUpperCase() : 'None',
-                        value: get(stick1, 'vertical.primaryAction', null)
+                        label: get(stick1, 'vertical.primaryAction', null)
+                            ? String(
+                                  get(stick1, 'vertical.primaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'vertical.primaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.vertical.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.vertical.primaryAction', value)
+                    }
                     isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={
-                        !stick1SecondaryActionIsUsingMPG && axes && axes[1] !== 0 && isHoldingModifierButton
+                        !stick1SecondaryActionIsUsingMPG &&
+                        axes &&
+                        axes[1] !== 0 &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'vertical.secondaryAction', null) ? String(get(stick1, 'vertical.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick1, 'vertical.secondaryAction', null)
+                        label: get(stick1, 'vertical.secondaryAction', null)
+                            ? String(
+                                  get(stick1, 'vertical.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'vertical.secondaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.vertical.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.vertical.secondaryAction', value)
+                    }
                     isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick1.vertical.isReversed}
-                        onChange={(e) => handleChange('stick1.vertical.isReversed', e.target.checked)}
-                        disabled={stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick1.vertical.isReversed',
+                                e.target.checked,
+                            )
+                        }
+                        disabled={
+                            stick1PrimaryActionIsUsingMPG &&
+                            stick1SecondaryActionIsUsingMPG
+                        }
                     />
                 </Tooltip>
             </div>
@@ -171,36 +266,63 @@ const JoystickOptions = () => {
                 <div>Stick 1 Use MPG</div>
                 <Select
                     styles={
-                        stick1PrimaryActionIsUsingMPG && axes && (axes[0] !== 0 || axes[1] !== 0) && !isHoldingModifierButton
+                        stick1PrimaryActionIsUsingMPG &&
+                        axes &&
+                        (axes[0] !== 0 || axes[1] !== 0) &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'mpgMode.primaryAction', null) ? String(get(stick1, 'mpgMode.primaryAction')).toUpperCase() : 'None',
-                        value: get(stick1, 'mpgMode.primaryAction', null)
+                        label: get(stick1, 'mpgMode.primaryAction', null)
+                            ? String(
+                                  get(stick1, 'mpgMode.primaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'mpgMode.primaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.mpgMode.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.mpgMode.primaryAction', value)
+                    }
                 />
                 <Select
                     styles={
-                        stick1SecondaryActionIsUsingMPG && axes && (axes[0] !== 0 || axes[1] !== 0) && isHoldingModifierButton
+                        stick1SecondaryActionIsUsingMPG &&
+                        axes &&
+                        (axes[0] !== 0 || axes[1] !== 0) &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'mpgMode.secondaryAction', null) ? String(get(stick1, 'mpgMode.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick1, 'mpgMode.secondaryAction', null)
+                        label: get(stick1, 'mpgMode.secondaryAction', null)
+                            ? String(
+                                  get(stick1, 'mpgMode.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick1, 'mpgMode.secondaryAction', null),
                     }}
-                    onChange={({ value }) => handleChange('stick1.mpgMode.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick1.mpgMode.secondaryAction', value)
+                    }
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick1.mpgMode.isReversed}
-                        onChange={(e) => handleChange('stick1.mpgMode.isReversed', e.target.checked)}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick1.mpgMode.isReversed',
+                                e.target.checked,
+                            )
+                        }
                     />
                 </Tooltip>
             </div>
@@ -209,39 +331,69 @@ const JoystickOptions = () => {
                 <div>Stick 2 Left/Right</div>
                 <Select
                     styles={
-                        !stick2PrimaryActionIsUsingMPG && axes && axes[2] !== 0 && !isHoldingModifierButton
+                        !stick2PrimaryActionIsUsingMPG &&
+                        axes &&
+                        axes[2] !== 0 &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'horizontal.primaryAction', null) ? String(get(stick2, 'horizontal.primaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'horizontal.primaryAction')
+                        label: get(stick2, 'horizontal.primaryAction', null)
+                            ? String(
+                                  get(stick2, 'horizontal.primaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'horizontal.primaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.horizontal.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.horizontal.primaryAction', value)
+                    }
                     isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={
-                        !stick2SecondaryActionIsUsingMPG && axes && axes[2] !== 0 && isHoldingModifierButton
+                        !stick2SecondaryActionIsUsingMPG &&
+                        axes &&
+                        axes[2] !== 0 &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'horizontal.secondaryAction', null) ? String(get(stick2, 'horizontal.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'horizontal.secondaryAction')
+                        label: get(stick2, 'horizontal.secondaryAction', null)
+                            ? String(
+                                  get(stick2, 'horizontal.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'horizontal.secondaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.horizontal.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.horizontal.secondaryAction', value)
+                    }
                     isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick2.horizontal.isReversed}
-                        onChange={(e) => handleChange('stick2.horizontal.isReversed', e.target.checked)}
-                        disabled={stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick2.horizontal.isReversed',
+                                e.target.checked,
+                            )
+                        }
+                        disabled={
+                            stick2PrimaryActionIsUsingMPG &&
+                            stick2SecondaryActionIsUsingMPG
+                        }
                     />
                 </Tooltip>
             </div>
@@ -250,39 +402,69 @@ const JoystickOptions = () => {
                 <div>Stick 2 Up/Down</div>
                 <Select
                     styles={
-                        !stick2PrimaryActionIsUsingMPG && axes && axes[3] !== 0 && !isHoldingModifierButton
+                        !stick2PrimaryActionIsUsingMPG &&
+                        axes &&
+                        axes[3] !== 0 &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'vertical.primaryAction', null) ? String(get(stick2, 'vertical.primaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'vertical.primaryAction')
+                        label: get(stick2, 'vertical.primaryAction', null)
+                            ? String(
+                                  get(stick2, 'vertical.primaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'vertical.primaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.vertical.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.vertical.primaryAction', value)
+                    }
                     isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={
-                        !stick2SecondaryActionIsUsingMPG && axes && axes[3] !== 0 && isHoldingModifierButton
+                        !stick2SecondaryActionIsUsingMPG &&
+                        axes &&
+                        axes[3] !== 0 &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'vertical.secondaryAction', null) ? String(get(stick2, 'vertical.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'vertical.secondaryAction')
+                        label: get(stick2, 'vertical.secondaryAction', null)
+                            ? String(
+                                  get(stick2, 'vertical.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'vertical.secondaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.vertical.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.vertical.secondaryAction', value)
+                    }
                     isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick2.vertical.isReversed}
-                        onChange={(e) => handleChange('stick2.vertical.isReversed', e.target.checked)}
-                        disabled={stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick2.vertical.isReversed',
+                                e.target.checked,
+                            )
+                        }
+                        disabled={
+                            stick2PrimaryActionIsUsingMPG &&
+                            stick2SecondaryActionIsUsingMPG
+                        }
                     />
                 </Tooltip>
             </div>
@@ -291,7 +473,10 @@ const JoystickOptions = () => {
                 <div>Stick 2 Use MPG</div>
                 <Select
                     styles={
-                        stick2PrimaryActionIsUsingMPG && axes && (axes[2] !== 0 || axes[3] !== 0) && !isHoldingModifierButton
+                        stick2PrimaryActionIsUsingMPG &&
+                        axes &&
+                        (axes[2] !== 0 || axes[3] !== 0) &&
+                        !isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
@@ -299,14 +484,23 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'mpgMode.primaryAction', null) ? String(get(stick2, 'mpgMode.primaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'mpgMode.primaryAction')
+                        label: get(stick2, 'mpgMode.primaryAction', null)
+                            ? String(
+                                  get(stick2, 'mpgMode.primaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'mpgMode.primaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.mpgMode.primaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.mpgMode.primaryAction', value)
+                    }
                 />
                 <Select
                     styles={
-                        stick2SecondaryActionIsUsingMPG && axes && (axes[2] !== 0 || axes[3] !== 0) && isHoldingModifierButton
+                        stick2SecondaryActionIsUsingMPG &&
+                        axes &&
+                        (axes[2] !== 0 || axes[3] !== 0) &&
+                        isHoldingModifierButton
                             ? { ...selectOverrideStyle, ...activeStyle }
                             : selectOverrideStyle
                     }
@@ -314,39 +508,82 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'mpgMode.secondaryAction', null) ? String(get(stick2, 'mpgMode.secondaryAction')).toUpperCase() : 'None',
-                        value: get(stick2, 'mpgMode.secondaryAction')
+                        label: get(stick2, 'mpgMode.secondaryAction', null)
+                            ? String(
+                                  get(stick2, 'mpgMode.secondaryAction'),
+                              ).toUpperCase()
+                            : 'None',
+                        value: get(stick2, 'mpgMode.secondaryAction'),
                     }}
-                    onChange={({ value }) => handleChange('stick2.mpgMode.secondaryAction', value)}
+                    onChange={({ value }) =>
+                        handleChange('stick2.mpgMode.secondaryAction', value)
+                    }
                 />
-                <Tooltip content="Invert Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+                <Tooltip
+                    content="Invert Axis Direction"
+                    location="default"
+                    wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+                >
                     <Checkbox
                         checked={stick2.mpgMode.isReversed}
-                        onChange={(e) => handleChange('stick2.mpgMode.isReversed', e.target.checked)}
+                        onChange={(e) =>
+                            handleChange(
+                                'stick2.mpgMode.isReversed',
+                                e.target.checked,
+                            )
+                        }
                     />
                 </Tooltip>
             </div>
 
-            <Tooltip content="Provide a threshold percentage before a joystick movement is recognized" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+            <Tooltip
+                content="Provide a threshold percentage before a joystick movement is recognized"
+                location="default"
+                wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+            >
                 <div className={styles.joystickOption}>
                     <div>Zero Threshold</div>
                     <Input
                         value={zeroThreshold}
-                        additionalProps={{ min: 0, max: 99, step: 5, type: 'number' }}
-                        onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
+                        additionalProps={{
+                            min: 0,
+                            max: 99,
+                            step: 5,
+                            type: 'number',
+                        }}
+                        onChange={(e) =>
+                            handleChange(
+                                'zeroThreshold',
+                                Number(e.target.value),
+                            )
+                        }
                         className={styles['joystick-option-input']}
                         units="%"
                     />
                 </div>
             </Tooltip>
 
-            <Tooltip content="Adjust the computed movement distance values for dynamic joystick jogging" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
+            <Tooltip
+                content="Adjust the computed movement distance values for dynamic joystick jogging"
+                location="default"
+                wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}
+            >
                 <div className={styles.joystickOption}>
                     <div>Movement Distance Override</div>
                     <Input
                         value={movementDistanceOverride}
-                        additionalProps={{ min: 10, max: 99999, step: 1, type: 'number' }}
-                        onChange={(e) => handleChange('movementDistanceOverride', Number(e.target.value))}
+                        additionalProps={{
+                            min: 10,
+                            max: 99999,
+                            step: 1,
+                            type: 'number',
+                        }}
+                        onChange={(e) =>
+                            handleChange(
+                                'movementDistanceOverride',
+                                Number(e.target.value),
+                            )
+                        }
                         className={styles['joystick-option-input']}
                         units="%"
                     />

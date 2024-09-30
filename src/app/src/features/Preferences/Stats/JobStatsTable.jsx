@@ -25,10 +25,15 @@ import React, { useEffect, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
-import SortableTable from 'app/components/SortableTable/SortableTable';
+import SortableTable from 'app/components/SortableTable';
 import styles from '../index.styl';
 import jobActions from './lib/jobApiActions';
-import { GRBL, JOB_STATUS, JOB_TYPES, USAGE_TOOL_NAME } from '../../../constants';
+import {
+    GRBL,
+    JOB_STATUS,
+    JOB_TYPES,
+    USAGE_TOOL_NAME,
+} from '../../../constants';
 import { collectUserUsageData } from '../../../lib/heatmap';
 
 const columnData = [
@@ -56,10 +61,15 @@ const columnData = [
         accessorKey: 'startTime',
         header: () => 'Start Time',
         cell: (info) => {
-            const [yyyy, mm, dd, hh, mi, ss] = info.renderValue().toString().split(/[:\-T.]+/);
+            const [yyyy, mm, dd, hh, mi, ss] = info
+                .renderValue()
+                .toString()
+                .split(/[:\-T.]+/);
             return (
                 <>
-                    <div>{hh}:{mi}:{ss} - {mm}/{dd}/{yyyy}</div>
+                    <div>
+                        {hh}:{mi}:{ss} - {mm}/{dd}/{yyyy}
+                    </div>
                 </>
             );
         },
@@ -70,7 +80,11 @@ const columnData = [
         accessorKey: 'jobStatus',
         header: () => 'Status',
         cell: (info) => {
-            return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
+            return info.renderValue() === JOB_STATUS.COMPLETE ? (
+                <Icon path={mdiCheckBold} size={1} />
+            ) : (
+                <Icon path={mdiClose} size={1} />
+            );
         },
         minSize: 50,
         maxSize: 50,
@@ -87,7 +101,7 @@ const defaultData = [
         controller: GRBL,
         startTime: new Date(),
         endTime: null,
-        jobStatus: JOB_STATUS.COMPLETE
+        jobStatus: JOB_STATUS.COMPLETE,
     },
 ];
 
@@ -100,7 +114,9 @@ const JobStatsTable = () => {
         jobActions.fetch(setData, setJobsFinished, setJobsCancelled);
 
         const timeout = setTimeout(() => {
-            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.JOB_TABLE);
+            collectUserUsageData(
+                USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.JOB_TABLE,
+            );
         }, 5000);
 
         return () => {
@@ -108,16 +124,17 @@ const JobStatsTable = () => {
         };
     }, []);
 
-
     return (
         <div className={[styles.addMargin].join(' ')}>
-            {
-                jobsFinished === 0 && jobsCancelled === 0
-                    ? <span>No jobs run</span>
-                    : (
-                        <SortableTable data={data} columns={columnData} defaultData={defaultData} />
-                    )
-            }
+            {jobsFinished === 0 && jobsCancelled === 0 ? (
+                <span>No jobs run</span>
+            ) : (
+                <SortableTable
+                    data={data}
+                    columns={columnData}
+                    defaultData={defaultData}
+                />
+            )}
         </div>
     );
 };

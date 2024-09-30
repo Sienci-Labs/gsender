@@ -23,7 +23,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import FunctionButton from 'app/components/Button';
+import { Button as FunctionButton } from 'app/components/Button';
 import {
     Toaster,
     TOASTER_DANGER,

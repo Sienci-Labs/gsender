@@ -22,13 +22,11 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-    sortingFns,
-} from '@tanstack/react-table';
+import { sortingFns } from '@tanstack/react-table';
 import Icon from '@mdi/react';
 import { mdiAlert, mdiPencil, mdiCheckOutline } from '@mdi/js';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import SortableTable from 'app/components/SortableTable/SortableTable';
+import SortableTable from 'app/components/SortableTable';
 import EditArea from './EditArea';
 import AddArea from './AddArea';
 import styles from '../index.styl';
@@ -43,7 +41,12 @@ const determineTime = (task) => {
     } else if (currentTime >= rangeStart && currentTime <= rangeEnd) {
         return 'Due';
     } else {
-        return <div><Icon path={mdiAlert} size={1} />{' Urgent!'}</div>;
+        return (
+            <div>
+                <Icon path={mdiAlert} size={1} />
+                {' Urgent!'}
+            </div>
+        );
     }
 };
 
@@ -57,13 +60,13 @@ const Maintenance = () => {
     const updateData = () => {
         maintenanceActions.fetch(setTasks).then((tasks) => {
             let formattedTasks = [];
-            tasks.forEach(task => {
+            tasks.forEach((task) => {
                 const formattedTask = {
                     id: task.id,
                     part: task.name,
                     time: determineTime(task),
                     edit: '',
-                    description: task.description
+                    description: task.description,
                 };
                 formattedTasks.push(formattedTask);
             });
@@ -89,7 +92,7 @@ const Maintenance = () => {
 
     const addTask = (newTask) => {
         const maxIDTask = tasks.reduce((prev, current) => {
-            return (prev && prev.id > current.id) ? prev : current;
+            return prev && prev.id > current.id ? prev : current;
         });
         newTask.id = maxIDTask.id + 1;
 
@@ -100,7 +103,8 @@ const Maintenance = () => {
     const deleteTask = () => {
         Confirm({
             title: 'Delete Task',
-            content: 'Are you sure you want to delete ' + currentTask.name + '?',
+            content:
+                'Are you sure you want to delete ' + currentTask.name + '?',
             confirmLabel: 'Yes',
             onConfirm: () => {
                 setShowEditModal(false);
@@ -109,7 +113,7 @@ const Maintenance = () => {
                     tasks.splice(index, 1);
                 }
                 updateTasks(tasks);
-            }
+            },
         });
     };
 
@@ -117,7 +121,9 @@ const Maintenance = () => {
         updateData();
 
         const timeout = setTimeout(() => {
-            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.MAINTENANCE);
+            collectUserUsageData(
+                USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.MAINTENANCE,
+            );
         }, 5000);
 
         return () => {
@@ -128,7 +134,10 @@ const Maintenance = () => {
     const onClear = (id) => {
         Confirm({
             title: 'Reset Maintenance Timer',
-            content: 'Are you sure you want to reset the maintenance timer for ' + tasks.find((obj) => obj.id === id).name + '? Only do this if you have just performed this maintenance task.',
+            content:
+                'Are you sure you want to reset the maintenance timer for ' +
+                tasks.find((obj) => obj.id === id).name +
+                '? Only do this if you have just performed this maintenance task.',
             confirmLabel: 'Yes',
             onConfirm: () => {
                 const updatedTasks = tasks.map((obj) => {
@@ -140,7 +149,7 @@ const Maintenance = () => {
                     return obj;
                 });
                 updateTasks(updatedTasks);
-            }
+            },
         });
     };
 
@@ -155,130 +164,150 @@ const Maintenance = () => {
     };
 
     // styling doesnt work with classname
-    const columns = useMemo(
-        () => [
-            {
-                accessorKey: 'time',
-                header: () => null,
-                cell: (info) => {
-                    if (Number(info.renderValue())) {
-                        return (
-                            <div
-                                style={{
-                                    color: 'green',
-                                    display: 'flex',
-                                    maxHeight: '100%',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    // padding: '50% 0px'
-                                }}
-                            >
-                                {info.renderValue() + ' Hours'}
-                            </div>
-                        );
-                    } else if (info.renderValue() === 'Due') {
-                        return (
-                            <div
-                                style={{
-                                    color: '#E15C00',
-                                    fontStyle: 'bold',
-                                    display: 'flex',
-                                    textAlign: 'center',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    height: '100%'
-                                }}
-                            >
-                                {info.renderValue()}
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div
-                                style={{
-                                    color: 'red',
-                                    fontStyle: 'bold',
-                                    display: 'flex',
-                                    textAlign: 'center',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    height: '100%'
-                                }}
-                            >
-                                {info.renderValue()}
-                            </div>
-                        );
-                    }
-                },
-                minSize: 30,
-                maxSize: 30,
-                invertSorting: true,
-                enableSorting: false,
-                filterFn: 'fuzzy',
-                sortingFn: sortingFns.alphanumeric,
-            },
-            {
-                accessorKey: 'part',
-                header: () => null,
-                cell: (info) => {
-                    return (
-                        <div style={{ whiteSpace: 'pre-line', overflowWrap: 'break-word' }}>
-                            <strong style={{ fontSize: '16px' }}>{info.cell.row.original.part}</strong>
-                            <span>{'\n'}</span>
-                            <span>{info.cell.row.original.description}</span>
-                        </div>
-                    );
-                },
-                enableSorting: false,
-            },
-            {
-                accessorKey: 'edit',
-                header: () => null,
-                cell: (info) => {
+    const columns = useMemo(() => [
+        {
+            accessorKey: 'time',
+            header: () => null,
+            cell: (info) => {
+                if (Number(info.renderValue())) {
                     return (
                         <div
                             style={{
-                                flexDirection: 'column',
-                                textAlign: 'center',
+                                color: 'green',
+                                display: 'flex',
+                                maxHeight: '100%',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                // padding: '50% 0px'
                             }}
                         >
-                            <Icon path={mdiCheckOutline} size={1.5} color="green" onClick={() => onClear(info.cell.row.original.id)} />
-                            <Icon path={mdiPencil} size={1.5} onClick={() => onEdit(info.cell.row.original.id)} />
+                            {info.renderValue() + ' Hours'}
                         </div>
                     );
-                },
-                enableSorting: false,
-                minSize: 15,
-                maxSize: 15,
-            }
-        ]
-    );
+                } else if (info.renderValue() === 'Due') {
+                    return (
+                        <div
+                            style={{
+                                color: '#E15C00',
+                                fontStyle: 'bold',
+                                display: 'flex',
+                                textAlign: 'center',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                            }}
+                        >
+                            {info.renderValue()}
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div
+                            style={{
+                                color: 'red',
+                                fontStyle: 'bold',
+                                display: 'flex',
+                                textAlign: 'center',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                            }}
+                        >
+                            {info.renderValue()}
+                        </div>
+                    );
+                }
+            },
+            minSize: 30,
+            maxSize: 30,
+            invertSorting: true,
+            enableSorting: false,
+            filterFn: 'fuzzy',
+            sortingFn: sortingFns.alphanumeric,
+        },
+        {
+            accessorKey: 'part',
+            header: () => null,
+            cell: (info) => {
+                return (
+                    <div
+                        style={{
+                            whiteSpace: 'pre-line',
+                            overflowWrap: 'break-word',
+                        }}
+                    >
+                        <strong style={{ fontSize: '16px' }}>
+                            {info.cell.row.original.part}
+                        </strong>
+                        <span>{'\n'}</span>
+                        <span>{info.cell.row.original.description}</span>
+                    </div>
+                );
+            },
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'edit',
+            header: () => null,
+            cell: (info) => {
+                return (
+                    <div
+                        style={{
+                            flexDirection: 'column',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <Icon
+                            path={mdiCheckOutline}
+                            size={1.5}
+                            color="green"
+                            onClick={() => onClear(info.cell.row.original.id)}
+                        />
+                        <Icon
+                            path={mdiPencil}
+                            size={1.5}
+                            onClick={() => onEdit(info.cell.row.original.id)}
+                        />
+                    </div>
+                );
+            },
+            enableSorting: false,
+            minSize: 15,
+            maxSize: 15,
+        },
+    ]);
     const sortBy = [
         {
             id: 'time',
-            desc: true
-        }
+            desc: true,
+        },
     ];
 
     return (
         <div>
             <div className={[styles.addMargin].join(' ')}>
-                <SortableTable data={formattedData} columns={columns} enableSortingRemoval={false} sortBy={sortBy} onAdd={onAdd} />
+                <SortableTable
+                    data={formattedData}
+                    columns={columns}
+                    enableSortingRemoval={false}
+                    sortBy={sortBy}
+                    onAdd={onAdd}
+                />
             </div>
-            { showEditModal && (
+            {showEditModal && (
                 <EditArea
                     task={currentTask}
                     update={replaceTask}
                     closeModal={() => setShowEditModal(false)}
                     deleteTask={deleteTask}
                 />
-            ) }
-            { showAddModal && (
+            )}
+            {showAddModal && (
                 <AddArea
                     update={addTask}
                     closeModal={() => setShowAddModal(false)}
                 />
-            ) }
+            )}
         </div>
     );
 };

@@ -25,7 +25,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Table from 'app/components/Table';
-import ToggleSwitch from 'app/components/ToggleSwitch';
+import ToggleSwitch from 'app/components/Switch';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
 import {
@@ -40,7 +40,7 @@ import {
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
     COOLANT_CATEGORY,
-    GRBLHAL
+    GRBLHAL,
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -66,39 +66,51 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             //that means a plus key is supposed to be there, but it was filtered out
             //due to keys.split
             if (shortcut[shortcut.length - 1] === '') {
-                cleanedShortcut = shortcut.filter(item => item !== '');
+                cleanedShortcut = shortcut.filter((item) => item !== '');
                 cleanedShortcut.push('+');
             }
 
-            const output = cleanedShortcut ? formatShortcut(cleanedShortcut, isActive) : formatShortcut(shortcut, isActive);
+            const output = cleanedShortcut
+                ? formatShortcut(cleanedShortcut, isActive)
+                : formatShortcut(shortcut, isActive);
 
             return (
                 <div className={styles.shortcutComboColumn}>
-                    {
-                        hasShortcut || ''
-                            ? (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                    {keysName ? <kbd>{keysName}</kbd> : output}
-                                </div>
-                            )
-                            : <div style={{ height: '24px' }} />
-                    }
+                    {hasShortcut || '' ? (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '0.5rem',
+                                alignItems: 'center',
+                            }}
+                        >
+                            {keysName ? <kbd>{keysName}</kbd> : output}
+                        </div>
+                    ) : (
+                        <div style={{ height: '24px' }} />
+                    )}
                     <div className={styles['icon-area']}>
-                        {
-                            hasShortcut && (
-                                <i
-                                    role="button"
-                                    tabIndex={-1}
-                                    className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
-                                    onClick={() => onDelete(row)}
-                                    onKeyDown={() => onDelete(row)}
-                                />
-                            )
-                        }
+                        {hasShortcut && (
+                            <i
+                                role="button"
+                                tabIndex={-1}
+                                className={cx(
+                                    'far fa-trash-alt',
+                                    styles.deleteIcon,
+                                    !hasShortcut ? styles.disabledIcon : '',
+                                )}
+                                onClick={() => onDelete(row)}
+                                onKeyDown={() => onDelete(row)}
+                            />
+                        )}
                         <i
                             role="button"
                             tabIndex={-1}
-                            className={cx(hasShortcut ? 'fas fa-edit' : 'fas fa-plus', styles.actionIcon)}
+                            className={cx(
+                                hasShortcut ? 'fas fa-edit' : 'fas fa-plus',
+                                styles.actionIcon,
+                            )}
                             onClick={() => onEdit(row)}
                             onKeyDown={null}
                         />
@@ -128,39 +140,63 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 [GENERAL_CATEGORY]: 'categoryGrey',
                 [TOOLBAR_CATEGORY]: 'categoryShipCove',
                 [MACRO_CATEGORY]: 'categoryLightBlue',
-                [COOLANT_CATEGORY]: 'categoryDarkRed'
+                [COOLANT_CATEGORY]: 'categoryDarkRed',
             };
 
-            const rowCategory = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].category : row.category;
+            const rowCategory = allShuttleControlEvents[row.cmd]
+                ? allShuttleControlEvents[row.cmd].category
+                : row.category;
             const category = categories[rowCategory];
-            return (
-                <div className={styles[category]}>{rowCategory}</div>
-            );
+            return <div className={styles[category]}>{rowCategory}</div>;
         },
         renderTitleCell: (_, row) => {
-            const rowTitle = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].title : row.title;
-            const isSpecial = allShuttleControlEvents[row.cmd]?.payload?.type === GRBLHAL;
+            const rowTitle = allShuttleControlEvents[row.cmd]
+                ? allShuttleControlEvents[row.cmd].title
+                : row.title;
+            const isSpecial =
+                allShuttleControlEvents[row.cmd]?.payload?.type === GRBLHAL;
             return (
-                <div>{rowTitle}{isSpecial ? <strong>*</strong> : ''}</div>
+                <div>
+                    {rowTitle}
+                    {isSpecial ? <strong>*</strong> : ''}
+                </div>
             );
         },
     };
 
     const columns = [
-        { dataKey: 'title', title: 'Action', sortable: true, width: '25%', render: renders.renderTitleCell },
-        { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: renders.renderShortcutCell },
-        { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: renders.renderCategoryCell },
-        { dataKey: 'isActive', title: 'Active', width: '10%', render: renders.renderToggleCell }
+        {
+            dataKey: 'title',
+            title: 'Action',
+            sortable: true,
+            width: '25%',
+            render: renders.renderTitleCell,
+        },
+        {
+            dataKey: 'keys',
+            title: 'Shortcut',
+            sortable: true,
+            width: '45%',
+            render: renders.renderShortcutCell,
+        },
+        {
+            dataKey: 'category',
+            title: 'Category',
+            sortable: true,
+            width: '20%',
+            render: renders.renderCategoryCell,
+        },
+        {
+            dataKey: 'isActive',
+            title: 'Active',
+            width: '10%',
+            render: renders.renderToggleCell,
+        },
     ];
 
     return (
         <>
-            <Table
-                rowKey="id"
-                columns={columns}
-                data={dataSet}
-                width={743}
-            />
+            <Table rowKey="id" columns={columns} data={dataSet} width={743} />
         </>
     );
 };

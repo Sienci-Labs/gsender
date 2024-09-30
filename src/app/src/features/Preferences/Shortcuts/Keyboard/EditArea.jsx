@@ -24,7 +24,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, ButtonGroup } from 'app/components/Buttons';
+import { Button, ButtonGroup } from 'app/components/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
 import { formatShortcut } from '../helpers';
@@ -48,7 +48,7 @@ export default class EditArea extends Component {
         switchPages: PropTypes.func,
         edit: PropTypes.func,
         onClose: PropTypes.func,
-    }
+    };
 
     initialState = {
         pressed: false,
@@ -58,8 +58,8 @@ export default class EditArea extends Component {
         altTriggered: false,
         shiftTriggered: false,
         ctrlTriggered: false,
-        state: { available: false, error: false, message: '' }
-    }
+        state: { available: false, error: false, message: '' },
+    };
 
     state = this.initialState;
 
@@ -133,7 +133,7 @@ export default class EditArea extends Component {
         keyCombo += key;
 
         return [key, keyCombo];
-    }
+    };
 
     /**
      * Function to listen to keydowns and generate new keybinding command combo
@@ -148,7 +148,9 @@ export default class EditArea extends Component {
             return;
         }
 
-        const foundShortcut = Object.entries(this.props.shortcuts).filter(([key, shortcut]) => shortcut.isActive).find(([key, shortcut]) => shortcut.keys === keyCombo);
+        const foundShortcut = Object.entries(this.props.shortcuts)
+            .filter(([key, shortcut]) => shortcut.isActive)
+            .find(([key, shortcut]) => shortcut.keys === keyCombo);
         const keyState = {
             singleKey,
             keyCombo,
@@ -160,24 +162,36 @@ export default class EditArea extends Component {
 
         if (foundShortcut) {
             if (foundShortcut[1].keys !== this.props.shortcut.keys) {
-                const title = allShuttleControlEvents[foundShortcut[1].cmd] ?
-                    allShuttleControlEvents[foundShortcut[1].cmd].title : foundShortcut[1].title;
+                const title = allShuttleControlEvents[foundShortcut[1].cmd]
+                    ? allShuttleControlEvents[foundShortcut[1].cmd].title
+                    : foundShortcut[1].title;
                 this.setState({
                     ...keyState,
-                    state: { available: false, error: true, message: `This shortcut is already in use by action "${title}"` }
+                    state: {
+                        available: false,
+                        error: true,
+                        message: `This shortcut is already in use by action "${title}"`,
+                    },
                 });
             } else {
                 //If it found itself, return to original state
-                this.setState({ ...keyState, state: { available: false, error: false, message: '' } });
+                this.setState({
+                    ...keyState,
+                    state: { available: false, error: false, message: '' },
+                });
             }
             return;
         }
 
         this.setState({
             ...keyState,
-            state: { available: true, error: false, message: 'Shortcut is Available' },
+            state: {
+                available: true,
+                error: false,
+                message: 'Shortcut is Available',
+            },
         });
-    }
+    };
 
     /**
      * Function to edit shortcut with new key combo, function invokes parent function received in props
@@ -187,7 +201,7 @@ export default class EditArea extends Component {
         const { keyCombo } = this.state;
 
         edit({ ...shortcut, keys: keyCombo });
-    }
+    };
 
     componentDidMount() {
         document.addEventListener('keydown', this.outputKeys);
@@ -204,15 +218,28 @@ export default class EditArea extends Component {
         const { state } = this.state;
 
         if (state.available) {
-            return (<div className={styles['info-window-area-success']}><i className="fas fa-check-circle" /> <p>{state.message}</p></div>);
+            return (
+                <div className={styles['info-window-area-success']}>
+                    <i className="fas fa-check-circle" /> <p>{state.message}</p>
+                </div>
+            );
         }
 
         if (state.error) {
-            return (<div className={styles['info-window-area-error']}><i className="fas fa-exclamation-circle" /> <p>{state.message}</p></div>);
+            return (
+                <div className={styles['info-window-area-error']}>
+                    <i className="fas fa-exclamation-circle" />{' '}
+                    <p>{state.message}</p>
+                </div>
+            );
         }
 
-        return (<div className={styles['info-window-area']}><i className="fas fa-info-circle" /> <p>&nbsp;</p></div>);
-    }
+        return (
+            <div className={styles['info-window-area']}>
+                <i className="fas fa-info-circle" /> <p>&nbsp;</p>
+            </div>
+        );
+    };
 
     displayShortcut = () => {
         const { shortcut } = this.props;
@@ -225,17 +252,19 @@ export default class EditArea extends Component {
         //that means a plus key is supposed to be there, but it was filtered out
         //due to keys.split
         if (shortcutArray[shortcutArray.length - 1] === '') {
-            cleanedShortcut = shortcutArray.filter(item => item !== '');
+            cleanedShortcut = shortcutArray.filter((item) => item !== '');
 
             if (shortcutArray[0]) {
                 cleanedShortcut.push('+');
             }
         }
 
-        const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcutArray);
+        const output = cleanedShortcut
+            ? formatShortcut(cleanedShortcut)
+            : formatShortcut(shortcutArray);
 
         return output;
-    }
+    };
 
     render() {
         const {
@@ -251,21 +280,25 @@ export default class EditArea extends Component {
 
         const infoWindowOutput = this.infoWindowOutput();
 
-        const output = pressed
-            ? formatShortcut([singleKey])
-            : <span className={styles['glowing-text']}>Press Some Keys...</span>;
+        const output = pressed ? (
+            formatShortcut([singleKey])
+        ) : (
+            <span className={styles['glowing-text']}>Press Some Keys...</span>
+        );
 
         const shortcutkeys = this.displayShortcut();
 
-        const title = allShuttleControlEvents[shortcut.cmd] ?
-            allShuttleControlEvents[shortcut.cmd].title : shortcut.title;
+        const title = allShuttleControlEvents[shortcut.cmd]
+            ? allShuttleControlEvents[shortcut.cmd].title
+            : shortcut.title;
 
         return (
             <div className={styles.wrapper}>
-
                 <div className={styles['edit-info']}>
                     <h4 className={styles['edit-subtitle']}>Action</h4>
-                    <h4 className={styles['edit-subtitle']}>Current Shortcut</h4>
+                    <h4 className={styles['edit-subtitle']}>
+                        Current Shortcut
+                    </h4>
 
                     <h4 style={{ textAlign: 'center' }}>{title}</h4>
                     <h4 style={{ textAlign: 'center' }}>{shortcutkeys}</h4>
@@ -279,21 +312,54 @@ export default class EditArea extends Component {
                 </div>
 
                 <div className={styles['trigger-keys']}>
-                    <label className={ctrlTriggered ? styles.active : styles.disabled}>Ctrl</label>
-                    <label className={shiftTriggered ? styles.active : styles.disabled}>Shift</label>
-                    <label className={altTriggered ? styles.active : styles.disabled}>Alt</label>
-                    <label className={metaTriggered ? styles.active : styles.disabled}>Command</label>
+                    <label
+                        className={
+                            ctrlTriggered ? styles.active : styles.disabled
+                        }
+                    >
+                        Ctrl
+                    </label>
+                    <label
+                        className={
+                            shiftTriggered ? styles.active : styles.disabled
+                        }
+                    >
+                        Shift
+                    </label>
+                    <label
+                        className={
+                            altTriggered ? styles.active : styles.disabled
+                        }
+                    >
+                        Alt
+                    </label>
+                    <label
+                        className={
+                            metaTriggered ? styles.active : styles.disabled
+                        }
+                    >
+                        Command
+                    </label>
                 </div>
 
                 {infoWindowOutput}
 
                 <div className={styles['button-group-wrapper']}>
                     <ButtonGroup style={{ marginTop: '2rem' }}>
-                        <Button btnSize="lg" btnStyle="default" onClick={onClose}>Cancel</Button>
                         <Button
-                            btnSize="lg" btnStyle="primary" disabled={!state.available}
+                            btnSize="lg"
+                            btnStyle="default"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            btnSize="lg"
+                            btnStyle="primary"
+                            disabled={!state.available}
                             onClick={this.handleEdit}
-                        >Save Changes
+                        >
+                            Save Changes
                         </Button>
                     </ButtonGroup>
                 </div>

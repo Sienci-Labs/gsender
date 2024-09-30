@@ -29,8 +29,8 @@ import Mousetrap from 'mousetrap';
 
 import { ALL_CATEGORY, USAGE_TOOL_NAME } from 'app/constants';
 import store from 'app/store';
-import Modal from 'app/components/Modal';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import { Modal } from 'app/components/Modal';
+import { Button as FunctionButton } from 'app/components/Button';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
@@ -47,19 +47,29 @@ import { collectUserUsageData } from '../../../../lib/heatmap';
  * @prop {Boolean} active Check if this page is currently active or not
  */
 const Keyboard = () => {
-    const [shortcutsList, setShortcutsList] = useState(store.get('commandKeys', {}));
+    const [shortcutsList, setShortcutsList] = useState(
+        store.get('commandKeys', {}),
+    );
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
     const filter = (category, shortcuts) => {
         const allShortcuts = shortcuts || shortcutsList;
-        const filteredData = category === ALL_CATEGORY ? allShortcuts : Object.fromEntries(Object.entries(allShortcuts).filter(([key, entry]) => {
-            if (allShuttleControlEvents[key]) {
-                return allShuttleControlEvents[key].category === category;
-            }
-            return entry.category === category;
-        }));
+        const filteredData =
+            category === ALL_CATEGORY
+                ? allShortcuts
+                : Object.fromEntries(
+                      Object.entries(allShortcuts).filter(([key, entry]) => {
+                          if (allShuttleControlEvents[key]) {
+                              return (
+                                  allShuttleControlEvents[key].category ===
+                                  category
+                              );
+                          }
+                          return entry.category === category;
+                      }),
+                  );
         setDataSet(filteredData);
         setFilterCategory(category);
     };
@@ -77,11 +87,15 @@ const Keyboard = () => {
         // dispatch(holdShortcutsListener());
         // pubsub.publish('removeshortcutsListener');
 
-        const token = pubsub.subscribe('keybindingsUpdated', (msg, shortcuts) => {
-            if (shortcuts) { // if shortcuts not sent, updateKeybindings published it
-                updateKeybindings(shortcuts);
-            }
-        });
+        const token = pubsub.subscribe(
+            'keybindingsUpdated',
+            (msg, shortcuts) => {
+                if (shortcuts) {
+                    // if shortcuts not sent, updateKeybindings published it
+                    updateKeybindings(shortcuts);
+                }
+            },
+        );
 
         const timeout = setTimeout(() => {
             collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.SHORTCUTS.KEYBOARD);
@@ -97,13 +111,17 @@ const Keyboard = () => {
         };
     }, []);
 
-    const showToast = _.throttle((msg = 'Shortcut Updated') => {
-        Toaster.pop({
-            msg,
-            type: TOASTER_SUCCESS,
-            duration: 3000
-        });
-    }, 5000, { trailing: false });
+    const showToast = _.throttle(
+        (msg = 'Shortcut Updated') => {
+            Toaster.pop({
+                msg,
+                type: TOASTER_SUCCESS,
+                duration: 3000,
+            });
+        },
+        5000,
+        { trailing: false },
+    );
 
     const handleEdit = (currentShortcut) => {
         setShowEditModal(true);
@@ -131,7 +149,9 @@ const Keyboard = () => {
 
     const toggleKeybinding = (shortcut, showToast) => {
         const updatedShortcutsList = _.cloneDeep(shortcutsList);
-        const shortcutInUse = Object.entries(updatedShortcutsList).filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd).find(([key, keybinding]) => keybinding.keys === shortcut.keys);
+        const shortcutInUse = Object.entries(updatedShortcutsList)
+            .filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd)
+            .find(([key, keybinding]) => keybinding.keys === shortcut.keys);
         if (shortcutInUse && shortcut.isActive) {
             shortcut.keys = '';
         }
@@ -201,8 +221,20 @@ const Keyboard = () => {
         return true;
     };
 
-    const allShortcutsEnabled = useMemo(() => Object.entries(shortcutsList).every(([key, shortcut]) => shortcut.isActive), [shortcutsList]);
-    const allShortcutsDisabled = useMemo(() => Object.entries(shortcutsList).every(([key, shortcut]) => !shortcut.isActive), [shortcutsList]);
+    const allShortcutsEnabled = useMemo(
+        () =>
+            Object.entries(shortcutsList).every(
+                ([key, shortcut]) => shortcut.isActive,
+            ),
+        [shortcutsList],
+    );
+    const allShortcutsDisabled = useMemo(
+        () =>
+            Object.entries(shortcutsList).every(
+                ([key, shortcut]) => !shortcut.isActive,
+            ),
+        [shortcutsList],
+    );
     return (
         <div>
             <CategoryFilter onChange={filter} filterCategory={filterCategory} />
@@ -216,20 +248,43 @@ const Keyboard = () => {
                 />
             </div>
 
-            <div style={{ display: 'grid', columnGap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
-                <FunctionButton primary onClick={enableAllShortcuts} disabled={allShortcutsEnabled}>
+            <div
+                style={{
+                    display: 'grid',
+                    columnGap: '1rem',
+                    gridTemplateColumns: '1fr 1fr',
+                }}
+            >
+                <FunctionButton
+                    primary
+                    onClick={enableAllShortcuts}
+                    disabled={allShortcutsEnabled}
+                >
                     <i className="fas fa-toggle-on" />
                     Enable All Shortcuts
                 </FunctionButton>
-                <FunctionButton primary onClick={disableAllShortcuts} disabled={allShortcutsDisabled}>
+                <FunctionButton
+                    primary
+                    onClick={disableAllShortcuts}
+                    disabled={allShortcutsDisabled}
+                >
                     <i className="fas fa-toggle-off" />
                     Disable All Shortcuts
                 </FunctionButton>
             </div>
 
-            { showEditModal && stopCallback() && (
-                <Modal onClose={closeModal} size="md" style={{ padding: '1rem 1rem 2rem', backgroundColor: '#d1d5db' }}>
-                    <h3 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h3>
+            {showEditModal && stopCallback() && (
+                <Modal
+                    onClose={closeModal}
+                    size="md"
+                    style={{
+                        padding: '1rem 1rem 2rem',
+                        backgroundColor: '#d1d5db',
+                    }}
+                >
+                    <h3 style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                        Edit Shortcut
+                    </h3>
 
                     <EditArea
                         shortcut={shortcutsList[currentShortcut]}
@@ -238,13 +293,13 @@ const Keyboard = () => {
                         onClose={closeModal}
                     />
                 </Modal>
-            ) }
+            )}
         </div>
     );
 };
 
 Keyboard.propTypes = {
-    active: PropTypes.bool
+    active: PropTypes.bool,
 };
 
 export default Keyboard;

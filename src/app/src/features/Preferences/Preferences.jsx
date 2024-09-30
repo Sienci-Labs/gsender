@@ -21,7 +21,7 @@
  *
  */
 
-import Modal from 'app/components/Modal';
+import { Modal } from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import pubsub from 'pubsub-js';
@@ -989,18 +989,6 @@ class PreferencesPage extends PureComponent {
         if (prevState.selectedMenu !== this.state.selectedMenu) {
             return;
         }
-
-        // if (units !== prevState.units) {
-        //     const surfacingValues = store.get('widgets.surfacing');
-
-        //     if (units === 'mm') {
-        //         store.replace('widgets.surfacing', convertValuesToMetric(surfacingValues));
-        //     }
-
-        //     if (units === 'in') {
-        //         store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
-        //     }
-        // }
 
         if (this.shouldShowToast) {
             this.showToast();

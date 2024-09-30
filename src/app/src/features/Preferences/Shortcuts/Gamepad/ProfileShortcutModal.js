@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -6,7 +5,7 @@ import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
-import Button from 'app/components/FunctionButton/FunctionButton';
+import { Button } from 'app/components/Button';
 import Modal from 'app/components/ToolModal/ToolModal';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
@@ -19,7 +18,14 @@ import Availability from './Availability';
 const { DEFAULT, AVAILABLE, UNAVAILABLE, IS_THE_SAME } = AVAILABILITY_TYPES;
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
-const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, filterFunc, filterCategory }) => {
+const ProfileShortcutModal = ({
+    profile,
+    shortcut,
+    onClose,
+    onUpdateProfiles,
+    filterFunc,
+    filterCategory,
+}) => {
     const [gamepadShortcut, setGamepadShortcut] = useState([]);
     const [availability, setAvailability] = useState(DEFAULT);
     const [shortcutName, setShortcutName] = useState('');
@@ -35,46 +41,61 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
         };
     }, []);
 
-    const gamepadListener = _.throttle(({ detail }) => {
-        const { gamepad: currentGamepad } = detail;
-        const { id, buttons } = currentGamepad;
+    const gamepadListener = _.throttle(
+        ({ detail }) => {
+            const { gamepad: currentGamepad } = detail;
+            const { id, buttons } = currentGamepad;
 
-        if (!profile.id.includes(id)) {
-            return;
-        }
+            if (!profile.id.includes(id)) {
+                return;
+            }
 
-        const clickedButtons =
-            buttons
-                .map((button, i) => ({ pressed: button.pressed || button.touched, buttonIndex: i }))
+            const clickedButtons = buttons
+                .map((button, i) => ({
+                    pressed: button.pressed || button.touched,
+                    buttonIndex: i,
+                }))
                 .filter((button) => button.pressed);
 
-        if (clickedButtons.length === 0) {
-            return;
-        }
+            if (clickedButtons.length === 0) {
+                return;
+            }
 
-        const profiles = store.get('workspace.gamepad.profiles', []);
-        const currentProfile = profiles.find(profile => profile.id.includes(id));
+            const profiles = store.get('workspace.gamepad.profiles', []);
+            const currentProfile = profiles.find((profile) =>
+                profile.id.includes(id),
+            );
 
-        const comboKeys = shortcutComboBuilder(clickedButtons.map(shortcut => shortcut.buttonIndex));
+            const comboKeys = shortcutComboBuilder(
+                clickedButtons.map((shortcut) => shortcut.buttonIndex),
+            );
 
-        const comboInUse = Object.entries(currentProfile.shortcuts)
-            .find(([key, shortcut]) => shortcut.keys === comboKeys);
+            const comboInUse = Object.entries(currentProfile.shortcuts).find(
+                ([key, shortcut]) => shortcut.keys === comboKeys,
+            );
 
-        if (!comboInUse) {
-            setAvailability(AVAILABLE);
-        } else if (comboInUse[1].cmd === shortcut?.cmd) {
-            setAvailability(IS_THE_SAME);
-        } else {
-            setAvailability(UNAVAILABLE);
-        }
+            if (!comboInUse) {
+                setAvailability(AVAILABLE);
+            } else if (comboInUse[1].cmd === shortcut?.cmd) {
+                setAvailability(IS_THE_SAME);
+            } else {
+                setAvailability(UNAVAILABLE);
+            }
 
-        setGamepadShortcut(clickedButtons);
-        listenerRef.current.handleButtonPress();
-    }, 250, { trailing: false });
+            setGamepadShortcut(clickedButtons);
+            listenerRef.current.handleButtonPress();
+        },
+        250,
+        { trailing: false },
+    );
 
     const handleUpdateShortcut = () => {
-        const newKeys = shortcutComboBuilder(gamepadShortcut.map(shortcut => shortcut.buttonIndex));
-        const newKeysName = shortcutName || gamepadShortcut.map(shortcut => shortcut.buttonIndex).join(', ');
+        const newKeys = shortcutComboBuilder(
+            gamepadShortcut.map((shortcut) => shortcut.buttonIndex),
+        );
+        const newKeysName =
+            shortcutName ||
+            gamepadShortcut.map((shortcut) => shortcut.buttonIndex).join(', ');
 
         let newShortcuts = _.cloneDeep(profile.shortcuts);
         newShortcuts[shortcut.cmd].keys = newKeys;
@@ -86,10 +107,14 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         //Checks if parent array has all the child array elements
-        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
+        const arrayComparator = (parentArr, childArr) =>
+            childArr.every((element) => parentArr.includes(element));
 
-        const cleanedProfiles =
-            profiles.map(currentProfile => (arrayComparator(currentProfile.id, profile.id) ? ({ ...profile, shortcuts: newShortcuts }) : currentProfile));
+        const cleanedProfiles = profiles.map((currentProfile) =>
+            arrayComparator(currentProfile.id, profile.id)
+                ? { ...profile, shortcuts: newShortcuts }
+                : currentProfile,
+        );
 
         onUpdateProfiles(cleanedProfiles);
 
@@ -98,16 +123,24 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
         Toaster.pop({
             msg: 'Updated Gamepad Action Shortcut',
             type: TOASTER_SUCCESS,
-            duration: 2000
+            duration: 2000,
         });
     };
 
     return (
-        <Modal onClose={onClose} size="small" title="Set Gamepad Profile Action">
+        <Modal
+            onClose={onClose}
+            size="small"
+            title="Set Gamepad Profile Action"
+        >
             <div className={styles.profileActionWrapper}>
                 <Availability
                     type={availability}
-                    shortcutTitle={allShuttleControlEvents[shortcut.cmd] ? allShuttleControlEvents[shortcut.cmd].title : shortcut.title}
+                    shortcutTitle={
+                        allShuttleControlEvents[shortcut.cmd]
+                            ? allShuttleControlEvents[shortcut.cmd].title
+                            : shortcut.title
+                    }
                     shortcut={gamepadShortcut}
                     listenerRef={listenerRef}
                 />
@@ -117,10 +150,15 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
                     onChange={(e) => setShortcutName(e.target.value)}
                     additionalProps={{
                         placeholder: 'Enter a Custom Shortcut Name Here...',
-                        disabled: !gamepadShortcut || availability !== AVAILABLE
+                        disabled:
+                            !gamepadShortcut || availability !== AVAILABLE,
                     }}
                     isNumber={false}
-                    className={availability === AVAILABLE ? styles.customProfileName : styles.customProfileNameHidden}
+                    className={
+                        availability === AVAILABLE
+                            ? styles.customProfileName
+                            : styles.customProfileNameHidden
+                    }
                 />
 
                 <Button
@@ -140,7 +178,7 @@ ProfileShortcutModal.propTypes = {
     profile: PropTypes.object,
     shortcut: PropTypes.object,
     onClose: PropTypes.func,
-    onUpdateProfiles: PropTypes.func
+    onUpdateProfiles: PropTypes.func,
 };
 
 export default ProfileShortcutModal;

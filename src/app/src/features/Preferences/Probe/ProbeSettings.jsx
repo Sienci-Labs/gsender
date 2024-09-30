@@ -23,8 +23,8 @@
 
 import React from 'react';
 
-import Tooltip from 'app/components/TooltipCustom/ToolTip';
-import ToggleSwitch from 'app/components/ToggleSwitch';
+import Tooltip from 'app/components/ToolTip';
+import ToggleSwitch from 'app/components/Switch';
 import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
 
 import Fieldset from '../components/Fieldset';
@@ -37,52 +37,78 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
 
     return (
         <Fieldset legend="Probing Settings" style={{ height: '100%' }}>
-
-            {
-                type !== TOUCHPLATE_TYPE_AUTOZERO && (
-                    <>
-                        <Tooltip content="Probe speed during initial touch-off" location="default">
-                            <Input
-                                label="Fast Find"
-                                value={values.fastFeedrate}
-                                onChange={probeActions.changeFastFeedrate}
-                                additionalProps={{ type: 'number', id: 'fastFeedrate' }}
-                                units={`${units}/min`}
-                            />
-                        </Tooltip>
-                        <Tooltip content="Probe speed during second touch-off - slower for more accuracy" location="default">
-                            <Input
-                                label="Slow Find"
-                                value={values.normalFeedrate}
-                                onChange={probeActions.changeNormalFeedrate}
-                                additionalProps={{ type: 'number', id: 'normalFeedrate' }}
-                                units={`${units}/min`}
-                            />
-                        </Tooltip>
-                        <Tooltip content="Specify far the probe reverses after a successful touch" location="default">
-                            <Input
-                                label="Retraction"
-                                value={values.retractionDistance}
-                                onChange={probeActions.changeRetractionDistance}
-                                additionalProps={{ type: 'number', id: 'retraction' }}
-                                units={units}
-                            />
-                        </Tooltip>
-                        <Tooltip content="Maximum distance for Z probe" location="default">
-                            <Input
-                                label="Z Probe Distance"
-                                value={values.zProbeDistance}
-                                onChange={probeActions.changeZProbeDistance}
-                                additionalProps={{ type: 'number', id: 'zProbeDistance' }}
-                                units={units}
-                            />
-                        </Tooltip>
-                    </>
-                )
-            }
-            <Tooltip content="Toggle check to see if your probe is connected correctly" location="default">
+            {type !== TOUCHPLATE_TYPE_AUTOZERO && (
+                <>
+                    <Tooltip
+                        content="Probe speed during initial touch-off"
+                        location="default"
+                    >
+                        <Input
+                            label="Fast Find"
+                            value={values.fastFeedrate}
+                            onChange={probeActions.changeFastFeedrate}
+                            additionalProps={{
+                                type: 'number',
+                                id: 'fastFeedrate',
+                            }}
+                            units={`${units}/min`}
+                        />
+                    </Tooltip>
+                    <Tooltip
+                        content="Probe speed during second touch-off - slower for more accuracy"
+                        location="default"
+                    >
+                        <Input
+                            label="Slow Find"
+                            value={values.normalFeedrate}
+                            onChange={probeActions.changeNormalFeedrate}
+                            additionalProps={{
+                                type: 'number',
+                                id: 'normalFeedrate',
+                            }}
+                            units={`${units}/min`}
+                        />
+                    </Tooltip>
+                    <Tooltip
+                        content="Specify far the probe reverses after a successful touch"
+                        location="default"
+                    >
+                        <Input
+                            label="Retraction"
+                            value={values.retractionDistance}
+                            onChange={probeActions.changeRetractionDistance}
+                            additionalProps={{
+                                type: 'number',
+                                id: 'retraction',
+                            }}
+                            units={units}
+                        />
+                    </Tooltip>
+                    <Tooltip
+                        content="Maximum distance for Z probe"
+                        location="default"
+                    >
+                        <Input
+                            label="Z Probe Distance"
+                            value={values.zProbeDistance}
+                            onChange={probeActions.changeZProbeDistance}
+                            additionalProps={{
+                                type: 'number',
+                                id: 'zProbeDistance',
+                            }}
+                            units={units}
+                        />
+                    </Tooltip>
+                </>
+            )}
+            <Tooltip
+                content="Toggle check to see if your probe is connected correctly"
+                location="default"
+            >
                 <div className={styles.inputSpread}>
-                    <label htmlFor="probeConnectivityTest">Probe connectivity test</label>
+                    <label htmlFor="probeConnectivityTest">
+                        Probe connectivity test
+                    </label>
                     <ToggleSwitch
                         checked={probeSettings.connectivityTest}
                         onChange={probeActions.changeConnectivityTest}

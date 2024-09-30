@@ -1,7 +1,12 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, {
+    useState,
+    useEffect,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
 import classnames from 'classnames';
 
-import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import Tooltip from 'app/components/ToolTip';
 
 import styles from '../index.styl';
 
@@ -17,7 +22,7 @@ const Listener = forwardRef((props, ref) => {
     }, []);
 
     const clearTimeouts = () => {
-        queue.forEach(item => clearTimeout(item));
+        queue.forEach((item) => clearTimeout(item));
     };
 
     const handleButtonPress = () => {
@@ -35,9 +40,15 @@ const Listener = forwardRef((props, ref) => {
     return (
         <Tooltip
             content="Button press indicator, animates when a button is pressed on your gamepad"
-            wrapperClassName={classnames(styles.activeIndicator, { [styles.activeIndicatorOn]: detectedButtonPress })}
+            wrapperClassName={classnames(styles.activeIndicator, {
+                [styles.activeIndicatorOn]: detectedButtonPress,
+            })}
         >
-            <i className={classnames('fas fa-gamepad', { [styles.activePulse]: detectedButtonPress })} />
+            <i
+                className={classnames('fas fa-gamepad', {
+                    [styles.activePulse]: detectedButtonPress,
+                })}
+            />
         </Tooltip>
     );
 });

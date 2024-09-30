@@ -27,40 +27,48 @@ import _ from 'lodash';
 import pubsub from 'pubsub-js';
 
 import store from 'app/store';
-import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import Tooltip from 'app/components/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
-import Button from 'app/components/FunctionButton/FunctionButton';
+import { Button } from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import defaultState from 'app/store/defaultState';
 
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import styles from '../index.styl';
-import { convertAllPresetsUnits, convertToImperial, convertToMetric } from '../calculate';
+import {
+    convertAllPresetsUnits,
+    convertToImperial,
+    convertToMetric,
+} from '../calculate';
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
 
 export default class JoggingPresets extends Component {
-    pubsubTokens = []
+    pubsubTokens = [];
 
     state = {
         units: store.get('workspace.units'),
         jogSpeeds: this.getJogSpeeds(),
         selectedPreset: 'precise',
-    }
+    };
 
-    showToast = _.throttle(() => {
-        Toaster.pop({
-            msg: 'Settings Updated',
-            type: TOASTER_SUCCESS,
-            duration: 3000
-        });
-    }, 5000, { trailing: false });
+    showToast = _.throttle(
+        () => {
+            Toaster.pop({
+                msg: 'Settings Updated',
+                type: TOASTER_SUCCESS,
+                duration: 3000,
+            });
+        },
+        5000,
+        { trailing: false },
+    );
 
     componentDidMount() {
         const tokens = [
             pubsub.subscribe('units:change', (msg, units) => {
                 this.updateState(units);
-            })
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -81,40 +89,43 @@ export default class JoggingPresets extends Component {
 
     handleJogClick = (selected) => {
         this.setState({
-            selectedPreset: selected
+            selectedPreset: selected,
         });
-    }
+    };
 
     updateState = (unit) => {
         const units = unit || store.get('workspace.units');
 
         const jogSpeeds = this.getJogSpeeds();
         // force update
-        this.setState({
-            units,
-            jogSpeeds: {
-                rapid: {
-                    xyStep: '',
-                    zStep: '',
-                    feedrate: ''
+        this.setState(
+            {
+                units,
+                jogSpeeds: {
+                    rapid: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: '',
+                    },
+                    normal: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: '',
+                    },
+                    precise: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: '',
+                    },
                 },
-                normal: {
-                    xyStep: '',
-                    zStep: '',
-                    feedrate: ''
-                },
-                precise: {
-                    xyStep: '',
-                    zStep: '',
-                    feedrate: ''
-                }
-            }
-        }, () => {
-            this.setState({
-                jogSpeeds: { ...jogSpeeds }
-            });
-        });
-    }
+            },
+            () => {
+                this.setState({
+                    jogSpeeds: { ...jogSpeeds },
+                });
+            },
+        );
+    };
 
     handleXYChange = (e) => {
         // if empty input, do nothing
@@ -148,7 +159,8 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
+        const convertedValue =
+            units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -158,15 +170,15 @@ export default class JoggingPresets extends Component {
                 ...prev.jog,
                 [selectedPreset]: {
                     ...currentPreset,
-                    xyStep: convertedValue
-                }
-            }
+                    xyStep: convertedValue,
+                },
+            },
         };
 
         store.replace('widgets.axes', updated);
         this.updateState();
         this.showToast();
-    }
+    };
 
     handleZChange = (e) => {
         if (e.target.value === '') {
@@ -199,7 +211,8 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
+        const convertedValue =
+            units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -209,15 +222,15 @@ export default class JoggingPresets extends Component {
                 ...prev.jog,
                 [selectedPreset]: {
                     ...currentPreset,
-                    zStep: convertedValue
-                }
-            }
+                    zStep: convertedValue,
+                },
+            },
         };
 
         store.replace('widgets.axes', updated);
         this.updateState();
         this.showToast();
-    }
+    };
 
     handleSpeedChange = (e) => {
         if (e.target.value === '') {
@@ -249,7 +262,8 @@ export default class JoggingPresets extends Component {
             }
         }
 
-        const convertedValue = units === METRIC_UNITS ? value : convertToMetric(value);
+        const convertedValue =
+            units === METRIC_UNITS ? value : convertToMetric(value);
 
         const prev = store.get('widgets.axes');
 
@@ -260,22 +274,23 @@ export default class JoggingPresets extends Component {
                 [selectedPreset]: {
                     ...currentPreset,
                     feedrate: convertedValue,
-                }
-            }
+                },
+            },
         };
 
         store.replace('widgets.axes', updated);
         this.updateState();
         this.showToast();
-    }
+    };
 
     confirmResetToDefault = () => {
         Confirm({
             title: 'Reset Jogging Presets to Default',
-            content: 'This will reset precise, normal, and rapid preset values to default. Are you sure you want to reset?',
+            content:
+                'This will reset precise, normal, and rapid preset values to default. Are you sure you want to reset?',
             onConfirm: this.resetToDefault,
         });
-    }
+    };
 
     resetToDefault = () => {
         const defaultJogPresets = _.get(defaultState, 'widgets.axes.jog', null);
@@ -289,30 +304,86 @@ export default class JoggingPresets extends Component {
 
         // convert before publishing
         const { units } = this.state;
-        let convertedDefaults = units === IMPERIAL_UNITS ? convertAllPresetsUnits(units, defaultJogPresets) : defaultJogPresets;
+        let convertedDefaults =
+            units === IMPERIAL_UNITS
+                ? convertAllPresetsUnits(units, defaultJogPresets)
+                : defaultJogPresets;
         pubsub.publish('jogSpeeds', convertedDefaults);
 
         this.showToast();
-    }
+    };
 
     render() {
         const { units, jogSpeeds, selectedPreset } = this.state;
 
         const preset = jogSpeeds[selectedPreset];
 
-        const xyValue = units === METRIC_UNITS ? preset?.xyStep : convertToImperial(preset?.xyStep);
-        const zValue = units === METRIC_UNITS ? preset?.zStep : convertToImperial(preset?.zStep);
-        const speedValue = units === METRIC_UNITS ? preset?.feedrate : convertToImperial(preset?.feedrate);
+        const xyValue =
+            units === METRIC_UNITS
+                ? preset?.xyStep
+                : convertToImperial(preset?.xyStep);
+        const zValue =
+            units === METRIC_UNITS
+                ? preset?.zStep
+                : convertToImperial(preset?.zStep);
+        const speedValue =
+            units === METRIC_UNITS
+                ? preset?.feedrate
+                : convertToImperial(preset?.feedrate);
 
         return (
             <Fieldset legend="Jogging Presets">
-                <div className={classnames(styles.jogSpeedWrapper, styles.flexRow)}>
-                    <button type="button" onClick={() => this.handleJogClick('precise')} className={styles[selectedPreset === 'precise' ? 'jog-speed-active' : 'jog-speed-inactive']}>Precise</button>
-                    <button type="button" onClick={() => this.handleJogClick('normal')} className={styles[selectedPreset === 'normal' ? 'jog-speed-active' : 'jog-speed-inactive']}>Normal</button>
-                    <button type="button" onClick={() => this.handleJogClick('rapid')} className={styles[selectedPreset === 'rapid' ? 'jog-speed-active' : 'jog-speed-inactive']}>Rapid</button>
+                <div
+                    className={classnames(
+                        styles.jogSpeedWrapper,
+                        styles.flexRow,
+                    )}
+                >
+                    <button
+                        type="button"
+                        onClick={() => this.handleJogClick('precise')}
+                        className={
+                            styles[
+                                selectedPreset === 'precise'
+                                    ? 'jog-speed-active'
+                                    : 'jog-speed-inactive'
+                            ]
+                        }
+                    >
+                        Precise
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => this.handleJogClick('normal')}
+                        className={
+                            styles[
+                                selectedPreset === 'normal'
+                                    ? 'jog-speed-active'
+                                    : 'jog-speed-inactive'
+                            ]
+                        }
+                    >
+                        Normal
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => this.handleJogClick('rapid')}
+                        className={
+                            styles[
+                                selectedPreset === 'rapid'
+                                    ? 'jog-speed-active'
+                                    : 'jog-speed-inactive'
+                            ]
+                        }
+                    >
+                        Rapid
+                    </button>
                 </div>
                 <div className={styles['jog-spead-wrapper']}>
-                    <Tooltip content="Set amount of movement for XY Jog Speed Preset Buttons" location="default">
+                    <Tooltip
+                        content="Set amount of movement for XY Jog Speed Preset Buttons"
+                        location="default"
+                    >
                         <Input
                             label="XY Move"
                             units={units}
@@ -321,7 +392,10 @@ export default class JoggingPresets extends Component {
                             value={xyValue}
                         />
                     </Tooltip>
-                    <Tooltip content="Set amount of movement for Z Jog Speed Preset Buttons" location="default">
+                    <Tooltip
+                        content="Set amount of movement for Z Jog Speed Preset Buttons"
+                        location="default"
+                    >
                         <Input
                             label="Z Move"
                             units={units}
@@ -330,7 +404,10 @@ export default class JoggingPresets extends Component {
                             value={zValue}
                         />
                     </Tooltip>
-                    <Tooltip content="Set the speed for the Jog Speed Preset Buttons" location="default">
+                    <Tooltip
+                        content="Set the speed for the Jog Speed Preset Buttons"
+                        location="default"
+                    >
                         <Input
                             label="Speed"
                             units={`${units}/min`}
@@ -342,7 +419,12 @@ export default class JoggingPresets extends Component {
                     </Tooltip>
                 </div>
 
-                <Button style={{ marginBottom: '1rem' }} onClick={this.confirmResetToDefault}>Reset to Default</Button>
+                <Button
+                    style={{ marginBottom: '1rem' }}
+                    onClick={this.confirmResetToDefault}
+                >
+                    Reset to Default
+                </Button>
             </Fieldset>
         );
     }

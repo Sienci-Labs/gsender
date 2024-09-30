@@ -26,14 +26,14 @@ import Select from 'react-select';
 import { isEmpty, map } from 'lodash';
 import api from 'app/api';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
-import SortableTable from 'app/components/SortableTable/SortableTable';
+import SortableTable from 'app/components/SortableTable';
 import styles from './index.styl';
 import {
     STATS_PAGES,
     OVERALL_STATS,
     JOB_PER_PORT,
     RUN_TIME_PER_PORT,
-    USAGE_TOOL_NAME
+    USAGE_TOOL_NAME,
 } from '../../../constants';
 import { collectUserUsageData } from '../../../lib/heatmap';
 
@@ -62,7 +62,7 @@ const columnData = {
                 return date.toISOString().slice(11, 19);
             },
         },
-    ]
+    ],
 };
 
 const StatsList = () => {
@@ -77,7 +77,7 @@ const StatsList = () => {
             let longestTime = 0;
             let jobsPerPort = {};
             let runTimePerPort = {};
-            data.jobs.forEach(job => {
+            data.jobs.forEach((job) => {
                 // jobs per port
                 if (!jobsPerPort[job.port]) {
                     jobsPerPort[job.port] = 0;
@@ -94,12 +94,16 @@ const StatsList = () => {
                     longestTime = job.duration;
                 }
             });
-            const portJobData = Object.entries(jobsPerPort).map(([port, data]) => {
-                return { port: port, numJobs: data };
-            });
-            const portRunTimeData = Object.entries(runTimePerPort).map(([port, data]) => {
-                return { port: port, runTime: data };
-            });
+            const portJobData = Object.entries(jobsPerPort).map(
+                ([port, data]) => {
+                    return { port: port, numJobs: data };
+                },
+            );
+            const portRunTimeData = Object.entries(runTimePerPort).map(
+                ([port, data]) => {
+                    return { port: port, runTime: data };
+                },
+            );
             const averageTime = allJobTimes / data.jobs.length;
 
             const allStats = {
@@ -109,14 +113,16 @@ const StatsList = () => {
                 averageTime: averageTime,
                 longestTime: longestTime,
                 jobsPerPort: portJobData,
-                runTimePerPort: portRunTimeData
+                runTimePerPort: portRunTimeData,
             };
 
             setStatsPages(getStatsPages(allStats));
         });
 
         const timeout = setTimeout(() => {
-            collectUserUsageData(USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.STATISTICS);
+            collectUserUsageData(
+                USAGE_TOOL_NAME.SETTINGS.JOB_HISTORY.STATISTICS,
+            );
         }, 5000);
 
         return () => {
@@ -132,49 +138,94 @@ const StatsList = () => {
             averageTime,
             longestTime,
             jobsPerPort,
-            runTimePerPort
+            runTimePerPort,
         } = stats;
 
         return {
             [OVERALL_STATS]: {
                 needsTable: false,
-                html:
-                <div className={styles.addMargin}>
-                    <div className={styles.statsContainer}>
-                        <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
-                        <div className={styles.dotsV2} />
-                        <span className={[styles.second, styles.bold].join(' ')}>{convertMillisecondsToTimeStamp(totalRuntime)}</span>
-                    </div>
-                    <div className={styles.indentContainer}>
+                html: (
+                    <div className={styles.addMargin}>
                         <div className={styles.statsContainer}>
-                            <span className={styles.first}>Longest Runtime</span>
+                            <span
+                                className={[styles.first, styles.bold].join(
+                                    ' ',
+                                )}
+                            >
+                                Total Runtime
+                            </span>
                             <div className={styles.dotsV2} />
-                            <span className={styles.second}>{convertMillisecondsToTimeStamp(longestTime)}</span>
+                            <span
+                                className={[styles.second, styles.bold].join(
+                                    ' ',
+                                )}
+                            >
+                                {convertMillisecondsToTimeStamp(totalRuntime)}
+                            </span>
+                        </div>
+                        <div className={styles.indentContainer}>
+                            <div className={styles.statsContainer}>
+                                <span className={styles.first}>
+                                    Longest Runtime
+                                </span>
+                                <div className={styles.dotsV2} />
+                                <span className={styles.second}>
+                                    {convertMillisecondsToTimeStamp(
+                                        longestTime,
+                                    )}
+                                </span>
+                            </div>
+                            <div className={styles.statsContainer}>
+                                <span className={styles.first}>
+                                    Average Runtime
+                                </span>
+                                <div className={styles.dotsV2} />
+                                <span className={styles.second}>
+                                    {convertMillisecondsToTimeStamp(
+                                        averageTime,
+                                    )}
+                                </span>
+                            </div>
                         </div>
                         <div className={styles.statsContainer}>
-                            <span className={styles.first}>Average Runtime</span>
+                            <span
+                                className={[styles.first, styles.bold].join(
+                                    ' ',
+                                )}
+                            >
+                                Total Jobs Run
+                            </span>
                             <div className={styles.dotsV2} />
-                            <span className={styles.second}>{convertMillisecondsToTimeStamp(averageTime)}</span>
+                            <span
+                                className={[styles.second, styles.bold].join(
+                                    ' ',
+                                )}
+                            >
+                                {jobsFinished + jobsCancelled}
+                            </span>
+                        </div>
+                        <div className={styles.indentContainer}>
+                            <div className={styles.statsContainer}>
+                                <span className={styles.first}>
+                                    Jobs Completed
+                                </span>
+                                <div className={styles.dotsV2} />
+                                <span className={styles.second}>
+                                    {jobsFinished}
+                                </span>
+                            </div>
+                            <div className={styles.statsContainer}>
+                                <span className={styles.first}>
+                                    Jobs Cancelled
+                                </span>
+                                <div className={styles.dotsV2} />
+                                <span className={styles.second}>
+                                    {jobsCancelled}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div className={styles.statsContainer}>
-                        <span className={[styles.first, styles.bold].join(' ')}>Total Jobs Run</span>
-                        <div className={styles.dotsV2} />
-                        <span className={[styles.second, styles.bold].join(' ')}>{jobsFinished + jobsCancelled}</span>
-                    </div>
-                    <div className={styles.indentContainer}>
-                        <div className={styles.statsContainer}>
-                            <span className={styles.first}>Jobs Completed</span>
-                            <div className={styles.dotsV2} />
-                            <span className={styles.second}>{jobsFinished}</span>
-                        </div>
-                        <div className={styles.statsContainer}>
-                            <span className={styles.first}>Jobs Cancelled</span>
-                            <div className={styles.dotsV2} />
-                            <span className={styles.second}>{jobsCancelled}</span>
-                        </div>
-                    </div>
-                </div>
+                ),
             },
             [JOB_PER_PORT]: {
                 needsTable: true,
@@ -185,7 +236,7 @@ const StatsList = () => {
                 needsTable: true,
                 columns: columnData.runTimePerPort,
                 data: runTimePerPort,
-            }
+            },
         };
     };
 
@@ -194,10 +245,12 @@ const StatsList = () => {
             color: '#333',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
-            textTransform: 'capitalize'
+            textTransform: 'capitalize',
         };
         return (
-            <div style={style} title={option.label}>{option.label}</div>
+            <div style={style} title={option.label}>
+                {option.label}
+            </div>
         );
     };
 
@@ -216,7 +269,7 @@ const StatsList = () => {
                     }}
                     options={map(STATS_PAGES, (value) => ({
                         value: value,
-                        label: value
+                        label: value,
                     }))}
                     searchable={false}
                     value={{ label: page }}
@@ -224,15 +277,16 @@ const StatsList = () => {
                 />
             </div>
             <div className={styles.statsContent}>
-                {
-                    !isEmpty(statsPages) && (
-                        statsPages[page].needsTable ? (
-                            <SortableTable data={statsPages[page].data} columns={statsPages[page].columns} height="472px" />
-                        ) : (
-                            statsPages[page].html
-                        )
-                    )
-                }
+                {!isEmpty(statsPages) &&
+                    (statsPages[page].needsTable ? (
+                        <SortableTable
+                            data={statsPages[page].data}
+                            columns={statsPages[page].columns}
+                            height="472px"
+                        />
+                    ) : (
+                        statsPages[page].html
+                    ))}
             </div>
         </div>
     );

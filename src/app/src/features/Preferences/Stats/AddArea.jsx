@@ -22,10 +22,10 @@
  */
 
 import React, { useState } from 'react';
-import { Button } from 'app/components/Buttons';
-import Modal from 'app/components/Modal';
+import { Button } from 'app/components/Button';
+import { Modal } from 'app/components/Modal';
 import { Form } from 'app/components/Forms';
-import ControlledNumberInput from 'app/components/ControlledNumberInput';
+import { ControlledNumberInput } from 'app/components/ControlledNumberInput';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
@@ -44,9 +44,7 @@ const AddArea = ({ update, closeModal }) => {
             className={styles.modalContainerStyle}
         >
             <Modal.Header>
-                <Modal.Title>
-                    {i18n._('Add New Task')}
-                </Modal.Title>
+                <Modal.Title>{i18n._('Add New Task')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className={styles.modalBodyStyle}>
@@ -72,7 +70,9 @@ const AddArea = ({ update, closeModal }) => {
                                 <ControlledNumberInput
                                     className="form-control"
                                     value={rangeStart}
-                                    externalOnChange={(e) => setRangeStart(Number(e.target.value))}
+                                    externalOnChange={(e) =>
+                                        setRangeStart(Number(e.target.value))
+                                    }
                                     name="rangeStart"
                                     type="number"
                                     min={1}
@@ -82,7 +82,9 @@ const AddArea = ({ update, closeModal }) => {
                                 <ControlledNumberInput
                                     className="form-control"
                                     value={rangeEnd}
-                                    externalOnChange={(e) => setRangeEnd(Number(e.target.value))}
+                                    externalOnChange={(e) =>
+                                        setRangeEnd(Number(e.target.value))
+                                    }
                                     name="rangeStart"
                                     type="number"
                                     min={1}
@@ -106,13 +108,13 @@ const AddArea = ({ update, closeModal }) => {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <Button onClick={closeModal}>{i18n._('Cancel')}</Button>
                 <Button
-                    onClick={closeModal}
-                >
-                    {i18n._('Cancel')}
-                </Button>
-                <Button
-                    style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
+                    style={{
+                        backgroundColor: '#3e85c7',
+                        color: 'white',
+                        backgroundImage: 'none',
+                    }}
                     onClick={() => {
                         const newTask = {
                             name: name,
