@@ -875,7 +875,9 @@ class GrblHalController {
 
 
             this.actionMask.queryParserState.state = false;
-            this.actionMask.queryParserState.reply = true;
+            // the firmware never replies back with the parser state unless the user invokes it, which then puts the feeder at a standstill
+            // so the parts that cause the code to wait for the parserstate are being commented out
+            // this.actionMask.queryParserState.reply = true;
 
             if (this.actionMask.replyParserState) {
                 this.emit('serialport:read', res.raw);
@@ -1029,10 +1031,12 @@ class GrblHalController {
             }
 
             if (this.isOpen()) {
-                this.actionMask.queryParserState.state = true;
+                // the firmware never replies back with the parser state unless the user invokes it, which then puts the feeder at a standstill
+                // so the parts that cause the code to wait for the parserstate are being commented out
+                // this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
+                // this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
             }
         }, 500);
 
@@ -1616,7 +1620,6 @@ class GrblHalController {
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
-                    // console.log(modalGCode);
 
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
@@ -2188,12 +2191,12 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        if (cmd === '$G') { // the command for grblHAL is not $G, but x83
-            data = GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT;
+        if (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) { // the command you must manually type for grblHAL gcode report is not $G, but x83
+            data = '\x83';
         }
 
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,
