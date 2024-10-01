@@ -549,9 +549,10 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
 
     const [xOff, yOff] = determineAutoPlateOffsetValues(direction, toolDiameter);
 
-    // const toolRadius = (diameter / 2);
-    // const toolCompensatedThickness = ((-1 * toolRadius));
-    // console.log(toolCompensatedThickness);
+    const toolRadius = (diameter / 2);
+    const toolCompensatedThickness = ((-1 * toolRadius));
+
+    const compensatedValue = 22.5 - toolCompensatedThickness;
 
     if (axes.z && axes.y && axes.z) {
         code.push(
@@ -570,14 +571,14 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} X19.325`,
+            `G10 L20 ${p} X${compensatedValue}`,
             'G21 G90 G0 X0',
             'G21 G91 G0 Y13',
             'G38.2 Y20 F250',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Y19.325`,
+            `G10 L20 ${p} Y${compensatedValue}`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
             `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
@@ -597,14 +598,14 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} X19.325`,
+            `G10 L20 ${p} X${compensatedValue}`,
             'G21 G90 G0 X0',
             'G21 G91 G0 Y13',
             'G38.2 Y20 F250',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Y19.325`,
+            `G10 L20 ${p} Y${compensatedValue}`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
             `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
@@ -635,7 +636,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Y19.325`,
+            `G10 L20 ${p} Y${compensatedValue}`,
             'G21 G90 G0 Y0',
             'G4 P0.15',
             `G10 L20 ${p} Y[Y_OFF]`,
@@ -652,7 +653,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} X19.325`,
+            `G10 L20 ${p} X${compensatedValue}`,
             'G21 G90 G0 X0',
             'G4 P0.15',
             `G10 L20 ${p} X[X_OFF]`,
