@@ -202,11 +202,11 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                     toolChangeOption === 'Code' && (
                         <div>
                             <div className={styles.spreadRow}>
-                                <TooltipCustom content="Disable tool change confirmation window.">
+                                <TooltipCustom content="Warning: Enabling this will skip the M6 tool change confirmation pop-up and proceed directly to the tool change.">
                                     <ToggleSwitch
-                                        label="Disable tool change confirmation"
+                                        label="Disable M6 tool change confirmation."
                                         checked={state.toolChange.disableM6Confirmation}
-                                        onChange={actions.toolChange.handledisableConfirmationToggle}
+                                        onChange={actions.toolChange.handleDisableM6ConfirmationToggle}
                                         style={{ marginBottom: '1rem' }}
                                     />
                                 </TooltipCustom>
