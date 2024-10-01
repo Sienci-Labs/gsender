@@ -183,6 +183,7 @@ class PreferencesPage extends PureComponent {
             ipRange: store.get('widgets.connection.ip', [192, 168, 5, 1]),
             toolChange: {
                 passthrough: store.get('workspace.toolChange.passthrough', false),
+                disableM6Confirmation: store.get('workspace.toolChange.disableM6Confirmation', false),
             },
             rotary: {
                 firmwareSettings: store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS),
@@ -757,7 +758,17 @@ class PreferencesPage extends PureComponent {
                         passthrough: !toolChange.passthrough
                     }
                 });
-            }
+            },
+            handleDisableM6ConfirmationToggle: () => {
+                const { toolChange } = this.state;
+                this.setState({
+                    toolChange: {
+                        ...toolChange,
+                        disableM6Confirmation: !toolChange.disableM6Confirmation
+                    }
+                });
+            },
+
         },
         rotary: {
             updateFirmwareSetting: (setting, value) => {
@@ -888,6 +899,7 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
         this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
         store.set('workspace.toolChange.passthrough', toolChange.passthrough);
+        store.set('workspace.toolChange.disableM6Confirmation', toolChange.disableM6Confirmation);
 
         controller.command('settings:updated', this.state);
 

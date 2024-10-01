@@ -480,6 +480,12 @@ export function* initialize() {
     });
 
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
+        const disableM6Confirmation = store.get('preferences.toolChange.disableM6Confirmation', false);
+        if (disableM6Confirmation) {
+            controller.command('toolchange:post');
+            return;
+        }
+
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
         };

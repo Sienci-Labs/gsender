@@ -202,6 +202,16 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                     toolChangeOption === 'Code' && (
                         <div>
                             <div className={styles.spreadRow}>
+                                <TooltipCustom content="Disable tool change confirmation window.">
+                                    <ToggleSwitch
+                                        label="Disable tool change confirmation"
+                                        checked={state.toolChange.disableM6Confirmation}
+                                        onChange={actions.toolChange.handledisableConfirmationToggle}
+                                        style={{ marginBottom: '1rem' }}
+                                    />
+                                </TooltipCustom>
+                            </div>
+                            <div className={styles.spreadRow}>
                                 <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
                             </div>
                             <textarea
