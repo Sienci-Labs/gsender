@@ -8,7 +8,7 @@ import classnames from 'classnames';
 
 import Tooltip from 'app/components/ToolTip';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const queue = [];
 

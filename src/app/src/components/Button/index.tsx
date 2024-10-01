@@ -28,3 +28,7 @@ export function Button(props: ButtonProps) {
         </button>
     );
 }
+
+export function ButtonGroup(props: ButtonProps) {
+    return <div></div>;
+}

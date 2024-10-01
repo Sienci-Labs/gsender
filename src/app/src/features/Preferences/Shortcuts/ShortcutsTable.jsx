@@ -44,7 +44,7 @@ import {
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
-import styles from './edit-area.styl';
+import styles from './edit-area.module.styl';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 

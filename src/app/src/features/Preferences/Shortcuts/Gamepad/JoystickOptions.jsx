@@ -11,7 +11,7 @@ import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';
 import { useGamepadListener } from '../../../../lib/hooks/useGamepadListener';
 
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const JoystickOptions = () => {
     const {

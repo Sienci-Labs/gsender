@@ -5,32 +5,42 @@ import shuttleEvents from 'app/lib/shuttleEvents';
 import { GamepadContext } from '../../utils/context';
 import { arrayComparator } from '../../utils';
 import { useGamepadListener } from '../../../../../../lib/hooks/useGamepadListener';
-import { setCurrentGamepadProfileButton, setCurrentModal, setGamepadProfileList } from '../../utils/actions';
+import {
+    setCurrentGamepadProfileButton,
+    setCurrentModal,
+    setGamepadProfileList,
+} from '../../utils/actions';
 import { GAMEPAD_MODAL } from '../../utils/constants';
 
-import styles from './index.styl';
+import styles from './index.module.styl';
 import { get } from 'lodash';
 import classNames from 'classnames';
 
 const ButtonActionsTable = () => {
-    const { state: { currentProfile, settings: { profiles } }, dispatch, actions: { getGamepadProfile, getMacros } } = useContext(GamepadContext);
+    const {
+        state: {
+            currentProfile,
+            settings: { profiles },
+        },
+        dispatch,
+        actions: { getGamepadProfile, getMacros },
+    } = useContext(GamepadContext);
     const { buttons } = useGamepadListener({ profile: currentProfile });
 
     const profile = getGamepadProfile(currentProfile);
     const macros = getMacros();
 
-    const buttonsArr = [...profile.buttons]
-        .sort(button => {
-            if (button?.value === profile.modifier?.button) {
-                return -1;
-            }
+    const buttonsArr = [...profile.buttons].sort((button) => {
+        if (button?.value === profile.modifier?.button) {
+            return -1;
+        }
 
-            if (button?.value === profile.lockout?.button) {
-                return -1;
-            }
+        if (button?.value === profile.lockout?.button) {
+            return -1;
+        }
 
-            return 1;
-        });
+        return 1;
+    });
 
     const handleOpenSetShortcutModal = (button, type) => {
         dispatch(setCurrentModal(GAMEPAD_MODAL.ADD_ACTION_TO_SHORTCUT));
@@ -38,58 +48,66 @@ const ButtonActionsTable = () => {
     };
 
     const handleRemoveButtonAction = (currentButtonValue, actionType) => {
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
-                ? ({
-                    ...profile,
-                    buttons: profile.buttons.map(button => (button.value === currentButtonValue ? { ...button, [actionType]: null } : button))
-                })
-                : profile
-            ));
+        const updatedProfiles = profiles.map((profile) =>
+            arrayComparator(profile.id, currentProfile)
+                ? {
+                      ...profile,
+                      buttons: profile.buttons.map((button) =>
+                          button.value === currentButtonValue
+                              ? { ...button, [actionType]: null }
+                              : button,
+                      ),
+                  }
+                : profile,
+        );
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
     const handleRemoveLockoutButton = () => {
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
-                ? ({
-                    ...profile,
-                    lockout: {
-                        button: null,
-                        active: false,
-                    },
-                })
-                : profile
-            ));
+        const updatedProfiles = profiles.map((profile) =>
+            arrayComparator(profile.id, currentProfile)
+                ? {
+                      ...profile,
+                      lockout: {
+                          button: null,
+                          active: false,
+                      },
+                  }
+                : profile,
+        );
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
     const handleRemoveModifierButton = () => {
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
-                ? ({
-                    ...profile,
-                    modifier: {
-                        button: null,
-                    },
-                })
-                : profile
-            ));
+        const updatedProfiles = profiles.map((profile) =>
+            arrayComparator(profile.id, currentProfile)
+                ? {
+                      ...profile,
+                      modifier: {
+                          button: null,
+                      },
+                  }
+                : profile,
+        );
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
     const handleButtonLabelChange = (currentButtonValue, label) => {
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, currentProfile)
-                ? ({
-                    ...profile,
-                    buttons: profile.buttons.map(button => (button.value === currentButtonValue ? { ...button, label } : button))
-                })
-                : profile
-            ));
+        const updatedProfiles = profiles.map((profile) =>
+            arrayComparator(profile.id, currentProfile)
+                ? {
+                      ...profile,
+                      buttons: profile.buttons.map((button) =>
+                          button.value === currentButtonValue
+                              ? { ...button, label }
+                              : button,
+                      ),
+                  }
+                : profile,
+        );
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
@@ -103,7 +121,9 @@ const ButtonActionsTable = () => {
                     <input
                         defaultValue={row.label}
                         className={styles['button-render-active']}
-                        onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                        onBlur={(e) =>
+                            handleButtonLabelChange(row.value, e.target.value)
+                        }
                     />
                 );
             }
@@ -112,7 +132,9 @@ const ButtonActionsTable = () => {
                 <input
                     defaultValue={row.label}
                     className={styles['button-render']}
-                    onBlur={(e) => handleButtonLabelChange(row.value, e.target.value)}
+                    onBlur={(e) =>
+                        handleButtonLabelChange(row.value, e.target.value)
+                    }
                 />
             );
         },
@@ -125,18 +147,26 @@ const ButtonActionsTable = () => {
                             tabIndex={-1}
                             className="fas fa-plus"
                             style={{ color: 'blue' }}
-                            onClick={() => handleOpenSetShortcutModal(value, type)}
-                            onKeyDown={() => handleOpenSetShortcutModal(value, type)}
+                            onClick={() =>
+                                handleOpenSetShortcutModal(value, type)
+                            }
+                            onKeyDown={() =>
+                                handleOpenSetShortcutModal(value, type)
+                            }
                         />
                     </div>
                 );
             }
 
-            const event = shuttleEvents.getEvent(action) || macros.find(el => el.cmd === action);
+            const event =
+                shuttleEvents.getEvent(action) ||
+                macros.find((el) => el.cmd === action);
 
             return (
                 <div className={styles['shortcut-item']}>
-                    <div style={{ width: '100%' }}>{event?.title ?? action}</div>
+                    <div style={{ width: '100%' }}>
+                        {event?.title ?? action}
+                    </div>
 
                     <div className={styles['shortcut-item-actions']}>
                         <i
@@ -144,16 +174,24 @@ const ButtonActionsTable = () => {
                             tabIndex={-1}
                             className="fas fa-edit"
                             style={{ color: 'blue', width: '20px' }}
-                            onClick={() => handleOpenSetShortcutModal(value, type)}
-                            onKeyDown={() => handleOpenSetShortcutModal(value, type)}
+                            onClick={() =>
+                                handleOpenSetShortcutModal(value, type)
+                            }
+                            onKeyDown={() =>
+                                handleOpenSetShortcutModal(value, type)
+                            }
                         />
                         <i
                             role="button"
                             tabIndex={-1}
                             className="fas fa-trash"
                             style={{ color: 'red', width: '20px' }}
-                            onClick={() => handleRemoveButtonAction(value, type)}
-                            onKeyDown={() => handleRemoveButtonAction(value, type)}
+                            onClick={() =>
+                                handleRemoveButtonAction(value, type)
+                            }
+                            onKeyDown={() =>
+                                handleRemoveButtonAction(value, type)
+                            }
                         />
                     </div>
                 </div>
@@ -198,18 +236,18 @@ const ButtonActionsTable = () => {
                     />
                 </div>
             );
-        }
+        },
     };
 
     const Action = ({ button = {} }) => {
         const activeStyles = {
             backgroundColor: 'rgb(75, 181, 67)',
             borderColor: 'rgb(75, 181, 67)',
-            color: 'white'
+            color: 'white',
         };
 
         const inactiveStyles = {
-            backgroundColor: 'lightgrey'
+            backgroundColor: 'lightgrey',
         };
 
         const buttonIsPressed = buttons[button.value]?.pressed;
@@ -217,11 +255,17 @@ const ButtonActionsTable = () => {
         const lockoutButton = get(profile, 'lockout.button');
         const modifierButton = get(profile, 'modifier.button');
 
-        const secondActionButtonBeingPressed = buttons.find((button, index) => index === modifierButton && button.pressed);
+        const secondActionButtonBeingPressed = buttons.find(
+            (button, index) => index === modifierButton && button.pressed,
+        );
 
         if (button.value === lockoutButton) {
             return (
-                <td className={styles.tableCell} colSpan={2} style={buttonIsPressed ? activeStyles : inactiveStyles}>
+                <td
+                    className={styles.tableCell}
+                    colSpan={2}
+                    style={buttonIsPressed ? activeStyles : inactiveStyles}
+                >
                     {render.lockout(null, button)}
                 </td>
             );
@@ -229,22 +273,42 @@ const ButtonActionsTable = () => {
 
         if (button.value === modifierButton) {
             return (
-                <td className={styles.tableCell} colSpan={2} style={buttonIsPressed ? activeStyles : inactiveStyles}>
+                <td
+                    className={styles.tableCell}
+                    colSpan={2}
+                    style={buttonIsPressed ? activeStyles : inactiveStyles}
+                >
                     {render.modifier(null, button)}
                 </td>
             );
         }
 
-        const highlightPrimaryActionCell = button.primaryAction !== null && buttonIsPressed && !secondActionButtonBeingPressed;
-        const highlightSecondaryActionCell = button.secondaryAction !== null && buttonIsPressed && secondActionButtonBeingPressed;
+        const highlightPrimaryActionCell =
+            button.primaryAction !== null &&
+            buttonIsPressed &&
+            !secondActionButtonBeingPressed;
+        const highlightSecondaryActionCell =
+            button.secondaryAction !== null &&
+            buttonIsPressed &&
+            secondActionButtonBeingPressed;
 
         return (
             <>
-                <td className={classNames(styles.tableCell, highlightPrimaryActionCell ? styles.active : '')}>
+                <td
+                    className={classNames(
+                        styles.tableCell,
+                        highlightPrimaryActionCell ? styles.active : '',
+                    )}
+                >
                     {render.primaryAction(null, button)}
                 </td>
 
-                <td className={classNames(styles.tableCell, highlightSecondaryActionCell ? styles.active : '')}>
+                <td
+                    className={classNames(
+                        styles.tableCell,
+                        highlightSecondaryActionCell ? styles.active : '',
+                    )}
+                >
                     {render.secondaryAction(null, button)}
                 </td>
             </>
@@ -255,24 +319,31 @@ const ButtonActionsTable = () => {
         <table>
             <thead>
                 <tr>
-                    <th className={styles.tableHeader} style={{ width: '20%', minWidth: '80px' }}>Button</th>
-                    <th className={styles.tableHeader} style={{ width: '40%' }}>Action</th>
-                    <th className={styles.tableHeader} style={{ width: '40%' }}>2nd Action</th>
+                    <th
+                        className={styles.tableHeader}
+                        style={{ width: '20%', minWidth: '80px' }}
+                    >
+                        Button
+                    </th>
+                    <th className={styles.tableHeader} style={{ width: '40%' }}>
+                        Action
+                    </th>
+                    <th className={styles.tableHeader} style={{ width: '40%' }}>
+                        2nd Action
+                    </th>
                 </tr>
             </thead>
 
             <tbody>
-                {
-                    buttonsArr.map(button => (
-                        <tr key={button.value}>
-                            <td className={styles.tableCell}>
-                                {render.button(null, button)}
-                            </td>
+                {buttonsArr.map((button) => (
+                    <tr key={button.value}>
+                        <td className={styles.tableCell}>
+                            {render.button(null, button)}
+                        </td>
 
-                            <Action button={button} />
-                        </tr>
-                    ))
-                }
+                        <Action button={button} />
+                    </tr>
+                ))}
             </tbody>
         </table>
     );

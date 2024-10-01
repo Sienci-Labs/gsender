@@ -28,7 +28,7 @@ import { Button, ButtonGroup } from 'app/components/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
 import { formatShortcut } from '../helpers';
-import styles from '../edit-area.styl';
+import styles from '../edit-area.module.styl';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;

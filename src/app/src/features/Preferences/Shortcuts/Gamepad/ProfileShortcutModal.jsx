@@ -11,7 +11,7 @@ import shuttleEvents from 'app/lib/shuttleEvents';
 
 import Input from '../../components/Input';
 
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import { AVAILABILITY_TYPES } from '../utils';
 import Availability from './Availability';
 

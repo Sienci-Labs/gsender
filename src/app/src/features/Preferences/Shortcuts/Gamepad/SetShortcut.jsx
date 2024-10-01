@@ -22,8 +22,8 @@ import { Button } from 'app/components/Button';
 import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';
 
-import styles from './index.styl';
-import generalStyles from '../edit-area.styl';
+import styles from './index.module.styl';
+import generalStyles from '../edit-area.module.styl';
 import { arrayComparator } from './utils';
 
 const SetShortcut = () => {

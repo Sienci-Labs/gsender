@@ -134,3 +134,5 @@ export const Tabs = ({ items }: TabbedProps) => {
         </div>
     );
 };
+
+export default Tabs;
