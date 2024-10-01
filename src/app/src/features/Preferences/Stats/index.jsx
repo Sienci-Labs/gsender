@@ -29,7 +29,7 @@ import TabbedWidget from 'app/components/Tabs';
 import SettingWrapper from '../components/SettingWrapper';
 import StatsList from './StatsList';
 import JobTable from './JobStatsTable';
-import styles from './index.styl';
+import styles from './index.module.styl';
 import Maintenance from './Maintenance';
 
 const tabs = [

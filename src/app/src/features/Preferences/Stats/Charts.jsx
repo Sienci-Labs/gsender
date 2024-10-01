@@ -23,7 +23,7 @@
 
 import React from 'react';
 import store from 'app/store';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 import Fieldset from '../components/Fieldset';
 import CustomPieChart from '../components/CustomPieChart';
 
@@ -37,19 +37,19 @@ const Charts = ({ state, actions }) => {
 
     return (
         <Fieldset legend="Charts">
-            <div className={[styles.addMargin, styles.chartsContainer].join(' ')}>
-                {
-                    jobsFinished === 0 && jobsCancelled === 0
-                        ? <span>No jobs run</span>
-                        : (
-                            <CustomPieChart
-                                propsData={data}
-                                height={300}
-                                width={340}
-                                showAnimation={false}
-                            />
-                        )
-                }
+            <div
+                className={[styles.addMargin, styles.chartsContainer].join(' ')}
+            >
+                {jobsFinished === 0 && jobsCancelled === 0 ? (
+                    <span>No jobs run</span>
+                ) : (
+                    <CustomPieChart
+                        propsData={data}
+                        height={300}
+                        width={340}
+                        showAnimation={false}
+                    />
+                )}
             </div>
         </Fieldset>
     );

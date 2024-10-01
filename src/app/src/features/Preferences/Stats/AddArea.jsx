@@ -27,7 +27,7 @@ import { Modal } from 'app/components/Modal';
 import { Form } from 'app/components/Forms';
 import { ControlledNumberInput } from 'app/components/ControlledNumberInput';
 import i18n from 'app/lib/i18n';
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const MAX_CHARACTERS = '1000';
 

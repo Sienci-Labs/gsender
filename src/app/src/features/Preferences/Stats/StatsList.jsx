@@ -27,7 +27,7 @@ import { isEmpty, map } from 'lodash';
 import api from 'app/api';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import SortableTable from 'app/components/SortableTable';
-import styles from './index.styl';
+import styles from './index.module.styl';
 import {
     STATS_PAGES,
     OVERALL_STATS,

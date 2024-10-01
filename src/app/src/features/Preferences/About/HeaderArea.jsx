@@ -3,7 +3,7 @@ import React from 'react';
 import logo from '../assets/icon-round.png';
 import canadaFlagIcon from '../assets/canada-flag-icon.png';
 import { version } from '../../../../package.json';
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 const HeaderArea = () => {
     const year = new Date().getFullYear();
