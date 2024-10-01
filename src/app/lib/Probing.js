@@ -549,7 +549,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
 
     const [xOff, yOff] = determineAutoPlateOffsetValues(direction, toolDiameter);
 
-    const toolRadius = (diameter / 2);
+    const toolRadius = (toolDiameter / 2);
     const toolCompensatedThickness = ((-1 * toolRadius));
 
     const compensatedValue = 22.5 - toolCompensatedThickness;
