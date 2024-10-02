@@ -29,4 +29,13 @@ import Title from './Title';
 import Button from './Button';
 import Controls from './Controls';
 
-export const Widget = Object.assign(WidgetComponent, { Header, Content, Footer, Title, Button, Controls })
+export const Widget = Object.assign(WidgetComponent, {
+    Header,
+    Content,
+    Footer,
+    Title,
+    Button,
+    Controls,
+});
+
+export default Widget;
