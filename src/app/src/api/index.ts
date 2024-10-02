@@ -382,9 +382,7 @@ const machines = {
 //
 const file = {
     upload: (formData: FormData): Promise<AxiosResponse> => {
-        return authrequest.post('/api/file', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        return authrequest.post('/api/file', formData);
     },
 };
 
