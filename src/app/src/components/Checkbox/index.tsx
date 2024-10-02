@@ -1,4 +1,4 @@
-export function Checkbox() {
+export function Checkbox(props) {
     return <div></div>;
 }
 

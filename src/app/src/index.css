@@ -13,6 +13,9 @@ html,
     input[type='number'] {
         appearance: none !important;
     }
+    label {
+        @apply text-sm
+    }
 }
 
 @layer utilities {

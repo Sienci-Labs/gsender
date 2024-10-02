@@ -41,7 +41,7 @@ const Switch = ({
                 {label && (
                     <span
                         className={cn(
-                            'text-sm font-medium text-gray-900 dark:text-gray-300',
+                            'text-sm font-normal text-gray-900 dark:text-gray-900',
                             isVertical ? 'mt-3' : 'ms-3',
                         )}
                     >
