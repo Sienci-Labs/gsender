@@ -25,18 +25,17 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
 
-import styles from './index.styl';
+import styles from './index.module.styl';
 
 /**
  * CameraDisplay component used to allow changing of camera angles
  * @param {Function} props.camera => Function to change camera angle
  */
 
-
 class CameraDisplay extends PureComponent {
     static propTypes = {
         camera: PropTypes.object,
-        cameraPosition: PropTypes.string
+        cameraPosition: PropTypes.string,
     };
 
     render = () => {
@@ -49,7 +48,11 @@ class CameraDisplay extends PureComponent {
                         title={i18n._('Top')}
                         type="button"
                         tabIndex={0}
-                        className={cameraPosition === 'Top' ? `${styles.faceTopActive}` : `${styles.faceTop}`}
+                        className={
+                            cameraPosition === 'Top'
+                                ? `${styles.faceTopActive}`
+                                : `${styles.faceTop}`
+                        }
                         onClick={(event) => {
                             camera.toTopView();
                         }}
@@ -58,7 +61,11 @@ class CameraDisplay extends PureComponent {
                         title={i18n._('Right')}
                         type="button"
                         tabIndex={0}
-                        className={cameraPosition === 'Right' ? `${styles.faceRightActive}` : `${styles.faceRight}`}
+                        className={
+                            cameraPosition === 'Right'
+                                ? `${styles.faceRightActive}`
+                                : `${styles.faceRight}`
+                        }
                         onClick={(event) => {
                             camera.toRightSideView();
                         }}
@@ -67,7 +74,11 @@ class CameraDisplay extends PureComponent {
                         title={i18n._('Front')}
                         type="button"
                         tabIndex={0}
-                        className={cameraPosition === 'Front' ? `${styles.faceFrontActive}` : `${styles.faceFront}`}
+                        className={
+                            cameraPosition === 'Front'
+                                ? `${styles.faceFrontActive}`
+                                : `${styles.faceFront}`
+                        }
                         onClick={(event) => {
                             camera.toFrontView();
                         }}
@@ -76,7 +87,11 @@ class CameraDisplay extends PureComponent {
                         title={i18n._('3D')}
                         type="button"
                         tabIndex={0}
-                        className={cameraPosition === '3D' ? `${styles.faceIsoActive}` : `${styles.faceIso}`}
+                        className={
+                            cameraPosition === '3D'
+                                ? `${styles.faceIsoActive}`
+                                : `${styles.faceIso}`
+                        }
                         onClick={(event) => {
                             camera.to3DView();
                         }}
@@ -95,7 +110,11 @@ class CameraDisplay extends PureComponent {
                         title={i18n._('Left')}
                         type="button"
                         tabIndex={0}
-                        className={cameraPosition === 'Left' ? `${styles.cornerC2Active}` : `${styles.cornerC2}`}
+                        className={
+                            cameraPosition === 'Left'
+                                ? `${styles.cornerC2Active}`
+                                : `${styles.cornerC2}`
+                        }
                         onClick={(event) => {
                             camera.toLeftSideView();
                         }}
@@ -109,6 +128,6 @@ class CameraDisplay extends PureComponent {
                 </div>
             </div>
         );
-    }
+    };
 }
 export default CameraDisplay;
