@@ -23,7 +23,7 @@
 
 import * as THREE from 'three';
 import log from 'app/lib/log';
-import CombinedCamera from 'app/lib/three/CombinedCamera';
+import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 
 const FOV_MIN = 15;
 const TARGET0 = new THREE.Vector3(0, 0, 0);
@@ -46,7 +46,9 @@ class Viewport {
             return;
         }
         if (width <= 0 || height <= 0) {
-            log.error(`Width (${width}) and height (${height}) cannot be less than or equal to zero.`);
+            log.error(
+                `Width (${width}) and height (${height}) cannot be less than or equal to zero.`,
+            );
             return;
         }
 
@@ -59,7 +61,7 @@ class Viewport {
             ...this.state,
             width: this.width,
             height: this.height,
-            target: TARGET0
+            target: TARGET0,
         };
 
         this.reset();
@@ -83,7 +85,7 @@ class Viewport {
             ...this.state,
             width,
             height,
-            target
+            target,
         };
 
         const visibleWidth = Math.abs(this.camera.right - this.camera.left);
@@ -103,7 +105,7 @@ class Viewport {
             // Find the distance from the camera to the closest face of the object
             const distance = target.distanceTo(eye);
             // The aspect ratio of the canvas (width / height)
-            const aspect = visibleHeight > 0 ? (visibleWidth / visibleHeight) : 1;
+            const aspect = visibleHeight > 0 ? visibleWidth / visibleHeight : 1;
 
             // http://stackoverflow.com/questions/14614252/how-to-fit-camera-to-object
             //
@@ -125,7 +127,9 @@ class Viewport {
                 // to fit the viewport height
                 2 * Math.atan(height / (2 * distance)) * (180 / Math.PI),
                 // to fit the viewport width
-                2 * Math.atan((width / aspect) / (2 * distance)) * (180 / Math.PI)
+                2 *
+                    Math.atan(width / aspect / (2 * distance)) *
+                    (180 / Math.PI),
             );
 
             this.camera.setFov(Math.max(fov, FOV_MIN));
