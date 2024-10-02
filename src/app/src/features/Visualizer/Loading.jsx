@@ -25,6 +25,8 @@ import React, { useState, useEffect } from 'react';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 
+import styles from './loader.module.styl';
+
 const Loading = () => {
     const [progress, setProgress] = useState(0);
 
@@ -45,8 +47,8 @@ const Loading = () => {
     }, []);
 
     return (
-        <div>
-            <div>
+        <div className={styles.loader}>
+            <div className={styles.loaderBar}>
                 <div className="progress" style={{ marginBottom: '0px' }}>
                     <div
                         className="progress-bar progress-bar-info progress-bar-striped"
@@ -59,7 +61,7 @@ const Loading = () => {
                 </div>
                 <strong className="justify-content-center d-flex position-absolute w-100">{`${progress}%`}</strong>
             </div>
-            <div>{i18n._('Loading...')}</div>
+            <div className={styles.loaderText}>{i18n._('Loading...')}</div>
         </div>
     );
 };

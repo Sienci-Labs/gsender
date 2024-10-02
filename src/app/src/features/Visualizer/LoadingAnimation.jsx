@@ -22,15 +22,28 @@
  */
 
 import React from 'react';
+import styles from './loader.module.styl';
 import bitImage from './images/dustbit11.png';
 import bitEffect from './images/effect.png';
 
 const LoadingAnimation = () => {
     return (
-        <div>
+        <div className={styles.bitContainer}>
             <div>
-                <img src={bitEffect} width="33px" height="60px" alt="" />
-                <img src={bitImage} width="26px" height="60px" alt="" />
+                <img
+                    src={bitEffect}
+                    width="33px"
+                    height="60px"
+                    alt=""
+                    className={styles.bitEffect}
+                />
+                <img
+                    src={bitImage}
+                    width="26px"
+                    height="60px"
+                    alt=""
+                    className={styles.bit}
+                />
             </div>
         </div>
     );

@@ -1,0 +1,114 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.loaderWrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40vw;
+    height: 25vh;
+    z-index: 9000;
+    background-color: #d1d5db;
+    transform: translate(-50%, -50%);
+}
+
+.loader {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translateX(-50%);
+
+    .loaderIcon {
+        > * {
+            font-size: 48px;
+            color: #111827;
+        }
+    }
+
+    .loaderText {
+        margin: 15px 0 10px;
+        color: #111827;
+    }
+
+    .loaderBar {
+        width: 30vw;
+    }
+}
+
+.loader.renderer {
+    transform: translate(-50%, -50%);
+}
+
+.bitContainer {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    width: 5vw;
+    border-style: solid;
+    border-width: 0px 0px 7px 0px;
+    transform: translateX(-50%);
+
+    .bit {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        -webkit-animation: linear infinite;
+        -webkit-animation-name: move;
+        -webkit-animation-duration: 2s;
+    }
+    @-webkit-keyframes move {
+        0%, 10%, 100% {
+            left: 10%;
+        }
+        50% {
+            left: 90%;
+        }
+    }
+
+    .bitEffect {
+        position: absolute;
+        bottom: 100%;
+        left: 10%;
+        transform: translateX(-50%);
+        -webkit-animation: linear infinite;
+        -webkit-animation-name: appear;
+        -webkit-animation-duration: 2s; 
+    }
+    @-webkit-keyframes appear {
+        0%, 10%, 100% {
+            opacity: 1;
+        }
+        11%, 99% {
+            opacity: 0;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+}
+
+
