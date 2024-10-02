@@ -1,22 +1,16 @@
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { RouterProvider } from '@tanstack/react-router';
 import { Provider as ReduxProvider } from 'react-redux';
+
 import { store as reduxStore } from 'app/store/redux';
 import rootSaga from 'app/store/redux/sagas';
 import { sagaMiddleware } from 'app/store/redux/sagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
-
-import { routeTree } from './routeTree.gen';
-import { useEffect } from 'react';
 import controller from 'app/lib/controller';
+import { createRouter } from './router';
 
-const router = createRouter({ routeTree });
-
-declare module '@tanstack/react-router' {
-    interface Register {
-        router: typeof router;
-    }
-}
+const router = createRouter();
 
 function App() {
     useEffect(() => {
