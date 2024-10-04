@@ -34,7 +34,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     return (
         <div className="relative h-full">
-            <div className="bg-transparent z-10 absolute top-[-60px] left-[35px] flex flex-col justify-center items-center">
+            <div className="bg-transparent z-10 absolute top-[-60px] left-1/2 right-1/2 flex flex-col justify-center items-center">
                 <div className="flex flex-row gap-2 justify-center mb-3">
                     <OutlineButton disabled={disabled} />
                     <StartFromLine disabled={disabled} />
