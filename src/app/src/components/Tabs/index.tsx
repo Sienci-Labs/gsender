@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, ReactNode } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 
 interface TabItem {
     label: string;
-    content: ReactNode;
+    content: React.ComponentType<{ isActive: boolean }>;
 }
 
 interface TabbedProps {
@@ -119,15 +119,15 @@ export const Tabs = ({ items }: TabbedProps) => {
                 </div>
             </div>
             <div className="block w-full h-full">
-                {items.map((item) => (
+                {items.map(({ label, content: Content }) => (
                     <div
-                        key={item.label}
+                        key={label}
                         className={classNames(
                             'w-full h-full',
-                            activeTab === item.label ? 'block' : 'hidden',
+                            activeTab === label ? 'block' : 'hidden',
                         )}
                     >
-                        {item.content}
+                        <Content isActive={activeTab === label} />
                     </div>
                 ))}
             </div>
