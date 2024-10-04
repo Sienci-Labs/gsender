@@ -18,7 +18,11 @@ import {
 
 import '@xterm/xterm/css/xterm.css';
 
-export default function Terminal() {
+type Props = {
+    isActive: boolean;
+};
+
+export default function Terminal({ isActive }: Props) {
     const terminalRef = useRef<HTMLDivElement>(null);
     const terminalInstance = useRef<XtermTerminal | null>(null);
     const fitAddonInstance = useRef<FitAddon | null>(null);
@@ -64,6 +68,12 @@ export default function Terminal() {
             window.removeEventListener('resize', debouncedRefitTerminal);
         };
     }, []);
+
+    useEffect(() => {
+        if (isActive) {
+            fitAddonInstance.current.fit();
+        }
+    }, [isActive]);
 
     const writeToTerminal = (data: string, source?: string) => {
         if (!terminalInstance.current || !data) {
