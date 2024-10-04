@@ -89,7 +89,7 @@ const SpindleWidget = () => {
         laserXOffset,
         laserYOffset,
     } = useTypedSelector((state) => ({
-        workflow: state.controller.workflow ?? '',
+        workflow: state.controller.workflow,
         isConnected: state.connection.isConnected ?? false,
         controllerState: state.controller.state ?? {},
         controllerType: state.controller.type ?? 'grbl',
@@ -98,7 +98,7 @@ const SpindleWidget = () => {
         spindleMax: Number(state.controller.settings.settings.$30 ?? 30000),
         laserAsSpindle: Number(state.controller.settings.settings.$32 ?? 0),
         wcs: state.controller.modal.wcs ?? '',
-        wpos: state.controller.wpos ?? {},
+        wpos: state.controller.wpos ?? { x: 0, y: 0 },
         units: state.controller.modal.units ?? {},
         availableSpindles: state.controller.spindles ?? [],
         $13: state.controller.settings.settings.$13 ?? '0',
