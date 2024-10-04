@@ -7,27 +7,32 @@ export const buttonStyle = tv({
         color: {
             primary: 'border-blue-500 text-white bg-blue-500',
             secondary: 'border-robin-500 hover:bg-gray-200 text-gray-500',
-        }
+            disabled: 'border-gray-300 bg-gray-100 text-gray-400',
+        },
     },
     defaultVariants: {
-        color: 'secondary'
-    }
+        color: 'secondary',
+    },
 });
 
-export type ButtonVariants = VariantProps<typeof buttonStyle>
-
+export type ButtonVariants = VariantProps<typeof buttonStyle>;
 
 export interface ButtonProps extends ButtonVariants {
     children?: React.ReactNode;
-    onClick?: () => void
+    onClick?: () => void;
+    disabled?: boolean;
 }
 
 export function Button(props: ButtonProps) {
     return (
         <button
             onClick={props.onClick}
-            className={buttonStyle(props)}>
+            className={buttonStyle(props)}
+            disabled={props.disabled}
+        >
             {props.children}
         </button>
-    )
+    );
 }
+
+export default Button;
