@@ -23,7 +23,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import bodyParser from 'body-parser';
+// import bodyParser from 'body-parser';
 import cors from 'cors';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
@@ -186,8 +186,9 @@ const appMain = () => {
 
     // Connect's body parsing middleware. This only handles urlencoded and json bodies.
     // https://github.com/expressjs/body-parser
-    app.use(bodyParser.json(settings.middleware['body-parser'].json));
-    app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
+    // This is no longer needed with Vite and later Node.js versions? This was causing issues with multer
+    // app.use(bodyParser.json(settings.middleware['body-parser'].json));
+    // app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
 
     // For multipart bodies, please use the following modules:
     // - [busboy](https://github.com/mscdex/busboy) and [connect-busboy](https://github.com/mscdex/connect-busboy)
@@ -378,6 +379,7 @@ const appMain = () => {
         const storage = multer.memoryStorage();
         const upload = multer({
             storage
+            // dest: './public/data/uploads/'
         });
         app.post(urljoin(settings.route, 'api/file'), upload.single('gcode'), api.files.uploadFile);
 

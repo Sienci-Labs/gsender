@@ -23,14 +23,13 @@
 
 import React from 'react';
 import i18n from 'app/lib/i18n';
+import { FaCube } from 'react-icons/fa';
 
 export default () => (
-    <div>
-        <div>
-            <div>
-                <i className="fa fa-cube fa-spin" />
-            </div>
-            <div>{i18n._('Rendering')}</div>
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[25vh] z-50 bg-gray-100">
+        <div className="flex flex-col items-center justify-center w-full h-full">
+            <FaCube className="animate-spin w-5 h-5 mb-2" />
+            <span>Rendering</span>
         </div>
     </div>
 );

@@ -47,14 +47,14 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
 } from 'app/constants';
-import CombinedCamera from 'app/lib/three/CombinedCamera';
+import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
-import TrackballControls from 'app/lib/three/TrackballControls';
+import TrackballControls from 'app/lib/three/oldTrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import _ from 'lodash';
@@ -276,8 +276,7 @@ class Visualizer extends Component {
         this.addResizeEventListener();
         //store.on('change', this.changeMachineProfile);
         if (this.node) {
-            const el = ReactDOM.findDOMNode(this.node);
-            this.createScene(el);
+            this.createScene(this.node);
 
             setTimeout(() => {
                 this.resizeRenderer();
@@ -443,6 +442,7 @@ class Visualizer extends Component {
                 this.cuttingTool.visible = false;
                 this.laserPointer.visible = false;
                 this.cuttingPointer.visible = false;
+                needUpdateScene = true;
             }
         }
 
@@ -599,15 +599,21 @@ class Visualizer extends Component {
 
     async uploadGCodeFile(gcode) {
         const serializedFile = new File([gcode], 'surfacing.gcode');
-        await api.file.upload(
-            serializedFile,
-            controller.port,
-            VISUALIZER_SECONDARY,
-        );
+
+        const formData = new FormData();
+        formData.append('gcode', serializedFile);
+        formData.append('port', controller.port);
+        formData.append('visualizer', VISUALIZER_PRIMARY);
+
+        await api.file.upload(formData);
     }
 
     rerenderGCode() {
         const content = reduxStore.getState().file.content;
+
+        if (!content) {
+            return;
+        }
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
@@ -905,30 +911,26 @@ class Visualizer extends Component {
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
 
-                console.log('file:load', data);
-
                 const isPrimaryVisualizer =
                     !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
                 const isSecondaryVisualizer =
                     isSecondary && activeVisualizer === VISUALIZER_SECONDARY;
 
-                // const callback = ({ bbox }) => {
-                //     console.log('callback', bbox);
-                //     // Set gcode bounding box
-                //     controller.context = {
-                //         ...controller.context,
-                //         xmin: bbox.min.x,
-                //         xmax: bbox.max.x,
-                //         ymin: bbox.min.y,
-                //         ymax: bbox.max.y,
-                //         zmin: bbox.min.z,
-                //         zmax: bbox.max.z,
-                //     };
-                // };
+                const callback = ({ bbox }) => {
+                    // Set gcode bounding box
+                    controller.context = {
+                        ...controller.context,
+                        xmin: bbox.min.x,
+                        xmax: bbox.max.x,
+                        ymin: bbox.min.y,
+                        ymax: bbox.max.y,
+                        zmin: bbox.min.z,
+                        zmax: bbox.max.z,
+                    };
+                };
 
                 if (isPrimaryVisualizer) {
-                    // this.load('', data, callback);
-                    this.load('', data);
+                    this.load('', data, callback);
                     return;
                 }
 
@@ -1021,10 +1023,10 @@ class Visualizer extends Component {
     }
 
     getVisibleWidth() {
-        const el = ReactDOM.findDOMNode(this.node);
+        const el = this.node;
 
         const visibleWidth = Math.max(
-            Number(el && el.parentNode && el.parentNode.clientWidth) || 0,
+            Number(el?.parentNode?.clientWidth) || 0,
             360,
         );
 
@@ -1282,7 +1284,7 @@ class Visualizer extends Component {
     // http://threejs.org/docs/#Manual/Introduction/Creating_a_scene
     //
     createScene(el) {
-        if (!el || el.firstChild) {
+        if (!el || el?.firstChild) {
             return;
         }
 
@@ -1305,8 +1307,6 @@ class Visualizer extends Component {
         );
         this.renderer.setSize(width, height);
         this.renderer.clear();
-
-        el.appendChild(this.renderer.domElement);
 
         // To actually be able to display anything with Three.js, we need three things:
         // A scene, a camera, and a renderer so we can render the scene with the camera.
@@ -1406,8 +1406,12 @@ class Visualizer extends Component {
         {
             // Cutting Tool
             Promise.all([
-                loadSTL('.').then((geometry) => geometry),
-                loadTexture('.').then((texture) => texture),
+                loadSTL('assets/models/stl/bit.stl').then(
+                    (geometry) => geometry,
+                ),
+                loadTexture('assets/textures/brushed-steel-texture.jpg').then(
+                    (texture) => texture,
+                ),
             ]).then((result) => {
                 const [geometry, texture] = result;
 
@@ -1501,6 +1505,10 @@ class Visualizer extends Component {
         }
 
         this.scene.add(this.group);
+
+        setTimeout(() => {
+            el.appendChild(this.renderer.domElement);
+        }, 0);
     }
 
     // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html,
@@ -1706,13 +1714,10 @@ class Visualizer extends Component {
         controls.maxDistance = TRACKBALL_CONTROLS_MAX_DISTANCE;
 
         let shouldAnimate = false;
+
         const animate = () => {
-            console.log('animate');
             controls.update();
-
-            // Update the scene
             this.updateScene();
-
             if (shouldAnimate) {
                 requestAnimationFrame(animate);
             }
@@ -1720,19 +1725,17 @@ class Visualizer extends Component {
 
         controls.addEventListener('start', () => {
             shouldAnimate = true;
-            console.log('start');
             animate();
         });
+
         controls.addEventListener('end', () => {
             shouldAnimate = false;
             this.props.actions.camera.toFreeView();
             this.updateScene();
-            console.log('end');
         });
+
         controls.addEventListener('change', () => {
-            // Update the scene
             this.updateScene();
-            console.log('change');
         });
 
         return controls;
@@ -2051,6 +2054,7 @@ class Visualizer extends Component {
                 new URL('../../workers/colors.worker.js', import.meta.url),
                 { type: 'module' },
             );
+
             this.colorsWorker = colorsWorker;
             this.colorsWorker.onmessage = colorsResponse;
             this.colorsWorker.postMessage({
@@ -2062,9 +2066,7 @@ class Visualizer extends Component {
                 theme: currentTheme,
             });
 
-            console.log(colorsWorker);
-
-            this.handleSceneRender(vizualization, callback);
+            // this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }
@@ -2376,9 +2378,6 @@ class Visualizer extends Component {
         }
         return (
             <div
-                style={{
-                    visibility: this.props.show ? 'visible' : 'hidden',
-                }}
                 className="overflow-hidden h-full w-full rounded"
                 ref={this.setRef}
             />

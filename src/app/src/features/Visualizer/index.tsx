@@ -21,7 +21,7 @@
  *
  */
 
-import { PureComponent } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import includes from 'lodash/includes';
@@ -38,7 +38,7 @@ import { colorsResponse } from 'app/workers/colors.response';
 import PropTypes from 'prop-types';
 
 import controller from 'app/lib/controller';
-// import gamepad, { runAction } from 'app/lib/gamepad';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -96,7 +96,7 @@ import {
     updateFileProcessing,
 } from 'app/store/redux/slices/fileInfo.slice';
 
-class Visualizer extends PureComponent {
+class Visualizer extends Component {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
         isSecondary: PropTypes.bool,
@@ -684,12 +684,12 @@ class Visualizer extends PureComponent {
             }, 0);
         }
 
-        // gamepad.on('gamepad:button', (event) => {
-        //     runAction({
-        //         event,
-        //         shuttleControlEvents: this.shuttleControlEvents,
-        //     });
-        // });
+        gamepad.on('gamepad:button', (event) => {
+            runAction({
+                event,
+                shuttleControlEvents: this.shuttleControlEvents,
+            });
+        });
     }
 
     componentWillUnmount() {

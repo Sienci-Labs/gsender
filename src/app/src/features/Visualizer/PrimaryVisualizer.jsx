@@ -13,19 +13,13 @@ import {
     GRBLHAL,
 } from 'app/constants';
 import { Widget } from 'app/components/Widget';
-// import ToggleSwitch from 'app/components/ToggleSwitch';
-// import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
-// import WorkflowControl from './WorkflowControl';
-// import MachineStatusArea from './MachineStatusArea';
-// import ValidationModal from './ValidationModal';
-// import WarningModal from './WarningModal';
 import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
-// import WatchDirectory from './WatchDirectory';
 import { MODAL_WATCH_DIRECTORY } from './constants';
 import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import LoadingAnimation from './LoadingAnimation';
+import CameraDisplay from './CameraDisplay/CameraDisplay';
 
 const PrimaryVisualizer = ({
     actions,
@@ -58,7 +52,7 @@ const PrimaryVisualizer = ({
     const doorOpen = activeState === GRBL_ACTIVE_STATE_DOOR;
     const showUnlockButton =
         isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
-    const { handleLiteModeToggle, handleRun, reset } = actions;
+    const { handleLiteModeToggle, handleRun, reset, camera } = actions;
 
     const containerID = 'visualizer_container';
 
@@ -66,11 +60,12 @@ const PrimaryVisualizer = ({
         <Widget className="w-full p-1">
             <Widget.Content id={containerID} className="w-full">
                 {showLoading && (
-                    <div>
+                    <div className="z-10 relative bg-gray-100 w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Loading />
                         <LoadingAnimation />
                     </div>
                 )}
+
                 {showRendering && <Rendering />}
 
                 <div className="h-full w-full absolute top-0 left-0 p-2">
@@ -95,6 +90,11 @@ const PrimaryVisualizer = ({
                             </span>
                         </div>
                     )}
+
+                    <CameraDisplay
+                        camera={camera}
+                        cameraPosition={cameraPosition}
+                    />
                 </div>
             </Widget.Content>
         </Widget>
