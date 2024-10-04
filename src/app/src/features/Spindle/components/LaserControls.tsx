@@ -89,7 +89,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
             />
             <div className="flex gap-2 justify-center items-center my-2">
                 <label>Test Duration:</label>
-                <div className="input-group">
+                <div className="flex gap-2">
                     <input
                         value={laser.duration}
                         onChange={actions.handleLaserDurationChange}
