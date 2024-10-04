@@ -1,10 +1,9 @@
-import { SPINDLE_LASER } from "../../constants";
+import { SPINDLE_LASER } from '../../constants';
 
 // Types
 
 export type SPINDLE_LASER_T =
-(typeof SPINDLE_LASER)[keyof typeof SPINDLE_LASER];
-
+    (typeof SPINDLE_LASER)[keyof typeof SPINDLE_LASER];
 
 // Interfaces
 
@@ -26,5 +25,8 @@ export interface SpindleState {
 }
 
 export interface Spindle {
-    label: string
+    enabled: boolean;
+    id: string;
+    label: string;
+    capabilities: string;
 }
