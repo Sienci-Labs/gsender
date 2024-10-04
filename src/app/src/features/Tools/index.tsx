@@ -3,7 +3,6 @@ import { Tabs } from '../../components/Tabs';
 import Console from '../Console';
 import Probe from '../Probe';
 import Spindle from '../Spindle';
-import Macros from '../Macro';
 
 const Coolant = () => {
     return <div>Coolant</div>;
@@ -21,10 +20,6 @@ const tabs = [
     {
         label: 'Probe',
         content: Probe,
-    },
-    {
-        label: 'Macros',
-        content: Macros,
     },
     {
         label: 'Coolant',
