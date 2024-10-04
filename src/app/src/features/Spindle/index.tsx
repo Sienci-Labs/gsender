@@ -89,27 +89,27 @@ const SpindleWidget = () => {
         laserXOffset,
         laserYOffset,
     } = useTypedSelector((state) => ({
-        workflow: state.controller.workflow,
-        isConnected: state.connection.isConnected,
-        controllerState: state.controller.state,
-        controllerType: state.controller.type,
-        spindleModal: state.controller.modal.spindle,
-        spindleMin: Number(state.controller.settings.settings.$31),
-        spindleMax: Number(state.controller.settings.settings.$30),
-        laserAsSpindle: Number(state.controller.settings.settings.$32),
-        wcs: state.controller.modal.wcs,
-        wpos: state.controller.wpos,
-        units: state.controller.modal.units,
-        availableSpindles: state.controller.spindles,
-        $13: state.controller.settings.settings.$13,
-        spindle: state.controller.spindles.find((s) => s.enabled) || {
+        workflow: state.controller.workflow ?? '',
+        isConnected: state.connection.isConnected ?? false,
+        controllerState: state.controller.state ?? {},
+        controllerType: state.controller.type ?? 'grbl',
+        spindleModal: state.controller.modal.spindle ?? 'M5',
+        spindleMin: Number(state.controller.settings.settings.$31 ?? 1000),
+        spindleMax: Number(state.controller.settings.settings.$30 ?? 30000),
+        laserAsSpindle: Number(state.controller.settings.settings.$32 ?? 0),
+        wcs: state.controller.modal.wcs ?? '',
+        wpos: state.controller.wpos ?? {},
+        units: state.controller.modal.units ?? {},
+        availableSpindles: state.controller.spindles ?? [],
+        $13: state.controller.settings.settings.$13 ?? '0',
+        spindle: state.controller.spindles.find((s) => s.enabled) ?? {
             label: 'Default Spindle',
             value: 0,
         },
-        laserMax: Number(state.controller.settings.settings.$730),
-        laserMin: Number(state.controller.settings.settings.$731),
-        laserXOffset: Number(state.controller.settings.settings.$741),
-        laserYOffset: Number(state.controller.settings.settings.$742),
+        laserMax: Number(state.controller.settings.settings.$730 ?? 255),
+        laserMin: Number(state.controller.settings.settings.$731 ?? 0),
+        laserXOffset: Number(state.controller.settings.settings.$741 ?? 0),
+        laserYOffset: Number(state.controller.settings.settings.$742 ?? 0),
     }));
 
     const [isLaserOn, setIsLaserOn] = useState<boolean>(false);
@@ -294,6 +294,7 @@ const SpindleWidget = () => {
             maxPower: 0,
             minPower: 0,
         });
+
         laser.maxPower = laserMax;
         laser.minPower = laserMin;
         config.set('laser', laser);
@@ -384,6 +385,7 @@ const SpindleWidget = () => {
         },
         sendLaserM3: () => {
             const laserPower = state.laser.maxPower * (state.laser.power / 100);
+
             setIsLaserOn(true);
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
@@ -615,13 +617,15 @@ const SpindleWidget = () => {
 
     const active = getSpindleActiveState();
 
+    const givenMode = laserAsSpindle ? LASER_MODE : SPINDLE_MODE;
+
     return (
         <Widget>
             <div className={styles.modalWrapper}>
                 <div>
                     <div className="flex gap-2 justify-center">
                         <ModalToggle
-                            mode={state.mode}
+                            mode={givenMode}
                             onChange={actions.handleModeToggle}
                             disabled={!canClick()}
                         />
@@ -639,7 +643,7 @@ const SpindleWidget = () => {
                     )}
                 </div>
                 <div>
-                    {state.mode === SPINDLE_MODE ? (
+                    {!laserAsSpindle ? (
                         <SpindleControls
                             state={state}
                             actions={actions}
