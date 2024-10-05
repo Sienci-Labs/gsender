@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master
+      - dev
+      - CI_update
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "master" ]
+
+jobs: 
+  build-debian-pi:
+    name: Build Raspberry PI packages
+    runs-on: ubuntu-latest  
+    env:
+      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+      NODE_OPTIONS: --max-old-space-size=8192
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Environment variables
+        run: |
+          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
+          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
+          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+          echo "• GITHUB_SHA=$GITHUB_SHA"
+          echo "• RUNNER_ARCH=$RUNNER_ARCH"
+          echo "• RUNNER_NAME=$RUNNER_NAME"
+          echo "• RUNNER_OS=$RUNNER_OS"
+          echo "• RUNNER_TEMP=$RUNNER_TEMP"
+          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"  
+      - name: Install Yarn package manager
+        run: |
+          npm install -g yarn
+          yarn global add node-gyp
+      - name: Build Pi binaries using docker
+        shell: bash
+        run: |
+          scripts/build-pi.sh
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
+          PRODUCT_NAME=gSender
+          PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
+          PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
+          mkdir -p releases/pi
+          ls -al output
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-PI-64Bit.AppImage" "releases/pi/${PACKAGE_NAME}-${PACKAGE_VERSION}-PI-64Bit.AppImage"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-PI-64Bit.deb" "releases/pi/${PACKAGE_NAME}-${PACKAGE_VERSION}-PI-64Bit.deb" 
+          ls -al output releases/pi
+          if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
+            yarn github-release delete \
+              --owner=gSender \
+              --repo=gsender \
+              --tag="${GITHUB_REF_NAME}-latest" \
+              --release-name="${GITHUB_REF_NAME}" \
+              "*-pi*";
+            yarn github-release upload \
+              --owner=gSender \
+              --repo=gsender \
+              --tag="${GITHUB_REF_NAME}-latest" \
+              --release-name="${GITHUB_REF_NAME}" \
+              --body="${GIT_COMMIT_LOG}" \
+              releases/pi/*;
+          fi
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            releases/pi/*
+          prerelease: true
+          draft: true
+
+ 
+  

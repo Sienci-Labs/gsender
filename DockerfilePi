@@ -1,0 +1,24 @@
+FROM --platform=$BUILDPLATFORM node:22-bookworm AS builder
+ARG NODE_OPTIONS="--max-old-space-size=8192"
+ARG USE_SYSTEM_FPM="true"
+ARG TARGETARCH
+
+WORKDIR /app
+COPY . .
+RUN apt update 
+RUN apt-get install npm \
+    libopenjp2-tools \
+    ruby-dev -y
+RUN gem i fpm -f
+
+RUN yarn global add node-gyp
+RUN yarn install
+RUN yarn run build
+RUN yarn run build:linux-arm64
+RUN for f in /app/output/*.deb; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
+RUN for f in /app/output/*.AppImage; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
+
+FROM scratch AS artifact
+
+COPY --from=builder /app/output/*.deb .
+COPY --from=builder /app/output/*.AppImage .
