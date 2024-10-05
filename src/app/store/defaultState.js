@@ -54,7 +54,8 @@ const defaultState = {
         longestTimeRun: 0,
         jobTimes: [],
         toolChange: {
-            passthrough: false
+            passthrough: false,
+            disableM6Confirmation: false
         },
         toolChangeOption: 'Ignore',
         toolChangePosition: {
