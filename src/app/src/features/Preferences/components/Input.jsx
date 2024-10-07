@@ -40,11 +40,11 @@ const Input = ({
 }) => {
     return (
         <div
-            className={classNames(styles.input, 'form-group', className)}
+            className={classNames(styles.input, styles.formGroup, className)}
             style={{ gridTemplateColumns: !label ? '1fr' : '' }}
         >
             {label && <label htmlFor="">{label}</label>}
-            <div className="input-group" style={{ maxHeight: '30px' }}>
+            <div className="flex flex-row " style={{ maxHeight: '30px' }}>
                 <ControlledNumberInput
                     {...additionalProps}
                     value={isNumber ? Number(value).toString() : value}
@@ -57,7 +57,9 @@ const Input = ({
                     }}
                     hasRounding={hasRounding}
                 />
-                {units && <span className="input-group-addon">{units}</span>}
+                {units && (
+                    <span className={styles.inputGroupAddon}>{units}</span>
+                )}
             </div>
         </div>
     );

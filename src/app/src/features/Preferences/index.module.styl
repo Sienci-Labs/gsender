@@ -716,3 +716,28 @@
   margin: 0 2px 1.4rem;
   font-size: 18px;
 }
+
+
+.form-group {
+  margin: 15px 0;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .form-control {
+    width: 440px;
+    max-width: 100%;
+    margin-right: 10px;
+
+    &.shorter {
+      width: 130px;
+    }
+    &.short {
+      width: 250px;
+    }
+    &.long {
+      width: 100%;
+    }
+  }
+}

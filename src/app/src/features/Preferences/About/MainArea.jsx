@@ -11,7 +11,7 @@ const MainArea = () => {
         <div style={{ height: '540px' }}>
             <div className={styles.section} style={{ height: '10%' }}>
                 <p style={{ marginTop: '1rem' }}>
-                    gSender is a a free GRBL CNC control software that is
+                    gSender is a free GRBL CNC control software that is
                     Feature-packed and is designed to be clean and easy to learn
                     while retaining a depth of capabilities for advanced users.
                     It is made for out-of-the-box use on the LongMill CNC and

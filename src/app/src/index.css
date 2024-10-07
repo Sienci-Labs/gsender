@@ -16,6 +16,9 @@ html,
     label {
         @apply text-sm
     }
+    input {
+        min-width: 100px;
+    }
 }
 
 @layer utilities {

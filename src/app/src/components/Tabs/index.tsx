@@ -10,14 +10,17 @@ interface TabbedProps {
     items: TabItem[];
 }
 
-export const Tabs = ({ items }: TabbedProps) => {
-    const [activeTab, setActiveTab] = useState(items[0]?.label);
+export const Tabs = ({ items = [] }: TabbedProps) => {
+    const [activeTab, setActiveTab] = useState('');
     const tabsRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
 
     useEffect(() => {
+        if (items.length > 0) {
+            setActiveTab(items[0].label);
+        }
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
     }, [items]);
@@ -88,22 +91,23 @@ export const Tabs = ({ items }: TabbedProps) => {
                         }}
                         onScroll={checkScrollability}
                     >
-                        {items.map((item, index) => (
-                            <button
-                                key={item.label}
-                                ref={(el) => (tabRefs.current[index] = el)}
-                                className={`flex-grow px-4 py-2 text-sm font-medium ${
-                                    activeTab === item.label
-                                        ? 'text-blue-600 border-b-2 border-blue-600'
-                                        : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800'
-                                }`}
-                                onClick={() =>
-                                    handleTabClick(item.label, index)
-                                }
-                            >
-                                {item.label}
-                            </button>
-                        ))}
+                        {items &&
+                            items.map((item, index) => (
+                                <button
+                                    key={item.label}
+                                    ref={(el) => (tabRefs.current[index] = el)}
+                                    className={`flex-grow px-4 py-2 text-sm font-medium ${
+                                        activeTab === item.label
+                                            ? 'text-blue-600 border-b-2 border-blue-600'
+                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800'
+                                    }`}
+                                    onClick={() =>
+                                        handleTabClick(item.label, index)
+                                    }
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
                     </div>
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ml-2 ${
@@ -119,17 +123,18 @@ export const Tabs = ({ items }: TabbedProps) => {
                 </div>
             </div>
             <div className="block w-full h-full">
-                {items.map((item) => (
-                    <div
-                        key={item.label}
-                        className={classNames(
-                            'w-full h-full',
-                            activeTab === item.label ? 'block' : 'hidden',
-                        )}
-                    >
-                        {item.content}
-                    </div>
-                ))}
+                {items &&
+                    items.map((item) => (
+                        <div
+                            key={item.label}
+                            className={classNames(
+                                'w-full h-full',
+                                activeTab === item.label ? 'block' : 'hidden',
+                            )}
+                        >
+                            {item.content}
+                        </div>
+                    ))}
             </div>
         </div>
     );
