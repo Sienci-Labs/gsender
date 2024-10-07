@@ -1,7 +1,6 @@
-#if docker buildx ls | grep -q buildx-builder -eq 1; then
+if docker buildx ls | grep -q buildx-builder -eq 1; then
    docker buildx create --name  buildx-builder --use 
-   docker buildx ls
-#fi
+fi
 mkdir -p release/pi/
 docker buildx build  -f DockerfilePi . \
    --platform linux/arm64 \
