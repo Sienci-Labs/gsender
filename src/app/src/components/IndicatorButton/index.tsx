@@ -38,7 +38,7 @@ export function IndicatorButton({
             </span>
             <span
                 className={cn('text-sm text-blue-500', {
-                    'text-blue-200': active,
+                    'text-gray-200': active,
                 })}
             >
                 {label}
