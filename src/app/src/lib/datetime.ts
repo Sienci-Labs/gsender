@@ -24,7 +24,10 @@
 import moment from 'moment';
 
 // solution found here: https://stackoverflow.com/a/59948911
-export const convertMillisecondsToTimeStamp = (milliseconds: number): string => {
+export const convertMillisecondsToTimeStamp = (
+    milliseconds: number,
+    short = false,
+): string => {
     if (milliseconds >= 0) {
         let seconds = milliseconds / 1000;
         const hours = Math.floor(seconds / 3600);
@@ -39,13 +42,41 @@ export const convertMillisecondsToTimeStamp = (milliseconds: number): string => 
             return `${String(days).padStart(2, '0')}d ${String(newHours).padStart(2, '0')}h`;
         }
 
+        if (short) {
+            return `${String(hours).padStart(2, '0')}hr${String(minutes).padStart(2, '0')}m`;
+        }
+
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     return '-';
 };
 
-export const convertSecondsToTimeStamp = (seconds: number, startTime: number): string => {
+export const convertMillisecondsToDHMS = (milliseconds: number): number[] => {
+    if (milliseconds >= 0) {
+        let seconds = milliseconds / 1000;
+        let hours = Math.floor(seconds / 3600);
+        seconds %= 3600; // seconds remaining after extracting hours
+        const minutes = Math.floor(seconds / 60);
+        seconds %= 60; // keep only seconds not extracted to minutes
+        seconds = Math.floor(seconds);
+
+        let days = 0;
+        if (hours >= 24) {
+            days = Math.floor(hours / 24);
+            hours = Math.floor(hours % 24); // get remaining hours
+        }
+
+        return [days, hours, minutes, seconds];
+    }
+
+    return [];
+};
+
+export const convertSecondsToTimeStamp = (
+    seconds: number,
+    startTime: number,
+): string => {
     if (startTime === 0 || seconds === undefined) {
         return '-';
     } else if (seconds <= 0) {
@@ -55,7 +86,9 @@ export const convertSecondsToTimeStamp = (seconds: number, startTime: number): s
     return convertMillisecondsToTimeStamp(seconds * 1000);
 };
 
-export const convertISOStringToDateAndTime = (ISOString: string): Array<string> => {
+export const convertISOStringToDateAndTime = (
+    ISOString: string,
+): Array<string> => {
     const dateFromString = moment(ISOString);
 
     if (!dateFromString.isValid()) {
