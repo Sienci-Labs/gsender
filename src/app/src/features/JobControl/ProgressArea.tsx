@@ -32,11 +32,10 @@ import {
 import { Progress } from 'app/components/shadcn/Progress';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import {
-    convertMillisecondsToDHMS,
     convertMillisecondsToTimeStamp,
+    convertSecondsToDHMS,
 } from 'app/lib/datetime';
 import Bit from './assets/Bit.svg';
-import texture from './assets/texture.png';
 
 interface Props {
     senderStatus: SenderStatus;
@@ -50,6 +49,7 @@ interface Props {
 const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     const { total, received, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
+    console.log(elapsedTime);
 
     const getFinishTime = (givenTime: number): string => {
         if (startTime === 0 || !givenTime || givenTime < 0) {
@@ -65,23 +65,60 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     };
 
     const updateTime = (): string => {
-        return getFinishTime(remainingTime);
+        return getFinishTime(Number(remainingTime));
+    };
+
+    const getTimesHTML = (
+        timeSplit: [number, number, number, number],
+    ): JSX.Element => {
+        let time1 = 0;
+        let time2 = 0;
+        let text1 = '';
+        let text2 = '';
+        if (timeSplit[0] !== 0) {
+            time1 = timeSplit[0];
+            text1 = 'd';
+            time2 = timeSplit[1];
+            text2 = 'hr';
+        } else if (timeSplit[1] !== 0) {
+            time1 = timeSplit[1];
+            text1 = 'hr';
+            time2 = timeSplit[2];
+            text2 = 'm';
+        } else {
+            time1 = timeSplit[2];
+            text1 = 'm';
+            time2 = timeSplit[3];
+            text2 = 's';
+        }
+        return (
+            <div className="flex flex-row justify-center items-end">
+                <span className="text-2xl font-bold">{time1}</span>
+                <span className="text-lg">{text1}</span>
+                <span className="text-2xl font-bold">{time2}</span>
+                <span className="text-lg">{text2}</span>
+            </div>
+        );
     };
 
     const percentageValue = Number.isNaN((received / total) * 100)
         ? 0
         : (received / total) * 100;
 
-    console.log(percentageValue);
-
-    const timeSplit = convertMillisecondsToDHMS(remainingTime);
+    const timeSplit = convertSecondsToDHMS(Number(remainingTime));
+    const timeComponent = getTimesHTML(timeSplit);
 
     return (
         <>
             <div className="w-60 border-solid border-[1px] border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1">
                 {/* <img src={Bit} /> */}
                 <div className="flex flex-col gap-0 w-full h-full -mt-6 pl-[34px]">
-                    <div className="flex flex-row justify-start items-end ml-3 -mb-1 whitespace-nowrap">
+                    <div
+                        className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap"
+                        style={{
+                            transform: `translateX(${percentageValue > 50 ? percentageValue - 60 : percentageValue || 0}%)`,
+                        }}
+                    >
                         <span className="font-bold text-2xl">
                             {percentageValue.toFixed(0)}
                         </span>
@@ -95,40 +132,15 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     </div> */}
                     <Progress
                         value={percentageValue}
-                        style={{
-                            backgroundImage: 'url("./assets/texture.png")',
-                        }}
                         Bit={Bit}
-                        className="h-[35px] w-full border-yellow-700 border-[1px] bg-yellow-100 rounded-none"
+                        className="h-[35px] w-full border-yellow-700 border-[1px] bg-yellow-100 rounded-none ![background-image:_url('texture.png')]"
                     />
                 </div>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex flex-col text-black justify-center items-center">
-                                {timeSplit[0] !== 0 ? (
-                                    <div className="flex flex-row justify-center items-end">
-                                        <span className="text-2xl font-bold">
-                                            {timeSplit[0]}
-                                        </span>
-                                        <span className="text-lg">d</span>
-                                        <span className="text-2xl font-bold">
-                                            {timeSplit[1]}
-                                        </span>
-                                        <span className="text-lg">hr</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-row justify-center items-end">
-                                        <span className="text-2xl font-bold">
-                                            {timeSplit[1]}
-                                        </span>
-                                        <span className="text-lg">hr</span>
-                                        <span className="text-2xl font-bold">
-                                            {timeSplit[2]}
-                                        </span>
-                                        <span className="text-lg">m</span>
-                                    </div>
-                                )}
+                                {timeComponent}
                                 <span>remaining</span>
                             </div>
                         </TooltipTrigger>
@@ -138,9 +150,9 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     </Tooltip>
                 </TooltipProvider>
             </div>
-            <div className="flex flex-row gap-10 justify-between items-center text-gray-500 whitespace-nowrap">
-                <span>{`${received} / ${total} Lines`}</span>
-                <span>
+            <div className="grid grid-cols-[50%_50%] gap-4 text-gray-500 text-sm whitespace-nowrap w-full">
+                <span className="flex flex-row justify-end items-center">{`${received} / ${total} Lines`}</span>
+                <span className="flex flex-row justify-start items-center">
                     {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
                 </span>
             </div>

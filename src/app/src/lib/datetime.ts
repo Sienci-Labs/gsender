@@ -43,7 +43,11 @@ export const convertMillisecondsToTimeStamp = (
         }
 
         if (short) {
-            return `${String(hours).padStart(2, '0')}hr${String(minutes).padStart(2, '0')}m`;
+            if (hours !== 0) {
+                return `${String(hours).padStart(2, '0')}hr${String(minutes).padStart(2, '0')}m`;
+            } else {
+                return `${String(minutes).padStart(2, '0')}m${String(seconds).padStart(2, '0')}s`;
+            }
         }
 
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -52,9 +56,10 @@ export const convertMillisecondsToTimeStamp = (
     return '-';
 };
 
-export const convertMillisecondsToDHMS = (milliseconds: number): number[] => {
-    if (milliseconds >= 0) {
-        let seconds = milliseconds / 1000;
+export const convertSecondsToDHMS = (
+    seconds: number,
+): [number, number, number, number] => {
+    if (seconds >= 0) {
         let hours = Math.floor(seconds / 3600);
         seconds %= 3600; // seconds remaining after extracting hours
         const minutes = Math.floor(seconds / 60);
@@ -70,7 +75,7 @@ export const convertMillisecondsToDHMS = (milliseconds: number): number[] => {
         return [days, hours, minutes, seconds];
     }
 
-    return [];
+    return [0, 0, 0, 0];
 };
 
 export const convertSecondsToTimeStamp = (

@@ -83,7 +83,7 @@ export default connect((reduxStore) => {
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
 
-    console.log(mposController);
+    // console.log(mposController);
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
 
     const wpos = mapValues(wposController, (pos) => {

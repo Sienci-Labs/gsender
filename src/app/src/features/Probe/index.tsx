@@ -110,7 +110,6 @@ const ProbeWidget = () => {
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
     const [units, setUnits] = useState<UNITS_EN>(store.get('workspace.units'));
-    console.log(units);
     const [availableTools, setAvailableTools] = useState<AvailableTool[]>(
         store.get('workspace.tools', []),
     );
