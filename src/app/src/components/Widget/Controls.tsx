@@ -31,8 +31,8 @@ const Controls: React.FC<WidgetProps> = ({ className, ...props }) => {
             {...props}
             className={classNames(
                 className,
-                "absolute top-0 right-0 cursor-auto w-auto bg-transparent" +
-                'widget-controls', 
+                'absolute top-0 right-0 cursor-auto w-auto bg-transparent' +
+                    'widget-controls',
             )}
         />
     );
