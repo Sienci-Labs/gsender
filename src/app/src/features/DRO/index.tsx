@@ -4,6 +4,7 @@ import {
     defaultDROPosition,
     DROPosition,
     gotoZero,
+    zeroAllAxes,
     zeroWCS,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
@@ -60,10 +61,7 @@ function DRO({
                 ))}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
-                <IconButton
-                    icon={<VscTarget />}
-                    onClick={() => zeroWCS('XYZ', 0)}
-                >
+                <IconButton icon={<VscTarget />} onClick={zeroAllAxes}>
                     Zero
                 </IconButton>
                 <Button color="alt" onClick={() => gotoZero('XY')}>

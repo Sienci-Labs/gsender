@@ -6,18 +6,18 @@ export const buttonStyle = tv({
     variants: {
         color: {
             primary: 'border-blue-500 text-white bg-blue-500',
-            secondary: 'border-robin-500 hover:bg-gray-200 text-gray-500',
+            secondary:
+                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white',
             alt: 'bg-robin-500 text-white border-robin-500',
             disabled: 'border-gray-300 bg-gray-100 text-gray-400',
         },
     },
     defaultVariants: {
-        color: 'secondary'
-    }
+        color: 'secondary',
+    },
 });
 
-export type ButtonVariants = VariantProps<typeof buttonStyle>
-
+export type ButtonVariants = VariantProps<typeof buttonStyle>;
 
 export interface ButtonProps extends ButtonVariants {
     children?: React.ReactNode;
@@ -35,10 +35,6 @@ export function Button(props: ButtonProps) {
             {props.children}
         </button>
     );
-}
-
-export function ButtonGroup(props: ButtonProps) {
-    return <div></div>;
 }
 
 export default Button;

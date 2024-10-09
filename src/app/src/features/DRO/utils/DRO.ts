@@ -43,6 +43,10 @@ export function zeroWCS(axis: string, value: number = 0) {
     controller.command('gcode', `G10 L20 P0 ${axisCode}${value}`);
 }
 
+export function zeroAllAxes() {
+    controller.command('gcode', `G10 L20 P0 X0 Y0 Z0`);
+}
+
 export function gotoZero(axis: string) {
     const commands: string[] = [];
     const settings = get(controller.settings, 'settings', {});
