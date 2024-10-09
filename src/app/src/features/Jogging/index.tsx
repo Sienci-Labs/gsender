@@ -5,8 +5,25 @@ import aLabels from './assets/aLabels.svg';
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
+import { useState, useEffect } from 'react';
 
 export function Jogging() {
+    const [jogSpeed, setJogSpeed] = useState({
+        xyStep: 0,
+        zStep: 0,
+        aStep: 0,
+        feedrate: 0,
+    });
+
+    useEffect(() => {
+        setJogSpeed({
+            xyStep: 5000,
+            zStep: 1000,
+            aStep: 5000,
+            feedrate: 10000,
+        });
+    }, []);
+
     return (
         <>
             <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center select-none">
@@ -37,10 +54,10 @@ export function Jogging() {
             </div>
             <div className="flex flex-row justify-between">
                 <div className="grid grid-cols-2 gap-1">
-                    <JogInput label="XY" currentValue={10} />
-                    <JogInput label="Z" currentValue={5} />
-                    <JogInput label="at" currentValue={5000} />
-                    <JogInput label="A°" currentValue={10} />
+                    <JogInput label="XY" currentValue={jogSpeed.xyStep} />
+                    <JogInput label="Z" currentValue={jogSpeed.zStep} />
+                    <JogInput label="at" currentValue={jogSpeed.feedrate} />
+                    <JogInput label="A°" currentValue={jogSpeed.aStep} />
                 </div>
 
                 <Tabs
