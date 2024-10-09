@@ -21,8 +21,8 @@ export function JogWheel(props: JogWheelProps) {
 
     return (
         <svg
-            width={200}
-            height={200}
+            width={180}
+            height={180}
             viewBox="0 0 200 200"
             fill="none"
             className="hover:transition-all duration-200"

@@ -42,7 +42,7 @@ export function WCSInput({
                 ref={inputRef}
                 onBlur={onBlur}
                 onKeyDown={onKeyPress}
-                className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-gray-50"
+                className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-none outline-none bg-opacity-0"
             />
         </>
     );

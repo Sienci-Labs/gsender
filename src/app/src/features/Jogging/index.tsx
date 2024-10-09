@@ -6,6 +6,7 @@ import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
 import { useState, useEffect } from 'react';
+import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
 
 export function Jogging() {
     const [jogSpeed, setJogSpeed] = useState({
@@ -52,26 +53,14 @@ export function Jogging() {
                     />
                 </div>
             </div>
-            <div className="flex flex-row justify-between">
+            <div className="flex flex-row justify-between flex-shrink">
                 <div className="grid grid-cols-2 gap-1">
                     <JogInput label="XY" currentValue={jogSpeed.xyStep} />
                     <JogInput label="Z" currentValue={jogSpeed.zStep} />
                     <JogInput label="at" currentValue={jogSpeed.feedrate} />
                     <JogInput label="A°" currentValue={jogSpeed.aStep} />
                 </div>
-
-                <Tabs
-                    defaultValue="rapid"
-                    orientation="vertical"
-                    aria-orientation="vertical"
-                    className="border border-gray-200 bg-white rounded"
-                >
-                    <TabsList className="flex flex-col text-gray-500 bg-blue-50 ">
-                        <TabsTrigger value="rapid">Rapid</TabsTrigger>
-                        <TabsTrigger value="normal">Normal</TabsTrigger>
-                        <TabsTrigger value="precide">Precise</TabsTrigger>
-                    </TabsList>
-                </Tabs>
+                <SpeedSelector />
             </div>
         </>
     );
