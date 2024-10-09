@@ -1,13 +1,13 @@
 export function UpdateAlert() {
     return (
         <div
-            className="bg-orange-100 border-t-4 border-orange-500 rounded-b text-orange-900 px-4 py-3 shadow-md mt-4 mb-2"
+            className="bg-yellow-100 border-t-4 border-yellow-500 rounded-b text-yellow-900 px-4 py-3 shadow-md mt-4 mb-2"
             role="alert"
         >
             <div className="flex">
                 <div className="py-1">
                     <svg
-                        className="fill-current h-6 w-6 text-orange-500 mr-4"
+                        className="fill-current h-6 w-6 text-yellow-500 mr-4"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
                     >
