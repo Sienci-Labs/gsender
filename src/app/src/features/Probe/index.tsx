@@ -57,6 +57,7 @@ import {
 } from './definitions';
 import { BasicObject, UNITS_EN } from 'app/definitions/general';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 
 const ProbeWidget = () => {
     const {
@@ -487,11 +488,21 @@ const ProbeWidget = () => {
     };
 
     return (
-        <div className="relative p-3 w-full h-full">
-            <RunProbe state={state} actions={actions} />
-            <Probe state={state} actions={actions} />
-        </div>
+        <WidgetConfigProvider widgetId="probe">
+            <div className="relative p-3 w-full h-full">
+                <RunProbe state={state} actions={actions} />
+                <Probe state={state} actions={actions} />
+            </div>
+        </WidgetConfigProvider>
     );
 };
 
-export default ProbeWidget;
+const ProbeWrapper = () => {
+    return (
+        <WidgetConfigProvider widgetId="probe">
+            <ProbeWidget />
+        </WidgetConfigProvider>
+    );
+};
+
+export default ProbeWrapper;

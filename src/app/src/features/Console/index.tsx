@@ -5,7 +5,11 @@ import TerminalInput from './TerminalInput';
 
 import './styles.css';
 
-export const Console = () => {
+type Props = {
+    isActive: boolean;
+};
+
+const Console = ({ isActive }: Props) => {
     const { isConnected } = useTypedSelector((state) => state.connection);
 
     return (
@@ -18,9 +22,11 @@ export const Console = () => {
                 </div>
             </div>
             <div className="grid grid-rows-[5fr_1fr] absolute gap-2 top-0 left-0 w-full h-full p-1">
-                <Terminal />
+                <Terminal isActive={isActive} />
                 <TerminalInput />
             </div>
         </>
     );
 };
+
+export default Console;

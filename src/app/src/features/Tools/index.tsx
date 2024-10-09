@@ -3,7 +3,9 @@ import { Tabs } from '../../components/Tabs';
 import Coolant from 'app/features/Coolant';
 import { Console } from '../Console';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import Console from '../Console';
 import Probe from '../Probe';
+import Spindle from '../Spindle';
 
 const Rotary = () => {
     return <div>Rotary</div>;
@@ -12,23 +14,23 @@ const Rotary = () => {
 const tabs = [
     {
         label: 'Console',
-        content: <Console />,
+        content: Console,
     },
     {
         label: 'Probe',
-        content: (
-            <WidgetConfigProvider widgetId="probe">
-                <Probe />
-            </WidgetConfigProvider>
-        ),
+        content: Probe,
     },
     {
         label: 'Coolant',
-        content: <Coolant />,
+        content: Coolant,
+    },
+    {
+        label: 'Spindle',
+        content: Spindle,
     },
     {
         label: 'Rotary',
-        content: <Rotary />,
+        content: Rotary,
     },
 ];
 

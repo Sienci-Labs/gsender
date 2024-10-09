@@ -3,6 +3,7 @@ import { cn } from 'app/lib/utils';
 type Props = {
     checked?: boolean;
     onChange: (checked: boolean) => void;
+    disabled?: boolean;
     label?: string;
     className?: string;
     position?: 'horizontal' | 'vertical';
@@ -13,6 +14,7 @@ const Switch = ({
     onChange,
     label,
     position = 'horizontal',
+    disabled = false,
 }: Props) => {
     const isVertical = position === 'vertical';
 
@@ -20,7 +22,10 @@ const Switch = ({
         <>
             <label
                 className={cn(
-                    'inline-flex cursor-pointer',
+                    'inline-flex',
+                    disabled
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer',
                     isVertical ? 'flex-col' : 'items-center',
                 )}
             >
@@ -29,6 +34,7 @@ const Switch = ({
                     checked={checked}
                     onChange={(e) => onChange(e.target.checked)}
                     className="sr-only peer"
+                    disabled={disabled}
                 />
                 <div
                     className={cn(
@@ -36,6 +42,7 @@ const Switch = ({
                         isVertical
                             ? 'w-6 h-11 peer-checked:after:translate-y-[-100%] after:left-[2px] after:bottom-[2px] after:h-5 after:w-5'
                             : 'w-11 h-6 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:top-[2px] after:start-[2px] after:h-5 after:w-5',
+                        disabled && 'opacity-50 cursor-not-allowed',
                     )}
                 ></div>
                 {label && (
@@ -43,6 +50,7 @@ const Switch = ({
                         className={cn(
                             'text-sm font-normal text-gray-900 dark:text-gray-900',
                             isVertical ? 'mt-3' : 'ms-3',
+                            disabled && 'opacity-50',
                         )}
                     >
                         {label}
