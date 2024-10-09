@@ -37,4 +37,8 @@ export function Button(props: ButtonProps) {
     );
 }
 
+export function ButtonGroup() {
+    return <div></div>;
+}
+
 export default Button;
