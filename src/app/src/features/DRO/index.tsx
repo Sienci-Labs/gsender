@@ -6,6 +6,7 @@ import {
     gotoZero,
     zeroAllAxes,
     zeroWCS,
+    zeroXYAxes,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { IconButton } from 'app/components/IconButton';
@@ -64,7 +65,7 @@ function DRO({
                 <IconButton icon={<VscTarget />} onClick={zeroAllAxes}>
                     Zero
                 </IconButton>
-                <Button color="alt" onClick={() => gotoZero('XY')}>
+                <Button color="alt" onClick={zeroXYAxes}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

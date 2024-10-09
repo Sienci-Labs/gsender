@@ -47,6 +47,10 @@ export function zeroAllAxes() {
     controller.command('gcode', `G10 L20 P0 X0 Y0 Z0`);
 }
 
+export function zeroXYAxes() {
+    controller.command('gcode', `G10 L20 P0 X0 Y0`);
+}
+
 export function gotoZero(axis: string) {
     const commands: string[] = [];
     const settings = get(controller.settings, 'settings', {});
