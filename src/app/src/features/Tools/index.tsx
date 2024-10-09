@@ -1,7 +1,6 @@
 import { Widget } from '../../components/Widget';
 import { Tabs } from '../../components/Tabs';
 import Coolant from 'app/features/Coolant';
-import { Console } from '../Console';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 import Console from '../Console';
 import Probe from '../Probe';
