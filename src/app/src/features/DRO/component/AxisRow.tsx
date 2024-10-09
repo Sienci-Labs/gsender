@@ -28,7 +28,7 @@ export function AxisRow({ axis, mpos, wpos }: AxisRowProps) {
                 {mpos}
             </span>
 
-            <Button onClick={() => gotoZero(axis)} color="primary">
+            <Button onClick={() => gotoZero(axis)} color="alt">
                 <span className="text-lg font-mono">{axis}0</span>
             </Button>
         </div>

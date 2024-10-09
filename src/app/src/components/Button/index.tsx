@@ -7,6 +7,7 @@ export const buttonStyle = tv({
         color: {
             primary: 'border-blue-500 text-white bg-blue-500',
             secondary: 'border-robin-500 hover:bg-gray-200 text-gray-500',
+            alt: 'bg-robin-500 text-white border-robin-500',
         },
     },
     defaultVariants: {

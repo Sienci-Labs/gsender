@@ -66,7 +66,7 @@ function DRO({
                 >
                     Zero
                 </IconButton>
-                <Button color="primary" onClick={() => gotoZero('XY')}>
+                <Button color="alt" onClick={() => gotoZero('XY')}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

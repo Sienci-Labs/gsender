@@ -33,7 +33,7 @@ export function GoTo({ units, wpos }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger className="border rounded hover:opacity-90 py-1 px-3 shadow border-blue-500 text-white bg-blue-500">
+            <PopoverTrigger className="border rounded hover:opacity-90 py-1 px-3 shadow border-robin-500 text-white bg-robin-500">
                 <FaPaperPlane />
             </PopoverTrigger>
             <PopoverContent className="bg-white">
