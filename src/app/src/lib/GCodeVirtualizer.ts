@@ -2,13 +2,52 @@ import { EventEmitter } from 'events';
 
 import { FILE_TYPE } from '../constants';
 import { parseLine } from './GCodeParser';
+import { BasicPosition, BBox } from 'app/definitions/general';
 
-interface Position {
-    x: number;
+interface Modal {
+    motion: string;
+    wcs: string;
+    plane: string;
+    units: string;
+    distance: string;
+    arc: string;
+    feedrate: string;
+    cutter: string;
+    tlo: string;
+    program: string;
+    spindle: string;
+    coolant: string;
+    tool: number;
+}
+
+interface RotationResult {
     y: number;
     z: number;
     a: number;
 }
+
+interface VMState {
+    tools: Set<string>;
+    spindle: Set<string>;
+    feedrates: Set<string>;
+    bbox: BBox;
+    usedAxes: Set<string>;
+}
+
+type Data = Array<{
+    Scode: any;
+    lineData: any;
+}>;
+
+type ModalChanges = Array<{
+    change: Partial<Modal>;
+    count: number;
+}>;
+
+type FeedrateChanges = Array<{
+    change: string;
+    count: number;
+}>;
 
 const translatePosition = (
     position: number,
@@ -29,15 +68,12 @@ export const toRadians = (degrees: number): number => {
 
 // We just need to check the difference between the a axis values,
 // this should work fine since they are both 0 initially
-export const shouldRotate = (start: Position, end: Position): boolean => {
+export const shouldRotate = (
+    start: BasicPosition,
+    end: BasicPosition,
+): boolean => {
     return start.a !== end.a;
 };
-
-interface RotationResult {
-    y: number;
-    z: number;
-    a: number;
-}
 
 export const rotateAxis = (
     axis: 'y' | 'z',
@@ -114,21 +150,7 @@ class GCodeVirtualizer extends EventEmitter {
 
     maxBounds: [number, number, number] = [0, 0, 0];
 
-    modal: {
-        motion: string;
-        wcs: string;
-        plane: string;
-        units: string;
-        distance: string;
-        arc: string;
-        feedrate: string;
-        cutter: string;
-        tlo: string;
-        program: string;
-        spindle: string;
-        coolant: string;
-        tool: number;
-    } = {
+    modal: Modal = {
         // Motion Mode
         // G0, G1, G2, G3, G80
         motion: 'G0',
@@ -179,48 +201,21 @@ class GCodeVirtualizer extends EventEmitter {
         tool: 0,
     };
 
-    position: {
-        x: number;
-        y: number;
-        z: number;
-        a: number;
-    } = {
+    position: BasicPosition = {
         x: 0,
         y: 0,
         z: 0,
         a: 0,
     };
 
-    offsets: {
-        x: number;
-        y: number;
-        z: number;
-        a: number;
-    } = {
+    offsets: BasicPosition = {
         x: 0,
         y: 0,
         z: 0,
         a: 0,
     };
 
-    vmState: {
-        tools: any;
-        spindle: any;
-        feedrates: any;
-        bbox: {
-            min: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            max: {
-                x: number;
-                y: number;
-                z: number;
-            };
-        };
-        usedAxes: Set<string>;
-    } = {
+    vmState: VMState = {
         tools: null,
         spindle: null,
         feedrates: null,
@@ -240,10 +235,7 @@ class GCodeVirtualizer extends EventEmitter {
     };
 
     // data to save so we don't have to reparse
-    data: Array<{
-        Scode: any;
-        lineData: any;
-    }> = [
+    data: Data = [
         {
             Scode: null, // spindle value for the line
             lineData: null, // modal changes, v1, v2, v0
@@ -252,10 +244,7 @@ class GCodeVirtualizer extends EventEmitter {
 
     estimates: number[] = [];
 
-    modalChanges: Array<{
-        change: any;
-        count: number;
-    }> = [
+    modalChanges: ModalChanges = [
         {
             change: null,
             count: 0,
@@ -263,10 +252,7 @@ class GCodeVirtualizer extends EventEmitter {
     ];
     modalCounter: number = 0;
 
-    feedrateChanges: Array<{
-        change: any;
-        count: number;
-    }> = [
+    feedrateChanges: FeedrateChanges = [
         {
             change: null,
             count: 0,
@@ -274,34 +260,44 @@ class GCodeVirtualizer extends EventEmitter {
     ];
     feedrateCounter: number = 0;
 
-    fn = {
+    fn: {
+        addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
+        addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
+        addArcCurve: (
+            modal: Modal,
+            v1: BasicPosition,
+            v2: BasicPosition,
+            v0: BasicPosition,
+        ) => void;
+        callback: () => void;
+    } = {
         addLine: noop,
-        addArcCurve: noop,
         addCurve: noop,
+        addArcCurve: noop,
         callback: noop,
     };
 
-    handlers = {
+    handlers: { [key: string]: (param: any) => void } = {
         // G0: Rapid Linear Move
-        G0: (params: Record<string, any>) => {
+        G0: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G0') {
                 this.setModal({ motion: 'G0' });
                 this.saveModal({ motion: 'G0' });
             }
 
-            const v1: Position = {
+            const v1: BasicPosition = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
                 a: this.position.a,
             };
-            const v2: Position = {
+            const v2: BasicPosition = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
                 a: this.translateA(params.A),
             };
-            const targetPosition: Position = {
+            const targetPosition: BasicPosition = {
                 x: v2.x,
                 y: v2.y,
                 z: v2.z,
@@ -356,25 +352,25 @@ class GCodeVirtualizer extends EventEmitter {
         //   G1 F1500 (Set the feedrate to 1500mm/minute)
         //   G1 X90.6 Y13.8 E22.4 (Move to 90.6mm on the X axis and 13.8mm on the Y axis while extruding 22.4mm of material)
         //
-        G1: (params: Record<string, any>) => {
+        G1: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G1') {
                 this.setModal({ motion: 'G1' });
                 this.saveModal({ motion: 'G1' });
             }
 
-            const v1: Position = {
+            const v1: BasicPosition = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
                 a: this.position.a,
             };
-            const v2: Position = {
+            const v2: BasicPosition = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
                 a: this.translateA(params.A),
             };
-            const targetPosition: Position = {
+            const targetPosition: BasicPosition = {
                 x: v2.x,
                 y: v2.y,
                 z: v2.z,
@@ -433,31 +429,31 @@ class GCodeVirtualizer extends EventEmitter {
         // Referring
         //   http://linuxcnc.org/docs/2.5/html/gcode/gcode.html#sec:G2-G3-Arc
         //   https://github.com/grbl/grbl/issues/236
-        G2: (params: Record<string, any>) => {
+        G2: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G2') {
                 this.setModal({ motion: 'G2' });
                 this.saveModal({ motion: 'G2' });
             }
 
-            const v1: Position3D = {
+            const v1: BasicPosition = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
             };
-            const v2: Position = {
+            const v2: BasicPosition = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
                 a: this.translateA(params.A),
             };
-            const v0: Position3D = {
+            const v0: BasicPosition = {
                 // fixed point
                 x: this.translateI(params.I),
                 y: this.translateJ(params.J),
                 z: this.translateK(params.K),
             };
             const isClockwise: boolean = true;
-            const targetPosition: Position3D = { x: v2.x, y: v2.y, z: v2.z };
+            const targetPosition: BasicPosition = { x: v2.x, y: v2.y, z: v2.z };
 
             if (this.isXYPlane()) {
                 // XY-plane
@@ -524,31 +520,31 @@ class GCodeVirtualizer extends EventEmitter {
                 v0: this.offsetG92(v0),
             };
         },
-        G3: (params: Record<string, any>) => {
+        G3: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G3') {
                 this.setModal({ motion: 'G3' });
                 this.saveModal({ motion: 'G3' });
             }
 
-            const v1: Position3D = {
+            const v1: BasicPosition = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
             };
-            const v2: Position = {
+            const v2: BasicPosition = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
                 a: this.translateA(params.A),
             };
-            const v0: Position3D = {
+            const v0: BasicPosition = {
                 // fixed point
                 x: this.translateI(params.I),
                 y: this.translateJ(params.J),
                 z: this.translateK(params.K),
             };
             const isClockwise: boolean = false;
-            const targetPosition: Position3D = { x: v2.x, y: v2.y, z: v2.z };
+            const targetPosition: BasicPosition = { x: v2.x, y: v2.y, z: v2.z };
 
             if (this.isXYPlane()) {
                 // XY-plane
@@ -620,7 +616,7 @@ class GCodeVirtualizer extends EventEmitter {
         //   Snnn Time to wait, in seconds (Only on Marlin and Smoothie)
         // Example
         //   G4 P200
-        G4: (params: Record<string, any>) => {
+        G4: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G4') {
                 this.setModal({ motion: 'G4' });
                 this.saveModal({ motion: 'G4' });
@@ -639,38 +635,38 @@ class GCodeVirtualizer extends EventEmitter {
             };
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
-        G10: (params: Record<string, any>): void => {},
+        G10: (_params: Record<string, any>): void => {},
         // G17..19: Plane Selection
         // G17: XY (default)
-        G17: (params: Record<string, any>): void => {
+        G17: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G17') {
                 this.setModal({ plane: 'G17' });
                 this.saveModal({ plane: 'G17' });
             }
         },
         // G18: XZ
-        G18: (params: Record<string, any>): void => {
+        G18: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G18') {
                 this.setModal({ plane: 'G18' });
                 this.saveModal({ plane: 'G18' });
             }
         },
         // G19: YZ
-        G19: (params: Record<string, any>): void => {
+        G19: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G19') {
                 this.setModal({ plane: 'G19' });
                 this.saveModal({ plane: 'G19' });
             }
         },
         // G20: Use inches for length units
-        G20: (params: Record<string, any>): void => {
+        G20: (_params: Record<string, any>): void => {
             if (this.modal.units !== 'G20') {
                 this.setModal({ units: 'G20' });
                 this.saveModal({ units: 'G20' });
             }
         },
         // G21: Use millimeters for length units
-        G21: (params: Record<string, any>): void => {
+        G21: (_params: Record<string, any>): void => {
             if (this.modal.units !== 'G21') {
                 this.setModal({ units: 'G21' });
                 this.saveModal({ units: 'G21' });
@@ -678,35 +674,35 @@ class GCodeVirtualizer extends EventEmitter {
         },
         // G38.x: Straight Probe
         // G38.2: Probe toward workpiece, stop on contact, signal error if failure
-        'G38.2': (params: Record<string, any>): void => {
+        'G38.2': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.2') {
                 this.setModal({ motion: 'G38.2' });
                 this.saveModal({ motion: 'G38.2' });
             }
         },
         // G38.3: Probe toward workpiece, stop on contact
-        'G38.3': (params: Record<string, any>): void => {
+        'G38.3': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.3') {
                 this.setModal({ motion: 'G38.3' });
                 this.saveModal({ motion: 'G38.3' });
             }
         },
         // G38.4: Probe away from workpiece, stop on loss of contact, signal error if failure
-        'G38.4': (params: Record<string, any>): void => {
+        'G38.4': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.4') {
                 this.setModal({ motion: 'G38.4' });
                 this.saveModal({ motion: 'G38.4' });
             }
         },
         // G38.5: Probe away from workpiece, stop on loss of contact
-        'G38.5': (params: Record<string, any>): void => {
+        'G38.5': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.5') {
                 this.setModal({ motion: 'G38.5' });
                 this.saveModal({ motion: 'G38.5' });
             }
         },
         // G43.1: Tool Length Offset
-        'G43.1': (params: Record<string, any>): void => {
+        'G43.1': (_params: Record<string, any>): void => {
             if (this.modal.tlo !== 'G43.1') {
                 this.setModal({ tlo: 'G43.1' });
                 this.saveModal({ tlo: 'G43.1' });
@@ -900,14 +896,14 @@ class GCodeVirtualizer extends EventEmitter {
         },
         // Spindle Control
         // M3: Start the spindle turning clockwise at the currently programmed speed
-        M3: (params: Record<string, any>): void => {
+        M3: (_params: Record<string, any>): void => {
             if (this.modal.spindle !== 'M3') {
                 this.setModal({ spindle: 'M3' });
                 this.saveModal({ spindle: 'M3' });
             }
         },
         // M4: Start the spindle turning counterclockwise at the currently programmed speed
-        M4: (params: Record<string, any>): void => {
+        M4: (_params: Record<string, any>): void => {
             if (this.modal.spindle !== 'M4') {
                 this.setModal({ spindle: 'M4' });
                 this.saveModal({ spindle: 'M4' });
@@ -975,9 +971,13 @@ class GCodeVirtualizer extends EventEmitter {
     };
 
     constructor(options: {
-        addLine?: typeof noop;
-        addArcCurve?: () => void;
-        addCurve?: () => void;
+        addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
+        addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
+        addArcCurve: (
+            modal: Modal,
+            v1: BasicPosition,
+            v2: BasicPosition,
+        ) => void;
         callback?: () => void;
         collate?: boolean;
         accelerations?: {
@@ -1026,8 +1026,8 @@ class GCodeVirtualizer extends EventEmitter {
         }
     }
 
-    partitionWordsByGroup(words: string[][] = []): string[][][] {
-        const groups: string[][][] = [];
+    partitionWordsByGroup(words: [string, any][] = []): [string, any][][] {
+        const groups: [string, any][][] = [];
 
         for (let i = 0; i < words.length; ++i) {
             const word = words[i];
@@ -1054,10 +1054,10 @@ class GCodeVirtualizer extends EventEmitter {
      *   fromPairs([['a', 1], ['b', 2]]);
      *   // => { 'a': 1, 'b': 2 }
      */
-    fromPairs(pairs: [string, any][]): Record<string, any> {
+    fromPairs(pairs: [string, any][]): Record<string, string> {
         let index = -1;
         const length = !pairs ? 0 : pairs.length;
-        const result: Record<string, any> = {};
+        const result: Record<string, string> = {};
 
         while (++index < length) {
             const pair = pairs[index];
@@ -1067,7 +1067,7 @@ class GCodeVirtualizer extends EventEmitter {
         return result;
     }
 
-    virtualize(line = '') {
+    virtualize(line = ''): void {
         if (!line) {
             this.fn.callback();
             return;
@@ -1088,7 +1088,7 @@ class GCodeVirtualizer extends EventEmitter {
             const letter = word[0];
             const code = word[1];
             if (letter === 'F') {
-                this.feed = code;
+                this.feed = Number(code);
                 this.vmState.feedrates.add(`F${code}`);
                 this.saveFeedrate(code);
             }
@@ -1227,7 +1227,7 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    offsetG92 = (pos) => {
+    offsetG92 = (pos: BasicPosition): BasicPosition => {
         return {
             x: pos.x + this.offsets.x,
             y: pos.y + this.offsets.y,
@@ -1236,7 +1236,7 @@ class GCodeVirtualizer extends EventEmitter {
         };
     };
 
-    setModal(modal) {
+    setModal(modal: Partial<Modal>): Modal {
         this.modal = {
             ...this.modal,
             ...modal,
@@ -1244,58 +1244,49 @@ class GCodeVirtualizer extends EventEmitter {
         return this.modal;
     }
 
-    setFeedrate(feed) {
+    setFeedrate(feed: number): number {
         this.feed = feed;
         return this.feed;
     }
 
-    isMetricUnits() {
+    isMetricUnits(): boolean {
         // mm
         return this.modal.units === 'G21';
     }
 
-    isImperialUnits() {
+    isImperialUnits(): boolean {
         // inches
         return this.modal.units === 'G20';
     }
 
-    isAbsoluteDistance() {
+    isAbsoluteDistance(): boolean {
         return this.modal.distance === 'G90';
     }
 
-    isRelativeDistance() {
+    isRelativeDistance(): boolean {
         return this.modal.distance === 'G91';
     }
 
-    isXYPlane() {
+    isXYPlane(): boolean {
         return this.modal.plane === 'G17';
     }
 
-    isZXPlane() {
+    isZXPlane(): boolean {
         return this.modal.plane === 'G18';
     }
 
-    isYZPlane() {
+    isYZPlane(): boolean {
         return this.modal.plane === 'G19';
     }
 
-    setPosition(...pos) {
-        if (typeof pos[0] === 'object') {
-            const { x, y, z, a } = { ...pos[0] };
-            this.position.x = typeof x === 'number' ? x : this.position.x;
-            this.position.y = typeof y === 'number' ? y : this.position.y;
-            this.position.z = typeof z === 'number' ? z : this.position.z;
-            this.position.a = typeof a === 'number' ? a : this.position.a;
-        } else {
-            const [x, y, z, a] = pos;
-            this.position.x = typeof x === 'number' ? x : this.position.x;
-            this.position.y = typeof y === 'number' ? y : this.position.y;
-            this.position.z = typeof z === 'number' ? z : this.position.z;
-            this.position.a = typeof a === 'number' ? a : this.position.a;
-        }
+    setPosition(x: number, y: number, z: number, a?: number): void {
+        this.position.x = typeof x === 'number' ? x : this.position.x;
+        this.position.y = typeof y === 'number' ? y : this.position.y;
+        this.position.z = typeof z === 'number' ? z : this.position.z;
+        this.position.a = typeof a === 'number' ? a : this.position.a;
     }
 
-    translateX(x, relative) {
+    translateX(x: number, relative?: boolean): number {
         if (x !== undefined) {
             x = this.isImperialUnits() ? in2mm(x) : x;
         }
@@ -1305,7 +1296,7 @@ class GCodeVirtualizer extends EventEmitter {
         return translatePosition(this.position.x, x, !!relative);
     }
 
-    translateY(y, relative) {
+    translateY(y: number, relative?: boolean): number {
         if (y !== undefined) {
             y = this.isImperialUnits() ? in2mm(y) : y;
         }
@@ -1315,7 +1306,7 @@ class GCodeVirtualizer extends EventEmitter {
         return translatePosition(this.position.y, y, !!relative);
     }
 
-    translateZ(z, relative) {
+    translateZ(z: number, relative?: boolean): number {
         if (z !== undefined) {
             z = this.isImperialUnits() ? in2mm(z) : z;
         }
@@ -1325,26 +1316,26 @@ class GCodeVirtualizer extends EventEmitter {
         return translatePosition(this.position.z, z, !!relative);
     }
 
-    translateA(a, relative) {
+    translateA(a: number, relative?: boolean): number {
         if (relative === undefined) {
             relative = this.isRelativeDistance();
         }
         return translatePosition(this.position.a, a, !!relative);
     }
 
-    translateI(i) {
+    translateI(i: number): number {
         return this.translateX(i, true);
     }
 
-    translateJ(j) {
+    translateJ(j: number): number {
         return this.translateY(j, true);
     }
 
-    translateK(k) {
+    translateK(k: number): number {
         return this.translateZ(k, true);
     }
 
-    translateR(r) {
+    translateR(r: number): number {
         r = Number(r);
         if (Number.isNaN(r)) {
             return 0;
@@ -1352,7 +1343,7 @@ class GCodeVirtualizer extends EventEmitter {
         return this.isImperialUnits() ? in2mm(r) : r;
     }
 
-    updateBounds(position) {
+    updateBounds(position: BasicPosition): void {
         const { x, y, z } = position;
 
         if (x > this.maxBounds[0]) {
@@ -1400,7 +1391,7 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    calculateMachiningTime(endPos, v1) {
+    calculateMachiningTime(endPos: BasicPosition, v1?: BasicPosition): void {
         let moveDuration = 0;
         let currentPos = v1 || this.position;
 
@@ -1467,7 +1458,11 @@ class GCodeVirtualizer extends EventEmitter {
 
     // TODO: if we find something we need to account for that will make the times longer,
     // we can include the initial accelerations in these calculations to make it more accurate and shorter
-    getAcceleratedMove(length, velocity, /*lastVelocity,*/ acceleration) {
+    getAcceleratedMove(
+        length: number,
+        velocity: number,
+        /*lastVelocity,*/ acceleration: number,
+    ): number {
         // taken from https://github.com/slic3r/Slic3r
         // for half of the move, there are 2 zones, where the speed is increasing/decreasing and
         // where the speed is constant.
@@ -1488,7 +1483,7 @@ class GCodeVirtualizer extends EventEmitter {
         return 2 * time; // cut in half before, so double to get full time spent.
     }
 
-    getData() {
+    getData(): { data: Data; estimates: number[] } {
         this.data.pop(); // get rid of the last entry, as it is a temp one with null values
         return {
             data: this.data,
@@ -1496,39 +1491,39 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    getModalChanges() {
+    getModalChanges(): ModalChanges {
         this.modalChanges[this.modalChanges.length - 1].count =
             this.modalCounter;
         this.modalCounter = 0;
         return this.modalChanges;
     }
 
-    getFeedrateChanges() {
+    getFeedrateChanges(): FeedrateChanges {
         this.feedrateChanges[this.feedrateChanges.length - 1].count =
             this.feedrateCounter;
         this.feedrateCounter = 0;
         return this.feedrateChanges;
     }
 
-    getCurrentModal() {
+    getCurrentModal(): Modal {
         return this.modal;
     }
 
-    saveModal(change) {
+    saveModal(change: Partial<Modal>): void {
         this.modalChanges[this.modalChanges.length - 1].count =
             this.modalCounter;
         this.modalCounter = 0;
         this.modalChanges.push({ change: change, count: 0 });
     }
 
-    saveFeedrate(change) {
+    saveFeedrate(change: string): void {
         this.feedrateChanges[this.feedrateChanges.length - 1].count =
             this.feedrateCounter;
         this.feedrateCounter = 0;
         this.feedrateChanges.push({ change: change, count: 0 });
     }
 
-    addToTotalTime(time) {
+    addToTotalTime(time: number): void {
         if (!Number(time)) {
             return;
         }

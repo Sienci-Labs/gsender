@@ -49,7 +49,6 @@ interface Props {
 const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     const { total, received, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
-    console.log(elapsedTime);
 
     const getFinishTime = (givenTime: number): string => {
         if (startTime === 0 || !givenTime || givenTime < 0) {
