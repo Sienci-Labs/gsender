@@ -4,10 +4,12 @@ import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import ControlButton from './ControlButton';
-import { PAUSE, START, STOP } from '../../constants';
+import { GRBL_ACTIVE_STATE_IDLE, PAUSE, START, STOP } from '../../constants';
 import Overrides from './FeedOverride';
 import OutlineButton from './OutlineButton';
 import StartFromLine from './StartFromLine';
+import ProgressArea from './ProgressArea';
+import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
@@ -18,6 +20,7 @@ interface JobControlProps {
     ovS: number;
     feedrate: string;
     spindle: string;
+    senderStatus: SenderStatus;
 }
 
 const JobControl: React.FC<JobControlProps> = ({
@@ -29,39 +32,52 @@ const JobControl: React.FC<JobControlProps> = ({
     ovS,
     feedrate,
     spindle,
+    senderStatus,
 }) => {
     const disabled = !isConnected || !fileLoaded;
 
     return (
         <div className="relative h-full">
+            <div className="z-10 absolute top-[-160px] flex flex-col justify-center items-center w-full">
+                {isConnected &&
+                    fileLoaded &&
+                    activeState !== GRBL_ACTIVE_STATE_IDLE && (
+                        <ProgressArea
+                            senderStatus={senderStatus}
+                        ></ProgressArea>
+                    )}
+            </div>
             <div className="bg-transparent z-10 absolute top-[-60px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                <div className="flex flex-row gap-2 justify-center mb-3">
-                    <OutlineButton disabled={disabled} />
-                    <StartFromLine disabled={disabled} />
-                </div>
-                <div className="flex flex-row gap-2 justify-center ">
-                    <ControlButton
-                        type={START}
-                        workflow={workflow}
-                        activeState={activeState}
-                        isConnected={isConnected}
-                        fileLoaded={fileLoaded}
-                    />
-                    <ControlButton
-                        type={PAUSE}
-                        workflow={workflow}
-                        activeState={activeState}
-                        isConnected={isConnected}
-                        fileLoaded={fileLoaded}
-                    />
-                    <ControlButton
-                        type={STOP}
-                        workflow={workflow}
-                        activeState={activeState}
-                        isConnected={isConnected}
-                        fileLoaded={fileLoaded}
-                    />
-                </div>
+                {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
+                    <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                        <OutlineButton disabled={disabled} />
+                        <StartFromLine disabled={disabled} />
+                    </div>
+                )}
+            </div>
+
+            <div className="z-10 absolute top-[-10px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
+                <ControlButton
+                    type={START}
+                    workflow={workflow}
+                    activeState={activeState}
+                    isConnected={isConnected}
+                    fileLoaded={fileLoaded}
+                />
+                <ControlButton
+                    type={PAUSE}
+                    workflow={workflow}
+                    activeState={activeState}
+                    isConnected={isConnected}
+                    fileLoaded={fileLoaded}
+                />
+                <ControlButton
+                    type={STOP}
+                    workflow={workflow}
+                    activeState={activeState}
+                    isConnected={isConnected}
+                    fileLoaded={fileLoaded}
+                />
             </div>
             <Widget>
                 <Widget.Content className="flex justify-center items-center flex-col">
@@ -90,6 +106,7 @@ export default connect((store) => {
     const ovS = ov[2];
     const feedrate = get(store, 'controller.state.status.feedrate');
     const spindle = get(store, 'controller.state.status.spindle');
+    const senderStatus = get(store, 'controller.sender.status');
 
     return {
         fileLoaded,
@@ -100,5 +117,6 @@ export default connect((store) => {
         ovS,
         feedrate,
         spindle,
+        senderStatus,
     };
 })(JobControl);

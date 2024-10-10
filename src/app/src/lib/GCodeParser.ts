@@ -3,13 +3,13 @@
 // import { parseLine } from 'gcode-parser';
 
 interface ParseLineOptions {
-    flatten?: boolean;
+    // flatten?: boolean;
     noParseLine?: boolean;
 }
 
 interface ParseLineResult {
     line: string;
-    words: Array<string | [string, string | number]>;
+    words: [string, any][];
     ln?: number;
     cs?: number;
     cmds?: string[];
@@ -49,7 +49,7 @@ export const parseLine = (
     const re =
         /(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/gim;
 
-    options.flatten = !!options.flatten;
+    // options.flatten = !!options.flatten;
     options.noParseLine = !!options.noParseLine;
 
     const result: ParseLineResult = {
@@ -109,11 +109,11 @@ export const parseLine = (
             value = argument;
         }
 
-        if (options.flatten) {
-            result.words.push(letter + value);
-        } else {
-            result.words.push([letter, value]);
-        }
+        // if (options.flatten) {
+        //     result.words.push(letter + value);
+        // } else {
+        result.words.push([letter, String(value)]);
+        // }
     }
 
     // Line number
