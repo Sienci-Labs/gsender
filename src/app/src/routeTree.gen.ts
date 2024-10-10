@@ -80,12 +80,54 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexLazyRoute,
-  ConfigurationLazyRoute,
-  StatsLazyRoute,
-  ToolsLazyRoute,
-})
+export interface FileRoutesByFullPath {
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+export interface FileRoutesByTo {
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+export interface FileRoutesById {
+  __root__: typeof rootRoute
+  '/': typeof IndexLazyRoute
+  '/configuration': typeof ConfigurationLazyRoute
+  '/stats': typeof StatsLazyRoute
+  '/tools': typeof ToolsLazyRoute
+}
+
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/configuration' | '/stats' | '/tools'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/configuration' | '/stats' | '/tools'
+  id: '__root__' | '/' | '/configuration' | '/stats' | '/tools'
+  fileRoutesById: FileRoutesById
+}
+
+export interface RootRouteChildren {
+  IndexLazyRoute: typeof IndexLazyRoute
+  ConfigurationLazyRoute: typeof ConfigurationLazyRoute
+  StatsLazyRoute: typeof StatsLazyRoute
+  ToolsLazyRoute: typeof ToolsLazyRoute
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexLazyRoute: IndexLazyRoute,
+  ConfigurationLazyRoute: ConfigurationLazyRoute,
+  StatsLazyRoute: StatsLazyRoute,
+  ToolsLazyRoute: ToolsLazyRoute,
+}
+
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 

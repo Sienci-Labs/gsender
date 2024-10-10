@@ -22,23 +22,30 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import { FaExclamation } from 'react-icons/fa';
-import styles from '../index.module.styl';
+import styles from '../../index.module.styl';
 
-const ActiveIndicator = ({ canClick, active = true }) => {
+const Tool = ({ metricDiameter, imperialDiameter, type, onDelete }) => {
     return (
-        <div className="flex items-center w-full justify-end">
-            <small>{active ? 'Active' : 'Not Active'}</small>
-            <div
-                className={cx(styles['active-indicator'], {
-                    [styles['active-indicator-on']]: active,
-                })}
-            >
-                {active && <FaExclamation className={styles['active-pulse']} />}
+        <div className={styles.tool}>
+            <div className={styles.toolDimensions}>
+                <div>
+                    <b>{metricDiameter}</b>mm
+                </div>
+                <div>
+                    <b>{imperialDiameter}</b>in
+                </div>
             </div>
+            <div>{type}</div>
+            <button
+                type="button"
+                className={styles.delete}
+                alt="Delete Tool"
+                onClick={onDelete}
+            >
+                <i className="far fa-trash-alt" />
+            </button>
         </div>
     );
 };
 
-export default ActiveIndicator;
+export default Tool;

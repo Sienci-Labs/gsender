@@ -1,13 +1,16 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute } from '@tanstack/react-router';
+import Preferences from 'app/features/Preferences';
+import { UpdateAlert } from 'app/components/UpdateAlert';
 
 export const Route = createLazyFileRoute('/configuration')({
-  component: Configuration
-})
+    component: Configuration,
+});
 
 function Configuration() {
-  return (
-      <div>
-        Configuration tools
-      </div>
-  );
+    return (
+        <div className="flex justify-center items-center flex-col">
+            <UpdateAlert />
+            <Preferences />
+        </div>
+    );
 }

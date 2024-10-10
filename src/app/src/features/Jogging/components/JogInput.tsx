@@ -7,7 +7,7 @@ interface JogInputProps {
 }
 export function JogInput({ label, currentValue }: JogInputProps) {
     return (
-        <div className="flex flex-row justify-between gap-4">
+        <div className="flex flex-row justify-between items-center gap-4">
             <Label className="text-right">{label}</Label>
             <input
                 className="w-[8ch] border border-gray-200 rounded px-2 text-gray-500"

@@ -23,23 +23,23 @@
 
 import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
-import { FaMinus, FaPlus, FaRedo } from "react-icons/fa";
+import { FaMinus, FaPlus, FaRedo } from 'react-icons/fa';
 import cx from 'classnames';
 
 export interface RangeSliderProps {
-    [key: string]: any,
-    title?: string,
-    step?: number,
-    min?: number,
-    max?: number,
-    percentage: number[],
-    defaultPercentage?: number[],
-    value: string
-    showText: boolean // optional parameter to show text representations of the percentage and to show title
-    onChange?: (percentage: number[]) => void,
-    onButtonPress?: (percentage: number[]) => void,
-    onPointerUp?: PointerEventHandler<HTMLInputElement>,
-    unitString?: string,
+    [key: string]: any;
+    title?: string;
+    step?: number;
+    min?: number;
+    max?: number;
+    percentage: number[];
+    defaultPercentage?: number[];
+    value: string;
+    showText: boolean; // optional parameter to show text representations of the percentage and to show title
+    onChange?: (percentage: number[]) => void;
+    onButtonPress?: (percentage: number[]) => void;
+    onPointerUp?: PointerEventHandler<HTMLInputElement>;
+    unitString?: string;
 }
 
 const RangeSlider = ({
@@ -51,7 +51,7 @@ const RangeSlider = ({
     value,
     defaultPercentage = [...percentage],
     showText,
-    colour = 'blue',
+    colour = 'bg-blue-400',
     onChange = null,
     onButtonPress = null,
     onPointerUp = null,
@@ -60,12 +60,16 @@ const RangeSlider = ({
     ...props
 }: RangeSliderProps): React.JSX.Element => {
     const textComponent = showText ? (
-            <div className="flex flex-row items-center justify-between w-full px-4">
-                <span className="min-w-4 text-right">{title}</span>
-                { !disabled && <span className="min-w-4 text-right text-blue-500">{`${value} ${unitString}`}</span> }
-                <span className="min-w-4 text-right">{`${percentage[0]}%`}</span>
-            </div>
-        ) : <div></div>;
+        <div className="flex flex-row items-center justify-between w-full px-4">
+            <span className="min-w-4 text-right">{title}</span>
+            {!disabled && (
+                <span className="min-w-4 text-right text-blue-500">{`${value} ${unitString}`}</span>
+            )}
+            <span className="min-w-4 text-right">{`${percentage[0]}%`}</span>
+        </div>
+    ) : (
+        <div></div>
+    );
     return (
         <div className="flex flex-col items-center gap-2 justify-center w-full">
             {textComponent}
@@ -73,11 +77,11 @@ const RangeSlider = ({
                 <button
                     type="button"
                     className={cx(
-                        "flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        'flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black',
                         {
-                            "border-blue-400 bg-white": !disabled,
-                            "border-gray-400 bg-gray-300": disabled
-                        }
+                            'border-blue-400 bg-white': !disabled,
+                            'border-gray-400 bg-gray-300': disabled,
+                        },
                     )}
                     onClick={() => onButtonPress(defaultPercentage)}
                     disabled={disabled}
@@ -96,23 +100,21 @@ const RangeSlider = ({
                     disabled={disabled}
                     {...props}
                 >
-                    <Slider.Track
-                        className="h-4 bg-gray-400 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
-                    >
-                        <Slider.Range className={`absolute h-full rounded-full bg-[${colour}]`}/>
+                    <Slider.Track className="h-4 bg-gray-400 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]">
+                        <Slider.Range
+                            className={`absolute h-full rounded-full ${colour}`}
+                        />
                     </Slider.Track>
-                    <Slider.Thumb 
-                        className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none"
-                    />
+                    <Slider.Thumb className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none" />
                 </Slider.Root>
                 <button
                     type="button"
                     className={cx(
-                        "flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        'flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black',
                         {
-                            "border-blue-400 bg-white": !disabled,
-                            "border-gray-400 bg-gray-300": disabled
-                        }
+                            'border-blue-400 bg-white': !disabled,
+                            'border-gray-400 bg-gray-300': disabled,
+                        },
                     )}
                     onClick={() => {
                         if (percentage[0] - step < min) {
@@ -128,11 +130,11 @@ const RangeSlider = ({
                 <button
                     type="button"
                     className={cx(
-                        "flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black",
+                        'flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border-[1px] bg-opacity-60 text-black',
                         {
-                            "border-blue-400 bg-white": !disabled,
-                            "border-gray-400 bg-gray-300": disabled
-                        }
+                            'border-blue-400 bg-white': !disabled,
+                            'border-gray-400 bg-gray-300': disabled,
+                        },
                     )}
                     onClick={() => {
                         if (percentage[0] + step > max) {

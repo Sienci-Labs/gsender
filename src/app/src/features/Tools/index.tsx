@@ -1,12 +1,10 @@
 import { Widget } from '../../components/Widget';
 import { Tabs } from '../../components/Tabs';
+import Coolant from 'app/features/Coolant';
+import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 import Console from '../Console';
 import Probe from '../Probe';
 import Spindle from '../Spindle';
-
-const Coolant = () => {
-    return <div>Coolant</div>;
-};
 
 const Rotary = () => {
     return <div>Rotary</div>;

@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from 'tailwindcss';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { patchCssModules } from 'vite-css-modules';
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
@@ -11,6 +12,11 @@ export default defineConfig({
     css: {
         postcss: {
             plugins: [tailwindcss()],
+        },
+        preprocessorOptions: { stylus: { modules: true } },
+        modules: {
+            // Enable CSS Modules for all .scss files
+            localsConvention: 'camelCaseOnly',
         },
     },
     plugins: [
@@ -23,7 +29,8 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         react(),
-        tailwindcss()
+        patchCssModules(),
+        tailwindcss(),
     ],
     resolve: {
         alias: {
@@ -33,5 +40,8 @@ export default defineConfig({
     },
     define: {
         'process.env': {},
+    },
+    optimizeDeps: {
+        include: ['**/*.styl'],
     },
 });
