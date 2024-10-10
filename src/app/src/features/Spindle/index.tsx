@@ -22,7 +22,6 @@ import {
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
-import styles from './index.module.styl';
 import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
@@ -621,42 +620,37 @@ const SpindleWidget = () => {
 
     return (
         <Widget>
-            <div className={styles.modalWrapper}>
-                <div>
-                    <div className="flex gap-2 justify-center">
-                        <ModalToggle
-                            mode={givenMode}
-                            onChange={actions.handleModeToggle}
-                            disabled={!canClick()}
-                        />
-                        <ActiveIndicator
-                            canClick={canClick()}
-                            active={active}
-                        />
-                    </div>
-                    {controllerType === GRBLHAL && (
-                        <SpindleSelector
-                            spindles={availableSpindles}
-                            onChange={actions.handleHALSpindleSelect}
-                            spindle={state.spindle}
-                        />
-                    )}
+            <div>
+                <div className="flex gap-2 justify-center">
+                    <ModalToggle
+                        mode={givenMode}
+                        onChange={actions.handleModeToggle}
+                        disabled={!canClick()}
+                    />
+                    <ActiveIndicator active={active} />
                 </div>
-                <div>
-                    {!laserAsSpindle ? (
-                        <SpindleControls
-                            state={state}
-                            actions={actions}
-                            canClick={canClick()}
-                        />
-                    ) : (
-                        <LaserControls
-                            state={state}
-                            actions={actions}
-                            canClick={canClick()}
-                        />
-                    )}
-                </div>
+                {controllerType === GRBLHAL && (
+                    <SpindleSelector
+                        spindles={availableSpindles}
+                        onChange={actions.handleHALSpindleSelect}
+                        spindle={state.spindle}
+                    />
+                )}
+            </div>
+            <div>
+                {!laserAsSpindle ? (
+                    <SpindleControls
+                        state={state}
+                        actions={actions}
+                        canClick={canClick()}
+                    />
+                ) : (
+                    <LaserControls
+                        state={state}
+                        actions={actions}
+                        canClick={canClick()}
+                    />
+                )}
             </div>
         </Widget>
     );
