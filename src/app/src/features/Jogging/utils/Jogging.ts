@@ -74,7 +74,7 @@ export function yMinusJog(
     feed: number,
     continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance * -1 }, feed, continuous);
+    startJogCommand({ Y: distance * -1 }, feed, continuous);
 }
 
 export function zPlusJog(

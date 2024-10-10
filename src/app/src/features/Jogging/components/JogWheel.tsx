@@ -2,6 +2,9 @@ import { useLongPress } from 'use-long-press';
 import {
     stopContinuousJog,
     xPlusJog,
+    yPlusJog,
+    xMinusJog,
+    yMinusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
 
 export interface JogWheelProps {
@@ -14,10 +17,22 @@ export function JogWheel(props: JogWheelProps) {
         onCancel: () => xPlusJog(10, 5000, false),
         onFinish: stopContinuousJog,
     });
-    const xMinusJogHandlers = useLongPress(
-        () => xMinusJogHandlers(1, 5000, true),
-        { threshold: 200, onFinish: stopContinuousJog },
-    );
+    const xMinusJogHandlers = useLongPress(() => xMinusJog(1, 5000, true), {
+        threshold: 200,
+        onCancel: () => xMinusJog(10, 5000, false),
+        onFinish: stopContinuousJog,
+    });
+
+    const yPlusJogHandlers = useLongPress(() => yPlusJog(1, 5000, true), {
+        threshold: 200,
+        onCancel: () => yPlusJog(10, 5000, false),
+        onFinish: stopContinuousJog,
+    });
+    const yMinusJogHandlers = useLongPress(() => yMinusJog(1, 5000, true), {
+        threshold: 200,
+        onCancel: () => yMinusJog(10, 5000, false),
+        onFinish: stopContinuousJog,
+    });
 
     return (
         <svg
@@ -50,19 +65,25 @@ export function JogWheel(props: JogWheelProps) {
                 className="hover:fill-blue-400"
             />
             <path
+                id="yMinus"
                 d="M138.268 192.388C126.136 197.413 113.132 200 100 200C86.8678 200 73.8642 197.413 61.7316 192.388L100 100L138.268 192.388Z"
                 fill="#3F85C7"
                 className="hover:fill-blue-600 transition duration-200"
+                {...yMinusJogHandlers}
             />
             <path
+                id="xMinus"
                 d="M7.61205 138.268C2.58658 126.136 -1.14805e-06 113.132 0 100C1.14805e-06 86.8678 2.58658 73.8642 7.61206 61.7316L100 100L7.61205 138.268Z"
                 fill="#3F85C7"
                 className="hover:fill-blue-600 transition duration-200"
+                {...xMinusJogHandlers}
             />
             <path
+                id="yPlus"
                 d="M61.7316 7.61205C73.8642 2.58658 86.8678 -1.566e-07 100 0C113.132 1.566e-07 126.136 2.58658 138.268 7.61205L100 100L61.7316 7.61205Z"
                 fill="#3F85C7"
                 className="hover:fill-blue-600 transition duration-200"
+                {...yPlusJogHandlers}
             />
             <path
                 id="xPlus"

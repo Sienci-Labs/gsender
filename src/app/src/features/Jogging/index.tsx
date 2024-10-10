@@ -3,7 +3,6 @@ import jogTab from './assets/tabs.svg';
 import zLabels from './assets/zlabels.svg';
 import aLabels from './assets/aLabels.svg';
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
-import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
 import { useState, useEffect } from 'react';
 import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
