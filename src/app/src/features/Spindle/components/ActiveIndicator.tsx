@@ -21,21 +21,31 @@
  *
  */
 
-import React from 'react';
 import cx from 'classnames';
 import { FaExclamation } from 'react-icons/fa';
-import styles from '../index.module.styl';
 
-const ActiveIndicator = ({ canClick, active = true }) => {
+type Props = {
+    active?: boolean;
+};
+
+const ActiveIndicator = ({ active = true }: Props) => {
     return (
         <div className="flex items-center w-full justify-end">
-            <small>{active ? 'Active' : 'Not Active'}</small>
+            <small className="text-gray-400 text-sm mr-2">
+                {active ? 'Active' : 'Not Active'}
+            </small>
             <div
-                className={cx(styles['active-indicator'], {
-                    [styles['active-indicator-on']]: active,
-                })}
+                className={cx(
+                    'w-8 h-8 rounded-full ml-4 border flex items-center justify-center',
+                    {
+                        'bg-red-600 border-red-700 animate-pulse': active,
+                        'bg-gray-400 border-gray-500': !active,
+                    },
+                )}
             >
-                {active && <FaExclamation className={styles['active-pulse']} />}
+                {active && (
+                    <FaExclamation className="text-white animate-bounce" />
+                )}
             </div>
         </div>
     );
