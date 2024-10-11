@@ -18,7 +18,7 @@ function jogAxis(params: JogDistances, feedrate: number) {
     controller.command('gcode', commands);
 }
 
-function continuousJogAxis() {}
+function continuousJogAxis(axes: JogDistances, feedrate: number) {}
 
 export function stopContinuousJog() {
     controller.command('jog:stop');
