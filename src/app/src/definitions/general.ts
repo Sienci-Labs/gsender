@@ -1,5 +1,4 @@
-import { GRBL_ACTIVE_STATES, GRBL_HAL_ACTIVE_STATES } from "../constants";
-
+import { GRBL_ACTIVE_STATES, GRBL_HAL_ACTIVE_STATES } from '../constants';
 
 // Types
 
@@ -12,39 +11,38 @@ export type GRBL_ACTIVE_STATES_T =
 export type GRBL_HAL_ACTIVE_STATES_T =
     (typeof GRBL_HAL_ACTIVE_STATES)[keyof typeof GRBL_HAL_ACTIVE_STATES];
 
-
 // Inerfaces
 
 export interface BasicObject {
-    [key: string]: string | number | boolean | Array<any> | BasicObject,
-};
+    [key: string]: string | number | boolean | Array<any> | BasicObject;
+}
 
 export interface BasicPosition {
-    x: number,
-    y: number,
-    z: number,
-    a?: number,
+    x: number;
+    y: number;
+    z: number;
+    a?: number;
     b?: number;
     c?: number;
-};
+}
 
 export interface BBox {
     min: {
-        x: number,
-        y: number,
-        z: number,
-    },
+        x: number;
+        y: number;
+        z: number;
+    };
     max: {
-        x: number,
-        y: number,
-        z: number,
-    },
-    delta: {
-        x: number,
-        y: number,
-        z: number,
-    }
-};
+        x: number;
+        y: number;
+        z: number;
+    };
+    delta?: {
+        x: number;
+        y: number;
+        z: number;
+    };
+}
 
 export interface Shuttle {
     feedrateMin: number;
