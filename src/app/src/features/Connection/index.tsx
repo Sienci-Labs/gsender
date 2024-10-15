@@ -114,7 +114,8 @@ function Connection(props: ConnectionProps) {
                 {connectionState == ConnectionState.CONNECTED && (
                     <ConnectionInfo port={activePort} firmwareType="grblHAL" />
                 )}
-                {connectionState == ConnectionState.DISCONNECTED && (
+                {(connectionState == ConnectionState.DISCONNECTED ||
+                    connectionState === ConnectionState.ERROR) && (
                     <PortListings
                         connectHandler={onConnectClick}
                         ports={props.ports}

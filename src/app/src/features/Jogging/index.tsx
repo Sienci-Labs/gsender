@@ -35,8 +35,6 @@ export function Jogging() {
     }, []);
 
     function updateJogValues(values: JogValueObject) {
-        console.log(values);
-        // Do converting if needed here
         setJogSpeed(values);
     }
 
