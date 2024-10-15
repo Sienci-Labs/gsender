@@ -1,63 +1,51 @@
+import React from 'react';
+
+import Toggle from './Toggle';
 import { cn } from 'app/lib/utils';
 
-type Props = {
-    checked?: boolean;
-    onChange: (checked: boolean) => void;
-    disabled?: boolean;
+interface SwitchProps {
     label?: string;
+    checked?: boolean;
+    onChange: (
+        checked: boolean,
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => void;
     className?: string;
-    position?: 'horizontal' | 'vertical';
-};
+    disabled?: boolean;
+    onColor?: string;
+    secondaryLabel?: string;
+    value?: number;
+    id?: string;
+}
 
-const Switch = ({
+const Switch: React.FC<SwitchProps> = ({
+    label,
     checked = false,
     onChange,
-    label,
-    position = 'horizontal',
+    className,
     disabled = false,
-}: Props) => {
-    const isVertical = position === 'vertical';
-
+    onColor = '#295d8d',
+    secondaryLabel,
+    value,
+    id,
+}) => {
     return (
-        <>
-            <label
+        <div className={cn('flex items-center', className)}>
+            {label && <span className="mr-2">{label}</span>}
+            <Toggle
+                id={id}
+                checked={checked}
+                onChange={onChange}
+                value={value}
+                disabled={disabled}
                 className={cn(
-                    'inline-flex',
-                    disabled
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'cursor-pointer',
-                    isVertical ? 'flex-col' : 'items-center',
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    checked ? `bg-[${onColor}]` : 'bg-gray-200',
+                    disabled && 'opacity-50 cursor-not-allowed',
                 )}
-            >
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => onChange(e.target.checked)}
-                    className="sr-only peer"
-                    disabled={disabled}
-                />
-                <div
-                    className={cn(
-                        "relative bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:border-white after:content-[''] after:absolute after:bg-white after:border-gray-300 after:border after:rounded-full after:transition-all dark:border-gray-600 peer-checked:bg-blue-600",
-                        isVertical
-                            ? 'w-6 h-11 peer-checked:after:translate-y-[-100%] after:left-[2px] after:bottom-[2px] after:h-5 after:w-5'
-                            : 'w-11 h-6 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:top-[2px] after:start-[2px] after:h-5 after:w-5',
-                        disabled && 'opacity-50 cursor-not-allowed',
-                    )}
-                ></div>
-                {label && (
-                    <span
-                        className={cn(
-                            'text-sm font-normal text-gray-900 dark:text-gray-900',
-                            isVertical ? 'mt-3' : 'ms-3',
-                            disabled && 'opacity-50',
-                        )}
-                    >
-                        {label}
-                    </span>
-                )}
-            </label>
-        </>
+            />
+            {secondaryLabel && <span className="ml-2">{secondaryLabel}</span>}
+        </div>
     );
 };
 
