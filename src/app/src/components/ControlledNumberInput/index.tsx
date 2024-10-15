@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { METRIC_UNITS } from '../../constants';
 import store from '../../store';
 import { round } from '../../lib/rounding';
@@ -29,7 +29,7 @@ import { round } from '../../lib/rounding';
 export interface ControlledNumberInputProps {
     className?: string;
     value: number | string;
-    externalOnChange?: () => void;
+    externalOnChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     max?: number;
     min?: number;
     hasRounding?: boolean;
@@ -54,7 +54,7 @@ export function ControlledNumberInput({
     const [localValue, setLocalValue] = useState(value);
     const units = store.get('workspace.units', METRIC_UNITS);
 
-    const updateLocalValue = (value) => {
+    const updateLocalValue = (value: number | string) => {
         if (hasRounding) {
             setLocalValue(round(value, units));
         } else {
@@ -62,7 +62,7 @@ export function ControlledNumberInput({
         }
     };
 
-    const updateOriginalValue = (value) => {
+    const updateOriginalValue = (value: number | string) => {
         if (hasRounding) {
             setOriginalValue(round(value, units));
         } else {
@@ -80,7 +80,7 @@ export function ControlledNumberInput({
         //inputRef.current.select();
     };
 
-    const onBlur = (e) => {
+    const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         const current = inputRef.current.value;
         if (localValue && localValue !== originalValue) {
             if (current < min) {
@@ -98,7 +98,7 @@ export function ControlledNumberInput({
         }
     };
 
-    const onKeyDown = (e) => {
+    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Escape') {
             updateLocalValue(originalValue);
             inputRef.current.blur();
@@ -107,14 +107,14 @@ export function ControlledNumberInput({
         }
     };
 
-    const onChange = (e) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         updateLocalValue(inputRef.current.value);
         if (externalOnChange) {
             externalOnChange(e);
         }
     };
 
-    const localChange = (e) => {
+    const localChange = () => {
         setLocalValue(inputRef.current.value); // no rounding on change
     };
 
