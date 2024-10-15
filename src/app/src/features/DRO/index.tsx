@@ -19,9 +19,16 @@ import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import store from 'app/store';
-import { METRIC_UNITS } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    METRIC_UNITS,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import { mapValues } from 'lodash';
 import { mapPositionToUnits } from 'app/lib/units.ts';
+import { useCallback } from 'react';
+import includes from 'lodash/includes';
 
 interface DROProps {
     axes: AxesArray;
@@ -30,6 +37,9 @@ interface DROProps {
     unitLabel: string;
     homingEnabled: boolean;
     canClick: boolean;
+    workflowState: string;
+    isConnected: boolean;
+    activeState: string;
 }
 
 function DRO({
@@ -37,9 +47,25 @@ function DRO({
     mpos,
     wpos,
     homingEnabled,
+    workflowState,
     unitLabel,
-    canClick,
+    isConnected,
+    activeState,
 }: DROProps): JSX.Element {
+    console.log(isConnected);
+    console.log(workflowState);
+    console.log(activeState);
+    const canClick = useCallback((): boolean => {
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    }, [isConnected, workflowState, activeState])();
+
+    console.log(canClick);
+
     return (
         <div>
             <div className="w-full min-h-10 flex flex-row align-bottom justify-between mb-2 px-4">
@@ -107,14 +133,22 @@ export default connect((reduxStore) => {
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 
-    const canClick = true;
+    const workflowState = get(reduxStore, 'controller.workflow.state', 'idle');
+    const activeState = get(
+        store,
+        'controller.state.status.activeState',
+        'Idle',
+    );
+    const isConnected = get(reduxStore, 'connection.isConnected', false);
 
     return {
+        isConnected,
         homingEnabled,
         axes,
         wpos,
         mpos,
         unitLabel,
-        canClick,
+        workflowState,
+        activeState,
     };
 })(DRO);
