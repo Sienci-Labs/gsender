@@ -5,18 +5,25 @@ import {
     yPlusJog,
     xMinusJog,
     yMinusJog,
+    JogDistances,
+    continuousJogAxis,
 } from 'app/features/Jogging/utils/Jogging.ts';
 
 export interface JogWheelProps {
     canClick?: boolean;
+    feedrate: number;
+    distance: number;
 }
 
 export function JogWheel(props: JogWheelProps) {
-    const xPlusJogHandlers = useLongPress(() => xPlusJog(1, 5000, true), {
-        threshold: 200,
-        onCancel: () => xPlusJog(10, 5000, false),
-        onFinish: stopContinuousJog,
-    });
+    const xPlusJogHandlers = useLongPress(
+        () => continuousJogAxis({ X: 1 }, props.feedrate),
+        {
+            threshold: 200,
+            onCancel: () => xPlusJog(10, 5000, false),
+            onFinish: stopContinuousJog,
+        },
+    );
     const xMinusJogHandlers = useLongPress(() => xMinusJog(1, 5000, true), {
         threshold: 200,
         onCancel: () => xMinusJog(10, 5000, false),

@@ -6,6 +6,8 @@ import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
 import { useState, useEffect } from 'react';
 import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
+import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
+import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 
 export function Jogging() {
     const [jogSpeed, setJogSpeed] = useState({
@@ -28,29 +30,18 @@ export function Jogging() {
         <>
             <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center select-none">
                 <div className="min-w-[200px] relative">
-                    <JogWheel />
+                    <JogWheel
+                        distance={jogSpeed.xyStep}
+                        feedrate={jogSpeed.feedrate}
+                    />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
                     />
                 </div>
-                <div id="zJog" className="relative">
-                    <img src={jogTab} alt="Z jog tab" />
-                    <img
-                        src={zLabels}
-                        alt="Z jog labels"
-                        className="absolute top-0 left-0 pointer-events-none"
-                    />
-                </div>
-                <div id="aJog" className="relative">
-                    <img src={jogTab} alt="A Jog tab" />
-                    <img
-                        src={aLabels}
-                        alt="A Labels tab"
-                        className="absolute top-1 right-1 pointer-events-none"
-                    />
-                </div>
+                <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />
+                <AJog distance={jogSpeed.aStep} feedrate={jogSpeed.feedrate} />
             </div>
             <div className="flex flex-row justify-between flex-shrink">
                 <div className="grid grid-cols-2 gap-1">

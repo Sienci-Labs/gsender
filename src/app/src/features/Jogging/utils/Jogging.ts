@@ -18,7 +18,10 @@ function jogAxis(params: JogDistances, feedrate: number) {
     controller.command('gcode', commands);
 }
 
-function continuousJogAxis(axes: JogDistances, feedrate: number) {}
+export function continuousJogAxis(axes: JogDistances, feedrate: number) {
+    const units = 'G21';
+    controller.command('jog:start', axes, feedrate, units);
+}
 
 export function stopContinuousJog() {
     controller.command('jog:stop');
@@ -33,13 +36,18 @@ export interface JogDistances {
     C?: number;
 }
 
+export interface JoggerProps {
+    distance: number;
+    feedrate: number;
+}
+
 export function startJogCommand(
     axes: JogDistances,
     feed: number,
     continuous: boolean,
 ) {
     if (continuous) {
-        controller.command();
+        continuousJogAxis(axes, feed);
     } else {
         jogAxis(axes, feed);
     }
@@ -106,5 +114,5 @@ export function aMinusJog(
     feed: number,
     continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance * -1 }, feed, continuous);
+    startJogCommand({ A: distance * -1 }, feed, continuous);
 }
