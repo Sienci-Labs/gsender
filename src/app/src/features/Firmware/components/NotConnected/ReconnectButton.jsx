@@ -22,21 +22,31 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import styles from './index.styl';
-
-
-const ToolModalButton = ({ className, icon = 'fas fa-info', children, ...props }) => {
+import Tooltip from 'app/components/ToolTip';
+import { Button } from 'app/components/Button';
+import PropType from 'prop-types';
+const ReconnectButton = ({ onClick, disabled = false }) => {
     return (
-        <button type="button" className={cx(styles.toolModalButton, className)} {...props}>
-            <div className={styles.toolModalButtonIcon}>
-                <i className={icon} />
-            </div>
-            <div className={styles.toolModalButtonContent}>
-                {children}
-            </div>
-        </button>
+        <Tooltip
+            content="Connects to the last active machine"
+            location="default"
+            wrapperStyle={{ width: '20rem' }}
+        >
+            <Button
+                icon="fas fa-plug"
+                onClick={onClick}
+                disabled={disabled}
+                color="primary"
+            >
+                Connect to last active port
+            </Button>
+        </Tooltip>
     );
 };
 
-export default ToolModalButton;
+ReconnectButton.propTypes = {
+    onClick: PropType.func.isRequired,
+    disabled: PropType.bool,
+};
+
+export default ReconnectButton;

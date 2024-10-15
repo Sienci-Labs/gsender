@@ -8,6 +8,7 @@ import { sagaMiddleware } from 'app/store/redux/sagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
+import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { createRouter } from './router';
 
 const router = createRouter();
@@ -39,6 +40,7 @@ function App() {
     return (
         <>
             <ReduxProvider store={reduxStore}>
+                <ConfirmationDialog />
                 <RouterProvider router={router} />
             </ReduxProvider>
         </>

@@ -22,12 +22,24 @@
  */
 
 import pubsub from 'pubsub-js';
+import { ReactNode } from 'react';
 
 export const DIALOG_CONFIRM = 'confirm';
 export const DIALOG_CANCEL = 'cancel';
 export const DIALOG_INVERT = 'invert';
 
-export const Confirm = (options = {}) => {
+interface ConfirmOptions {
+    title?: string;
+    buttons?: string[];
+    content?: ReactNode;
+    onClose?: () => void;
+    onConfirm?: () => void;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    show?: boolean;
+}
+
+export const Confirm = (options: ConfirmOptions = {}): void => {
     const {
         title = 'Confirm',
         buttons = [],
@@ -38,14 +50,15 @@ export const Confirm = (options = {}) => {
         cancelLabel = 'Cancel',
         show = true,
     } = options;
+
     pubsub.publish('dialog:new', {
-        title: title,
-        buttons: buttons,
-        content: content,
-        onClose: onClose,
-        onConfirm: onConfirm,
-        confirmLabel: confirmLabel,
-        cancelLabel: cancelLabel,
-        show: show
+        title,
+        buttons,
+        content,
+        onClose,
+        onConfirm,
+        confirmLabel,
+        cancelLabel,
+        show,
     });
 };

@@ -21,51 +21,58 @@
  *
  */
 
-.tool-modal-button {
-  width: 100%;
-  background: #fff;
-  border: solid 1px #3e85c7;
-  --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  border-radius: 0.25rem;
-  color: #3e85c7;
+.input-wrapper {
+  min-width: 100px;
   display: flex;
   flex-direction: row;
-  padding: 0;
+  width: 100%;
   align-items: stretch;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  flex-grow: 1;
+  border: 1px solid #d8d8d8;
+  height: 2.25rem;
 
-  &:hover {
-    background: #F3F4F6;
-  }
+  input {
+    text-align: center;
+    width: 75%;
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    border: none;
 
-  &:disabled {
-    background-color: rgba(0, 0, 0, 0.15);
-    color: rgba(0, 0, 0, 0.3);
-    border: solid 1px rgba(0, 0, 0, 0.15);
-    cursor: not-allowed;
+    &:focus {
+      outline: none;
+    }
   }
 }
 
-.tool-modal-button-content {
-  padding: 1rem 0;
+.control-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  span {
+    font-weight: bold;
+  }
+
+  button + button {
+    margin-left: 0;
+  }
+}
+
+.step-button {
+  border: none;
+  position: relative;
+  text-align: center;
+  width: 30px;
+  font-size: 10px;
+  outline: none;
   display: flex;
   flex-grow: 1;
+  margin: 0;
+  padding: 0
   justify-content: center;
-}
-
-.tool-modal-button-icon {
-  width: 3rem;
-  background: #3e85c7;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  margin-right: 0.5rem;
-  flex-direction column;
-
-  i {
-    color: #FFFFFF;
-    font-size: 1.6rem;
-  }
+  align-items: center;
+  border-radius: 0;
+  flex-direction: column;
+  height: 100%;
 }

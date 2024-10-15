@@ -1,13 +1,18 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from '@tanstack/react-router';
 
-export const Route = createLazyFileRoute("/tools")({
+import { UpdateAlert } from 'app/components/UpdateAlert';
+
+export const Route = createLazyFileRoute('/tools')({
     component: Tools,
 });
 
+import Firmware from 'app/features/Firmware';
+
 function Tools() {
     return (
-        <div className="h-full">
-            <h1>Tools</h1>
+        <div className="flex justify-center items-center flex-col">
+            <UpdateAlert />
+            <Firmware />
         </div>
     );
 }
