@@ -6,6 +6,10 @@ import {
     xMinusJog,
     yMinusJog,
     continuousJogAxis,
+    xPlusYMinus,
+    xPlusYPlus,
+    xMinusYMinus,
+    xMinusYPlus,
 } from 'app/features/Jogging/utils/Jogging.ts';
 
 export interface JogWheelProps {
@@ -19,7 +23,7 @@ export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
         () => continuousJogAxis({ X: 1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => xPlusJog(10, feedrate, false),
+            onCancel: () => xPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     );
@@ -40,6 +44,40 @@ export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
         onFinish: stopContinuousJog,
     });
 
+    const xPlusYMinusHandlers = useLongPress(
+        () => continuousJogAxis({ X: 1, Y: -1 }, feedrate),
+        {
+            threshold: 200,
+            onCancel: () => xPlusYMinus(distance, feedrate, false),
+            onFinish: stopContinuousJog,
+        },
+    );
+    const xPlusYPlusHandlers = useLongPress(
+        () => continuousJogAxis({ X: 1, Y: 1 }, feedrate),
+        {
+            threshold: 200,
+            onCancel: () => xPlusYPlus(distance, feedrate, false),
+            onFinish: stopContinuousJog,
+        },
+    );
+
+    const xMinusYPlusHandlers = useLongPress(
+        () => continuousJogAxis({ X: -1, Y: 1 }, feedrate),
+        {
+            threshold: 200,
+            onCancel: () => xMinusYPlus(distance, feedrate, false),
+            onFinish: stopContinuousJog,
+        },
+    );
+    const xMinusYMinusHandlers = useLongPress(
+        () => continuousJogAxis({ X: -1, Y: -1 }, feedrate),
+        {
+            threshold: 200,
+            onCancel: () => xMinusYMinus(distance, feedrate, false),
+            onFinish: stopContinuousJog,
+        },
+    );
+
     return (
         <svg
             width={180}
@@ -50,24 +88,32 @@ export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
             xmlns="http://www.w3.org/2000/svg"
         >
             <path
+                id="xPlusYMinus"
                 d="M180.191 140.859C171.562 157.794 157.794 171.562 140.859 180.191L100 100L180.191 140.859Z"
                 fill="#689AC9"
                 className="hover:fill-blue-400 transition duration-200"
+                {...xPlusYMinusHandlers}
             />
             <path
+                id="xMinusYMinus"
                 d="M59.1408 180.191C42.2063 171.562 28.438 157.794 19.8094 140.859L100 100L59.1408 180.191Z"
                 fill="#689AC9"
                 className="hover:fill-blue-400"
+                {...xMinusYMinusHandlers}
             />
             <path
+                id="xMinusYPlus"
                 d="M19.8094 59.1409C28.438 42.2063 42.2063 28.438 59.1408 19.8094L100 100L19.8094 59.1409Z"
                 fill="#689AC9"
                 className="hover:fill-blue-400"
+                {...xMinusYPlusHandlers}
             />
             <path
+                id="xPlusYPlus"
                 d="M140.859 19.8094C157.794 28.438 171.562 42.2063 180.191 59.1409L100 100L140.859 19.8094Z"
                 fill="#689AC9"
                 className="hover:fill-blue-400"
+                {...xPlusYPlusHandlers}
             />
             <path
                 id="yMinus"

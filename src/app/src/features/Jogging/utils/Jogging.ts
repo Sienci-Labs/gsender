@@ -122,3 +122,32 @@ export function aMinusJog(
 ) {
     startJogCommand({ A: distance * -1 }, feed, continuous);
 }
+
+export function xPlusYPlus(
+    distance: number,
+    feed: number,
+    continuous: boolean = false,
+) {
+    startJogCommand({ X: distance, Y: distance }, feed, continuous);
+}
+export function xPlusYMinus(
+    distance: number,
+    feed: number,
+    continuous: boolean = false,
+) {
+    startJogCommand({ X: distance, Y: distance * -1 }, feed, continuous);
+}
+export function xMinusYPlus(
+    distance: number,
+    feed: number,
+    continuous: boolean = false,
+) {
+    startJogCommand({ X: distance * -1, Y: distance }, feed, continuous);
+}
+export function xMinusYMinus(
+    distance: number,
+    feed: number,
+    continuous: boolean = false,
+) {
+    startJogCommand({ X: distance * -1, Y: distance * -1 }, feed, continuous);
+}
