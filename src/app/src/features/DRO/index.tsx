@@ -52,9 +52,6 @@ function DRO({
     isConnected,
     activeState,
 }: DROProps): JSX.Element {
-    console.log(isConnected);
-    console.log(workflowState);
-    console.log(activeState);
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
@@ -63,8 +60,6 @@ function DRO({
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
-
-    console.log(canClick);
 
     return (
         <div>
