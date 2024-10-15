@@ -1,5 +1,7 @@
+import {FirmwareFlavour} from "app/features/Connection";
+
 interface ConnectionInfoProps {
-    firmwareType: "grblHAL" | "grbl"
+    firmwareType: FirmwareFlavour
     port: string
 }
 

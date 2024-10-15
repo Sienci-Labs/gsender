@@ -98,7 +98,6 @@ function Connection(props: ConnectionProps) {
     }
 
     function onSelectFirmware(type: FirmwareFlavour) {
-        console.log('CLICKED');
         setFirmware(type);
         // TODO: Update saved value;
         store.set('widgets.connection.controller.type', type);
@@ -131,7 +130,7 @@ function Connection(props: ConnectionProps) {
                     <span>Unable to connect.</span>
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
-                    <ConnectionInfo port={activePort} firmwareType="grblHAL" />
+                    <ConnectionInfo port={activePort} firmwareType={firmware} />
                 )}
                 {(connectionState == ConnectionState.DISCONNECTED ||
                     connectionState === ConnectionState.ERROR) && (

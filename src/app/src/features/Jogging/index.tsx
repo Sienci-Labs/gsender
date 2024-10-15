@@ -8,6 +8,7 @@ import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
 import stopSign from './assets/stop.svg';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
+import {FirmwareFlavour} from "app/features/Connection";
 
 export interface JogValueObject {
     xyStep: number;
@@ -23,10 +24,12 @@ export function Jogging() {
         aStep: 0,
         feedrate: 0,
     });
+    const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     useEffect(() => {
         const jogValues = store.get('widgets.axes.jog.normal', {});
-
+        const firmwareType = store.get('widgets.connection.controller.type', 'Grbl');
+        setFirmware(firmwareType);
         setJogSpeed({
             ...jogValues,
         });
@@ -64,7 +67,9 @@ export function Jogging() {
                     <JogInput label="XY" currentValue={jogSpeed.xyStep} />
                     <JogInput label="Z" currentValue={jogSpeed.zStep} />
                     <JogInput label="at" currentValue={jogSpeed.feedrate} />
-                    <JogInput label="A°" currentValue={jogSpeed.aStep} />
+                    {
+                        firmware === 'grblHAL' && <JogInput label="A°" currentValue={jogSpeed.aStep} />
+                    }
                 </div>
                 <SpeedSelector onClick={updateJogValues} />
             </div>
