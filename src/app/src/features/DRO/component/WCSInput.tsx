@@ -38,7 +38,7 @@ export function WCSInput({
     };
 
     return (
-        <>
+        <div key={`wcs-${axis}-${value}`}>
             <input
                 type="number"
                 defaultValue={value}
@@ -48,6 +48,6 @@ export function WCSInput({
                 onKeyDown={onKeyPress}
                 className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-gray-100 outline-none focus:bg-white"
             />
-        </>
+        </div>
     );
 }

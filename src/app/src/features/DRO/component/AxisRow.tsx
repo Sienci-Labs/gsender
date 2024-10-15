@@ -8,9 +8,10 @@ interface AxisRowProps {
     mpos: number;
     wpos: number;
     disabled: boolean;
+    key: string
 }
 
-export function AxisRow({ axis, mpos, wpos, disabled }: AxisRowProps) {
+export function AxisRow({ axis, mpos, wpos, disabled, key }: AxisRowProps) {
     return (
         <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
             <Button
