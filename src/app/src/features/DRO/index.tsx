@@ -3,9 +3,7 @@ import {
     AxesArray,
     defaultDROPosition,
     DROPosition,
-    gotoZero,
     zeroAllAxes,
-    zeroWCS,
     zeroXYAxes,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
@@ -46,7 +44,6 @@ function DRO({
     axes,
     mpos,
     wpos,
-    homingEnabled,
     workflowState,
     unitLabel,
     isConnected,

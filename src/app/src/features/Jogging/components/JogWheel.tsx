@@ -1,3 +1,4 @@
+// @ts-ignore
 import { useLongPress } from 'use-long-press';
 import {
     stopContinuousJog,
@@ -18,7 +19,7 @@ export interface JogWheelProps {
     distance: number;
 }
 
-export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
+export function JogWheel({ distance, feedrate }: JogWheelProps) {
     const xPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ X: 1 }, feedrate),
         {
