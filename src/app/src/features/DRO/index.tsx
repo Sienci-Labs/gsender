@@ -72,15 +72,38 @@ function DRO({
                 <Label>Go</Label>
             </div>
             <div className="flex flex-col w-full gap-1 space-between">
-                {axes.map((axis: Axis) => (
+                <AxisRow
+                    axis={'X'}
+                    key={'X'}
+                    mpos={Number(mpos.x)}
+                    wpos={Number(wpos.x)}
+                    disabled={!canClick}
+                />
+                <AxisRow
+                    axis={'Y'}
+                    key={'Y'}
+                    mpos={Number(mpos.y)}
+                    wpos={Number(wpos.y)}
+                    disabled={!canClick}
+                />
+                <AxisRow
+                    axis={'Z'}
+                    key={'Z'}
+                    mpos={Number(mpos.z)}
+                    wpos={Number(wpos.z)}
+                    disabled={!canClick}
+                />
+                {
+                    axes.includes('a') &&
                     <AxisRow
-                        axis={axis}
-                        key={axis}
-                        mpos={mpos[axis.toLowerCase()]}
-                        wpos={wpos[axis.toLowerCase()]}
+                        axis={'A'}
+                        key={'a'}
+                        mpos={Number(mpos.a)}
+                        wpos={Number(wpos.a)}
                         disabled={!canClick}
                     />
-                ))}
+                }
+
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
                 <IconButton
