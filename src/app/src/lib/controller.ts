@@ -382,7 +382,7 @@ class Controller {
     // Removes the specified `listener` from the listener array for the event named `eventName`.
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
-    removeListener(eventName: string, listener: Function): boolean {
+    removeListener(eventName: string, listener?: Function): boolean {
         const listeners =
             this.listeners[eventName as keyof typeof this.listeners];
         if (!listeners || typeof listener !== 'function') {
