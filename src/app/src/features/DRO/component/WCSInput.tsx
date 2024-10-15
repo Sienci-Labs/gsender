@@ -16,6 +16,7 @@ export function WCSInput({
 }: WCSInputProps) {
     const inputRef = useRef<HTMLInputElement>();
 
+
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const inputValue = Number(inputRef.current.value);

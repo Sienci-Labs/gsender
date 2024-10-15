@@ -1,6 +1,7 @@
 import controller from 'app/lib/controller';
 import store from 'app/store';
 import get from 'lodash/get';
+import {METRIC_UNITS} from "app/constants";
 export type Axis =
     | 'A'
     | 'B'
@@ -95,7 +96,10 @@ export function GoTo(pos: DROPosition, isG91: boolean) {
 
 export function handleManualOffset(value: string | number, axis: Axis) {
     const offset = Number(value);
+    const units = store.get('workspace.units');
+    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+
     const command = `G10 P0 L20 ${axis.toUpperCase()}${offset}`;
-    controller.command('gcode', command);
+    controller.command('gcode:safe', command, modal);
 
 }
