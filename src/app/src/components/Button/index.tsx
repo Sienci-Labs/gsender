@@ -11,7 +11,11 @@ export const buttonStyle = tv({
             alt: 'bg-robin-500 text-white border-robin-500',
             disabled: 'border-gray-300 bg-gray-100 text-gray-400',
         },
+        disabled: {
+            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300',
+        },
     },
+
     defaultVariants: {
         color: 'secondary',
     },

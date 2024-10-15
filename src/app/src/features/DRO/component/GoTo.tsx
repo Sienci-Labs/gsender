@@ -13,9 +13,10 @@ import { useState } from 'react';
 interface GotoProps {
     units: string;
     wpos: DROPosition;
+    disabled: boolean;
 }
 
-export function GoTo({ units, wpos }: GotoProps) {
+export function GoTo({ units, wpos, disabled }: GotoProps) {
     const [movementMode, setMovementMode] = useState(false);
     const [movementPos, setMovementPos] = useState({
         x: 0,
@@ -33,7 +34,10 @@ export function GoTo({ units, wpos }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger className="border rounded hover:opacity-90 py-1 px-3 shadow border-robin-500 text-white bg-robin-500">
+            <PopoverTrigger
+                disabled={disabled}
+                className="border rounded hover:opacity-90 py-1 px-3 shadow border-robin-500 text-white bg-robin-500 disabled:bg-gray-300 disabled:border-gray-500 disabled:text-gray-500"
+            >
                 <FaPaperPlane />
             </PopoverTrigger>
             <PopoverContent className="bg-white">

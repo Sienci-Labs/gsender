@@ -29,6 +29,7 @@ interface DROProps {
     wpos: DROPosition;
     unitLabel: string;
     homingEnabled: boolean;
+    canClick: boolean;
 }
 
 function DRO({
@@ -37,11 +38,12 @@ function DRO({
     wpos,
     homingEnabled,
     unitLabel,
+    canClick,
 }: DROProps): JSX.Element {
     return (
         <div>
             <div className="w-full min-h-10 flex flex-row align-bottom justify-between mb-2 px-4">
-                <GoTo wpos={wpos} units={unitLabel} />
+                <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {/*homingEnabled && (
                     <IconButton icon={<LuParkingSquare />} color="primary" />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
@@ -58,14 +60,19 @@ function DRO({
                         key={axis}
                         mpos={mpos[axis.toLowerCase()]}
                         wpos={wpos[axis.toLowerCase()]}
+                        disabled={!canClick}
                     />
                 ))}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
-                <IconButton icon={<VscTarget />} onClick={zeroAllAxes}>
+                <IconButton
+                    icon={<VscTarget />}
+                    onClick={zeroAllAxes}
+                    disabled={!canClick}
+                >
                     Zero
                 </IconButton>
-                <Button color="alt" onClick={zeroXYAxes}>
+                <Button color="alt" onClick={zeroXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
@@ -100,11 +107,14 @@ export default connect((reduxStore) => {
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 
+    const canClick = true;
+
     return {
         homingEnabled,
         axes,
         wpos,
         mpos,
         unitLabel,
+        canClick,
     };
 })(DRO);
