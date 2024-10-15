@@ -1,14 +1,15 @@
 import { Widget } from '../../components/Widget';
 import { Tabs } from '../../components/Tabs';
-import Coolant from 'app/features/Coolant';
-import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 import Console from '../Console';
 import Probe from '../Probe';
 import Spindle from '../Spindle';
+import Coolant from '../Coolant';
+import Rotary from '../Rotary';
 
-const Rotary = () => {
-    return <div>Rotary</div>;
-};
+interface TabItem {
+    label: string;
+    content: React.ComponentType<{ isActive: boolean }>;
+}
 
 const tabs = [
     {
@@ -37,7 +38,7 @@ export function Tools() {
     return (
         <Widget>
             <Widget.Content>
-                <Tabs items={tabs} />
+                <Tabs items={tabs as TabItem[]} />
             </Widget.Content>
         </Widget>
     );
