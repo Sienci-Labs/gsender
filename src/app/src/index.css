@@ -17,7 +17,6 @@ html,
         @apply text-sm
     }
     input {
-        min-width: 100px;
     }
 }
 

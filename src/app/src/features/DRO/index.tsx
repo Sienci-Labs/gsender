@@ -17,7 +17,7 @@ import { Button } from 'app/components/Button';
 import { Axis } from './utils/DRO';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
-import { GoTo } from 'app/features/Connection/components/GoTo';
+import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import store from 'app/store';
 import { METRIC_UNITS } from 'app/constants';
 import { mapValues } from 'lodash';

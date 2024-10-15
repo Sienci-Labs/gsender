@@ -16,7 +16,7 @@ export function UnitInput({
             {label && <Label className="flex items-center">{label}</Label>}
             <input
                 type="number"
-                className="w-14 border-none margin-none p-0 focus:border-none focus:outline-none text-center"
+                className="w-[7ch] border-none margin-none p-0 focus:border-none focus:outline-none text-center"
                 defaultValue={value}
             />
             <span className="text-gray-500 bg-gray-200 p-1 min-w-12 rounded-tr rounded-br text-center text-sm">
