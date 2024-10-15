@@ -1754,9 +1754,6 @@ video {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(202 138 4 / var(--tw-bg-opacity)) !important;
 }
-.bg-opacity-0 {
-  --tw-bg-opacity: 0 !important;
-}
 .bg-opacity-30 {
   --tw-bg-opacity: 0.3 !important;
 }
@@ -1768,9 +1765,6 @@ video {
 }
 .bg-gradient-to-r {
   background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
-}
-.bg-none {
-  background-image: none !important;
 }
 .from-blue-300 {
   --tw-gradient-from: #487ccf var(--tw-gradient-from-position) !important;
@@ -2535,6 +2529,12 @@ html,
 
 .focus\:border-none:focus {
   border-style: none !important;
+}
+
+
+.focus\:bg-white:focus {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity)) !important;
 }
 
 

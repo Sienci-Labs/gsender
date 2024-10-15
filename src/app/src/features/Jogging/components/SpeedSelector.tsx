@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging.ts';
 import store from 'app/store';
 import get from 'lodash/get';
+import { JogValueObject } from 'app/features/Jogging';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;
@@ -28,7 +29,7 @@ export function SpeedSelectButton({
 }
 
 interface SpeedSelectorProps {
-    onClick?: (values: object) => void;
+    onClick?: (values: JogValueObject) => void;
 }
 
 export function SpeedSelector({ onClick }: SpeedSelectorProps) {

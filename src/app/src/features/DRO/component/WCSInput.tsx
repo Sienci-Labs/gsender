@@ -44,7 +44,7 @@ export function WCSInput({
                 onBlur={onBlur}
                 onKeyDown={onKeyPress}
                 onChange={onChange}
-                className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-none outline-none bg-opacity-0"
+                className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-gray-100 outline-none focus:bg-white"
             />
         </>
     );
