@@ -1,7 +1,4 @@
 import jogWheeelLabels from './assets/labels.svg';
-import jogTab from './assets/tabs.svg';
-import zLabels from './assets/zlabels.svg';
-import aLabels from './assets/aLabels.svg';
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
 import { useState, useEffect } from 'react';
@@ -9,7 +6,8 @@ import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
-import get from 'lodash/get';
+import stopSign from './assets/stop.svg';
+import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
 
 export interface JogValueObject {
     xyStep: number;
@@ -50,6 +48,12 @@ export function Jogging() {
                         className="absolute top-0 left-0 pointer-events-none"
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
+                    />
+                    <img
+                        src={stopSign}
+                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"
+                        alt="E-Stop button"
+                        onClick={cancelJog}
                     />
                 </div>
                 <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />

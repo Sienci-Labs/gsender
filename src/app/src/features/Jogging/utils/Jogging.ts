@@ -43,6 +43,10 @@ export interface JoggerProps {
     feedrate: number;
 }
 
+export function cancelJog() {
+    controller.command('jog:cancel');
+}
+
 export function startJogCommand(
     axes: JogDistances,
     feed: number,

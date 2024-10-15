@@ -6,8 +6,6 @@ import {
     continuousJogAxis,
     JoggerProps,
     stopContinuousJog,
-    xMinusJog,
-    xPlusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 

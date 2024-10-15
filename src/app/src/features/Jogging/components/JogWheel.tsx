@@ -5,7 +5,6 @@ import {
     yPlusJog,
     xMinusJog,
     yMinusJog,
-    JogDistances,
     continuousJogAxis,
 } from 'app/features/Jogging/utils/Jogging.ts';
 

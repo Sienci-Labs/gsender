@@ -7,7 +7,7 @@ export interface WCSInputProps {
 }
 
 export function WCSInput({
-    value,
+    value = 0,
     disabled = false,
     movementHandler,
 }: WCSInputProps) {
@@ -31,17 +31,19 @@ export function WCSInput({
     const onBlur = () => {
         inputRef.current.value = String(value);
     };
+    const onChange = () => {};
 
     return (
         <>
             <input
                 type="number"
-                defaultValue={value}
                 value={value}
+                defaultValue={value}
                 disabled={disabled}
                 ref={inputRef}
                 onBlur={onBlur}
                 onKeyDown={onKeyPress}
+                onChange={onChange}
                 className="text-xl flex items-center text-blue-500 font-bold font-mono w-[9ch] p-0 m-0 text-center border-none bg-none outline-none bg-opacity-0"
             />
         </>
