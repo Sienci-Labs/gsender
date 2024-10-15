@@ -12,7 +12,6 @@ import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
 
 //import { LuParkingSquare } from 'react-icons/lu';
-import { Axis } from './utils/DRO';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';

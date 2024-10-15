@@ -11,7 +11,7 @@ interface AxisRowProps {
     key: string
 }
 
-export function AxisRow({ axis, mpos, wpos, disabled, key }: AxisRowProps) {
+export function AxisRow({ axis, mpos, wpos, disabled }: AxisRowProps) {
     return (
         <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
             <Button
