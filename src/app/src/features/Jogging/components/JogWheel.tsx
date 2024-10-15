@@ -84,7 +84,7 @@ export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
             height={180}
             viewBox="0 0 200 200"
             fill="none"
-            className="hover:transition-all duration-200"
+            className="hover:transition-all duration-200 cursor-pointer"
             xmlns="http://www.w3.org/2000/svg"
         >
             <path

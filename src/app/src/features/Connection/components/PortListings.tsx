@@ -1,11 +1,13 @@
 import { BsEthernet, BsUsbPlug } from 'react-icons/bs';
-import { ConnectionType } from '../index';
+import { ConnectionType, FirmwareFlavour } from '../index';
 import { Port } from '../definitions';
 import { FirmwareSelector } from 'app/features/Connection/components/FirmwareSelector.tsx';
 
 export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
+    selectedFirmware: FirmwareFlavour;
+    onFirmwareClick: (t: FirmwareFlavour) => void;
 }
 
 export function PortListings(props: PortListingsProps): JSX.Element {
@@ -42,7 +44,10 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </span>
                 </div>
             </div>
-            <FirmwareSelector />
+            <FirmwareSelector
+                selectedFirmware={props.selectedFirmware}
+                onClick={props.onFirmwareClick}
+            />
         </div>
     );
 }

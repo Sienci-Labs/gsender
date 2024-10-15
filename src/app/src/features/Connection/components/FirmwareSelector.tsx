@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { FirmwareFlavour } from 'app/features/Connection';
 
 interface FirmwareSelectButtonProps {
     label: string;
@@ -6,12 +7,17 @@ interface FirmwareSelectButtonProps {
     onClick?: () => void;
 }
 
-function FirmwareSelectButton({ label, active }: FirmwareSelectButtonProps) {
+function FirmwareSelectButton({
+    label,
+    active,
+    onClick,
+}: FirmwareSelectButtonProps) {
     return (
         <button
             className={cn('text-sm px-2 py-1 rounded', {
                 'bg-blue-400 bg-opacity-30': active,
             })}
+            onClick={onClick}
         >
             {label}
         </button>
@@ -19,7 +25,7 @@ function FirmwareSelectButton({ label, active }: FirmwareSelectButtonProps) {
 }
 
 interface FirmwareSelectorProps {
-    onClick: (type: string) => void;
+    onClick: (type: FirmwareFlavour) => void;
     selectedFirmware: string;
 }
 
@@ -41,7 +47,7 @@ export function FirmwareSelector({
                 <FirmwareSelectButton
                     active={halActive}
                     label="grblHal"
-                    onClick={() => onClick('grblHal')}
+                    onClick={() => onClick('grblHAL')}
                 />
             </div>
         </div>

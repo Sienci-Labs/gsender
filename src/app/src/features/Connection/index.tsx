@@ -10,6 +10,7 @@ import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
+import store from 'app/store';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -29,6 +30,8 @@ export interface ConnectionProps {
     ports: Port[];
 }
 
+export type FirmwareFlavour = 'Grbl' | 'grblHAL';
+
 function Connection(props: ConnectionProps) {
     const [connectionState, setConnectionState] = useState(
         ConnectionState.DISCONNECTED,
@@ -36,9 +39,18 @@ function Connection(props: ConnectionProps) {
     const [connectionType, setConnectionType] = useState(
         ConnectionType.DISCONNECTED,
     );
+
+    const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
+
     const [activePort, setActivePort] = useState('');
 
     useEffect(() => {
+        const preferredFirmware = store.get(
+            'widgets.connection.controller.type',
+            'grbl',
+        );
+        setFirmware(preferredFirmware);
+
         refreshPorts();
     }, []);
 
@@ -56,7 +68,7 @@ function Connection(props: ConnectionProps) {
         // Attempt connect with callback
         controller.openPort(
             port,
-            'grblHAL',
+            firmware,
             {
                 baudrate: 115200,
                 network,
@@ -83,6 +95,13 @@ function Connection(props: ConnectionProps) {
             }
             refreshPorts();
         });
+    }
+
+    function onSelectFirmware(type: FirmwareFlavour) {
+        console.log('CLICKED');
+        setFirmware(type);
+        // TODO: Update saved value;
+        store.set('widgets.connection.controller.type', type);
     }
 
     return (
@@ -119,6 +138,8 @@ function Connection(props: ConnectionProps) {
                     <PortListings
                         connectHandler={onConnectClick}
                         ports={props.ports}
+                        selectedFirmware={firmware}
+                        onFirmwareClick={onSelectFirmware}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (

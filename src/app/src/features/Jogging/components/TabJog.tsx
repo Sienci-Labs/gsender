@@ -10,6 +10,7 @@ const TabJog = (props: TabJogProps) => (
         viewBox="0 0 50 187"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        className="cursor-pointer"
     >
         <path
             d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"
