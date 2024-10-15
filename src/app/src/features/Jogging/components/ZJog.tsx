@@ -1,8 +1,6 @@
 import zLabels from 'app/features/Jogging/assets/zLabels.svg';
 import TabJog from 'app/features/Jogging/components/TabJog.tsx';
 import {
-    aMinusJog,
-    aPlusJog,
     continuousJogAxis,
     JoggerProps,
     stopContinuousJog,
@@ -11,20 +9,20 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function ZJog(props: JoggerProps) {
+export function ZJog({ feedrate, distance }: JoggerProps) {
     const zPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ Z: 1 }, props.feedrate),
+        () => continuousJogAxis({ Z: 1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => zPlusJog(10, 5000, false),
+            onCancel: () => zPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     );
     const zMinusJogHandlers = useLongPress(
-        () => continuousJogAxis({ Z: -1 }, props.feedrate),
+        () => continuousJogAxis({ Z: -1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => zMinusJog(10, 5000, false),
+            onCancel: () => zMinusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     );

@@ -8,6 +8,8 @@ export interface JogSpeeds {
     feedrate: number;
 }
 
+export type JoggingSpeedOptions = 'Rapid' | 'Normal' | 'Precise';
+
 function jogAxis(params: JogDistances, feedrate: number) {
     const modal = 'G21';
     const s = map(

@@ -15,29 +15,29 @@ export interface JogWheelProps {
     distance: number;
 }
 
-export function JogWheel(props: JogWheelProps) {
+export function JogWheel({ distance, canClick, feedrate }: JogWheelProps) {
     const xPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ X: 1 }, props.feedrate),
+        () => continuousJogAxis({ X: 1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => xPlusJog(10, 5000, false),
+            onCancel: () => xPlusJog(10, feedrate, false),
             onFinish: stopContinuousJog,
         },
     );
-    const xMinusJogHandlers = useLongPress(() => xMinusJog(1, 5000, true), {
+    const xMinusJogHandlers = useLongPress(() => xMinusJog(1, feedrate, true), {
         threshold: 200,
-        onCancel: () => xMinusJog(10, 5000, false),
+        onCancel: () => xMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     });
 
-    const yPlusJogHandlers = useLongPress(() => yPlusJog(1, 5000, true), {
+    const yPlusJogHandlers = useLongPress(() => yPlusJog(1, feedrate, true), {
         threshold: 200,
-        onCancel: () => yPlusJog(10, 5000, false),
+        onCancel: () => yPlusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     });
-    const yMinusJogHandlers = useLongPress(() => yMinusJog(1, 5000, true), {
+    const yMinusJogHandlers = useLongPress(() => yMinusJog(1, feedrate, true), {
         threshold: 200,
-        onCancel: () => yMinusJog(10, 5000, false),
+        onCancel: () => yMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     });
 
@@ -49,7 +49,6 @@ export function JogWheel(props: JogWheelProps) {
             fill="none"
             className="hover:transition-all duration-200"
             xmlns="http://www.w3.org/2000/svg"
-            {...props}
         >
             <path
                 d="M180.191 140.859C171.562 157.794 157.794 171.562 140.859 180.191L100 100L180.191 140.859Z"

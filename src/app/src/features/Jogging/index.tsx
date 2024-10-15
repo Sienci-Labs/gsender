@@ -8,9 +8,18 @@ import { useState, useEffect } from 'react';
 import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
+import store from 'app/store';
+import get from 'lodash/get';
+
+export interface JogValueObject {
+    xyStep: number;
+    aStep: number;
+    zStep: number;
+    feedrate: number;
+}
 
 export function Jogging() {
-    const [jogSpeed, setJogSpeed] = useState({
+    const [jogSpeed, setJogSpeed] = useState<JogValueObject>({
         xyStep: 0,
         zStep: 0,
         aStep: 0,
@@ -18,13 +27,18 @@ export function Jogging() {
     });
 
     useEffect(() => {
+        const jogValues = store.get('widgets.axes.jog.normal', {});
+
         setJogSpeed({
-            xyStep: 5000,
-            zStep: 1000,
-            aStep: 5000,
-            feedrate: 10000,
+            ...jogValues,
         });
     }, []);
+
+    function updateJogValues(values: JogValueObject) {
+        console.log(values);
+        // Do converting if needed here
+        setJogSpeed(values);
+    }
 
     return (
         <>
@@ -50,7 +64,7 @@ export function Jogging() {
                     <JogInput label="at" currentValue={jogSpeed.feedrate} />
                     <JogInput label="A°" currentValue={jogSpeed.aStep} />
                 </div>
-                <SpeedSelector />
+                <SpeedSelector onClick={updateJogValues} />
             </div>
         </>
     );

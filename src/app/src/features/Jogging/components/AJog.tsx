@@ -11,20 +11,20 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function AJog(props: JoggerProps) {
+export function AJog({ feedrate, distance }: JoggerProps) {
     const aPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ A: 1 }, props.feedrate),
+        () => continuousJogAxis({ A: 1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => aPlusJog(10, 5000, false),
+            onCancel: () => aPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     );
     const aMinusJogHandlers = useLongPress(
-        () => continuousJogAxis({ A: -1 }, props.feedrate),
+        () => continuousJogAxis({ A: -1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => aMinusJog(10, 5000, false),
+            onCancel: () => aMinusJog(feedrate, distance, false),
             onFinish: stopContinuousJog,
         },
     );
