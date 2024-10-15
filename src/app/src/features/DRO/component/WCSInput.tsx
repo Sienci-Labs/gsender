@@ -14,17 +14,17 @@ export function WCSInput({
     movementHandler,
     axis
 }: WCSInputProps) {
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>();
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const inputValue = Number(inputRef.current.value);
-            console.log(inputValue);
+
             if (Number.isNaN(inputValue)) {
                 movementHandler(value, axis);
             }
 
-            movementHandler(value, axis);
+            movementHandler(inputValue, axis);
             return;
         }
         if (e.key === 'Escape') {
