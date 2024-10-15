@@ -20,24 +20,34 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import pubsub from 'pubsub-js';
 import cx from 'classnames';
 import { FaExclamationTriangle } from 'react-icons/fa';
-import styles from './index.styl';
+
 import ConfirmationDialogButton from './ConfirmationDialogButton';
 import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 
+import styles from './index.module.styl';
+
+interface DialogOptions {
+    title: string;
+    content: ReactNode;
+    onClose?: () => void;
+    onConfirm?: () => void;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    show: boolean;
+}
+
 const ConfirmationDialog = () => {
-    const [show, setShow] = useState(false);
-    const [title, setTitle] = useState(null);
-    //const [buttons, setButtons] = useState([]);
-    const [content, setContent] = useState(null);
-    const [onClose, setOnClose] = useState(null);
-    const [onConfirm, setOnConfirm] = useState(null);
-    const [confirmLabel, setConfirmLabel] = useState(null);
-    const [cancelLabel, setCancelLabel] = useState(null);
+    const [show, setShow] = useState<boolean>(false);
+    const [title, setTitle] = useState<string | null>(null);
+    const [content, setContent] = useState<ReactNode | null>(null);
+    const [onClose, setOnClose] = useState<(() => void) | null>(null);
+    const [onConfirm, setOnConfirm] = useState<(() => void) | null>(null);
+    const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
+    const [cancelLabel, setCancelLabel] = useState<string | null>(null);
 
     let hideModal = !show;
 
@@ -46,15 +56,22 @@ const ConfirmationDialog = () => {
     }, [show]);
 
     useEffect(() => {
-        pubsub.subscribe('dialog:new', (event, options) => {
-            setTitle(options.title);
-            setContent(options.content);
-            setOnClose(() => options.onClose);
-            setOnConfirm(() => options.onConfirm);
-            setConfirmLabel(options.confirmLabel);
-            setCancelLabel(options.cancelLabel);
-            setShow(options.show);
-        });
+        const token = pubsub.subscribe(
+            'dialog:new',
+            (_: string, options: DialogOptions) => {
+                setTitle(options.title);
+                setContent(options.content);
+                setOnClose(() => options.onClose);
+                setOnConfirm(() => options.onConfirm);
+                setConfirmLabel(options.confirmLabel || null);
+                setCancelLabel(options.cancelLabel || null);
+                setShow(options.show);
+            },
+        );
+
+        return () => {
+            pubsub.unsubscribe(token);
+        };
     }, []);
 
     return (
@@ -79,7 +96,7 @@ const ConfirmationDialog = () => {
                                 if (onClose !== null) {
                                     onClose();
                                 }
-                                return setShow(false);
+                                setShow(false);
                             }}
                             variant={DIALOG_CANCEL}
                         >
@@ -93,7 +110,7 @@ const ConfirmationDialog = () => {
                                 if (onConfirm !== null) {
                                     onConfirm();
                                 }
-                                return setShow(false);
+                                setShow(false);
                             }}
                             variant={DIALOG_CONFIRM}
                         >

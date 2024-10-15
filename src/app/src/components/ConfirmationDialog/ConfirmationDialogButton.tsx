@@ -23,18 +23,37 @@
 
 import React from 'react';
 import cx from 'classnames';
-import styles from './index.styl';
+
 import { DIALOG_CANCEL, DIALOG_CONFIRM } from './ConfirmationDialogLib';
 
+import styles from './index.module.styl';
 
-const ConfirmationDialogButton = ({ children, onClick, variant = DIALOG_CONFIRM }) => {
+interface ConfirmationDialogButtonProps {
+    children: React.ReactNode;
+    onClick: () => void;
+    variant?: typeof DIALOG_CONFIRM | typeof DIALOG_CANCEL;
+}
+
+const ConfirmationDialogButton: React.FC<ConfirmationDialogButtonProps> = ({
+    children,
+    onClick,
+    variant = DIALOG_CONFIRM,
+}) => {
     return (
         <button
             type="button"
             onClick={onClick}
-            className={cx(styles.confirmationDialogButton,
-                { [styles.confirmationDialogButtonConfirm]: variant === DIALOG_CONFIRM },
-                { [styles.confirmationDialogButtonCancel]: variant === DIALOG_CANCEL })}
+            className={cx(
+                styles.confirmationDialogButton,
+                {
+                    [styles.confirmationDialogButtonConfirm]:
+                        variant === DIALOG_CONFIRM,
+                },
+                {
+                    [styles.confirmationDialogButtonCancel]:
+                        variant === DIALOG_CANCEL,
+                },
+            )}
         >
             {children}
         </button>
