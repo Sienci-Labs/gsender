@@ -92,3 +92,10 @@ export function GoTo(pos: DROPosition, isG91: boolean) {
     code.push(`${mode} G0 X${pos.x} Y${pos.y} Z${pos.z}`);
     controller.command('gcode:safe', code);
 }
+
+export function handleManualOffset(value: string | number, axis: Axis) {
+    const offset = Number(value);
+    const command = `G10 P0 L20 ${axis.toUpperCase()}${offset}`;
+    controller.command('gcode', command);
+
+}
