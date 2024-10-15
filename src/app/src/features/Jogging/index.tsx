@@ -59,7 +59,7 @@ export function Jogging() {
                 <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />
                 <AJog distance={jogSpeed.aStep} feedrate={jogSpeed.feedrate} />
             </div>
-            <div className="flex flex-row justify-between flex-shrink">
+            <div className="flex flex-row justify-around flex-shrink">
                 <div className="grid grid-cols-2 gap-1">
                     <JogInput label="XY" currentValue={jogSpeed.xyStep} />
                     <JogInput label="Z" currentValue={jogSpeed.zStep} />
