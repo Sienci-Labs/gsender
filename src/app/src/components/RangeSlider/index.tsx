@@ -102,7 +102,7 @@ const RangeSlider = ({
                 >
                     <Slider.Track className="h-4 bg-gray-400 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]">
                         <Slider.Range
-                            className={`absolute h-full rounded-full ${colour}`}
+                            className={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
                         />
                     </Slider.Track>
                     <Slider.Thumb className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none" />
