@@ -1,21 +1,20 @@
 import React, { useRef } from 'react';
-import {Axis} from "app/features/DRO/utils/DRO.ts";
+import { Axis } from 'app/features/DRO/utils/DRO.ts';
 
 export interface WCSInputProps {
     value: number;
     disabled?: boolean;
     movementHandler?: (t: string | number, s: Axis) => void;
-    axis: Axis
+    axis: Axis;
 }
 
 export function WCSInput({
     value = 0,
     disabled = false,
     movementHandler,
-    axis
+    axis,
 }: WCSInputProps) {
     const inputRef = useRef<HTMLInputElement>();
-
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -38,7 +37,10 @@ export function WCSInput({
     };
 
     return (
-        <div key={`wcs-${axis}-${value}`}>
+        <div
+            key={`wcs-${axis}-${value}`}
+            className="flex justify-center items-center"
+        >
             <input
                 type="number"
                 defaultValue={value}
