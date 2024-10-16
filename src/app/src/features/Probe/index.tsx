@@ -143,7 +143,7 @@ const ProbeWidget = () => {
         config.get('zProbeDistance') || {},
     );
     const [touchplate, setTouchplate] = useState<ProbeProfile>(
-        config.get('workspace[probeProfile]', {}),
+        store.get('workspace.probeProfile', {}),
     );
     const [toolDiameter, setToolDiameter] =
         useState<number>(calcToolDiamater());

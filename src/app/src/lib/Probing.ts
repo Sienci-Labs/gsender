@@ -1,21 +1,31 @@
-import { PROBE_TYPE_AUTO, PROBE_TYPE_TIP, PROBE_TYPES, TOUCHPLATE_TYPE_AUTOZERO } from './constants';
+import {
+    PROBE_TYPE_AUTO,
+    PROBE_TYPE_TIP,
+    PROBE_TYPES,
+    TOUCHPLATE_TYPE_AUTOZERO,
+} from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
 import { UNITS_GCODE } from 'app/definitions/general';
 import { AXES_T } from 'app/features/Axes/definitions';
-import { PROBE_DIRECTIONS, ProbingOptions, PROBE_TYPES_T } from 'app/features/Probe/definitions';
+import {
+    PROBE_DIRECTIONS,
+    ProbingOptions,
+    PROBE_TYPES_T,
+} from 'app/features/Probe/definitions';
 
 export const BL = 0;
 export const TL = 1;
 export const TR = 2;
 export const BR = 3;
 
-
 // 0 is default (bottom left), moves clockwise
 export const probeDirections = [BL, TL, TR, BR];
 
 // Returns which direction to probe in for X and Y - positive or negative
-export const getProbeDirections = (corner: PROBE_DIRECTIONS): [number, number] => {
+export const getProbeDirections = (
+    corner: PROBE_DIRECTIONS,
+): [number, number] => {
     if (corner === BL) {
         return [1, 1];
     } else if (corner === TL) {
@@ -27,7 +37,6 @@ export const getProbeDirections = (corner: PROBE_DIRECTIONS): [number, number] =
     }
     return [0, 0];
 };
-
 
 // Setup variables for probing and
 export const getPreamble = (options: ProbingOptions): Array<string> => {
@@ -49,14 +58,14 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         zRetract,
         firmware,
         xyPositionAdjust,
-        zPositionAdjust
+        zPositionAdjust,
     } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
     // Add axes to initial zeroing
-    Object.keys(axes).forEach(axis => {
+    Object.keys(axes).forEach((axis) => {
         if (axes[axis as keyof typeof axes]) {
             initialOffsets += `${axis.toUpperCase()}0`;
         }
@@ -84,7 +93,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         `%Y_RETRACT_DIRECTION=${yRetractModifier}`,
         `%X_RETRACT_DIRECTION=${xRetractModifier}`,
         `${initialOffsets}`,
-        `G91 G${modal}`
+        `G91 G${modal}`,
     ];
 };
 
@@ -99,7 +108,10 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
     TOOL_DIAMETER - Tool diameter
     UNITS - prior units
  */
-const updateOptionsForDirection = (options: ProbingOptions, direction: PROBE_DIRECTIONS): ProbingOptions => {
+const updateOptionsForDirection = (
+    options: ProbingOptions,
+    direction: PROBE_DIRECTIONS,
+): ProbingOptions => {
     const { units, toolDiameter } = options;
     options.direction = direction;
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
@@ -119,15 +131,21 @@ const updateOptionsForDirection = (options: ProbingOptions, direction: PROBE_DIR
     options.zRetract = options.retract;
 
     // Alter thickness for X and Y by tool diameter
-    const toolRadius = toolDiameter as number / 2;
-    const toolCompensatedXY = Number(((-1 * toolRadius) - options.xyThickness).toFixed(3));
+    const toolRadius = (toolDiameter as number) / 2;
+    const toolCompensatedXY = Number(
+        (-1 * toolRadius - options.xyThickness).toFixed(3),
+    );
     options.yThickness = toolCompensatedXY * yProbeDir;
     options.xThickness = toolCompensatedXY * xProbeDir;
 
     // Figure out movement distances for getting bit into position
-    let xyMovement = toolDiameter as number + 20;
-    options.xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : Number(mm2in(xyMovement).toFixed(3));
-    options.zPositionAdjust = (units === METRIC_UNITS) ? 15 : Number(mm2in(15).toFixed(3));
+    let xyMovement = (toolDiameter as number) + 20;
+    options.xyPositionAdjust =
+        units === METRIC_UNITS
+            ? xyMovement
+            : Number(mm2in(xyMovement).toFixed(3));
+    options.zPositionAdjust =
+        units === METRIC_UNITS ? 15 : Number(mm2in(15).toFixed(3));
 
     return options;
 };
@@ -142,13 +160,15 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
-        `G0 ${axis}[${axis}_RETRACT_DISTANCE]`
+        `G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
     ];
 
     return code;
 };
 
-export const get3AxisStandardRoutine = (options: ProbingOptions): Array<string> => {
+export const get3AxisStandardRoutine = (
+    options: ProbingOptions,
+): Array<string> => {
     const code: Array<string> = [];
 
     code.push(...getPreamble(options));
@@ -164,7 +184,7 @@ export const get3AxisStandardRoutine = (options: ProbingOptions): Array<string> 
         // Z also handles positioning for next probe on X
         code.push(
             'G91 G0 X[X_ADJUST * X_RETRACT_DIRECTION]',
-            'G0 Z-[Z_ADJUST]'
+            'G0 Z-[Z_ADJUST]',
         );
     }
     if (axes.x) {
@@ -173,7 +193,7 @@ export const get3AxisStandardRoutine = (options: ProbingOptions): Array<string> 
         if (!axes.z) {
             code.push(
                 'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
-                'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]'
+                'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
             );
         }
 
@@ -185,28 +205,27 @@ export const get3AxisStandardRoutine = (options: ProbingOptions): Array<string> 
         code.push(
             'G0 X[X_RETRACT_DISTANCE * 2]',
             'G0 Y[Y_ADJUST * Y_RETRACT_DIRECTION]',
-            'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]'
+            'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
         );
 
         // Probe Y
         code.push(...getSingleAxisStandardRoutine('Y'));
     }
     // Move back to original position
-    code.push(
-        'G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]',
-        'G90 G0 X0Y0',
-    );
+    code.push('G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
     return code;
 };
 
-
-const determineAutoPlateOffsetValues = (direction: PROBE_DIRECTIONS, diameter: PROBE_TYPES_T | number = null): [number, number] => {
+const determineAutoPlateOffsetValues = (
+    direction: PROBE_DIRECTIONS,
+    diameter: PROBE_TYPES_T | number = null,
+): [number, number] => {
     let xOff = 22.5;
     let yOff = 22.5;
 
     if (diameter && !(diameter in PROBE_TYPES)) {
         // math to compensate for tool
-        const toolRadius = (diameter as number / 2);
+        const toolRadius = (diameter as number) / 2;
         xOff -= toolRadius;
         yOff -= toolRadius;
     }
@@ -222,7 +241,12 @@ const determineAutoPlateOffsetValues = (direction: PROBE_DIRECTIONS, diameter: P
     return [xOff, yOff];
 };
 
-export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }: ProbingOptions): Array<string> => {
+export const get3AxisAutoRoutine = ({
+    axes,
+    $13,
+    direction,
+    firmware,
+}: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
 
@@ -279,7 +303,7 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }: ProbingO
             `${prependUnits} G0 Y[Y_CENTER]`,
             'G21 G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
-            'G21 G0 G90 Z1'
+            'G21 G0 G90 Z1',
         );
     } else if (axes.x && axes.y) {
         code.push(
@@ -382,7 +406,12 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }: ProbingO
     return code;
 };
 
-export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }: ProbingOptions): Array<string> => {
+export const get3AxisAutoTipRoutine = ({
+    axes,
+    $13,
+    direction,
+    firmware,
+}: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
 
@@ -439,7 +468,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }: Probi
             `${prependUnits} G0 Y[Y_CENTER]`,
             'G21 G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
-            'G21 G0 G90 Z1'
+            'G21 G0 G90 Z1',
         );
     } else if (axes.x && axes.y) {
         code.push(
@@ -542,12 +571,18 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }: Probi
     return code;
 };
 
-export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }: ProbingOptions): Array<string> => {
+export const get3AxisAutoDiameterRoutine = ({
+    axes,
+    direction,
+    toolDiameter,
+}: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
 
-
-    const [xOff, yOff] = determineAutoPlateOffsetValues(direction, toolDiameter);
+    const [xOff, yOff] = determineAutoPlateOffsetValues(
+        direction,
+        toolDiameter,
+    );
 
     // const toolRadius = (diameter / 2);
     // const toolCompensatedThickness = ((-1 * toolRadius));
@@ -662,21 +697,21 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }: P
     return code;
 };
 
-export const getNextDirection = (direction: PROBE_DIRECTIONS): PROBE_DIRECTIONS => {
+export const getNextDirection = (
+    direction: PROBE_DIRECTIONS,
+): PROBE_DIRECTIONS => {
     if (direction === 3) {
         return 0;
     }
     return Number(direction) + 1;
 };
 
-
 // Master function - given selected routine, determine which probe code to return for a specific direction
-export const getProbeCode = (options: ProbingOptions, direction: PROBE_DIRECTIONS = 0): Array<string> => {
-    const {
-        plateType,
-        axes,
-        probeType
-    } = options;
+export const getProbeCode = (
+    options: ProbingOptions,
+    direction: PROBE_DIRECTIONS = 0,
+): Array<string> => {
+    const { plateType, axes, probeType } = options;
 
     //let axesCount = Object.values(axes).reduce((a, item) => a + item, 0);
 
@@ -684,12 +719,12 @@ export const getProbeCode = (options: ProbingOptions, direction: PROBE_DIRECTION
         if (probeType === PROBE_TYPE_AUTO) {
             return get3AxisAutoRoutine({
                 ...options,
-                direction
+                direction,
             });
         } else if (probeType === PROBE_TYPE_TIP) {
             return get3AxisAutoTipRoutine({
                 ...options,
-                direction
+                direction,
             });
         } else {
             return get3AxisAutoDiameterRoutine({ ...options, direction });
@@ -705,20 +740,11 @@ export const getProbeCode = (options: ProbingOptions, direction: PROBE_DIRECTION
     } else if (axes.x && axes.y) {
         return get3AxisStandardRoutine(options);
     } else if (axes.z) {
-        return [
-            ...getPreamble(options),
-            ...getSingleAxisStandardRoutine('Z')
-        ];
+        return [...getPreamble(options), ...getSingleAxisStandardRoutine('Z')];
     } else if (axes.y) {
-        return [
-            ...getPreamble(options),
-            ...getSingleAxisStandardRoutine('Y')
-        ];
+        return [...getPreamble(options), ...getSingleAxisStandardRoutine('Y')];
     } else if (axes.x) {
-        return [
-            ...getPreamble(options),
-            ...getSingleAxisStandardRoutine('X')
-        ];
+        return [...getPreamble(options), ...getSingleAxisStandardRoutine('X')];
     }
 
     // Default do nothing bc we don't recognize the options
