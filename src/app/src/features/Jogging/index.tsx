@@ -44,7 +44,7 @@ export function Jogging() {
 
     return (
         <>
-            <div className="mt-4 flex flex-row w-full gap-2 justify-between items-center select-none">
+            <div className="mt-4 flex flex-row w-full gap-2 justify-around items-center select-none">
                 <div className="min-w-[180px] relative">
                     <JogWheel
                         distance={jogSpeed.xyStep}
