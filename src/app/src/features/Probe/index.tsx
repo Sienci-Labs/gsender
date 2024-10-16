@@ -484,6 +484,7 @@ const ProbeWidget = () => {
         units: units,
         direction: direction,
         probeType: probeType,
+        connectivityTest: connectivityTest,
     };
 
     return (
