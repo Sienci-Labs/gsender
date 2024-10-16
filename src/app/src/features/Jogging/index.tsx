@@ -71,7 +71,7 @@ export function Jogging() {
                     />
                 </div>
                 <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />
-                {axes.includes('A') && (
+                {axes && axes.includes('A') && (
                     <AJog
                         distance={jogSpeed.aStep}
                         feedrate={jogSpeed.feedrate}

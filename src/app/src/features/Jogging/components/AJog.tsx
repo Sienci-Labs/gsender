@@ -10,7 +10,6 @@ import {
 import { useLongPress } from 'use-long-press';
 
 export function AJog({ feedrate, distance }: JoggerProps) {
-    console.log(axes);
     const aPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ A: 1 }, feedrate),
         {
