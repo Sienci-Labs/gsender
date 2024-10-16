@@ -1,7 +1,7 @@
 import controller from 'app/lib/controller';
 import store from 'app/store';
 import get from 'lodash/get';
-import {METRIC_UNITS} from "app/constants";
+import { METRIC_UNITS } from 'app/constants';
 export type Axis =
     | 'A'
     | 'B'
@@ -48,8 +48,8 @@ export function zeroAllAxes() {
     controller.command('gcode', `G10 L20 P0 X0 Y0 Z0`);
 }
 
-export function zeroXYAxes() {
-    controller.command('gcode', `G10 L20 P0 X0 Y0`);
+export function goXYAxes() {
+    controller.command('gcode', `G90 G0 X0 Y0`);
 }
 
 export function gotoZero(axis: string) {
@@ -97,9 +97,8 @@ export function GoTo(pos: DROPosition, isG91: boolean) {
 export function handleManualOffset(value: string | number, axis: Axis) {
     const offset = Number(value);
     const units = store.get('workspace.units');
-    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+    const modal = units === METRIC_UNITS ? 'G21' : 'G20';
 
     const command = `G10 P0 L20 ${axis.toUpperCase()}${offset}`;
     controller.command('gcode:safe', command, modal);
-
 }

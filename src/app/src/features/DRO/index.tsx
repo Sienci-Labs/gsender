@@ -4,7 +4,7 @@ import {
     defaultDROPosition,
     DROPosition,
     zeroAllAxes,
-    zeroXYAxes,
+    goXYAxes,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { IconButton } from 'app/components/IconButton';
@@ -48,7 +48,7 @@ function DRO({
     unitLabel,
     isConnected,
     activeState,
-    preferredUnits
+    preferredUnits,
 }: DROProps): JSX.Element {
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -102,8 +102,7 @@ function DRO({
                     wpos={Number(wpos.z)}
                     disabled={!canClick}
                 />
-                {
-                    axes.includes('a') &&
+                {axes.includes('a') && (
                     <AxisRow
                         axis={'A'}
                         key={'a'}
@@ -111,8 +110,7 @@ function DRO({
                         wpos={Number(wpos.a)}
                         disabled={!canClick}
                     />
-                }
-
+                )}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
                 <IconButton
@@ -122,7 +120,7 @@ function DRO({
                 >
                     Zero
                 </IconButton>
-                <Button color="alt" onClick={zeroXYAxes} disabled={!canClick}>
+                <Button color="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
@@ -166,6 +164,6 @@ export default connect((reduxStore) => {
         unitLabel,
         workflowState,
         activeState,
-        preferredUnits
+        preferredUnits,
     };
 })(DRO);
