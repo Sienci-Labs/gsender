@@ -9,6 +9,9 @@ import store from 'app/store';
 import stopSign from './assets/stop.svg';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
 import { FirmwareFlavour } from 'app/features/Connection';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
 
 export interface JogValueObject {
     xyStep: number;
@@ -18,6 +21,11 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
+    const axes = useSelector((state: RootState) => {
+        const controllerState = state.controller.state;
+        return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
+    });
+
     const [jogSpeed, setJogSpeed] = useState<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -63,7 +71,12 @@ export function Jogging() {
                     />
                 </div>
                 <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />
-                <AJog distance={jogSpeed.aStep} feedrate={jogSpeed.feedrate} />
+                {axes.includes('A') && (
+                    <AJog
+                        distance={jogSpeed.aStep}
+                        feedrate={jogSpeed.feedrate}
+                    />
+                )}
             </div>
             <div className="flex flex-row justify-around flex-shrink">
                 <div className="grid grid-cols-2 gap-1">

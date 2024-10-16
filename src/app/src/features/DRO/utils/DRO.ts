@@ -59,8 +59,6 @@ export function gotoZero(axis: string) {
     const homingEnabled = homingSetting !== 0;
 
     const retractHeight = Number(store.get('workspace.safeRetractHeight', -1));
-    console.log(retractHeight);
-    console.log(homingSetting);
 
     if (retractHeight !== 0 && axis !== 'Z') {
         if (homingEnabled) {

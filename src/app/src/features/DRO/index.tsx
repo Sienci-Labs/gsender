@@ -102,7 +102,7 @@ function DRO({
                     wpos={Number(wpos.z)}
                     disabled={!canClick}
                 />
-                {axes.includes('a') && (
+                {axes.includes('A') && (
                     <AxisRow
                         axis={'A'}
                         key={'a'}
