@@ -1,4 +1,4 @@
-import { Axis } from 'app/features/DRO/utils/DRO.ts';
+import {Axis, handleManualOffset} from 'app/features/DRO/utils/DRO.ts';
 import { Button } from 'app/components/Button';
 import { zeroWCS, gotoZero } from '../utils/DRO.ts';
 import { WCSInput } from 'app/features/DRO/component/WCSInput.tsx';
@@ -8,6 +8,7 @@ interface AxisRowProps {
     mpos: number;
     wpos: number;
     disabled: boolean;
+    key: string
 }
 
 export function AxisRow({ axis, mpos, wpos, disabled }: AxisRowProps) {
@@ -24,7 +25,7 @@ export function AxisRow({ axis, mpos, wpos, disabled }: AxisRowProps) {
                 </span>
             </Button>
 
-            <WCSInput disabled={disabled} value={wpos} />
+            <WCSInput disabled={disabled} value={wpos} axis={axis} movementHandler={handleManualOffset}/>
 
             <span className="font-mono flex items-center text-gray-600 w-[9ch] text-center">
                 {mpos}

@@ -33,17 +33,21 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </div>
                 </button>
             ))}
-            <div className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1">
+            {
+                props.selectedFirmware === 'grblHAL' &&
+                <div
+                    className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1">
                 <span className="text-4xl">
-                    <BsEthernet />
+                    <BsEthernet/>
                 </span>
-                <div className="flex flex-col gap-1 text-right">
-                    <span>192.168.5.1</span>
-                    <span className="text-sm text-gray-600 font-normal">
+                    <div className="flex flex-col gap-1 text-right">
+                        <span>192.168.5.1</span>
+                        <span className="text-sm text-gray-600 font-normal">
                         Ethernet on port 23
                     </span>
+                    </div>
                 </div>
-            </div>
+            }
             <FirmwareSelector
                 selectedFirmware={props.selectedFirmware}
                 onClick={props.onFirmwareClick}

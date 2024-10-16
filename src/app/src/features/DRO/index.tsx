@@ -12,7 +12,6 @@ import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
 
 //import { LuParkingSquare } from 'react-icons/lu';
-import { Axis } from './utils/DRO';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
@@ -30,24 +29,26 @@ import includes from 'lodash/includes';
 
 interface DROProps {
     axes: AxesArray;
-    mpos: DROPosition;
-    wpos: DROPosition;
+    mposController: DROPosition;
+    wposController: DROPosition;
     unitLabel: string;
     homingEnabled: boolean;
     canClick: boolean;
     workflowState: string;
     isConnected: boolean;
     activeState: string;
+    preferredUnits: 'in' | 'mm';
 }
 
 function DRO({
     axes,
-    mpos,
-    wpos,
+    mposController,
+    wposController,
     workflowState,
     unitLabel,
     isConnected,
     activeState,
+    preferredUnits
 }: DROProps): JSX.Element {
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -57,6 +58,14 @@ function DRO({
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
+
+    const wpos = mapValues(wposController, (pos) => {
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
+
+    const mpos = mapValues(mposController, (pos) => {
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
 
     return (
         <div>
@@ -72,15 +81,38 @@ function DRO({
                 <Label>Go</Label>
             </div>
             <div className="flex flex-col w-full gap-1 space-between">
-                {axes.map((axis: Axis) => (
+                <AxisRow
+                    axis={'X'}
+                    key={'X'}
+                    mpos={Number(mpos.x)}
+                    wpos={Number(wpos.x)}
+                    disabled={!canClick}
+                />
+                <AxisRow
+                    axis={'Y'}
+                    key={'Y'}
+                    mpos={Number(mpos.y)}
+                    wpos={Number(wpos.y)}
+                    disabled={!canClick}
+                />
+                <AxisRow
+                    axis={'Z'}
+                    key={'Z'}
+                    mpos={Number(mpos.z)}
+                    wpos={Number(wpos.z)}
+                    disabled={!canClick}
+                />
+                {
+                    axes.includes('a') &&
                     <AxisRow
-                        axis={axis}
-                        key={axis}
-                        mpos={mpos[axis.toLowerCase()]}
-                        wpos={wpos[axis.toLowerCase()]}
+                        axis={'A'}
+                        key={'a'}
+                        mpos={Number(mpos.a)}
+                        wpos={Number(wpos.a)}
                         disabled={!canClick}
                     />
-                ))}
+                }
+
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
                 <IconButton
@@ -117,14 +149,6 @@ export default connect((reduxStore) => {
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
 
-    const wpos = mapValues(wposController, (pos) => {
-        return String(mapPositionToUnits(pos, preferredUnits));
-    });
-
-    const mpos = mapValues(mposController, (pos) => {
-        return String(mapPositionToUnits(pos, preferredUnits));
-    });
-
     const workflowState = get(reduxStore, 'controller.workflow.state', 'idle');
     const activeState = get(
         store,
@@ -137,10 +161,11 @@ export default connect((reduxStore) => {
         isConnected,
         homingEnabled,
         axes,
-        wpos,
-        mpos,
+        wposController,
+        mposController,
         unitLabel,
         workflowState,
         activeState,
+        preferredUnits
     };
 })(DRO);
