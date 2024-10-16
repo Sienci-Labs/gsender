@@ -60,6 +60,7 @@ const RunProbe = ({ actions, state }: Props) => {
         availableProbeCommands,
         selectedProbeCommand,
         touchplate,
+        connectivityTest,
     } = state;
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
@@ -114,24 +115,32 @@ const RunProbe = ({ actions, state }: Props) => {
         actions.onOpenChange(false);
     };
 
-    // const startConnectivityTest = (probeStatus: () => boolean, connectivityTest: boolean): void => {
-    //     // If we disabled test, immediately set connectionMade to true and return
-    //     if (!connectivityTest) {
-    //         actions.setProbeConnectivity(true);
-    //         return;
-    //     }
+    const startConnectivityTest = (
+        probeStatus: () => boolean,
+        connectivityTest: boolean,
+    ): void => {
+        // If we disabled test, immediately set connectionMade to true and return
+        if (!connectivityTest) {
+            actions.setProbeConnectivity(true);
+            return;
+        }
 
-    //     setTestInterval(setInterval(() => {
-    //         if (probeStatus()) {
-    //             actions.setProbeConnectivity(true);
-    //             clearInterval(testInterval);
-    //             setTestInterval(null);
-    //         }
-    //     }, 500));
-    // }
+        setTestInterval(
+            setInterval(() => {
+                if (probeStatus()) {
+                    actions.setProbeConnectivity(true);
+                    clearInterval(testInterval);
+                    setTestInterval(null);
+                }
+            }, 500),
+        );
+    };
 
     useEffect(() => {
-        //this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
+        startConnectivityTest(
+            actions.returnProbeConnectivity,
+            connectivityTest,
+        );
         addShuttleControlEvents();
         useKeybinding(shuttleControlEvents);
 

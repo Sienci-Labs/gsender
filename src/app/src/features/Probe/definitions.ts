@@ -135,4 +135,5 @@ export interface State {
     units: UNITS_EN;
     direction: number;
     probeType: PROBE_TYPES_T;
+    connectivityTest: boolean;
 }
