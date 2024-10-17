@@ -25,4 +25,4 @@ cypress.env.json
 .env.sentry-build-plugin
 
 
-*/application.css
+**/application.css
