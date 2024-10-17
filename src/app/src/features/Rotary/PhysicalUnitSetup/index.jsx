@@ -207,7 +207,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                             </div>
                         </div>
 
-                        <div className={`mt-8 ${!linesUp ? 'opacity-0' : ''}`}>
+                        <div className={`mt-8 ${!linesUp ? 'opacity-50' : ''}`}>
                             <div className="mb-2">Number of holes</div>
                             <div className="flex items-center">
                                 <label className="mr-2">
@@ -219,6 +219,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                                         onChange={() =>
                                             handleDrillCountSelection(SIX)
                                         }
+                                        disabled={!linesUp}
                                     />
                                     6
                                 </label>
@@ -231,6 +232,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                                         onChange={() =>
                                             handleDrillCountSelection(TEN)
                                         }
+                                        disabled={!linesUp}
                                     />
                                     10
                                 </label>
@@ -248,6 +250,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                         icon="fas fa-play"
                         className="w-1/2 mx-auto"
                         onClick={onSubmit}
+                        color="primary"
                     >
                         Send to Visualizer
                     </Button>
