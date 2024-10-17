@@ -184,13 +184,13 @@ const RunProbe = ({ actions, state }: Props) => {
         <Dialog open={show} onOpenChange={actions.onOpenChange}>
             <DialogContent
                 className={cx(
-                    'flex flex-col justify-center items-center bg-gray-100 w-[700px] h-[450px] sm:min-w-[20%] sm:max-w-[80%] p-4',
+                    'flex flex-col justify-center items-center bg-gray-100 w-[500px] min-h-[450px] p-4',
                     {
                         hidden: !show,
                     },
                 )}
             >
-                <DialogHeader className="bg-robin-950 text-robin-700 flex items-start justify-center h-10 border-b-[1px] border-gray-400 mb-1">
+                <DialogHeader className="text-robin-700 flex items-start justify-center h-10 border-b-[1px] border-gray-400 mb-1">
                     <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
                 </DialogHeader>
                 <div className="grid grid-cols-[1.5fr_1fr] gap-3 w-[600px] min-h-[200px]">

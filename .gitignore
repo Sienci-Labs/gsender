@@ -23,3 +23,6 @@ cypress.env.json
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+
+**/application.css
