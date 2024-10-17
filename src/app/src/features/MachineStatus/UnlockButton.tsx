@@ -23,43 +23,59 @@
 
 import React, { MouseEventHandler } from 'react';
 import cx from 'classnames';
-import { FaHome, FaUnlock } from "react-icons/fa";
+import { FaHome, FaUnlock } from 'react-icons/fa';
 
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
 
 export interface UnlockProps {
-    activeState: GRBL_ACTIVE_STATES_T,
-    alarmCode: ALARM_CODE,
-    onClick: MouseEventHandler<HTMLButtonElement>,
-};
+    activeState: GRBL_ACTIVE_STATES_T;
+    alarmCode: ALARM_CODE;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+}
 
-const UnlockButton: React.FC<UnlockProps> = ({ activeState, alarmCode, onClick }) => {
+const UnlockButton: React.FC<UnlockProps> = ({
+    activeState,
+    alarmCode,
+    onClick,
+}) => {
     const getButtonText = (): string => {
-        if (alarmCode === 11) {
+        if (alarmCode === 11 || alarmCode === 'Homing') {
             return 'Click to Run Homing';
         }
         return 'Click to Unlock Machine';
     };
 
-    const SymbolComponent = activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 'Homing' || alarmCode === 11) ? (
-        <FaHome className="text-9xl h-16 mr-1" role="button" tabIndex={-1} />
-    ) : (
-        <FaUnlock className="text-9xl h-16 mr-1" role="button" tabIndex={-1} />
-    );
+    const SymbolComponent =
+        activeState === GRBL_ACTIVE_STATE_ALARM &&
+        (alarmCode === 'Homing' || alarmCode === 11) ? (
+            <FaHome
+                className="text-9xl h-16 mr-1"
+                role="button"
+                tabIndex={-1}
+            />
+        ) : (
+            <FaUnlock
+                className="text-9xl h-16 mr-1"
+                role="button"
+                tabIndex={-1}
+            />
+        );
 
     return (
         <div className="flex items-center justify-center pointer-events-auto">
             <button
                 type="button"
                 className={cx(
-                    "w-[8.5rem] flex flex-row items-center justify-between p-3 rounded-3xl leading-tight line-s text-white border-solid border-[1px] opacity-90 hover:opacity-70",
+                    'w-[8.5rem] flex flex-row items-center justify-between p-3 rounded-3xl leading-tight line-s text-white border-solid border-[1px] opacity-90 hover:opacity-70',
                     {
-                        "border-red-800 bg-red-600 grow [animation:grow_2s_infinite]": activeState === GRBL_ACTIVE_STATE_ALARM,
-                        "border-yellow-800 bg-yellow-600": activeState !== GRBL_ACTIVE_STATE_ALARM,
+                        'border-red-800 bg-red-600 grow [animation:grow_2s_infinite]':
+                            activeState === GRBL_ACTIVE_STATE_ALARM,
+                        'border-yellow-800 bg-yellow-600':
+                            activeState !== GRBL_ACTIVE_STATE_ALARM,
                         // "pr-1": alarmCode !== 'Homing' && alarmCode !== 11 // this is for adjusting the position of the text
-                    }
+                    },
                 )}
                 onClick={onClick}
             >
