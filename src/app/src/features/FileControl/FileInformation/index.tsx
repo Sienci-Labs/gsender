@@ -14,7 +14,7 @@ const FileInformation = () => {
 
     if (fileProcessing) {
         return (
-            <div className="flex flex-col gap-2 justify-center p-3 items-center h-full">
+            <div className="flex flex-col gap-2 justify-center items-center h-full">
                 <div className="flex gap-2">
                     <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
                     <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
@@ -26,7 +26,7 @@ const FileInformation = () => {
 
     if (!fileLoaded) {
         return (
-            <div className="flex flex-col gap-2 justify-center p-3 items-center h-full">
+            <div className="flex flex-col gap-2 justify-center items-center h-full">
                 <h2 className="text-lg font-bold">No file loaded</h2>
             </div>
         );
