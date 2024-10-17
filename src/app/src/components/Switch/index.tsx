@@ -16,6 +16,7 @@ interface SwitchProps {
     secondaryLabel?: string;
     value?: number;
     id?: string;
+    position?: 'horizontal' | 'vertical';
 }
 
 const Switch: React.FC<SwitchProps> = ({
@@ -28,6 +29,7 @@ const Switch: React.FC<SwitchProps> = ({
     secondaryLabel,
     value,
     id,
+    position = 'horizontal',
 }) => {
     return (
         <div className={cn('flex items-center', className)}>
@@ -43,6 +45,7 @@ const Switch: React.FC<SwitchProps> = ({
                     checked ? `bg-[${onColor}]` : 'bg-gray-200',
                     disabled && 'opacity-50 cursor-not-allowed',
                 )}
+                position={position}
             />
             {secondaryLabel && <span className="ml-2">{secondaryLabel}</span>}
         </div>
