@@ -100,3 +100,11 @@ export function handleManualOffset(value: string | number, axis: Axis) {
     const command = `G10 P0 L20 ${axis.toUpperCase()}${offset}`;
     controller.command('gcode:safe', command, modal);
 }
+
+export function homeMachine() {
+    controller.command('gcode', '$H');
+}
+
+export function homeAxis(axis: string) {
+    controller.command('gcode', `$H${axis}`);
+}

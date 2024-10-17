@@ -24,8 +24,9 @@ import {
 } from 'app/constants';
 import { mapValues } from 'lodash';
 import { mapPositionToUnits } from 'app/lib/units.ts';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import includes from 'lodash/includes';
+import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 
 interface DROProps {
     axes: AxesArray;
@@ -50,6 +51,12 @@ function DRO({
     activeState,
     preferredUnits,
 }: DROProps): JSX.Element {
+    const [homingMode, setHomingMode] = useState<boolean>(false);
+
+    function toggleHoming() {
+        setHomingMode(!homingMode);
+    }
+
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
@@ -77,38 +84,42 @@ function DRO({
                 )*/}
             </div>
             <div className="w-full flex flex-row justify-between px-3">
-                <Label>Set</Label>
+                <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go</Label>
             </div>
             <div className="flex flex-col w-full gap-1 space-between">
                 <AxisRow
                     axis={'X'}
                     key={'X'}
-                    mpos={Number(mpos.x)}
-                    wpos={Number(wpos.x)}
+                    mpos={mpos.x}
+                    wpos={wpos.x}
                     disabled={!canClick}
+                    homingMode={homingMode}
                 />
                 <AxisRow
                     axis={'Y'}
                     key={'Y'}
-                    mpos={Number(mpos.y)}
-                    wpos={Number(wpos.y)}
+                    mpos={mpos.y}
+                    wpos={wpos.y}
                     disabled={!canClick}
+                    homingMode={homingMode}
                 />
                 <AxisRow
                     axis={'Z'}
                     key={'Z'}
-                    mpos={Number(mpos.z)}
-                    wpos={Number(wpos.z)}
+                    mpos={mpos.z}
+                    wpos={wpos.z}
                     disabled={!canClick}
+                    homingMode={homingMode}
                 />
                 {axes.includes('A') && (
                     <AxisRow
                         axis={'A'}
                         key={'a'}
-                        mpos={Number(mpos.a)}
-                        wpos={Number(wpos.a)}
+                        mpos={mpos.a}
+                        wpos={wpos.a}
                         disabled={!canClick}
+                        homingMode={homingMode}
                     />
                 )}
             </div>
@@ -120,6 +131,10 @@ function DRO({
                 >
                     Zero
                 </IconButton>
+                <HomingSwitch
+                    onChange={toggleHoming}
+                    homingValue={homingMode}
+                />
                 <Button color="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
