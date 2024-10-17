@@ -24,7 +24,6 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 
-import store from 'app/store';
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
     PROBE_TYPE_AUTO,
@@ -68,9 +67,14 @@ const convertAvailableTools = (tools: AvailableTool[], units: UNITS_EN) => {
 
 const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
     const { _setToolDiameter, _setProbeType } = actions;
-    let { availableTools, units } = state;
+    let { availableTools, units, touchplate, toolDiameter } = state;
+    const { touchplateType } = touchplate;
 
-    const [value, setValue] = useState('Auto');
+    const [value, setValue] = useState(
+        touchplateType === TOUCHPLATE_TYPE_AUTOZERO
+            ? 'Auto'
+            : String(toolDiameter),
+    );
 
     const tools = [...availableTools];
 
@@ -88,8 +92,6 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
     const options = [];
 
     const toolsObjects = convertAvailableTools(tools, units);
-
-    const touchplateType = store.get('workspace.probeProfile.touchplateType');
 
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
         options.push(
