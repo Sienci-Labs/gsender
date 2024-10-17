@@ -5,7 +5,7 @@ import Probe from '../Probe';
 import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
-
+import Macros from '../Macros';
 interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
@@ -19,6 +19,10 @@ const tabs = [
     {
         label: 'Probe',
         content: Probe,
+    },
+    {
+        label: 'Macros',
+        content: Macros,
     },
     {
         label: 'Coolant',
