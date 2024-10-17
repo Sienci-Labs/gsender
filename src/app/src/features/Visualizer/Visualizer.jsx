@@ -1429,20 +1429,22 @@ class Visualizer extends Component {
                     geometry.boundingBox.max.z - geometry.boundingBox.min.z;
                 geometry.translate(0, 0, height / 2);
 
-                let material;
+                let material = new THREE.MeshLambertMaterial({
+                    map: texture,
+                    opacity: 0.6,
+                    transparent: false,
+                    emissive: 0xffffff,
+                    emissiveIntensity: 0.4,
+                    color: '#caf0f8',
+                });
+
                 if (geometry.hasColors) {
-                    material = new THREE.MeshLambertMaterial({
-                        map: texture,
-                        opacity: 0.6,
-                        transparent: false,
-                        emissive: 0xffffff,
-                        emissiveIntensity: 0.4,
-                        color: '#caf0f8',
-                    });
+                    material.vertexColors = true;
                 }
 
+                const mesh = new THREE.Mesh(geometry, material);
                 const object = new THREE.Object3D();
-                object.add(new THREE.Mesh(geometry, material));
+                object.add(mesh);
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
