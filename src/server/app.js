@@ -186,9 +186,25 @@ const appMain = () => {
 
     // Connect's body parsing middleware. This only handles urlencoded and json bodies.
     // https://github.com/expressjs/body-parser
-    // This is no longer needed with Vite and later Node.js versions? This was causing issues with multer
     // app.use(bodyParser.json(settings.middleware['body-parser'].json));
     // app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
+    // app.use(express.json());
+    // app.use(express.urlencoded({ extended: true }));
+    app.use((req, res, next) => {
+        if (req.path === urljoin(settings.route, 'api/file')) {
+            // Skip body parsing for the file upload route
+            return next();
+        }
+        express.json()(req, res, (err) => {
+            if (err) {
+                return next(err);
+            }
+            express.urlencoded({ extended: true })(req, res, next);
+            return null;
+        });
+
+        return null;
+    });
 
     // For multipart bodies, please use the following modules:
     // - [busboy](https://github.com/mscdex/busboy) and [connect-busboy](https://github.com/mscdex/connect-busboy)
@@ -379,7 +395,6 @@ const appMain = () => {
         const storage = multer.memoryStorage();
         const upload = multer({
             storage
-            // dest: './public/data/uploads/'
         });
         app.post(urljoin(settings.route, 'api/file'), upload.single('gcode'), api.files.uploadFile);
 
