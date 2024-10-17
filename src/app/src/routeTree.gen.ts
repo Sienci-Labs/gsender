@@ -80,38 +80,37 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export interface FileRoutesByFullPath {
+interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/stats': typeof StatsLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
-export interface FileRoutesByTo {
+interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/stats': typeof StatsLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
-export interface FileRoutesById {
-  __root__: typeof rootRoute
+interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/stats': typeof StatsLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
-export interface FileRouteTypes {
+interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/configuration' | '/stats' | '/tools'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/configuration' | '/stats' | '/tools'
-  id: '__root__' | '/' | '/configuration' | '/stats' | '/tools'
+  id: '/' | '/configuration' | '/stats' | '/tools'
   fileRoutesById: FileRoutesById
 }
 
-export interface RootRouteChildren {
+interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ConfigurationLazyRoute: typeof ConfigurationLazyRoute
   StatsLazyRoute: typeof StatsLazyRoute

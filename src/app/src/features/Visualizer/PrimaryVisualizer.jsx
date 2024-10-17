@@ -20,6 +20,7 @@ import { MODAL_WATCH_DIRECTORY } from './constants';
 import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
+import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
 
 const PrimaryVisualizer = ({
     actions,
@@ -95,6 +96,7 @@ const PrimaryVisualizer = ({
                         camera={camera}
                         cameraPosition={cameraPosition}
                     />
+                    <WorkspaceSelector />
                 </div>
             </Widget.Content>
         </Widget>

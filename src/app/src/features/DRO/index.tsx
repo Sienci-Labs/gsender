@@ -69,7 +69,7 @@ function DRO({
 
     return (
         <div>
-            <div className="w-full min-h-10 flex flex-row align-bottom justify-between mb-2 px-4">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {/*homingEnabled && (
                     <IconButton icon={<LuParkingSquare />} color="primary" />
