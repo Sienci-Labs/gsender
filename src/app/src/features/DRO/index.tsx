@@ -50,6 +50,7 @@ function DRO({
     isConnected,
     activeState,
     preferredUnits,
+    homingEnabled,
 }: DROProps): JSX.Element {
     const [homingMode, setHomingMode] = useState<boolean>(false);
 
@@ -131,10 +132,14 @@ function DRO({
                 >
                     Zero
                 </IconButton>
-                <HomingSwitch
-                    onChange={toggleHoming}
-                    homingValue={homingMode}
-                />
+                {homingEnabled && (
+                    <HomingSwitch
+                        onChange={toggleHoming}
+                        homingValue={homingMode}
+                        disabled={!canClick}
+                    />
+                )}
+
                 <Button color="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
