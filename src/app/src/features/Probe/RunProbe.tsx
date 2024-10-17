@@ -103,7 +103,7 @@ const RunProbe = ({ actions, state }: Props) => {
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();
-        //console.log(probeCommands);
+        // console.log(probeCommands);
 
         actions.runProbeCommands(probeCommands);
         Toaster.pop({

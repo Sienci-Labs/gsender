@@ -450,7 +450,7 @@ const ProbeWidget = () => {
         setUnits(store.get('workspace.units'));
         setAvailableTools(store.get('workspace.tools', []));
         setTouchplateType(store.get('workspace.probeProfile.touchplateType'));
-        setTouchplate(config.get('workspace[probeProfile]', {}));
+        setTouchplate(store.get('workspace.probeProfile', {}));
         setDirection(config.get('direction', 0));
         // setProbeAxis(config.get('probeAxis', 'Z'));
         setProbeCommand(config.get('probeCommand', 'G38.2'));
