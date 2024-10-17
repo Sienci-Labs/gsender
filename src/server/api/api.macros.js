@@ -154,7 +154,7 @@ export const create = (req, res) => {
         records.push(record);
         config.set(CONFIG_KEY, records);
 
-        res.send({ err: null });
+        res.send({ err: null, macro: record });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)
