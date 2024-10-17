@@ -39,13 +39,9 @@ const JobControl: React.FC<JobControlProps> = ({
     return (
         <div className="relative h-full">
             <div className="z-10 absolute top-[-160px] flex flex-col justify-center items-center w-full">
-                {isConnected &&
-                    fileLoaded &&
-                    activeState !== GRBL_ACTIVE_STATE_IDLE && (
-                        <ProgressArea
-                            senderStatus={senderStatus}
-                        ></ProgressArea>
-                    )}
+                {isConnected && fileLoaded && senderStatus.sent > 0 && (
+                    <ProgressArea senderStatus={senderStatus}></ProgressArea>
+                )}
             </div>
             <div className="bg-transparent z-10 absolute top-[-60px] left-1/2 right-1/2 flex flex-col justify-center items-center">
                 {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
