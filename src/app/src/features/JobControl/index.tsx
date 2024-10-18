@@ -37,58 +37,60 @@ const JobControl: React.FC<JobControlProps> = ({
     const disabled = !isConnected || !fileLoaded;
 
     return (
-        <div className="relative h-full">
-            <div className="z-10 absolute top-[-160px] flex flex-col justify-center items-center w-full">
-                {isConnected && fileLoaded && senderStatus.sent > 0 && (
-                    <ProgressArea senderStatus={senderStatus}></ProgressArea>
-                )}
-            </div>
-            <div className="bg-transparent z-10 absolute top-[-60px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
-                    <div className="flex flex-row gap-2 justify-center mb-3 w-full">
-                        <OutlineButton disabled={disabled} />
-                        <StartFromLine disabled={disabled} />
+        <Widget>
+            <Widget.Content className="flex justify-center items-center flex-col relative w-full">
+                <div className="z-10 top-[-85px] flex flex-col justify-center items-center absolute left-1/2 right-1/2">
+                    <div className="flex flex-col justify-center items-center w-full">
+                        {isConnected && fileLoaded && senderStatus.sent > 0 && (
+                            <ProgressArea
+                                senderStatus={senderStatus}
+                            ></ProgressArea>
+                        )}
                     </div>
-                )}
-            </div>
+                    <div
+                        className={`bg-transparent z-10 flex flex-col justify-center items-center ${!fileLoaded || activeState !== GRBL_ACTIVE_STATE_IDLE ? 'opacity-0' : ''}`}
+                    >
+                        <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                            <OutlineButton disabled={disabled} />
+                            <StartFromLine disabled={disabled} />
+                        </div>
+                    </div>
 
-            <div className="z-10 absolute top-[-10px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
-                <ControlButton
-                    type={START}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                />
-                <ControlButton
-                    type={PAUSE}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                />
-                <ControlButton
-                    type={STOP}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                />
-            </div>
-            <Widget>
-                <Widget.Content className="flex justify-center items-center flex-col">
-                    <div className="mt-4">
-                        <Overrides
-                            ovF={ovF}
-                            ovS={ovS}
-                            feedrate={feedrate}
-                            spindle={spindle}
+                    <div className="flex flex-row gap-2 justify-center items-center">
+                        <ControlButton
+                            type={START}
+                            workflow={workflow}
+                            activeState={activeState}
                             isConnected={isConnected}
+                            fileLoaded={fileLoaded}
+                        />
+                        <ControlButton
+                            type={PAUSE}
+                            workflow={workflow}
+                            activeState={activeState}
+                            isConnected={isConnected}
+                            fileLoaded={fileLoaded}
+                        />
+                        <ControlButton
+                            type={STOP}
+                            workflow={workflow}
+                            activeState={activeState}
+                            isConnected={isConnected}
+                            fileLoaded={fileLoaded}
                         />
                     </div>
-                </Widget.Content>
-            </Widget>
-        </div>
+                </div>
+                <div className="mt-4">
+                    <Overrides
+                        ovF={ovF}
+                        ovS={ovS}
+                        feedrate={feedrate}
+                        spindle={spindle}
+                        isConnected={isConnected}
+                    />
+                </div>
+            </Widget.Content>
+        </Widget>
     );
 };
 
