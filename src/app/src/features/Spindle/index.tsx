@@ -388,8 +388,7 @@ const SpindleWidget = () => {
             setIsLaserOn(true);
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
-        handleSpindleSpeedChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = Number(e.target.value);
+        handleSpindleSpeedChange: (value: number) => {
             if (isSpindleOn) {
                 debounceSpindleSpeed(value);
             }
