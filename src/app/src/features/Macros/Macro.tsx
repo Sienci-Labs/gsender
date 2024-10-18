@@ -42,7 +42,7 @@ const Container: React.FC<ContainerProps> = ({ columns, children }) => {
 
     return (
         <div
-            className="grid overflow-y-auto absolute h-full w-full"
+            className="grid overflow-y-auto absolute h-full w-full gap-1"
             style={{ gridTemplateColumns }}
         >
             {children}
