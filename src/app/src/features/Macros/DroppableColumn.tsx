@@ -38,11 +38,10 @@ const DroppableColumn = ({
     disabled,
 }: DroppableColumnProps) => {
     const getListStyle = (_isDraggingOver: boolean) => ({
-        padding: 8,
         width: '100%',
         display: 'grid',
         gridAutoRows: 'min-content',
-        gap: 5,
+        gap: 4,
     });
 
     const getItemStyle = (
