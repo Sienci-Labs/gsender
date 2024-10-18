@@ -2,7 +2,7 @@ import React from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const buttonStyle = tv({
-    base: 'border rounded hover:opacity-90 py-1 px-3 shadow',
+    base: 'border rounded hover:opacity-90 px-3 shadow',
     variants: {
         color: {
             primary: 'border-blue-500 text-white bg-blue-500',
@@ -27,6 +27,7 @@ export interface ButtonProps extends ButtonVariants {
     children?: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
+    className?: string;
 }
 
 export function Button(props: ButtonProps) {

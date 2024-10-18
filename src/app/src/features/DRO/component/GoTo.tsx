@@ -36,7 +36,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         <Popover>
             <PopoverTrigger
                 disabled={disabled}
-                className="border rounded hover:opacity-90 py-1 px-3 shadow border-robin-500 text-white bg-robin-500 disabled:bg-gray-300 disabled:border-gray-500 disabled:text-gray-500"
+                className="border rounded hover:opacity-90 px-3 shadow border-robin-500 text-white bg-robin-500 disabled:bg-gray-300 disabled:border-gray-500 disabled:text-gray-500"
             >
                 <FaPaperPlane />
             </PopoverTrigger>

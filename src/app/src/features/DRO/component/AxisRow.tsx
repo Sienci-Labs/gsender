@@ -35,6 +35,7 @@ export function AxisRow({
                 }}
                 disabled={disabled}
                 color={homingMode ? 'alt' : 'secondary'}
+                className={"px-5"}
             >
                 <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                     {axis}
@@ -48,7 +49,7 @@ export function AxisRow({
                 movementHandler={handleManualOffset}
             />
 
-            <span className="font-mono flex items-center text-gray-600 w-[9ch] text-center">
+            <span className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center">
                 {mpos}
             </span>
 
