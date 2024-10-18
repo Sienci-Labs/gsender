@@ -41,6 +41,7 @@ export interface JogDistances {
 export interface JoggerProps {
     distance: number;
     feedrate: number;
+    canClick?: boolean;
 }
 
 export function cancelJog() {

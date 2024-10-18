@@ -9,7 +9,7 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function ZJog({ feedrate, distance }: JoggerProps) {
+export function ZJog({ feedrate, distance, canClick }: JoggerProps) {
     const zPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ Z: 1 }, feedrate),
         {
@@ -32,6 +32,7 @@ export function ZJog({ feedrate, distance }: JoggerProps) {
             <TabJog
                 topHandlers={zPlusJogHandlers}
                 bottomHandlers={zMinusJogHandlers}
+                canClick={canClick}
             />
             <img
                 src={zLabels}

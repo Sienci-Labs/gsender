@@ -9,7 +9,7 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function AJog({ feedrate, distance }: JoggerProps) {
+export function AJog({ feedrate, distance, canClick }: JoggerProps) {
     const aPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ A: 1 }, feedrate),
         {
@@ -32,6 +32,7 @@ export function AJog({ feedrate, distance }: JoggerProps) {
             <TabJog
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}
+                canClick={canClick}
             />
             <img
                 src={aLabels}

@@ -81,10 +81,10 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
         },
     );
 
-    const standardColourClass = 'hover:fill-blue-600';
-    const altColourClass = 'hover:fill-blue-400';
+    const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
+    const altColourClass = 'fill-robin-500 hover:fill-blue-400';
     const disabledColorClass = 'fill-gray-400 hover:fill-gray-400'
-
+    console.log(canClick);
     return (
         <svg
             width={180}

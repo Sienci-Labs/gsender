@@ -1,17 +1,19 @@
 import jogWheeelLabels from './assets/labels.svg';
-import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
-import { useState, useEffect } from 'react';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
-import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
-import { AJog } from 'app/features/Jogging/components/AJog.tsx';
+import {JogInput} from 'app/features/Jogging/components/JogInput.tsx';
+import {JogWheel} from 'app/features/Jogging/components/JogWheel.tsx';
+import {useCallback, useEffect, useState} from 'react';
+import {SpeedSelector} from 'app/features/Jogging/components/SpeedSelector.tsx';
+import {ZJog} from 'app/features/Jogging/components/ZJog.tsx';
+import {AJog} from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
 import stopSign from './assets/stop.svg';
-import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
-import { FirmwareFlavour } from 'app/features/Connection';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import {cancelJog} from 'app/features/Jogging/utils/Jogging.ts';
+import {FirmwareFlavour} from 'app/features/Connection';
+import {useSelector} from 'react-redux';
+import {RootState} from 'app/store/redux';
 import get from 'lodash/get';
+import {GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG, WORKFLOW_STATE_RUNNING} from "app/constants";
+import includes from "lodash/includes";
 
 export interface JogValueObject {
     xyStep: number;
@@ -25,6 +27,21 @@ export function Jogging() {
         const controllerState = state.controller.state;
         return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
     });
+
+    const isConnected = useSelector((state: RootState) => state.connection.isConnected);
+    const workflowState = useSelector((state:RootState) => state.controller.workflow.state);
+    const activeState = useSelector((state: RootState) => {
+        return get(state, 'controller.state.status.activeState', 'Idle')
+    });
+
+    const canClick = useCallback((): boolean => {
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    }, [isConnected, workflowState, activeState])();
 
     const [jogSpeed, setJogSpeed] = useState<JogValueObject>({
         xyStep: 0,
@@ -57,6 +74,7 @@ export function Jogging() {
                     <JogWheel
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
+                        canClick={canClick}
                     />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
@@ -70,11 +88,12 @@ export function Jogging() {
                         onClick={cancelJog}
                     />
                 </div>
-                <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} />
+                <ZJog distance={jogSpeed.zStep} feedrate={jogSpeed.feedrate} canClick={canClick}/>
                 {axes && axes.includes('A') && (
                     <AJog
                         distance={jogSpeed.aStep}
                         feedrate={jogSpeed.feedrate}
+                        canClick={canClick}
                     />
                 )}
             </div>

@@ -1013,6 +1013,9 @@ video {
 .min-h-48 {
   min-height: 12rem !important;
 }
+.min-h-8 {
+  min-height: 2rem !important;
+}
 .min-h-96 {
   min-height: 24rem !important;
 }
@@ -1824,11 +1827,17 @@ video {
 .to-blue-800 {
   --tw-gradient-to: #244c8d var(--tw-gradient-to-position) !important;
 }
+.fill-blue-500 {
+  fill: #346DCA !important;
+}
 .fill-current {
   fill: currentColor !important;
 }
 .fill-gray-400 {
   fill: #9ca3af !important;
+}
+.fill-robin-500 {
+  fill: #689AC9 !important;
 }
 .p-0 {
   padding: 0px !important;
