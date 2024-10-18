@@ -43,7 +43,7 @@ export function WorkspaceSelector() {
     }
 
     return (
-        <div className="absolute top-4 right-4 w-[200px]">
+        <div className="absolute top-4 left-8 w-[200px]">
             <Select
                 onValueChange={onWorkspaceSelect}
                 value={workspace}
