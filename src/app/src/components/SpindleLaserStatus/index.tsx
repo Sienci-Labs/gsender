@@ -28,6 +28,9 @@ const SpindleLaserStatus = () => {
         <SpindleLaserStatusVariant label="Spindle" color="disabled" />
     );
 
+    if (!spindleOn) {
+        return <></>
+    }
     return <div className="absolute top-4 left-1/2 flex ml-52">{label}</div>;
 };
 
