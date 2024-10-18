@@ -21,7 +21,7 @@ const Size = () => {
         },
     };
     return (
-        <table className="border-collapse border border-gray-300 text-sm">
+        <table className="border-collapse border border-gray-300">
             <thead>
                 <tr>
                     <th className="border border-gray-300 px-1 py-0.5"></th>
