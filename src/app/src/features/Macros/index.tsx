@@ -407,10 +407,10 @@ const MacroWidget = ({
                     ref={inputRef}
                 />
 
-                <div className="flex justify-center gap-2 mt-2 w-full">
+                <div className="flex justify-center gap-2 mt-2 w-full min-h-8">
                     <Button
                         onClick={actions.openAddMacroModal}
-                        className="flex flex-1 justify-center"
+                        className="flex flex-1 justify-center items-center"
                     >
                         <FaPlus />
                     </Button>
@@ -419,14 +419,14 @@ const MacroWidget = ({
                         onClick={() => {
                             inputRef.current?.click();
                         }}
-                        className="flex flex-1 justify-center"
+                        className="flex flex-1 justify-center items-center"
                     >
                         <FaFileImport />
                     </Button>
 
                     <Button
                         onClick={exportMacros}
-                        className="flex flex-1 justify-center"
+                        className="flex flex-1 justify-center items-center"
                     >
                         <FaFileExport />
                     </Button>
