@@ -27,6 +27,7 @@ import { mapPositionToUnits } from 'app/lib/units.ts';
 import { useCallback, useState } from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
+import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
 
 interface DROProps {
     axes: AxesArray;
@@ -77,8 +78,9 @@ function DRO({
 
     return (
         <div>
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
+                {homingEnabled && <RapidPositionButtons />}
                 {/*homingEnabled && (
                     <IconButton icon={<LuParkingSquare />} color="primary" />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
