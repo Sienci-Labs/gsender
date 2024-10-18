@@ -65,7 +65,6 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
-        console.log('Close File');
     };
 
     return (
