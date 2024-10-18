@@ -698,6 +698,15 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('settings:group', (data) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_GROUPS,
+            payload: {
+                groups: data
+            }
+        });
+    });
+
     controller.addListener('networkScan:status', (isScanning) => {
         reduxStore.dispatch({
             type: connectionActions.SCAN_NETWORK,

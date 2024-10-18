@@ -18,7 +18,8 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;
-    const firmwareType = get(reduxStore.getState(), 'controller.type');
+    const reduxStoreState = reduxStore.getState();
+    const firmwareType = get(reduxStoreState, 'controller.type');
     const rotaryFirmwareSettings = store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS);
 
     store.replace('workspace.mode', mode);
@@ -32,22 +33,24 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
             controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
         } else if (firmwareType === GRBLHAL) {
+            const previousHoming = Number(store.get('workspace.rotaryAxis.homingValue', 0));
+            const homingString = (previousHoming !== 0) ? `$22=${previousHoming}` : '';
             // switch A and Y axis settings back
             const newAAxisSettings = [
-                `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
-                `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
-                `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`,
-                `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
+                `$103=${get(reduxStoreState, 'controller.settings.settings.$101')}`,
+                `$113=${get(reduxStoreState, 'controller.settings.settings.$111')}`,
+                `$123=${get(reduxStoreState, 'controller.settings.settings.$121')}`,
+                `$133=${get(reduxStoreState, 'controller.settings.settings.$131')}`
             ];
             const newYAxisSettings = [
-                `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
-                `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
-                `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`,
-                `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
+                `$101=${get(reduxStoreState, 'controller.settings.settings.$103')}`,
+                `$111=${get(reduxStoreState, 'controller.settings.settings.$113')}`,
+                `$121=${get(reduxStoreState, 'controller.settings.settings.$123')}`,
+                `$131=${get(reduxStoreState, 'controller.settings.settings.$133')}`
             ];
 
             // zero y and enable rotary
-            controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
+            controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, ROTARY_TOGGLE_MACRO, 'G4 P0.4', homingString, '$$']);
         }
         return;
     }
@@ -122,22 +125,26 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                     </div>
                 ),
                 onConfirm: () => {
+                    const reduxStoreState = reduxStore.getState();
+                    const homingValue = Number(get(reduxStoreState, 'controller.settings.settings.$22', -1));
+                    const homingString = (homingValue > 0) ? '$22=0' : '';
+                    store.set('workspace.rotaryAxis.homingValue', homingValue);
                     // switch A and Y axis settings, will look something like this: ["$101=26.667", ...]
                     const newAAxisSettings = [
-                        `$103=${get(reduxStore.getState(), 'controller.settings.settings.$101')}`,
-                        `$113=${get(reduxStore.getState(), 'controller.settings.settings.$111')}`,
-                        `$123=${get(reduxStore.getState(), 'controller.settings.settings.$121')}`,
-                        `$133=${get(reduxStore.getState(), 'controller.settings.settings.$131')}`
+                        `$103=${get(reduxStoreState, 'controller.settings.settings.$101')}`,
+                        `$113=${get(reduxStoreState, 'controller.settings.settings.$111')}`,
+                        `$123=${get(reduxStoreState, 'controller.settings.settings.$121')}`,
+                        `$133=${get(reduxStoreState, 'controller.settings.settings.$131')}`
                     ];
                     const newYAxisSettings = [
-                        `$101=${get(reduxStore.getState(), 'controller.settings.settings.$103')}`,
-                        `$111=${get(reduxStore.getState(), 'controller.settings.settings.$113')}`,
-                        `$121=${get(reduxStore.getState(), 'controller.settings.settings.$123')}`,
-                        `$131=${get(reduxStore.getState(), 'controller.settings.settings.$133')}`
+                        `$101=${get(reduxStoreState, 'controller.settings.settings.$103')}`,
+                        `$111=${get(reduxStoreState, 'controller.settings.settings.$113')}`,
+                        `$121=${get(reduxStoreState, 'controller.settings.settings.$123')}`,
+                        `$131=${get(reduxStoreState, 'controller.settings.settings.$133')}`
                     ];
 
                     // zero y and enable rotary
-                    controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
+                    controller.command('gcode', [homingString, 'G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 

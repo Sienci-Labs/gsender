@@ -132,6 +132,7 @@ const defaultState = {
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
+            homingValue: 0
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -355,7 +356,19 @@ const defaultState = {
             },
             showWarning: false,
             showLineWarnings: false,
-            showSoftLimitWarning: false
+            showSoftLimitWarning: false,
+            'Custom Background': '#d0021b',
+            'Custom Cutting Coordinates Lines': '#fff',
+            'Custom G0': '#0ef6ae',
+            'Custom G1-3': '#3e85c7',
+            'Custom Grid': '#77a9d7',
+            'Custom Jogging Coordinates Lines': '#0ef6ae',
+            'Custom Laser': '#FF0000',
+            'Custom Limit': '#5191cc',
+            'Custom Planned Cutting Lines': '#dff204',
+            'Custom X Axis': '#df3b3b',
+            'Custom Y Axis': '#06b881',
+            'Custom Z Axis': '#295d8d',
         }
     },
     commandKeys: {}

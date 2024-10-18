@@ -4,6 +4,7 @@ export const LONGMILL_MASTER_LIST_GRBL = {
     $0: '10',
     $1: '100',
     $2: '1',
+    // $3: "* Some value *",
     $4: '1',
     $5: '0',
     $6: '0',
@@ -30,7 +31,10 @@ export const LONGMILL_MASTER_LIST_GRBL = {
     $112: '3000.000',
     $120: '750.000',
     $121: '750.000',
-    $122: '500.000',
+    $122: '500.000'
+    // $130: "* Some value *"
+    // $131: "* Some value *"
+    // $132: "* Some value *"
 };
 
 export const LONGMILL_MK1_12x12 = {

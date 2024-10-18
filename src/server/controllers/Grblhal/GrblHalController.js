@@ -127,8 +127,6 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
-            console.log('connection error:');
-            console.log(err);
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
@@ -275,7 +273,6 @@ class GrblHalController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
-                console.log(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
@@ -901,7 +898,7 @@ class GrblHalController {
             this.emit('grblHal:info', res);
         });
 
-        this.runner.on('startup', (res) => {
+        this.runner.on('startup', async (res) => {
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -920,6 +917,9 @@ class GrblHalController {
                 // Initialize controller
                 this.initController();
             }
+
+            await delay(300);
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
         });
 
         this.toolChanger = new ToolChanger({
@@ -942,6 +942,10 @@ class GrblHalController {
 
         this.runner.on('alarmDetail', (payload) => {
             this.emit('settings:alarms', this.runner.settings.alarms);
+        });
+
+        this.runner.on('groupDetail', (payload) => {
+            this.emit('settings:group', this.runner.settings.groups);
         });
 
         const queryStatusReport = () => {
@@ -1319,11 +1323,9 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
                     await delay(100);
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
-                    await delay(250);
-                    this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                 }
                 let counter = 3;
                 const interval = setInterval(() => {

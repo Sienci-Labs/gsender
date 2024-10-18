@@ -207,7 +207,7 @@ class GCodeVisualizer {
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
             const offsetIndex = v1 * 4;
-            const opacity = this.isLaser ? 1 : 0.3;
+            const opacity = 0.3;
             // grey
             const runColor = new THREE.Color(this.theme.get(CUTTING_PART));
             const greyArray = [...runColor.toArray(), opacity];
@@ -215,8 +215,15 @@ class GCodeVisualizer {
             const yellowColor = new THREE.Color(this.theme.get(PLANNED_PART));
             const yellowArray = [...yellowColor.toArray(), 1];
             // color arrays
-            const runColorArray = Array.from({ length: (v2 - v1) }, () => greyArray).flat(); // grey, a couple movements before where our bit currently is
+            let runColorArray = Array.from({ length: (v2 - v1) }, () => greyArray).flat(); // grey, a couple movements before where our bit currently is
             const bufferColorArray = Array.from({ length: (this.plannedV1 - this.frames[v2FrameIndex + 1]) }, () => yellowArray).flat(); // yellow, everything in between run lines and last planned line
+            // changes for laser mode
+            if (this.isLaser) {
+                // add original color on top so you can see the parts the laser has finished
+                for (let i = 0; i < runColorArray.length; i++) {
+                    runColorArray[i] += this.colors[offsetIndex + i];
+                }
+            }
 
             let isOverflowing = false;
             let lengthLeft = null;
