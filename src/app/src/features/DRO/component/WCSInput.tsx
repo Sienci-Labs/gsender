@@ -2,14 +2,14 @@ import React, { useRef } from 'react';
 import { Axis } from 'app/features/DRO/utils/DRO.ts';
 
 export interface WCSInputProps {
-    value: number;
+    value: string;
     disabled?: boolean;
     movementHandler?: (t: string | number, s: Axis) => void;
     axis: Axis;
 }
 
 export function WCSInput({
-    value = 0,
+    value = '0.00',
     disabled = false,
     movementHandler,
     axis,
