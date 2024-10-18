@@ -24,7 +24,7 @@
 import hull from 'hull.js';
 import chunk from 'lodash/chunk';
 
-onmessage = ({ data }) => {
+self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
     const getOutlineGcode = (concavity = 60) => {
         let vertices = [];

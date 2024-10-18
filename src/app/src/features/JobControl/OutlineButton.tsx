@@ -1,6 +1,7 @@
 import cx from 'classnames';
 import { Button } from "app/components/shadcn/Button";
 import { TbVector } from 'react-icons/tb';
+import pubsub from "pubsub-js";
 
 interface OutlineButtonProps {
     disabled: boolean
@@ -10,7 +11,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
 
     // TODO
     const runOutline = () => {
-        console.log('outline');
+        pubsub.publish('outline:start');
     };
 
     return (
