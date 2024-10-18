@@ -2,12 +2,18 @@ import { BsEthernet, BsUsbPlug } from 'react-icons/bs';
 import { ConnectionType, FirmwareFlavour } from '../index';
 import { Port } from '../definitions';
 import { FirmwareSelector } from 'app/features/Connection/components/FirmwareSelector.tsx';
+import Tooltip from "app/components/Tooltip";
 
 export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
     selectedFirmware: FirmwareFlavour;
     onFirmwareClick: (t: FirmwareFlavour) => void;
+}
+
+function truncatePortName(port: string): string {
+    const portName = port.split('/').pop()
+    return portName.substring(portName.length - 8, portName.length);
 }
 
 export function PortListings(props: PortListingsProps): JSX.Element {
@@ -29,7 +35,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                         <BsUsbPlug />
                     </span>
                     <div className="flex flex-col gap-1 text-right">
-                        <span>{port.port}</span>
+                        <span><Tooltip content={port.port}>{truncatePortName(port.port)}</Tooltip></span>
                         <span className="text-sm text-gray-600 font-normal">
                             USB at 115200 baud
                         </span>

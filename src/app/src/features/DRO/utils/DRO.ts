@@ -45,7 +45,11 @@ export function zeroWCS(axis: string, value: number = 0) {
 }
 
 export function zeroAllAxes() {
+    const firmware = store.get('widgets.connection.controller.type', 'Grbl');
     controller.command('gcode', `G10 L20 P0 X0 Y0 Z0`);
+    if (firmware === 'grblHal') {
+        controller.command('gcode', 'G10 L20 P0 A0');
+    }
 }
 
 export function goXYAxes() {
