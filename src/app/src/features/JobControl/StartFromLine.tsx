@@ -22,14 +22,6 @@ import { FaPlay } from 'react-icons/fa';
 
 type StartFromLineProps = {
     disabled: boolean;
-    state: {
-        showModal: boolean;
-        needsRecovery: boolean;
-        value: number;
-        waitForHoming: boolean;
-        safeHeight: number;
-        defaultSafeHeight: number;
-    };
 };
 
 const StartFromLine = ({ disabled }: StartFromLineProps) => {
