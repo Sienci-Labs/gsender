@@ -184,7 +184,7 @@ const RunProbe = ({ actions, state }: Props) => {
         <Dialog open={show} onOpenChange={actions.onOpenChange}>
             <DialogContent
                 className={cx(
-                    'flex flex-col justify-center items-center bg-gray-100 w-[500px] min-h-[450px] p-4',
+                    'flex flex-col justify-center items-center bg-gray-100 w-[650px] min-h-[450px] p-4',
                     {
                         hidden: !show,
                     },
