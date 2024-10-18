@@ -78,6 +78,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     onValueChange={(value) =>
                         actions.handleSpindleSpeedChange(value[0])
                     }
+                    disabled={!canClick}
                 />
                 <span>{state.spindleSpeed} RPM</span>
             </div>
