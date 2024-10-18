@@ -5,6 +5,7 @@ import Switch from 'app/components/Switch';
 
 import Size from './Size';
 import Info from './Info';
+import LoadingAnimation from './LoadingAnimation';
 
 const FileInformation = () => {
     const { name, size, total, path, fileLoaded, fileProcessing } =
@@ -13,15 +14,7 @@ const FileInformation = () => {
     const [toggleInfo, setToggleInfo] = useState(false);
 
     if (fileProcessing) {
-        return (
-            <div className="flex flex-col gap-2 justify-center items-center h-full">
-                <div className="flex gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-                </div>
-            </div>
-        );
+        return <LoadingAnimation />;
     }
 
     if (!fileLoaded) {
@@ -49,7 +42,7 @@ const FileInformation = () => {
     const ToggleOutput = toggleInfo ? Info : Size;
 
     return (
-        <div className="flex flex-col gap-1 justify-center p-3 items-center h-full w-[90%] self-center">
+        <div className="flex flex-col gap-1 justify-center p-3 items-center h-full w-[90%] self-center text-sm">
             <h2 className="text-lg font-bold">{name}</h2>
 
             <div className="text-gray-500 flex gap-1 text-sm">
