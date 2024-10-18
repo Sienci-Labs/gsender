@@ -21,18 +21,15 @@
  *
  */
 
-import React from 'react';
 import Button from 'app/components/Button';
-import Slider from './Slider';
+import { Slider } from 'app/components/shadcn/Slider';
 
 type Props = {
     actions: {
         sendM3: () => void;
         sendM4: () => void;
         sendM5: () => void;
-        handleSpindleSpeedChange: (
-            event: React.ChangeEvent<HTMLInputElement>,
-        ) => void;
+        handleSpindleSpeedChange: (value: number) => void;
     };
     state: {
         spindleSpeed: number;
@@ -71,16 +68,18 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     Stop (M5)
                 </Button>
             </div>
-            <div className="flex flex-col gap-2 justify-center my-2">
+            <div className="flex flex-row gap-2 justify-center my-2 items-center">
+                <span>Speed</span>
                 <Slider
-                    label="Speed"
-                    unitString="RPM"
-                    value={state.spindleSpeed}
+                    value={[state.spindleSpeed]}
                     min={state.spindleMin}
                     max={state.spindleMax}
                     step={10}
-                    onChange={actions.handleSpindleSpeedChange}
+                    onValueChange={(value) =>
+                        actions.handleSpindleSpeedChange(value[0])
+                    }
                 />
+                <span>{state.spindleSpeed} RPM</span>
             </div>
         </>
     );

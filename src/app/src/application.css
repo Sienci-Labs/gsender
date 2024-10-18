@@ -685,14 +685,20 @@ video {
 .top-4 {
   top: 1rem !important;
 }
+.top-\[-160px\] {
+  top: -160px !important;
+}
+.top-\[-30px\] {
+  top: -30px !important;
+}
 .top-\[-35px\] {
   top: -35px !important;
 }
 .top-\[-47px\] {
   top: -47px !important;
 }
-.top-\[-85px\] {
-  top: -85px !important;
+.top-\[-80px\] {
+  top: -80px !important;
 }
 .top-\[1px\] {
   top: 1px !important;
@@ -1821,6 +1827,9 @@ video {
 .fill-current {
   fill: currentColor !important;
 }
+.fill-gray-400 {
+  fill: #9ca3af !important;
+}
 .p-0 {
   padding: 0px !important;
 }
@@ -2533,6 +2542,11 @@ html,
 
 .hover\:fill-blue-600:hover {
   fill: #2f62b6 !important;
+}
+
+
+.hover\:fill-gray-400:hover {
+  fill: #9ca3af !important;
 }
 
 
