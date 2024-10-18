@@ -38,7 +38,7 @@ export function AxisRow({
                 className={"px-5"}
             >
                 <span className="font-bold font-mono text-xl transition-all transition-duration-300">
-                    {axis}
+                    {`${homingMode ? 'H' : ''}${axis}${homingMode ? '' : '0'}`}
                 </span>
             </Button>
 
@@ -58,7 +58,7 @@ export function AxisRow({
                 onClick={() => gotoZero(axis)}
                 color="alt"
             >
-                <span className="text-lg font-mono">{axis}0</span>
+                <span className="text-lg font-mono">{axis}</span>
             </Button>
         </div>
     );
