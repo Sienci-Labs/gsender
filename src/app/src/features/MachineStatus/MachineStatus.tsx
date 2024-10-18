@@ -99,7 +99,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({ activeState, alarmCode, i
                                 {
                                     activeState === GRBL_ACTIVE_STATE_ALARM ? (
                                         <div className="flex w-full flex-row justify-center align-middle items-center font-light text-3xl mb-1">
-                                            <div className="flex justify-center">{activeState}</div>
+                                            <div className="flex justify-center">{activeState}
+                                                {activeState === GRBL_ACTIVE_STATE_ALARM && <span>({alarmCode})</span>}</div>
                                             <div className="absolute right-3 flex float-right"><AlarmDescriptionIcon code={alarmCode} /></div>
                                         </div>
                                     ) : (
