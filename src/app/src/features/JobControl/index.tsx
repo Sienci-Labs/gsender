@@ -39,16 +39,16 @@ const JobControl: React.FC<JobControlProps> = ({
     return (
         <Widget>
             <Widget.Content className="flex justify-center items-center flex-col relative w-full">
-                <div className="z-10 top-[-85px] flex flex-col justify-center items-center absolute left-1/2 right-1/2">
-                    <div className="flex flex-col justify-center items-center w-full">
-                        {isConnected && fileLoaded && senderStatus.sent > 0 && (
-                            <ProgressArea
-                                senderStatus={senderStatus}
-                            ></ProgressArea>
-                        )}
+                <div className="z-10 top-[-160px] flex flex-col justify-center items-center absolute left-1/2 right-1/2">
+                    <div
+                        className={`flex flex-col justify-center items-center w-full ${isConnected && fileLoaded && senderStatus.sent > 0 ? '' : 'opacity-0'}`}
+                    >
+                        <ProgressArea
+                            senderStatus={senderStatus}
+                        ></ProgressArea>
                     </div>
                     <div
-                        className={`bg-transparent z-10 flex flex-col justify-center items-center ${!fileLoaded || activeState !== GRBL_ACTIVE_STATE_IDLE ? 'opacity-0' : ''}`}
+                        className={`bg-transparent z-10 flex flex-col justify-center items-center ${fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE ? '' : 'opacity-0'}`}
                     >
                         <div className="flex flex-row gap-2 justify-center mb-3 w-full">
                             <OutlineButton disabled={disabled} />
