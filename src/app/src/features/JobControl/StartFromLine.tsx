@@ -16,7 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import { Input } from 'app/components/shadcn/Input';
 import { FaPlay } from 'react-icons/fa';
 

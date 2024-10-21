@@ -2,7 +2,7 @@ import React, { useRef, useContext } from 'react';
 
 import store from 'app/store';
 import { GRBLHAL } from 'app/constants';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import Button from 'app/components/Button';
 import {
     Toaster,

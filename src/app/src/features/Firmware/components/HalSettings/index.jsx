@@ -5,7 +5,7 @@ import classname from 'classnames';
 import { FaUndo } from 'react-icons/fa';
 
 import { GRBLHAL, GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import Button from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {

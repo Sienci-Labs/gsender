@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 

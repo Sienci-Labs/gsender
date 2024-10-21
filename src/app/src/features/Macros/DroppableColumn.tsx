@@ -7,7 +7,7 @@ import {
     DraggableStateSnapshot,
 } from 'react-beautiful-dnd';
 
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 import MacroItem from './MacroItem';

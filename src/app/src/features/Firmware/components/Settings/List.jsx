@@ -3,7 +3,7 @@ import classname from 'classnames';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import Button from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 

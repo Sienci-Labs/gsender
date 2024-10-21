@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import { Button } from 'app/components/Button';
 import PropType from 'prop-types';
 const ReconnectButton = ({ onClick, disabled = false }) => {
