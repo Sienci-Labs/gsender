@@ -643,8 +643,8 @@ video {
 .left-2 {
   left: 0.5rem !important;
 }
-.left-8 {
-  left: 2rem !important;
+.left-5 {
+  left: 1.25rem !important;
 }
 .left-\[50\%\] {
   left: 50% !important;
@@ -684,6 +684,9 @@ video {
 }
 .top-4 {
   top: 1rem !important;
+}
+.top-5 {
+  top: 1.25rem !important;
 }
 .top-\[-160px\] {
   top: -160px !important;
@@ -1075,6 +1078,9 @@ video {
 }
 .w-5 {
   width: 1.25rem !important;
+}
+.w-56 {
+  width: 14rem !important;
 }
 .w-6 {
   width: 1.5rem !important;
@@ -1503,6 +1509,11 @@ video {
 }
 .overflow-x-hidden {
   overflow-x: hidden !important;
+}
+.truncate {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 .text-ellipsis {
   text-overflow: ellipsis !important;

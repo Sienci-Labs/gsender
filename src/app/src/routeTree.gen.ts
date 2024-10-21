@@ -24,21 +24,25 @@ const IndexLazyImport = createFileRoute('/')()
 // Create/Update Routes
 
 const ToolsLazyRoute = ToolsLazyImport.update({
+  id: '/tools',
   path: '/tools',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/tools.lazy').then((d) => d.Route))
 
 const StatsLazyRoute = StatsLazyImport.update({
+  id: '/stats',
   path: '/stats',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/stats.lazy').then((d) => d.Route))
 
 const ConfigurationLazyRoute = ConfigurationLazyImport.update({
+  id: '/configuration',
   path: '/configuration',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/configuration.lazy').then((d) => d.Route))
 
 const IndexLazyRoute = IndexLazyImport.update({
+  id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))

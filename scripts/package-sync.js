@@ -32,14 +32,14 @@ const deps = _uniq([
 //pkgApp.name = pkg.name; // Exclude the name field
 pkgApp.version = pkg.version;
 pkgApp.homepage = pkg.homepage;
-pkgApp.author =  pkg.author;
+pkgApp.author = pkg.author;
 pkgApp.license = pkg.license;
 pkgApp.repository = pkg.repository;
 
 // Copy only Node.js dependencies to application package.json
 pkgApp.dependencies = _.pick(pkg.dependencies, deps);
 
-const target = path.resolve(__dirname, "../src/app/package.json");
+const target = path.resolve(__dirname, "../src/package.json");
 const content = JSON.stringify(pkgApp, null, 2);
 fs.writeFileSync(target, content + "\n", "utf8");
 
