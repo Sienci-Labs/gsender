@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-1",
+  "version": "1.5.0-Edge-1-latest",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -28,7 +28,7 @@
   "preferGlobal": true,
   "scripts": {
     "prepare": "npm run clean",
-    "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT}\" && bash scripts/prebuild-prod.sh",
+    "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT} --allow-same-version\" && bash scripts/prebuild-prod.sh",
     "prebuild-dev": "npm run package-sync && bash scripts/prebuild-dev.sh",
     "prebuild-prod": "npm run package-sync && bash scripts/prebuild-prod.sh",
     "build": "npm run build-prod",
