@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import styles from 'app/features/preferences/index.module.styl';
+import styles from '../index.module.styl';
 
 const SettingWrapper = ({ children, show, title }) => {
     return (
