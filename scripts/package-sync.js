@@ -7,9 +7,10 @@ const path = require("path");
 const _uniq = require("lodash/uniq");
 const findImports = require("find-imports");
 
-// Copy necessary properties from 'package.json' to 'src/package.json'
+// Copy necessary properties from 'package.json' to 'src/app/package.json'
 const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
+const { urPK } = require("@mui/material/locale");
 
 const files = ["src/app/*.{js,jsx}", "src/server/**/*.{js,jsx}"];
 
@@ -40,8 +41,14 @@ pkgApp.repository = pkg.repository;
 pkgApp.dependencies = _.pick(pkg.dependencies, deps);
 
 const target = path.resolve(__dirname, "../src/app/package.json");
+const secondTarget = path.resolve(__dirname, "../src/package.json");
+
 const content = JSON.stringify(pkgApp, null, 2);
+delete pkgApp.type;
+const secondContent = JSON.stringify(pkgApp, null, 2);
+
 fs.writeFileSync(target, content + "\n", "utf8");
+fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
 
 //Save app versions to releases.json
 /*try {
