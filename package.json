@@ -85,7 +85,7 @@
     "check-types": "tsc --noEmit -p ./src/app/src"
   },
   "build": {
-    "appId": "org.sienci.gsender",
+    "appId": "org.sienci.gsender-edge",
     "extraMetadata": {
       "main": "./main.js"
     },
@@ -93,7 +93,7 @@
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender",
+    "productName": "gSenderEdge",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "extraResources": [
