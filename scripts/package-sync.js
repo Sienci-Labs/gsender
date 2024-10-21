@@ -10,7 +10,6 @@ const findImports = require("find-imports");
 // Copy necessary properties from 'package.json' to 'src/package.json'
 const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
-const feApp = require("../src/app/package.json");
 
 const files = ["src/app/*.{js,ts,tsx,jsx}", "src/server/**/*.{js,jsx}"];
 
@@ -31,11 +30,11 @@ const deps = _uniq([
 ]).sort();
 
 //pkgApp.name = pkg.name; // Exclude the name field
-pkgApp.version = feApp.version = pkg.version;
-pkgApp.homepage = feApp.version = pkg.homepage;
-pkgApp.author = feApp.author = pkg.author;
-pkgApp.license = feApp.license = pkg.license;
-pkgApp.repository = feApp.repository = pkg.repository;
+pkgApp.version = pkg.version;
+pkgApp.homepage = pkg.homepage;
+pkgApp.author =  pkg.author;
+pkgApp.license = pkg.license;
+pkgApp.repository = pkg.repository;
 
 // Copy only Node.js dependencies to application package.json
 pkgApp.dependencies = _.pick(pkg.dependencies, deps);
