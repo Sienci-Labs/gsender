@@ -100,159 +100,51 @@
       "output": "output",
       "app": "dist/gsender"
     },
-    "files": [
-      "bin",
-      "dist",
-      "static"
-    ],
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/Sienci-Labs/gsender"
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false,
+      "license": "LICENSE",
+      "perMachine": true,
+      "installerSidebar": "electron-build/sidebar.bmp",
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "include": "electron-build/installer.nsh"
     },
-    "license": "MIT",
-    "engines": {
-      "node": ">=14"
+    "publish": {
+      "provider": "github"
     },
-    "preferGlobal": true,
-    "scripts": {
-      "prepare": "npm run clean",
-      "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT}\" && bash scripts/prebuild-prod.sh",
-      "prebuild-dev": "npm run package-sync && bash scripts/prebuild-dev.sh",
-      "prebuild-prod": "npm run package-sync && bash scripts/prebuild-prod.sh",
-      "build": "npm run build-prod",
-      "build-i18n": "concurrently --kill-others-on-fail --names \"build-i18n-server,build-i18n-app\" \"npm run build-i18n-server\" \"npm run build-i18n-app\"",
-      "build-i18n-server": "i18next-scanner --config i18next-scanner.config.server.js \"src/server/**/*.{html,js,jsx}\" \"!src/server/i18n/**\" \"!**/node_modules/**\"",
-      "build-i18n-app": "i18next-scanner --config i18next-scanner.config.app.js \"src/app_old/**/*.{html,js,jsx}\" \"!src/app_old/i18n/**\" \"!**/node_modules/**\"",
-      "build-latest": "concurrently --kill-others-on-fail --names \"build-prod-server,build-prod-app\" \"npm run build-prod-server\" \"npm run build-prod-app\"",
-      "build-dev": "concurrently --kill-others-on-fail --names \"build-dev-server,build-dev-app\" \"npm run build-dev-server\" \"npm run build-dev-app\"",
-      "build-dev-server": "cross-env NODE_ENV=development webpack-cli --progress --config webpack.config.server.development.js && npm run build-i18n-server",
-      "build-dev-app": "npm run build-i18n-app && npm run vite:build",
-      "build-prod": "concurrently --kill-others-on-fail --names \"build-prod-server,vite:build\" \"npm run build-prod-server\" \"npm run vite:build\"",
-      "build-prod-server": "cross-env NODE_ENV=production webpack-cli --config webpack.config.server.production.js && npm run build-i18n-server",
-      "build-prod-app": "cross-env NODE_ENV=production webpack-cli --config webpack.config.app.production.js && npm run build-i18n-app",
-      "postbuild-dev-server": "bash -c \"mkdir -p output/server; cp -af src/server/{i18n,views} output/server/\"",
-      "postbuild-dev-app": "bash -c \"mkdir -p output/app output/app-server; cp -af src/app_old/{favicon.ico,i18n,images,assets} output/app/\"",
-      "postbuild-prod-server": "bash -c \"mkdir -p dist/gsender/server; cp -af src/server/{i18n,views} dist/gsender/server/\"",
-      "postbuild-prod-app": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app_old/{favicon.ico,i18n,images,assets} dist/gsender/app/\"",
-      "clean": "bash -c 'rm -rf ./dist ./output'",
-      "electron": "electron",
-      "electron-builder": "electron-builder",
-      "electron-builder:debug": "cross-env DEBUG=electron-builder electron-builder",
-      "github-release": "github-release",
-      "electron-rebuild": "electron-rebuild",
-      "package-sync": "node scripts/package-sync.js",
-      "build:macos": "bash -c 'scripts/electron-builder.sh --macos --x64'",
-      "build:macos-x64": "bash -c 'scripts/electron-builder.sh --macos --x64'",
-      "build:macos-arm64": "bash -c 'scripts/electron-builder.sh --macos --arm64'",
-      "build:linux-ia32": "bash -c 'scripts/electron-builder.sh --linux --ia32'",
-      "build:linux-x64": "bash -c 'scripts/electron-builder.sh --linux --x64'",
-      "build:linux-armv7l": "bash -c 'scripts/electron-builder.sh --linux --armv7l'",
-      "build:linux": "bash -c 'scripts/electron-builder.sh --linux --x64 --arm64'",
-      "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
-      "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
-      "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-      "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-      "start": "cross-env ./bin/gsender",
-      "start-electron": "electron ./dist/gsender/main",
-      "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
-      "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
-      "dev": "npm run build-dev && npm run start-dev",
-      "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
-      "lint": "concurrently --kill-others-on-fail --names \"eslint,stylint\"\"yarn run eslint\" \"yarn run stylint\"",
-      "eslint": "npm run eslint:build",
-      "eslint:build": "eslint --ext .js --ext .jsx *.js scripts test --fix",
-      "eslint:debug": "echo \"Checking code style...\"; DEBUG=eslint:cli-engine eslint --ext .js --ext .jsx *.js src scripts test",
-      "stylint": "stylint src/app",
-      "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
-      "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
-      "cypress:open": "cypress open",
-      "vite:build": "npm run vite:build:server && npm run vite:build:client",
-      "vite:build:client": "vite build --ssrManifest",
-      "vite:build:server": "vite build --ssr ./src/app/src/entry-server.tsx --outDir ../../dist/gsender/app-server",
-      "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app_old/{favicon.ico,i18n,images,assets} dist/gsender/app/\"",
-      "install:packages": "yarn install && yarn install --prefix /src/app"
-    },
-    "build": {
-      "appId": "org.sienci.gsender",
-      "artifactName": "${name}-${version}-${arch}.${ext}",
-      "asar": false,
-      "asarUnpack": [],
-      "productName": "gSender",
-      "generateUpdatesFilesForAllChannels": true,
-      "npmRebuild": false,
-      "extraResources": [
-        "./node_modules/@electron/remote/**"
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg"
       ],
-      "directories": {
-        "buildResources": "electron-build",
-        "output": "output",
-        "app": "dist/gsender"
-      },
-      "nsis": {
-        "allowToChangeInstallationDirectory": true,
-        "oneClick": false,
-        "license": "LICENSE",
-        "perMachine": true,
-        "installerSidebar": "electron-build/sidebar.bmp",
-        "createDesktopShortcut": false,
-        "createStartMenuShortcut": false,
-        "include": "electron-build/installer.nsh"
-      },
-      "publish": {
-        "provider": "github"
-      },
-      "mac": {
-        "category": "public.app-category.productivity",
-        "target": [
-          "dmg"
-        ],
-        "icon": "electron-build/icon.icns"
-      },
-      "dmg": {
-        "background": "electron-build/background.png",
-        "icon": "electron-build/icon.icns",
-        "iconSize": 80,
-        "iconTextSize": 12,
-        "contents": [
-          {
-            "x": 448,
-            "y": 344,
-            "type": "link",
-            "path": "/Applications"
-          },
-          {
-            "x": 192,
-            "y": 344,
-            "type": "file"
-          }
-        ]
-      },
-      "win": {
-        "target": [
-          "nsis"
-        ],
-        "icon": "electron-build/icon.ico"
-      },
-      "linux": {
-        "category": "Utility",
-        "target": [
-          "AppImage",
-          "deb"
-        ]
-      }
+      "icon": "electron-build/icon.icns"
     },
-    "keywords": [
-      "gsender",
-      "arduino",
-      "raspberry",
-      "pi",
-      "cnc",
-      "gcode",
-      "grbl",
-      "grblhal",
-      "react",
-      "socket.io"
-    ],
+    "dmg": {
+      "background": "electron-build/background.png",
+      "icon": "electron-build/icon.icns",
+      "iconSize": 80,
+      "iconTextSize": 12,
+      "contents": [
+        {
+          "x": 448,
+          "y": 344,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 192,
+          "y": 344,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "electron-build/icon.ico"
+    },
     "linux": {
       "category": "Utility",
       "target": [
