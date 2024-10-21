@@ -2,7 +2,7 @@ import React from 'react';
 
 import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import ToggleSwitch from 'app/components/Switch';
 
 import Fieldset from '../components/Fieldset';

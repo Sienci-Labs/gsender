@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import get from 'lodash/get';
 
 import store from 'app/store';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import ToggleSwitch from 'app/components/Switch';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { WORKSPACE_MODE } from 'app/constants';

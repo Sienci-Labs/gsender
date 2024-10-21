@@ -6,7 +6,7 @@ import React, {
 } from 'react';
 import classnames from 'classnames';
 
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 
 import styles from '../index.module.styl';
 

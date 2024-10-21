@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Tooltip as TooltipCustom } from 'app/components/ToolTip';
+import { Tooltip as TooltipCustom } from 'app/components/Tooltip';
 
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';

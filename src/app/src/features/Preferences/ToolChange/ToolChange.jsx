@@ -8,7 +8,7 @@ import controller from 'app/lib/controller';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { MacroVariableDropdown } from 'app/components/MacroVariableDropdown';
 import ToggleSwitch from 'app/components/Switch';
-import { Tooltip as TooltipCustom } from 'app/components/ToolTip';
+import { Tooltip as TooltipCustom } from 'app/components/Tooltip';
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 import styles from '../index.module.styl';

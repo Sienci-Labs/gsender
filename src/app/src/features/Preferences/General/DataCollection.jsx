@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import ToggleSwitch from 'app/components/Switch';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import { USER_DATA_COLLECTION } from 'app/constants';
 import api from 'app/api';
 

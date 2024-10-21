@@ -27,7 +27,7 @@ import _ from 'lodash';
 import pubsub from 'pubsub-js';
 
 import store from 'app/store';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { Button } from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 

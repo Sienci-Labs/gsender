@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { cloneDeep, set, get } from 'lodash';
 
 import { Checkbox } from 'app/components/Checkbox';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 
 import Input from '../../components/Input';
 import { GamepadContext } from './utils/context';

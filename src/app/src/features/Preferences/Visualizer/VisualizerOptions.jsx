@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import ToggleSwitch from 'app/components/Switch';
 
 import Fieldset from '../components/Fieldset';

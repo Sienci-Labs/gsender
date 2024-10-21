@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import { Tooltip as TooltipCustom } from 'app/components/ToolTip';
+import { Tooltip as TooltipCustom } from 'app/components/Tooltip';
 import Select from 'react-select';
 import Input from '../../components/Input';
 import styles from '../../index.module.styl';

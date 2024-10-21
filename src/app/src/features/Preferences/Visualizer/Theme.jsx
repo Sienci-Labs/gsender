@@ -4,7 +4,7 @@ import map from 'lodash/map';
 import uniqueId from 'lodash/uniqueId';
 import { useSelector } from 'react-redux';
 
-import Tooltip from 'app/components/ToolTip';
+import Tooltip from 'app/components/Tooltip';
 import {
     CUSTOMIZABLE_THEMES,
     ALL_THEMES,
