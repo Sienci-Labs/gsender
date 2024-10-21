@@ -4,7 +4,8 @@ import classnames from 'classnames';
 import ReactMarkdown from 'react-markdown';
 import { team } from './tools';
 import styles from './index.module.styl';
-import releases from './releases.json';
+
+const releases = [];
 
 const MainArea = () => {
     return (
