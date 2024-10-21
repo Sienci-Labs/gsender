@@ -52,6 +52,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
             // zero y and enable rotary
             controller.command('gcode', ['G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, ROTARY_TOGGLE_MACRO, 'G4 P0.4', homingString, '$$']);
         }
+        controller.command('updateRotaryMode', mode === ROTARY);
         return;
     }
 
@@ -88,6 +89,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                 onConfirm: () => {
                     // zero y and enable rotary
                     controller.command('gcode', ['G10 L20 P1 Y0', ...rotaryFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
+                    controller.command('updateRotaryMode', mode === ROTARY);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 
@@ -145,6 +147,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
                     // zero y and enable rotary
                     controller.command('gcode', [homingString, 'G10 L20 P1 Y0', ...newAAxisSettings, ...newYAxisSettings, '$$', ROTARY_TOGGLE_MACRO]);
+                    controller.command('updateRotaryMode', mode === ROTARY);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 
