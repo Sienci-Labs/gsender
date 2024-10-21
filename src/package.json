@@ -1,18 +1,14 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-1",
-  "productName": "gSender",
-  "description": "CNC Milling Controller",
-  "author": {
-    "name": "Sienci Labs <hi@sienci.com>",
-    "email": "hi@sienci.com"
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest ",
+    "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx",
+    "preview": "cross-env NODE_ENV=production node server"
   },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Sienci-Labs/gsender"
-  },
-  "main": "main.js",
   "dependencies": {
     "@sentry/electron": "^4.14.0",
     "@sentry/react": "^7.72.0",
@@ -77,5 +73,39 @@
     "watch": "~1.0.2",
     "webappengine": "~1.2.0",
     "winston": "~3.2.1"
+  },
+  "devDependencies": {
+    "@tanstack/router-devtools": "^1.46.7",
+    "@tanstack/router-plugin": "^1.47.0",
+    "@types/classnames": "^2.3.0",
+    "@types/cli-color": "^2.0.6",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.79",
+    "@types/react-beautiful-dnd": "^13.1.8",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-select": "^5.0.1",
+    "@types/redux-action": "^1.2.8",
+    "@types/redux-batched-subscribe": "^0.1.7",
+    "@types/redux-logger": "^3.0.13",
+    "@types/superagent": "^8.1.9",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.4.5",
+    "vite": "^5.4.2",
+    "vite-tsconfig-paths": "^5.0.1"
+  },
+  "author": {
+    "name": "Sienci Labs <hi@sienci.com>",
+    "email": "hi@sienci.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sienci-Labs/gsender"
   }
 }
