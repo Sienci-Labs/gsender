@@ -1,10 +1,9 @@
-import { USER_DATA_COLLECTION } from "app/constants";
+import { USER_DATA_COLLECTION } from 'app/constants';
 
 // Types
 
 export type USER_DATA_COLLECTION_T =
-(typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
-
+    (typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
 
 // Interfaces
 

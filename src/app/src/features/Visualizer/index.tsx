@@ -99,7 +99,7 @@ import {
 class Visualizer extends Component {
     static propTypes = {
         widgetId: PropTypes.string,
-        isSecondary: PropTypes.bool
+        isSecondary: PropTypes.bool,
     };
 
     config = new WidgetConfig('visualizer');

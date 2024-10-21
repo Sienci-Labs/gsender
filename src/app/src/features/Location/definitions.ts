@@ -1,17 +1,17 @@
-import { Shuttle } from "definitions/general";
-import { JogSpeed } from "../Jogging/definitions";
+import { Shuttle } from 'definitions/general';
+import { JogSpeed } from '../Jogging/definitions';
 
 export interface Location {
-    minimized: boolean,
-    axes: string[],
+    minimized: boolean;
+    axes: string[];
     jog: {
-        keypad: boolean,
-        step: number,
-        distances: number[],
-        speeds: JogSpeed,
-    },
+        keypad: boolean;
+        step: number;
+        distances: number[];
+        speeds: JogSpeed;
+    };
     mdi: {
-        disabled: boolean,
-    },
-    shuttle: Shuttle,
+        disabled: boolean;
+    };
+    shuttle: Shuttle;
 }

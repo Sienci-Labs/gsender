@@ -66,7 +66,7 @@ class TextSprite {
         const material = new THREE.SpriteMaterial({
             map: texture,
             transparent: true,
-            opacity: opacity
+            opacity: opacity,
         });
 
         textObject.textHeight = size;
@@ -74,18 +74,18 @@ class TextSprite {
 
         // Position X
         if (options.textAlign === 'left') {
-            textObject.position.x = options.x + (textObject.textWidth / 2);
+            textObject.position.x = options.x + textObject.textWidth / 2;
         } else if (options.textAlign === 'right') {
-            textObject.position.x = options.x - (textObject.textWidth / 2);
+            textObject.position.x = options.x - textObject.textWidth / 2;
         } else {
             textObject.position.x = options.x || 0;
         }
 
         // Position Y
         if (options.textBaseline === 'top') {
-            textObject.position.y = options.y - (textObject.textHeight / 2);
+            textObject.position.y = options.y - textObject.textHeight / 2;
         } else if (options.textBaseline === 'bottom') {
-            textObject.position.y = options.y + (textObject.textHeight / 2);
+            textObject.position.y = options.y + textObject.textHeight / 2;
         } else {
             textObject.position.y = options.y || 0;
         }
@@ -94,7 +94,7 @@ class TextSprite {
         textObject.position.z = options.z || 0;
 
         const sprite = new THREE.Sprite(material);
-        sprite.scale.set(textWidth / textHeight * size, size, 1);
+        sprite.scale.set((textWidth / textHeight) * size, size, 1);
 
         textObject.add(sprite);
 

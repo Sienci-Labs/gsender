@@ -15,17 +15,19 @@ export const generateList = (shortcuts) => {
         return [];
     }
     let shortcutsList = [];
-    Object.keys(shortcuts).forEach(key => {
+    Object.keys(shortcuts).forEach((key) => {
         shortcutsList.push(shortcuts[key]);
     });
     shortcutsList.sort((a, b) => {
         let categoryA = MACRO_CATEGORY;
         let categoryB = MACRO_CATEGORY;
         if (allShuttleControlEvents[a.cmd]) {
-            categoryA = allShuttleControlEvents[a.cmd].category || MACRO_CATEGORY;
+            categoryA =
+                allShuttleControlEvents[a.cmd].category || MACRO_CATEGORY;
         }
         if (allShuttleControlEvents[b.cmd]) {
-            categoryB = allShuttleControlEvents[b.cmd].category || MACRO_CATEGORY;
+            categoryB =
+                allShuttleControlEvents[b.cmd].category || MACRO_CATEGORY;
         }
         return categoryA.localeCompare(categoryB);
     });

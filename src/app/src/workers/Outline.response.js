@@ -7,7 +7,7 @@ export const outlineResponse = ({ data }) => {
     Toaster.clear();
     Toaster.pop({
         type: TOASTER_SUCCESS,
-        msg: 'Running file outline'
+        msg: 'Running file outline',
     });
     pubsub.publish('outline:done');
 };

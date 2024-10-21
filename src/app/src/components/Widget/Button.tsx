@@ -25,21 +25,27 @@ import classNames from 'classnames';
 import Anchor from '../Anchor';
 import { WidgetProps } from './definitions';
 
-const Button: React.FC<WidgetProps> = ({ className, inverted, disabled, ...props }) => {
+const Button: React.FC<WidgetProps> = ({
+    className,
+    inverted,
+    disabled,
+    ...props
+}) => {
     return (
         <Anchor
             {...props}
             className={classNames(
                 className,
-                "min-w-8 h-8 float-left relative text-sm font-[$font-family-arial] m-0 text-center first:pl-0",
+                'min-w-8 h-8 float-left relative text-sm font-[$font-family-arial] m-0 text-center first:pl-0',
                 {
-                    "disabled:text-yellow-300 disabled:cursor-not-allowed disabled:hover:bg-inherit": disabled,
-                    "text-white bg-gray-800 hover:bg-gray-900": inverted,
-                    "opacity-40": disabled && inverted,
-                }
+                    'disabled:text-yellow-300 disabled:cursor-not-allowed disabled:hover:bg-inherit':
+                        disabled,
+                    'text-white bg-gray-800 hover:bg-gray-900': inverted,
+                    'opacity-40': disabled && inverted,
+                },
             )}
         />
     );
-}
+};
 
 export default Button;

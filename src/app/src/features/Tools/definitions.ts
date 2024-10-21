@@ -1,5 +1,5 @@
 export interface Tool {
-    metricDiameter: number,
-    imperialDiameter: number,
-    type: string,
-};
+    metricDiameter: number;
+    imperialDiameter: number;
+    type: string;
+}

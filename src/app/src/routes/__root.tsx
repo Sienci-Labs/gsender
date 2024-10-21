@@ -1,5 +1,5 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
-import Workspace from "../workspace";
+import { createRootRoute, Outlet } from '@tanstack/react-router';
+import Workspace from '../workspace';
 
 export const Route = createRootRoute({
     component: () => (

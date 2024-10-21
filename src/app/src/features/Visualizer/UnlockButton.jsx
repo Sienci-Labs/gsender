@@ -29,7 +29,6 @@ import controller from 'app/lib/controller';
 import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import styles from './UnlockButton.styl';
 
-
 const UnlockButton = ({ activeState, alarmCode }) => {
     const [isHovering, setIsHovering] = useState(false);
     const onMouseOver = () => {
@@ -66,14 +65,16 @@ const UnlockButton = ({ activeState, alarmCode }) => {
             <div className={styles.unlockIndicator}>
                 <i className="fas fa-caret-right" />
             </div>
-            <i className={isHovering ? 'fas fa-lock-open' : 'fas fa-unlock fa-flip-horizontal'} />
-            {
-                isHovering && (
-                    <div className={styles.unlockText}>
-                        {getButtonText()}
-                    </div>
-                )
-            }
+            <i
+                className={
+                    isHovering
+                        ? 'fas fa-lock-open'
+                        : 'fas fa-unlock fa-flip-horizontal'
+                }
+            />
+            {isHovering && (
+                <div className={styles.unlockText}>{getButtonText()}</div>
+            )}
         </button>
     );
 };
@@ -83,6 +84,6 @@ export default connect((store) => {
     const alarmCode = get(store, 'controller.state.status.alarmCode');
     return {
         activeState,
-        alarmCode
+        alarmCode,
     };
 })(UnlockButton);

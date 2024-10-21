@@ -22,38 +22,39 @@
  */
 
 /* eslint prefer-arrow-callback: 0 */
-const promisify = (fn: Function, options: { errorFirst: boolean, thisArg: any }) => function (...args: Array<any>): Promise<any> {
-    const {
-        errorFirst = true,
-        thisArg
-    } = { ...options };
+const promisify = (
+    fn: Function,
+    options: { errorFirst: boolean; thisArg: any },
+) =>
+    function (...args: Array<any>): Promise<any> {
+        const { errorFirst = true, thisArg } = { ...options };
 
-    return new Promise((resolve, reject) => {
-        args.push(function (...results: Array<any>) {
-            if (errorFirst) {
-                const err = results.shift();
-                if (err) {
-                    reject(err);
-                    return;
+        return new Promise((resolve, reject) => {
+            args.push(function (...results: Array<any>) {
+                if (errorFirst) {
+                    const err = results.shift();
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
                 }
+
+                if (results.length > 1) {
+                    resolve(results);
+                } else if (results.length === 1) {
+                    resolve(results[0]);
+                } else {
+                    resolve([]);
+                }
+            });
+
+            if (typeof fn !== 'function') {
+                reject(new TypeError('The first parameter must be a function'));
+                return;
             }
 
-            if (results.length > 1) {
-                resolve(results);
-            } else if (results.length === 1) {
-                resolve(results[0]);
-            } else {
-                resolve([]);
-            }
+            fn.apply(thisArg, args);
         });
-
-        if (typeof fn !== 'function') {
-            reject(new TypeError('The first parameter must be a function'));
-            return;
-        }
-
-        fn.apply(thisArg, args);
-    });
-};
+    };
 
 export default promisify;

@@ -32,7 +32,7 @@ export const {
     NOTIFICATION_M30_PROGRAM_END,
     NOTIFICATION_M6_TOOL_CHANGE,
     NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE
+    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE,
 } = constants('widgets/Visualizer', [
     'MODAL_WATCH_DIRECTORY',
     'NOTIFICATION_PROGRAM_ERROR',
@@ -42,7 +42,7 @@ export const {
     'NOTIFICATION_M30_PROGRAM_END',
     'NOTIFICATION_M6_TOOL_CHANGE',
     'NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE',
-    'NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE'
+    'NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE',
 ]);
 
 export const CAMERA_MODE_PAN = 'pan';
@@ -56,14 +56,8 @@ export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
 export const CUST_THEME = 'Custom';
 
-export const ALL_THEMES = [
-    DARK_THEME,
-    LIGHT_THEME,
-    CUST_THEME,
-];
-export const CUSTOMIZABLE_THEMES = [
-    CUST_THEME,
-];
+export const ALL_THEMES = [DARK_THEME, LIGHT_THEME, CUST_THEME];
+export const CUSTOMIZABLE_THEMES = [CUST_THEME];
 
 export const BACKGROUND_PART = 'Background';
 export const GRID_PART = 'Grid';
@@ -92,7 +86,7 @@ export const PARTS_LIST = [
     PLANNED_PART,
     G0_PART,
     G1_PART,
-    LASER_PART
+    LASER_PART,
 ];
 
 export const DARK_THEME_VALUES = new Map([
@@ -126,5 +120,5 @@ export const LIGHT_THEME_VALUES = new Map([
     [G1_PART, '#111827'], // Dark Blue
     [G2_PART, '#111827'], // Dark Blue
     [G3_PART, '#111827'], // Dark Blue
-    [LASER_PART, '#FF0000'] // Red
+    [LASER_PART, '#FF0000'], // Red
 ]);

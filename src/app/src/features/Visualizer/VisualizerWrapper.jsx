@@ -32,7 +32,7 @@ class VisualizerWrapper extends Component {
         super(props);
         this.state = {
             needRefresh: false,
-            needReload: false
+            needReload: false,
         };
     }
 
@@ -49,7 +49,7 @@ class VisualizerWrapper extends Component {
         if (this.state.needRefresh) {
             this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
-        // a step further than refresh, reparsing the gcode as well
+            // a step further than refresh, reparsing the gcode as well
         } else if (this.state.needReload) {
             this.visualizer.reparseGCode();
             this.setNeedReload(false);
@@ -59,7 +59,7 @@ class VisualizerWrapper extends Component {
     setNeedRefresh(state) {
         this.setState(() => {
             return {
-                needRefresh: state
+                needRefresh: state,
             };
         });
     }
@@ -67,7 +67,7 @@ class VisualizerWrapper extends Component {
     setNeedReload(state) {
         this.setState(() => {
             return {
-                needReload: state
+                needReload: state,
             };
         });
     }
@@ -84,7 +84,7 @@ class VisualizerWrapper extends Component {
             // currently, changing the settings requires reparsing of the gcode
             pubsub.subscribe('visualizer:settings', () => {
                 this.setNeedReload(true);
-            })
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -97,39 +97,42 @@ class VisualizerWrapper extends Component {
     }
 
     render() {
-        const { state, show, cameraPosition, actions, containerID, isSecondary } = this.props;
+        const {
+            state,
+            show,
+            cameraPosition,
+            actions,
+            containerID,
+            isSecondary,
+        } = this.props;
         let renderSVG = shouldVisualizeSVG();
         return (
             <>
-                {
-                    !renderSVG && (
-                        <Visualizer
-                            show={show}
-                            cameraPosition={cameraPosition}
-                            ref={(visualizerRef) => {
-                                this.visualizer = visualizerRef;
-                            }}
-                            state={state}
-                            actions={actions}
-                            containerID={containerID}
-                            isSecondary={isSecondary}
-                        />
-                    )
-                }
-                {
-                    renderSVG && (
-                        <SVGVisualizer
-                            show={show}
-                            ref={(visualizerRef) => {
-                                this.visualizer = visualizerRef;
-                            }}
-                            state={state}
-                            actions={actions}
-                            containerID={containerID}
-                            isSecondary={isSecondary}
-                        />
-                    )
-                }
+                {!renderSVG && (
+                    <Visualizer
+                        show={show}
+                        cameraPosition={cameraPosition}
+                        ref={(visualizerRef) => {
+                            this.visualizer = visualizerRef;
+                        }}
+                        state={state}
+                        actions={actions}
+                        containerID={containerID}
+                        isSecondary={isSecondary}
+                    />
+                )}
+                {renderSVG && (
+                    <SVGVisualizer
+                        show={show}
+                        ref={(visualizerRef) => {
+                            this.visualizer = visualizerRef;
+                        }}
+                        state={state}
+                        actions={actions}
+                        containerID={containerID}
+                        isSecondary={isSecondary}
+                    />
+                )}
             </>
         );
     }

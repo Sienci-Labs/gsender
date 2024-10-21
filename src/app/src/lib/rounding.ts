@@ -107,7 +107,10 @@ export const roundMetric = (val: number | string): number => {
     return Number(Number(val).toFixed(2));
 };
 
-export const round = (val: number | string, units: UNITS_GCODE | UNITS_EN): number => {
+export const round = (
+    val: number | string,
+    units: UNITS_GCODE | UNITS_EN,
+): number => {
     if (units === METRIC_UNITS || units === 'G21') {
         return roundMetric(val);
     } else {
@@ -128,10 +131,10 @@ export const determineRoundedValue = (key: string, value: any): any => {
             newVal[el] = determineRoundedValue(key + '.' + el, value[el]);
         });
         return newVal;
-    // if array and is something we should round, iterate through the values and round
+        // if array and is something we should round, iterate through the values and round
     } else if (isArray && storeValuesThatNeedRounding.has(key)) {
         return value.map((el) => roundMetric(el));
-    // if a single value, round
+        // if a single value, round
     } else if (storeValuesThatNeedRounding.has(key)) {
         return roundMetric(value as string);
     }

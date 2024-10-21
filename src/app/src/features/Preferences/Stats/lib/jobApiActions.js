@@ -1,10 +1,16 @@
 import api from 'app/api';
 
 const actions = {
-    fetch: async (setData, setJobsFinished, setJobsCancelled, setTotalRuntime) => {
+    fetch: async (
+        setData,
+        setJobsFinished,
+        setJobsCancelled,
+        setTotalRuntime,
+    ) => {
         try {
             let res = await api.jobStats.fetch();
-            const { jobs, jobsFinished, jobsCancelled, totalRuntime } = res.body;
+            const { jobs, jobsFinished, jobsCancelled, totalRuntime } =
+                res.body;
             setData && setData(jobs);
             setJobsFinished && setJobsFinished(jobsFinished);
             setJobsCancelled && setJobsCancelled(jobsCancelled);

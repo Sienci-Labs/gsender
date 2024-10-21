@@ -17,8 +17,8 @@ export const getParsedData = (): Promise<ParsedData> => {
                 .transaction(OBJECT_STORE)
                 .objectStore(OBJECT_STORE)
                 .get(DATA_ID).onsuccess = (event: Event) => {
-                    return resolve((event.target as IDBRequest).result);
-                };
+                return resolve((event.target as IDBRequest).result);
+            };
         };
         request.onerror = () => {
             console.error('Error getting parsed data from indexedDB');
@@ -37,11 +37,12 @@ export const getEstimateData = (): Promise<EstimateData> => {
                 .transaction(OBJECT_STORE)
                 .objectStore(OBJECT_STORE)
                 .get(DATA_ID).onsuccess = (event: Event) => {
-                    return resolve({
-                        estimates: (event.target as IDBRequest).result?.estimates,
-                        estimatedTime: (event.target as IDBRequest).result?.info?.estimatedTime
-                    });
-                };
+                return resolve({
+                    estimates: (event.target as IDBRequest).result?.estimates,
+                    estimatedTime: (event.target as IDBRequest).result?.info
+                        ?.estimatedTime,
+                });
+            };
         };
         request.onerror = () => {
             console.error('Error getting parsed data from indexedDB');
@@ -60,18 +61,18 @@ export const replaceParsedData = (parsedData: ParsedData): Promise<string> => {
                 .transaction(OBJECT_STORE, 'readwrite')
                 .objectStore(OBJECT_STORE)
                 .delete(DATA_ID).onsuccess = () => {
-                    // delete previous data
-                    const replaceReq = db
-                        .transaction([OBJECT_STORE], 'readwrite')
-                        .objectStore(OBJECT_STORE)
-                        .put({ id: DATA_ID, ...parsedData });
-                    replaceReq.onsuccess = () => {
-                        return resolve('Finished replacing parsed data');
-                    };
-                    replaceReq.onerror = () => {
-                        console.error('Error replacing parsed data from indexedDB');
-                    };
+                // delete previous data
+                const replaceReq = db
+                    .transaction([OBJECT_STORE], 'readwrite')
+                    .objectStore(OBJECT_STORE)
+                    .put({ id: DATA_ID, ...parsedData });
+                replaceReq.onsuccess = () => {
+                    return resolve('Finished replacing parsed data');
                 };
+                replaceReq.onerror = () => {
+                    console.error('Error replacing parsed data from indexedDB');
+                };
+            };
         };
     });
 };

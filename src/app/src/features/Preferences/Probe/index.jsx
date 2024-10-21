@@ -36,7 +36,9 @@ import { METRIC_UNITS, USAGE_TOOL_NAME } from '../../../constants';
 import { convertToImperial } from '../calculate';
 
 const Probe = ({ active, state, actions }) => {
-    const [type, setType] = useState(store.get('workspace.probeProfile.touchplateType'));
+    const [type, setType] = useState(
+        store.get('workspace.probeProfile.touchplateType'),
+    );
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -52,14 +54,38 @@ const Probe = ({ active, state, actions }) => {
     const probeActions = actions.probe;
 
     const values = {
-        length: units === METRIC_UNITS ? probe.plateLength : convertToImperial(probe.plateLength),
-        width: units === METRIC_UNITS ? probe.plateWidth : convertToImperial(probe.plateWidth),
-        xyThickness: units === METRIC_UNITS ? probe.xyThickness : convertToImperial(probe.xyThickness),
-        zThickness: units === METRIC_UNITS ? probe.zThickness : convertToImperial(probe.zThickness),
-        fastFeedrate: units === METRIC_UNITS ? probeSettings.fastFeedrate : convertToImperial(probeSettings.fastFeedrate),
-        normalFeedrate: units === METRIC_UNITS ? probeSettings.normalFeedrate : convertToImperial(probeSettings.normalFeedrate),
-        retractionDistance: units === METRIC_UNITS ? probeSettings.retractionDistance : convertToImperial(probeSettings.retractionDistance),
-        zProbeDistance: units === METRIC_UNITS ? probeSettings.zProbeDistance : convertToImperial(probeSettings.zProbeDistance),
+        length:
+            units === METRIC_UNITS
+                ? probe.plateLength
+                : convertToImperial(probe.plateLength),
+        width:
+            units === METRIC_UNITS
+                ? probe.plateWidth
+                : convertToImperial(probe.plateWidth),
+        xyThickness:
+            units === METRIC_UNITS
+                ? probe.xyThickness
+                : convertToImperial(probe.xyThickness),
+        zThickness:
+            units === METRIC_UNITS
+                ? probe.zThickness
+                : convertToImperial(probe.zThickness),
+        fastFeedrate:
+            units === METRIC_UNITS
+                ? probeSettings.fastFeedrate
+                : convertToImperial(probeSettings.fastFeedrate),
+        normalFeedrate:
+            units === METRIC_UNITS
+                ? probeSettings.normalFeedrate
+                : convertToImperial(probeSettings.normalFeedrate),
+        retractionDistance:
+            units === METRIC_UNITS
+                ? probeSettings.retractionDistance
+                : convertToImperial(probeSettings.retractionDistance),
+        zProbeDistance:
+            units === METRIC_UNITS
+                ? probeSettings.zProbeDistance
+                : convertToImperial(probeSettings.zProbeDistance),
     };
 
     const handleTouchplateTypeChange = (option) => {

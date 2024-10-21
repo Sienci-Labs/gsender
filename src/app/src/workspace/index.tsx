@@ -1,5 +1,5 @@
-import { Sidebar } from "./Sidebar";
-import { TopBar } from "./TopBar";
+import { Sidebar } from './Sidebar';
+import { TopBar } from './TopBar';
 
 type Props = {
     children: React.ReactNode;

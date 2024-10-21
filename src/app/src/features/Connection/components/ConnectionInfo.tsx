@@ -1,8 +1,8 @@
-import {FirmwareFlavour} from "app/features/Connection";
+import { FirmwareFlavour } from 'app/features/Connection';
 
 interface ConnectionInfoProps {
-    firmwareType: FirmwareFlavour
-    port: string
+    firmwareType: FirmwareFlavour;
+    port: string;
 }
 
 export function ConnectionInfo(props: ConnectionInfoProps) {
@@ -11,5 +11,5 @@ export function ConnectionInfo(props: ConnectionInfoProps) {
             <div className="font-bold text-gray-900">{props.port}</div>
             <div className="text-sm text-gray-600">{props.firmwareType}</div>
         </div>
-    )
+    );
 }

@@ -2,7 +2,7 @@ interface DisconnectButtonProps {
     disconnectHandler: () => void;
 }
 
-export function DisconnectButton({disconnectHandler}: DisconnectButtonProps) {
+export function DisconnectButton({ disconnectHandler }: DisconnectButtonProps) {
     return (
         <button
             type="button"
@@ -11,5 +11,5 @@ export function DisconnectButton({disconnectHandler}: DisconnectButtonProps) {
         >
             Disconnect
         </button>
-    )
+    );
 }

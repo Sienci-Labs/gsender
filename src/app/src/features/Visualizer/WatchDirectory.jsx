@@ -35,7 +35,7 @@ import styles from './renderer.styl';
 class WatchDirectory extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
     };
 
     tableNode = null;
@@ -45,7 +45,8 @@ class WatchDirectory extends PureComponent {
     componentDidMount() {
         this.addResizeEventListener();
 
-        api.watch.getFiles({ path: '' })
+        api.watch
+            .getFiles({ path: '' })
             .then((res) => {
                 const body = res.body;
                 const data = body.files.map((file) => {
@@ -56,9 +57,9 @@ class WatchDirectory extends PureComponent {
                         name: name,
                         props: {
                             ...props,
-                            path: body.path || ''
+                            path: body.path || '',
                         },
-                        loadOnDemand: props.type === 'd'
+                        loadOnDemand: props.type === 'd',
                     };
                 });
 
@@ -116,7 +117,10 @@ class WatchDirectory extends PureComponent {
         let child = row.firstChild;
         let col = colgroup.firstChild;
         while (child && col) {
-            const width = Math.max(child.clientWidth, tableHeaders[i].clientWidth);
+            const width = Math.max(
+                child.clientWidth,
+                tableHeaders[i].clientWidth,
+            );
             col.style.minWidth = width + 'px';
             col.style.width = width + 'px';
             tableHeaders[i].style.width = width + 'px';
@@ -139,11 +143,11 @@ class WatchDirectory extends PureComponent {
                 </Modal.Header>
                 <Modal.Body>
                     <table
-                        ref={node => {
+                        ref={(node) => {
                             this.tableNode = node;
                         }}
                         style={{
-                            width: '100%'
+                            width: '100%',
                         }}
                     >
                         <thead>
@@ -157,7 +161,7 @@ class WatchDirectory extends PureComponent {
                     </table>
                     <InfiniteTree
                         style={{ height: 240 }}
-                        ref={node => {
+                        ref={(node) => {
                             if (!this.treeNode) {
                                 this.treeNode = node;
                                 this.addColumnGroup();
@@ -168,7 +172,13 @@ class WatchDirectory extends PureComponent {
                         autoOpen={true}
                         layout="table"
                         loadNodes={(parentNode, done) => {
-                            api.watch.getFiles({ path: path.join(parentNode.props.path, parentNode.name) })
+                            api.watch
+                                .getFiles({
+                                    path: path.join(
+                                        parentNode.props.path,
+                                        parentNode.name,
+                                    ),
+                                })
                                 .then((res) => {
                                     const body = res.body;
                                     const nodes = body.files.map((file) => {
@@ -179,9 +189,9 @@ class WatchDirectory extends PureComponent {
                                             name: name,
                                             props: {
                                                 ...props,
-                                                path: body.path || ''
+                                                path: body.path || '',
                                             },
-                                            loadOnDemand: (props.type === 'd')
+                                            loadOnDemand: props.type === 'd',
                                         };
                                     });
 
@@ -194,7 +204,7 @@ class WatchDirectory extends PureComponent {
                         rowRenderer={renderer}
                         shouldSelectNode={(node) => {
                             const tree = this.treeNode.tree;
-                            if (!node || (node === tree.getSelectedNode())) {
+                            if (!node || node === tree.getSelectedNode()) {
                                 return false; // Prevent from desdelecting the current node
                             }
                             return true;
@@ -210,22 +220,32 @@ class WatchDirectory extends PureComponent {
                             const node = tree.getSelectedNode();
                             const nodeIndex = tree.getSelectedIndex();
 
-                            if (event.keyCode === 13) { // Enter
+                            if (event.keyCode === 13) {
+                                // Enter
                                 if (!node) {
                                     return;
                                 }
-                                const file = path.join(node.props.path, node.name);
+                                const file = path.join(
+                                    node.props.path,
+                                    node.name,
+                                );
                                 actions.loadFile(file);
                                 actions.closeModal();
-                            } else if (event.keyCode === 37) { // Left
+                            } else if (event.keyCode === 37) {
+                                // Left
                                 tree.closeNode(node);
-                            } else if (event.keyCode === 38) { // Up
-                                const prevNode = tree.nodes[nodeIndex - 1] || node;
+                            } else if (event.keyCode === 38) {
+                                // Up
+                                const prevNode =
+                                    tree.nodes[nodeIndex - 1] || node;
                                 tree.selectNode(prevNode);
-                            } else if (event.keyCode === 39) { // Right
+                            } else if (event.keyCode === 39) {
+                                // Right
                                 tree.openNode(node);
-                            } else if (event.keyCode === 40) { // Down
-                                const nextNode = tree.nodes[nodeIndex + 1] || node;
+                            } else if (event.keyCode === 40) {
+                                // Down
+                                const nextNode =
+                                    tree.nodes[nodeIndex + 1] || node;
                                 tree.selectNode(nextNode);
                             }
                         }}
@@ -241,7 +261,10 @@ class WatchDirectory extends PureComponent {
                                 const node = tree.getSelectedNode();
 
                                 if (node) {
-                                    const file = path.join(node.props.path, node.name);
+                                    const file = path.join(
+                                        node.props.path,
+                                        node.name,
+                                    );
                                     actions.loadFile(file);
                                     actions.closeModal();
                                 }
@@ -265,7 +288,10 @@ class WatchDirectory extends PureComponent {
                             const node = tree.getSelectedNode();
 
                             if (node) {
-                                const file = path.join(node.props.path, node.name);
+                                const file = path.join(
+                                    node.props.path,
+                                    node.name,
+                                );
                                 actions.loadFile(file);
                                 actions.closeModal();
                             }

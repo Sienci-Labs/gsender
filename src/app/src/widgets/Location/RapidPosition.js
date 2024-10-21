@@ -66,7 +66,6 @@ const getMachineMovementLimits = () => {
     return [xLimit, yLimit];
 };
 
-
 // Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
 export function isBitSetInNumber(number, bitPosition) {
     number = Number(number);
@@ -74,7 +73,12 @@ export function isBitSetInNumber(number, bitPosition) {
     return (number & (1 << bitPosition)) !== 0;
 }
 
-const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pullOff) => {
+const getPositionMovements = (
+    requestedPosition,
+    homingPosition,
+    homingFlag,
+    pullOff,
+) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
 
     pullOff = PULLOFF_DISTANCE;
@@ -85,8 +89,8 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
 
     if (!xLimit || !yLimit) {
         Toaster.pop({
-            msg: 'Unable to find machine limits - make sure they\'re set in preferences',
-            type: TOASTER_DANGER
+            msg: "Unable to find machine limits - make sure they're set in preferences",
+            type: TOASTER_DANGER,
         });
         return [null, null];
     }
@@ -97,8 +101,9 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
         } else if (requestedPosition === FRONT_LEFT) {
             return [xLimit * -1, pullOff];
         } else if (requestedPosition === BACK_LEFT) {
-            return [(xLimit * -1), yLimit];
-        } else { // Back Right
+            return [xLimit * -1, yLimit];
+        } else {
+            // Back Right
             return [pullOff * -1, yLimit];
         }
     } else if (homingPosition === FRONT_LEFT) {
@@ -108,7 +113,8 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
             return [pullOff, pullOff];
         } else if (requestedPosition === BACK_RIGHT) {
             return [xLimit, yLimit];
-        } else { // Back Right
+        } else {
+            // Back Right
             return [pullOff, yLimit];
         }
     } else if (homingPosition === BACK_LEFT) {
@@ -118,7 +124,8 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
             return [pullOff, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
             return [pullOff, pullOff * -1];
-        } else { // Back Right
+        } else {
+            // Back Right
             return [xLimit, pullOff * -1];
         }
     } else if (homingPosition === BACK_RIGHT) {
@@ -128,7 +135,8 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
             return [xLimit * -1, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
             return [xLimit * -1, pullOff * -1];
-        } else { // Back Right
+        } else {
+            // Back Right
             return [pullOff * -1, pullOff * -1];
         }
     }
@@ -136,14 +144,22 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
     return [null, null];
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag, pullOff) => {
+export const getMovementGCode = (
+    requestedPosition,
+    homingPositionSetting,
+    homingFlag,
+    pullOff,
+) => {
     const gcode = [];
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
     const homingPosition = getHomingLocation(homingPositionSetting);
 
     // Change homing flag for grblHal specifically
-    const controllerType = prefStore.get('widgets.connection.controller.type', 'grbl');
+    const controllerType = prefStore.get(
+        'widgets.connection.controller.type',
+        'grbl',
+    );
 
     if (controllerType === 'grblHAL') {
         const store = reduxStore.getState();
@@ -152,12 +168,17 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting, homin
         homingFlag = isBitSetInNumber(homingValue, 3);
     }
 
-    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
+    const [xMovement, yMovement] = getPositionMovements(
+        requestedPosition,
+        homingPosition,
+        homingFlag,
+        pullOff,
+    );
 
     if (xMovement === null || yMovement === null) {
         Toaster.pop({
             msg: 'Unable to calculate position movements based on inputs - check arguments passed',
-            type: TOASTER_DANGER
+            type: TOASTER_DANGER,
         });
         return [];
     }

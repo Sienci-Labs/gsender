@@ -1,18 +1,18 @@
-import {ConnectionState, ConnectionType} from "../index";
-import { PiPlugLight } from "react-icons/pi";
-import { BsEthernet } from "react-icons/bs";
-import { BsUsbPlug } from "react-icons/bs";
-import { GrSatellite } from "react-icons/gr";
-import {ReactElement} from "react";
+import { ConnectionState, ConnectionType } from '../index';
+import { PiPlugLight } from 'react-icons/pi';
+import { BsEthernet } from 'react-icons/bs';
+import { BsUsbPlug } from 'react-icons/bs';
+import { GrSatellite } from 'react-icons/gr';
+import { ReactElement } from 'react';
 import cn from 'classnames';
 
 interface ConnectionStateIndicatorProps {
-    state: ConnectionState
-    type: ConnectionType
+    state: ConnectionState;
+    type: ConnectionType;
 }
 
 function getIcon(type: ConnectionType): ReactElement {
-    switch(type) {
+    switch (type) {
         case ConnectionType.DISCONNECTED:
             return <PiPlugLight />;
         case ConnectionType.ETHERNET:
@@ -29,28 +29,32 @@ function getIcon(type: ConnectionType): ReactElement {
 function getStateColour(state: ConnectionState) {
     switch (state) {
         case ConnectionState.DISCONNECTED:
-            return "text-blue-700"
+            return 'text-blue-700';
         case ConnectionState.CONNECTED:
-            return "text-green-700"
+            return 'text-green-700';
         case ConnectionState.CONNECTING:
-            return "text-yellow-600"
+            return 'text-yellow-600';
         case ConnectionState.ERROR:
-            return "text-red-600"
+            return 'text-red-600';
         default:
-            return "text-yellow-700"
+            return 'text-yellow-700';
     }
 }
 
-export function ConnectionStateIndicator(props: ConnectionStateIndicatorProps): JSX.Element {
+export function ConnectionStateIndicator(
+    props: ConnectionStateIndicatorProps,
+): JSX.Element {
     const icon = getIcon(props.type);
-    const colour = getStateColour(props.state)
+    const colour = getStateColour(props.state);
 
     return (
-        <div className={
-            cn("w-[45px] h-[45px] text-5xl flex items-center justify-center",
-                colour
-            )}>
+        <div
+            className={cn(
+                'w-[45px] h-[45px] text-5xl flex items-center justify-center',
+                colour,
+            )}
+        >
             {icon}
         </div>
-    )
+    );
 }

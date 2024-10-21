@@ -1,5 +1,3 @@
-
-
 import store from 'app/store';
 import {
     SET_CURRENT_GAMEPAD_PROFILE,
@@ -32,61 +30,61 @@ const initialState = () => {
 
 const reducer = (state, action) => {
     switch (action.type) {
-    case SET_CURRENT_GAMEPAD_PROFILE: {
-        return {
-            ...state,
-            currentProfile: action.payload,
-        };
-    }
+        case SET_CURRENT_GAMEPAD_PROFILE: {
+            return {
+                ...state,
+                currentProfile: action.payload,
+            };
+        }
 
-    case SET_CURRENT_GAMEPAD_PROFILE_BUTTON: {
-        return {
-            ...state,
-            currentButton: action.payload,
-        };
-    }
+        case SET_CURRENT_GAMEPAD_PROFILE_BUTTON: {
+            return {
+                ...state,
+                currentButton: action.payload,
+            };
+        }
 
-    case SET_GAMEPAD_PROFILE_LOCKOUT_BUTTON: {
-        return {
-            ...state,
-            lockoutButton: action.payload,
-        };
-    }
+        case SET_GAMEPAD_PROFILE_LOCKOUT_BUTTON: {
+            return {
+                ...state,
+                lockoutButton: action.payload,
+            };
+        }
 
-    case SET_GAMEPAD_PROFILE_MODIFIER_BUTTON: {
-        return {
-            ...state,
-            modifierButton: action.payload,
-        };
-    }
+        case SET_GAMEPAD_PROFILE_MODIFIER_BUTTON: {
+            return {
+                ...state,
+                modifierButton: action.payload,
+            };
+        }
 
-    case SET_CURRENT_GAMEPAD_MODAL: {
-        return {
-            ...state,
-            currentModal: action.payload,
-        };
-    }
+        case SET_CURRENT_GAMEPAD_MODAL: {
+            return {
+                ...state,
+                currentModal: action.payload,
+            };
+        }
 
-    case SET_GAMEPAD_PROFILE_LIST: {
-        return {
-            ...state,
-            settings: {
-                ...state.settings,
-                profiles: action.payload
-            },
-        };
-    }
+        case SET_GAMEPAD_PROFILE_LIST: {
+            return {
+                ...state,
+                settings: {
+                    ...state.settings,
+                    profiles: action.payload,
+                },
+            };
+        }
 
-    case SET_MACROS: {
-        return {
-            ...state,
-            macros: action.payload,
-        };
-    }
+        case SET_MACROS: {
+            return {
+                ...state,
+                macros: action.payload,
+            };
+        }
 
-    default: {
-        return state;
-    }
+        default: {
+            return state;
+        }
     }
 };
 

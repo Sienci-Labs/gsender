@@ -37,12 +37,12 @@ export default [
         mm: {
             width: 792,
             depth: 845,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 31.18,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -50,7 +50,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_30x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_30x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_30x30,
     },
     {
         id: 1,
@@ -61,19 +61,19 @@ export default [
         mm: {
             width: 1279.9,
             depth: 845,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 50.39,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
         coolant: false,
         laser: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_48x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_48x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_48x30,
     },
     {
         id: 2,
@@ -84,12 +84,12 @@ export default [
         mm: {
             width: 792,
             depth: 345,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 31.18,
             depth: 13.58,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -97,7 +97,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30,
     },
     {
         id: 7,
@@ -108,12 +108,12 @@ export default [
         mm: {
             width: 234,
             depth: 185,
-            height: 90
+            height: 90,
         },
         in: {
             width: 9.21,
             depth: 7.28,
-            height: 3.54
+            height: 3.54,
         },
         endstops: false,
         spindle: false,
@@ -131,12 +131,12 @@ export default [
         mm: {
             width: 234,
             depth: 185,
-            height: 90
+            height: 90,
         },
         in: {
             width: 9.21,
             depth: 7.28,
-            height: 3.54
+            height: 3.54,
         },
         endstops: false,
         spindle: false,
@@ -154,12 +154,12 @@ export default [
         mm: {
             width: 258,
             depth: 185,
-            height: 90
+            height: 90,
         },
         in: {
             width: 10.16,
             depth: 7.28,
-            height: 3.54
+            height: 3.54,
         },
         endstops: false,
         spindle: false,
@@ -177,12 +177,12 @@ export default [
         mm: {
             width: 307,
             depth: 345,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 12.09,
             depth: 13.58,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -190,7 +190,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK1_12x12,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x12
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x12,
     },
     {
         id: 4,
@@ -201,12 +201,12 @@ export default [
         mm: {
             width: 792,
             depth: 345,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 31.18,
             depth: 13.58,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -214,7 +214,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK1_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_12x30,
     },
     {
         id: 5,
@@ -225,12 +225,12 @@ export default [
         mm: {
             width: 792,
             depth: 845,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 31.18,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -238,7 +238,7 @@ export default [
         laser: false,
         laserOnOutline: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK1_30x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_30x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_30x30,
     },
     {
         id: 6,
@@ -249,19 +249,19 @@ export default [
         mm: {
             width: 1279.9,
             depth: 845,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 50.39,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
         coolant: false,
         laser: false,
         eepromSettings: longMillGrblEEPROM.LONGMILL_MK1_48x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_48x30
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK1_48x30,
     },
     {
         id: 10,
@@ -271,17 +271,17 @@ export default [
         mm: {
             width: 304,
             depth: 304.8,
-            height: 63.5
+            height: 63.5,
         },
         in: {
             width: 11.97,
             depth: 12,
-            height: 2.5
+            height: 2.5,
         },
         endstops: false,
         spindle: false,
         coolant: false,
-        laser: false
+        laser: false,
     },
     {
         id: 18,
@@ -291,12 +291,12 @@ export default [
         mm: {
             width: 1219.2,
             depth: 609.6,
-            height: 101.6
+            height: 101.6,
         },
         in: {
             width: 48,
             depth: 24,
-            height: 4
+            height: 4,
         },
         endstops: true,
         spindle: true,
@@ -312,12 +312,12 @@ export default [
         mm: {
             width: 1219.2,
             depth: 609.6,
-            height: 101.6
+            height: 101.6,
         },
         in: {
             width: 48,
             depth: 24,
-            height: 4
+            height: 4,
         },
         endstops: true,
         spindle: true,
@@ -333,12 +333,12 @@ export default [
         mm: {
             width: 819.15,
             depth: 819.15,
-            height: 113.35
+            height: 113.35,
         },
         in: {
             width: 32.25,
             depth: 32.25,
-            height: 4.46
+            height: 4.46,
         },
         endstops: true,
         spindle: false,
@@ -354,12 +354,12 @@ export default [
         mm: {
             width: 270,
             depth: 270,
-            height: 80
+            height: 80,
         },
         in: {
             width: 10.63,
             depth: 10.63,
-            height: 3.15
+            height: 3.15,
         },
         endstops: true,
         spindle: false,
@@ -375,12 +375,12 @@ export default [
         mm: {
             width: 300,
             depth: 270,
-            height: 47
+            height: 47,
         },
         in: {
             width: 11.81,
             depth: 10.63,
-            height: 1.85
+            height: 1.85,
         },
         endstops: true,
         spindle: false,
@@ -396,12 +396,12 @@ export default [
         mm: {
             width: 260,
             depth: 260,
-            height: 50
+            height: 50,
         },
         in: {
             width: 10.24,
             depth: 10.24,
-            height: 1.97
+            height: 1.97,
         },
         endstops: false,
         spindle: false,
@@ -417,12 +417,12 @@ export default [
         mm: {
             width: 400.05,
             depth: 368.3,
-            height: 177.8
+            height: 177.8,
         },
         in: {
             width: 15.75,
             depth: 14.5,
-            height: 7
+            height: 7,
         },
         endstops: false,
         spindle: false,
@@ -438,12 +438,12 @@ export default [
         mm: {
             width: 457.2,
             depth: 406.4,
-            height: 83.82
+            height: 83.82,
         },
         in: {
             width: 18,
             depth: 16,
-            height: 3.3
+            height: 3.3,
         },
         endstops: true,
         spindle: false,
@@ -459,12 +459,12 @@ export default [
         mm: {
             width: 609.6,
             depth: 609.6,
-            height: 90.17
+            height: 90.17,
         },
         in: {
             width: 24,
             depth: 24,
-            height: 3.55
+            height: 3.55,
         },
         endstops: true,
         spindle: true,
@@ -480,12 +480,12 @@ export default [
         mm: {
             width: 180,
             depth: 100,
-            height: 45
+            height: 45,
         },
         in: {
             width: 7.09,
             depth: 3.94,
-            height: 1.77
+            height: 1.77,
         },
         endstops: false,
         spindle: false,
@@ -501,12 +501,12 @@ export default [
         mm: {
             width: 228,
             depth: 356,
-            height: 203
+            height: 203,
         },
         in: {
             width: 9,
             depth: 14,
-            height: 8
+            height: 8,
         },
         endstops: false,
         spindle: false,
@@ -522,12 +522,12 @@ export default [
         mm: {
             width: 530,
             depth: 450,
-            height: 465
+            height: 465,
         },
         in: {
             width: 20.8,
             depth: 17.7,
-            height: 18.3
+            height: 18.3,
         },
         endstops: false,
         spindle: false,
@@ -543,12 +543,12 @@ export default [
         mm: {
             width: 530,
             depth: 450,
-            height: 465
+            height: 465,
         },
         in: {
             width: 20.8,
             depth: 17.7,
-            height: 18.3
+            height: 18.3,
         },
         endstops: false,
         spindle: false,
@@ -565,12 +565,12 @@ export default [
         mm: {
             width: 792,
             depth: 845,
-            height: 114.3
+            height: 114.3,
         },
         in: {
             width: 31.18,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: false,
         spindle: false,
@@ -579,7 +579,7 @@ export default [
         laserOnOutline: false,
         eepromSettings: DefaultSLBSettings,
         grblHALeepromSettings: DefaultSLBSettings,
-        isHal: true
+        isHal: true,
     },
     {
         id: 54,
@@ -590,12 +590,12 @@ export default [
         mm: {
             width: 1260,
             depth: 1248,
-            height: 170
+            height: 170,
         },
         in: {
             width: 31.18,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: true,
         spindle: false,
@@ -605,7 +605,7 @@ export default [
         eepromSettings: altmillSettings.DEFAULT,
         grblHALeepromSettings: altmillSettings.DEFAULT,
         orderedSettings: altmillSettings.ALTMILL_ORDERED,
-        isHal: true
+        isHal: true,
     },
     {
         id: 55,
@@ -616,12 +616,12 @@ export default [
         mm: {
             width: 49.6,
             depth: 49.1,
-            height: 6.6
+            height: 6.6,
         },
         in: {
             width: 49.6,
             depth: 49.1,
-            height: 6.6
+            height: 6.6,
         },
         endstops: true,
         spindle: true,
@@ -631,6 +631,6 @@ export default [
         eepromSettings: altmillSettings.SPINDLE_KIT,
         grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
         orderedSettings: altmillSettings.SPINDLE_ORDERED,
-        isHal: true
-    }
+        isHal: true,
+    },
 ];

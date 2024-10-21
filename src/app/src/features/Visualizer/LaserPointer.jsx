@@ -25,17 +25,15 @@ import * as THREE from 'three';
 
 class LaserPointer {
     constructor(options) {
-        const {
-            diameter = 1,
-        } = { ...options };
+        const { diameter = 1 } = { ...options };
         const radius = Number(diameter / 2) || 1;
 
         // line
         const geometryC = new THREE.CylinderGeometry(0.8, 0.8, 30, 32);
         const materialC = new THREE.MeshBasicMaterial({
-            color: 0x80388B,
+            color: 0x80388b,
             opacity: 0.6,
-            transparent: true
+            transparent: true,
         });
         const cylinder = new THREE.Mesh(geometryC, materialC);
         cylinder.position.set(0, 0, 15); // move up
@@ -44,7 +42,7 @@ class LaserPointer {
         // sphere
         const geometryB = new THREE.IcosahedronGeometry(radius, 5);
         const materialB = new THREE.MeshBasicMaterial({
-            color: 0x9DFCFF,
+            color: 0x9dfcff,
         });
         const ball = new THREE.Mesh(geometryB, materialB);
         ball.layers.enable(1); // bloom

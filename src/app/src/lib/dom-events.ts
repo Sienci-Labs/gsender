@@ -38,8 +38,13 @@ export const stopPropagation = (e: Event): void => {
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Compatibility
-export const addEventListener = (target: EventTarget, type: string, listener: EventListener): void => {
-    if (target.addEventListener) { // Standard
+export const addEventListener = (
+    target: EventTarget,
+    type: string,
+    listener: EventListener,
+): void => {
+    if (target.addEventListener) {
+        // Standard
         target.addEventListener(type, listener, false);
     }
     // } else if (target.attachEvent) { // IE8
@@ -49,8 +54,13 @@ export const addEventListener = (target: EventTarget, type: string, listener: Ev
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
-export const removeEventListener = (target: EventTarget, type: string, listener: EventListener): void => {
-    if (target.removeEventListener) { // Standard
+export const removeEventListener = (
+    target: EventTarget,
+    type: string,
+    listener: EventListener,
+): void => {
+    if (target.removeEventListener) {
+        // Standard
         target.removeEventListener(type, listener, false);
     }
     // } else if (target.detachEvent) { // IE8

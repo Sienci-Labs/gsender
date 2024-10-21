@@ -107,7 +107,6 @@ const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 import { outlineResponse } from '../../workers/Outline.response';
 
-
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
@@ -127,7 +126,7 @@ class Visualizer extends Component {
 
     pubsubTokens = [];
 
-    outlineRunning =  false;
+    outlineRunning = false;
 
     isAgitated = false;
 
@@ -997,14 +996,14 @@ class Visualizer extends Component {
                 }
             }),
             pubsub.subscribe('outline:start', () => {
-               console.log('Outline called across the void');
+                console.log('Outline called across the void');
                 if (this.outlineRunning) {
                     return;
                 }
 
                 this.outlineRunning = true;
 
-               const vertices = this.props.actions.getHull();
+                const vertices = this.props.actions.getHull();
                 const outlineWorker = new Worker(
                     new URL('../../workers/Outline.worker.js', import.meta.url),
                     { type: 'module' },
@@ -1013,7 +1012,8 @@ class Visualizer extends Component {
                 const machineProfile = store.get('workspace.machineProfile');
                 const spindleMode = store.get('widgets.spindle.mode');
                 // outline toggled on and currently in laser mode
-                const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+                const isLaser =
+                    machineProfile.laserOnOutline && spindleMode === LASER_MODE;
 
                 outlineWorker.onmessage = ({ data }) => {
                     outlineResponse({ data }, machineProfile.laserOnOutline);
@@ -1023,7 +1023,7 @@ class Visualizer extends Component {
 
                 outlineWorker.postMessage({
                     isLaser,
-                    parsedData: vertices
+                    parsedData: vertices,
                 });
             }),
         ];

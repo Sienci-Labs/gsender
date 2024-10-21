@@ -16,7 +16,11 @@ export class StockTurningGenerator {
         const feedrate = this.processValue(newOptions.feedrate);
 
         // Checking for odd and even number of passes for full spiral is done later
-        if ((newStartHeight - newOptions.stepdown <= newFinalHeight) && !newOptions.enableRehoming) { // check if one pass
+        if (
+            newStartHeight - newOptions.stepdown <= newFinalHeight &&
+            !newOptions.enableRehoming
+        ) {
+            // check if one pass
             method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
         } else {
             method = STOCK_TURNING_METHOD.FULL_SPIRALS; // not one pass, then use full spiral
@@ -27,7 +31,7 @@ export class StockTurningGenerator {
             method,
             feedrate,
             startHeight: newStartHeight,
-            finalHeight: newFinalHeight
+            finalHeight: newFinalHeight,
         };
     }
 
@@ -48,7 +52,7 @@ export class StockTurningGenerator {
             'G90',
             `M3 S${spindleRPM}`,
             '(Header End)',
-            '\n'
+            '\n',
         ];
 
         const getZeroBlock = (axes) => {
@@ -62,18 +66,14 @@ export class StockTurningGenerator {
                 axesZeroLine += ' A0';
             }
 
-            return [
-                'G90',
-                `G0 Z${safeHeight}`,
-                axesZeroLine
-            ];
+            return ['G90', `G0 Z${safeHeight}`, axesZeroLine];
         };
 
         const footerBlock = [
             '\n',
             '(Footer)',
             'M5 ;Turn off spindle',
-            '(End of Footer)'
+            '(End of Footer)',
         ];
 
         const bodyBlock = this.generateLayers([], this.options.startHeight, 1);
@@ -82,14 +82,14 @@ export class StockTurningGenerator {
             ...headerBlock,
             ...bodyBlock,
             ...getZeroBlock({ x: true, a: !enableRehoming }),
-            ...footerBlock
+            ...footerBlock,
         ];
 
         // Convert to string so it can be interpreted by controller and visualizer
         const gcodeString = arr.join('\n');
 
         this.gcode = gcodeString;
-    }
+    };
 
     generateLayers = (array, currentDepth, count) => {
         const { stepdown, finalHeight } = this.options;
@@ -98,18 +98,22 @@ export class StockTurningGenerator {
             return array.flat(); //Flatten out array at the end when all subset layers have been added
         }
 
-        const layer = this.createLayer({ depth: currentDepth > finalHeight ? currentDepth : finalHeight, count });
+        const layer = this.createLayer({
+            depth: currentDepth > finalHeight ? currentDepth : finalHeight,
+            count,
+        });
 
         array.push(layer);
 
         return this.generateLayers(array, currentDepth - stepdown, count + 1);
-    }
+    };
 
     createLayer = ({ count, depth }) => {
         const { method } = this.options;
 
         const runSpiral = {
-            [STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS]: this.createHalfAndHalfSpiral,
+            [STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS]:
+                this.createHalfAndHalfSpiral,
             [STOCK_TURNING_METHOD.FULL_SPIRALS]: this.createFullSpiral,
         }[method];
 
@@ -123,26 +127,33 @@ export class StockTurningGenerator {
             `(*** Layer ${count} ***)`,
             ...layer,
             `(*** End of Layer ${count} ***)`,
-            '\n'
+            '\n',
         ];
-    }
+    };
 
     createHalfAndHalfSpiral = (depth) => {
         const { processValue } = this;
-        const { finalHeight, feedrate, stockLength, stepover, stepdown, bitDiameter } = this.options;
+        const {
+            finalHeight,
+            feedrate,
+            stockLength,
+            stepover,
+            stepdown,
+            bitDiameter,
+        } = this.options;
         const safeHeight = this.getSafeZValue();
         const halfOfStockLength = (stockLength / 2).toFixed(3);
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
         const stepoverPercentage = stepover / 100;
 
-        const currentZValue = depth > 0
-            ? depth
-            : this.getDefaultCurrentZValue();
+        const currentZValue =
+            depth > 0 ? depth : this.getDefaultCurrentZValue();
 
         let modifiedCurrentZValue = this.getDefaultCurrentZValue();
 
         if (depth > 0) {
-            modifiedCurrentZValue = depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
+            modifiedCurrentZValue =
+                depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
         }
 
         const isFinalStepdown = currentZValue - stepdown <= finalHeight;
@@ -158,12 +169,12 @@ export class StockTurningGenerator {
 
             /** 5 */
             isFinalStepdown
-                ? (`G1 A${processValue(-360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`)
+                ? `G1 A${processValue(-360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${((0.2 * 360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`
                 : '',
 
             /** 6 */ `G1 A${processValue(-360)}`,
 
-            /** 7 */ `G1 X${halfOfStockLength} A${processValue((0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter))).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 7 */ `G1 X${halfOfStockLength} A${processValue((0.5 * -360 * stockLength) / (stepoverPercentage * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 8 */ `G1 A${processValue(-360)}`,
 
@@ -179,18 +190,18 @@ export class StockTurningGenerator {
 
             /** 14 */
             isFinalStepdown
-                ? `G1 A${processValue(360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
+                ? `G1 A${processValue(360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${((0.2 * 360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`
                 : '',
 
             /** 15 */ `G1 A${processValue(360)}`,
 
-            /** 16 */ `G1 X${-halfOfStockLength} A${processValue((0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter))).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 16 */ `G1 X${-halfOfStockLength} A${processValue((0.5 * 360 * stockLength) / (stepoverPercentage * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 17 */ `G1 A${processValue(360)}`,
         ];
 
         return array;
-    }
+    };
 
     createFullSpiral = (depth, count) => {
         const { processValue } = this;
@@ -202,7 +213,7 @@ export class StockTurningGenerator {
             stepover,
             bitDiameter,
             stepdown,
-            enableRehoming
+            enableRehoming,
         } = this.options;
         const safeHeight = this.getSafeZValue();
         const halfOfStockLength = (stockLength / 2).toFixed(3);
@@ -210,16 +221,17 @@ export class StockTurningGenerator {
         const stepoverPercentage = stepover / 100;
         const alternateFactor = count % 2 === 0 ? 1 : -1;
 
-        const currentZValue = depth > 0
-            ? depth
-            : this.getDefaultCurrentZValue();
+        const currentZValue =
+            depth > 0 ? depth : this.getDefaultCurrentZValue();
         let modifiedCurrentZValue = this.getDefaultCurrentZValue();
         if (depth > 0) {
-            modifiedCurrentZValue = depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
+            modifiedCurrentZValue =
+                depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
         }
 
         const isFinalStepdown = currentZValue - stepdown <= finalHeight;
-        const isEvenNumberOfStepdowns = Math.ceil((startHeight - finalHeight) / stepdown) % 2 === 0;
+        const isEvenNumberOfStepdowns =
+            Math.ceil((startHeight - finalHeight) / stepdown) % 2 === 0;
         const isFirstLayer = currentZValue === startHeight;
 
         const firstLayerBlock = [
@@ -233,11 +245,11 @@ export class StockTurningGenerator {
         ];
 
         const continuingLayerBlock = [
-            `G1 A${processValue(alternateFactor * 360)} Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown).toFixed(3)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 A${processValue(alternateFactor * 360)} Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown).toFixed(3)} F${((0.2 * 360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             `G1 A${processValue(alternateFactor * 360)}`,
 
-            `G1 X${-(alternateFactor * stockLength)} A${(processValue(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter)))).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 X${-(alternateFactor * stockLength)} A${processValue(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             `G1 A${processValue(alternateFactor * 360)}`,
         ];
@@ -247,12 +259,12 @@ export class StockTurningGenerator {
 
             /** 5 */
             isFinalStepdown
-                ? (`G1 A${processValue(-360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`)
+                ? `G1 A${processValue(-360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${((0.2 * 360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`
                 : '',
 
             /** 6 */ `G1 A${processValue(-360)}`,
 
-            /** 7 */ `G1 X${halfOfStockLength} A${processValue((0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter))).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 7 */ `G1 X${halfOfStockLength} A${processValue((0.5 * -360 * stockLength) / (stepoverPercentage * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 8 */ `G1 A${processValue(-360)}`,
 
@@ -268,12 +280,12 @@ export class StockTurningGenerator {
 
             /** 14 */
             isFinalStepdown
-                ? `G1 A${processValue(360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
+                ? `G1 A${processValue(360)} Z${(-(currentZValue - finalHeight)).toFixed(3)} F${((0.2 * 360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`
                 : '',
 
             /** 15 */ `G1 A${processValue(360)}`,
 
-            /** 16 */ `G1 X${-halfOfStockLength} A${processValue((0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter))).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 16 */ `G1 X${-halfOfStockLength} A${processValue((0.5 * 360 * stockLength) / (stepoverPercentage * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 17 */ `G1 A${processValue(360)}`,
         ];
@@ -282,12 +294,17 @@ export class StockTurningGenerator {
             return [...firstLayerBlock, ...continuingLayerBlock].flat();
         }
 
-        if (!isFirstLayer && !enableRehoming && !isEvenNumberOfStepdowns && isFinalStepdown) {
+        if (
+            !isFirstLayer &&
+            !enableRehoming &&
+            !isEvenNumberOfStepdowns &&
+            isFinalStepdown
+        ) {
             return finalLayerBlock.flat();
         } else {
             return continuingLayerBlock.flat();
         }
-    }
+    };
 
     getSafeZValue() {
         const { startHeight } = this.options;
@@ -308,7 +325,7 @@ export class StockTurningGenerator {
         const workspaceUnits = store.get('workspace.units');
 
         if (workspaceUnits === 'in') {
-            return +((value / 25.4).toFixed(3));
+            return +(value / 25.4).toFixed(3);
         }
 
         return value;

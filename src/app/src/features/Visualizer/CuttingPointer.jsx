@@ -33,7 +33,7 @@ class CuttingPointer {
             phiStart = 0,
             phiLength = Math.PI * 2,
             thetaStart = 0,
-            thetaLength = Math.PI
+            thetaLength = Math.PI,
         } = { ...options };
         const radius = Number(diameter / 2) || 1;
 
@@ -44,10 +44,10 @@ class CuttingPointer {
             phiStart,
             phiLength,
             thetaStart,
-            thetaLength
+            thetaLength,
         );
         const material = new THREE.MeshBasicMaterial({
-            color: color
+            color: color,
         });
 
         return new THREE.Mesh(geometry, material);

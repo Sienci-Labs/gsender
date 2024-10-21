@@ -83,7 +83,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
 
     const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
     const altColourClass = 'fill-robin-500 hover:fill-blue-400';
-    const disabledColorClass = 'fill-gray-400 hover:fill-gray-400'
+    const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
     console.log(canClick);
     return (
         <svg
@@ -126,28 +126,36 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
                 id="yMinus"
                 d="M138.268 192.388C126.136 197.413 113.132 200 100 200C86.8678 200 73.8642 197.413 61.7316 192.388L100 100L138.268 192.388Z"
                 fill="#3F85C7"
-                className={cn(canClick ? standardColourClass : disabledColorClass)}
+                className={cn(
+                    canClick ? standardColourClass : disabledColorClass,
+                )}
                 {...yMinusJogHandlers}
             />
             <path
                 id="xMinus"
                 d="M7.61205 138.268C2.58658 126.136 -1.14805e-06 113.132 0 100C1.14805e-06 86.8678 2.58658 73.8642 7.61206 61.7316L100 100L7.61205 138.268Z"
                 fill="#3F85C7"
-                className={cn(canClick ? standardColourClass : disabledColorClass)}
+                className={cn(
+                    canClick ? standardColourClass : disabledColorClass,
+                )}
                 {...xMinusJogHandlers}
             />
             <path
                 id="yPlus"
                 d="M61.7316 7.61205C73.8642 2.58658 86.8678 -1.566e-07 100 0C113.132 1.566e-07 126.136 2.58658 138.268 7.61205L100 100L61.7316 7.61205Z"
                 fill="#3F85C7"
-                className={cn(canClick ? standardColourClass : disabledColorClass)}
+                className={cn(
+                    canClick ? standardColourClass : disabledColorClass,
+                )}
                 {...yPlusJogHandlers}
             />
             <path
                 id="xPlus"
                 d="M192.388 61.7317C197.413 73.8642 200 86.8678 200 100C200 113.132 197.413 126.136 192.388 138.268L100 100L192.388 61.7317Z"
                 fill="#3F85C7"
-                className={cn(canClick ? standardColourClass : disabledColorClass)}
+                className={cn(
+                    canClick ? standardColourClass : disabledColorClass,
+                )}
                 {...xPlusJogHandlers}
             />
             <circle cx={99.9168} cy={100.415} r={38.5} fill="#F4F4F4" />

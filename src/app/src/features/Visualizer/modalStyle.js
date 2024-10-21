@@ -23,12 +23,12 @@
 
 export const modalStyle = {
     border: 'none',
-    backgroundColor: '#d1d5db'
+    backgroundColor: '#d1d5db',
 };
 
 export const modalHeaderStyle = {
     backgroundColor: '#d1d5db',
-    border: 'none'
+    border: 'none',
 };
 
 export const modalTitleStyle = {
@@ -37,9 +37,9 @@ export const modalTitleStyle = {
 };
 
 export const modalBodyStyle = {
-    fontSize: '1.25rem'
+    fontSize: '1.25rem',
 };
 
 export const modalFooterStyle = {
-    backgroundColor: '#d1d5db'
+    backgroundColor: '#d1d5db',
 };

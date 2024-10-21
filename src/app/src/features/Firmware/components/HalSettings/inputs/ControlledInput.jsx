@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-
-const ControlledInput = ({ className, value, type = 'decimal', externalOnChange = null, ...rest }) => {
+const ControlledInput = ({
+    className,
+    value,
+    type = 'decimal',
+    externalOnChange = null,
+    ...rest
+}) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);

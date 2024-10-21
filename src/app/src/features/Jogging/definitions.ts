@@ -1,13 +1,13 @@
 export interface JogSpeed {
-    xyStep: number,
-    zStep: number,
+    xyStep: number;
+    zStep: number;
     aStep?: number;
     xaStep?: number;
-    feedrate: number,
+    feedrate: number;
 }
 
 export interface JogSpeeds {
-    rapid: JogSpeed,
-    normal: JogSpeed,
-    precise: JogSpeed
-};
+    rapid: JogSpeed;
+    normal: JogSpeed;
+    precise: JogSpeed;
+}
