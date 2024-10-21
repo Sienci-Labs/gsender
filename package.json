@@ -497,5 +497,6 @@
     "webpack@4.47.0": {
       "terser-webpack-plugin": "^4.2.3"
     }
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

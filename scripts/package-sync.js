@@ -11,7 +11,7 @@ const findImports = require("find-imports");
 const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
 
-const files = ["src/app/*.{js,ts,tsx,jsx}", "src/server/**/*.{js,jsx}"];
+const files = ["src/app/*.{js,jsx}", "src/server/**/*.{js,jsx}"];
 
 const resolvedImports = findImports(files, {
   flatten: true,
@@ -39,7 +39,7 @@ pkgApp.repository = pkg.repository;
 // Copy only Node.js dependencies to application package.json
 pkgApp.dependencies = _.pick(pkg.dependencies, deps);
 
-const target = path.resolve(__dirname, "../src/package.json");
+const target = path.resolve(__dirname, "../src/app/package.json");
 const content = JSON.stringify(pkgApp, null, 2);
 fs.writeFileSync(target, content + "\n", "utf8");
 
