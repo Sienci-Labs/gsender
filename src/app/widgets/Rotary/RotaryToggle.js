@@ -3,7 +3,6 @@ import { get } from 'lodash';
 import { useSelector } from 'react-redux';
 
 import store from 'app/store';
-import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import { WORKSPACE_MODE, GRBLHAL } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
@@ -44,7 +43,6 @@ const RotaryToggle = ({ disabled }) => {
     const handleToggle = (toggled) => {
         const newMode = toggled ? ROTARY : DEFAULT;
         updateWorkspaceMode(newMode);
-        controller.command('updateRotaryMode', newMode === ROTARY);
     };
 
     return (
