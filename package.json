@@ -87,7 +87,7 @@
   "build": {
     "appId": "org.sienci.gsender",
     "extraMetadata": {
-      "main": "./server-cli.js"
+      "main": "./main.js"
     },
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",

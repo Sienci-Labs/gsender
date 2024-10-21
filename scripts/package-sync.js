@@ -12,7 +12,11 @@ const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
 const { urPK } = require("@mui/material/locale");
 
-const files = ["src/app/*.{js,jsx}", "src/server/**/*.{js,jsx}"];
+const files = [
+  "src/app/*.{js,jsx,ts,tsx}",
+  "src/server/**/*.{js,jsx,ts,tsx}",
+  "src/main.js",
+];
 
 const resolvedImports = findImports(files, {
   flatten: true,
@@ -27,6 +31,8 @@ const deps = _uniq([
   "@sentry/node",
   "regenerator-runtime",
   "debug",
+  "is-electron",
+  "commander",
   ...resolvedImports.map((x) => x.split("/")[0]),
 ]).sort();
 
