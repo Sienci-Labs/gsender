@@ -408,6 +408,7 @@
     "@babel/preset-env": "~7.4.3",
     "@babel/preset-react": "~7.0.0",
     "@babel/register": "~7.4.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@sentry/webpack-plugin": "^2.7.1",
     "@tanstack/router-devtools": "^1.46.7",
     "@tanstack/router-plugin": "^1.47.0",

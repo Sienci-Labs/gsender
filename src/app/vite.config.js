@@ -5,6 +5,7 @@ import tailwindcss from 'tailwindcss';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { patchCssModules } from 'vite-css-modules';
+import json from '@rollup/plugin-json';
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html

@@ -2,7 +2,6 @@ import React from 'react';
 
 import logo from '../assets/icon-round.png';
 import canadaFlagIcon from '../assets/canada-flag-icon.png';
-import { version } from '../../../../package.json';
 import styles from './index.module.styl';
 
 const HeaderArea = () => {
@@ -14,7 +13,7 @@ const HeaderArea = () => {
                 <div style={{ alignSelf: 'center' }}>
                     <h2 style={{ margin: 0 }}>gSender</h2>
                     <small>by Sienci Labs</small>
-                    <p>Version {version || '0.6.5'}</p>
+                    <p>Version {version || 'EDGE'}</p>
                 </div>
             </div>
 
