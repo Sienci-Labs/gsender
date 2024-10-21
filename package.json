@@ -86,6 +86,10 @@
   },
   "build": {
     "appId": "org.sienci.gsender",
+    "extraMetadata": {
+      "main": "./server-cli.js"
+    },
+    "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
