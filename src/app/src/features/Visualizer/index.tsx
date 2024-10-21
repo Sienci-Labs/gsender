@@ -98,7 +98,7 @@ import {
 
 class Visualizer extends Component {
     static propTypes = {
-        widgetId: PropTypes.string
+        widgetId: PropTypes.string,
         isSecondary: PropTypes.bool,
     };
 
