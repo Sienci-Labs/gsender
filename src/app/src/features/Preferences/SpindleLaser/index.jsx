@@ -8,7 +8,7 @@ import SettingWrapper from '../components/SettingWrapper';
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import GeneralArea from '../components/GeneralArea';
-import { Tooltip as TooltipCustom } from 'app/components/ToolTip';
+import { Tooltip as TooltipCustom } from 'app/components/Tooltip';
 import Laser from './Laser';
 import Spindle from './Spindle';
 import { collectUserUsageData } from '../../../lib/heatmap';
