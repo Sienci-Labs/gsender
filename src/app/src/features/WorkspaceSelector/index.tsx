@@ -43,7 +43,7 @@ export function WorkspaceSelector() {
     }
 
     return (
-        <div className="absolute top-4 left-8 w-[200px]">
+        <div className="absolute top-5 left-5 w-[200px]">
             <Select
                 onValueChange={onWorkspaceSelect}
                 value={workspace}
@@ -59,6 +59,7 @@ export function WorkspaceSelector() {
                                 const [key, value] = option;
                                 return (
                                     <SelectItem
+                                        key={key}
                                         value={key}
                                         className="bg-white "
                                     >
