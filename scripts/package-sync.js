@@ -45,7 +45,7 @@ const content = JSON.stringify(pkgApp, null, 2);
 fs.writeFileSync(target, content + "\n", "utf8");
 
 //Save app versions to releases.json
-try {
+/*try {
   const releaseTarget = path.resolve(
     __dirname,
     "../src/app/containers/Preferences/About/releases.json",
@@ -74,3 +74,4 @@ try {
 } catch (error) {
   console.log(error.message);
 }
+*/
