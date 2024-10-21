@@ -38,7 +38,7 @@ const tabs = [
     },
 ];
 
-export function Tools() {
+const Tools = () => {
     return (
         <Widget>
             <Widget.Content>
@@ -46,4 +46,6 @@ export function Tools() {
             </Widget.Content>
         </Widget>
     );
-}
+};
+
+export default Tools;
