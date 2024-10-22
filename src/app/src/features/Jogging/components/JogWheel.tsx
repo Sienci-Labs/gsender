@@ -29,23 +29,23 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onCancel: () => xPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
     const xMinusJogHandlers = useLongPress(() => xMinusJog(1, feedrate, true), {
         threshold: 200,
         onCancel: () => xMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
-    });
+    })();
 
     const yPlusJogHandlers = useLongPress(() => yPlusJog(1, feedrate, true), {
         threshold: 200,
         onCancel: () => yPlusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
-    });
+    })();
     const yMinusJogHandlers = useLongPress(() => yMinusJog(1, feedrate, true), {
         threshold: 200,
         onCancel: () => yMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
-    });
+    })();
 
     const xPlusYMinusHandlers = useLongPress(
         () => continuousJogAxis({ X: 1, Y: -1 }, feedrate),
@@ -54,7 +54,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onCancel: () => xPlusYMinus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
     const xPlusYPlusHandlers = useLongPress(
         () => continuousJogAxis({ X: 1, Y: 1 }, feedrate),
         {
@@ -62,7 +62,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onCancel: () => xPlusYPlus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
 
     const xMinusYPlusHandlers = useLongPress(
         () => continuousJogAxis({ X: -1, Y: 1 }, feedrate),
@@ -71,7 +71,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onCancel: () => xMinusYPlus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
     const xMinusYMinusHandlers = useLongPress(
         () => continuousJogAxis({ X: -1, Y: -1 }, feedrate),
         {
@@ -79,12 +79,12 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onCancel: () => xMinusYMinus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
 
     const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
     const altColourClass = 'fill-robin-500 hover:fill-blue-400';
     const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
-    console.log(canClick);
+
     return (
         <svg
             width={180}

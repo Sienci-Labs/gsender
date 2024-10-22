@@ -17,7 +17,7 @@ export function AJog({ feedrate, distance, canClick }: JoggerProps) {
             onCancel: () => aPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
     const aMinusJogHandlers = useLongPress(
         () => continuousJogAxis({ A: -1 }, feedrate),
         {
@@ -25,7 +25,7 @@ export function AJog({ feedrate, distance, canClick }: JoggerProps) {
             onCancel: () => aMinusJog(feedrate, distance, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
 
     return (
         <div id="aJog" className="relative">

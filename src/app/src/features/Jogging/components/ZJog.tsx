@@ -17,7 +17,7 @@ export function ZJog({ feedrate, distance, canClick }: JoggerProps) {
             onCancel: () => zPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
     const zMinusJogHandlers = useLongPress(
         () => continuousJogAxis({ Z: -1 }, feedrate),
         {
@@ -25,7 +25,7 @@ export function ZJog({ feedrate, distance, canClick }: JoggerProps) {
             onCancel: () => zMinusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
-    );
+    )();
 
     return (
         <div id="zJog" className="relative">
