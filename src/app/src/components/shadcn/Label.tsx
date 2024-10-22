@@ -1,16 +1,16 @@
 // https://ui.shadcn.com/docs/components/label
 
-"use client"
+'use client';
 
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
-import { cva, VariantProps } from "class-variance-authority"
+import * as React from 'react';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import { cva, VariantProps } from 'class-variance-authority';
 
-import cx from "classnames"
+import cx from 'classnames';
 
 const labelVariants = cva(
-    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-)
+    'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+);
 
 const Label = React.forwardRef<
     React.ElementRef<typeof LabelPrimitive.Root>,
@@ -22,7 +22,7 @@ const Label = React.forwardRef<
         className={cx(labelVariants(), className)}
         {...props}
     />
-))
-Label.displayName = LabelPrimitive.Root.displayName
+));
+Label.displayName = LabelPrimitive.Root.displayName;
 
-export { Label }
+export { Label };

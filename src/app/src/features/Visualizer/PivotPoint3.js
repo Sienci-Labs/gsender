@@ -58,7 +58,11 @@ export default class PivotPoint3 {
         z = Number(z) || 0;
 
         // Pass relative position to the callback
-        this.callback(-(x - pivotPoint.x), -(y - pivotPoint.y), -(z - pivotPoint.z));
+        this.callback(
+            -(x - pivotPoint.x),
+            -(y - pivotPoint.y),
+            -(z - pivotPoint.z),
+        );
 
         this.pivotPoint = { x: x, y: y, z: z };
     }

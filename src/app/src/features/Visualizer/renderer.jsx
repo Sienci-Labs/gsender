@@ -33,17 +33,23 @@ import { formatBytes } from 'app/lib/numeral';
 import styles from './renderer.styl';
 
 const TreeNode = (props) => {
-    const { componentClass, id, selected, disabled, className, children, ...others } = props;
+    const {
+        componentClass,
+        id,
+        selected,
+        disabled,
+        className,
+        children,
+        ...others
+    } = props;
     const Component = componentClass || 'tr';
 
     return (
         <Component
             {...others}
-            className={classNames(
-                className,
-                styles.treeNode,
-                { [styles.selected]: selected }
-            )}
+            className={classNames(className, styles.treeNode, {
+                [styles.selected]: selected,
+            })}
             data-id={id}
             disabled={disabled}
         >
@@ -53,26 +59,27 @@ const TreeNode = (props) => {
 };
 TreeNode.propTypes = {
     componentClass: PropTypes.node,
-    id: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-    ]),
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     selected: PropTypes.bool,
-    disabled: PropTypes.bool
+    disabled: PropTypes.bool,
 };
 
 const TreeNodeColumn = (props) => {
-    const { className, children, padding = true, componentClass, ...others } = props;
+    const {
+        className,
+        children,
+        padding = true,
+        componentClass,
+        ...others
+    } = props;
     const Component = componentClass || 'td';
 
     return (
         <Component
             {...others}
-            className={classNames(
-                className,
-                styles.treeNodeColumn,
-                { [styles.noPadding]: !padding }
-            )}
+            className={classNames(className, styles.treeNodeColumn, {
+                [styles.noPadding]: !padding,
+            })}
         >
             {children}
         </Component>
@@ -80,7 +87,7 @@ const TreeNodeColumn = (props) => {
 };
 TreeNodeColumn.propTypes = {
     padding: PropTypes.bool,
-    componentClass: PropTypes.node
+    componentClass: PropTypes.node,
 };
 
 const TreeNodeToggler = ({ show, expanded }) => {
@@ -89,20 +96,16 @@ const TreeNodeToggler = ({ show, expanded }) => {
     }
 
     return (
-        <span
-            className={classNames(
-                styles.treeToggler
-            )}
-        >
+        <span className={classNames(styles.treeToggler)}>
             <i
                 className={classNames(
                     'fa',
                     'fa-fw',
                     { 'fa-chevron-down': expanded },
-                    { 'fa-chevron-right': !expanded }
+                    { 'fa-chevron-right': !expanded },
                 )}
                 style={{
-                    opacity: expanded ? 1 : 0.5
+                    opacity: expanded ? 1 : 0.5,
                 }}
             />
         </span>
@@ -110,7 +113,7 @@ const TreeNodeToggler = ({ show, expanded }) => {
 };
 TreeNodeToggler.propTypes = {
     show: PropTypes.bool,
-    expanded: PropTypes.bool
+    expanded: PropTypes.bool,
 };
 
 const TreeNodeLoader = ({ show }) => {
@@ -122,24 +125,30 @@ const TreeNodeLoader = ({ show }) => {
         <i
             style={{ marginLeft: 5 }}
             className={classNames(
-                { 'hidden': !show },
+                { hidden: !show },
                 'fa',
                 'fa-circle-o-notch',
                 'fa-fw',
-                { 'fa-spin': show }
+                { 'fa-spin': show },
             )}
         />
     );
 };
 TreeNodeLoader.propTypes = {
-    show: PropTypes.bool
+    show: PropTypes.bool,
 };
 
 const renderer = (node, treeOptions) => {
     const { id, loadOnDemand = false } = node;
-    const { depth, open, loading = false, selected = false, filtered } = node.state;
+    const {
+        depth,
+        open,
+        loading = false,
+        selected = false,
+        filtered,
+    } = node.state;
     const more = node.hasChildren();
-    const paddingLeft = (more || loadOnDemand) ? depth * 18 : (depth + 1) * 18;
+    const paddingLeft = more || loadOnDemand ? depth * 18 : (depth + 1) * 18;
 
     if (filtered === false) {
         return '';
@@ -147,7 +156,7 @@ const renderer = (node, treeOptions) => {
 
     node.props = { ...node.props };
 
-    const disabled = (function(node) {
+    const disabled = (function (node) {
         let { disabled = false } = node.props;
 
         while (node && node.parent) {
@@ -158,10 +167,12 @@ const renderer = (node, treeOptions) => {
             node = node.parent;
         }
         return disabled;
-    }(node));
+    })(node);
     const dateModified = moment(node.props.mtime).format('lll');
-    const size = includes(['f', 'l'], node.props.type) ? formatBytes(node.props.size, 0) : '';
-    const type = (function(node) {
+    const size = includes(['f', 'l'], node.props.type)
+        ? formatBytes(node.props.size, 0)
+        : '';
+    const type = (function (node) {
         if (node.props.type === 'd') {
             return i18n._('File folder');
         }
@@ -174,20 +185,16 @@ const renderer = (node, treeOptions) => {
             // path.extname('index')
             // -> ''
             const extname = path.extname(node.name || '').slice(1);
-            return (extname.length > 0)
+            return extname.length > 0
                 ? i18n._('{{extname}} File', { extname: extname.toUpperCase() }) // e.g. NC File
                 : i18n._('File');
         }
 
         return '';
-    }(node));
+    })(node);
 
     return (
-        <TreeNode
-            id={id}
-            selected={selected}
-            disabled={disabled}
-        >
+        <TreeNode id={id} selected={selected} disabled={disabled}>
             <TreeNodeColumn>
                 <div style={{ paddingLeft: paddingLeft }}>
                     <TreeNodeToggler
@@ -199,7 +206,7 @@ const renderer = (node, treeOptions) => {
                             'fa',
                             { 'fa-folder-open-o': more && open },
                             { 'fa-folder-o': more && !open },
-                            { 'fa-file-o': !more }
+                            { 'fa-file-o': !more },
                         )}
                     />
                     <Space width="8" />
@@ -210,9 +217,7 @@ const renderer = (node, treeOptions) => {
             <TreeNodeColumn className="text-nowrap">
                 {dateModified}
             </TreeNodeColumn>
-            <TreeNodeColumn className="text-nowrap">
-                {type}
-            </TreeNodeColumn>
+            <TreeNodeColumn className="text-nowrap">{type}</TreeNodeColumn>
             <TreeNodeColumn className="text-nowrap text-right">
                 {size}
             </TreeNodeColumn>

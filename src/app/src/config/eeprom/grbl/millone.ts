@@ -1,4 +1,4 @@
-import { EEPROMSettings } from "definitions/firmware";
+import { EEPROMSettings } from 'definitions/firmware';
 
 const MILL_ONE_MASTER_LIST: EEPROMSettings = {
     $0: '10',

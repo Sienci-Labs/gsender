@@ -24,31 +24,34 @@
 import { ReactComponentLike } from 'prop-types';
 import ReactDOM from 'react-dom';
 
-export default (Component: ReactComponentLike, node: Element = null) => new Promise<void>((resolve, _reject): void => {
-    let defaultNode: Element = null;
+export default (Component: ReactComponentLike, node: Element = null) =>
+    new Promise<void>((resolve, _reject): void => {
+        let defaultNode: Element = null;
 
-    if (!node) {
-        defaultNode = document.createElement('div');
-        defaultNode.setAttribute('data-portal', '');
-        document && document.body && document.body.appendChild(defaultNode);
-    }
+        if (!node) {
+            defaultNode = document.createElement('div');
+            defaultNode.setAttribute('data-portal', '');
+            document && document.body && document.body.appendChild(defaultNode);
+        }
 
-    ReactDOM.render(
-        <Component
-            onClose={() => {
-                setTimeout(() => {
-                    if (node) {
-                        ReactDOM.unmountComponentAtNode(node);
-                    } else if (defaultNode) {
-                        ReactDOM.unmountComponentAtNode(defaultNode);
-                        document && document.body && document.body.removeChild(defaultNode);
-                        defaultNode = null;
-                    }
+        ReactDOM.render(
+            <Component
+                onClose={() => {
+                    setTimeout(() => {
+                        if (node) {
+                            ReactDOM.unmountComponentAtNode(node);
+                        } else if (defaultNode) {
+                            ReactDOM.unmountComponentAtNode(defaultNode);
+                            document &&
+                                document.body &&
+                                document.body.removeChild(defaultNode);
+                            defaultNode = null;
+                        }
 
-                    resolve();
-                }, 0);
-            }}
-        />,
-        node || defaultNode
-    );
-});
+                        resolve();
+                    }, 0);
+                }}
+            />,
+            node || defaultNode,
+        );
+    });

@@ -25,7 +25,7 @@ export const RadioWrapper = styled.div`
 `;
 
 export const WarningBanner = styled.div`
-    background-color: rgba(220,38,38,0.9);
+    background-color: rgba(220, 38, 38, 0.9);
     padding: 1rem;
     margin-bottom: 0.75rem;
     color: white;

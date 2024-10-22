@@ -32,7 +32,11 @@ import memoize from 'memoize-one';
 export const isWebGLAvailable: () => boolean = memoize(() => {
     try {
         let canvas = document.createElement('canvas');
-        return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        return !!(
+            window.WebGLRenderingContext &&
+            (canvas.getContext('webgl') ||
+                canvas.getContext('experimental-webgl'))
+        );
     } catch (e) {
         return false;
     }
@@ -59,15 +63,16 @@ export const getWebGL2ErrorMessage = (): HTMLDivElement => {
 export const getErrorMessage = (version: number): HTMLDivElement => {
     const names = {
         1: 'WebGL',
-        2: 'WebGL 2'
+        2: 'WebGL 2',
     };
 
     const contexts = {
         1: window.WebGLRenderingContext,
-        2: window.WebGL2RenderingContext
+        2: window.WebGL2RenderingContext,
     };
 
-    let message = 'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
+    let message =
+        'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
 
     const element = document.createElement('div');
     element.id = 'webglmessage';

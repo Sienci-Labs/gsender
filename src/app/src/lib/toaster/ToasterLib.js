@@ -41,5 +41,5 @@ export const Toaster = {
     },
     clear: () => {
         pubsub.publish('toast:clear');
-    }
+    },
 };

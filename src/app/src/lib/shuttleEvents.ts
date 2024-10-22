@@ -2,11 +2,12 @@ import React from 'react';
 import { ShuttleControlEvents, ShuttleEvent } from './definitions/shortcuts';
 
 class ShuttleEvents extends React.PureComponent {
-    allShuttleControlEvents: ShuttleControlEvents = { MACRO: function(){} };
+    allShuttleControlEvents: ShuttleControlEvents = { MACRO: function () {} };
 
     updateShuttleEvents(shuttleControlEvents: ShuttleControlEvents): void {
-        Object.keys(shuttleControlEvents).forEach(eventName => {
-            this.allShuttleControlEvents[eventName] = shuttleControlEvents[eventName]!;
+        Object.keys(shuttleControlEvents).forEach((eventName) => {
+            this.allShuttleControlEvents[eventName] =
+                shuttleControlEvents[eventName]!;
         });
     }
 

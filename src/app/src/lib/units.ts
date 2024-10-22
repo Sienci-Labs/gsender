@@ -28,7 +28,11 @@ import store from '../store';
 const CALC_UNIT = 25.4;
 
 //Function to set custom decimal places for VALUES
-const setDecimalPlacesValue = (defaultPlace: number, val: string | number, conversionType: Function): string => {
+const setDecimalPlacesValue = (
+    defaultPlace: number,
+    val: string | number,
+    conversionType: Function,
+): string => {
     val = Number(val);
     // This value is set by the user
     let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
@@ -40,7 +44,10 @@ const setDecimalPlacesValue = (defaultPlace: number, val: string | number, conve
 };
 
 //Function to set custom decimal places for POSITIONS
-const setDecimalPlacesPosition = (defaultPlace: number, val: string | number): string => {
+const setDecimalPlacesPosition = (
+    defaultPlace: number,
+    val: string | number,
+): string => {
     val = Number(val);
     // This value is set by the user
     let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
@@ -52,10 +59,10 @@ const setDecimalPlacesPosition = (defaultPlace: number, val: string | number): s
 };
 
 // Converts value from millimeters to inches
-export const mm2in = (val = 0): number => (val / 25.4);
+export const mm2in = (val = 0): number => val / 25.4;
 
 // Converts values from inches to millimeters
-export const in2mm = (val = 0): number => (val * 25.4);
+export const in2mm = (val = 0): number => val * 25.4;
 
 // Maps value to imperial units
 export const mapValueToImperialUnits = (val: string | number): string => {
@@ -74,14 +81,17 @@ export const mapValueToMetricUnits = (val: string | number): string => {
 // Maps value to the specified units
 // in: 0.10203 -> "0.102"
 // mm: 0.10002 -> "0.1"
-export const mapValueToUnits = (val: string | number, units: UNITS_EN = METRIC_UNITS): string => {
+export const mapValueToUnits = (
+    val: string | number,
+    units: UNITS_EN = METRIC_UNITS,
+): string => {
     if (units === IMPERIAL_UNITS) {
         return mapValueToImperialUnits(val);
     }
     if (units === METRIC_UNITS) {
         return mapValueToMetricUnits(val);
     }
-    return val as string || '0';
+    return (val as string) || '0';
 };
 
 // Maps position to imperial units
@@ -101,7 +111,10 @@ export const mapPositionToMetricUnits = (pos: string | number): string => {
 // Maps position to the specified units
 // in: 0.12345 > "0.1235"
 // mm: 0.1234  > "0.123"
-export const mapPositionToUnits = (pos: string | number, units: UNITS_EN = METRIC_UNITS): string => {
+export const mapPositionToUnits = (
+    pos: string | number,
+    units: UNITS_EN = METRIC_UNITS,
+): string => {
     if (units === IMPERIAL_UNITS) {
         return mapPositionToImperialUnits(pos);
     }
@@ -124,11 +137,10 @@ export const convertValueToMetricUnits = (pos: string | number): string => {
     return setDecimalPlacesValue(defaultDecimalPlace, pos, in2mm);
 };
 
-
 export const mapPositionToPreferredUnits = (
     pos: string | number,
     currentUnits: UNITS_EN,
-    preferredUnits: UNITS_EN
+    preferredUnits: UNITS_EN,
 ): string => {
     // Assumption: original value is always mm
     if (currentUnits !== preferredUnits) {

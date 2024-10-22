@@ -54,7 +54,7 @@ export const IMPERIAL_STEPS = [
     3,
     5,
     10,
-    20
+    20,
 ];
 
 // Metric System
@@ -83,7 +83,7 @@ export const METRIC_STEPS = [
     100,
     200,
     300,
-    500
+    500,
 ];
 
 // Controller
@@ -137,7 +137,8 @@ export const SPINDLE_LASER_CATEGORY = 'Spindle/Laser';
 export const GENERAL_CATEGORY = 'General';
 export const TOOLBAR_CATEGORY = 'Toolbar';
 export const COOLANT_CATEGORY = 'Coolant';
-export const ALL_CATEGORIES = [ // keep in alphabetical order
+export const ALL_CATEGORIES = [
+    // keep in alphabetical order
     ALL_CATEGORY,
     CARVING_CATEGORY,
     COOLANT_CATEGORY,
@@ -166,7 +167,8 @@ export const START_POSITION_FRONT_LEFT = 'START_POSITION_FRONT_LEFT';
 export const START_POSITION_FRONT_RIGHT = 'START_POSITION_FRONT_RIGHT';
 export const START_POSITION_CENTER = 'START_POSITION_CENTER';
 
-export const SURFACING_VISUALIZER_CONTAINER_ID = 'SURFACING_VISUALIZER_CONTAINER_ID';
+export const SURFACING_VISUALIZER_CONTAINER_ID =
+    'SURFACING_VISUALIZER_CONTAINER_ID';
 export const VISUALIZER_PRIMARY = 'VISUALIZER_PRIMARY';
 export const VISUALIZER_SECONDARY = 'VISUALIZER_SECONDARY';
 
@@ -199,7 +201,7 @@ export const PROGRAM_EVENTS = [
     PROGRAM_START,
     PROGRAM_END,
     PROGRAM_PAUSE,
-    PROGRAM_RESUME
+    PROGRAM_RESUME,
 ];
 
 export const USER_DATA_COLLECTION = {
@@ -210,21 +212,21 @@ export const USER_DATA_COLLECTION = {
 
 export const OVERRIDE_VALUE_RANGES = {
     MIN: 20,
-    MAX: 200
+    MAX: 200,
 };
 
 export const ROTARY_MODE_FIRMWARE_SETTINGS = {
     $101: '19.75308642',
     $111: '8000.00',
     $20: '0',
-    $21: '0'
+    $21: '0',
 };
 
 export const DEFAULT_FIRMWARE_SETTINGS = {
     $101: '200',
     $111: '4000',
     $20: '0',
-    $21: '0'
+    $21: '0',
 };
 
 export const WORKSPACE_MODE = {
@@ -235,7 +237,7 @@ export const WORKSPACE_MODE = {
 export const FILE_TYPE = {
     DEFAULT: 'DEFAULT',
     ROTARY: 'ROTARY',
-    FOUR_AXIS: 'FOUR_AXIS'
+    FOUR_AXIS: 'FOUR_AXIS',
 };
 
 export const STOCK_TURNING_METHOD = {
@@ -251,10 +253,7 @@ export const ROTARY_TOGGLE_MACRO = `
 export const ALARM = 'ALARM';
 export const ERROR = 'ERROR';
 
-export const ALARM_ERROR_TYPES = [
-    ALARM,
-    ERROR
-];
+export const ALARM_ERROR_TYPES = [ALARM, ERROR];
 
 export const JOB_TYPES = {
     JOB: 'JOB',
@@ -273,7 +272,7 @@ export const RUN_TIME_PER_PORT = 'Run Time Per Com Port';
 export const STATS_PAGES = {
     OVERALL_STATS,
     JOB_PER_PORT,
-    RUN_TIME_PER_PORT
+    RUN_TIME_PER_PORT,
 };
 
 export const DB_NAME = 'ParsedDataDB';
@@ -308,10 +307,10 @@ export const USAGE_TOOL_NAME = {
         JOB_HISTORY: {
             STATISTICS: 'STATISTICS',
             JOB_TABLE: 'JOB_TABLE',
-            MAINTENANCE: 'MAINTENANCE'
+            MAINTENANCE: 'MAINTENANCE',
         },
         PROGRAM_EVENTS: 'PROGRAM_EVENTS_SETTINGS',
         TOOL_CHANGE: 'TOOL_CHANGE_SETTINGS',
         ROTARY: 'ROTARY_SETTINGS',
-    }
+    },
 };

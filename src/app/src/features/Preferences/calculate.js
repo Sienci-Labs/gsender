@@ -33,7 +33,8 @@ export const convertToMetric = (val) => {
 };
 
 export const convertPresetUnits = (units, preset) => {
-    const conversionFunc = units === METRIC_UNITS ? convertToMetric : convertToImperial;
+    const conversionFunc =
+        units === METRIC_UNITS ? convertToMetric : convertToImperial;
     let convertedPreset = JSON.parse(JSON.stringify(preset));
     for (const key of Object.keys(preset)) {
         convertedPreset[key] = conversionFunc(preset[key]);
@@ -50,5 +51,9 @@ export const convertAllPresetsUnits = (units, jog) => {
     const convertedNormal = convertPresetUnits(units, normal);
     const convertedPrecise = convertPresetUnits(units, precise);
 
-    return { rapid: convertedRapid, normal: convertedNormal, precise: convertedPrecise };
+    return {
+        rapid: convertedRapid,
+        normal: convertedNormal,
+        precise: convertedPrecise,
+    };
 };

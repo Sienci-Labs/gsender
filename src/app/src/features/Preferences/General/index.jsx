@@ -46,7 +46,6 @@ const General = ({ active, state, actions }) => {
     return (
         <SettingWrapper title="General" show={active}>
             <GeneralArea>
-
                 <GeneralArea.Half>
                     <Connection state={state} actions={actions} />
                     <Workspace state={state} actions={actions} />
@@ -57,7 +56,6 @@ const General = ({ active, state, actions }) => {
                     <DataCollection />
                     <JoggingPresets />
                 </GeneralArea.Half>
-
             </GeneralArea>
         </SettingWrapper>
     );

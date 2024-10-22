@@ -50,14 +50,14 @@ class Cuboid {
                 color,
                 opacity,
                 transparent,
-                ...others
+                ...others,
             });
         } else {
             material = new THREE.LineBasicMaterial({
                 color,
                 opacity,
                 transparent,
-                ...others
+                ...others,
             });
         }
 

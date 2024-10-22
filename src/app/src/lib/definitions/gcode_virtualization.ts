@@ -1,5 +1,4 @@
-import { BasicPosition, UNITS_GCODE } from "definitions/general";
-
+import { BasicPosition, UNITS_GCODE } from 'definitions/general';
 
 // Types
 
@@ -31,43 +30,42 @@ export type COOLANT = 'M7' | 'M8' | 'M7' | 'M8' | 'M9';
 // Tool Select
 export type TOOL = number;
 
-
 // Interfaces
 
 export interface LineData {
-    v0?: BasicPosition,
-    v1: BasicPosition,
-    v2: BasicPosition,
-    shouldUseAddCurve: boolean
-};
+    v0?: BasicPosition;
+    v1: BasicPosition;
+    v2: BasicPosition;
+    shouldUseAddCurve: boolean;
+}
 
 export interface PDData {
-    Scode: string,
-    lineData: LineData
-};
+    Scode: string;
+    lineData: LineData;
+}
 
 export interface FeedrateChanges {
-    change: number,
-    count: number
-};
+    change: number;
+    count: number;
+}
 
 export interface Modal {
-    motion?: MOTION,
-    wcs?: WCS,
-    plane?: PLANE,
-    units?: UNITS_GCODE,
-    distance?: DISTANCE,
-    arc?: ARC,
-    feedrate?: FEEDRATE,
-    cutter?: CUTTER,
-    tlo?: TLO,
-    program?: PROGRAM,
-    spindle?: SPINDLE,
-    coolant?: COOLANT,
-    tool?: TOOL
+    motion?: MOTION;
+    wcs?: WCS;
+    plane?: PLANE;
+    units?: UNITS_GCODE;
+    distance?: DISTANCE;
+    arc?: ARC;
+    feedrate?: FEEDRATE;
+    cutter?: CUTTER;
+    tlo?: TLO;
+    program?: PROGRAM;
+    spindle?: SPINDLE;
+    coolant?: COOLANT;
+    tool?: TOOL;
 }
 
 export interface ModalChanges {
-    change: Modal,
-    count: number
-};
+    change: Modal;
+    count: number;
+}

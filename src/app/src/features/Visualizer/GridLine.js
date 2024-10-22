@@ -26,7 +26,6 @@ import * as THREE from 'three';
 class GridLine {
     group = new THREE.Object3D();
 
-
     colorGrid = new THREE.Color(0x888888);
 
     constructor(sizeX, sizeY, step, colorGrid) {

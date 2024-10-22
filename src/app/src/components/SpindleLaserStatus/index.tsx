@@ -29,7 +29,7 @@ const SpindleLaserStatus = () => {
     );
 
     if (!spindleOn) {
-        return <></>
+        return <></>;
     }
     return <div className="absolute top-4 left-1/2 flex ml-52">{label}</div>;
 };

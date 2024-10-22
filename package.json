@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-1-latest",
+  "version": "1.5.0-Edge-1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -23,7 +23,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "preferGlobal": true,
   "scripts": {
@@ -85,15 +85,15 @@
     "check-types": "tsc --noEmit -p ./src/app/src"
   },
   "build": {
-    "appId": "org.sienci.gsender",
+    "appId": "org.sienci.gsender-edge",
     "extraMetadata": {
-      "main": "./server-cli.js"
+      "main": "./main.js"
     },
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender",
+    "productName": "gSender Edge",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "extraResources": [
@@ -390,7 +390,7 @@
     "universal-logger": "~1.0.1",
     "universal-logger-browser": "~1.0.2",
     "usb": "^2.11.0",
-    "use-long-press": "^1.1.2",
+    "use-long-press": "^3.2.0",
     "use-stay-awake": "^0.1.7",
     "uuid": "~3.3.2",
     "vaul": "^0.9.1",
@@ -497,5 +497,6 @@
     "webpack@4.47.0": {
       "terser-webpack-plugin": "^4.2.3"
     }
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

@@ -1,4 +1,4 @@
-import { EEPROMSettings } from "definitions/firmware";
+import { EEPROMSettings } from 'definitions/firmware';
 
 export const SLB_DEFAULT: EEPROMSettings = {
     $0: '5',

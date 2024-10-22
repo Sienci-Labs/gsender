@@ -3,7 +3,13 @@ import { useState, useEffect } from 'react';
 import gamepad from '../gamepad';
 import { GamepadDetail, GamepadProfile } from '../gamepad/definitions';
 
-export const useGamepadListener = ({ profile, axisThreshold }: { profile: GamepadProfile, axisThreshold: number }) => {
+export const useGamepadListener = ({
+    profile,
+    axisThreshold,
+}: {
+    profile: GamepadProfile;
+    axisThreshold: number;
+}) => {
     const [buttons, setButtons] = useState<Array<GamepadButton>>([]);
     const [axes, setAxes] = useState(null);
 
@@ -40,7 +46,11 @@ export const useGamepadListener = ({ profile, axisThreshold }: { profile: Gamepa
 
         // Map values under threshold to zero for easier hook usage when determining whether
         // that certain axis was changed or not
-        setAxes(gamepad.axes.map(axis => (Math.abs(axis) < axisThreshold ? 0 : axis)));
+        setAxes(
+            gamepad.axes.map((axis) =>
+                Math.abs(axis) < axisThreshold ? 0 : axis,
+            ),
+        );
     };
 
     return { buttons, axes };

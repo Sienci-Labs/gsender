@@ -26,7 +26,10 @@ module.exports = [
     '%wait\n',
     { type: 'header', text: 'User-defined global variables' },
     '%global.tool = Number(tool) || 0\n',
-    { type: 'header', text: 'Display a global variable using an inline comment' },
+    {
+        type: 'header',
+        text: 'Display a global variable using an inline comment',
+    },
     '(tool=[global.tool])\n',
     { type: 'header', text: 'Keep a backup of current work position' },
     '%X0=posx,Y0=posy,Z0=posz\n',

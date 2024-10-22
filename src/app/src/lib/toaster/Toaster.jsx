@@ -29,14 +29,13 @@ import styles from './toaster.styl';
 import Toast from './Toast';
 import { TOASTER_DEFAULT, TOASTER_UNTIL_CLOSE } from './ToasterLib';
 
-
 class Toaster extends PureComponent {
     pubsubTokens = [];
 
     constructor(props) {
         super(props);
         this.state = {
-            activeToasts: []
+            activeToasts: [],
         };
     }
 
@@ -52,7 +51,7 @@ class Toaster extends PureComponent {
             createdAt: Date.now(),
             duration: duration,
             closeHandler: closeHandler,
-            ...options
+            ...options,
         });
         // Handle self-expiring
         if (duration !== TOASTER_UNTIL_CLOSE) {
@@ -61,7 +60,7 @@ class Toaster extends PureComponent {
             }, duration);
         }
         this.setState({
-            activeToasts: activeToasts
+            activeToasts: activeToasts,
         });
     }
 
@@ -70,7 +69,7 @@ class Toaster extends PureComponent {
         const activeToasts = [...state.activeToasts];
         let filteredToasts = activeToasts.filter((toast) => toast.id !== id);
         this.setState({
-            activeToasts: filteredToasts
+            activeToasts: filteredToasts,
         });
     }
 
@@ -78,7 +77,7 @@ class Toaster extends PureComponent {
         this.setState({ activeToasts: [] });
     }
 
-    subscribe () {
+    subscribe() {
         const tokens = [
             pubsub.subscribe('toast:new', (msg, options) => {
                 this.createNewToast(options);
@@ -88,12 +87,12 @@ class Toaster extends PureComponent {
             }),
             pubsub.subscribe('toast:clear', (msg) => {
                 this.removeAll();
-            })
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
 
-    unsubscribe () {
+    unsubscribe() {
         this.pubsubTokens.forEach((token) => {
             pubsub.unsubscribe(token);
         });
@@ -113,22 +112,20 @@ class Toaster extends PureComponent {
         return (
             <div className={styles.toasterContainer}>
                 <TransitionGroup>
-                    {
-                        activeToasts.map((toast) => (
-                            <CSSTransition
-                                key={toast.id}
-                                timeout={150}
-                                classNames={{
-                                    enterActive: styles.toastAppearEnterActive,
-                                    enterDone: styles.toastAppearEnterDone,
-                                    exitActive: styles.toastAppearExitActive,
-                                    exitDone: styles.toastAppearExitDone
-                                }}
-                            >
-                                <Toast {...toast} />
-                            </CSSTransition>
-                        ))
-                    }
+                    {activeToasts.map((toast) => (
+                        <CSSTransition
+                            key={toast.id}
+                            timeout={150}
+                            classNames={{
+                                enterActive: styles.toastAppearEnterActive,
+                                enterDone: styles.toastAppearEnterDone,
+                                exitActive: styles.toastAppearExitActive,
+                                exitDone: styles.toastAppearExitDone,
+                            }}
+                        >
+                            <Toast {...toast} />
+                        </CSSTransition>
+                    ))}
                 </TransitionGroup>
             </div>
         );

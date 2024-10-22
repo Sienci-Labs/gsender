@@ -56,7 +56,7 @@ export function AxisRow({
                 disabled={disabled}
                 onClick={() => gotoZero(axis)}
                 color="alt"
-                className={"px-4"}
+                className={'px-4'}
             >
                 <span className="text-lg font-mono">{axis}</span>
             </Button>

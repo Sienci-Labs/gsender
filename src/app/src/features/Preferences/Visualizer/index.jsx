@@ -28,7 +28,6 @@ import reduxStore from 'app/store/redux';
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
 
-
 import VisualizerOptions from './VisualizerOptions';
 import Theme from './Theme';
 import { collectUserUsageData } from '../../../lib/heatmap';

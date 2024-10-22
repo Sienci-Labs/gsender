@@ -15,11 +15,11 @@ export interface Rotary {
     tab: {
         show: boolean;
     };
-};
+}
 
 export interface RotarySettings {
-    $101: string,
-    $111: string,
-    $20: string,
-    $21: string,
-};
+    $101: string;
+    $111: string;
+    $20: string;
+    $21: string;
+}

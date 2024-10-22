@@ -30,28 +30,26 @@ const getBoundingBox = (object) => {
         min: {
             x: box.min.x === Infinity ? 0 : box.min.x,
             y: box.min.y === Infinity ? 0 : box.min.y,
-            z: box.min.z === Infinity ? 0 : box.min.z
+            z: box.min.z === Infinity ? 0 : box.min.z,
         },
         max: {
             x: box.max.x === -Infinity ? 0 : box.max.x,
             y: box.max.y === -Infinity ? 0 : box.max.y,
-            z: box.max.z === -Infinity ? 0 : box.max.z
-        }
+            z: box.max.z === -Infinity ? 0 : box.max.z,
+        },
     };
 
     return boundingBox;
 };
 
-const loadSTL = (url) => new Promise(resolve => {
-    new STLLoader().load(url, resolve);
-});
+const loadSTL = (url) =>
+    new Promise((resolve) => {
+        new STLLoader().load(url, resolve);
+    });
 
-const loadTexture = (url) => new Promise(resolve => {
-    new THREE.TextureLoader().load(url, resolve);
-});
+const loadTexture = (url) =>
+    new Promise((resolve) => {
+        new THREE.TextureLoader().load(url, resolve);
+    });
 
-export {
-    getBoundingBox,
-    loadSTL,
-    loadTexture,
-};
+export { getBoundingBox, loadSTL, loadTexture };

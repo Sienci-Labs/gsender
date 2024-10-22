@@ -7,11 +7,16 @@ const path = require("path");
 const _uniq = require("lodash/uniq");
 const findImports = require("find-imports");
 
-// Copy necessary properties from 'package.json' to 'src/package.json'
+// Copy necessary properties from 'package.json' to 'src/app/package.json'
 const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
+const { urPK } = require("@mui/material/locale");
 
-const files = ["src/app/*.{js,ts,tsx,jsx}", "src/server/**/*.{js,jsx}"];
+const files = [
+  "src/app/*.{js,jsx,ts,tsx}",
+  "src/server/**/*.{js,jsx,ts,tsx}",
+  "src/main.js",
+];
 
 const resolvedImports = findImports(files, {
   flatten: true,
@@ -26,13 +31,15 @@ const deps = _uniq([
   "@sentry/node",
   "regenerator-runtime",
   "debug",
+  "is-electron",
+  "commander",
   ...resolvedImports.map((x) => x.split("/")[0]),
 ]).sort();
 
 //pkgApp.name = pkg.name; // Exclude the name field
 pkgApp.version = pkg.version;
 pkgApp.homepage = pkg.homepage;
-pkgApp.author =  pkg.author;
+pkgApp.author = pkg.author;
 pkgApp.license = pkg.license;
 pkgApp.repository = pkg.repository;
 
@@ -40,8 +47,14 @@ pkgApp.repository = pkg.repository;
 pkgApp.dependencies = _.pick(pkg.dependencies, deps);
 
 const target = path.resolve(__dirname, "../src/app/package.json");
+const secondTarget = path.resolve(__dirname, "../src/package.json");
+
 const content = JSON.stringify(pkgApp, null, 2);
+delete pkgApp.type;
+const secondContent = JSON.stringify(pkgApp, null, 2);
+
 fs.writeFileSync(target, content + "\n", "utf8");
+fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
 
 //Save app versions to releases.json
 /*try {

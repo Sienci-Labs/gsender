@@ -21,12 +21,7 @@
  *
  */
 
-export const modifierKeys = [
-    'shift',
-    'alt',
-    'ctrl',
-    'meta',
-];
+export const modifierKeys = ['shift', 'alt', 'ctrl', 'meta'];
 
 export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
 

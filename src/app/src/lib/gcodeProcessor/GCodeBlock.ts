@@ -21,7 +21,7 @@
  *
  */
 
-import { BasicObject, BasicType } from "definitions/general";
+import { BasicObject, BasicType } from 'definitions/general';
 
 class GCodeBlock {
     words: Array<Array<string>> = null;
@@ -58,11 +58,11 @@ class GCodeBlock {
 
     has(word: string): boolean {
         const result = word in this.pairs;
-        return (result);
+        return result;
     }
 
     hasLetter(letter: string): boolean {
-        return (letter in this.flatPairs);
+        return letter in this.flatPairs;
     }
 
     get(word: string): BasicType {

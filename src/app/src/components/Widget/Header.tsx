@@ -25,16 +25,21 @@ import classNames from 'classnames';
 import React from 'react';
 import { WidgetProps } from './definitions';
 
-const Header: React.FC<WidgetProps> = ({ fixed, className, embedded = false, ...props }) => (
+const Header: React.FC<WidgetProps> = ({
+    fixed,
+    className,
+    embedded = false,
+    ...props
+}) => (
     <div
         {...props}
         className={classNames(
             className,
-            "bg-gray-200 relative border-gray-400 text-gray-900",
+            'bg-gray-200 relative border-gray-400 text-gray-900',
             {
-                "cursor-default": fixed,
-                "hidden": embedded
-            }
+                'cursor-default': fixed,
+                hidden: embedded,
+            },
         )}
     />
 );

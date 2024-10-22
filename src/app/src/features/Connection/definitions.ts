@@ -13,10 +13,10 @@ export interface Connection {
     };
     autoReconnect: boolean;
     ip: number[];
-};
+}
 
 export interface Port {
-    port: string,
-    inuse: boolean,
-    manufacturer: string,
+    port: string;
+    inuse: boolean;
+    manufacturer: string;
 }

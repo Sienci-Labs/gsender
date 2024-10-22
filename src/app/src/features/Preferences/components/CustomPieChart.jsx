@@ -22,16 +22,24 @@ const CustomPieChart = ({ propsData, height, width, showAnimation }) => {
     const renderLabelContent = (props) => {
         const { value, percent, x, y, midAngle } = props;
         return (
-            <G transform={`translate(${x}, ${y})`} textAnchor={midAngle < -90 || midAngle >= 90 ? 'end' : 'start'}>
-                <Text x={0} y={0}>{value}</Text>
+            <G
+                transform={`translate(${x}, ${y})`}
+                textAnchor={midAngle < -90 || midAngle >= 90 ? 'end' : 'start'}
+            >
+                <Text x={0} y={0}>
+                    {value}
+                </Text>
                 <Text x={0} y={20}>{`(${(percent * 100).toFixed(2)}%)`}</Text>
             </G>
         );
     };
 
-
     return (
-        <PieChart width={width} height={height} style={{ marginBottom: '30px' }}>
+        <PieChart
+            width={width}
+            height={height}
+            style={{ marginBottom: '30px' }}
+        >
             <Legend />
             <Pie
                 data={propsData}
@@ -47,7 +55,9 @@ const CustomPieChart = ({ propsData, height, width, showAnimation }) => {
             >
                 {propsData.map((entry, index) => (
                     <Cell
-                        style={{ outline: 'none' }} key={`slice-${uniqueId()}`} fill={entry.color}
+                        style={{ outline: 'none' }}
+                        key={`slice-${uniqueId()}`}
+                        fill={entry.color}
                     />
                 ))}
                 <Label width={50} position="center">

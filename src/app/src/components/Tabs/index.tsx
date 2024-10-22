@@ -123,17 +123,18 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                 </div>
             </div>
             <div className="block w-full h-full">
-                {items && items.map(({ label, content: Content }) => (
-                    <div
-                        key={label}
-                        className={classNames(
-                            'w-full h-full',
-                            activeTab === label ? 'block' : 'hidden',
-                        )}
-                    >
-                        <Content isActive={activeTab === label} />
-                    </div>
-                ))}
+                {items &&
+                    items.map(({ label, content: Content }) => (
+                        <div
+                            key={label}
+                            className={classNames(
+                                'w-full h-full',
+                                activeTab === label ? 'block' : 'hidden',
+                            )}
+                        >
+                            <Content isActive={activeTab === label} />
+                        </div>
+                    ))}
             </div>
         </div>
     );

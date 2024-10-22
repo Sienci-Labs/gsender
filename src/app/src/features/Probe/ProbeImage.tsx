@@ -72,7 +72,11 @@ const ProbeImage: React.FC<Props> = ({
 
     return (
         <div className="flex items-center justify-center">
-            <img alt="Probe Block orientation guide image" src={imgSrc} className={'w-[15vh] my-0 mx-auto'} />
+            <img
+                alt="Probe Block orientation guide image"
+                src={imgSrc}
+                className={'w-[15vh] my-0 mx-auto'}
+            />
         </div>
     );
 };

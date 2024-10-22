@@ -6,4 +6,4 @@ export interface JobStatus {
     lastFile: string;
     lastFileSize: string;
     lastFileRunLength: string;
-};
+}

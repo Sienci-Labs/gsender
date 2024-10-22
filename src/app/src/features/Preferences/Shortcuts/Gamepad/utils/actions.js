@@ -4,9 +4,11 @@ import shuttleEvents from 'app/lib/shuttleEvents';
 import { MACRO_CATEGORY } from 'app/constants';
 
 export const SET_CURRENT_GAMEPAD_PROFILE = 'SET_CURRENT_GAMEPAD_PROFILE';
-export const SET_CURRENT_GAMEPAD_PROFILE_BUTTON = 'SET_CURRENT_GAMEPAD_PROFILE_BUTTON';
+export const SET_CURRENT_GAMEPAD_PROFILE_BUTTON =
+    'SET_CURRENT_GAMEPAD_PROFILE_BUTTON';
 export const SET_GAMEPAD_PROFILE_LOCKOUT_BUTTON = 'SET_GAMEPAD_LOCKOUT_BUTTON';
-export const SET_GAMEPAD_PROFILE_MODIFIER_BUTTON = 'SET_GAMEPAD_MODIFIER_BUTTON';
+export const SET_GAMEPAD_PROFILE_MODIFIER_BUTTON =
+    'SET_GAMEPAD_MODIFIER_BUTTON';
 export const SET_CURRENT_GAMEPAD_MODAL = 'SET_CURRENT_GAMEPAD_MODAL';
 export const SET_GAMEPAD_PROFILE_LIST = 'SET_GAMEPAD_PROFILE_LIST';
 export const SET_MACROS = 'SET_MACROS';
@@ -32,7 +34,10 @@ export const setGamepadLockoutButton = (lockoutButton) => {
 export const setGamepadModifierButton = (modifierButton) => {
     store.replace('workspace.gamepad.modifierButton', modifierButton);
 
-    return { type: SET_GAMEPAD_PROFILE_MODIFIER_BUTTON, payload: modifierButton };
+    return {
+        type: SET_GAMEPAD_PROFILE_MODIFIER_BUTTON,
+        payload: modifierButton,
+    };
 };
 
 export const setGamepadProfileList = (profiles) => {
@@ -63,7 +68,7 @@ export const setMacros = async () => {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const macroCallback = allShuttleControlEvents.MACRO;
 
-    macros.forEach(macro => {
+    macros.forEach((macro) => {
         macroList.push({
             keys: '',
             title: macro.name,
@@ -72,7 +77,7 @@ export const setMacros = async () => {
             preventDefault: false,
             isActive: false,
             category: MACRO_CATEGORY,
-            callback: macroCallback
+            callback: macroCallback,
         });
     });
 

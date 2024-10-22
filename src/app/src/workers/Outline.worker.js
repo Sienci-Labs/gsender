@@ -28,7 +28,7 @@ self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
     const getOutlineGcode = (concavity = 60) => {
         let vertices = [];
-        parsedData.forEach(n => vertices.push(n.toFixed(3)));
+        parsedData.forEach((n) => vertices.push(n.toFixed(3)));
         vertices = chunk(vertices, 3);
 
         const fileHull = hull(vertices, concavity);
@@ -48,7 +48,7 @@ self.onmessage = ({ data }) => {
         if (isLaser) {
             gCode.push('G1F3000 M3 S1');
         }
-        points.forEach(point => {
+        points.forEach((point) => {
             const [x, y] = point;
             gCode.push(`G21 G90 ${movementModal} X${x} Y${y}`);
         });

@@ -3,7 +3,11 @@ import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
 import { MACRO_CATEGORY } from '../constants';
-import { CommandKeys, ShuttleControlEvents, ShuttleEvent } from './definitions/shortcuts';
+import {
+    CommandKeys,
+    ShuttleControlEvents,
+    ShuttleEvent,
+} from './definitions/shortcuts';
 
 const TARGET_NUM_CALLS = 10; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
@@ -30,13 +34,19 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
     // update stored shuttle control events
     shuttleEvents.updateShuttleEvents(shuttleControlEvents);
 
-    Object.keys(shuttleControlEvents).forEach(eventName => {
+    Object.keys(shuttleControlEvents).forEach((eventName) => {
         const defaultCommand = shuttleControlEvents[eventName];
         if (eventName !== 'MACRO' && eventName !== 'STOP_CONT_JOG') {
             const defaultShuttle = defaultCommand as ShuttleEvent; // no macro so it will be a ShuttleEvent type
             // add keybindings
-            const currentCommandKeys: CommandKeys = store.get('commandKeys', {});
-            if (_.isEmpty(currentCommandKeys) || !currentCommandKeys[defaultShuttle.cmd]) {
+            const currentCommandKeys: CommandKeys = store.get(
+                'commandKeys',
+                {},
+            );
+            if (
+                _.isEmpty(currentCommandKeys) ||
+                !currentCommandKeys[defaultShuttle.cmd]
+            ) {
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
                 const key = defaultShuttle.keys || '';
@@ -93,7 +103,10 @@ export function removeOldKeybindings(): void {
         const event = allShuttleControlEvents[key];
         // if the category doesn't exist, it's not a macro
         // but if it's an old keybinding that still stores the category info, make sure it's not a macro
-        if (event === undefined && (!keybinding.category || keybinding.category !== MACRO_CATEGORY)) {
+        if (
+            event === undefined &&
+            (!keybinding.category || keybinding.category !== MACRO_CATEGORY)
+        ) {
             delete updatedCommandKeys[key];
         }
     });
