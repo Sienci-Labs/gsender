@@ -80,4 +80,12 @@ export default {
     },
   },
   plugins: [],
+  purge: {
+    enabled: false,
+  },
+  safelist: [
+    {
+      pattern: /./, // the "." means "everything"
+    },
+  ],
 } satisfies Config;
