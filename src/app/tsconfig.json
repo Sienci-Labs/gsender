@@ -15,7 +15,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "strict": true,
         "strictNullChecks": false, // this is so we can assign variables as null before defining them
         "noUnusedLocals": true,
