@@ -1,7 +1,7 @@
 import cn from 'classnames';
 
 interface MenuProps {
-    menu: string[];
+    menu: SettingsMenuSection[];
     onClick?: (
         e: React.MouseEventHandler<HTMLButtonElement>,
         n: number,
@@ -14,14 +14,14 @@ interface MenuItemProps {
     label: string;
     active?: boolean;
     onClick?: (e: MouseEventHandler<HTMLButtonElement>, n: number) => void;
+    icon: (p) => JSX.Element;
 }
 
-function MenuItem({ key, label, active, onClick }: MenuItemProps) {
-    console.log(active);
+function MenuItem({ key, label, active, onClick, icon }: MenuItemProps) {
     return (
         <button
             className={cn(
-                'flex items-center justify-center flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 border-b-border-b-2 border-b-gray-50',
+                'flex items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 border-b-border-b-2 border-b-gray-50 font-sans',
                 {
                     'text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
                         active,
@@ -30,7 +30,14 @@ function MenuItem({ key, label, active, onClick }: MenuItemProps) {
             key={key}
             onClick={onClick}
         >
-            {label}
+            <span
+                className={cn('text-gray-600', {
+                    'text-blue-500': active,
+                })}
+            >
+                {icon({})}
+            </span>
+            <span>{label}</span>
         </button>
     );
 }
@@ -43,8 +50,9 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
                 return (
                     <MenuItem
                         key={index}
-                        label={item}
+                        label={item.label}
                         active={active}
+                        icon={item.icon}
                         onClick={(
                             e: MouseEventHandler<HTMLButtonElement>,
                             i: number,

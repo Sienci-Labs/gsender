@@ -3,6 +3,7 @@ import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
 import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
+import { SettingsMenu } from './assets/SettingsMenu';
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -14,36 +15,26 @@ export function Config() {
         setActiveSection(index);
     }
 
-    const menu = [
-        'Basics',
-        'Safety',
-        'Motors',
-        'Probe',
-        'Limit Switches',
-        'Spindle/Laser',
-        'Tool Changing',
-        'Rotary',
-        'Automations',
-        'Shortcuts',
-        'Customize UI',
-        'About',
-    ];
     return (
-        <div className="h-full w-4/5 m-auto mt-6 mb-6 shadow flex flex-col items-stretch justify-stretch content-stretch bg-gray-50">
-            <div className="min-h-32 bg-white border border-bottom border-gray-200 flex flex-row justify-end gap-2 items-center">
+        <div className="h-full w-full m-auto  mb-6 shadow flex flex-col items-stretch justify-stretch content-stretch bg-gray-50">
+            <div className="min-h-32 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-80">
                 <Search />
                 <ApplicationPreferences />
             </div>
             <div className="flex flex-row h-[calc(80vh-8rem)]">
                 <Menu
-                    menu={menu}
+                    menu={SettingsMenu}
                     onClick={navigateToSection}
                     activeSection={activeSection}
                 />
                 <div className="px-10 flex flex-1  w-full gap-4 flex-col mt-4 overflow-clip box-border overflow-y-scroll">
-                    {menu.map((item, index) => {
+                    {SettingsMenu.map((item, index) => {
                         return (
-                            <Section title={item} key={`section-${index}`}>
+                            <Section
+                                title={item.label}
+                                key={`section-${index}`}
+                                settings={item.settings}
+                            >
                                 THIS IS A SECTION
                             </Section>
                         );
