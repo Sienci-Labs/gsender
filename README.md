@@ -110,6 +110,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - $G output emitted to UI when connected using grblHAL and manually sent
 - AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased.
 - Rotary toggle no longer updates values when cancelled on grblHAL.
+- Changed Spindle/Laser toggle behaviour for when to use gSender settings vs EEPROM settings for laser offset and spindle/laser min and max.
 - Custom theme visualizer background now saving correctly.
 - Altmill profile now at top of profiles with other Sienci Machines
 
