@@ -16,7 +16,7 @@ function settingRow(setting: gSenderSetting) {
     return (
         <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center">
             <span className="w-1/5">{setting.label}</span>
-            <span className="w-1/5 text-xs">CTRL</span>
+            <span className="w-1/5 text-xs">{setting.type}</span>
             <span></span>
             <span className="text-gray-500 text-sm w-2/5">
                 {setting.description || ''}

@@ -21,7 +21,7 @@ function MenuItem({ key, label, active, onClick, icon }: MenuItemProps) {
     return (
         <button
             className={cn(
-                'flex items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 border-b-border-b-2 border-b-gray-50 font-sans',
+                'flex items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500',
                 {
                     'text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
                         active,
@@ -31,11 +31,18 @@ function MenuItem({ key, label, active, onClick, icon }: MenuItemProps) {
             onClick={onClick}
         >
             <span
-                className={cn('text-gray-600', {
-                    'text-blue-500': active,
-                })}
+                className={cn(
+                    'text-gray-600 text-2xl group-hover:text-blue-500',
+                    {
+                        'text-blue-500 fill-blue-500': active,
+                    },
+                )}
             >
-                {icon({})}
+                {icon({
+                    className: active
+                        ? 'text-blue-500'
+                        : 'text-gray-600 group-hover:text-blue-500 hover:text-blue-500',
+                })}
             </span>
             <span>{label}</span>
         </button>

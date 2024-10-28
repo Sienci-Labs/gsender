@@ -29,7 +29,8 @@ export type gSenderSettingType =
     | 'select'
     | 'number'
     | 'text'
-    | 'radio';
+    | 'radio'
+    | 'ip';
 
 export interface gSenderSetting {
     label: string;
@@ -110,13 +111,116 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 description: 'Allow gSender to collect your data periodically',
                 type: 'boolean',
             },
+            {
+                label: '',
+                key: '',
+                description: '',
+                type: 'boolean',
+            },
         ],
     },
     { label: 'Motors', icon: PiEngine },
-    { label: 'Probe', icon: MdTouchApp },
+    {
+        label: 'Probe',
+        icon: MdTouchApp,
+        settings: [
+            {
+                label: 'Touch Plate Type',
+                key: 'widgets.connection.baudrate',
+                type: 'select',
+                description:
+                    "Select the touch plate you're using with your machine (default Standard block)",
+                options: ['Standard', 'Auto', 'Z Probe'],
+            },
+            {
+                label: 'Z Thickness',
+                key: '',
+                description:
+                    'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
+                type: 'number',
+            },
+            {
+                label: 'XY Thickness',
+                key: '',
+                description:
+                    'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
+                type: 'number',
+            },
+            {
+                label: 'Z Probe Distance',
+                key: '',
+                description:
+                    'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
+                type: 'number',
+            },
+            {
+                label: 'Fast Find',
+                key: '',
+                description:
+                    'Probe speed before the first touch-off (default 150)',
+                type: 'number',
+            },
+            {
+                label: 'Slow Find',
+                key: '',
+                description:
+                    'Slower speed for more accuracy on second touch-off (default 75)',
+                type: 'number',
+            },
+            {
+                label: 'Retraction',
+                key: '',
+                description:
+                    'How far the probe moves away after a successful touch (default 4)',
+                type: 'number',
+            },
+            {
+                label: 'Probe Connection Test',
+                key: '',
+                description:
+                    'A safe check to make sure your probe is connected correctly',
+                type: 'boolean',
+            },
+        ],
+    },
     { label: 'Status Lights', icon: CiLight },
     { label: 'Limits and Homing', icon: FaHome },
-    { label: 'Spindle/Laser', icon: GiTargetLaser },
+    {
+        label: 'Spindle/Laser',
+        icon: GiTargetLaser,
+        settings: [
+            {
+                label: 'Enable',
+                key: '',
+                description: '',
+                type: 'boolean',
+            },
+            {
+                label: 'Delay after start',
+                key: '',
+                description: '',
+                type: 'number',
+            },
+            {
+                label: 'Minimum Spindle Speed',
+                key: '',
+                description: '',
+                type: 'number',
+            },
+            {
+                label: 'Maximum Spindle Speed',
+                key: '',
+                description: '',
+                type: 'boolean',
+            },
+            {
+                label: '',
+                key: '',
+                description: '',
+                type: 'boolean',
+            },
+        ],
+    },
     { label: 'Automations', icon: FaRobot },
     { label: 'Action Buttons', icon: RxButton },
     { label: 'Accessory Outputs', icon: CiMapPin },
