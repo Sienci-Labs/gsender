@@ -159,9 +159,10 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
-            const { laser } = this.state;
-            const { power } = laser;
-            const laserPower = laser.maxPower * (power / 100);
+            const laserSettings = this.actions.getLaserSettings();
+            const { power } = this.state.laser;
+
+            const laserPower = laserSettings.laserMax * (power / 100);
             this.isLaserOn = true;
 
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
@@ -231,6 +232,23 @@ class SpindleWidget extends PureComponent {
             this.setState({
                 spindle
             });
+        },
+        getLaserSettings: () => {
+            if (this.props.controllerType === GRBLHAL) {
+                return {
+                    laserMin: this.props.laserMin,
+                    laserMax: this.props.laserMax,
+                    laserXOffset: this.props.laserXOffset,
+                    laserYOffset: this.props.laserYOffset
+                };
+            }
+
+            return {
+                laserMax: this.state.laser.maxPower,
+                laserMin: this.state.laser.minPower,
+                laserXOffset: this.state.laser.xOffset,
+                laserYOffset: this.state.laser.yOffset
+            };
         }
     };
 
