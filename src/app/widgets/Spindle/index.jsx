@@ -366,21 +366,25 @@ class SpindleWidget extends PureComponent {
     }
 
     enableSpindleMode() {
-        const { units, spindleMax: maxPower, spindleMin: minPower, spindle } = this.props;
+        const { units, spindleMax: maxPower, spindleMin: minPower, availableSpindles } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
+
+        const SLBLaserExists = findIndex(availableSpindles, o => o.label === 'SLB_LASER') !== -1;
 
         // get previously saved spindle values
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
 
-        // save current laser values
-        let laser = this.config.get('laser');
-        laser.maxPower = maxPower;
-        laser.minPower = minPower;
-        this.config.set('laser', laser);
+        // save current laser values if not using HAL/SLB Laser specific spindle
+        if (!SLBLaserExists) {
+            let laser = this.config.get('laser');
+            laser.maxPower = maxPower;
+            laser.minPower = minPower;
+            this.config.set('laser', laser);
+        }
 
-        const powerCommands = (spindle.label === 'SLB_LASER') ? []
+        const powerCommands = (SLBLaserExists) ? []
             : [
                 `$30=${spindleMax}`,
                 `$31=${spindleMin}`,
@@ -393,7 +397,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getSpindleOffsetCode(preferredUnits),
+            ...this.getSpindleOffsetCode(preferredUnits, SLBLaserExists),
             ...powerCommands,
             '$32=0',
             units
@@ -451,7 +455,7 @@ class SpindleWidget extends PureComponent {
         return [round(Number(x) + Number(xOffset), units), round(Number(y) + Number(yOffset), units)];
     }
 
-    getLaserOffsetCode(preferredUnits) {
+    getLaserOffsetCode(preferredUnits, SLBLaser = false) {
         const laser = this.config.get('laser');
         const { controllerType, laserXOffset, laserYOffset } = this.props;
 
@@ -460,8 +464,10 @@ class SpindleWidget extends PureComponent {
         });
         let { xOffset, yOffset } = laser;
 
+        console.log('laser');
+
         // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
-        if (controllerType === GRBLHAL) {
+        if (controllerType === GRBLHAL && SLBLaser) {
             xOffset = laserXOffset;
             yOffset = laserYOffset;
         }
@@ -493,7 +499,7 @@ class SpindleWidget extends PureComponent {
         return offsetQuery;
     }
 
-    getSpindleOffsetCode(preferredUnits) {
+    getSpindleOffsetCode(preferredUnits, SLBLaser = false) {
         const { controllerType, laserXOffset, laserYOffset } = this.props;
 
         const laser = this.config.get('laser');
@@ -505,7 +511,7 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
 
         // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
-        if (controllerType === GRBLHAL) {
+        if (controllerType === GRBLHAL && SLBLaser) {
             xOffset = laserXOffset;
             yOffset = laserYOffset;
         }
@@ -536,7 +542,7 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { units, spindleMax, spindleMin, spindle } = this.props;
+        const { units, spindleMax, spindleMin, availableSpindles } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
 
@@ -544,11 +550,15 @@ class SpindleWidget extends PureComponent {
         const laser = this.config.get('laser');
         const { minPower, maxPower } = laser;
 
-        // save current spindle values
-        this.config.set('spindleMin', spindleMin);
-        this.config.set('spindleMax', spindleMax);
+        const SLBLaserExists = findIndex(availableSpindles, o => o.label === 'SLB_LASER') !== -1;
 
-        const powerCommands = (spindle.label === 'SLB_LASER') ? []
+        // save current spindle values if not using our SLB firmware
+        if (!SLBLaserExists) {
+            this.config.set('spindleMin', spindleMin);
+            this.config.set('spindleMax', spindleMax);
+        }
+
+        const powerCommands = (SLBLaserExists) ? []
             : [
                 `$30=${maxPower}`,
                 `$31=${minPower}`,
@@ -561,7 +571,7 @@ class SpindleWidget extends PureComponent {
         }
         const commands = [
             preferredUnits,
-            ...this.getLaserOffsetCode(preferredUnits),
+            ...this.getLaserOffsetCode(preferredUnits, SLBLaserExists),
             ...powerCommands,
             '$32=1',
             units

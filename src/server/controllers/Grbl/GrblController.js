@@ -1287,7 +1287,7 @@ class GrblController {
                 log.debug('No start message. Waiting for status');
                 this.waitingForStatus = true;
                 this.write('?');
-                this.write('$$');
+                this.write('$$\n');
                 setTimeout(() => {
                     if (this.waitingForStatus) {
                         log.debug('No status. Soft resetting');
