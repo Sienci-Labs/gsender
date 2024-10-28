@@ -206,7 +206,7 @@ const determineAutoPlateOffsetValues = (direction, diameter = null) => {
 
     if (diameter && diameter !== 'Tip' && diameter !== 'Auto') {
         // math to compensate for tool
-        const toolRadius = (diameter / 2);
+        const toolRadius = 0;
         xOff -= toolRadius;
         yOff -= toolRadius;
     }
@@ -551,8 +551,8 @@ export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) =
 
     const toolRadius = (toolDiameter / 2);
     const toolCompensatedThickness = ((-1 * toolRadius));
-
-    const compensatedValue = 22.5 - toolCompensatedThickness;
+    // Addition because it's already negative
+    const compensatedValue = 22.5 + toolCompensatedThickness;
 
     if (axes.z && axes.y && axes.z) {
         code.push(
