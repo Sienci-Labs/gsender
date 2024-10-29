@@ -43,6 +43,15 @@ const setDecimalPlacesValue = (
     }
 };
 
+const determineCorrectedValue = (val: number, decimalPlaces: number) => {
+    const roundedVal = val.toFixed(decimalPlaces);
+    let num = Number(roundedVal);
+    if (num === 0) {
+        return (0).toFixed(decimalPlaces);
+    }
+    return roundedVal;
+};
+
 //Function to set custom decimal places for POSITIONS
 const setDecimalPlacesPosition = (
     defaultPlace: number,
@@ -52,9 +61,9 @@ const setDecimalPlacesPosition = (
     // This value is set by the user
     let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
     if (customDecimalPlace === 0) {
-        return val.toFixed(defaultPlace);
+        return determineCorrectedValue(val, defaultPlace);
     } else {
-        return val.toFixed(customDecimalPlace);
+        return determineCorrectedValue(val, customDecimalPlace);
     }
 };
 
