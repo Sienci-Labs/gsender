@@ -103,12 +103,12 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### 1.4.10 (October 28, 2024)
+- Jog no longer sends double jog commands on touch devices
+- $G output emitted to UI when connected using grblHAL and manually sent
 - Altmill profile updated $103 A steps to account for compiled microstepping
 - SLB profiles updated with new values
 - Updated defaults on Mk2, Mk1, and MillOne profiles
-- Jog no longer sends double jog commands on touch devices
-- $G output emitted to UI when connected using grblHAL and manually sent
-- AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased.
+- AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased for non-tip routines.
 - Rotary toggle no longer updates values when cancelled on grblHAL.
 - Custom theme visualizer background now saving correctly.
 - Altmill profile now at top of profiles with other Sienci Machines
