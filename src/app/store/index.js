@@ -244,6 +244,12 @@ const migrateStore = () => {
         return;
     }
 
+    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
+    if (semver.lt(cnc.version, '1.4.10')) {
+        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
+        store.set('workspace.machineProfile', defaultMachineProfile);
+    }
+
     if (semver.lt(cnc.version, '1.4.8')) {
         const delay = store.get('widgets.spindle.delay');
         if (delay) {
@@ -315,11 +321,7 @@ const migrateStore = () => {
         }
     }
 
-    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
-    if (semver.lt(cnc.version, '1.4.1')) {
-        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
-        store.set('workspace.machineProfile', defaultMachineProfile);
-    }
+
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
         const currentCommandKeys = store.get('commandKeys');
