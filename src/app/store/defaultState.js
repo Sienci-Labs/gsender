@@ -79,7 +79,7 @@ const defaultState = {
                 ]
             }
         },
-        machineProfile: machineProfiles[4],
+        machineProfile: machineProfiles[3],
         probeProfile: {
             xyThickness: 10,
             zThickness: 15,

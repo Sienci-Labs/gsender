@@ -246,8 +246,8 @@ const migrateStore = () => {
 
     // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
     if (semver.lt(cnc.version, '1.4.10')) {
-        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
-        store.set('workspace.machineProfile', defaultMachineProfile);
+        const defaultMachineProfile = get(defaultState, 'workspace.machineProfile');
+        store.replace('workspace.machineProfile', defaultMachineProfile);
     }
 
     if (semver.lt(cnc.version, '1.4.8')) {
