@@ -49,7 +49,7 @@ export function WorkspaceSelector() {
                 value={workspace}
                 disabled={!isConnected}
             >
-                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border-[1px] border-gray-300">
+                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border border-gray-300">
                     <SelectValue placeholder="G54" />
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">
