@@ -1,8 +1,9 @@
-import { GamepadListener } from 'gamepad.js';
+import gamepad from 'gamepad.js';
 import shuttleEvents from '../shuttleEvents';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from '../toaster/ToasterLib';
-import { debounce, noop } from 'lodash';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
 import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
 
@@ -14,7 +15,7 @@ const macroCallbackDebounce = debounce(
 let buttonPressDebounce = noop;
 let currentShuttleEvent: ShuttleEvent = null;
 
-class Gamepad extends GamepadListener {
+class Gamepad extends gamepad.GamepadListener {
     constructor() {
         super({ axis: { precision: 2 }, button: { analog: false } });
         this.shouldHold = false;
@@ -129,7 +130,7 @@ class Gamepad extends GamepadListener {
 const getGamepadInstance = ():
     | Gamepad
     | { start: () => void; on: () => void; off: () => void } => {
-    if (navigator.userAgent.includes('Firefox')) {
+    if (window?.navigator.userAgent.includes('Firefox')) {
         console.log('Mock gamepad');
         return {
             start: () => {},

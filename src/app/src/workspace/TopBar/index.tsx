@@ -4,6 +4,7 @@ import SpindleLaserStatus from 'app/components/SpindleLaserStatus';
 
 import gSenderIcon from './assets/icon-round.png';
 import MachineInfo from 'app/features/MachineInfo';
+import StatusIcons from 'app/features/StatusIcons';
 
 export const TopBar = () => {
     return (
@@ -16,6 +17,7 @@ export const TopBar = () => {
                 <MachineInfo />
             </div>
             <MachineStatus />
+            <StatusIcons />
             <SpindleLaserStatus />
         </div>
     );
