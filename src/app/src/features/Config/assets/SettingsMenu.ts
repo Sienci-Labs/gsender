@@ -19,7 +19,7 @@ import React from 'react';
 export interface SettingsMenuSection {
     label: string;
     icon: (props) => JSX.Element;
-    settings?: gSenderSetting[];
+    settings?: gSenderSettings[];
     eeprom?: gSenderEEPROMSetting[];
 }
 
@@ -32,6 +32,8 @@ export type gSenderSettingType =
     | 'radio'
     | 'ip';
 
+export type gSenderSettingsValues = number | string | boolean;
+
 export interface gSenderSetting {
     label: string;
     type: gSenderSettingType;
@@ -39,9 +41,27 @@ export interface gSenderSetting {
     description?: string;
     options?: string[] | number[];
     unit?: string;
+    value?: gSenderSettingsValues;
 }
 
-export interface gSenderEEPROMSetting {}
+export interface gSenderSubSection {
+    label: string;
+    settings: gSenderSetting[];
+}
+
+export type gSenderSettings = gSenderSetting | gSenderSubSection;
+
+export interface gSenderEEPROMSetting {
+    eId: string;
+    value?: gSenderSettingsValues;
+    defaultValue?: gSenderSettingsValues;
+    description?: string;
+    details?: string;
+    unit?: string;
+    format?: string;
+    dataType?: number;
+    group?: number;
+}
 
 export const SettingsMenu: SettingsMenuSection[] = [
     {
@@ -111,12 +131,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 description: 'Allow gSender to collect your data periodically',
                 type: 'boolean',
             },
-            {
-                label: '',
-                key: '',
-                description: '',
-                type: 'boolean',
-            },
         ],
     },
     { label: 'Motors', icon: PiEngine },
@@ -176,7 +190,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Probe Connection Test',
-                key: '',
+                key: 'widgets.probe.connectivityTest',
                 description:
                     'A safe check to make sure your probe is connected correctly',
                 type: 'boolean',
@@ -200,18 +214,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 key: '',
                 description: '',
                 type: 'number',
+                unit: 's',
             },
             {
                 label: 'Minimum Spindle Speed',
                 key: '',
                 description: '',
                 type: 'number',
+                unit: 'rpm',
             },
             {
                 label: 'Maximum Spindle Speed',
                 key: '',
                 description: '',
                 type: 'boolean',
+                unit: 'rpm',
             },
             {
                 label: '',
@@ -226,8 +243,71 @@ export const SettingsMenu: SettingsMenuSection[] = [
     { label: 'Accessory Outputs', icon: CiMapPin },
     { label: 'Tool Changing', icon: IoIosSwap },
     { label: 'Rotary', icon: FaArrowsSpin },
-    { label: 'Customize UI', icon: MdSettingsApplications },
-    { label: 'Ethernet', icon: BsEthernet },
+    {
+        label: 'Customize UI',
+        icon: MdSettingsApplications,
+        settings: [
+            {
+                label: 'DRO Zeros',
+                key: '',
+                description:
+                    'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
+                type: 'boolean',
+            },
+            {
+                label: 'Jogging Presets',
+                settings: [],
+            },
+            {
+                label: 'Visualizer',
+                settings: [
+                    {
+                        label: 'Visualizer on right side',
+                        key: '',
+                        description: '',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Theme',
+                        key: '',
+                        description: '',
+                        type: 'select',
+                    },
+                    {
+                        label: 'Visualize g-code',
+                        key: '',
+                        description: '',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Animate tool',
+                        key: '',
+                        description: '',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Lightweight mode',
+                        key: '',
+                        description: '',
+                        type: 'select',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Ethernet',
+        icon: BsEthernet,
+        settings: [
+            {
+                label: 'IP Address',
+                key: '',
+                description:
+                    'Set the IP address for network scanning (default 192.168.5.1)',
+                type: 'ip',
+            },
+        ],
+    },
     { label: 'Advanced Motors', icon: SiCoronaengine },
     { label: 'More Settings', icon: MdOutlineReadMore },
     { label: 'About', icon: CiCircleInfo },

@@ -6,7 +6,7 @@ export const Route = createLazyFileRoute('/configuration')({
 
 function Configuration() {
     return (
-        <div className="flex justify-center items-center flex-col h-full">
+        <div className="flex justify-center items-center flex-col h-full overflow-y-hidden">
             <Config />
         </div>
     );
