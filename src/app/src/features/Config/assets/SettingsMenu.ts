@@ -20,7 +20,7 @@ export interface SettingsMenuSection {
     label: string;
     icon: (props) => JSX.Element;
     settings?: gSenderSettings[];
-    eeprom?: gSenderEEPROMSetting[];
+    eeprom?: gSenderEEEPROMSettings;
 }
 
 export type gSenderSettingType =
@@ -50,6 +50,9 @@ export interface gSenderSubSection {
 }
 
 export type gSenderSettings = gSenderSetting | gSenderSubSection;
+export type gSenderEEEPROMSettings =
+    | gSenderEEPROMSetting[]
+    | gSEnderEEPROMSettingSection;
 
 export interface gSenderEEPROMSetting {
     eId: string;
@@ -61,6 +64,11 @@ export interface gSenderEEPROMSetting {
     format?: string;
     dataType?: number;
     group?: number;
+}
+
+export interface gSEnderEEPROMSettingSection {
+    label: string;
+    eeprom: gSenderEEPROMSetting[];
 }
 
 export const SettingsMenu: SettingsMenuSection[] = [
@@ -133,7 +141,30 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
-    { label: 'Motors', icon: PiEngine },
+    {
+        label: 'Motors',
+        icon: PiEngine,
+        eeprom: [
+            {
+                eId: '$3',
+            },
+            {
+                eId: '$100',
+            },
+            {
+                eId: '$150',
+            },
+            {
+                eId: '$110',
+            },
+            {
+                eId: '$120',
+            },
+            {
+                eId: '$150',
+            },
+        ],
+    },
     {
         label: 'Probe',
         icon: MdTouchApp,
@@ -196,9 +227,66 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 type: 'boolean',
             },
         ],
+        eeprom: [
+            {
+                eId: '$6',
+            },
+            {
+                eId: '$668',
+            },
+            {
+                eId: '$',
+            },
+        ],
     },
-    { label: 'Status Lights', icon: CiLight },
-    { label: 'Limits and Homing', icon: FaHome },
+    {
+        label: 'Status Lights',
+        icon: CiLight,
+        eeprom: [
+            {
+                eId: '$664',
+            },
+            {
+                eId: '$665',
+            },
+        ],
+    },
+    {
+        label: 'Limits and Homing',
+        icon: FaHome,
+        eeprom: [
+            {
+                eId: '$5',
+            },
+            {
+                eId: '$22',
+            },
+            {
+                eId: '$130',
+            },
+            {
+                eId: '$131',
+            },
+            {
+                eId: '$132',
+            },
+            {
+                eId: '$133',
+            },
+            {
+                eId: '$20',
+            },
+            {
+                eId: '$40',
+            },
+            {
+                eId: '$21',
+            },
+            {
+                eId: '$22',
+            },
+        ],
+    },
     {
         label: 'Spindle/Laser',
         icon: GiTargetLaser,

@@ -21,12 +21,13 @@ export const NavBar: React.FC<Props> = ({ show }) => {
                     icon={MdKeyboardCommandKey}
                     label="Control"
                 />
-                <NavbarLink href="/tools" icon={FaMicrochip} label="Firmware" />
                 <NavbarLink
                     href="/configuration"
                     icon={FaTasks}
-                    label="Preferences"
+                    label="Config"
                 />
+
+                <NavbarLink href="/tools" icon={FaMicrochip} label="Firmware" />
             </div>
         </>
     );
