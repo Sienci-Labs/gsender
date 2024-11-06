@@ -402,7 +402,11 @@ class SpindleWidget extends PureComponent {
             '$32=0',
             units
         ];
-        this.updateControllerSettings(spindleMax, spindleMin, 0);
+
+        if (!SLBLaserExists) {
+            this.updateControllerSettings(spindleMax, spindleMin, 0);
+        }
+
         controller.command('gcode', commands);
     }
 
@@ -576,7 +580,11 @@ class SpindleWidget extends PureComponent {
             '$32=1',
             units
         ];
-        this.updateControllerSettings(maxPower, minPower, 1);
+
+        if (!SLBLaserExists) {
+            this.updateControllerSettings(maxPower, minPower, 1);
+        }
+
         controller.command('gcode', commands);
     }
 
