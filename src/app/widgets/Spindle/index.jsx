@@ -688,7 +688,7 @@ export default connect((store) => {
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
-    const availableSpindles = get(store, 'controller.spindles', []);
+    let availableSpindles = get(store, 'controller.spindles', []);
     const $13 = get(store, 'controller.settings.settings.$13', '0');
     // SLB - 730 max, 731 min laser
     // SLB - 741 laser X offset, 742 laser Y offset
@@ -706,6 +706,11 @@ export default connect((store) => {
             label: 'Default Spindle',
             value: 0
         };
+    }
+
+    // If we connect to GRBL after grblHAL, redux may report spindles being available - since other logs depends on this (SLBLaserExists), clear the array.
+    if (controllerType === GRBL) {
+        availableSpindles = [];
     }
 
     return {
