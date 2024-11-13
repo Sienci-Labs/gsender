@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    gSenderEEEPROMSettings,
     gSenderSetting,
     gSenderSettings,
     gSenderSubSection,
@@ -8,6 +9,7 @@ import { BooleanSettingInput } from 'app/features/Config/components/SettingInput
 import { SelectSettingInput } from 'app/features/Config/components/SettingInputs/SelectSettingInput.tsx';
 import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
+import {EEPROMSection} from "app/features/Config/components/EEPROMSection.tsx";
 
 interface SectionProps {
     title: string;
@@ -17,6 +19,7 @@ interface SectionProps {
     id: string;
     index: number;
     settings: gSenderSettings[];
+    eeprom?: gSenderEEEPROMSettings
 }
 
 function returnSettingControl(setting: gSenderSetting) {
@@ -64,7 +67,7 @@ export function isSubSection(
     return 'label' in setting && 'settings' in setting;
 }
 
-export function Section({ title, settings = [], key, id }: SectionProps) {
+export function Section({ title, settings = [], key, id, eeprom = [] }: SectionProps) {
     return (
         <div id={id}>
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
@@ -75,6 +78,9 @@ export function Section({ title, settings = [], key, id }: SectionProps) {
                     }
                     return settingRow(setting);
                 })}
+                {
+                    eeprom && (eeprom?.length > 0) && <EEPROMSection />
+                }
             </div>
         </div>
     );

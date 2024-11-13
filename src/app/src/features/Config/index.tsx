@@ -46,6 +46,7 @@ export function Config() {
                                     id={`section-${index}`}
                                     index={index}
                                     settings={item.settings}
+                                    eeprom={item.eeprom}
                                 />
                             );
                         })}

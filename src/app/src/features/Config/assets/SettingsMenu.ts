@@ -14,7 +14,6 @@ import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { CiCircleInfo } from 'react-icons/ci';
-import React from 'react';
 
 export interface SettingsMenuSection {
     label: string;
