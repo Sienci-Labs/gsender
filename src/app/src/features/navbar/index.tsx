@@ -7,25 +7,32 @@ import cx from 'classnames';
 interface Props {
     show: boolean;
 }
-export const NavBar: React.FC<Props> = ({ show }) => {
+export const NavBar: React.FC<Props> = ({ show = false }) => {
     return (
         <>
             <div
                 className={cx(
-                    'w-20 flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch',
-                    { hidden: !show },
+                    'flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch',
                 )}
             >
                 <NavbarLink
                     href="/"
                     icon={MdKeyboardCommandKey}
                     label="Control"
+                    minimized={!show}
+                    isActive={true}
                 />
-                <NavbarLink href="/tools" icon={FaMicrochip} label="Firmware" />
+                <NavbarLink
+                    href="/tools"
+                    icon={FaMicrochip}
+                    label="Firmware"
+                    minimized={!show}
+                />
                 <NavbarLink
                     href="/configuration"
                     icon={FaCog}
                     label="Preferences"
+                    minimized={!show}
                 />
             </div>
         </>

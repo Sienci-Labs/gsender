@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
+import cn from 'classnames';
 
 interface NavbarLinkProps {
     href: string;
@@ -13,13 +14,29 @@ interface NavbarLinkProps {
 
 export function NavbarLink(props: NavbarLinkProps) {
     return (
-        <div className="flex flex-col">
+        <div
+            className={cn(
+                'flex flex-col text-gray-500 group rounded-xl p-1 m-2 ',
+                {
+                    'border bg-blue-200 bg-opacity-10': props.isActive,
+                    'border-transparent bg-transparent bg-opacity-100':
+                        props.minimized,
+                },
+            )}
+        >
             <Link
-                className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                className={cn(
+                    'flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm transition-all duration-1000 opacity-100',
+                    { 'text-blue-500': props.isActive },
+                )}
                 to={props.href}
             >
-                <props.icon className="text-4xl text-gray-800" />
-                {!props.minimized && props.label}
+                <props.icon
+                    className={`text-4xl ${props.isActive ? 'text-blue-600' : 'text-gray-600'}`}
+                />
+                <span className={cn('', { 'opacity-0': props.minimized })}>
+                    {props.label}
+                </span>
             </Link>
         </div>
     );
