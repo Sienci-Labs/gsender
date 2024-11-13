@@ -20,7 +20,6 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     icon={MdKeyboardCommandKey}
                     label="Control"
                     minimized={!show}
-                    isActive={true}
                 />
                 <NavbarLink
                     href="/tools"
