@@ -282,6 +282,7 @@ class Controller {
         this.socket = this.io(host, options).connect();
 
         this.socket.on('disconnect', (reason) => {
+            console.log(reason);
             if (reason !== 'io client disconnect') {
                 this.reconnect();
             }
@@ -398,12 +399,7 @@ class Controller {
     // @param {string} [options.controllerType] One of: 'Grbl', 'Smoothe', 'TinyG'. Defaults to 'Grbl'.
     // @param {number} [options.baudrate] Defaults to 115200.
     // @param {function} [callback] Called after a connection is opened.
-    openPort(
-        port: string,
-        controllerType: string,
-        options: object,
-        callback: Function,
-    ): void {
+    openPort(port: string, options: object, callback: Function): void {
         // if (typeof options !== 'object') {
         //     options = {};
         //     callback = options;
@@ -411,8 +407,7 @@ class Controller {
         if (typeof callback !== 'function') {
             callback = noop;
         }
-        this.socket &&
-            this.socket.emit('open', port, controllerType, options, callback);
+        this.socket && this.socket.emit('open', port, options, callback);
     }
 
     // Closes an open connection.

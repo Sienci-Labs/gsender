@@ -420,38 +420,6 @@ export function* initialize(): Generator<any, void, any> {
                 ipcRenderer.send('reconnect-main', options);
             }
 
-            const machineProfile: MachineProfile = store.get(
-                'workspace.machineProfile',
-            );
-            const showLineWarnings: boolean = store.get(
-                'widgets.visualizer.showLineWarnings',
-            );
-            const delay: number = store.get('widgets.spindle.delay');
-            // Reset homing run flag to prevent rapid position without running homing
-            reduxStore.dispatch(resetHoming());
-
-            if (machineProfile) {
-                controller.command('machineprofile:load', machineProfile);
-            }
-
-            if (showLineWarnings) {
-                controller.command('settings:updated', { showLineWarnings });
-            }
-
-            if (delay !== undefined) {
-                controller.command('settings:updated', { spindleDelay: delay });
-            }
-            const hooks = store.get('workspace.toolChangeHooks', {});
-            const toolChangeOption = store.get(
-                'workspace.toolChangeOption',
-                'Ignore',
-            );
-            const toolChangeContext = {
-                ...hooks,
-                toolChangeOption,
-            };
-            controller.command('toolchange:context', toolChangeContext);
-
             reduxStore.dispatch(
                 openConnection({
                     port: options.port,
@@ -459,14 +427,49 @@ export function* initialize(): Generator<any, void, any> {
                     isConnected: true,
                 }),
             );
-
-            pubsub.publish('machine:connected');
         },
     );
+
+    controller.addListener('serialport:openController', () => {
+        const machineProfile: MachineProfile = store.get(
+            'workspace.machineProfile',
+        );
+        const showLineWarnings: boolean = store.get(
+            'widgets.visualizer.showLineWarnings',
+        );
+        const delay: number = store.get('widgets.spindle.delay');
+        // Reset homing run flag to prevent rapid position without running homing
+        reduxStore.dispatch(resetHoming());
+
+        if (machineProfile) {
+            controller.command('machineprofile:load', machineProfile);
+        }
+
+        if (showLineWarnings) {
+            controller.command('settings:updated', { showLineWarnings });
+        }
+
+        if (delay !== undefined) {
+            controller.command('settings:updated', { spindleDelay: delay });
+        }
+        const hooks = store.get('workspace.toolChangeHooks', {});
+        const toolChangeOption = store.get(
+            'workspace.toolChangeOption',
+            'Ignore',
+        );
+        const toolChangeContext = {
+            ...hooks,
+            toolChangeOption,
+        };
+        controller.command('toolchange:context', toolChangeContext);
+
+        pubsub.publish('machine:connected');
+    });
 
     controller.addListener(
         'serialport:close',
         (options: SerialPortOptions, received: number) => {
+            console.log('serialport close sagas');
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             reduxStore.dispatch(closeConnection({ port: options.port }));

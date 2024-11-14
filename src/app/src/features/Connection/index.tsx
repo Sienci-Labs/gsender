@@ -68,7 +68,7 @@ function Connection(props: ConnectionProps) {
         // Attempt connect with callback
         controller.openPort(
             port,
-            firmware,
+            // firmware,
             {
                 baudrate: 115200,
                 network,
