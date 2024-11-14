@@ -12,7 +12,7 @@ import { WRITE_SOURCE_CLIENT } from '../controllers/constants';
 const log = logger('connection');
 
 class Connection extends EventEmitter {
-    sockets = [];
+    sockets = {};
     // runner = null;
     controller = null;
     controllerType = null;
@@ -25,6 +25,9 @@ class Connection extends EventEmitter {
         data: (data) => {
             this.emit('data', data);
             log.silly(`< ${data}`);
+            if (this.controllerType === null) {
+                console.log('controller type: ' + this.controllerType);
+            }
             if (this.controllerType === null) {
                 data = ('' + data).replace(/\s+$/, '');
                 if (!data) {
@@ -203,9 +206,11 @@ class Connection extends EventEmitter {
 
             log.debug(`Connected to serial port "${port}"`);
 
-            this.timeout = setInterval(() => {
-                this.connection.writeImmediate('$I\n');
-            }, 500);
+            if (!this.controllerType) {
+                this.timeout = setInterval(() => {
+                    this.connection.writeImmediate('$I\n');
+                }, 500);
+            }
 
             // this.workflow.stop();
 
@@ -216,6 +221,7 @@ class Connection extends EventEmitter {
 
     close(callback) {
         console.log('close');
+        console.log(this.options);
         const { port } = this.options;
 
         // Assertion check
@@ -247,7 +253,7 @@ class Connection extends EventEmitter {
             return;
         }
 
-        this.connection.close();
+        this.connection.close(callback);
     }
 
     addController = (controller) => {
@@ -306,6 +312,26 @@ class Connection extends EventEmitter {
             const socket = this.sockets[id];
             socket.emit(eventName, ...args);
         });
+    }
+
+    destroy() {
+        if (this.controller) {
+            this.controller = null;
+        }
+
+        this.sockets = {};
+
+        if (this.connection) {
+            this.connection = null;
+        }
+
+        if (this.controllerType) {
+            this.controllerType = null;
+        }
+
+        if (this.timeout) {
+            this.timeout = null;
+        }
     }
 }
 

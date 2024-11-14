@@ -108,10 +108,11 @@ class GrblHalController {
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
+            console.log(data);
             this.runner.parse('' + data);
         },
         close: (err) => {
-            // this.ready = false;
+            this.ready = false;
             const received = this.sender?.state?.received;
             if (err) {
                 log.warn(`Disconnected from serial port "${this.options.port}":`, err);
@@ -127,7 +128,7 @@ class GrblHalController {
             }, received);
         },
         error: (err) => {
-            // this.ready = false;
+            this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
             }
@@ -212,14 +213,14 @@ class GrblHalController {
         this.engine = engine;
 
 
-        // const { port, baudrate, rtscts, network } = { ...options };
-        // this.options = {
-        //     ...this.options,
-        //     port: port,
-        //     baudrate: baudrate,
-        //     rtscts: rtscts,
-        //     network
-        // };
+        const { port, baudrate, rtscts, network } = { ...options };
+        this.options = {
+            ...this.options,
+            port: port,
+            baudrate: baudrate,
+            rtscts: rtscts,
+            network
+        };
 
         // Connection
         this.connection = connection;
@@ -655,6 +656,7 @@ class GrblHalController {
         });
 
         // Grbl
+        console.log('new runner');
         this.runner = new GrblHalRunner();
 
         this.runner.on('raw', noop);
@@ -1257,6 +1259,7 @@ class GrblHalController {
         }
 
         if (this.runner) {
+            console.log('destroy runner');
             this.runner.removeAllListeners();
             this.runner = null;
         }
@@ -1376,6 +1379,7 @@ class GrblHalController {
     }
 
     close(callback, received) {
+        console.log('controller close');
         const { port } = this.options;
 
         // Assertion check
@@ -1404,17 +1408,17 @@ class GrblHalController {
         //     });
         // }
 
-        if (this.isClose()) {
-            callback(null);
-            return;
-        }
-
-        this.connection.removeAllListeners();
-        this.connection.close(callback);
+        // if (this.isClose()) {
+        //     callback(null);
+        //     return;
+        // }
+        callback(null);
+        // this.connection.removeAllListeners();
+        // this.connection.close(callback);
     }
 
     isOpen() {
-        return this.connection && this.connection.isOpen;
+        return this.connection && this.connection.isOpen();
     }
 
     isClose() {

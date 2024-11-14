@@ -259,12 +259,12 @@ class CNCEngine {
                 log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
                 controller.addConnection(socket);
                 log.info(`Controller state: ${controller.isOpen()}`);
-                // if (controller.isOpen()) {
-                //     log.info('Joining port room on socket');
-                //     socket.join(port);
-                // } else {
-                //     log.info('Controller no longer open');
-                // }
+                if (this.connection.isOpen()) {
+                    log.info('Joining port room on socket');
+                    socket.join(port);
+                } else {
+                    log.info('Connection no longer open');
+                }
             });
 
             socket.on('addclient', (port) => {
@@ -283,7 +283,7 @@ class CNCEngine {
                 }
                 log.info(`Adding new client to controller on port ${port} with socket ID ${socket.id}`);
                 controller.addConnection(socket);
-                // log.info(`Controller state: ${controller.isOpen()}`);
+                log.info(`Connection state: ${this.connection.isOpen()}`);
             });
 
             // List the available serial ports
@@ -369,9 +369,10 @@ class CNCEngine {
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
-                this.connection = new Connection(engine, port, options, callback);
-
-                this.connection.addConnection(socket);
+                // create new connection
+                if (!this.connection) {
+                    this.connection = new Connection(engine, port, options, callback);
+                }
 
                 this.connection.on('serialport:open', (port, baudrate, inuse) => {
                     this.emit('serialport:open', port, baudrate, null, inuse);
@@ -384,6 +385,7 @@ class CNCEngine {
                 });
 
                 this.connection.on('firmwareFound', (controllerType = GRBL, options, callback = noop) => {
+                    log.debug('firmware found');
                     let { baudrate, rtscts, network } = { ...options };
 
                     console.log(controllerType);
@@ -438,9 +440,9 @@ class CNCEngine {
                         // System Trigger: Open a serial port
                         // this.event.trigger('port:open');
 
-                        // if (store.get(`controllers["${port}"]`)) {
-                        //     log.error(`Serial port "${port}" was not properly closed`);
-                        // }
+                        if (store.get(`controllers["${port}"]`)) {
+                            log.error(`Serial port "${port}" was not properly closed`);
+                        }
                         store.set(`controllers[${JSON.stringify(port)}]`, controller);
 
                         callback(null);
@@ -448,6 +450,8 @@ class CNCEngine {
 
                     socket.emit('serialport:openController');
                 });
+
+                this.connection.addConnection(socket);
 
                 if (this.connection.isOpen()) {
                     // Join the room
@@ -509,7 +513,12 @@ class CNCEngine {
                 socket.leave(port);
 
                 if (numClients <= 1) { // if only this one was connected
-                    this.connection.close(callback);
+                    this.connection.close(err => {
+                        // Destroy controller
+                        this.connection.destroy();
+
+                        this.connection = null;
+                    });
                     controller.close(err => {
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);
@@ -528,11 +537,7 @@ class CNCEngine {
 
             socket.on('command', (port, cmd, ...args) => {
                 log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
-                // const controller = store.get(`controllers["${port}"]`);
-                // if (!controller || controller.isClose()) {
-                //     log.error(`Serial port "${port}" not accessible`);
-                //     return;
-                // }
+
                 if (!this.connection || this.connection.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
                     return;
@@ -600,6 +605,7 @@ class CNCEngine {
                     }
 
                     // Normal flash - close port then flash using AVRgirl
+                    this.connection.close();
                     controller.close(
                         () => {
                             FlashingFirmware(flashPort, imageType, socket);
