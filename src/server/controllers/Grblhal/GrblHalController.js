@@ -1114,7 +1114,7 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.writeln('$$');
+        this.writeln('$$\n$I\n');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
     }
@@ -1323,7 +1323,7 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    await delay(100);
+                    await delay(250);
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
