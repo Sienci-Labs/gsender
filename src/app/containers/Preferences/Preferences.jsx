@@ -182,7 +182,7 @@ class PreferencesPage extends PureComponent {
             shouldWarnZero: store.get('workspace.shouldWarnZero', false),
             ipRange: store.get('widgets.connection.ip', [192, 168, 5, 1]),
             toolChange: {
-                passthrough: store.get('workspace.toolChange.passthrough', false),
+                passthrough: store.get('workspace.toolChange.passthrough', true),
             },
             rotary: {
                 firmwareSettings: store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS),

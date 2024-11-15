@@ -343,7 +343,7 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                const passthroughM6 = store.get('preferences.toolChange.passthrough', true);
                 if (!passthroughM6 && _.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
@@ -464,7 +464,7 @@ class GrblHalController {
                 }
 
                 /* Emit event to UI for toolchange handler */
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                const passthroughM6 = store.get('preferences.toolChange.passthrough', true);
                 if (!passthroughM6 && _.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
