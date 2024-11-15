@@ -24,7 +24,7 @@ import {
 } from 'app/constants';
 import { mapValues } from 'lodash';
 import { mapPositionToUnits } from 'app/lib/units.ts';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
@@ -54,6 +54,16 @@ function DRO({
     homingEnabled,
 }: DROProps): JSX.Element {
     const [homingMode, setHomingMode] = useState<boolean>(false);
+    const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
+
+    useEffect(() => {
+        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
+        setIsRotaryMode(mode);
+        store.on('change', () => {
+            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
+            setIsRotaryMode(workspaceMode === 'ROTARY');
+        });
+    }, []);
 
     function toggleHoming() {
         setHomingMode(!homingMode);
@@ -99,14 +109,16 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                <AxisRow
-                    axis={'Y'}
-                    key={'Y'}
-                    mpos={mpos.y}
-                    wpos={wpos.y}
-                    disabled={!canClick}
-                    homingMode={homingMode}
-                />
+                {!isRotaryMode && (
+                    <AxisRow
+                        axis={'Y'}
+                        key={'Y'}
+                        mpos={mpos.y}
+                        wpos={wpos.y}
+                        disabled={!canClick}
+                        homingMode={homingMode}
+                    />
+                )}
                 <AxisRow
                     axis={'Z'}
                     key={'Z'}
@@ -115,7 +127,7 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                {axes.includes('A') && (
+                {(isRotaryMode || axes.includes('A')) && (
                     <AxisRow
                         axis={'A'}
                         key={'a'}
