@@ -35,12 +35,14 @@ export default class Generator {
         const defaultSurfacingState = get(defaultState, 'workspace.widgets.surfacing');
 
         const { surfacing, units, generateGcode, getSafeZValue } = this;
-        const { skimDepth, maxDepth, feedrate, spindleRPM, spindle = M3, shouldDwell } = { ...defaultSurfacingState, ...surfacing };
+        const { skimDepth, maxDepth, feedrate, spindleRPM, spindle = M3, shouldDwell, mist, flood } = { ...defaultSurfacingState, ...surfacing };
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
         const z = getSafeZValue();
 
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
+        const m7 = mist ? ['M7'] : [];
+        const m8 = flood ? ['M8'] : [];
 
         const depth = skimDepth;
         const gcodeArr = [
@@ -49,6 +51,8 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
+            ...m7,
+            ...m8,
             `G0 Z${z}`,
             'G0 X0 Y0',
             `G1 F${feedrate}`,
@@ -73,8 +77,11 @@ export default class Generator {
 
         gcodeArr.push(...processedGcode);
 
+        const m9 = mist || flood ? ['M9'] : [];
+
         gcodeArr.push(
             '(Footer)',
+            ...m9,
             'M5 ;Turn off spindle',
             ...dwell,
             '(End of Footer)'
@@ -103,6 +110,8 @@ export default class Generator {
             type,
             cutDirectionFlipped,
             skimDepth,
+            mist,
+            flood
         } = this.surfacing;
 
         const stepoverPercentage = stepover > 80 ? 80 / 100 : stepover / 100;
@@ -129,6 +138,8 @@ export default class Generator {
             axisFactors,
             cutDirectionFlipped,
             startPosition,
+            mist,
+            flood
         };
 
         const executeSurfacing = {

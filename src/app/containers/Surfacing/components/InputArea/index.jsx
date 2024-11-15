@@ -13,6 +13,7 @@ import MultiInputBlock from './MultiInputBlock';
 import { InputLabelStyled, InputWrapperStyled } from './styled';
 import { SurfacingContext } from '../Surfacing/Context';
 import { convertValuesToImperial } from '../../utils';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
@@ -29,6 +30,8 @@ const InputArea = () => {
         spindleRPM,
         maxDepth,
         shouldDwell,
+        flood,
+        mist
     } = surfacing;
 
     const defaultValues = units === METRIC_UNITS
@@ -143,6 +146,30 @@ const InputArea = () => {
 
                 <MachinePosition />
             </InputWrapperStyled>
+
+            <MultiInputBlock
+                label="I/O Control"
+                firstComponent={(
+                    <div style={{ display: 'flex' }}>
+                        <ToggleSwitch
+                            label="Mist (M7)"
+                            checked={mist ?? false}
+                            size="small"
+                            onChange={(value) => onSelect({ type: 'mist', value })}
+                        />
+                    </div>
+                )}
+                secondComponent={(
+                    <div style={{ display: 'flex' }}>
+                        <ToggleSwitch
+                            label="Flood (M8)"
+                            checked={flood ?? false}
+                            size="small"
+                            onChange={(value) => onSelect({ type: 'flood', value })}
+                        />
+                    </div>
+                )}
+            />
         </div>
     );
 };
