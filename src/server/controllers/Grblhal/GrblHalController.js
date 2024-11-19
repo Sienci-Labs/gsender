@@ -108,7 +108,7 @@ class GrblHalController {
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
-            console.log(data);
+            // console.log(data);
             this.runner.parse('' + data);
         },
         close: (err) => {
@@ -418,6 +418,8 @@ class GrblHalController {
                 return;
             }
 
+            console.log('feeder data');
+
             // this.emit('serialport:write', line + '\n', {
             //     ...context,
             //     source: WRITE_SOURCE_FEEDER
@@ -582,9 +584,11 @@ class GrblHalController {
                 return;
             }
 
+            console.log('sender data');
+            console.log(line);
             this.emit('serialport:read', line);
 
-            // this.connection.write(line + '\n');
+            this.connection.write(line + '\n');
             // log.silly(`> ${line}`);
         });
         this.sender.on('hold', noop);
@@ -709,6 +713,7 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
+            console.log('**in ok');
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -1312,6 +1317,7 @@ class GrblHalController {
     }
 
     open(port, baudrate, callback = noop) {
+        console.log('controller open');
         // const { port, baudrate } = this.options;
 
         // // Assertion check
@@ -1408,13 +1414,13 @@ class GrblHalController {
         //     });
         // }
 
-        // if (this.isClose()) {
-        //     callback(null);
-        //     return;
-        // }
-        callback(null);
+        if (this.isClose()) {
+            callback(null);
+            return;
+        }
         // this.connection.removeAllListeners();
-        // this.connection.close(callback);
+        // this.connection.close(noop, received); // have to call it from here in case of port disconnect
+        // callback(null);
     }
 
     isOpen() {
@@ -1560,7 +1566,7 @@ class GrblHalController {
                 const [lineToStartFrom, zMax, safeHeight = 10] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
-                log.info(startEventEnabled);
+                // log.info(startEventEnabled);
                 this.emit('job:start');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {

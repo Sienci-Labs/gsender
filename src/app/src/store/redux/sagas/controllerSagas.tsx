@@ -95,7 +95,7 @@ import { EEPROMDescriptions, MachineProfile } from 'app/definitions/firmware';
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-// import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
+import { connectToLastDevice } from 'app/features/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -507,10 +507,14 @@ export function* initialize(): Generator<any, void, any> {
                     cancelLabel: 'Close',
                     onConfirm: () => {
                         // TODO: add this back in
-                        // connectToLastDevice(() => {
-                        //     // prompt recovery, either with homing or a prompt to start from line
-                        //     pubsub.publish('disconnect:recovery', received, homingEnabled);
-                        // });
+                        connectToLastDevice(() => {
+                            // prompt recovery, either with homing or a prompt to start from line
+                            // pubsub.publish(
+                            //     'disconnect:recovery',
+                            //     received,
+                            //     homingEnabled,
+                            // );
+                        });
                     },
                 });
             }

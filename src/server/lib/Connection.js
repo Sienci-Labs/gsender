@@ -24,6 +24,7 @@ class Connection extends EventEmitter {
     connectionEventListener = {
         data: (data) => {
             this.emit('data', data);
+            // console.log(data);
             log.silly(`< ${data}`);
             if (this.controllerType === null) {
                 console.log('controller type: ' + this.controllerType);
@@ -63,24 +64,17 @@ class Connection extends EventEmitter {
         },
         close: (err) => {
             this.emit('close', err);
-            if (this.controllerType === null) {
-                // const received = this.sender?.state?.received;
-                if (err) {
-                    log.warn(
-                        `Disconnected from serial port "${this.options.port}":`,
-                        err,
-                    );
-                }
 
-                // this.close((err) => {
-                //     // Remove controller from store
-                //     const port = this.options.port;
-                //     store.unset(`controllers[${JSON.stringify(port)}]`);
-
-                //     // Destroy controller
-                //     this.controller.destroy();
-                // }, received);
+            if (err) {
+                log.warn(
+                    `Disconnected from serial port "${this.options.port}":`,
+                    err,
+                );
             }
+
+            this.close((err) => {
+                this.destroy(); // Destroy self
+            });
         },
         error: (err) => {
             this.emit('error', err);
@@ -106,6 +100,7 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
+        console.log(options);
         const { baudrate, rtscts, network } = { ...options };
         this.options = {
             ...this.options,
@@ -116,6 +111,8 @@ class Connection extends EventEmitter {
         };
         this.callback = callback;
         this.engine = engine;
+
+        console.log(options);
 
         this.connection = new SerialConnection({
             path: port,
@@ -170,6 +167,7 @@ class Connection extends EventEmitter {
     }
 
     open = (callback = noop) => {
+        console.log('connection open');
         const { port, baudrate } = this.options;
 
         // Assertion check
@@ -205,8 +203,8 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-
             if (!this.controllerType) {
+                // console.log(this.connection);
                 this.timeout = setInterval(() => {
                     this.connection.writeImmediate('$I\n');
                 }, 500);
@@ -219,26 +217,22 @@ class Connection extends EventEmitter {
         });
     };
 
-    close(callback) {
-        console.log('close');
+    close() {
+        console.log('close connection');
         console.log(this.options);
         const { port } = this.options;
 
         // Assertion check
         if (!this.connection) {
             const err = `Serial port "${port}" is not available`;
-            callback(new Error(err));
+            log.error(err);
             return;
         }
 
-        // this.emit(
-        //     'serialport:close',
-        //     {
-        //         port: port,
-        //         inuse: false,
-        //     },
-        //     received,
-        // );
+        this.emit('serialport:close', {
+            port: port,
+            inuse: false,
+        });
 
         // Emit a change event to all connected sockets
         if (this.engine.io) {
@@ -249,11 +243,12 @@ class Connection extends EventEmitter {
         }
 
         if (this.isClose()) {
-            callback(null);
+            this.destroy();
             return;
         }
 
-        this.connection.close(callback);
+        this.connection.close();
+        this.destroy();
     }
 
     addController = (controller) => {

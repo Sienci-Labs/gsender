@@ -11,6 +11,7 @@ import controller from 'app/lib/controller';
 import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import store from 'app/store';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -33,6 +34,8 @@ export interface ConnectionProps {
 export type FirmwareFlavour = 'Grbl' | 'grblHAL';
 
 function Connection(props: ConnectionProps) {
+    const connectionConfig = new WidgetConfig('connection');
+
     const [connectionState, setConnectionState] = useState(
         ConnectionState.DISCONNECTED,
     );
@@ -83,6 +86,9 @@ function Connection(props: ConnectionProps) {
                 setActivePort(port);
             },
         );
+
+        connectionConfig.set('port', port);
+        connectionConfig.set('baudrate', 115200);
     }
 
     function onDisconnectClick() {

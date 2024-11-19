@@ -57,11 +57,13 @@ export const connectToLastDevice = (callback) => {
     const baudrate = connectionConfig.get('baudrate');
     const controllerType = connectionConfig.get('controller.type') || GRBL;
 
+    console.log(baudrate);
+
     const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
 
     controller.openPort(
         port,
-        controllerType,
+        // controllerType,
         {
             baudrate,
             rtscts: false,

@@ -112,6 +112,7 @@ export default function Terminal({ isActive }: Props) {
             port: string;
             baudrate: number;
         }) => {
+            console.log('terminal serialport open');
             if (fitAddonInstance.current) {
                 fitAddonInstance.current.fit();
             }
@@ -133,6 +134,7 @@ export default function Terminal({ isActive }: Props) {
             data: string,
             context: { source: string; __sender__: string },
         ) => {
+            console.log('terminal serialportwrite');
             const { source, __sender__ } = context;
 
             if (__sender__ === senderId || !terminalInstance.current) {
@@ -156,6 +158,7 @@ export default function Terminal({ isActive }: Props) {
             // this.throttledRefitTerminal();
         },
         'serialport:read': (data: string) => {
+            console.log('terminal serialport read');
             if (!terminalInstance.current) {
                 return;
             }

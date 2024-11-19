@@ -364,6 +364,7 @@ class CNCEngine {
 
             // Open serial port
             socket.on('open', (port, options, callback) => {
+                console.log('cnc engine open');
                 //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 const engine = this;
 
@@ -371,6 +372,7 @@ class CNCEngine {
 
                 // create new connection
                 if (!this.connection) {
+                    console.log('connection null');
                     this.connection = new Connection(engine, port, options, callback);
                 }
 
@@ -378,10 +380,10 @@ class CNCEngine {
                     this.emit('serialport:open', port, baudrate, null, inuse);
                 });
 
-                this.connection.on('serialport:close', (port, inuse, received) => {
-                    console.log(port);
-                    console.log(inuse);
-                    this.emit('serialport:close', port, inuse, received);
+                this.connection.on('serialport:close', (options, received) => {
+                    console.log('cnc engine close from connection');
+                    // this.emit('serialport:close', options, received);
+                    this.connection = null;
                 });
 
                 this.connection.on('firmwareFound', (controllerType = GRBL, options, callback = noop) => {
@@ -513,12 +515,9 @@ class CNCEngine {
                 socket.leave(port);
 
                 if (numClients <= 1) { // if only this one was connected
-                    this.connection.close(err => {
-                        // Destroy controller
-                        this.connection.destroy();
-
-                        this.connection = null;
-                    });
+                    this.connection.close();
+                    this.connection = null;
+                    console.log('this.connection = null');
                     controller.close(err => {
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);
