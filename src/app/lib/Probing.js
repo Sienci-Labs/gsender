@@ -1,5 +1,5 @@
 import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
-import { GRBLHAL, METRIC_UNITS } from '../constants';
+import { GRBLHAL, IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
 import { mm2in } from 'app/lib/units';
 
 export const BL = 0;
@@ -542,12 +542,16 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
     return code;
 };
 
-export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) => {
+export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter, units }) => {
     const code = [];
     const p = 'P0';
 
-
     const [xOff, yOff] = determineAutoPlateOffsetValues(direction, toolDiameter);
+
+    // We need to reconvert diameter to mm since auto probe is entirely in mm
+    if (units === IMPERIAL_UNITS) {
+        toolDiameter *= 25.4;
+    }
 
     const toolRadius = (toolDiameter / 2);
     const toolCompensatedThickness = ((-1 * toolRadius));
