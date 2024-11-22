@@ -24,7 +24,7 @@ gSender is available for the following systems and does not yet support headless
 | Windows (x64)                                                                                                               | Mac (Universal)                                                                                                                 | Linux (Intel)                                                                                                                        | Linux (ARM)                                                                                                                   | Pi (64 bit)                                                                                                                       |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.6/gSender-1.4.6-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -103,12 +103,12 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### 1.4.10 (October 28, 2024)
+- Jog no longer sends double jog commands on touch devices
+- $G output emitted to UI when connected using grblHAL and manually sent
 - Altmill profile updated $103 A steps to account for compiled microstepping
 - SLB profiles updated with new values
 - Updated defaults on Mk2, Mk1, and MillOne profiles
-- Jog no longer sends double jog commands on touch devices
-- $G output emitted to UI when connected using grblHAL and manually sent
-- AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased.
+- AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased for non-tip routines.
 - Rotary toggle no longer updates values when cancelled on grblHAL.
 - Changed Spindle/Laser toggle behaviour for when to use gSender settings vs EEPROM settings for laser offset and spindle/laser min and max.
 - Custom theme visualizer background now saving correctly.

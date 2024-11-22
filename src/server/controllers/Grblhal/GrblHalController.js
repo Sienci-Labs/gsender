@@ -1323,7 +1323,7 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    await delay(100);
+                    await delay(300);
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
@@ -1335,6 +1335,7 @@ class GrblHalController {
                         return;
                     }
                     if (this.connection) {
+                        this.connection.writeImmediate(String.fromCharCode(0x87));
                         this.connection.write('$I\n');
                     }
                     counter--;
@@ -1594,14 +1595,14 @@ class GrblHalController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
+                    modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
                         modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
                     }
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
-                    modalGCode.push(`F${feedRate} S${spindleRate}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');

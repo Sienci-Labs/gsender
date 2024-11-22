@@ -244,10 +244,10 @@ const migrateStore = () => {
         return;
     }
 
-    // Reset machine profile to default selection for 1.4.10 to prevent ID overlaps
+    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
     if (semver.lt(cnc.version, '1.4.10')) {
-        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
-        store.set('workspace.machineProfile', defaultMachineProfile);
+        const defaultMachineProfile = get(defaultState, 'workspace.machineProfile');
+        store.replace('workspace.machineProfile', defaultMachineProfile);
     }
 
     if (semver.lt(cnc.version, '1.4.8')) {
@@ -319,12 +319,6 @@ const migrateStore = () => {
                 zProbeDistance: settings.widgets.probe.zProbeDistance.mm
             });
         }
-    }
-
-    // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
-    if (semver.lt(cnc.version, '1.4.1')) {
-        const defaultMachineProfile = get(defaultState, 'workspace.machineProfiles');
-        store.set('workspace.machineProfile', defaultMachineProfile);
     }
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
