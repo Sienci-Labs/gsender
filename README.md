@@ -66,16 +66,24 @@ gSender is available for the following systems and does not yet support headless
 * Sleep management to keep PC awake during g-code sending
 * Pre-built machine profiles, including:
     - LongMill
+    - AltMill
     - Shapeoko
-    - X-carve 
+    - X-Carve
     - OpenBuilds CNCs
-    - 3018 CNC & PROVer
-    - BobsCNC CNCs
-    - CNC4Newbie CNCs
-    - Mill Right CNCs
     - Ooznest WorkBee
     - Nomad
     - Carvey
+    - RatRig
+    - 3018 CNC & PROVer
+    - Bulk-Man 3D
+    - FoxAlien
+    - SainSmart/Genmitsu
+    - YoraHome
+    - Two Trees
+    - BobsCNC
+    - CNC4Newbie
+    - MillRight
+    - Onefinity (running grbl-based controller)
     - Mill One, and more...
 
 ## 🎓 Documentation
