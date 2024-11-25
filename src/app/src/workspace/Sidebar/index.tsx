@@ -6,13 +6,15 @@ import cx from 'classnames';
 export const Sidebar = () => {
     const [show, setShow] = useState(true);
     return (
-        <div className="border flex flex-col justify-end box-border">
+        <div
+            className={cx(
+                'border flex flex-col justify-end box-border transition-width ease-out duration-1000 w-10',
+                { 'w-20': show },
+            )}
+        >
             <NavBar show={show} />
             <MinimizeHandle
-                className={cx('z-20', {
-                    'absolute left-0 bottom-5 bg-white border-2 border-l-0 border-blue-500':
-                        !show,
-                })}
+                className={cx('z-20')}
                 onClick={() => setShow(!show)}
             />
         </div>

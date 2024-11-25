@@ -59,6 +59,7 @@ import StatsPage from './Stats';
 import SafetySettings from './Safety';
 //from '../../widgets/Visualizer/constants';
 import { roundMetric } from '../../lib/rounding';
+import { toast } from 'app/lib/toaster';
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
@@ -76,11 +77,7 @@ class PreferencesPage extends PureComponent {
 
     showToast = _.throttle(
         () => {
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000,
-            });
+            toast.success('Settings Updated');
         },
         3000,
         { trailing: false },

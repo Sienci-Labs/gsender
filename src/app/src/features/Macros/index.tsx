@@ -15,11 +15,6 @@ import Button from 'app/components/Button';
 import Macro from './Macro';
 import MacroForm from './MacroForm';
 import {
-    Toaster,
-    TOASTER_SUCCESS,
-    TOASTER_DANGER,
-} from '../../lib/toaster/ToasterLib';
-import {
     // Grbl
     GRBL,
     GRBLHAL,
@@ -42,6 +37,7 @@ import {
     ModalType,
 } from './constants';
 import { deleteGamepadMacro } from '../../lib/gamepad';
+import { toast } from 'app/lib/toaster';
 
 type MacroWidgetProps = {
     type: string;
@@ -65,12 +61,15 @@ const MacroWidget = ({
     });
     const [editMacro, setEditMacro] = useState<any>(null);
 
-    const toast = _.throttle(
-        ({ msg, type }: { msg: string; type: string }) => {
-            Toaster.pop({
-                msg,
-                type,
-            });
+    const showToast = _.throttle(
+        ({
+            msg,
+            type,
+        }: {
+            msg: string;
+            type: 'info' | 'success' | 'error';
+        }) => {
+            toast[type](msg);
         },
         3000,
         { trailing: false },
@@ -110,12 +109,12 @@ const MacroWidget = ({
 
                 combokeys.reload();
 
-                toast({ msg: 'Added New Macro', type: TOASTER_SUCCESS });
+                showToast({ msg: 'Added New Macro', type: 'success' });
                 actions.closeModal();
             } catch (err) {
-                toast({
+                showToast({
                     msg: 'Failed to add macro',
-                    type: TOASTER_DANGER,
+                    type: 'error',
                 });
             }
         },
@@ -134,7 +133,7 @@ const MacroWidget = ({
                 combokeys.reload();
                 deleteGamepadMacro(id);
 
-                toast({ msg: 'Deleted Macro', type: TOASTER_SUCCESS });
+                showToast({ msg: 'Deleted Macro', type: 'success' });
             } catch (err) {
                 // Ignore error
             }
@@ -263,7 +262,7 @@ const MacroWidget = ({
 
     const exportMacros = () => {
         if (macros.length === 0) {
-            toast({ msg: 'No Macros to Export', type: TOASTER_DANGER });
+            showToast({ msg: 'No Macros to Export', type: 'error' });
             return;
         }
 
@@ -305,15 +304,15 @@ const MacroWidget = ({
                     }
                 }
 
-                toast({
+                showToast({
                     msg: 'Macros Imported Successfully',
-                    type: TOASTER_SUCCESS,
+                    type: 'success',
                 });
             };
             reader.onerror = () => {
-                toast({
+                showToast({
                     msg: 'Error Importing Macros',
-                    type: TOASTER_DANGER,
+                    type: 'error',
                 });
             };
         }

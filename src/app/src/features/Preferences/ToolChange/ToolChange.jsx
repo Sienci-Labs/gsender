@@ -13,6 +13,7 @@ import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 import styles from '../index.module.styl';
 import { Button as FunctionButton } from 'app/components/Button';
+import { toast } from 'app/lib/toaster';
 
 /*const options = [
     'Ignore',
@@ -144,11 +145,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
             preHook,
         };
         controller.command('toolchange:context', context);
-        Toaster.pop({
-            msg: 'Saved tool change hooks',
-            type: TOASTER_SUCCESS,
-            icon: 'fa-check',
-        });
+        toast.success('Saved tool change hooks');
     };
 
     useEffect(() => {

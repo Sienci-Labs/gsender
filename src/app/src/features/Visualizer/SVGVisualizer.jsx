@@ -37,6 +37,7 @@ import {
 import controller from '../../lib/controller';
 import { BACKGROUND_PART, G0_PART, G1_PART } from './constants';
 import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 class SVGVisualizer extends Component {
     static propTypes = {
@@ -150,7 +151,7 @@ class SVGVisualizer extends Component {
 
     async uploadGCodeFile(gcode) {
         const serializedFile = new File([gcode], 'surfacing.gcode');
-        await api.file.upload(
+        await uploadGcodeFileToServer(
             serializedFile,
             controller.port,
             VISUALIZER_SECONDARY,

@@ -5,6 +5,7 @@ import { Toaster, TOASTER_INFO } from '../toaster/ToasterLib';
 import { debounce, noop } from 'lodash';
 import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
+import { toast } from '../toaster';
 
 const macroCallbackDebounce = debounce(
     (action: string) =>
@@ -283,20 +284,15 @@ gamepadInstance.on('gamepad:connected', ({ detail }: GamepadDetail): void => {
         profile.id.includes(gamepad.id),
     );
 
-    Toaster.pop({
-        msg: foundGamepad
+    toast.info(
+        foundGamepad
             ? `${foundGamepad.name} Connected`
             : 'New gamepad connected, add it as a profile in your preferences',
-        type: TOASTER_INFO,
-    });
+    );
 });
 
 gamepadInstance.on('gamepad:disconnected', () => {
-    Toaster.pop({
-        msg: 'Gamepad Disconnected',
-        type: TOASTER_INFO,
-        duration: 2000,
-    });
+    toast.info('Gamepad Disconnected');
 });
 
 export default gamepadInstance;

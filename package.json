@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-1",
+  "version": "1.5.0-Edge-2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -431,7 +431,7 @@
     "css-split-webpack-plugin": "~0.2.6",
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
-    "electron": "^26.2.2",
+    "electron": "^33.2.0",
     "electron-builder": "~23.6.0",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
