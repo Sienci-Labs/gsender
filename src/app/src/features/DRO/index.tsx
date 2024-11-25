@@ -28,6 +28,18 @@ import { useCallback, useEffect, useState } from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from 'app/components/shadcn/AlertDialog';
 
 interface DROProps {
     axes: AxesArray;
@@ -55,6 +67,7 @@ function DRO({
 }: DROProps): JSX.Element {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
+    const { shouldWarnZero } = useWorkspaceState();
 
     useEffect(() => {
         const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
@@ -139,13 +152,42 @@ function DRO({
                 )}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
-                <IconButton
-                    icon={<VscTarget />}
-                    onClick={zeroAllAxes}
-                    disabled={!canClick}
-                >
-                    Zero
-                </IconButton>
+                {!shouldWarnZero ? (
+                    <IconButton
+                        icon={<VscTarget />}
+                        onClick={zeroAllAxes}
+                        disabled={!canClick}
+                    >
+                        Zero
+                    </IconButton>
+                ) : (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <IconButton
+                                icon={<VscTarget />}
+                                disabled={!canClick}
+                            >
+                                Zero
+                            </IconButton>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Zero All Axes
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to zero all axes?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={zeroAllAxes}>
+                                    Continue
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
                 {homingEnabled && (
                     <HomingSwitch
                         onChange={toggleHoming}
