@@ -106,6 +106,8 @@ const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0,
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 import { outlineResponse } from '../../workers/Outline.response';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import { toast } from 'app/lib/toaster';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -547,10 +549,7 @@ class Visualizer extends Component {
 
     showToast = _.throttle(
         () => {
-            Toaster.pop({
-                msg: this.state.finishedMessage,
-                type: 'TOASTER_DANGER',
-            });
+            toast.info(this.state.finishedMessage);
         },
         2000,
         { trailing: false },
@@ -559,11 +558,7 @@ class Visualizer extends Component {
     controllerEvents = {
         gcode_error: _throttle(
             (msg) => {
-                Toaster.pop({
-                    msg,
-                    type: TOASTER_DANGER,
-                    duration: TOASTER_UNTIL_CLOSE,
-                });
+                toast.danger(msg);
             },
             250,
             { trailing: false },
@@ -603,12 +598,11 @@ class Visualizer extends Component {
     async uploadGCodeFile(gcode) {
         const serializedFile = new File([gcode], 'surfacing.gcode');
 
-        const formData = new FormData();
-        formData.append('gcode', serializedFile);
-        formData.append('port', controller.port);
-        formData.append('visualizer', VISUALIZER_PRIMARY);
-
-        await api.file.upload(formData);
+        await uploadGcodeFileToServer(
+            serializedFile,
+            controller.port,
+            VISUALIZER_PRIMARY,
+        );
     }
 
     rerenderGCode() {

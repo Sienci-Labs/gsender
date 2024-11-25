@@ -15,17 +15,14 @@ import {
     removeGamepadProfileFromList,
     setCurrentGamepadProfile,
 } from './utils/actions';
+import { toast } from 'app/lib/toaster';
 
 const ProfileItem = ({ title, icon, id }) => {
     const { dispatch } = useContext(GamepadContext);
 
     const deleteProfile = (profileID) => {
         dispatch(removeGamepadProfileFromList(profileID));
-        Toaster.pop({
-            msg: 'Removed Gamepad Profile',
-            type: TOASTER_SUCCESS,
-            duration: TOASTER_SHORT,
-        });
+        toast.info('Removed Gamepad Profile');
     };
 
     const handleDelete = (e, ommitId) => {

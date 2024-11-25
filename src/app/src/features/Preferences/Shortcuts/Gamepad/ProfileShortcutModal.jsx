@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
 import { Button } from 'app/components/Button';
@@ -120,11 +120,7 @@ const ProfileShortcutModal = ({
 
         onClose();
 
-        Toaster.pop({
-            msg: 'Updated Gamepad Action Shortcut',
-            type: TOASTER_SUCCESS,
-            duration: 2000,
-        });
+        toast.success('Updated Gamepad Action Shortcut');
     };
 
     return (

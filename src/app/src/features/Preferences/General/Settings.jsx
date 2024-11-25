@@ -8,6 +8,7 @@ import api from 'app/api';
 import { restoreDefault, storeUpdate } from '../../../lib/storeUpdate';
 
 import Fieldset from '../components/Fieldset';
+import { toast } from 'app/lib/toaster';
 
 const Settings = () => {
     const inputRef = React.createRef();
@@ -42,10 +43,7 @@ const Settings = () => {
                 await storeUpdate(event.target.result);
             };
             reader.onerror = () => {
-                Toaster.pop({
-                    msg: 'There was a problem importing your settings',
-                    type: TOASTER_DANGER,
-                });
+                toast.error('There was a problem importing your settings');
             };
         }
     };

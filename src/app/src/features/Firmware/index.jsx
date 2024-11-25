@@ -32,6 +32,7 @@ import {
 import { collectUserUsageData } from '../../lib/heatmap';
 
 import styles from './index.module.styl';
+import { toast } from 'app/lib/toaster';
 
 const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
     const isConnected = useSelector((store) =>
@@ -88,20 +89,19 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
         message: (message) => {
             setIsFlashing(false);
             modalClose();
-            Toaster.pop({
-                msg: `Flashing completed successfully on port: ${JSON.stringify(message)}  Please reconnect your machine`,
-                type: TOASTER_INFO,
-            });
+            toast.info(
+                `Flashing completed successfully on port: ${JSON.stringify(
+                    message,
+                )}  Please reconnect your machine`,
+            );
         },
         'task:error': (error) => {
             setIsFlashing(false);
-            Toaster.pop({
-                msg: JSON.stringify(
+            toast.error(
+                JSON.stringify(
                     isEmpty(error) ? error : 'Process failed.',
                 ).replaceAll('"', ''),
-                type: TOASTER_UNTIL_CLOSE,
-                duration: 10000,
-            });
+            );
         },
         'serialport:open': () => {
             controller.command('gcode', '$$');

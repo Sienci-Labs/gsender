@@ -20,6 +20,8 @@ import ActionArea from './ActionArea';
 import PhysicalUnitSetup from './PhysicalUnitSetup';
 import { RotaryContext } from './Context';
 import { MODALS } from './utils/constants';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import { toast } from 'app/lib/toaster';
 // import StockTurning from './StockTurning';
 
 let pubsubTokens = [];
@@ -137,23 +139,20 @@ const Rotary = () => {
             controller.command('gcode:safe', command, modal);
         },
         loadGcode: async (rotarySetupGcode = null) => {
-            const name = 'gSender_RotaryUnitSetup';
-            const formData = new FormData();
-            formData.append(
-                'file',
-                new Blob([rotarySetupGcode], { type: 'text/plain' }),
-                name,
+            const file = new Blob(
+                [rotarySetupGcode],
+                { type: 'text/plain' },
+                'gSender_RotaryUnitSetup',
             );
-            formData.append('port', controller.port);
-            formData.append('visualizer', VISUALIZER_PRIMARY);
 
-            await api.file.upload(formData);
+            await uploadGcodeFileToServer(
+                file,
+                controller.port,
+                VISUALIZER_PRIMARY,
+            );
         },
         runProbing: (name = 'rotary', commands) => {
-            Toaster.pop({
-                msg: `Running ${name} probing commands`,
-                type: TOASTER_INFO,
-            });
+            toast.info(`Running ${name} probing commands`);
 
             const unitModal = getUnitModal();
 

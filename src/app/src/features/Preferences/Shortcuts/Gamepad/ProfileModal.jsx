@@ -20,6 +20,7 @@ import { AVAILABILITY_TYPES } from '../utils';
 import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';
 import { defaultOptions } from 'app/store/gamepad';
+import { toast } from 'app/lib/toaster';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 
@@ -93,11 +94,7 @@ const ProfileModal = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        Toaster.pop({
-            msg: 'Added New Gamepad Profile',
-            type: TOASTER_SUCCESS,
-            duration: TOASTER_SHORT,
-        });
+        toast.success('Added New Gamepad Profile');
 
         closeModal();
     };

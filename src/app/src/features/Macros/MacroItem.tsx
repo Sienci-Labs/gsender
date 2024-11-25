@@ -9,6 +9,7 @@ import {
 import Tooltip from 'app/components/Tooltip';
 
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 
 interface Macro {
     id: string;
@@ -40,10 +41,7 @@ const MacroItem = ({
         }
 
         onRun(macro);
-        Toaster.pop({
-            msg: `Started running macro '${macro.name}'!`,
-            type: TOASTER_INFO,
-        });
+        toast.info(`Started running macro '${macro.name}'!`);
     };
 
     const MacroButton = () => (

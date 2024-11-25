@@ -19,6 +19,7 @@ import {
     RotaryModeFirmwareSettings,
 } from 'definitions/firmware';
 import { WORKSPACE_MODE_T } from 'workspace/definitions';
+import { toast } from './toaster';
 
 export const updateWorkspaceMode = (
     mode: WORKSPACE_MODE_T = WORKSPACE_MODE.DEFAULT,
@@ -144,10 +145,7 @@ export const updateWorkspaceMode = (
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        Toaster.pop({
-                            msg: 'Rotary Mode Enabled',
-                            type: TOASTER_INFO,
-                        });
+                        toast.info('Rotary Mode Enabled');
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
@@ -220,10 +218,7 @@ export const updateWorkspaceMode = (
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        Toaster.pop({
-                            msg: 'Rotary Mode Enabled',
-                            type: TOASTER_INFO,
-                        });
+                        toast.info('Rotary Mode Enabled');
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
