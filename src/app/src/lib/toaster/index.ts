@@ -1,5 +1,5 @@
 import { toast as sonnerToast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'uuid';
 
 import store from 'app/store';
 import { Notification } from 'app/workspace/definitions';
@@ -28,7 +28,7 @@ const saveNotificationToStore = ({
         type,
         status: 'unread',
         timestamp: new Date(),
-        id: uuidv4(),
+        id: uuid.v4(),
     });
 
     store.replace('workspace.notifications', notifications);
