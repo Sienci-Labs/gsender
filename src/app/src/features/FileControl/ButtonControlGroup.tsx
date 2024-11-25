@@ -23,6 +23,7 @@ import {
 } from 'app/components/shadcn/Dropdown';
 import { getRecentFiles } from './utils/recentfiles';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -42,11 +43,6 @@ const ButtonControlGroup = () => {
         const files = event.target.files;
         const file = files[0];
 
-        const formData = new FormData();
-        formData.append('gcode', file);
-        formData.append('port', controller.port);
-        formData.append('visualizer', VISUALIZER_PRIMARY);
-
         const hooks = store.get('workspace.toolChangeHooks', {});
         const toolChangeOption = store.get(
             'workspace.toolChangeOption',
@@ -58,7 +54,11 @@ const ButtonControlGroup = () => {
         };
 
         controller.command('toolchange:context', toolChangeContext);
-        await api.file.upload(formData);
+        await uploadGcodeFileToServer(
+            file,
+            controller.port,
+            VISUALIZER_PRIMARY,
+        );
     };
 
     const handleClickLoadFile = () => {
@@ -86,11 +86,17 @@ const ButtonControlGroup = () => {
         });
     }, 300);
 
-    const handleCloseFile = () => {
+    const handleCloseFile = debounce(() => {
+        if (!fileInputRef.current?.value) {
+            return;
+        }
+
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
-    };
+
+        fileInputRef.current.value = '';
+    }, 100);
 
     return (
         <div className="relative w-full flex justify-center">
