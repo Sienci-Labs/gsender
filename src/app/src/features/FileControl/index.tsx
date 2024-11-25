@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import isElectron from 'is-electron';
 
 import { Widget } from 'app/components/Widget';
-import api from 'app/api';
 import { store as reduxStore } from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import ButtonControlGroup from './ButtonControlGroup';
 import FileInformation from './FileInformation';
@@ -14,7 +14,7 @@ import {
     addRecentFile,
     createRecentFileFromRawPath,
 } from './utils/recentfiles';
-import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 
 type FileData = {
     data: string;
@@ -43,11 +43,9 @@ const FileControl = () => {
                     },
                 ) => {
                     if (!fileMetaData) {
-                        Toaster.pop({
-                            msg: 'Error loading recent file, it may have been deleted or moved to a different folder.',
-                            type: TOASTER_DANGER,
-                            duration: 5000,
-                        });
+                        toast.error(
+                            'Error loading recent file, it may have been deleted or moved to a different folder.',
+                        );
 
                         return;
                     }
@@ -68,10 +66,7 @@ const FileControl = () => {
         file: FileData,
         isRecentFile = false,
     ) => {
-        const formData = new FormData();
-        formData.append('gcode', new File([file.data], file.name));
-        formData.append('port', controller.port);
-        formData.append('visualizer', VISUALIZER_PRIMARY);
+        const givenFile = new File([file.data], file.name);
 
         if (isElectron() && isRecentFile) {
             // Assuming these functions are imported or defined elsewhere
@@ -82,7 +77,12 @@ const FileControl = () => {
             addRecentFile(recentFile);
         }
 
-        await api.file.upload(formData);
+        await uploadGcodeFileToServer(
+            givenFile,
+            controller.port,
+            VISUALIZER_PRIMARY,
+        );
+
         reduxStore.dispatch(updateFileInfo({ path: file.path }));
     };
     return (
