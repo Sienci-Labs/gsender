@@ -20,6 +20,7 @@ class Connection extends EventEmitter {
     connection = null;
     engine = null;
     timeout = null;
+    count = 0;
 
     connectionEventListener = {
         data: (data) => {
@@ -204,9 +205,21 @@ class Connection extends EventEmitter {
 
             log.debug(`Connected to serial port "${port}"`);
             if (!this.controllerType) {
-                // console.log(this.connection);
                 this.timeout = setInterval(() => {
+                    if (this.count === 5) {
+                        this.controllerType = GRBL;
+                        this.emit(
+                            'firmwareFound',
+                            GRBL,
+                            this.options,
+                            this.callback,
+                        );
+                        clearInterval(this.timeout);
+                        return;
+                    }
+                    console.log('writing');
                     this.connection.writeImmediate('$I\n');
+                    this.count++;
                 }, 500);
             }
 

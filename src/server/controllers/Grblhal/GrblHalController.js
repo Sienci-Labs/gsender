@@ -1420,7 +1420,7 @@ class GrblHalController {
         }
         // this.connection.removeAllListeners();
         // this.connection.close(noop, received); // have to call it from here in case of port disconnect
-        // callback(null);
+        callback(null);
     }
 
     isOpen() {

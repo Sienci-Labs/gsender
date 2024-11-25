@@ -514,11 +514,21 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                if (numClients <= 1) { // if only this one was connected
+                console.log('numclients: ' + numClients);
+
+                // for some reason numclients can be undefined,
+                // meaning it won't disconnect and the connection will keep the same firmware setting
+                // meaning if the user switches to a different firmware machine, it won't repoll for the firmware type
+                // so if its undefined, just force close
+                // if (!numClients) {
+                //     this.connection = null;
+                // }
+                if (!numClients || numClients <= 1) { // if only this one was connected
                     this.connection.close();
                     this.connection = null;
                     console.log('this.connection = null');
                     controller.close(err => {
+                        console.log('hi');
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);
 
