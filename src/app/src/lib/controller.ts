@@ -282,7 +282,6 @@ class Controller {
         this.socket = this.io(host, options).connect();
 
         this.socket.on('disconnect', (reason) => {
-            console.log(reason);
             if (reason !== 'io client disconnect') {
                 this.reconnect();
             }

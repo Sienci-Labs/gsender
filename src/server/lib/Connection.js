@@ -25,11 +25,7 @@ class Connection extends EventEmitter {
     connectionEventListener = {
         data: (data) => {
             this.emit('data', data);
-            // console.log(data);
             log.silly(`< ${data}`);
-            if (this.controllerType === null) {
-                console.log('controller type: ' + this.controllerType);
-            }
             if (this.controllerType === null) {
                 data = ('' + data).replace(/\s+$/, '');
                 if (!data) {
@@ -101,7 +97,6 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
-        console.log(options);
         const { baudrate, rtscts, network } = { ...options };
         this.options = {
             ...this.options,
@@ -112,8 +107,6 @@ class Connection extends EventEmitter {
         };
         this.callback = callback;
         this.engine = engine;
-
-        console.log(options);
 
         this.connection = new SerialConnection({
             path: port,
@@ -168,7 +161,6 @@ class Connection extends EventEmitter {
     }
 
     open = (callback = noop) => {
-        console.log('connection open');
         const { port, baudrate } = this.options;
 
         // Assertion check
@@ -217,7 +209,6 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    console.log('writing');
                     this.connection.writeImmediate('$I\n');
                     this.count++;
                 }, 500);
@@ -231,8 +222,6 @@ class Connection extends EventEmitter {
     };
 
     close() {
-        console.log('close connection');
-        console.log(this.options);
         const { port } = this.options;
 
         // Assertion check

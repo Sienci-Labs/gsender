@@ -1233,7 +1233,6 @@ class GrblController {
     }
 
     open(port, baudrate, callback = noop) {
-        console.log('controller open');
         // const { port, baudrate } = this.options;
 
         // Assertion check
@@ -1317,7 +1316,6 @@ class GrblController {
     }
 
     close(callback, received) {
-        console.log('controller closing');
         const { port } = this.options;
 
         // Assertion check

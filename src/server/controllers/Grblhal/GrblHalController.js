@@ -108,7 +108,6 @@ class GrblHalController {
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
-            // console.log(data);
             this.runner.parse('' + data);
         },
         close: (err) => {
@@ -418,14 +417,12 @@ class GrblHalController {
                 return;
             }
 
-            console.log('feeder data');
-
             // this.emit('serialport:write', line + '\n', {
             //     ...context,
             //     source: WRITE_SOURCE_FEEDER
             // });
 
-            this.connection.write(line + '\n', {
+            this.write(line + '\n', {
                 ...context,
                 source: WRITE_SOURCE_FEEDER
             });
@@ -584,11 +581,9 @@ class GrblHalController {
                 return;
             }
 
-            console.log('sender data');
-            console.log(line);
             this.emit('serialport:read', line);
 
-            this.connection.write(line + '\n');
+            this.write(line + '\n');
             // log.silly(`> ${line}`);
         });
         this.sender.on('hold', noop);
@@ -660,7 +655,6 @@ class GrblHalController {
         });
 
         // Grbl
-        console.log('new runner');
         this.runner = new GrblHalRunner();
 
         this.runner.on('raw', noop);
@@ -713,7 +707,6 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
-            console.log('**in ok');
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -1264,7 +1257,6 @@ class GrblHalController {
         }
 
         if (this.runner) {
-            console.log('destroy runner');
             this.runner.removeAllListeners();
             this.runner = null;
         }
@@ -1317,7 +1309,6 @@ class GrblHalController {
     }
 
     open(port, baudrate, callback = noop) {
-        console.log('controller open');
         // const { port, baudrate } = this.options;
 
         // // Assertion check
@@ -1367,7 +1358,7 @@ class GrblHalController {
             if (this.connection) {
                 await delay(100);
                 this.connection.writeImmediate(String.fromCharCode(0x87));
-                this.connection.write('$I\n');
+                this.write('$I\n');
             }
             let counter = 3;
             const interval = setInterval(() => {
@@ -1377,7 +1368,7 @@ class GrblHalController {
                     return;
                 }
                 if (this.connection) {
-                    this.connection.write('$I\n');
+                    this.write('$I\n');
                 }
                 counter--;
             }, 3000);
@@ -1385,7 +1376,6 @@ class GrblHalController {
     }
 
     close(callback, received) {
-        console.log('controller close');
         const { port } = this.options;
 
         // Assertion check

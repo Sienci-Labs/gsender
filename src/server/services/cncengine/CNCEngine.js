@@ -364,7 +364,6 @@ class CNCEngine {
 
             // Open serial port
             socket.on('open', (port, options, callback) => {
-                console.log('cnc engine open');
                 //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 const engine = this;
 
@@ -372,7 +371,6 @@ class CNCEngine {
 
                 // create new connection
                 if (!this.connection) {
-                    console.log('connection null');
                     this.connection = new Connection(engine, port, options, callback);
                 }
 
@@ -381,7 +379,6 @@ class CNCEngine {
                 });
 
                 this.connection.on('serialport:close', (options, received) => {
-                    console.log('cnc engine close from connection');
                     // this.emit('serialport:close', options, received);
                     this.connection = null;
                 });
@@ -390,7 +387,6 @@ class CNCEngine {
                     log.debug('firmware found');
                     let { baudrate, rtscts, network } = { ...options };
 
-                    console.log(controllerType);
                     if (typeof callback !== 'function') {
                         callback = noop;
                     }
@@ -434,7 +430,6 @@ class CNCEngine {
 
                     controller.open(port, baudrate, (err = null) => {
                         if (err) {
-                            console.log('431');
                             callback(err);
                             return;
                         }
@@ -465,7 +460,6 @@ class CNCEngine {
 
                 this.connection.open((err = null) => {
                     if (err) {
-                        console.log('459');
                         callback(err);
                         return;
                     }
@@ -514,8 +508,6 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                console.log('numclients: ' + numClients);
-
                 // for some reason numclients can be undefined,
                 // meaning it won't disconnect and the connection will keep the same firmware setting
                 // meaning if the user switches to a different firmware machine, it won't repoll for the firmware type
@@ -526,9 +518,7 @@ class CNCEngine {
                 if (!numClients || numClients <= 1) { // if only this one was connected
                     this.connection.close();
                     this.connection = null;
-                    console.log('this.connection = null');
                     controller.close(err => {
-                        console.log('hi');
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);
 
@@ -654,27 +644,27 @@ class CNCEngine {
             socket.on('write', (port, data, context = {}) => {
                 log.debug(`socket.write("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
 
-                // const controller = store.get(`controllers["${port}"]`);
+                const controller = store.get(`controllers["${port}"]`);
                 // if (!controller || controller.isClose()) {
-                if (!this.connection || this.connection.isClose()) {
+                if (!this.connection || this.connection.isClose() || !controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
                     return;
                 }
 
-                this.connection.write(data, context);
+                controller.write(data, context);
             });
 
             socket.on('writeln', (port, data, context = {}) => {
                 log.debug(`socket.writeln("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
                 store.set('inAppConsoleInput', data);
-                // const controller = store.get(`controllers["${port}"]`);
+                const controller = store.get(`controllers["${port}"]`);
                 // if (!controller || controller.isClose()) {
-                if (!this.connection || this.connection.isClose()) {
+                if (!this.connection || this.connection.isClose() || !controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
                     return;
                 }
 
-                this.connection.writeln(data, context);
+                controller.writeln(data, context);
             });
 
             socket.on('hPing', () => {
@@ -692,7 +682,6 @@ class CNCEngine {
             });
 
             socket.on('networkScan', (port, target) => {
-                // console.log(target);
                 this.networkDevices = [];
                 const options = {
                     target: target,

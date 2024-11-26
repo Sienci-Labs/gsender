@@ -469,7 +469,6 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:close',
         (options: SerialPortOptions, received: number) => {
-            console.log('serialport close sagas');
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             reduxStore.dispatch(closeConnection({ port: options.port }));

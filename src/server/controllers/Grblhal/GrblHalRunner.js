@@ -126,8 +126,6 @@ class GrblHalRunner extends events.EventEmitter {
         const { type, payload } = result;
         const { raw } = payload;
 
-        // console.log(data);
-
         if (type === GrblHalLineParserResultStatus) {
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
