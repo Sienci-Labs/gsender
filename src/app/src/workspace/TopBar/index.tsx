@@ -16,13 +16,12 @@ export const TopBar = () => {
 
             <Connection />
 
-            <div className="flex float-right">
-                <MachineInfo />
-            </div>
+            <MachineInfo />
 
             <NotificationsArea />
 
             <MachineStatus />
+
             <StatusIcons />
 
             <SpindleLaserStatus />
