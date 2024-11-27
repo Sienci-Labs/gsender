@@ -21,7 +21,6 @@
  *
  */
 
-import { Modal } from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import pubsub from 'pubsub-js';
@@ -1024,7 +1023,7 @@ class PreferencesPage extends PureComponent {
         const { menu, selectedMenu } = state;
 
         return (
-            <Modal onClose={modalClose}>
+            <>
                 <div className={styles.preferencesContainer}>
                     <div className={styles.preferencesContent}>
                         <div className={styles.preferencesMenu}>
@@ -1061,7 +1060,7 @@ class PreferencesPage extends PureComponent {
                         </div>
                     </div>
                 </div>
-            </Modal>
+            </>
         );
     }
 }
