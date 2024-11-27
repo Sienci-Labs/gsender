@@ -7,6 +7,7 @@ import cx from 'classnames';
 interface Props {
     show: boolean;
 }
+
 export const NavBar: React.FC<Props> = ({ show = false }) => {
     return (
         <>
@@ -29,7 +30,7 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                 />
                 <NavbarLink
                     href="/configuration"
-                    icon={faTasks}
+                    icon={FaTasks}
                     label="Config"
                     minimized={!show}
                 />

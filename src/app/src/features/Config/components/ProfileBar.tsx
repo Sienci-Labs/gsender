@@ -1,8 +1,59 @@
+import { IconFunctionButton } from 'app/features/Config/components/IconFunctionButton.tsx';
+import { GrRevert } from 'react-icons/gr';
+import { PiLightning } from 'react-icons/pi';
+import { CiImport } from 'react-icons/ci';
+import { CiExport } from 'react-icons/ci';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from 'app/components/shadcn/Select.tsx';
+import defaultMachineProfiles from '../assets/MachineDefaults/defaultMachineProfiles.ts';
+import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts';
+import { useEffect, useState } from 'react';
+
 export function ProfileBar() {
+    const [getMachineProfile, setMachineProfile] = useState({});
+
+    useEffect(() => {
+        setMachineProfile({});
+    }, []);
+
     return (
-        <div className="flex flex-row w-full p-4 min-h-1/5">
-            <div>Profile Select</div>
-            <div>Apply button</div>
+        <div className="flex flex-row w-full p-4 min-h-1/5 justify-around items-center font-sans">
+            <div className="w-1/4">
+                <Select>
+                    <SelectTrigger className="bg-white bg-opacity-100">
+                        <SelectValue
+                            placeholder={humanReadableMachineName(
+                                defaultMachineProfiles[0],
+                            )}
+                        />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white bg-opacity-100">
+                        {defaultMachineProfiles.map((o) => (
+                            <SelectItem value={`${o.id}`}>
+                                {humanReadableMachineName(o)}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex flex-row gap-10">
+                <IconFunctionButton icon={<CiExport />} label="Export" />
+                <IconFunctionButton icon={<CiImport />} label="Import" />
+                <IconFunctionButton
+                    icon={<GrRevert />}
+                    label="Restore Defaults"
+                />
+                <IconFunctionButton icon={<PiLightning />} label="Flash" />
+            </div>
+            <button className="bg-green-600 text-white p-3 text-lg rounded border-gray-500">
+                Apply Settings
+            </button>
         </div>
     );
 }
