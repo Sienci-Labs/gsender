@@ -67,7 +67,7 @@ const StatusIcons = () => {
             >
                 <MdPhonelinkRing
                     className={cx('w-7 h-7', {
-                        'text-black': !headlessSettings.headlessStatus,
+                        'text-gray-400': !headlessSettings.headlessStatus,
                         'text-green-500': headlessSettings.headlessStatus,
                     })}
                 />
@@ -84,7 +84,7 @@ const StatusIcons = () => {
             >
                 <LuGamepad2
                     className={cx('w-7 h-7', {
-                        'text-black': !gamepadConnected,
+                        'text-gray-400': !gamepadConnected,
                         'text-green-500': gamepadConnected,
                     })}
                 />
