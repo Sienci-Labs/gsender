@@ -1,8 +1,10 @@
-import { NavbarLink } from './components/NavbarLink.tsx';
 import { FaMicrochip } from 'react-icons/fa';
 import { FaTasks } from 'react-icons/fa';
 import { MdKeyboardCommandKey } from 'react-icons/md';
+import { RiToolsFill } from 'react-icons/ri';
 import cx from 'classnames';
+
+import { NavbarLink } from './components/NavbarLink.tsx';
 
 interface Props {
     show: boolean;
@@ -23,9 +25,15 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     minimized={!show}
                 />
                 <NavbarLink
-                    href="/tools"
+                    href="/firmware"
                     icon={FaMicrochip}
                     label="Firmware"
+                    minimized={!show}
+                />
+                <NavbarLink
+                    href="/tools"
+                    icon={RiToolsFill}
+                    label="Tools"
                     minimized={!show}
                 />
                 <NavbarLink

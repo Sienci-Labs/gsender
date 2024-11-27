@@ -8,7 +8,7 @@ type Props = {
 };
 
 const NotificationList = ({ value }: Props) => {
-    const { notifications } = useWorkspaceState();
+    const { notifications = [] } = useWorkspaceState();
 
     const filteredNotifications =
         value === 'all'

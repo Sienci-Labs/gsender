@@ -11,7 +11,7 @@ import TabList from './TabList';
 import Header from './Header';
 
 const NotificationsArea = () => {
-    const { notifications } = useWorkspaceState();
+    const { notifications = [] } = useWorkspaceState();
 
     return (
         <Popover>
