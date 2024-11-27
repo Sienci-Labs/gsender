@@ -4,7 +4,7 @@ import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Header = () => {
-    const { notifications } = useWorkspaceState();
+    const { notifications = [] } = useWorkspaceState();
 
     const handleClearNotifications = () => {
         if (notifications?.length === 0) {
