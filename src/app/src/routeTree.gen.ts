@@ -17,7 +17,9 @@ import { Route as rootRoute } from './routes/__root'
 // Create Virtual Routes
 
 const ToolsLazyImport = createFileRoute('/tools')()
+const SurfacingLazyImport = createFileRoute('/surfacing')()
 const StatsLazyImport = createFileRoute('/stats')()
+const FirmwareLazyImport = createFileRoute('/firmware')()
 const ConfigurationLazyImport = createFileRoute('/configuration')()
 const IndexLazyImport = createFileRoute('/')()
 
@@ -29,11 +31,23 @@ const ToolsLazyRoute = ToolsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/tools.lazy').then((d) => d.Route))
 
+const SurfacingLazyRoute = SurfacingLazyImport.update({
+  id: '/surfacing',
+  path: '/surfacing',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/surfacing.lazy').then((d) => d.Route))
+
 const StatsLazyRoute = StatsLazyImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/stats.lazy').then((d) => d.Route))
+
+const FirmwareLazyRoute = FirmwareLazyImport.update({
+  id: '/firmware',
+  path: '/firmware',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/firmware.lazy').then((d) => d.Route))
 
 const ConfigurationLazyRoute = ConfigurationLazyImport.update({
   id: '/configuration',
@@ -65,11 +79,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigurationLazyImport
       parentRoute: typeof rootRoute
     }
+    '/firmware': {
+      id: '/firmware'
+      path: '/firmware'
+      fullPath: '/firmware'
+      preLoaderRoute: typeof FirmwareLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/stats': {
       id: '/stats'
       path: '/stats'
       fullPath: '/stats'
       preLoaderRoute: typeof StatsLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/surfacing': {
+      id: '/surfacing'
+      path: '/surfacing'
+      fullPath: '/surfacing'
+      preLoaderRoute: typeof SurfacingLazyImport
       parentRoute: typeof rootRoute
     }
     '/tools': {
@@ -87,14 +115,18 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
+  '/firmware': typeof FirmwareLazyRoute
   '/stats': typeof StatsLazyRoute
+  '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
+  '/firmware': typeof FirmwareLazyRoute
   '/stats': typeof StatsLazyRoute
+  '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
@@ -102,30 +134,49 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
+  '/firmware': typeof FirmwareLazyRoute
   '/stats': typeof StatsLazyRoute
+  '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/configuration' | '/stats' | '/tools'
+  fullPaths:
+    | '/'
+    | '/configuration'
+    | '/firmware'
+    | '/stats'
+    | '/surfacing'
+    | '/tools'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/configuration' | '/stats' | '/tools'
-  id: '__root__' | '/' | '/configuration' | '/stats' | '/tools'
+  to: '/' | '/configuration' | '/firmware' | '/stats' | '/surfacing' | '/tools'
+  id:
+    | '__root__'
+    | '/'
+    | '/configuration'
+    | '/firmware'
+    | '/stats'
+    | '/surfacing'
+    | '/tools'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ConfigurationLazyRoute: typeof ConfigurationLazyRoute
+  FirmwareLazyRoute: typeof FirmwareLazyRoute
   StatsLazyRoute: typeof StatsLazyRoute
+  SurfacingLazyRoute: typeof SurfacingLazyRoute
   ToolsLazyRoute: typeof ToolsLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   ConfigurationLazyRoute: ConfigurationLazyRoute,
+  FirmwareLazyRoute: FirmwareLazyRoute,
   StatsLazyRoute: StatsLazyRoute,
+  SurfacingLazyRoute: SurfacingLazyRoute,
   ToolsLazyRoute: ToolsLazyRoute,
 }
 
@@ -141,7 +192,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/configuration",
+        "/firmware",
         "/stats",
+        "/surfacing",
         "/tools"
       ]
     },
@@ -151,8 +204,14 @@ export const routeTree = rootRoute
     "/configuration": {
       "filePath": "configuration.lazy.tsx"
     },
+    "/firmware": {
+      "filePath": "firmware.lazy.tsx"
+    },
     "/stats": {
       "filePath": "stats.lazy.tsx"
+    },
+    "/surfacing": {
+      "filePath": "surfacing.lazy.tsx"
     },
     "/tools": {
       "filePath": "tools.lazy.tsx"

@@ -25,12 +25,6 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     minimized={!show}
                 />
                 <NavbarLink
-                    href="/firmware"
-                    icon={FaMicrochip}
-                    label="Firmware"
-                    minimized={!show}
-                />
-                <NavbarLink
                     href="/tools"
                     icon={RiToolsFill}
                     label="Tools"
