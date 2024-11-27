@@ -107,6 +107,7 @@ import {
 import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
+import { toast } from 'app/lib/toaster';
 
 export function* initialize(): Generator<any, void, any> {
     let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -536,11 +537,7 @@ export function* initialize(): Generator<any, void, any> {
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
-            Toaster.pop({
-                msg: msg,
-                type: TOASTER_INFO,
-                duration: TOASTER_UNTIL_CLOSE,
-            });
+            toast.info(msg);
         } else {
             let title, instructions;
 
@@ -694,11 +691,9 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
-        Toaster.pop({
-            msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
-            type: TOASTER_INFO,
-            duration: TOASTER_UNTIL_CLOSE,
-        });
+        toast.info(
+            `'${data}' pause command found in file - press "Resume Job" to continue running.`,
+        );
     });
 
     controller.addListener('sender:M0M1', (opts: { comment: string }) => {
@@ -730,11 +725,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('outline:start', () => {
-        Toaster.clear();
-        Toaster.pop({
-            type: TOASTER_SUCCESS,
-            msg: 'Running file outline',
-        });
+        toast.success('Running file outline');
     });
 
     controller.addListener('homing:flag', (flag: boolean) => {

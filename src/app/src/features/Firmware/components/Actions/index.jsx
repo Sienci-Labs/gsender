@@ -19,6 +19,7 @@ import {
 import Notifications from './Notifications';
 
 import styles from '../../index.module.styl';
+import { toast } from 'app/lib/toaster';
 
 const ActionArea = () => {
     const {
@@ -51,10 +52,7 @@ const ActionArea = () => {
             try {
                 const uploadedSettings = JSON.parse(e.target.result);
 
-                Toaster.pop({
-                    msg: 'Settings Imported From File',
-                    type: TOASTER_INFO,
-                });
+                toast.info('Settings Imported From File');
 
                 let newSetting = false;
                 setSettings((prev) =>
@@ -69,10 +67,7 @@ const ActionArea = () => {
                 );
                 setSettingsToApply(newSetting);
             } catch (error) {
-                Toaster.pop({
-                    msg: 'Unable to Load Settings From File',
-                    type: TOASTER_DANGER,
-                });
+                toast.error('Unable to Load Settings From File');
             }
 
             return null;

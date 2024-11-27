@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from 'app/components/shadcn/Dialog';
+import { toast } from 'app/lib/toaster';
 
 const SLB_DFU_PORT = {
     port: 'SLB_DFU',
@@ -263,10 +264,9 @@ const HalFlashModal = ({ onClose }) => {
                                 <Button
                                     onClick={() => {
                                         if (!fileContent || !file) {
-                                            Toaster.pop({
-                                                msg: 'Please select a hex file',
-                                                type: TOASTER_INFO,
-                                            });
+                                            toast.info(
+                                                'Please select a hex file',
+                                            );
                                             return;
                                         }
                                         setIsFlashing(true);

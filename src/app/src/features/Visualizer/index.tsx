@@ -28,15 +28,12 @@ import includes from 'lodash/includes';
 import get from 'lodash/get';
 import debounce from 'lodash/debounce';
 import pubsub from 'pubsub-js';
+import PropTypes from 'prop-types';
 
-import api from 'app/api';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
-
 import { colorsResponse } from 'app/workers/colors.response';
-import PropTypes from 'prop-types';
-
 import controller from 'app/lib/controller';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import log from 'app/lib/log';
@@ -46,9 +43,15 @@ import {
     TOASTER_LONG,
     TOASTER_WARNING,
 } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
+import {
+    updateFileInfo,
+    updateFileProcessing,
+} from 'app/store/redux/slices/fileInfo.slice';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import PrimaryVisualizer from './PrimaryVisualizer';
-
 import {
     // Units
     METRIC_UNITS,
@@ -91,10 +94,6 @@ import {
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import shuttleEvents from '../../lib/shuttleEvents';
-import {
-    updateFileInfo,
-    updateFileProcessing,
-} from 'app/store/redux/slices/fileInfo.slice';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -612,10 +611,7 @@ class Visualizer extends Component {
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
-            Toaster.pop({
-                msg: 'G-code File Closed',
-                icon: 'fa-exclamation',
-            });
+            toast('G-code File Closed');
         },
         getHull: () => {
             return this.visualizer.getToolpathHull();
@@ -632,12 +628,9 @@ class Visualizer extends Component {
                 invalidGcode: { ...prev.invalidGcode, list: invalidGcode },
             }));
             if (this.state.invalidGcode.shouldShow) {
-                Toaster.pop({
-                    msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-                    type: TOASTER_WARNING,
-                    duration: TOASTER_LONG,
-                    icon: 'fa-exclamation-triangle',
-                });
+                toast.info(
+                    `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                );
             }
         }
 
@@ -886,11 +879,7 @@ class Visualizer extends Component {
 
     showToast = _.throttle(
         () => {
-            Toaster.pop({
-                msg: 'Unable to activate GrblHAL ONLY shortcut',
-                type: TOASTER_WARNING,
-                duration: 3000,
-            });
+            toast.info('Unable to activate GrblHAL ONLY shortcut');
         },
         3000,
         { trailing: false },
@@ -1612,7 +1601,7 @@ class Visualizer extends Component {
                 'gcode:surfacing',
                 async (_, { gcode, name, size }) => {
                     const file = new File([gcode], name);
-                    await api.file.upload(
+                    await uploadGcodeFileToServer(
                         file,
                         controller.port,
                         VISUALIZER_PRIMARY,
@@ -1641,7 +1630,8 @@ class Visualizer extends Component {
                 'gcode:rotarySetup',
                 async (_, { setupFile, name }) => {
                     const file = new File([setupFile], name);
-                    await api.file.upload(
+
+                    await uploadGcodeFile(
                         file,
                         controller.port,
                         VISUALIZER_PRIMARY,

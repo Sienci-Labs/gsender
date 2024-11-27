@@ -26,6 +26,7 @@ import {
 import defaultGRBLSettings from '../../eepromFiles/DefaultGrblSettings.json';
 import defaultGRBLHALSettings from '../../eepromFiles/DefaultGrblHalSettings.json';
 import HalFlashModal from '../HalFlashModal';
+import { toast } from 'app/lib/toaster';
 
 const Notifications = () => {
     const {
@@ -47,11 +48,7 @@ const Notifications = () => {
 
     const beginFlashing = (port, profile) => {
         if (profile === '' || port === '') {
-            Toaster.pop({
-                msg: 'Please select a Port and Machine profile',
-                type: TOASTER_WARNING,
-                duration: 2500,
-            });
+            toast.info('Please select a Port and Machine profile');
         } else {
             setPortSelected(port);
             startFlash(port, profile);

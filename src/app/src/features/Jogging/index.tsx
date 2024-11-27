@@ -27,6 +27,8 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
+    const [isRotaryMode, setIsRotaryMode] = useState(false);
+
     const axes = useSelector((state: RootState) => {
         const controllerState = state.controller.state;
         return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
@@ -71,6 +73,15 @@ export function Jogging() {
         });
     }, []);
 
+    useEffect(() => {
+        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
+        setIsRotaryMode(mode);
+        store.on('change', () => {
+            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
+            setIsRotaryMode(workspaceMode === 'ROTARY');
+        });
+    }, []);
+
     function updateJogValues(values: JogValueObject) {
         setJogSpeed(values);
     }
@@ -101,7 +112,7 @@ export function Jogging() {
                     feedrate={jogSpeed.feedrate}
                     canClick={canClick}
                 />
-                {axes && axes.includes('A') && (
+                {axes && (isRotaryMode || axes.includes('A')) && (
                     <AJog
                         distance={jogSpeed.aStep}
                         feedrate={jogSpeed.feedrate}
@@ -114,7 +125,7 @@ export function Jogging() {
                     <JogInput label="XY" currentValue={jogSpeed.xyStep} />
                     <JogInput label="Z" currentValue={jogSpeed.zStep} />
                     <JogInput label="at" currentValue={jogSpeed.feedrate} />
-                    {firmware === 'grblHAL' && (
+                    {(firmware === 'grblHAL' || isRotaryMode) && (
                         <JogInput label="A°" currentValue={jogSpeed.aStep} />
                     )}
                 </div>

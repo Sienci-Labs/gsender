@@ -23,6 +23,7 @@ import {
     CLOSE_ACTIVE_DIALOG,
     UPDATE_PHYSICAL_UNIT_SETUP,
 } from '../Context/actions';
+import { toast } from 'app/lib/toaster';
 
 const PhysicalUnitSetup = ({ actions }) => {
     const {
@@ -64,10 +65,10 @@ const PhysicalUnitSetup = ({ actions }) => {
 
         actions.loadGcode(gcode);
         handleModalClose();
-        Toaster.pop({
-            msg: `File added for ${localHoleCount} ${drillBitDiameter}" mounting holes`,
-            type: TOASTER_INFO,
-        });
+
+        toast.info(
+            `File added for ${localHoleCount} ${drillBitDiameter}" mounting holes`,
+        );
     };
 
     const handleModalClose = () => {
@@ -91,10 +92,7 @@ const PhysicalUnitSetup = ({ actions }) => {
 
     const handleDisableRotaryMode = () => {
         updateWorkspaceMode(FILE_TYPE.DEFAULT);
-        Toaster.pop({
-            msg: 'Rotary Mode Disabled',
-            type: TOASTER_INFO,
-        });
+        toast.info('Rotary Mode Disabled');
     };
 
     const getIllustrationImage = () => {

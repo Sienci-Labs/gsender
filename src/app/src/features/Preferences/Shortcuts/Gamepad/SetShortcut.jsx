@@ -25,6 +25,7 @@ import { setCurrentModal, setGamepadProfileList } from './utils/actions';
 import styles from './index.module.styl';
 import generalStyles from '../edit-area.module.styl';
 import { arrayComparator } from './utils';
+import { toast } from 'app/lib/toaster';
 
 const SetShortcut = () => {
     const {
@@ -109,11 +110,7 @@ const SetShortcut = () => {
     const onSetClick = () => {
         closeModal();
 
-        Toaster.pop({
-            msg: 'Button Shortcut Set',
-            type: TOASTER_INFO,
-            duration: 3000,
-        });
+        toast.success('Button Shortcut Set');
     };
 
     const getData = () => {

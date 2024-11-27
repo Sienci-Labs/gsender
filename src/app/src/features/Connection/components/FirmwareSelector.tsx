@@ -38,7 +38,7 @@ export function FirmwareSelector({
 
     return (
         <div className="mt-4 p-2">
-            <div className="flex flex-row justify-around bg-white rounded-md border-solid border-[1px] border-gray-300 p-[2px]">
+            <div className="flex flex-row justify-around bg-white rounded-md border-solid border border-gray-300 p-[2px]">
                 <FirmwareSelectButton
                     active={grblActive}
                     label="Grbl"

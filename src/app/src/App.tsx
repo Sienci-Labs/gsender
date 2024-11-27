@@ -10,6 +10,7 @@ import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { createRouter } from './router';
+import { Toaster } from './components/shadcn/Sonner';
 
 const router = createRouter();
 
@@ -41,6 +42,12 @@ function App() {
         <>
             <ReduxProvider store={reduxStore}>
                 <ConfirmationDialog />
+                <Toaster
+                    richColors
+                    closeButton
+                    theme="light"
+                    visibleToasts={5}
+                />
                 <RouterProvider router={router} />
             </ReduxProvider>
         </>

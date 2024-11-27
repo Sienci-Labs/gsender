@@ -187,7 +187,7 @@ export interface Session {
     token: string;
 }
 
-export interface DefaultState {
+export interface State {
     session: Session;
     workspace: Workspace;
     widgets: {

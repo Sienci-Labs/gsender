@@ -113,7 +113,7 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
                 value={value}
                 disabled={!probeCommand.tool}
             >
-                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border-[1px] border-gray-300">
+                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border border-gray-300">
                     <SelectValue placeholder="Select a Probe Type" />
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">

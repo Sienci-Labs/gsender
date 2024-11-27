@@ -10,6 +10,9 @@ export default {
   important: true,
   theme: {
     extend: {
+      transitionProperty: {
+        width: "width",
+      },
       colors: {
         robin: {
           50: "#f6f9fc",
