@@ -5,10 +5,12 @@ import {
 import store from 'app/store';
 import React, { useEffect, useState } from 'react';
 import { isSubSection } from 'app/features/Config/components/Section.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
-    EEPROM?: number[];
+    EEPROM?: object;
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
 }
@@ -21,6 +23,7 @@ const defaultState = {
     settings: SettingsMenu,
     settingsToUpdate: {},
     EEPROMToUpdate: {},
+    EEPROM: {},
 };
 
 export const SettingsContext =
@@ -75,17 +78,29 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
 export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
+    const [EEPROM, setEEPROM] = useState<object>({});
     const [settingsToUpdate, setSettingsToUpdate] = useState({});
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
 
+    const detectedEEPROM = useSelector(
+        (state: RootState) => state.controller.settings.settings,
+    );
+
     useEffect(() => {
-        setSettings(populateSettingsValues(settings));
-    }, []);
+        const populatedSettings = populateSettingsValues(settings);
+        setSettings([...populatedSettings]);
+        setEEPROM(detectedEEPROM);
+    }, [detectedEEPROM]);
+
+    const payload = {
+        settings,
+        settingsToUpdate,
+        EEPROMToUpdate,
+        EEPROM,
+    };
 
     return (
-        <SettingsContext.Provider
-            value={{ settings, settingsToUpdate, EEPROMToUpdate }}
-        >
+        <SettingsContext.Provider value={payload}>
             {children}
         </SettingsContext.Provider>
     );

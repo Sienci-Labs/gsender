@@ -18,10 +18,10 @@ export function SelectSettingInput({
 }: SelectSettingInputProps): React.ReactNode {
     return (
         <Select>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white bg-opacity-100">
                 <SelectValue placeholder="125000" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white bg-opacity-100">
                 {options.map((o) => (
                     <SelectItem value={`${o}`}>{o}</SelectItem>
                 ))}
