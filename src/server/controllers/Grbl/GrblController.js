@@ -1233,25 +1233,9 @@ class GrblController {
     }
 
     open(port, baudrate, callback = noop) {
-        // const { port, baudrate } = this.options;
-
-        // Assertion check
-        // if (this.isOpen()) {
-        //     log.error(`Cannot open serial port "${port}"`);
-        //     return;
-        // }
-
         this.connection.on('data', this.connectionEventListener.data);
         this.connection.on('close', this.connectionEventListener.close);
         this.connection.on('error', this.connectionEventListener.error);
-
-        // this.connection.open((err) => {
-        //     if (err) {
-        //         log.error(`Error opening serial port "${port}":`, err);
-        //         this.emit('serialport:error', { err: err, port: port });
-        //         callback(err); // notify error
-        //         return;
-        //     }
 
         this.emit('serialport:open', {
             port: port,
@@ -1259,14 +1243,6 @@ class GrblController {
             controllerType: this.type,
             inuse: true
         });
-
-        // // Emit a change event to all connected sockets
-        // if (this.engine.io) {
-        //     this.engine.io.emit('serialport:change', {
-        //         port: port,
-        //         inuse: true
-        //     });
-        // }
 
         callback(); // register controller
 
@@ -1278,7 +1254,6 @@ class GrblController {
 
         // set timeout to wait for connection
         this.waitForInfo();
-        // this.ready = true;
     }
 
     waitForInfo() {
@@ -1299,20 +1274,6 @@ class GrblController {
                 }
             }, 3000);
         }, 500);
-        // setTimeout(() => {
-        //     if (!this.ready) {
-        //         log.debug('No start message. Waiting for status');
-        //         this.waitingForStatus = true;
-        //         this.write('?');
-        //         this.write('$$');
-        //         setTimeout(() => {
-        //             if (this.waitingForStatus) {
-        //                 log.debug('No status. Soft resetting');
-        //                 this.write('\x18');
-        //             }
-        //         }, 3000);
-        //     }
-        // }, 3000);
     }
 
     close(callback, received) {
@@ -1336,21 +1297,11 @@ class GrblController {
             inuse: false,
         }, received);
 
-        // // Emit a change event to all connected sockets
-        // if (this.engine.io) {
-        //     this.engine.io.emit('serialport:change', {
-        //         port: port,
-        //         inuse: false
-        //     });
-        // }
-
         if (this.isClose()) {
             callback(null);
             return;
         }
 
-        // this.connection.removeAllListeners();
-        // this.connection.close(callback);
         callback(null);
     }
 
@@ -1373,20 +1324,6 @@ class GrblController {
             return;
         }
 
-        // log.debug(`Add socket connection: id=${socket.id}`);
-        // this.sockets[socket.id] = socket;
-
-        //
-        // Send data to newly connected client
-        //
-        // if (this.isOpen()) {
-        //     socket.emit('serialport:open', {
-        //         port: this.options.port,
-        //         baudrate: this.options.baudrate,
-        //         controllerType: this.type,
-        //         inuse: true
-        //     });
-        // }
         if (!_.isEmpty(this.settings)) {
             // controller settings
             socket.emit('controller:settings', GRBL, this.settings);
@@ -1412,23 +1349,8 @@ class GrblController {
         }
     }
 
-    // removeConnection(socket) {
-    //     if (!socket) {
-    //         log.error('The socket parameter is not specified');
-    //         return;
-    //     }
-
-    //     log.debug(`Remove socket connection: id=${socket.id}`);
-    //     this.sockets[socket.id] = undefined;
-    //     delete this.sockets[socket.id];
-    // }
-
     emit(eventName, ...args) {
         this.connection.emitToSockets(eventName, ...args);
-        // Object.keys(this.sockets).forEach(id => {
-        //     const socket = this.sockets[id];
-        //     socket.emit(eventName, ...args);
-        // });
     }
 
     consumeFeederCB() {
@@ -2120,10 +2042,6 @@ class GrblController {
         this.actionMask.replyStatusReport = (cmd === '?') || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
-        // this.emit('serialport:write', data, {
-        //     ...context,
-        //     source: WRITE_SOURCE_CLIENT
-        // });
         this.connection.write(data, {
             ...context,
             source: WRITE_SOURCE_CLIENT

@@ -216,14 +216,6 @@ class CNCEngine {
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
 
-                // const controllers = store.get('controllers', {});
-                // Object.keys(controllers).forEach(port => {
-                // const controller = controllers[port];
-                // if (!controller) {
-                //     return;
-                // }
-                // controller.removeConnection(socket);
-                // });
                 if (!this.connection) {
                     return;
                 }
@@ -364,7 +356,6 @@ class CNCEngine {
 
             // Open serial port
             socket.on('open', (port, options, callback) => {
-                //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 const engine = this;
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
@@ -379,7 +370,6 @@ class CNCEngine {
                 });
 
                 this.connection.on('serialport:close', (options, received) => {
-                    // this.emit('serialport:close', options, received);
                     this.connection = null;
                 });
 
@@ -418,15 +408,7 @@ class CNCEngine {
                         log.debug('No file in CNCEngine to load to sender');
                     }
 
-                    // if (controller.isOpen()) {
-                    //     // Join the room
-                    //     socket.join(port);
-
-                    //     callback(null);
-                    //     return;
-                    // }
                     this.connection.addController(controller);
-                    // controller.startUp();
 
                     controller.open(port, baudrate, (err = null) => {
                         if (err) {
@@ -469,13 +451,6 @@ class CNCEngine {
 
                     callback(null);
                 });
-
-                // socket.emit('serialport:open', {
-                //     port: port,
-                //     baudrate: baudrate,
-                //     controllerType: this.type,
-                //     inuse: true
-                // });
             });
 
             // Close serial port
@@ -508,13 +483,6 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                // for some reason numclients can be undefined,
-                // meaning it won't disconnect and the connection will keep the same firmware setting
-                // meaning if the user switches to a different firmware machine, it won't repoll for the firmware type
-                // so if its undefined, just force close
-                // if (!numClients) {
-                //     this.connection = null;
-                // }
                 if (!numClients || numClients <= 1) { // if only this one was connected
                     this.connection.close();
                     this.connection = null;

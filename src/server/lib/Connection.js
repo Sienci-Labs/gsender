@@ -13,7 +13,6 @@ const log = logger('connection');
 
 class Connection extends EventEmitter {
     sockets = {};
-    // runner = null;
     controller = null;
     controllerType = null;
     options = {};
@@ -85,15 +84,6 @@ class Connection extends EventEmitter {
             }
         },
     };
-
-    // controllerEvents = {
-    //     'serialport:write': (data, context) => {
-    //         this.write(data, context);
-    //     },
-    //     'serialport:read': (data, context) => {
-    //         this.write(data, context);
-    //     },
-    // };
 
     constructor(engine, port, options, callback) {
         super();
@@ -213,11 +203,6 @@ class Connection extends EventEmitter {
                     this.count++;
                 }, 500);
             }
-
-            // this.workflow.stop();
-
-            // Clear action values
-            // this.clearActionValues();
         });
     };
 
@@ -255,16 +240,6 @@ class Connection extends EventEmitter {
 
     addController = (controller) => {
         this.controller = controller;
-
-        // use correct runner
-        // if (this.controllerType === GRBLHAL) {
-        //     this.runner = new GrblHalRunner();
-        // } else {
-        //     this.runner = new GrblRunner();
-        // }
-        // this.connection.on('data', this.connectionEventListener.data);
-        // this.connection.on('close', this.connectionEventListener.close);
-        // this.connection.on('error', this.connectionEventListener.error);
     };
 
     write(data, context = { source: WRITE_SOURCE_CLIENT }) {
