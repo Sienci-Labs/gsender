@@ -613,7 +613,6 @@ class CNCEngine {
                 log.debug(`socket.write("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
 
                 const controller = store.get(`controllers["${port}"]`);
-                // if (!controller || controller.isClose()) {
                 if (!this.connection || this.connection.isClose() || !controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
                     return;
@@ -626,7 +625,6 @@ class CNCEngine {
                 log.debug(`socket.writeln("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
                 store.set('inAppConsoleInput', data);
                 const controller = store.get(`controllers["${port}"]`);
-                // if (!controller || controller.isClose()) {
                 if (!this.connection || this.connection.isClose() || !controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
                     return;
