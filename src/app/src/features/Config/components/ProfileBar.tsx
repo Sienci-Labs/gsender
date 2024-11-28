@@ -23,33 +23,35 @@ export function ProfileBar() {
 
     return (
         <div className="flex flex-row w-full p-4 min-h-1/5 justify-around items-center font-sans">
-            <div className="w-1/4">
-                <Select>
-                    <SelectTrigger className="bg-white bg-opacity-100">
-                        <SelectValue
-                            placeholder={humanReadableMachineName(
-                                defaultMachineProfiles[0],
-                            )}
-                        />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white bg-opacity-100">
-                        {defaultMachineProfiles.map((o) => (
-                            <SelectItem value={`${o.id}`}>
-                                {humanReadableMachineName(o)}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            <div className="border border-gray-200 flex flex-row items-center w-3/5 justify-between px-4 py-2">
+                <div className="w-1/4">
+                    <Select>
+                        <SelectTrigger className="bg-white bg-opacity-100">
+                            <SelectValue
+                                placeholder={humanReadableMachineName(
+                                    defaultMachineProfiles[0],
+                                )}
+                            />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white bg-opacity-100">
+                            {defaultMachineProfiles.map((o) => (
+                                <SelectItem value={`${o.id}`}>
+                                    {humanReadableMachineName(o)}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
 
-            <div className="flex flex-row gap-10">
-                <IconFunctionButton icon={<CiExport />} label="Export" />
-                <IconFunctionButton icon={<CiImport />} label="Import" />
-                <IconFunctionButton
-                    icon={<GrRevert />}
-                    label="Restore Defaults"
-                />
-                <IconFunctionButton icon={<PiLightning />} label="Flash" />
+                <div className="flex flex-row gap-10">
+                    <IconFunctionButton icon={<CiExport />} label="Export" />
+                    <IconFunctionButton icon={<CiImport />} label="Import" />
+                    <IconFunctionButton
+                        icon={<GrRevert />}
+                        label="Restore Defaults"
+                    />
+                    <IconFunctionButton icon={<PiLightning />} label="Flash" />
+                </div>
             </div>
             <button className="bg-green-600 text-white p-3 text-lg rounded border-gray-500">
                 Apply Settings

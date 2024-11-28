@@ -9,6 +9,8 @@ import { isSubSection } from 'app/features/Config/components/Section.tsx';
 interface iSettingsContext {
     settings: SettingsMenuSection[];
     EEPROM?: number[];
+    settingsToUpdate?: object;
+    EEPROMToUpdate?: object;
 }
 
 interface SettingsProviderProps {
@@ -17,6 +19,8 @@ interface SettingsProviderProps {
 
 const defaultState = {
     settings: SettingsMenu,
+    settingsToUpdate: {},
+    EEPROMToUpdate: {},
 };
 
 export const SettingsContext =
@@ -33,6 +37,16 @@ export function useSettings() {
 function fetchStoreValue(key) {
     return store.get(key);
 }
+
+export function hasSettingsToApply(settings: object, eeprom: object) {
+    return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
+}
+
+export function applyStoreValues(settings) {}
+
+export function applyEEPROMValues(settings) {}
+
+export function applyNewSettings(settings, eeprom) {}
 
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
     if (!settingsSections.length) {
@@ -61,14 +75,17 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
 export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
+    const [settingsToUpdate, setSettingsToUpdate] = useState({});
+    const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
 
     useEffect(() => {
         setSettings(populateSettingsValues(settings));
-        console.log(settings);
     }, []);
 
     return (
-        <SettingsContext.Provider value={{ settings }}>
+        <SettingsContext.Provider
+            value={{ settings, settingsToUpdate, EEPROMToUpdate }}
+        >
             {children}
         </SettingsContext.Provider>
     );

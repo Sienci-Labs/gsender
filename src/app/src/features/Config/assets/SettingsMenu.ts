@@ -178,42 +178,42 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Z Thickness',
-                key: '',
+                key: 'workspace.probeProfile.zThickness',
                 description:
                     'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                 type: 'number',
             },
             {
                 label: 'XY Thickness',
-                key: '',
+                key: 'workspace.probeProfile.xyThickness',
                 description:
                     'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                 type: 'number',
             },
             {
                 label: 'Z Probe Distance',
-                key: '',
+                key: 'widgets.probe.zProbeDistance',
                 description:
                     'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                 type: 'number',
             },
             {
                 label: 'Fast Find',
-                key: '',
+                key: 'widgets.probe.probeFastFeedrate',
                 description:
                     'Probe speed before the first touch-off (default 150)',
                 type: 'number',
             },
             {
                 label: 'Slow Find',
-                key: '',
+                key: 'widgets.probe.probeFeedrate',
                 description:
                     'Slower speed for more accuracy on second touch-off (default 75)',
                 type: 'number',
             },
             {
                 label: 'Retraction',
-                key: '',
+                key: 'widgets.probe.retractionDistance',
                 description:
                     'How far the probe moves away after a successful touch (default 4)',
                 type: 'number',
@@ -336,10 +336,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
         settings: [
             {
                 label: 'DRO Zeros',
-                key: '',
+                key: 'workspace.customDecimalPlaces',
                 description:
                     'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
-                type: 'boolean',
+                type: 'number',
             },
             {
                 label: 'Jogging Presets',
@@ -349,34 +349,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Visualizer',
                 settings: [
                     {
-                        label: 'Visualizer on right side',
-                        key: '',
-                        description: '',
+                        label: 'Visualize g-code',
+                        key: 'widgets.visualizer.disabled',
+                        description:
+                            'Only disable if your computer is struggling to run gSender',
                         type: 'boolean',
                     },
                     {
                         label: 'Theme',
-                        key: '',
+                        key: 'widgets.visualizer.theme',
                         description: '',
                         type: 'select',
-                    },
-                    {
-                        label: 'Visualize g-code',
-                        key: '',
-                        description: '',
-                        type: 'boolean',
+                        options: ['Light', 'Dark'],
                     },
                     {
                         label: 'Animate tool',
-                        key: '',
-                        description: '',
+                        key: 'widgets.visualizer.minimizeRenders',
+                        description:
+                            'Based on preference, reduces some memory usage',
                         type: 'boolean',
                     },
                     {
                         label: 'Lightweight mode',
-                        key: '',
-                        description: '',
-                        type: 'select',
+                        key: 'widgets.visualizer.liteMode',
+                        description:
+                            'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
+                        type: 'boolean',
                     },
                 ],
             },
@@ -388,7 +386,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         settings: [
             {
                 label: 'IP Address',
-                key: '',
+                key: 'widgets.connection.ip',
                 description:
                     'Set the IP address for network scanning (default 192.168.5.1)',
                 type: 'ip',

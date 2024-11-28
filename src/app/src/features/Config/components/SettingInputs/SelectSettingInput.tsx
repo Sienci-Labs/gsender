@@ -8,6 +8,9 @@ import {
 
 export interface SelectSettingInputProps {
     options: string[] | number[];
+    index: number;
+    subIndex: number;
+    value: number;
 }
 
 export function SelectSettingInput({
