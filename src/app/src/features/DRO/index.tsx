@@ -24,10 +24,22 @@ import {
 } from 'app/constants';
 import { mapValues } from 'lodash';
 import { mapPositionToUnits } from 'app/lib/units.ts';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from 'app/components/shadcn/AlertDialog';
 
 interface DROProps {
     axes: AxesArray;
@@ -54,6 +66,17 @@ function DRO({
     homingEnabled,
 }: DROProps): JSX.Element {
     const [homingMode, setHomingMode] = useState<boolean>(false);
+    const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
+    const { shouldWarnZero } = useWorkspaceState();
+
+    useEffect(() => {
+        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
+        setIsRotaryMode(mode);
+        store.on('change', () => {
+            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
+            setIsRotaryMode(workspaceMode === 'ROTARY');
+        });
+    }, []);
 
     function toggleHoming() {
         setHomingMode(!homingMode);
@@ -99,14 +122,16 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                <AxisRow
-                    axis={'Y'}
-                    key={'Y'}
-                    mpos={mpos.y}
-                    wpos={wpos.y}
-                    disabled={!canClick}
-                    homingMode={homingMode}
-                />
+                {!isRotaryMode && (
+                    <AxisRow
+                        axis={'Y'}
+                        key={'Y'}
+                        mpos={mpos.y}
+                        wpos={wpos.y}
+                        disabled={!canClick}
+                        homingMode={homingMode}
+                    />
+                )}
                 <AxisRow
                     axis={'Z'}
                     key={'Z'}
@@ -115,7 +140,7 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                {axes.includes('A') && (
+                {(isRotaryMode || axes.includes('A')) && (
                     <AxisRow
                         axis={'A'}
                         key={'a'}
@@ -127,13 +152,42 @@ function DRO({
                 )}
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
-                <IconButton
-                    icon={<VscTarget />}
-                    onClick={zeroAllAxes}
-                    disabled={!canClick}
-                >
-                    Zero
-                </IconButton>
+                {!shouldWarnZero ? (
+                    <IconButton
+                        icon={<VscTarget />}
+                        onClick={zeroAllAxes}
+                        disabled={!canClick}
+                    >
+                        Zero
+                    </IconButton>
+                ) : (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <IconButton
+                                icon={<VscTarget />}
+                                disabled={!canClick}
+                            >
+                                Zero
+                            </IconButton>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Zero All Axes
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to zero all axes?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={zeroAllAxes}>
+                                    Continue
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
                 {homingEnabled && (
                     <HomingSwitch
                         onChange={toggleHoming}

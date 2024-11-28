@@ -4,6 +4,8 @@ import logo from '../assets/icon-round.png';
 import canadaFlagIcon from '../assets/canada-flag-icon.png';
 import styles from './index.module.styl';
 
+import { version } from '../../../../package.json';
+
 const HeaderArea = () => {
     const year = new Date().getFullYear();
     return (

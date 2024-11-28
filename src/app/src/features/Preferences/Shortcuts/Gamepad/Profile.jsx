@@ -20,6 +20,7 @@ import ButtonActionsTable from './components/ButtonActionsTable';
 import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
 import { GAMEPAD_MODAL } from './utils/constants';
+import { toast } from 'app/lib/toaster';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -77,12 +78,7 @@ const Profile = ({ data }) => {
         );
 
         dispatch(setGamepadProfileList(updatedProfiles));
-
-        Toaster.pop({
-            msg: 'Updated Profile Name',
-            type: TOASTER_INFO,
-            duration: 2000,
-        });
+        toast.info('Updated Profile Name');
     };
 
     return (

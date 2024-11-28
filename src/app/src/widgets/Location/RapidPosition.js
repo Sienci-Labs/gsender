@@ -25,6 +25,7 @@ import prefStore from 'app/store';
 
 import get from 'lodash/get';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
@@ -88,10 +89,9 @@ const getPositionMovements = (
     }
 
     if (!xLimit || !yLimit) {
-        Toaster.pop({
-            msg: "Unable to find machine limits - make sure they're set in preferences",
-            type: TOASTER_DANGER,
-        });
+        toast.danger(
+            "Unable to find machine limits - make sure they're set in preferences",
+        );
         return [null, null];
     }
 
@@ -176,10 +176,9 @@ export const getMovementGCode = (
     );
 
     if (xMovement === null || yMovement === null) {
-        Toaster.pop({
-            msg: 'Unable to calculate position movements based on inputs - check arguments passed',
-            type: TOASTER_DANGER,
-        });
+        toast.danger(
+            'Unable to calculate position movements based on inputs - check arguments passed',
+        );
         return [];
     }
     gcode.push(`G53 G21 G0 X${xMovement} Y${yMovement}`);

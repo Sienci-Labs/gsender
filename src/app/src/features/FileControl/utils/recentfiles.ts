@@ -24,7 +24,7 @@
 import pubsub from 'pubsub-js';
 
 import store from 'app/store';
-import { TOASTER_DANGER, Toaster } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 
 export const RECENT_FILE_LIMIT = 5;
 
@@ -69,10 +69,9 @@ export const updateRecentFileDate = (filepath: string, recentFiles: any[]) => {
 
 export const addRecentFile = (fileMetaData: any) => {
     if (fileMetaData === null) {
-        Toaster.pop({
-            type: TOASTER_DANGER,
-            msg: 'Unable to load file - file may have been moved or deleted.',
-        });
+        toast.error(
+            'Unable to load file - file may have been moved or deleted.',
+        );
         return;
     }
     const recentFiles = getRecentFiles();

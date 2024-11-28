@@ -19,6 +19,7 @@ import {
 import Tooltip from 'app/components/Tooltip';
 import { Input } from 'app/components/shadcn/Input';
 import { FaPlay } from 'react-icons/fa';
+import { toast } from 'app/lib/toaster';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -57,11 +58,7 @@ const StartFromLine = ({ disabled }: StartFromLineProps) => {
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
-        Toaster.pop({
-            msg: 'Running Start From Specific Line Command',
-            type: TOASTER_SUCCESS,
-            duration: 2000,
-        });
+        toast.info('Running Start From Specific Line Command');
     };
 
     return (

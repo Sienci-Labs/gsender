@@ -20,6 +20,9 @@
     </head>
     <body>
         <script type="module" src="./src/entry-client.tsx"></script>
+        <script>
+            var global = global || window;
+        </script>
         <div id="app"><!--app-html--></div>
         <!--store-data-outlet-->
     </body>

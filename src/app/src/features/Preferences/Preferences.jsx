@@ -21,7 +21,6 @@
  *
  */
 
-import { Modal } from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import pubsub from 'pubsub-js';
@@ -59,6 +58,7 @@ import StatsPage from './Stats';
 import SafetySettings from './Safety';
 //from '../../widgets/Visualizer/constants';
 import { roundMetric } from '../../lib/rounding';
+import { toast } from 'app/lib/toaster';
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
@@ -76,11 +76,7 @@ class PreferencesPage extends PureComponent {
 
     showToast = _.throttle(
         () => {
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000,
-            });
+            toast.success('Settings Updated');
         },
         3000,
         { trailing: false },
@@ -1027,7 +1023,7 @@ class PreferencesPage extends PureComponent {
         const { menu, selectedMenu } = state;
 
         return (
-            <Modal onClose={modalClose}>
+            <>
                 <div className={styles.preferencesContainer}>
                     <div className={styles.preferencesContent}>
                         <div className={styles.preferencesMenu}>
@@ -1064,7 +1060,7 @@ class PreferencesPage extends PureComponent {
                         </div>
                     </div>
                 </div>
-            </Modal>
+            </>
         );
     }
 }

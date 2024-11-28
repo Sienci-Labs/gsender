@@ -35,13 +35,13 @@ import {
 
 import machineProfiles from './machineProfiles';
 import { profiles } from './gamepad';
-import { DefaultState } from '../definitions';
+import { State } from '../definitions';
 import { MachineProfile } from 'app/definitions/firmware';
 import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
 
 const [M3] = SPINDLE_MODES;
 
-const defaultState: DefaultState = {
+const defaultState: State = {
     session: {
         name: '',
         token: '',
@@ -138,6 +138,7 @@ const defaultState: DefaultState = {
                 storedValue: null,
             },
         },
+        notifications: [],
     },
     widgets: {
         axes: {

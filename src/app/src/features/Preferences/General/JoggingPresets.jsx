@@ -42,6 +42,7 @@ import {
     convertToMetric,
 } from '../calculate';
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
+import { toast } from 'app/lib/toaster';
 
 export default class JoggingPresets extends Component {
     pubsubTokens = [];
@@ -54,11 +55,7 @@ export default class JoggingPresets extends Component {
 
     showToast = _.throttle(
         () => {
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000,
-            });
+            toast.success('Settings Updated');
         },
         5000,
         { trailing: false },

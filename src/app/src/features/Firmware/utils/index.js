@@ -39,6 +39,7 @@ import StringInput from '../components/HalSettings/inputs/StringInput';
 import PasswordInput from '../components/HalSettings/inputs/PasswordInput';
 import Ipv4Input from '../components/HalSettings/inputs/Ipv4Input';
 import machineProfiles from '../components/defaultMachineProfiles';
+import { toast } from 'app/lib/toaster';
 
 export const FirmwareContext = createContext({});
 
@@ -98,18 +99,12 @@ export const getMachineProfileVersion = (profile) => {
 
 export const startFlash = (port, profile, hex = null, isHal = false) => {
     if (!port) {
-        Toaster.pop({
-            msg: 'No port specified - please connect to the device to determine what is being flashed',
-            type: TOASTER_DANGER,
-            duration: 15000,
-        });
+        toast.error(
+            'No port specified - please connect to the device to determine what is being flashed',
+        );
         return;
     }
-    Toaster.pop({
-        msg: `Flashing started on port: ${port} `,
-        type: TOASTER_INFO,
-        duration: 10000,
-    });
+    toast.info(`Flashing started on port: ${port} `);
     const imageType = getMachineProfileVersion(profile);
 
     //const isInDFUmode = port === 'SLB_DFU';
@@ -183,10 +178,7 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
 
     controller.command('gcode', values);
 
-    Toaster.pop({
-        msg: 'Default Settings Restored',
-        type: TOASTER_INFO,
-    });
+    toast.info('Default Settings Restored');
 };
 
 export const restoreSingleDefaultSetting = (
@@ -205,10 +197,7 @@ export const restoreSingleDefaultSetting = (
 
     controller.command('gcode', [`${setting}=${defaultValue}`, '$$']);
 
-    Toaster.pop({
-        msg: `Restored Default Value for ${setting}`,
-        type: TOASTER_INFO,
-    });
+    toast.info(`Restored Default Value for ${setting}`);
 };
 
 export const addControllerEvents = (controllerEvents) => {
@@ -283,10 +272,7 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
     }
     controller.command('gcode', changedSettings);
     setSettingsToApply(false);
-    Toaster.pop({
-        msg: 'Firmware Settings Updated',
-        type: TOASTER_SUCCESS,
-    });
+    toast.success('Firmware Settings Updated');
 };
 
 export const importFirmwareSettings = (file, callback) => {

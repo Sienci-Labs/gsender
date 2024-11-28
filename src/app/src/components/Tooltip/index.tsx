@@ -15,7 +15,9 @@ export function Tooltip(props: TooltipProps) {
     return (
         <TooltipProvider>
             <TooltipWrapper>
-                <TooltipTrigger>{props.children}</TooltipTrigger>
+                <TooltipTrigger className="w-full">
+                    {props.children}
+                </TooltipTrigger>
                 <TooltipContent>{props.content}</TooltipContent>
             </TooltipWrapper>
         </TooltipProvider>
