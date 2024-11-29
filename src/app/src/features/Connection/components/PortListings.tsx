@@ -1,14 +1,11 @@
 import { BsEthernet, BsUsbPlug } from 'react-icons/bs';
 import { ConnectionType, FirmwareFlavour } from '../index';
 import { Port } from '../definitions';
-import { FirmwareSelector } from 'app/features/Connection/components/FirmwareSelector.tsx';
 import Tooltip from 'app/components/Tooltip';
 
 export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
-    selectedFirmware: FirmwareFlavour;
-    onFirmwareClick: (t: FirmwareFlavour) => void;
 }
 
 function truncatePortName(port: string): string {
@@ -48,31 +45,25 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </div>
                 </button>
             ))}
-            {props.selectedFirmware === 'grblHAL' && (
-                <button
-                    className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1 w-full"
-                    onClick={() => {
-                        props.connectHandler(
-                            '192.168.5.1',
-                            ConnectionType.ETHERNET,
-                        );
-                    }}
-                >
-                    <span className="text-4xl">
-                        <BsEthernet />
+            <button
+                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1 w-full"
+                onClick={() => {
+                    props.connectHandler(
+                        '192.168.5.1',
+                        ConnectionType.ETHERNET,
+                    );
+                }}
+            >
+                <span className="text-4xl">
+                    <BsEthernet />
+                </span>
+                <div className="flex flex-col gap-1 text-right">
+                    <span>192.168.5.1</span>
+                    <span className="text-sm text-gray-600 font-normal">
+                        Ethernet on port 23
                     </span>
-                    <div className="flex flex-col gap-1 text-right">
-                        <span>192.168.5.1</span>
-                        <span className="text-sm text-gray-600 font-normal">
-                            Ethernet on port 23
-                        </span>
-                    </div>
-                </button>
-            )}
-            <FirmwareSelector
-                selectedFirmware={props.selectedFirmware}
-                onClick={props.onFirmwareClick}
-            />
+                </div>
+            </button>
         </div>
     );
 }

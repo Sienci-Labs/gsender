@@ -130,13 +130,6 @@ class Connection extends EventEmitter {
 
         log.debug(`Add socket connection: id=${socket.id}`);
         this.sockets[socket.id] = socket;
-
-        socket.emit('serialport:open', {
-            port: this.options.port,
-            baudrate: this.options.baudrate,
-            controllerType: this.type,
-            inuse: true,
-        });
     };
 
     removeConnection(socket) {
@@ -151,7 +144,7 @@ class Connection extends EventEmitter {
     }
 
     open = (callback = noop) => {
-        const { port, baudrate } = this.options;
+        const { port, network } = this.options;
 
         // Assertion check
         if (this.isOpen()) {
@@ -171,12 +164,6 @@ class Connection extends EventEmitter {
                 return;
             }
 
-            this.emit('serialport:open', {
-                port: port,
-                baudrate: baudrate,
-                inuse: true,
-            });
-
             // Emit a change event to all connected sockets
             if (this.engine.io) {
                 this.engine.io.emit('serialport:change', {
@@ -186,7 +173,15 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-            if (!this.controllerType) {
+            if (!this.controllerType && network) {
+                this.controllerType = GRBLHAL;
+                this.emit(
+                    'firmwareFound',
+                    GRBLHAL,
+                    this.options,
+                    this.callback,
+                );
+            } else if (!this.controllerType) {
                 this.timeout = setInterval(() => {
                     if (this.count === 5) {
                         this.controllerType = GRBL;
@@ -201,7 +196,7 @@ class Connection extends EventEmitter {
                     }
                     this.connection.writeImmediate('$I\n');
                     this.count++;
-                }, 500);
+                }, 1000);
             }
         });
     };
@@ -240,6 +235,13 @@ class Connection extends EventEmitter {
 
     addController = (controller) => {
         this.controller = controller;
+
+        this.emit('serialport:open', {
+            port: this.options.port,
+            baudrate: this.options.baudrate,
+            controllerType: this.controllerType,
+            inuse: true,
+        });
     };
 
     write(data, context = { source: WRITE_SOURCE_CLIENT }) {
@@ -284,6 +286,13 @@ class Connection extends EventEmitter {
             const socket = this.sockets[id];
             socket.emit(eventName, ...args);
         });
+    }
+
+    updateOptions(options) {
+        this.options = {
+            ...this.options,
+            options
+        };
     }
 
     destroy() {

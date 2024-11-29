@@ -363,10 +363,12 @@ class CNCEngine {
                 // create new connection
                 if (!this.connection) {
                     this.connection = new Connection(engine, port, options, callback);
+                } else {
+                    this.connection.updateOptions(options);
                 }
 
-                this.connection.on('serialport:open', (port, baudrate, inuse) => {
-                    this.emit('serialport:open', port, baudrate, null, inuse);
+                this.connection.on('serialport:open', (port, baudrate, controllerType, inuse) => {
+                    this.emit('serialport:open', port, baudrate, controllerType, inuse);
                 });
 
                 this.connection.on('serialport:close', (options, received) => {
@@ -374,7 +376,6 @@ class CNCEngine {
                 });
 
                 this.connection.on('firmwareFound', (controllerType = GRBL, options, callback = noop) => {
-                    log.debug('firmware found');
                     let { baudrate, rtscts, network } = { ...options };
 
                     if (typeof callback !== 'function') {
@@ -427,7 +428,7 @@ class CNCEngine {
                         callback(null);
                     });
 
-                    socket.emit('serialport:openController');
+                    socket.emit('serialport:openController', controllerType);
                 });
 
                 this.connection.addConnection(socket);

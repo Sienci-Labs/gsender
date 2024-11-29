@@ -29,6 +29,7 @@ export enum ConnectionType {
 
 export interface ConnectionProps {
     ports: Port[];
+    // unrecognizedPorts: Port[];
 }
 
 export type FirmwareFlavour = 'Grbl' | 'grblHAL';
@@ -103,12 +104,6 @@ function Connection(props: ConnectionProps) {
         });
     }
 
-    function onSelectFirmware(type: FirmwareFlavour) {
-        setFirmware(type);
-        // TODO: Update saved value;
-        store.set('widgets.connection.controller.type', type);
-    }
-
     return (
         <div
             className="relative group cursor-pointer dropdown"
@@ -142,9 +137,7 @@ function Connection(props: ConnectionProps) {
                     connectionState === ConnectionState.ERROR) && (
                     <PortListings
                         connectHandler={onConnectClick}
-                        ports={props.ports}
-                        selectedFirmware={firmware}
-                        onFirmwareClick={onSelectFirmware}
+                        ports={props.ports /*.concat(props.unrecognizedPorts)*/}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
@@ -158,8 +151,10 @@ function Connection(props: ConnectionProps) {
 export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
+    // const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
 
     return {
         ports,
+        // unrecognizedPorts,
     };
 })(Connection);

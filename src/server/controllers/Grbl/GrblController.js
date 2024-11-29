@@ -1237,13 +1237,6 @@ class GrblController {
         this.connection.on('close', this.connectionEventListener.close);
         this.connection.on('error', this.connectionEventListener.error);
 
-        this.emit('serialport:open', {
-            port: port,
-            baudrate: baudrate,
-            controllerType: this.type,
-            inuse: true
-        });
-
         callback(); // register controller
 
         // log.debug(`Connected to serial port "${port}"`);
@@ -1261,18 +1254,8 @@ class GrblController {
         // We set controller ready if version found
         setTimeout(() => {
             if (!this.ready && this.connection) {
-                // await delay(100);
-                log.debug('No start message. Waiting for status');
-                this.waitingForStatus = true;
-                // this.connection.writeImmediate('?');
-                this.connection.writeImmediate('$$');
+                this.write('\x18');
             }
-            setTimeout(() => {
-                if (this.waitingForStatus) {
-                    log.debug('No status. Soft resetting');
-                    this.write('\x18');
-                }
-            }, 3000);
         }, 500);
     }
 

@@ -1273,13 +1273,6 @@ class GrblHalController {
         this.connection.on('close', this.connectionEventListener.close);
         this.connection.on('error', this.connectionEventListener.error);
 
-        this.emit('serialport:open', {
-            port: port,
-            baudrate: baudrate,
-            controllerType: this.type,
-            inuse: true
-        });
-
         callback(); // register controller
 
         this.workflow.stop();

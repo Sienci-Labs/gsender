@@ -431,7 +431,7 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('serialport:openController', () => {
+    controller.addListener('serialport:openController', (controllerType) => {
         const machineProfile: MachineProfile = store.get(
             'workspace.machineProfile',
         );
@@ -463,6 +463,8 @@ export function* initialize(): Generator<any, void, any> {
             toolChangeOption,
         };
         controller.command('toolchange:context', toolChangeContext);
+
+        store.set('widgets.connection.controller.type', controllerType);
 
         pubsub.publish('machine:connected');
     });
