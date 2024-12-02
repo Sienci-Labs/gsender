@@ -10,16 +10,17 @@ export interface SelectSettingInputProps {
     options: string[] | number[];
     index: number;
     subIndex: number;
-    value: number;
+    value: string | number;
 }
 
 export function SelectSettingInput({
     options = [],
+    value = '',
 }: SelectSettingInputProps): React.ReactNode {
     return (
         <Select>
             <SelectTrigger className="bg-white bg-opacity-100">
-                <SelectValue placeholder="125000" />
+                <SelectValue placeholder={`${value}`} />
             </SelectTrigger>
             <SelectContent className="bg-white bg-opacity-100">
                 {options.map((o) => (

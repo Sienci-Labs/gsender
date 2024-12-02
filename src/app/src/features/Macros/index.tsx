@@ -299,7 +299,7 @@ const MacroWidget = ({
                         actions.addMacro({
                             name,
                             content,
-                            description: '',
+                            details: '',
                         });
                     }
                 }

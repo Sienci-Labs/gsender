@@ -124,7 +124,12 @@ export function Section({
                     }
                     return settingRow(setting, index);
                 })}
-                {eeprom && eeprom?.length > 0 && <EEPROMSection />}
+                {eeprom && eeprom?.length > 0 && (
+                    <EEPROMSection
+                        label={`${title} EEPROM`}
+                        settings={eeprom}
+                    />
+                )}
             </div>
         </div>
     );

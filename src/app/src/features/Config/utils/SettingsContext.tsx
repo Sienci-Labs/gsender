@@ -8,6 +8,13 @@ import { isSubSection } from 'app/features/Config/components/Section.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 
+import {
+    GRBL_SETTINGS,
+    GRBL_HAL_SETTINGS,
+} from 'app/features/Config/assets/SettingsDescriptions.ts';
+import { GRBLHAL } from 'app/constants';
+import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+
 interface iSettingsContext {
     settings: SettingsMenuSection[];
     EEPROM?: object;
@@ -78,7 +85,7 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
 export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
-    const [EEPROM, setEEPROM] = useState<object>({});
+    const [EEPROM, setEEPROM] = useState<object>([]);
     const [settingsToUpdate, setSettingsToUpdate] = useState({});
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
 
@@ -86,11 +93,37 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         (state: RootState) => state.controller.settings.settings,
     );
 
+    const detectedEEPROMDescriptions = useSelector(
+        (state: RootState) => state.controller.settings.descriptions,
+    );
+
+    const detectedEEPROMGroups = useSelector(
+        (state: RootState) => state.controller.settings.groups,
+    );
+
+    const controllerType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
+
+    const BASE_SETTINGS =
+        controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
+
     useEffect(() => {
         const populatedSettings = populateSettingsValues(settings);
         setSettings([...populatedSettings]);
-        setEEPROM(detectedEEPROM);
     }, [detectedEEPROM]);
+
+    useEffect(() => {
+        setEEPROM(
+            getFilteredEEPROMSettings(
+                BASE_SETTINGS,
+                detectedEEPROM,
+                detectedEEPROMDescriptions,
+                detectedEEPROMGroups,
+            ),
+        );
+        console.log(EEPROM);
+    }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     const payload = {
         settings,

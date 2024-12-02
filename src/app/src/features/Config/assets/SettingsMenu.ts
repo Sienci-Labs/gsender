@@ -29,7 +29,8 @@ export type gSenderSettingType =
     | 'number'
     | 'text'
     | 'radio'
-    | 'ip';
+    | 'ip'
+    | 'hybrid';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -51,7 +52,7 @@ export interface gSenderSubSection {
 export type gSenderSettings = gSenderSetting | gSenderSubSection;
 export type gSenderEEEPROMSettings =
     | gSenderEEPROMSetting[]
-    | gSEnderEEPROMSettingSection;
+    | gSenderEEPROMSettingSection;
 
 export interface gSenderEEPROMSetting {
     eId: string;
@@ -65,7 +66,7 @@ export interface gSenderEEPROMSetting {
     group?: number;
 }
 
-export interface gSEnderEEPROMSettingSection {
+export interface gSenderEEPROMSettingSection {
     label: string;
     eeprom: gSenderEEPROMSetting[];
 }
@@ -79,14 +80,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Preferred Units',
                 key: 'workspace.units',
                 type: 'radio',
-                description: 'What units would you like gSender to show you?',
+                details: 'What units would you like gSender to show you?',
                 options: ['mm', 'in'],
             },
             {
                 label: 'Baudrate',
                 key: 'widgets.connection.baudrate',
                 type: 'select',
-                description:
+                details:
                     'Rate needed for your particular CNC (how fast data is sent over the serial line, default 115200)',
                 options: [
                     '250000',
@@ -102,40 +103,39 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Reconnect Automatically',
                 key: 'widgets.connection.autoReconnect',
                 type: 'boolean',
-                description:
-                    'Reconnect to the last machine you used automatically',
+                details: 'Reconnect to the last machine you used automatically',
             },
             {
                 label: 'Warn if bad file',
                 key: 'widgets.visualizer.showWarning',
-                description:
+                details:
                     'Warns if any invalid commands are found when a file is opened',
                 type: 'boolean',
             },
             {
                 label: 'Warn on bad line',
                 key: 'widgets.visualizer.showLineWarnings',
-                description:
+                details:
                     'Warns when running a job if any invalid commands are found',
                 type: 'boolean',
             },
             {
                 label: 'Prompt when setting zero',
                 key: 'widgets.visualizer.showSoftLimitWarning',
-                description: 'Useful if you tend to set zero accidentally',
+                details: 'Useful if you tend to set zero accidentally',
                 type: 'boolean',
             },
             {
                 label: 'Safe Height',
                 key: 'workspace.safeRetractHeight',
                 type: 'number',
-                description:
+                details:
                     "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
             },
             {
                 label: 'Send Usage Data',
                 key: '',
-                description: 'Allow gSender to collect your data periodically',
+                details: 'Allow gSender to collect your data periodically',
                 type: 'boolean',
             },
         ],
@@ -172,56 +172,55 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Touch Plate Type',
                 key: 'widgets.connection.baudrate',
                 type: 'select',
-                description:
+                details:
                     "Select the touch plate you're using with your machine (default Standard block)",
                 options: ['Standard', 'Auto', 'Z Probe'],
             },
             {
                 label: 'Z Thickness',
                 key: 'workspace.probeProfile.zThickness',
-                description:
+                details:
                     'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                 type: 'number',
             },
             {
                 label: 'XY Thickness',
                 key: 'workspace.probeProfile.xyThickness',
-                description:
+                details:
                     'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                 type: 'number',
             },
             {
                 label: 'Z Probe Distance',
                 key: 'widgets.probe.zProbeDistance',
-                description:
+                details:
                     'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                 type: 'number',
             },
             {
                 label: 'Fast Find',
                 key: 'widgets.probe.probeFastFeedrate',
-                description:
-                    'Probe speed before the first touch-off (default 150)',
+                details: 'Probe speed before the first touch-off (default 150)',
                 type: 'number',
             },
             {
                 label: 'Slow Find',
                 key: 'widgets.probe.probeFeedrate',
-                description:
+                details:
                     'Slower speed for more accuracy on second touch-off (default 75)',
                 type: 'number',
             },
             {
                 label: 'Retraction',
                 key: 'widgets.probe.retractionDistance',
-                description:
+                details:
                     'How far the probe moves away after a successful touch (default 4)',
                 type: 'number',
             },
             {
                 label: 'Probe Connection Test',
                 key: 'widgets.probe.connectivityTest',
-                description:
+                details:
                     'A safe check to make sure your probe is connected correctly',
                 type: 'boolean',
             },
@@ -293,43 +292,73 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Enable',
                 key: '',
-                description: '',
+                details: '',
                 type: 'boolean',
             },
             {
                 label: 'Delay after start',
                 key: '',
-                description: '',
+                details: '',
                 type: 'number',
                 unit: 's',
             },
             {
                 label: 'Minimum Spindle Speed',
                 key: '',
-                description: '',
+                details: '',
                 type: 'number',
                 unit: 'rpm',
             },
             {
                 label: 'Maximum Spindle Speed',
                 key: '',
-                description: '',
+                details: '',
                 type: 'boolean',
                 unit: 'rpm',
             },
             {
                 label: '',
                 key: '',
-                description: '',
+                details: '',
                 type: 'boolean',
             },
         ],
     },
     { label: 'Automations', icon: FaRobot },
-    { label: 'Action Buttons', icon: RxButton },
-    { label: 'Accessory Outputs', icon: CiMapPin },
+    {
+        label: 'Action Buttons',
+        icon: RxButton,
+        eeprom: [
+            { eId: '$450' },
+            { eId: '$451' },
+            { eId: '$452' },
+            { eId: '$453' },
+            { eId: '$454' },
+            { eId: '$455' },
+        ],
+    },
+    {
+        label: 'Accessory Outputs',
+        icon: CiMapPin,
+        eeprom: [
+            { eId: '$456' },
+            { eId: '$457' },
+            { eId: '$458' },
+            { eId: '$459' },
+        ],
+    },
     { label: 'Tool Changing', icon: IoIosSwap },
-    { label: 'Rotary', icon: FaArrowsSpin },
+    {
+        label: 'Rotary',
+        icon: FaArrowsSpin,
+        eeprom: [
+            { eId: '$376' },
+            { eId: '$376' },
+            { eId: '$103' },
+            { eId: '$113' },
+            { eId: '$123' },
+        ],
+    },
     {
         label: 'Customize UI',
         icon: MdSettingsApplications,
@@ -337,7 +366,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'DRO Zeros',
                 key: 'workspace.customDecimalPlaces',
-                description:
+                details:
                     'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
                 type: 'number',
             },
@@ -351,28 +380,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Visualize g-code',
                         key: 'widgets.visualizer.disabled',
-                        description:
+                        details:
                             'Only disable if your computer is struggling to run gSender',
                         type: 'boolean',
                     },
                     {
                         label: 'Theme',
                         key: 'widgets.visualizer.theme',
-                        description: '',
+                        details: '',
                         type: 'select',
                         options: ['Light', 'Dark'],
                     },
                     {
                         label: 'Animate tool',
                         key: 'widgets.visualizer.minimizeRenders',
-                        description:
+                        details:
                             'Based on preference, reduces some memory usage',
                         type: 'boolean',
                     },
                     {
                         label: 'Lightweight mode',
                         key: 'widgets.visualizer.liteMode',
-                        description:
+                        details:
                             'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
                         type: 'boolean',
                     },
@@ -387,10 +416,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'IP Address',
                 key: 'widgets.connection.ip',
-                description:
+                details:
                     'Set the IP address for network scanning (default 192.168.5.1)',
                 type: 'ip',
             },
+        ],
+        eeprom: [
+            { eId: '$301' },
+            { eId: '$302' },
+            { eId: '$303' },
+            { eId: '$304' },
+            { eId: '$70' },
+            { eId: '$300' },
+            { eId: '$305' },
+            { eId: '$307' },
+            { eId: '$308' },
         ],
     },
     { label: 'Advanced Motors', icon: SiCoronaengine },
