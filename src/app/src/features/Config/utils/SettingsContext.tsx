@@ -20,6 +20,8 @@ interface iSettingsContext {
     EEPROM?: object;
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
+    machineProfile: object;
+    firmwareType: 'Grbl' | 'GrblHAL';
 }
 
 interface SettingsProviderProps {
@@ -31,6 +33,8 @@ const defaultState = {
     settingsToUpdate: {},
     EEPROMToUpdate: {},
     EEPROM: {},
+    machineProfile: {},
+    firmwareType: 'Grbl',
 };
 
 export const SettingsContext =
@@ -88,6 +92,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [EEPROM, setEEPROM] = useState<object>([]);
     const [settingsToUpdate, setSettingsToUpdate] = useState({});
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
+    const [machineProfile, setMachineProfile] = useState({});
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -107,6 +112,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     const BASE_SETTINGS =
         controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
+
+    useEffect(() => {
+        const machineProfile = store.get('workspace.machineProfile', {});
+        console.log(machineProfile);
+        setMachineProfile(machineProfile);
+    }, []);
 
     useEffect(() => {
         const populatedSettings = populateSettingsValues(settings);
@@ -130,6 +141,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsToUpdate,
         EEPROMToUpdate,
         EEPROM,
+        machineProfile,
+        firmwareType: controllerType,
     };
 
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from 'Containers/Firmware/components/HalSettings/inputs/index.styl';
-import ControlledInput from 'Containers/Firmware/components/HalSettings/inputs/ControlledInput';
+import styles from './index.module.styl';
+import ControlledInput from './ControlledInput';
 
 const PasswordInput = ({ setting, info, onChange, disabled }) => {
     const { unit = null } = info;
@@ -8,10 +8,14 @@ const PasswordInput = ({ setting, info, onChange, disabled }) => {
 
     return (
         <div className={styles.inputRow}>
-            <ControlledInput type="password" className={styles.textInput} value={value} externalOnChange={onChange} disabled={disabled} />
-            {
-                unit && <span className={styles.unit}>{unit}</span>
-            }
+            <ControlledInput
+                type="password"
+                className={styles.textInput}
+                value={value}
+                externalOnChange={onChange}
+                disabled={disabled}
+            />
+            {unit && <span className={styles.unit}>{unit}</span>}
         </div>
     );
 };

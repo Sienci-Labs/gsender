@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from 'Containers/Firmware/components/HalSettings/inputs/index.styl';
-import ControlledInput from 'Containers/Firmware/components/HalSettings/inputs/ControlledInput';
+import styles from './index.module.styl';
+import ControlledInput from './ControlledInput';
 
 const IntegerInput = ({ info, setting, onChange, disabled }) => {
     const { unit = null } = info;
@@ -17,9 +17,7 @@ const IntegerInput = ({ info, setting, onChange, disabled }) => {
                 externalOnChange={onChange}
                 disabled={disabled}
             />
-            {
-                unit && <span className={styles.unit}>{unit}</span>
-            }
+            {unit && <span className={styles.unit}>{unit}</span>}
         </div>
     );
 };

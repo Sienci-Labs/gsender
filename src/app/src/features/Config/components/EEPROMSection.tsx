@@ -7,6 +7,9 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
+import get from 'lodash/get';
+import { BiReset } from 'react-icons/bi';
+import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 
 function filterNewlines(data = '') {
     if (!data) {
@@ -25,21 +28,55 @@ export interface EEPROMSectionProps {
 }
 
 export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
-    const { EEPROM } = useSettings();
+    const { EEPROM, machineProfile, firmwareType } = useSettings();
     if (!EEPROM) {
         return;
     }
     const EEPROMData = EEPROM.find((s) => s.setting === setting.eId);
     if (EEPROMData) {
-        const detailString = `${EEPROMData.setting} - default X - ${filterNewlines(EEPROMData.details)}`;
+        const profileDefaults =
+            firmwareType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : machineProfile.grblHALeepromSettings;
+
+        const InputElement = getDatatypeInput(
+            EEPROMData.dataType,
+            firmwareType,
+        );
+
+        const inputDefault = get(profileDefaults, setting.eId, '-');
+        const isDefault = `${setting.value}` === `${inputDefault}`;
+        const detailString = (
+            <span>
+                <b>{EEPROMData.setting}</b>
+                <span> - </span>
+                {filterNewlines(EEPROMData.details)}
+                <br />
+                <i>Default {inputDefault}</i>
+            </span>
+        );
+
         return (
             <div
                 key={`${EEPROMData.key}`}
                 className="odd:bg-robin-100 even:bg-white p-2 flex flex-row items-center"
             >
                 <span className="w-1/5">{EEPROMData.description}</span>
-                <span className="w-1/5 text-xs px-4">Control</span>
-                <span className="text-gray-500 text-sm w-3/5">
+                <span className="w-1/5 text-xs px-4">
+                    <InputElement
+                        info={EEPROMData}
+                        setting={EEPROMData}
+                        onChange={() => {}}
+                    />
+                </span>
+                <span className="w-1/5 text-xs px-4">
+                    {!isDefault && (
+                        <button className="text-3xl" title="Reset Default">
+                            <BiReset />
+                        </button>
+                    )}
+                </span>
+                <span className="text-gray-500 text-sm w-2/5">
                     {detailString}
                 </span>
             </div>
@@ -69,7 +106,6 @@ export function EEPROMSection({
             return EEPROMSettingRow(eSetting, index);
         }
     });
-    console.log(components);
 
     return (
         <fieldset className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col">

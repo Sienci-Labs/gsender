@@ -86,7 +86,7 @@ function settingRow(setting: gSenderSetting, index: number, subIndex = -1) {
             </span>
             <span></span>
             <span className="text-gray-500 text-sm w-2/5">
-                {setting.description || ''}
+                {setting.description}
             </span>
         </div>
     );
