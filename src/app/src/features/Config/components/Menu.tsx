@@ -10,7 +10,7 @@ interface MenuProps {
 }
 
 interface MenuItemProps {
-    key: number;
+    key: string;
     label: string;
     active?: boolean;
     onClick?: (e: MouseEventHandler<HTMLButtonElement>, n: number) => void;
@@ -56,7 +56,7 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
                 let active = index === activeSection;
                 return (
                     <MenuItem
-                        key={index}
+                        key={`menu-item-${index}`}
                         label={item.label}
                         active={active}
                         icon={item.icon}

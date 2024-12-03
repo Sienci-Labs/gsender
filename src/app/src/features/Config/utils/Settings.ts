@@ -35,7 +35,7 @@ export async function exportSettings() {
     delete settings.session;
 
     const res = await api.events.fetch();
-    const events = res.body.records;
+    const events = res.data.records;
 
     const settingsJSON = JSON.stringify({ settings, events }, null, 3);
     const data = new Blob([settingsJSON], {
@@ -81,5 +81,15 @@ export function importSettings(e) {
             'All your current settings will be replaced. Are you sure you want to import your settings on gSender?',
         confirmLabel: 'Import Settings',
         onConfirm: () => onImportConfirm(file),
+    });
+}
+
+export function handleRestoreDefaultClick() {
+    Confirm({
+        title: 'Restore Settings',
+        content:
+            'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
+        confirmLabel: 'Restore Settings',
+        onConfirm: restoreDefault,
     });
 }

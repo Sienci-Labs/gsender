@@ -26,7 +26,7 @@ export function Config() {
 
     return (
         <SettingsProvider>
-            <div className="w-full flex h-[85%] shadow bg-gray-50 overflow-y-hidden-clip box-border">
+            <div className="w-full flex h-[85%] max-h-[85%] shadow bg-gray-50 overflow-y-hidden-clip box-border">
                 <Menu
                     menu={SettingsMenu}
                     onClick={navigateToSection}
