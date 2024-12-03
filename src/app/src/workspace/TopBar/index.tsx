@@ -4,6 +4,7 @@ import SpindleLaserStatus from 'app/components/SpindleLaserStatus';
 
 import gSenderIcon from './assets/icon-round.png';
 import MachineInfo from 'app/features/MachineInfo';
+import StatusIcons from 'app/features/StatusIcons';
 import NotificationsArea from './NotificationsArea';
 
 export const TopBar = () => {
@@ -15,13 +16,13 @@ export const TopBar = () => {
 
             <Connection />
 
-            <div className="flex float-right">
-                <MachineInfo />
-            </div>
+            <MachineInfo />
 
             <NotificationsArea />
 
             <MachineStatus />
+
+            <StatusIcons />
 
             <SpindleLaserStatus />
         </div>

@@ -1,8 +1,8 @@
-import { GamepadListener } from 'gamepad.js';
+import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
 import shuttleEvents from '../shuttleEvents';
 import store from 'app/store';
-import { Toaster, TOASTER_INFO } from '../toaster/ToasterLib';
-import { debounce, noop } from 'lodash';
+import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
 import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
 import { toast } from '../toaster';
@@ -16,6 +16,8 @@ let buttonPressDebounce = noop;
 let currentShuttleEvent: ShuttleEvent = null;
 
 class Gamepad extends GamepadListener {
+    shouldHold = false;
+
     constructor() {
         super({ axis: { precision: 2 }, button: { analog: false } });
         this.shouldHold = false;
@@ -130,21 +132,53 @@ class Gamepad extends GamepadListener {
 const getGamepadInstance = ():
     | Gamepad
     | { start: () => void; on: () => void; off: () => void } => {
-    if (navigator.userAgent.includes('Firefox')) {
+    if (typeof window === 'undefined') {
+        return {
+            start: () => {},
+            on: () => {},
+            off: () => {},
+        };
+    }
+
+    if (window?.navigator.userAgent.includes('Firefox')) {
         console.log('Mock gamepad');
         return {
             start: () => {},
             on: () => {},
             off: () => {},
         };
-    } else {
-        return new Gamepad();
     }
+
+    const gamepadInstance = new Gamepad();
+
+    gamepadInstance.start();
+
+    gamepadInstance.on('gamepad:connected', ({ detail }: GamepadDetail) => {
+        const { gamepad } = detail;
+
+        const profiles: Array<GamepadProfile> = store.get(
+            'workspace.gamepad.profiles',
+        );
+
+        const foundGamepad = profiles.find((profile) =>
+            profile.id.includes(gamepad.id),
+        );
+
+        toast.info(
+            foundGamepad
+                ? `${foundGamepad.name} Connected`
+                : 'New gamepad connected, add it as a profile in your preferences',
+        );
+    });
+
+    gamepadInstance.on('gamepad:disconnected', () => {
+        toast.info('Gamepad Disconnected');
+    });
+
+    return gamepadInstance;
 };
 
 const gamepadInstance = getGamepadInstance();
-
-gamepadInstance.start();
 
 export const shortcutComboBuilder = (list: Array<string> = []): string => {
     const JOIN_KEY = '+';
@@ -156,6 +190,10 @@ export const checkButtonHold = (
     buttonType: 'modifier' | 'lockout',
     currentProfile: GamepadProfile,
 ): boolean => {
+    if (typeof navigator === 'undefined') {
+        return false;
+    }
+
     const gamepads = navigator.getGamepads();
 
     const currentGamepad = gamepads.find((gamepad) =>
@@ -272,27 +310,5 @@ export const deleteGamepadMacro = (macroID: string): void => {
         }
     });
 };
-
-gamepadInstance.on('gamepad:connected', ({ detail }: GamepadDetail): void => {
-    const { gamepad } = detail;
-
-    const profiles: Array<GamepadProfile> = store.get(
-        'workspace.gamepad.profiles',
-    );
-
-    const foundGamepad = profiles.find((profile) =>
-        profile.id.includes(gamepad.id),
-    );
-
-    toast.info(
-        foundGamepad
-            ? `${foundGamepad.name} Connected`
-            : 'New gamepad connected, add it as a profile in your preferences',
-    );
-});
-
-gamepadInstance.on('gamepad:disconnected', () => {
-    toast.info('Gamepad Disconnected');
-});
 
 export default gamepadInstance;

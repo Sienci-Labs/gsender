@@ -22,7 +22,13 @@ const Header = () => {
                 onClick={handleClearNotifications}
                 disabled={notifications?.length === 0}
             >
-                <LuTrash className="w-6 h-6" />
+                <LuTrash
+                    className={`w-6 h-6 text-gray-500 ${
+                        notifications?.length === 0
+                            ? 'cursor-not-allowed'
+                            : 'hover:text-gray-700'
+                    }`}
+                />
             </button>
         </div>
     );
