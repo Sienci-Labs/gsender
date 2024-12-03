@@ -80,14 +80,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Preferred Units',
                 key: 'workspace.units',
                 type: 'radio',
-                details: 'What units would you like gSender to show you?',
+                description: 'What units would you like gSender to show you?',
                 options: ['mm', 'in'],
             },
             {
                 label: 'Baudrate',
                 key: 'widgets.connection.baudrate',
                 type: 'select',
-                details:
+                description:
                     'Rate needed for your particular CNC (how fast data is sent over the serial line, default 115200)',
                 options: [
                     '250000',
@@ -103,39 +103,40 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Reconnect Automatically',
                 key: 'widgets.connection.autoReconnect',
                 type: 'boolean',
-                details: 'Reconnect to the last machine you used automatically',
+                description:
+                    'Reconnect to the last machine you used automatically',
             },
             {
                 label: 'Warn if bad file',
                 key: 'widgets.visualizer.showWarning',
-                details:
+                description:
                     'Warns if any invalid commands are found when a file is opened',
                 type: 'boolean',
             },
             {
                 label: 'Warn on bad line',
                 key: 'widgets.visualizer.showLineWarnings',
-                details:
+                description:
                     'Warns when running a job if any invalid commands are found',
                 type: 'boolean',
             },
             {
                 label: 'Prompt when setting zero',
                 key: 'widgets.visualizer.showSoftLimitWarning',
-                details: 'Useful if you tend to set zero accidentally',
+                description: 'Useful if you tend to set zero accidentally',
                 type: 'boolean',
             },
             {
                 label: 'Safe Height',
                 key: 'workspace.safeRetractHeight',
                 type: 'number',
-                details:
+                description:
                     "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
             },
             {
                 label: 'Send Usage Data',
                 key: '',
-                details: 'Allow gSender to collect your data periodically',
+                description: 'Allow gSender to collect your data periodically',
                 type: 'boolean',
             },
         ],
@@ -172,55 +173,56 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Touch Plate Type',
                 key: 'widgets.connection.baudrate',
                 type: 'select',
-                details:
+                description:
                     "Select the touch plate you're using with your machine (default Standard block)",
                 options: ['Standard', 'Auto', 'Z Probe'],
             },
             {
                 label: 'Z Thickness',
                 key: 'workspace.probeProfile.zThickness',
-                details:
+                description:
                     'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                 type: 'number',
             },
             {
                 label: 'XY Thickness',
                 key: 'workspace.probeProfile.xyThickness',
-                details:
+                description:
                     'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                 type: 'number',
             },
             {
                 label: 'Z Probe Distance',
                 key: 'widgets.probe.zProbeDistance',
-                details:
+                description:
                     'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                 type: 'number',
             },
             {
                 label: 'Fast Find',
                 key: 'widgets.probe.probeFastFeedrate',
-                details: 'Probe speed before the first touch-off (default 150)',
+                description:
+                    'Probe speed before the first touch-off (default 150)',
                 type: 'number',
             },
             {
                 label: 'Slow Find',
                 key: 'widgets.probe.probeFeedrate',
-                details:
+                description:
                     'Slower speed for more accuracy on second touch-off (default 75)',
                 type: 'number',
             },
             {
                 label: 'Retraction',
                 key: 'widgets.probe.retractionDistance',
-                details:
+                description:
                     'How far the probe moves away after a successful touch (default 4)',
                 type: 'number',
             },
             {
                 label: 'Probe Connection Test',
                 key: 'widgets.probe.connectivityTest',
-                details:
+                description:
                     'A safe check to make sure your probe is connected correctly',
                 type: 'boolean',
             },
@@ -292,34 +294,34 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Enable',
                 key: '',
-                details: '',
+                description: '',
                 type: 'boolean',
             },
             {
                 label: 'Delay after start',
                 key: '',
-                details: '',
+                description: '',
                 type: 'number',
                 unit: 's',
             },
             {
                 label: 'Minimum Spindle Speed',
                 key: '',
-                details: '',
+                description: '',
                 type: 'number',
                 unit: 'rpm',
             },
             {
                 label: 'Maximum Spindle Speed',
                 key: '',
-                details: '',
+                description: '',
                 type: 'boolean',
                 unit: 'rpm',
             },
             {
                 label: '',
                 key: '',
-                details: '',
+                description: '',
                 type: 'boolean',
             },
         ],
@@ -366,7 +368,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'DRO Zeros',
                 key: 'workspace.customDecimalPlaces',
-                details:
+                description:
                     'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
                 type: 'number',
             },
@@ -380,28 +382,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Visualize g-code',
                         key: 'widgets.visualizer.disabled',
-                        details:
+                        description:
                             'Only disable if your computer is struggling to run gSender',
                         type: 'boolean',
                     },
                     {
                         label: 'Theme',
                         key: 'widgets.visualizer.theme',
-                        details: '',
+                        description: '',
                         type: 'select',
                         options: ['Light', 'Dark'],
                     },
                     {
                         label: 'Animate tool',
                         key: 'widgets.visualizer.minimizeRenders',
-                        details:
+                        description:
                             'Based on preference, reduces some memory usage',
                         type: 'boolean',
                     },
                     {
                         label: 'Lightweight mode',
                         key: 'widgets.visualizer.liteMode',
-                        details:
+                        description:
                             'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
                         type: 'boolean',
                     },
@@ -416,7 +418,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'IP Address',
                 key: 'widgets.connection.ip',
-                details:
+                description:
                     'Set the IP address for network scanning (default 192.168.5.1)',
                 type: 'ip',
             },

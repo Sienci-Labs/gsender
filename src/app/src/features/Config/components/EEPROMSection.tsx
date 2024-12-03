@@ -59,9 +59,11 @@ export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
         return (
             <div
                 key={`${EEPROMData.key}`}
-                className="odd:bg-robin-100 even:bg-white p-2 flex flex-row items-center"
+                className="odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center"
             >
-                <span className="w-1/5">{EEPROMData.description}</span>
+                <span className="w-1/5 text-gray-700">
+                    {EEPROMData.description}
+                </span>
                 <span className="w-1/5 text-xs px-4">
                     <InputElement
                         info={EEPROMData}

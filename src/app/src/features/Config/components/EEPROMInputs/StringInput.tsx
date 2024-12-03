@@ -7,7 +7,7 @@ const StringInput = ({ info, setting, onChange, disabled }) => {
     let { value } = setting;
 
     return (
-        <div className={styles.inputRow}>
+        <div className="ring-1 ring-gray-300 flex flex-row flex-1 rounded">
             <ControlledInput
                 type="text"
                 className={styles.textInput}
@@ -15,7 +15,11 @@ const StringInput = ({ info, setting, onChange, disabled }) => {
                 externalOnChange={onChange}
                 disabled={disabled}
             />
-            {unit && <span className={styles.unit}>{unit}</span>}
+            {unit && (
+                <span className="flex items-center justify-center min-w-16 px-2 text-xs bg-gray-300 text-gray-700">
+                    {unit}
+                </span>
+            )}
         </div>
     );
 };

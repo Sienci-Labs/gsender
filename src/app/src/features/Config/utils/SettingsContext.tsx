@@ -113,6 +113,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const BASE_SETTINGS =
         controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
 
+    const handleEEPROMChange = (index) => (value) => {};
+
     useEffect(() => {
         const machineProfile = store.get('workspace.machineProfile', {});
         console.log(machineProfile);

@@ -17,7 +17,7 @@ export function NumberSettingInput({
                 className="flex-1 p-2 focus:outline-none"
             />
             {unit && (
-                <span className="flex items-center justify-center min-w-16 px-2 text-base bg-gray-300 text-gray-700">
+                <span className="flex items-center justify-center min-w-16 px-2 text-xs bg-gray-300 text-gray-700">
                     {unit}
                 </span>
             )}
