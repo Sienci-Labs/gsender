@@ -155,22 +155,24 @@ const Macro = ({ state, actions, workflow }) => {
                 macros.length === 0
                     ? <div className={styles['macro-container']}><div className={styles.emptyResult}>No Macros...</div></div>
                     : (
-                        <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
-                            <Container columns={2}>
-                                <DroppableColumn
-                                    droppableId="column1"
-                                    macros={column1.items}
-                                    actions={actions}
-                                    disabled={disabled}
-                                />
-                                <DroppableColumn
-                                    droppableId="column2"
-                                    macros={column2.items}
-                                    actions={actions}
-                                    disabled={disabled}
-                                />
-                            </Container>
-                        </DragDropContext>
+                        <div style={{ position: 'absolute', height: '75%', width: '100%' }}>
+                            <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
+                                <Container columns={2}>
+                                    <DroppableColumn
+                                        droppableId="column1"
+                                        macros={column1.items}
+                                        actions={actions}
+                                        disabled={disabled}
+                                    />
+                                    <DroppableColumn
+                                        droppableId="column2"
+                                        macros={column2.items}
+                                        actions={actions}
+                                        disabled={disabled}
+                                    />
+                                </Container>
+                            </DragDropContext>
+                        </div>
                     )
             }
         </>
