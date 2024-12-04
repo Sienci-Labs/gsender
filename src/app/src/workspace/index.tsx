@@ -13,7 +13,7 @@ const Workspace = ({ children }: Props) => {
             <div className="flex h-full">
                 <Sidebar />
 
-                <div className="h-full w-full">{children}</div>
+                <div className="w-full">{children}</div>
             </div>
         </div>
     );

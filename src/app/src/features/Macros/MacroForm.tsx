@@ -50,7 +50,7 @@ const MacroForm = ({
     const [macroState, setMacroState] = useState<MacroState>({
         name: macroName,
         content: macroContent,
-        description: macroDescription,
+        details: macroDescription,
     });
 
     const nameRef = useRef<HTMLInputElement>(null);
@@ -218,7 +218,7 @@ const MacroForm = ({
                                         id,
                                         name,
                                         content,
-                                        description,
+                                        description: details,
                                     });
                                 }
                             }}
