@@ -95,7 +95,7 @@ import { EEPROMDescriptions, MachineProfile } from 'app/definitions/firmware';
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-// import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
+import { connectToLastDevice } from 'app/features/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -421,38 +421,6 @@ export function* initialize(): Generator<any, void, any> {
                 ipcRenderer.send('reconnect-main', options);
             }
 
-            const machineProfile: MachineProfile = store.get(
-                'workspace.machineProfile',
-            );
-            const showLineWarnings: boolean = store.get(
-                'widgets.visualizer.showLineWarnings',
-            );
-            const delay: number = store.get('widgets.spindle.delay');
-            // Reset homing run flag to prevent rapid position without running homing
-            reduxStore.dispatch(resetHoming());
-
-            if (machineProfile) {
-                controller.command('machineprofile:load', machineProfile);
-            }
-
-            if (showLineWarnings) {
-                controller.command('settings:updated', { showLineWarnings });
-            }
-
-            if (delay !== undefined) {
-                controller.command('settings:updated', { spindleDelay: delay });
-            }
-            const hooks = store.get('workspace.toolChangeHooks', {});
-            const toolChangeOption = store.get(
-                'workspace.toolChangeOption',
-                'Ignore',
-            );
-            const toolChangeContext = {
-                ...hooks,
-                toolChangeOption,
-            };
-            controller.command('toolchange:context', toolChangeContext);
-
             reduxStore.dispatch(
                 openConnection({
                     port: options.port,
@@ -460,10 +428,46 @@ export function* initialize(): Generator<any, void, any> {
                     isConnected: true,
                 }),
             );
-
-            pubsub.publish('machine:connected');
         },
     );
+
+    controller.addListener('serialport:openController', (controllerType) => {
+        const machineProfile: MachineProfile = store.get(
+            'workspace.machineProfile',
+        );
+        const showLineWarnings: boolean = store.get(
+            'widgets.visualizer.showLineWarnings',
+        );
+        const delay: number = store.get('widgets.spindle.delay');
+        // Reset homing run flag to prevent rapid position without running homing
+        reduxStore.dispatch(resetHoming());
+
+        if (machineProfile) {
+            controller.command('machineprofile:load', machineProfile);
+        }
+
+        if (showLineWarnings) {
+            controller.command('settings:updated', { showLineWarnings });
+        }
+
+        if (delay !== undefined) {
+            controller.command('settings:updated', { spindleDelay: delay });
+        }
+        const hooks = store.get('workspace.toolChangeHooks', {});
+        const toolChangeOption = store.get(
+            'workspace.toolChangeOption',
+            'Ignore',
+        );
+        const toolChangeContext = {
+            ...hooks,
+            toolChangeOption,
+        };
+        controller.command('toolchange:context', toolChangeContext);
+
+        store.set('widgets.connection.controller.type', controllerType);
+
+        pubsub.publish('machine:connected');
+    });
 
     controller.addListener(
         'serialport:close',
@@ -505,10 +509,14 @@ export function* initialize(): Generator<any, void, any> {
                     cancelLabel: 'Close',
                     onConfirm: () => {
                         // TODO: add this back in
-                        // connectToLastDevice(() => {
-                        //     // prompt recovery, either with homing or a prompt to start from line
-                        //     pubsub.publish('disconnect:recovery', received, homingEnabled);
-                        // });
+                        connectToLastDevice(() => {
+                            // prompt recovery, either with homing or a prompt to start from line
+                            // pubsub.publish(
+                            //     'disconnect:recovery',
+                            //     received,
+                            //     homingEnabled,
+                            // );
+                        });
                     },
                 });
             }

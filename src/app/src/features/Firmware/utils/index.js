@@ -62,7 +62,7 @@ export const connectToLastDevice = (callback) => {
 
     controller.openPort(
         port,
-        controllerType,
+        // controllerType,
         {
             baudrate,
             rtscts: false,
