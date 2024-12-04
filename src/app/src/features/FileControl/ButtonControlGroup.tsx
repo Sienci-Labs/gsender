@@ -97,7 +97,7 @@ const ButtonControlGroup = () => {
     }, 300);
 
     const handleCloseFile = debounce(() => {
-        if (!fileInputRef.current?.value) {
+        if (!fileLoaded) {
             return;
         }
 
