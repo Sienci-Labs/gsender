@@ -293,6 +293,16 @@ const controllerSlice = createSlice({
             );
             state.spindles = [...otherSpindles, action.payload];
         },
+        updateControllerType: (
+            state,
+            action: PayloadAction<{
+                type: string;
+                settings: ControllerSettings;
+            }>,
+        ) => {
+            const { type } = action.payload;
+            state.type = type;
+        },
     },
 });
 
@@ -310,6 +320,7 @@ export const {
     updateSettingsDescriptions,
     updateAlarmDescriptions,
     addSpindle,
+    updateControllerType,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;

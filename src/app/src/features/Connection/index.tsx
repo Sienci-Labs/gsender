@@ -157,7 +157,7 @@ export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
     // const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
-    const reportedFirmware = get(controller, 'type', 'Grbl');
+    const reportedFirmware = get(store, 'controller.type', 'Grbl');
 
     return {
         ports,

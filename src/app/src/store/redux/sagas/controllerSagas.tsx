@@ -82,6 +82,7 @@ import {
     updateSettingsDescriptions,
     updateHomingFlag,
     updateSenderStatus,
+    updateControllerType,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
@@ -465,6 +466,7 @@ export function* initialize(): Generator<any, void, any> {
         controller.command('toolchange:context', toolChangeContext);
 
         store.set('widgets.connection.controller.type', controllerType);
+        reduxStore.dispatch(updateControllerType(controllerType));
 
         pubsub.publish('machine:connected');
     });
