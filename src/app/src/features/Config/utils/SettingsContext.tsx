@@ -22,7 +22,7 @@ interface iSettingsContext {
     EEPROMToUpdate?: object;
     machineProfile: object;
     firmwareType: 'Grbl' | 'GrblHAL';
-    setMachineProfile: () => {};
+    setMachineProfile: (o) => {};
 }
 
 interface SettingsProviderProps {
