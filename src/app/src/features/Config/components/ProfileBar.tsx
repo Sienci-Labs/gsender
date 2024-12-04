@@ -3,44 +3,14 @@ import { GrRevert } from 'react-icons/gr';
 import { PiLightning } from 'react-icons/pi';
 import { CiImport } from 'react-icons/ci';
 import { CiExport } from 'react-icons/ci';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from 'app/components/shadcn/Select.tsx';
-import defaultMachineProfiles from '../assets/MachineDefaults/defaultMachineProfiles.ts';
-import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts';
-import { useEffect, useState } from 'react';
+import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
 
 export function ProfileBar() {
-    const [getMachineProfile, setMachineProfile] = useState({});
-
-    useEffect(() => {
-        setMachineProfile({});
-    }, []);
-
     return (
         <div className="flex flex-row w-full p-4 min-h-1/5 justify-around items-center font-sans">
             <div className="border border-gray-200 flex flex-row items-center w-3/5 justify-between px-4 py-2">
                 <div className="w-1/4">
-                    <Select>
-                        <SelectTrigger className="bg-white bg-opacity-100">
-                            <SelectValue
-                                placeholder={humanReadableMachineName(
-                                    defaultMachineProfiles[0],
-                                )}
-                            />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white bg-opacity-100">
-                            {defaultMachineProfiles.map((o) => (
-                                <SelectItem value={`${o.id}`}>
-                                    {humanReadableMachineName(o)}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <MachineProfileSelector />
                 </div>
 
                 <div className="flex flex-row gap-10">

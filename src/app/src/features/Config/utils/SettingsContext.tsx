@@ -22,6 +22,7 @@ interface iSettingsContext {
     EEPROMToUpdate?: object;
     machineProfile: object;
     firmwareType: 'Grbl' | 'GrblHAL';
+    setMachineProfile: () => {};
 }
 
 interface SettingsProviderProps {
@@ -117,7 +118,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     useEffect(() => {
         const machineProfile = store.get('workspace.machineProfile', {});
-        console.log(machineProfile);
         setMachineProfile(machineProfile);
     }, []);
 
@@ -145,6 +145,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         EEPROM,
         machineProfile,
         firmwareType: controllerType,
+        setMachineProfile,
     };
 
     return (
