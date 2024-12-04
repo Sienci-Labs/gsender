@@ -30,9 +30,10 @@ export enum ConnectionType {
 export interface ConnectionProps {
     ports: Port[];
     // unrecognizedPorts: Port[];
+    reportedFirmware: FirmwareFlavour;
 }
 
-export type FirmwareFlavour = 'Grbl' | 'grblHAL';
+export type FirmwareFlavour = 'Grbl' | 'grblHAL' | '';
 
 function Connection(props: ConnectionProps) {
     const connectionConfig = new WidgetConfig('connection');
@@ -104,6 +105,10 @@ function Connection(props: ConnectionProps) {
         });
     }
 
+    useEffect(() => {
+        setFirmware(props.reportedFirmware);
+    }, [props.reportedFirmware]);
+
     return (
         <div
             className="relative group cursor-pointer dropdown"
@@ -152,9 +157,11 @@ export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
     // const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
+    const reportedFirmware = get(controller, 'type', 'Grbl');
 
     return {
         ports,
         // unrecognizedPorts,
+        reportedFirmware,
     };
 })(Connection);
