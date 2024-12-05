@@ -206,6 +206,7 @@ class GrblHalController {
     programResumeTimeout = null;
 
     constructor(engine, connection, options) {
+        log.debug('constructor');
         if (!engine) {
             throw new Error('engine must be specified');
         }
@@ -1268,10 +1269,12 @@ class GrblHalController {
         };
     }
 
-    open(port, baudrate, callback = noop) {
-        this.connection.on('data', this.connectionEventListener.data);
-        this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);
+    open(port, baudrate, refresh, callback = noop) {
+        if (!refresh) {
+            this.connection.on('data', this.connectionEventListener.data);
+            this.connection.on('close', this.connectionEventListener.close);
+            this.connection.on('error', this.connectionEventListener.error);
+        }
 
         callback(); // register controller
 
@@ -1288,18 +1291,23 @@ class GrblHalController {
                 this.connection.writeImmediate(String.fromCharCode(0x87));
                 this.write('$I\n');
             }
-            let counter = 3;
-            const interval = setInterval(() => {
-                // check if 3 tries or controller is ready
-                if (this.ready || counter <= 0) {
-                    clearInterval(interval);
-                    return;
-                }
-                if (this.connection) {
-                    this.write('$I\n');
-                }
-                counter--;
-            }, 3000);
+            if (!refresh) {
+                let counter = 3;
+                const interval = setInterval(() => {
+                    // check if 3 tries or controller is ready
+                    if (this.ready || counter <= 0) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    if (this.connection) {
+                        this.write('$I\n');
+                    }
+                    counter--;
+                }, 3000);
+            } else {
+                this.initialized = true;
+                this.initController();
+            }
         }, 500);
     }
 
@@ -1319,7 +1327,7 @@ class GrblHalController {
         // Clear initialized flag
         this.initialized = false;
 
-        this.emit('serialport:close', {
+        this.emit('serialport:closeController', {
             port: port,
             inuse: false,
         }, received);

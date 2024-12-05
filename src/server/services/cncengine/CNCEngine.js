@@ -190,13 +190,13 @@ class CNCEngine {
 
             const connectionListeners = {
                 'serialport:open': (port, baudrate, controllerType, inuse) => {
-                    console.log('open');
                     this.emit('serialport:open', port, baudrate, controllerType, inuse);
                 },
                 'serialport:close': (options, received) => {
                     this.connection = null;
+                    this.emit('serialport:close', options, received);
                 },
-                'firmwareFound': (controllerType = GRBL, options, callback = noop) => {
+                'firmwareFound': (controllerType = GRBL, options, callback = noop, refresh = false) => {
                     let { port, baudrate, rtscts, network } = { ...options };
 
                     if (typeof callback !== 'function') {
@@ -205,6 +205,7 @@ class CNCEngine {
 
                     let controller = store.get(`controllers["${port}"]`);
                     if (!controller) {
+                        log.debug('making new controller');
                         const Controller = this.controllerClass[controllerType];
                         if (!Controller) {
                             const err = `Not supported controller: ${controllerType}`;
@@ -232,7 +233,7 @@ class CNCEngine {
 
                     this.connection.addController(controller);
 
-                    controller.open(port, baudrate, (err = null) => {
+                    controller.open(port, baudrate, refresh, (err = null) => {
                         if (err) {
                             callback(err);
                             return;
@@ -448,20 +449,6 @@ class CNCEngine {
                     addConnectionListeners(); // add listeners back
 
                     this.connection.updateOptions(options);
-
-                    let controller = store.get(`controllers["${port}"]`);
-                    if (!controller) {
-                        const err = `Controller on "${port}" not accessible`;
-                        log.error(err);
-                        callback(new Error(err));
-                        return;
-                    }
-                    if (this.hasFileLoaded()) {
-                        controller.loadFile(this.gcode, this.meta);
-                        socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
-                    } else {
-                        log.debug('No file in CNCEngine to load to sender');
-                    }
 
                     this.connection.refresh();
                 }

@@ -182,6 +182,7 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
+                log.debug('setting interval');
                 this.timeout = setInterval(() => {
                     if (this.count === 5) {
                         this.controllerType = GRBL;
@@ -297,12 +298,12 @@ class Connection extends EventEmitter {
 
     refresh() {
         log.debug('connection refresh');
-        this.emit('serialport:open', {
-            port: this.options.port,
-            baudrate: this.options.baudrate,
-            controllerType: this.controllerType,
-            inuse: true,
-        });
+        this.emit('firmwareFound',
+            this.controllerType,
+            this.options,
+            this.callback,
+            true
+        );
     }
 
     destroy() {
