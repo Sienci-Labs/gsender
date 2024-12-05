@@ -482,7 +482,12 @@ export function* initialize(): Generator<any, void, any> {
             reduxStore.dispatch(closeConnection({ port: options.port }));
 
             pubsub.publish('machine:disconnected');
+        },
+    );
 
+    controller.addListener(
+        'serialport:closeController',
+        (options: SerialPortOptions, received: number) => {
             // if the connection was closed unexpectedly (not by the user),
             // the number of lines sent will be defined.
             // create a pop up so the user can connect to the last active port

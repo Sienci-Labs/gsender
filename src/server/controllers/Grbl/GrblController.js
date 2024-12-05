@@ -1232,7 +1232,7 @@ class GrblController {
         };
     }
 
-    open(port, baudrate, callback = noop) {
+    open(port, baudrate, refresh, callback = noop) {
         this.connection.on('data', this.connectionEventListener.data);
         this.connection.on('close', this.connectionEventListener.close);
         this.connection.on('error', this.connectionEventListener.error);
@@ -1275,7 +1275,7 @@ class GrblController {
         // Clear initialized flag
         this.initialized = false;
 
-        this.emit('serialport:close', {
+        this.emit('serialport:closeController', {
             port: port,
             inuse: false,
         }, received);
