@@ -113,17 +113,8 @@ export function EEPROMSection({
     return (
         <fieldset className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col">
             <legend>{label}</legend>
-            {(!connected || Object.keys(EEPROM).length === 0) && (
-                <EEPROMNotConnectedWarning />
-            )}
-            {connected &&
-                settings.map((eSetting, index) => {
-                    if (isEEPROMSettingsSection(eSetting)) {
-                        return EEPROMSettingSection(eSetting, index);
-                    } else {
-                        return EEPROMSettingRow(eSetting, index);
-                    }
-                })}
+            {!connected && <EEPROMNotConnectedWarning />}
+            {components}
         </fieldset>
     );
 }

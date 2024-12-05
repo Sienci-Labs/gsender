@@ -14,6 +14,7 @@ import {
 } from 'app/features/Config/assets/SettingsDescriptions.ts';
 import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import get from 'lodash/get';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -124,6 +125,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const machineProfile = store.get('workspace.machineProfile', {});
         setMachineProfile(machineProfile);
     }, []);
+
+    function isDefaultEEPROMValue(key) {
+        const machineProfileValue = get(machineProfile, key, null);
+        // If we don't find a match, don't highlight
+        if (machineProfileValue === null) {
+            return true;
+        }
+    }
 
     useEffect(() => {
         const populatedSettings = populateSettingsValues(settings);

@@ -6,16 +6,23 @@ import { CiExport } from 'react-icons/ci';
 import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { exportFirmwareSettings } from 'app/features/Config/utils/Settings';
-import {
-    importEEPROMSettings,
-    importFirmwareSettings,
-} from 'app/features/Config/utils/EEPROM.ts';
+import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { useRef } from 'react';
 import { toast } from 'app/lib/toaster';
+import { RootState } from 'app/store/redux';
+import { useSelector } from 'react-redux';
 
-export function ProfileBar() {
+interface ProfileBarProps {
+    setShowFlashDialog: () => void;
+}
+
+export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     const { rawEEPROM, setEEPROM } = useSettings();
     const inputRef = useRef(null);
+
+    const connected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
 
     function importEEPROMSettings(e) {
         const file = e.target.files[0];
@@ -52,6 +59,7 @@ export function ProfileBar() {
                         icon={<CiExport />}
                         label="Export"
                         onClick={() => exportFirmwareSettings(rawEEPROM)}
+                        disabled={!connected}
                     />
                     <IconFunctionButton
                         icon={<CiImport />}
@@ -60,12 +68,18 @@ export function ProfileBar() {
                             inputRef.current.click();
                             inputRef.current.value = null;
                         }}
+                        disabled={!connected}
                     />
                     <IconFunctionButton
                         icon={<GrRevert />}
-                        label="Restore Defaults"
+                        label="Defaults"
+                        disabled={!connected}
                     />
-                    <IconFunctionButton icon={<PiLightning />} label="Flash" />
+                    <IconFunctionButton
+                        icon={<PiLightning />}
+                        label="Flash"
+                        disabled={true}
+                    />
                 </div>
             </div>
             <button className="bg-green-600 text-white p-3 text-lg rounded border-gray-500">
