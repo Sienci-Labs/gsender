@@ -295,6 +295,16 @@ class Connection extends EventEmitter {
         };
     }
 
+    refresh() {
+        log.debug('connection refresh');
+        this.emit('serialport:open', {
+            port: this.options.port,
+            baudrate: this.options.baudrate,
+            controllerType: this.controllerType,
+            inuse: true,
+        });
+    }
+
     destroy() {
         if (this.controller) {
             this.controller = null;
