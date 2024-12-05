@@ -1233,9 +1233,11 @@ class GrblController {
     }
 
     open(port, baudrate, refresh, callback = noop) {
-        this.connection.on('data', this.connectionEventListener.data);
-        this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);
+        if (!refresh) {
+            this.connection.on('data', this.connectionEventListener.data);
+            this.connection.on('close', this.connectionEventListener.close);
+            this.connection.on('error', this.connectionEventListener.error);
+        }
 
         callback(); // register controller
 
