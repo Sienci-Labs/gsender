@@ -21,6 +21,7 @@ export function IconFunctionButton({
                     'text-gray-400 bg-gray-300': disabled,
                 },
             )}
+            disabled={disabled}
             onClick={onClick}
         >
             <span className="text-4xl font-bold">{icon}</span>
