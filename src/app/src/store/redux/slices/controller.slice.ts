@@ -297,7 +297,6 @@ const controllerSlice = createSlice({
             state,
             action: PayloadAction<{
                 type: string;
-                settings: ControllerSettings;
             }>,
         ) => {
             const { type } = action.payload;
