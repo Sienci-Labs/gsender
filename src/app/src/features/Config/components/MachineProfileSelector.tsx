@@ -14,13 +14,17 @@ import { find } from 'lodash';
 export function MachineProfileSelector() {
     const { setMachineProfile, machineProfile } = useSettings();
 
+    function machineProfileLookup(idString) {
+        const id = Number(idString);
+        return find(defaultMachineProfiles, (o) => o.id === id);
+    }
+
     function updateMachineProfileSelection(idString) {
         const id = Number(idString);
-        const profile = find(defaultMachineProfiles, (o) => o.id === id);
-        console.log(profile);
+        const profile = machineProfileLookup(idString);
         if (!profile) {
             console.error('Unable to find matching machine profile');
-            return;
+            return {};
         }
         store.replace('workspace.machineProfile', profile);
         setMachineProfile(profile);
