@@ -97,6 +97,7 @@ export function EEPROMSection({
     settings = [],
 }: EEPROMSectionProps): JSX.Element {
     const { EEPROM } = useSettings();
+    console.log(EEPROM);
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );

@@ -21,8 +21,10 @@ interface iSettingsContext {
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
     machineProfile: object;
+    rawEEPROM: object;
     firmwareType: 'Grbl' | 'GrblHAL';
     setMachineProfile: (o) => {};
+    setEEPROM: (state) => {};
 }
 
 interface SettingsProviderProps {
@@ -34,6 +36,7 @@ const defaultState = {
     settingsToUpdate: {},
     EEPROMToUpdate: {},
     EEPROM: {},
+    rawEEPROM: {},
     machineProfile: {},
     firmwareType: 'Grbl',
 };
@@ -91,6 +94,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
     const [EEPROM, setEEPROM] = useState<object>([]);
+    const [rawEEPROM, setRawEEPROM] = useState<object>({});
     const [settingsToUpdate, setSettingsToUpdate] = useState({});
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
     const [machineProfile, setMachineProfile] = useState({});
@@ -124,6 +128,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     useEffect(() => {
         const populatedSettings = populateSettingsValues(settings);
         setSettings([...populatedSettings]);
+        setRawEEPROM(detectedEEPROM);
     }, [detectedEEPROM]);
 
     useEffect(() => {
@@ -135,7 +140,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 detectedEEPROMGroups,
             ),
         );
-        console.log(EEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     const payload = {
@@ -143,8 +147,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsToUpdate,
         EEPROMToUpdate,
         EEPROM,
+        setEEPROM,
         machineProfile,
         firmwareType: controllerType,
+        rawEEPROM,
         setMachineProfile,
     };
 

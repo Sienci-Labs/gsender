@@ -4,8 +4,42 @@ import { PiLightning } from 'react-icons/pi';
 import { CiImport } from 'react-icons/ci';
 import { CiExport } from 'react-icons/ci';
 import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { exportFirmwareSettings } from 'app/features/Config/utils/Settings';
+import {
+    importEEPROMSettings,
+    importFirmwareSettings,
+} from 'app/features/Config/utils/EEPROM.ts';
+import { useRef } from 'react';
+import { toast } from 'app/lib/toaster';
 
 export function ProfileBar() {
+    const { rawEEPROM, setEEPROM } = useSettings();
+    const inputRef = useRef(null);
+
+    function importEEPROMSettings(e) {
+        const file = e.target.files[0];
+        try {
+            importFirmwareSettings(file, (e) => {
+                const uploadedSettings = JSON.parse(e.target.result);
+                let newSetting = false;
+                setEEPROM((prev) =>
+                    prev.map((item) => {
+                        let value = item.value;
+                        if (uploadedSettings[item.setting]) {
+                            newSetting = true;
+                            value = uploadedSettings[item.setting];
+                        }
+                        return { ...item, value: value, dirty: true };
+                    }),
+                );
+            });
+            toast.success('EEPROM Settings imported');
+        } catch (e) {
+            toast.error('Unable to import settings');
+        }
+    }
+
     return (
         <div className="flex flex-row w-full p-4 min-h-1/5 justify-around items-center font-sans">
             <div className="border border-gray-200 flex flex-row items-center w-3/5 justify-between px-4 py-2">
@@ -14,8 +48,19 @@ export function ProfileBar() {
                 </div>
 
                 <div className="flex flex-row gap-10">
-                    <IconFunctionButton icon={<CiExport />} label="Export" />
-                    <IconFunctionButton icon={<CiImport />} label="Import" />
+                    <IconFunctionButton
+                        icon={<CiExport />}
+                        label="Export"
+                        onClick={() => exportFirmwareSettings(rawEEPROM)}
+                    />
+                    <IconFunctionButton
+                        icon={<CiImport />}
+                        label="Import"
+                        onClick={() => {
+                            inputRef.current.click();
+                            inputRef.current.value = null;
+                        }}
+                    />
                     <IconFunctionButton
                         icon={<GrRevert />}
                         label="Restore Defaults"
@@ -26,6 +71,14 @@ export function ProfileBar() {
             <button className="bg-green-600 text-white p-3 text-lg rounded border-gray-500">
                 Apply Settings
             </button>
+            <input
+                type="file"
+                className="hidden"
+                multiple={false}
+                accept=".txt,.json"
+                onChange={importEEPROMSettings}
+                ref={inputRef}
+            />
         </div>
     );
 }
