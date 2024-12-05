@@ -893,8 +893,6 @@ class GrblHalController {
         });
 
         this.runner.on('startup', async (res) => {
-            log.debug('startup');
-            log.debug(res.raw);
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -1272,9 +1270,11 @@ class GrblHalController {
     }
 
     open(port, baudrate, refresh, callback = noop) {
-        this.connection.on('data', this.connectionEventListener.data);
-        this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);
+        if (!refresh) {
+            this.connection.on('data', this.connectionEventListener.data);
+            this.connection.on('close', this.connectionEventListener.close);
+            this.connection.on('error', this.connectionEventListener.error);
+        }
 
         callback(); // register controller
 

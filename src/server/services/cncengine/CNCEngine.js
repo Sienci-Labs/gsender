@@ -190,7 +190,6 @@ class CNCEngine {
 
             const connectionListeners = {
                 'serialport:open': (port, baudrate, controllerType, inuse) => {
-                    console.log('open');
                     this.emit('serialport:open', port, baudrate, controllerType, inuse);
                 },
                 'serialport:close': (options, received) => {
@@ -205,7 +204,6 @@ class CNCEngine {
                     }
 
                     let controller = store.get(`controllers["${port}"]`);
-                    console.log(!controller);
                     if (!controller) {
                         log.debug('making new controller');
                         const Controller = this.controllerClass[controllerType];
