@@ -429,6 +429,9 @@ export function* initialize(): Generator<any, void, any> {
                     isConnected: true,
                 }),
             );
+            reduxStore.dispatch(
+                updateControllerType({ type: options.controllerType }),
+            );
         },
     );
 
@@ -466,7 +469,7 @@ export function* initialize(): Generator<any, void, any> {
         controller.command('toolchange:context', toolChangeContext);
 
         store.set('widgets.connection.controller.type', controllerType);
-        reduxStore.dispatch(updateControllerType(controllerType));
+        reduxStore.dispatch(updateControllerType({ type: controllerType }));
 
         pubsub.publish('machine:connected');
     });

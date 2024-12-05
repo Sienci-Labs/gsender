@@ -27,7 +27,7 @@ const NotificationList = ({ value }: Props) => {
 
     return (
         <div className="flex flex-col gap-2 pr-1 items-center text-sm text-black max-h-[200px] min-h-[200px] overflow-y-auto">
-            {filteredNotifications.reverse().map((tab) => (
+            {filteredNotifications.toReversed().map((tab) => (
                 <NotificationItem key={tab.id} notification={tab} />
             ))}
         </div>
