@@ -26,7 +26,8 @@ export interface EEPROMSectionProps {
 export function EEPROMSection({
     settings = [],
 }: EEPROMSectionProps): JSX.Element {
-    const { EEPROM, setSettingsAreDirty, setEEPROM } = useSettings();
+    const { EEPROM, setSettingsAreDirty, setEEPROM, searchTerm } =
+        useSettings();
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
