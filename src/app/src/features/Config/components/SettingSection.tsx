@@ -3,6 +3,7 @@ import {
     gSenderSubSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
@@ -12,6 +13,20 @@ export function SettingSection({
     settings = [],
     label = null,
 }: SettingSectionProps): JSX.Element {
+    const { setSettingsValues, setSettingsAreDirty } = useSettings();
+    const changeHandler = (i) => (v) => {
+        setSettingsAreDirty(true);
+        setSettingsValues((prev) => {
+            const updated = [...prev];
+            updated[i].value = v;
+            updated[i].dirty = true;
+            console.log(updated[i]);
+            return updated;
+        });
+        console.log(i);
+        console.log(v);
+    };
+
     return (
         <div>
             {label && (
@@ -20,7 +35,12 @@ export function SettingSection({
                 </h2>
             )}
             {settings.map((setting) => {
-                return <SettingRow setting={setting} />;
+                return (
+                    <SettingRow
+                        setting={setting}
+                        changeHandler={changeHandler}
+                    />
+                );
             })}
         </div>
     );

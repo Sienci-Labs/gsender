@@ -98,19 +98,31 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     />
                 </div>
             </div>
-            <button
+            <div
                 className={cn(
-                    'p-3 text-lg rounded border-gray-500',
-                    { 'bg-gray-300 text-gray-500': !settingsAreDirty },
-                    {
-                        'bg-green-600 text-white': settingsAreDirty,
-                    },
+                    'ring rounded relative',
+                    { 'ring-green-600': settingsAreDirty },
+                    { 'ring-gray-300': !settingsAreDirty },
                 )}
-                disabled={!settingsAreDirty}
-                onClick={updateSettingsHandler}
             >
-                Apply Settings
-            </button>
+                <button
+                    className={cn(
+                        'p-3 text-lg rounded border-gray-500',
+                        { 'bg-gray-300 text-gray-500': !settingsAreDirty },
+                        {
+                            'bg-green-600 text-white': settingsAreDirty,
+                        },
+                    )}
+                    disabled={!settingsAreDirty}
+                    onClick={updateSettingsHandler}
+                >
+                    Apply Settings
+                </button>
+                {settingsAreDirty && (
+                    <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>
+                )}
+            </div>
+
             <input
                 type="file"
                 className="hidden"

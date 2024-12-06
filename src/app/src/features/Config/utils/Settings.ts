@@ -109,13 +109,11 @@ export function updateSenderSettings(settings) {}
 
 export function updateAllSettings(settings, eeprom) {
     const eepromToChange = generateEEPROMSettings(eeprom);
-    console.log(eepromToChange);
     const eepromNumber = Object.keys(eepromToChange).length;
     if (eepromNumber > 0) {
         let changedSettings = Object.keys(eepromToChange).map(
             (k) => `${k}=${eepromToChange[k]}`,
         );
-        console.log(changedSettings);
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);
         toast.success(`Updated ${eepromNumber} EEPROM values.`);

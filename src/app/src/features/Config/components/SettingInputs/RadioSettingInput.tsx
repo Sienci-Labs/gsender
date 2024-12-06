@@ -15,8 +15,9 @@ export function RadioSettingInput({
     options = [],
     value,
 }: RadioSettingInputProps): React.ReactNode {
+    value = `${value}`;
     return (
-        <RadioGroup defaultValue={`${value}`}>
+        <RadioGroup defaultValue={`${value}`} value={value}>
             {options.map((o) => (
                 <div className="flex flex-row gap-2 items-center">
                     <RadioGroupItem value={`${o}`} />

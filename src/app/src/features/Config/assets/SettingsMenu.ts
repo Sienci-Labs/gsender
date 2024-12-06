@@ -42,12 +42,15 @@ export interface gSenderSetting {
     options?: string[] | number[];
     unit?: string;
     eID?: string;
+    globalIndex?: number;
     value?: gSenderSettingsValues;
+    defaultValue?: any;
+    dirty?: boolean;
 }
 
 export interface gSenderSubSection {
     label?: string;
-    settings: gSenderSetting[];
+    settings?: gSenderSetting[];
 }
 
 export type gSenderSettings = gSenderSetting | gSenderSubSection;
@@ -631,7 +634,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         settings: [
             {
                 label: '',
-                setting: [
+                settings: [
                     {
                         label: 'Resolution',
                         key: '',
