@@ -18,7 +18,7 @@ import { CiCircleInfo } from 'react-icons/ci';
 export interface SettingsMenuSection {
     label: string;
     icon: (props) => JSX.Element;
-    settings?: gSenderSettings[];
+    settings?: gSenderSubSection[];
     eeprom?: gSenderEEEPROMSettings;
 }
 
@@ -46,7 +46,7 @@ export interface gSenderSetting {
 }
 
 export interface gSenderSubSection {
-    label: string;
+    label?: string;
     settings: gSenderSetting[];
 }
 
@@ -76,67 +76,75 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: FaCog,
         settings: [
             {
-                label: 'Preferred Units',
-                key: 'workspace.units',
-                type: 'radio',
-                description: 'What units would you like gSender to show you?',
-                options: ['mm', 'in'],
-            },
-            {
-                label: 'Baudrate',
-                key: 'widgets.connection.baudrate',
-                type: 'select',
-                description:
-                    'Rate needed for your particular CNC (how fast data is sent over the serial line, default 115200)',
-                options: [
-                    '250000',
-                    '115200',
-                    '57600',
-                    '38400',
-                    '19200',
-                    '9600',
-                    '2400',
+                label: '',
+                settings: [
+                    {
+                        label: 'Preferred Units',
+                        key: 'workspace.units',
+                        type: 'radio',
+                        description:
+                            'What units would you like gSender to show you?',
+                        options: ['mm', 'in'],
+                    },
+                    {
+                        label: 'Baudrate',
+                        key: 'widgets.connection.baudrate',
+                        type: 'select',
+                        description:
+                            'Rate needed for your particular CNC (how fast data is sent over the serial line, default 115200)',
+                        options: [
+                            '250000',
+                            '115200',
+                            '57600',
+                            '38400',
+                            '19200',
+                            '9600',
+                            '2400',
+                        ],
+                    },
+                    {
+                        label: 'Reconnect Automatically',
+                        key: 'widgets.connection.autoReconnect',
+                        type: 'boolean',
+                        description:
+                            'Reconnect to the last machine you used automatically',
+                    },
+                    {
+                        label: 'Warn if bad file',
+                        key: 'widgets.visualizer.showWarning',
+                        description:
+                            'Warns if any invalid commands are found when a file is opened',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Warn on bad line',
+                        key: 'widgets.visualizer.showLineWarnings',
+                        description:
+                            'Warns when running a job if any invalid commands are found',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Prompt when setting zero',
+                        key: 'widgets.visualizer.showSoftLimitWarning',
+                        description:
+                            'Useful if you tend to set zero accidentally',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Safe Height',
+                        key: 'workspace.safeRetractHeight',
+                        type: 'number',
+                        description:
+                            "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
+                    },
+                    {
+                        label: 'Send Usage Data',
+                        key: '',
+                        description:
+                            'Allow gSender to collect your data periodically',
+                        type: 'boolean',
+                    },
                 ],
-            },
-            {
-                label: 'Reconnect Automatically',
-                key: 'widgets.connection.autoReconnect',
-                type: 'boolean',
-                description:
-                    'Reconnect to the last machine you used automatically',
-            },
-            {
-                label: 'Warn if bad file',
-                key: 'widgets.visualizer.showWarning',
-                description:
-                    'Warns if any invalid commands are found when a file is opened',
-                type: 'boolean',
-            },
-            {
-                label: 'Warn on bad line',
-                key: 'widgets.visualizer.showLineWarnings',
-                description:
-                    'Warns when running a job if any invalid commands are found',
-                type: 'boolean',
-            },
-            {
-                label: 'Prompt when setting zero',
-                key: 'widgets.visualizer.showSoftLimitWarning',
-                description: 'Useful if you tend to set zero accidentally',
-                type: 'boolean',
-            },
-            {
-                label: 'Safe Height',
-                key: 'workspace.safeRetractHeight',
-                type: 'number',
-                description:
-                    "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
-            },
-            {
-                label: 'Send Usage Data',
-                key: '',
-                description: 'Allow gSender to collect your data periodically',
-                type: 'boolean',
             },
         ],
     },
@@ -174,61 +182,66 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: MdTouchApp,
         settings: [
             {
-                label: 'Touch Plate Type',
-                key: 'widgets.connection.baudrate',
-                type: 'select',
-                description:
-                    "Select the touch plate you're using with your machine (default Standard block)",
-                options: ['Standard', 'Auto', 'Z Probe'],
-            },
-            {
-                label: 'Z Thickness',
-                key: 'workspace.probeProfile.zThickness',
-                description:
-                    'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
-                type: 'number',
-            },
-            {
-                label: 'XY Thickness',
-                key: 'workspace.probeProfile.xyThickness',
-                description:
-                    'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
-                type: 'number',
-            },
-            {
-                label: 'Z Probe Distance',
-                key: 'widgets.probe.zProbeDistance',
-                description:
-                    'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
-                type: 'number',
-            },
-            {
-                label: 'Fast Find',
-                key: 'widgets.probe.probeFastFeedrate',
-                description:
-                    'Probe speed before the first touch-off (default 150)',
-                type: 'number',
-            },
-            {
-                label: 'Slow Find',
-                key: 'widgets.probe.probeFeedrate',
-                description:
-                    'Slower speed for more accuracy on second touch-off (default 75)',
-                type: 'number',
-            },
-            {
-                label: 'Retraction',
-                key: 'widgets.probe.retractionDistance',
-                description:
-                    'How far the probe moves away after a successful touch (default 4)',
-                type: 'number',
-            },
-            {
-                label: 'Probe Connection Test',
-                key: 'widgets.probe.connectivityTest',
-                description:
-                    'A safe check to make sure your probe is connected correctly',
-                type: 'boolean',
+                label: '',
+                settings: [
+                    {
+                        label: 'Touch Plate Type',
+                        key: 'widgets.connection.baudrate',
+                        type: 'select',
+                        description:
+                            "Select the touch plate you're using with your machine (default Standard block)",
+                        options: ['Standard', 'Auto', 'Z Probe'],
+                    },
+                    {
+                        label: 'Z Thickness',
+                        key: 'workspace.probeProfile.zThickness',
+                        description:
+                            'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'XY Thickness',
+                        key: 'workspace.probeProfile.xyThickness',
+                        description:
+                            'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'Z Probe Distance',
+                        key: 'widgets.probe.zProbeDistance',
+                        description:
+                            'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'Fast Find',
+                        key: 'widgets.probe.probeFastFeedrate',
+                        description:
+                            'Probe speed before the first touch-off (default 150)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'Slow Find',
+                        key: 'widgets.probe.probeFeedrate',
+                        description:
+                            'Slower speed for more accuracy on second touch-off (default 75)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'Retraction',
+                        key: 'widgets.probe.retractionDistance',
+                        description:
+                            'How far the probe moves away after a successful touch (default 4)',
+                        type: 'number',
+                    },
+                    {
+                        label: 'Probe Connection Test',
+                        key: 'widgets.probe.connectivityTest',
+                        description:
+                            'A safe check to make sure your probe is connected correctly',
+                        type: 'boolean',
+                    },
+                ],
             },
         ],
         eeprom: [
@@ -364,67 +377,72 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: GiTargetLaser,
         settings: [
             {
-                label: 'Delay after start',
-                key: '',
-                description:
-                    'Delays all jobs at the start to give time for the spindle to spin up',
-                type: 'hybrid',
-                eID: '$392',
-                unit: 's',
-            },
-            {
-                label: 'Minimum Spindle Speed',
-                key: '',
-                description:
-                    'Match this to the minimum speed your spindle is able to spin at ($31, default 7200)',
-                type: 'hybrid',
-                eID: '$31',
-                unit: 'rpm',
-            },
-            {
-                label: 'Maximum Spindle Speed',
-                key: '',
-                description:
-                    'Match this to the maximum speed your spindle is able to spin at ($30, default 24000)',
-                type: 'boolean',
-                eID: '$30',
-                unit: 'rpm',
-            },
-            {
-                label: 'Minimum Laser Power',
-                key: '',
-                description:
-                    'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
-                type: 'hybrid',
-                eID: '$731',
-                unit: '',
-            },
-            {
-                label: 'Maximum Laser Power',
-                key: '',
-                description:
-                    'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
-                type: 'hybrid',
-                eID: '$730',
-                unit: '',
-            },
-            {
-                label: 'Laser X Offset',
-                key: '',
-                description:
-                    'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
-                type: 'hybrid',
-                eID: '$741',
-                unit: 'mm',
-            },
-            {
-                label: 'Laser Y Offset',
-                key: '',
-                description:
-                    'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
-                type: 'hybrid',
-                eID: '$742',
-                unit: 'rpm',
+                label: '',
+                settings: [
+                    {
+                        label: 'Delay after start',
+                        key: '',
+                        description:
+                            'Delays all jobs at the start to give time for the spindle to spin up',
+                        type: 'hybrid',
+                        eID: '$392',
+                        unit: 's',
+                    },
+                    {
+                        label: 'Minimum Spindle Speed',
+                        key: '',
+                        description:
+                            'Match this to the minimum speed your spindle is able to spin at ($31, default 7200)',
+                        type: 'hybrid',
+                        eID: '$31',
+                        unit: 'rpm',
+                    },
+                    {
+                        label: 'Maximum Spindle Speed',
+                        key: '',
+                        description:
+                            'Match this to the maximum speed your spindle is able to spin at ($30, default 24000)',
+                        type: 'boolean',
+                        eID: '$30',
+                        unit: 'rpm',
+                    },
+                    {
+                        label: 'Minimum Laser Power',
+                        key: '',
+                        description:
+                            'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
+                        type: 'hybrid',
+                        eID: '$731',
+                        unit: '',
+                    },
+                    {
+                        label: 'Maximum Laser Power',
+                        key: '',
+                        description:
+                            'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
+                        type: 'hybrid',
+                        eID: '$730',
+                        unit: '',
+                    },
+                    {
+                        label: 'Laser X Offset',
+                        key: '',
+                        description:
+                            'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
+                        type: 'hybrid',
+                        eID: '$741',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Laser Y Offset',
+                        key: '',
+                        description:
+                            'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
+                        type: 'hybrid',
+                        eID: '$742',
+                        unit: 'rpm',
+                    },
+                ],
             },
         ],
         eeprom: [
@@ -612,36 +630,41 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: FaArrowsSpin,
         settings: [
             {
-                label: 'Resolution',
-                key: '',
-                description:
-                    'Travel resolution in steps per degree ($103, default 19.75308642)',
-                type: 'hybrid',
-                eID: '$103',
-                unit: 'rpm',
-            },
-            {
-                label: 'Max Speed',
-                key: '',
-                description:
-                    'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
-                type: 'hybrid',
-                eID: '$113',
-                unit: 'rpm',
-            },
-            {
-                label: 'Force Hard Limits',
-                key: '',
-                description:
-                    'Updates hard limits when toggling into rotary mode',
-                type: 'boolean',
-            },
-            {
-                label: 'Force Soft Limits',
-                key: '',
-                description:
-                    'Updates soft limits when toggling into rotary mode',
-                type: 'boolean',
+                label: '',
+                setting: [
+                    {
+                        label: 'Resolution',
+                        key: '',
+                        description:
+                            'Travel resolution in steps per degree ($103, default 19.75308642)',
+                        type: 'hybrid',
+                        eID: '$103',
+                        unit: 'rpm',
+                    },
+                    {
+                        label: 'Max Speed',
+                        key: '',
+                        description:
+                            'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
+                        type: 'hybrid',
+                        eID: '$113',
+                        unit: 'rpm',
+                    },
+                    {
+                        label: 'Force Hard Limits',
+                        key: '',
+                        description:
+                            'Updates hard limits when toggling into rotary mode',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Force Soft Limits',
+                        key: '',
+                        description:
+                            'Updates soft limits when toggling into rotary mode',
+                        type: 'boolean',
+                    },
+                ],
             },
         ],
         eeprom: [
@@ -656,11 +679,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: MdSettingsApplications,
         settings: [
             {
-                label: 'DRO Zeros',
-                key: 'workspace.customDecimalPlaces',
-                description:
-                    'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
-                type: 'number',
+                label: '',
+                settings: [
+                    {
+                        label: 'DRO Zeros',
+                        key: 'workspace.customDecimalPlaces',
+                        description:
+                            'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
+                        type: 'number',
+                    },
+                ],
             },
             {
                 label: 'Jogging Presets',
@@ -706,11 +734,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: BsEthernet,
         settings: [
             {
-                label: 'IP Address',
-                key: 'widgets.connection.ip',
-                description:
-                    'Set the IP address for network scanning (default 192.168.5.1)',
-                type: 'ip',
+                label: '',
+                settings: [
+                    {
+                        label: 'IP Address',
+                        key: 'widgets.connection.ip',
+                        description:
+                            'Set the IP address for network scanning (default 192.168.5.1)',
+                        type: 'ip',
+                    },
+                ],
             },
         ],
         eeprom: [

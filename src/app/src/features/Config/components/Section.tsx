@@ -12,6 +12,8 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { EEPROMSection } from 'app/features/Config/components/EEPROMSection.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
+import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
+import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 
 interface SectionProps {
     title: string;
@@ -22,69 +24,6 @@ interface SectionProps {
     index: number;
     settings: gSenderSettings[];
     eeprom?: gSenderEEEPROMSettings;
-}
-
-function returnSettingControl(
-    setting: gSenderSetting,
-    index: number = -1,
-    subIndex: number = -1,
-) {
-    switch (setting.type) {
-        case 'boolean':
-            return (
-                <BooleanSettingInput
-                    value={setting.value as boolean}
-                    index={index}
-                    subIndex={subIndex}
-                />
-            );
-        case 'select':
-            return (
-                <SelectSettingInput
-                    options={setting.options}
-                    index={index}
-                    subIndex={subIndex}
-                    value={setting.value as string}
-                />
-            );
-        case 'number':
-            return (
-                <NumberSettingInput
-                    unit={setting.unit}
-                    value={setting.value as number}
-                    index={index}
-                    subIndex={subIndex}
-                />
-            );
-        case 'radio':
-            return (
-                <RadioSettingInput
-                    options={setting.options}
-                    index={index}
-                    subIndex={subIndex}
-                    value={setting.value as string}
-                />
-            );
-        case 'ip':
-            return (
-                <IPSettingInput
-                    ip={setting.value as number[]}
-                    index={index}
-                    subIndex={subIndex}
-                />
-            );
-        case 'hybrid':
-            return (
-                <HybridNumber
-                    value={setting.value as number}
-                    index={index}
-                    subIndex={subIndex}
-                    eepromKey={setting.eID}
-                />
-            );
-        default:
-            return setting.type;
-    }
 }
 
 function settingRow(setting: gSenderSetting, index: number, subIndex = -1) {
@@ -98,15 +37,6 @@ function settingRow(setting: gSenderSetting, index: number, subIndex = -1) {
             <span className="text-gray-500 text-sm w-2/5">
                 {setting.description}
             </span>
-        </div>
-    );
-}
-
-function subSection(setting: gSenderSubSection, index: number) {
-    return (
-        <div>
-            <h2 className="blue-">{setting.label}</h2>
-            {setting.settings.map((s) => settingRow(s))}
         </div>
     );
 }
@@ -128,12 +58,12 @@ export function Section({
         <div id={id}>
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
             <div className="bg-white rounded-xl shadow p-6">
-                {settings.map((setting: gSenderSettings, index) => {
-                    if (isSubSection(setting, index)) {
-                        return subSection(setting);
-                    }
-                    return settingRow(setting, index);
-                })}
+                {settings.map((setting: gSenderSubSection, index) => (
+                    <SettingSection
+                        settings={setting.settings}
+                        label={setting.label}
+                    />
+                ))}
                 {eeprom && eeprom?.length > 0 && (
                     <EEPROMSection
                         label={`${title} EEPROM`}
