@@ -16,6 +16,8 @@ export function SettingSection({
     const { setSettingsValues, setSettingsAreDirty } = useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
+        console.log('this');
+        console.log(v);
         setSettingsValues((prev) => {
             const updated = [...prev];
             updated[i].value = v;
@@ -23,8 +25,6 @@ export function SettingSection({
             console.log(updated[i]);
             return updated;
         });
-        console.log(i);
-        console.log(v);
     };
 
     return (

@@ -63,7 +63,7 @@ function returnSettingControl(
         case 'ip':
             return (
                 <IPSettingInput
-                    ip={setting.value as number[]}
+                    ip={value as number[]}
                     index={index}
                     onChange={handler}
                 />
@@ -71,7 +71,7 @@ function returnSettingControl(
         case 'hybrid':
             return (
                 <HybridNumber
-                    value={setting.value as number}
+                    value={value as number}
                     index={index}
                     eepromKey={setting.eID}
                     onChange={handler}
@@ -89,7 +89,6 @@ export function SettingRow({
 }: SettingRowProps): JSX.Element {
     const { settingsValues } = useSettings();
     const populatedValue = settingsValues[setting.globalIndex] || {};
-    console.log(populatedValue);
 
     return (
         <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center">

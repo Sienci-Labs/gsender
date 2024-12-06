@@ -26,8 +26,8 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         setEEPROM,
         settingsAreDirty,
         setSettingsAreDirty,
-        settings,
         EEPROM,
+        settingsValues,
     } = useSettings();
     const inputRef = useRef(null);
 
@@ -36,7 +36,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     );
 
     function updateSettingsHandler() {
-        updateAllSettings(settings, EEPROM);
+        updateAllSettings(settingsValues, EEPROM);
         setSettingsAreDirty(false);
     }
 

@@ -105,7 +105,16 @@ export function matchesSearchTerm(o, term = '') {
     return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
 }
 
-export function updateSenderSettings(settings) {}
+export function generateSenderSettings(settings) {
+    const dirtySettings = {};
+    settings.map((s) => {
+        if (s.dirty) {
+            dirtySettings[s.key] = s.value;
+            s.dirty = false;
+        }
+    });
+    return dirtySettings;
+}
 
 export function updateAllSettings(settings, eeprom) {
     const eepromToChange = generateEEPROMSettings(eeprom);
@@ -117,5 +126,14 @@ export function updateAllSettings(settings, eeprom) {
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);
         toast.success(`Updated ${eepromNumber} EEPROM values.`);
+    }
+
+    const settingsToUpdate = generateSenderSettings(settings);
+    const updateableSettingsNumber = Object.keys(settingsToUpdate).length;
+    if (updateableSettingsNumber > 0) {
+        Object.keys(settingsToUpdate).map((k) => {
+            store.set(k, settingsToUpdate[k]);
+        });
+        toast.success(`Updated ${updateableSettingsNumber} settings.`);
     }
 }
