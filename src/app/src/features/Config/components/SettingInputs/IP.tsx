@@ -14,35 +14,33 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
         console.log(newIP);
         onChange(newIP);
     }
-    const [first, second, third, fourth] = ip;
-
     return (
         <div className="flex flex-row gap-2 items-end">
             <input
                 type="number"
                 className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
-                value={first}
+                value={ip[0]}
                 onChange={(e) => updateIPPortion(0, e.target.value)}
             />
             .
             <input
                 type="number"
                 className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
-                value={second}
+                value={ip[1]}
                 onChange={(e) => updateIPPortion(1, e.target.value)}
             />
             .
             <input
                 type="number"
                 className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
-                value={third}
+                value={ip[2]}
                 onChange={(e) => updateIPPortion(2, e.target.value)}
             />
             .
             <input
                 type="number"
                 className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
-                value={fourth}
+                value={ip[3]}
                 onChange={(e) => updateIPPortion(3, e.target.value)}
             />
         </div>
