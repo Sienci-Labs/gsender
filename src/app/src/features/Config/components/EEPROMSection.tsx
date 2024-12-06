@@ -12,7 +12,7 @@ import { BiReset } from 'react-icons/bi';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import controller from 'app/lib/controller.ts';
-import { toast } from 'sonner';
+import { toast } from 'app/lib/toaster';
 
 export function isEEPROMSettingsSection(s: gSenderEEEPROMSettings): boolean {
     return 'label' in s && 'eeprom' in s;
