@@ -26,6 +26,7 @@ interface iSettingsContext {
     firmwareType: 'Grbl' | 'GrblHAL';
     setMachineProfile: (o) => {};
     setEEPROM: (state) => {};
+    connected: boolean;
 }
 
 interface SettingsProviderProps {
@@ -40,6 +41,7 @@ const defaultState = {
     rawEEPROM: {},
     machineProfile: {},
     firmwareType: 'Grbl',
+    connected: false,
 };
 
 export const SettingsContext =
@@ -99,6 +101,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settingsToUpdate, setSettingsToUpdate] = useState({});
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
     const [machineProfile, setMachineProfile] = useState({});
+    const [connected, setConnected] = useState(false);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -114,6 +117,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     const controllerType = useSelector(
         (state: RootState) => state.controller.type,
+    );
+
+    const connectionState = useSelector(
+        (state: RootState) => state.connection.isConnected,
     );
 
     const BASE_SETTINGS =
@@ -141,6 +148,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [detectedEEPROM]);
 
     useEffect(() => {
+        setConnected(connectionState);
+    }, [connectionState]);
+
+    useEffect(() => {
         setEEPROM(
             getFilteredEEPROMSettings(
                 BASE_SETTINGS,
@@ -161,6 +172,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         firmwareType: controllerType,
         rawEEPROM,
         setMachineProfile,
+        connected,
     };
 
     return (

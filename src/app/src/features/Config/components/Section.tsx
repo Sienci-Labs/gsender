@@ -11,6 +11,7 @@ import { NumberSettingInput } from 'app/features/Config/components/SettingInputs
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
 import { EEPROMSection } from 'app/features/Config/components/EEPROMSection.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
+import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 
 interface SectionProps {
     title: string;
@@ -70,6 +71,15 @@ function returnSettingControl(
                     ip={setting.value as number[]}
                     index={index}
                     subIndex={subIndex}
+                />
+            );
+        case 'hybrid':
+            return (
+                <HybridNumber
+                    value={setting.value as number}
+                    index={index}
+                    subIndex={subIndex}
+                    eepromKey={setting.eID}
                 />
             );
         default:

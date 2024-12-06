@@ -41,6 +41,7 @@ export interface gSenderSetting {
     description?: string;
     options?: string[] | number[];
     unit?: string;
+    eID?: string;
     value?: gSenderSettingsValues;
 }
 
@@ -363,43 +364,76 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: GiTargetLaser,
         settings: [
             {
-                label: 'Enable',
-                key: '',
-                description: '',
-                type: 'boolean',
-            },
-            {
                 label: 'Delay after start',
                 key: '',
-                description: '',
-                type: 'number',
+                description:
+                    'Delays all jobs at the start to give time for the spindle to spin up',
+                type: 'hybrid',
+                eID: '$392',
                 unit: 's',
             },
             {
                 label: 'Minimum Spindle Speed',
                 key: '',
-                description: '',
-                type: 'number',
+                description:
+                    'Match this to the minimum speed your spindle is able to spin at ($31, default 7200)',
+                type: 'hybrid',
+                eID: '$31',
                 unit: 'rpm',
             },
             {
                 label: 'Maximum Spindle Speed',
                 key: '',
-                description: '',
+                description:
+                    'Match this to the maximum speed your spindle is able to spin at ($30, default 24000)',
                 type: 'boolean',
+                eID: '$30',
                 unit: 'rpm',
             },
             {
-                label: '',
+                label: 'Minimum Laser Power',
                 key: '',
-                description: '',
-                type: 'boolean',
+                description:
+                    'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
+                type: 'hybrid',
+                eID: '$731',
+                unit: '',
+            },
+            {
+                label: 'Maximum Laser Power',
+                key: '',
+                description:
+                    'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
+                type: 'hybrid',
+                eID: '$730',
+                unit: '',
+            },
+            {
+                label: 'Laser X Offset',
+                key: '',
+                description:
+                    'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
+                type: 'hybrid',
+                eID: '$741',
+                unit: 'mm',
+            },
+            {
+                label: 'Laser Y Offset',
+                key: '',
+                description:
+                    'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
+                type: 'hybrid',
+                eID: '$742',
+                unit: 'rpm',
             },
         ],
         eeprom: [
             {
                 label: 'Spindle',
                 eeprom: [
+                    {
+                        eId: '$32',
+                    },
                     {
                         eId: '$395',
                     },
@@ -576,15 +610,44 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Rotary',
         icon: FaArrowsSpin,
+        settings: [
+            {
+                label: 'Resolution',
+                key: '',
+                description:
+                    'Travel resolution in steps per degree ($103, default 19.75308642)',
+                type: 'hybrid',
+                eID: '$103',
+                unit: 'rpm',
+            },
+            {
+                label: 'Max Speed',
+                key: '',
+                description:
+                    'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
+                type: 'hybrid',
+                eID: '$113',
+                unit: 'rpm',
+            },
+            {
+                label: 'Force Hard Limits',
+                key: '',
+                description:
+                    'Updates hard limits when toggling into rotary mode',
+                type: 'boolean',
+            },
+            {
+                label: 'Force Soft Limits',
+                key: '',
+                description:
+                    'Updates soft limits when toggling into rotary mode',
+                type: 'boolean',
+            },
+        ],
         eeprom: [
             {
                 label: 'Rotary',
-                eeprom: [
-                    { eId: '$376' },
-                    { eId: '$103' },
-                    { eId: '$113' },
-                    { eId: '$123' },
-                ],
+                eeprom: [{ eId: '$376' }, { eId: '$123' }],
             },
         ],
     },
