@@ -4,6 +4,8 @@ import {
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
+import cn from 'classnames';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
@@ -13,11 +15,11 @@ export function SettingSection({
     settings = [],
     label = null,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty } = useSettings();
+    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
+        useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
-        console.log('this');
-        console.log(v);
+
         setSettingsValues((prev) => {
             const updated = [...prev];
             updated[i].value = v;
@@ -27,14 +29,18 @@ export function SettingSection({
         });
     };
 
+    const filteredSettings = settings.filter((o) =>
+        matchesSearchTerm(o, searchTerm),
+    );
+
     return (
-        <div>
+        <div className={cn({ hidden: filteredSettings.length === 0 })}>
             {label && (
                 <h2 className="text-blue-500 border-bottom border-blue-500">
                     {label}
                 </h2>
             )}
-            {settings.map((setting) => {
+            {filteredSettings.map((setting) => {
                 return (
                     <SettingRow
                         setting={setting}
