@@ -36,7 +36,6 @@ export function Config() {
                     activeSection={activeSection}
                 />
                 <div className="flex flex-col h-[700px]">
-                    <FlashDialog show={showFlashDialog} />
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24">
                         <Search />
                         <ApplicationPreferences />
@@ -57,7 +56,6 @@ export function Config() {
                     </div>
                     <ProfileBar
                         setShowFlashDialog={() => {
-                            console.log('Toggle');
                             setShowFlashDialog(!showFlashDialog);
                         }}
                     />

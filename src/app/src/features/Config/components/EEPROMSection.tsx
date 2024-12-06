@@ -10,13 +10,7 @@ import { useSelector } from 'react-redux';
 import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
-
-function filterNewlines(data = '') {
-    if (!data) {
-        return '';
-    }
-    return data.replace(/\\n/gim, '\n');
-}
+import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 
 export function isEEPROMSettingsSection(s: gSenderEEEPROMSettings): boolean {
     return 'label' in s && 'eeprom' in s;
@@ -27,7 +21,7 @@ export interface EEPROMSectionProps {
     settings?: gSenderEEEPROMSettings;
 }
 
-export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
+/*export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
     const { EEPROM, machineProfile, firmwareType } = useSettings();
     if (!EEPROM) {
         return;
@@ -85,36 +79,35 @@ export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
         );
     }
     return <></>;
-}
-
-export function EEPROMSettingSection(
-    section: gSenderEEPROMSettingSection,
-    index: number,
-) {}
+}*/
 
 export function EEPROMSection({
     label,
     settings = [],
 }: EEPROMSectionProps): JSX.Element {
     const { EEPROM } = useSettings();
-    console.log(EEPROM);
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
 
-    const components = settings.map((eSetting, index) => {
-        if (isEEPROMSettingsSection(eSetting)) {
-            return EEPROMSettingSection(eSetting, index);
-        } else {
-            return EEPROMSettingRow(eSetting, index);
-        }
-    });
+    if (!connected) {
+        return <EEPROMNotConnectedWarning />;
+    }
 
     return (
-        <fieldset className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col">
-            <legend>{label}</legend>
-            {!connected && <EEPROMNotConnectedWarning />}
-            {components}
-        </fieldset>
+        <>
+            {settings.map((e) => (
+                <fieldset className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col">
+                    {settings.length > 1 && <legend>{e.label}</legend>}
+                    {e.eeprom.map((eKey, index) => (
+                        <EEPROMSettingRow
+                            eID={eKey.eId}
+                            index={index}
+                            key={`${eKey.eId}-${index}`}
+                        />
+                    ))}
+                </fieldset>
+            ))}
+        </>
     );
 }

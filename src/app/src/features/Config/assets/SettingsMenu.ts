@@ -50,9 +50,7 @@ export interface gSenderSubSection {
 }
 
 export type gSenderSettings = gSenderSetting | gSenderSubSection;
-export type gSenderEEEPROMSettings =
-    | gSenderEEPROMSetting[]
-    | gSenderEEPROMSettingSection;
+export type gSenderEEEPROMSettings = gSenderEEPROMSettingSection[];
 
 export interface gSenderEEPROMSetting {
     eId: string;
@@ -146,22 +144,27 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         eeprom: [
             {
-                eId: '$3',
-            },
-            {
-                eId: '$100',
-            },
-            {
-                eId: '$150',
-            },
-            {
-                eId: '$110',
-            },
-            {
-                eId: '$120',
-            },
-            {
-                eId: '$150',
+                label: 'Motors',
+                eeprom: [
+                    {
+                        eId: '$3',
+                    },
+                    {
+                        eId: '$100',
+                    },
+                    {
+                        eId: '$150',
+                    },
+                    {
+                        eId: '$110',
+                    },
+                    {
+                        eId: '$120',
+                    },
+                    {
+                        eId: '$150',
+                    },
+                ],
             },
         ],
     },
@@ -229,13 +232,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
         eeprom: [
             {
-                eId: '$6',
-            },
-            {
-                eId: '$668',
-            },
-            {
-                eId: '$',
+                label: 'Probe',
+                eeprom: [
+                    {
+                        eId: '$6',
+                    },
+                    {
+                        eId: '$668',
+                    },
+                    {
+                        eId: '$',
+                    },
+                ],
             },
         ],
     },
@@ -244,10 +252,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: CiLight,
         eeprom: [
             {
-                eId: '$664',
-            },
-            {
-                eId: '$665',
+                label: 'Status Lights',
+                eeprom: [
+                    {
+                        eId: '$664',
+                    },
+                    {
+                        eId: '$665',
+                    },
+                ],
             },
         ],
     },
@@ -256,34 +269,39 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: FaHome,
         eeprom: [
             {
-                eId: '$5',
-            },
-            {
-                eId: '$22',
-            },
-            {
-                eId: '$130',
-            },
-            {
-                eId: '$131',
-            },
-            {
-                eId: '$132',
-            },
-            {
-                eId: '$133',
-            },
-            {
-                eId: '$20',
-            },
-            {
-                eId: '$40',
-            },
-            {
-                eId: '$21',
-            },
-            {
-                eId: '$22',
+                label: 'Limits and Homing',
+                eeprom: [
+                    {
+                        eId: '$5',
+                    },
+                    {
+                        eId: '$22',
+                    },
+                    {
+                        eId: '$130',
+                    },
+                    {
+                        eId: '$131',
+                    },
+                    {
+                        eId: '$132',
+                    },
+                    {
+                        eId: '$133',
+                    },
+                    {
+                        eId: '$20',
+                    },
+                    {
+                        eId: '$40',
+                    },
+                    {
+                        eId: '$21',
+                    },
+                    {
+                        eId: '$22',
+                    },
+                ],
             },
         ],
     },
@@ -331,22 +349,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
         label: 'Action Buttons',
         icon: RxButton,
         eeprom: [
-            { eId: '$450' },
-            { eId: '$451' },
-            { eId: '$452' },
-            { eId: '$453' },
-            { eId: '$454' },
-            { eId: '$455' },
+            {
+                label: 'Action',
+                eeprom: [
+                    { eId: '$450' },
+                    { eId: '$451' },
+                    { eId: '$452' },
+                    { eId: '$453' },
+                    { eId: '$454' },
+                    { eId: '$455' },
+                ],
+            },
         ],
     },
     {
         label: 'Accessory Outputs',
         icon: CiMapPin,
         eeprom: [
-            { eId: '$456' },
-            { eId: '$457' },
-            { eId: '$458' },
-            { eId: '$459' },
+            {
+                label: 'Accessories',
+                eeprom: [
+                    { eId: '$456' },
+                    { eId: '$457' },
+                    { eId: '$458' },
+                    { eId: '$459' },
+                ],
+            },
         ],
     },
     { label: 'Tool Changing', icon: IoIosSwap },
@@ -354,11 +382,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
         label: 'Rotary',
         icon: FaArrowsSpin,
         eeprom: [
-            { eId: '$376' },
-            { eId: '$376' },
-            { eId: '$103' },
-            { eId: '$113' },
-            { eId: '$123' },
+            {
+                label: 'Rotary',
+                eeprom: [
+                    { eId: '$376' },
+                    { eId: '$376' },
+                    { eId: '$103' },
+                    { eId: '$113' },
+                    { eId: '$123' },
+                ],
+            },
         ],
     },
     {
@@ -424,15 +457,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
         eeprom: [
-            { eId: '$301' },
-            { eId: '$302' },
-            { eId: '$303' },
-            { eId: '$304' },
-            { eId: '$70' },
-            { eId: '$300' },
-            { eId: '$305' },
-            { eId: '$307' },
-            { eId: '$308' },
+            {
+                label: 'Ethernet',
+                eeprom: [
+                    { eId: '$301' },
+                    { eId: '$302' },
+                    { eId: '$303' },
+                    { eId: '$304' },
+                    { eId: '$70' },
+                    { eId: '$300' },
+                    { eId: '$305' },
+                    { eId: '$307' },
+                    { eId: '$308' },
+                ],
+            },
         ],
     },
     { label: 'Advanced Motors', icon: SiCoronaengine },
