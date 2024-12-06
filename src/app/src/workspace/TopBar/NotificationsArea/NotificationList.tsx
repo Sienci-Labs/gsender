@@ -1,14 +1,16 @@
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { Notification } from 'app/workspace/definitions';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import { NotificationItem } from './NotificationItem';
-import { Notification } from 'app/workspace/definitions';
 
 type Props = {
     value: 'all' | Notification['type'];
 };
 
 const NotificationList = ({ value }: Props) => {
-    const { notifications = [] } = useWorkspaceState();
+    const notifications = useTypedSelector(
+        (state) => state.preferences.notifications,
+    );
 
     const filteredNotifications =
         value === 'all'
