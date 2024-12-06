@@ -51,7 +51,7 @@ function MenuItem({ key, label, active, onClick, icon }: MenuItemProps) {
 
 export function Menu({ menu, onClick, activeSection }: MenuProps) {
     return (
-        <div className="flex flex-col w-1/3 items-stretch border border-gray-200 divide-y bg-white">
+        <div className="flex flex-col w-1/5 items-stretch border border-gray-200 divide-y bg-white">
             {menu.map((item, index) => {
                 let active = index === activeSection;
                 return (
