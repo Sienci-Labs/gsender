@@ -9,7 +9,6 @@ import {
     useSettings,
 } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
-import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -29,18 +28,18 @@ export function Config() {
 
     return (
         <SettingsProvider>
-            <div className="w-full flex flex-grow-0 h-[700px] shadow bg-gray-50 overflow-y-hidden-clip box-border">
+            <div className="w-full flex flex-grow-0 shadow bg-gray-50 overflow-y-hidden box-border no-scrollbar">
                 <Menu
                     menu={SettingsMenu}
                     onClick={navigateToSection}
                     activeSection={activeSection}
                 />
-                <div className="flex flex-col h-[700px] w-4/5">
+                <div className="flex flex-col h-[800px] w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24">
                         <Search />
                         <ApplicationPreferences />
                     </div>
-                    <div className="px-10 min-h-3/5 flex gap-4 flex-col mt-4 box-border overflow-y-auto max-h-[960px]">
+                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll">
                         {settings.map((item, index) => {
                             return (
                                 <Section
