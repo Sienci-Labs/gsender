@@ -24,11 +24,13 @@ interface iSettingsContext {
     machineProfile: object;
     rawEEPROM: object;
     firmwareType: 'Grbl' | 'GrblHAL';
-    setMachineProfile: (o) => {};
-    setEEPROM: (state) => {};
+    setMachineProfile: (v) => void;
+    setEEPROM: (v) => void;
     connected: boolean;
     settingsAreDirty: boolean;
     setSettingsAreDirty: (v) => void;
+    searchTerm: string;
+    setSearchTerm: (v) => void;
 }
 
 interface SettingsProviderProps {
@@ -100,6 +102,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [machineProfile, setMachineProfile] = useState({});
     const [connected, setConnected] = useState(false);
     const [settingsAreDirty, setSettingsAreDirty] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -173,6 +176,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         connected,
         settingsAreDirty,
         setSettingsAreDirty,
+        searchTerm,
+        setSearchTerm,
     };
 
     return (

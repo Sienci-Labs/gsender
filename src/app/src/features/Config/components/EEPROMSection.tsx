@@ -52,8 +52,11 @@ export function EEPROMSection({
 
     return (
         <>
-            {settings.map((e) => (
-                <fieldset className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col">
+            {settings.map((e, index) => (
+                <fieldset
+                    key={`${e.label}-${index}`}
+                    className="w-[95%] m-auto border border-solid border-gray-100 p-4 rounded flex flex-col"
+                >
                     {settings.length > 1 && <legend>{e.label}</legend>}
                     {e.eeprom.map((eKey, index) => (
                         <EEPROMSettingRow
