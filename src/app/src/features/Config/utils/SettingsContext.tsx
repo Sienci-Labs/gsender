@@ -28,6 +28,7 @@ interface iSettingsContext {
     setEEPROM: (state) => {};
     connected: boolean;
     settingsAreDirty: boolean;
+    setSettingsAreDirty: (v) => void;
 }
 
 interface SettingsProviderProps {
@@ -64,12 +65,6 @@ function fetchStoreValue(key) {
 export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
-
-export function applyStoreValues(settings) {}
-
-export function applyEEPROMValues(settings) {}
-
-export function applyNewSettings(settings, eeprom) {}
 
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
     if (!settingsSections.length) {
@@ -177,6 +172,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setMachineProfile,
         connected,
         settingsAreDirty,
+        setSettingsAreDirty,
     };
 
     return (

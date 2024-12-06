@@ -4,10 +4,13 @@ import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 interface EEPROMSettingRowProps {
     eID: string;
     index: number;
+    changeHandler: (value: number) => void;
+    resetHandler: (k, v) => void;
 }
 
 function filterNewlines(data = '') {
@@ -17,8 +20,13 @@ function filterNewlines(data = '') {
     return data.replace(/\\n/gim, '\n');
 }
 
-export function EEPROMSettingRow({ eID, index }: EEPROMSettingRowProps) {
-    const { EEPROM, machineProfile, firmwareType } = useSettings();
+export function EEPROMSettingRow({
+    eID,
+    changeHandler,
+    resetHandler,
+}: EEPROMSettingRowProps) {
+    const { EEPROM, machineProfile, firmwareType, setSettingsAreDirty } =
+        useSettings();
     if (!EEPROM) {
         return;
     }
@@ -55,28 +63,47 @@ export function EEPROMSettingRow({ eID, index }: EEPROMSettingRowProps) {
 
         return (
             <div
-                key={`${EEPROMData.key}`}
+                key={`eSetting-${EEPROMData.key}`}
                 className={cn(
                     'odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center',
                     {
-                        'odd:bg-yellow-50 even:bg-yellow-50 border border-yellow-200':
-                            !isDefault,
+                        'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
                     },
                 )}
             >
                 <span className="w-1/5 text-gray-700">
                     {EEPROMData.description}
                 </span>
-                <span className="w-1/5 text-xs px-4">
+                <div
+                    className="w-1/5 text-xs px-4"
+                    key={`input-${EEPROMData.key}`}
+                >
                     <InputElement
                         info={EEPROMData}
                         setting={EEPROMData}
-                        onChange={() => {}}
+                        onChange={changeHandler(EEPROMData.globalIndex)}
                     />
-                </span>
+                </div>
                 <span className="w-1/5 text-xs px-4">
                     {!isDefault && (
-                        <button className="text-3xl" title="Reset Default">
+                        <button
+                            className="text-3xl"
+                            title="Reset Default"
+                            onClick={() => {
+                                Confirm({
+                                    title: 'Reset Single EEPROM Value',
+                                    content:
+                                        'Are you sure you want to reset this value to default?',
+                                    confirmLabel: 'Yes',
+                                    onConfirm: () => {
+                                        resetHandler(
+                                            EEPROMData.setting,
+                                            inputDefault,
+                                        );
+                                    },
+                                });
+                            }}
+                        >
                             <BiReset />
                         </button>
                     )}

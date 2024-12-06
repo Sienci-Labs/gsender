@@ -70,6 +70,18 @@ export const halDatatypeMap = {
 };
 
 export const getDatatypeInput = (type, firmware) => {
+    // Translate the old values to new
     type = Number(type);
     return halDatatypeMap[type] || String;
 };
+
+export function generateEEPROMSettings(eeprom) {
+    const toChange = {};
+    eeprom.map((setting) => {
+        if (setting.dirty) {
+            toChange[setting.setting] = setting.value;
+            setting.dirty = false;
+        }
+    });
+    return toChange;
+}

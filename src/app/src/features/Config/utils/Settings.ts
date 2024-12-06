@@ -3,6 +3,9 @@ import store from 'app/store';
 import api from 'app/api';
 import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import { toast } from 'sonner';
+import controller from 'app/lib/controller.ts';
 
 export function exportFirmwareSettings(settings) {
     const output = JSON.stringify(settings);
@@ -92,4 +95,21 @@ export function handleRestoreDefaultClick() {
         confirmLabel: 'Restore Settings',
         onConfirm: restoreDefault,
     });
+}
+
+export function updateSenderSettings(settings) {}
+
+export function updateAllSettings(settings, eeprom) {
+    const eepromToChange = generateEEPROMSettings(eeprom);
+    console.log(eepromToChange);
+    const eepromNumber = Object.keys(eepromToChange).length;
+    if (eepromNumber > 0) {
+        let changedSettings = Object.keys(eepromToChange).map(
+            (k) => `${k}=${eepromToChange[k]}`,
+        );
+        console.log(changedSettings);
+        changedSettings.push('$$');
+        controller.command('gcode', changedSettings);
+        toast.success(`Updated ${eepromNumber} EEPROM values.`);
+    }
 }

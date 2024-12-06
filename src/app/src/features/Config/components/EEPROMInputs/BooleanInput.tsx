@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ToggleSwitch from 'app/components/Switch';
 import styles from './index.module.styl';
 
-const BooleanInput = ({ info, setting, onChange, disabled }) => {
+const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
     let [bool, setBool] = useState(false);
 
     useEffect(() => {
@@ -15,7 +15,6 @@ const BooleanInput = ({ info, setting, onChange, disabled }) => {
         const value = checked ? 1 : 0;
         setBool(checked);
         onChange(value);
-        // Handle value change
     };
 
     return (
@@ -24,6 +23,7 @@ const BooleanInput = ({ info, setting, onChange, disabled }) => {
                 checked={bool}
                 onChange={booleanOnChange}
                 disabled={disabled}
+                {...props}
             />
         </div>
     );

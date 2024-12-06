@@ -5,7 +5,6 @@ interface IPSettingInputsProps {
 }
 
 export function IPSettingInput({ ip = [] }: IPSettingInputsProps) {
-    console.log(ip);
     return (
         <div className="flex flex-row gap-2 items-end">
             <input

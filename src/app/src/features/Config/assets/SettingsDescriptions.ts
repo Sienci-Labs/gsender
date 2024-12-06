@@ -1,11 +1,11 @@
 export const GRBL_HAL_SETTINGS_INPUT_TYPES = {
-    NUMBER: 'number',
-    MASK: 'mask',
-    AXIS_MASK: 'axis-mask',
-    MASK_STATUS_REPORT: 'mask-status-report',
-    SWITCH: 'switch',
-    SELECT: 'select',
-    STRING: 'string',
+    NUMBER: '5',
+    MASK: '1',
+    AXIS_MASK: '4',
+    MASK_STATUS_REPORT: '0',
+    SWITCH: '0',
+    SELECT: '3',
+    STRING: '7',
 };
 
 const { NUMBER, MASK, AXIS_MASK, MASK_STATUS_REPORT, SWITCH, SELECT, STRING } =

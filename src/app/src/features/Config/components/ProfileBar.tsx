@@ -5,7 +5,10 @@ import { CiImport } from 'react-icons/ci';
 import { CiExport } from 'react-icons/ci';
 import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { exportFirmwareSettings } from 'app/features/Config/utils/Settings';
+import {
+    exportFirmwareSettings,
+    updateAllSettings,
+} from 'app/features/Config/utils/Settings';
 import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { useRef } from 'react';
 import { toast } from 'app/lib/toaster';
@@ -18,12 +21,24 @@ interface ProfileBarProps {
 }
 
 export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
-    const { rawEEPROM, setEEPROM, settingsAreDirty } = useSettings();
+    const {
+        rawEEPROM,
+        setEEPROM,
+        settingsAreDirty,
+        setSettingsAreDirty,
+        settings,
+        EEPROM,
+    } = useSettings();
     const inputRef = useRef(null);
 
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
+
+    function updateSettingsHandler() {
+        updateAllSettings(settings, EEPROM);
+        setSettingsAreDirty(false);
+    }
 
     function importEEPROMSettings(e) {
         const file = e.target.files[0];
@@ -87,9 +102,12 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                 className={cn(
                     'p-3 text-lg rounded border-gray-500',
                     { 'bg-gray-300 text-gray-500': !settingsAreDirty },
-                    { 'bg-green-600 text-white': settingsAreDirty },
+                    {
+                        'bg-green-600 text-white': settingsAreDirty,
+                    },
                 )}
                 disabled={!settingsAreDirty}
+                onClick={updateSettingsHandler}
             >
                 Apply Settings
             </button>

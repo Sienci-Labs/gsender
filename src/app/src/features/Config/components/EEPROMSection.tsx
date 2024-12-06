@@ -11,6 +11,8 @@ import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'sonner';
 
 export function isEEPROMSettingsSection(s: gSenderEEEPROMSettings): boolean {
     return 'label' in s && 'eeprom' in s;
@@ -21,77 +23,31 @@ export interface EEPROMSectionProps {
     settings?: gSenderEEEPROMSettings;
 }
 
-/*export function EEPROMSettingRow(setting: gSenderEEPROMSetting, index: number) {
-    const { EEPROM, machineProfile, firmwareType } = useSettings();
-    if (!EEPROM) {
-        return;
-    }
-    const EEPROMData = EEPROM.find((s) => s.setting === setting.eId);
-    if (EEPROMData) {
-        const profileDefaults =
-            firmwareType === 'Grbl'
-                ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
-
-        const InputElement = getDatatypeInput(
-            EEPROMData.dataType,
-            firmwareType,
-        );
-
-        const inputDefault = get(profileDefaults, setting.eId, '-');
-        const isDefault = `${setting.value}` === `${inputDefault}`;
-        const detailString = (
-            <span>
-                <b>{EEPROMData.setting}</b>
-                <span> - </span>
-                {filterNewlines(EEPROMData.details)}
-                <br />
-                <i>Default {inputDefault}</i>
-            </span>
-        );
-
-        return (
-            <div
-                key={`${EEPROMData.key}`}
-                className="odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center"
-            >
-                <span className="w-1/5 text-gray-700">
-                    {EEPROMData.description}
-                </span>
-                <span className="w-1/5 text-xs px-4">
-                    <InputElement
-                        info={EEPROMData}
-                        setting={EEPROMData}
-                        onChange={() => {}}
-                    />
-                </span>
-                <span className="w-1/5 text-xs px-4">
-                    {!isDefault && (
-                        <button className="text-3xl" title="Reset Default">
-                            <BiReset />
-                        </button>
-                    )}
-                </span>
-                <span className="text-gray-500 text-sm w-2/5">
-                    {detailString}
-                </span>
-            </div>
-        );
-    }
-    return <></>;
-}*/
-
 export function EEPROMSection({
-    label,
     settings = [],
 }: EEPROMSectionProps): JSX.Element {
-    const { EEPROM } = useSettings();
+    const { EEPROM, setSettingsAreDirty, setEEPROM } = useSettings();
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
 
     if (!connected) {
         return <EEPROMNotConnectedWarning />;
+    }
+
+    const handleSettingsChange = (index) => (value) => {
+        setSettingsAreDirty(true);
+        setEEPROM((prev) => {
+            const updated = [...prev];
+            updated[index].value = value;
+            updated[index].dirty = true;
+            return updated;
+        });
+    };
+
+    function handleSingleSettingReset(setting, value) {
+        controller.command('gcode', [`${setting}=${value}`, '$$']);
+        toast.success(`Restored ${setting} to default value of ${value}`);
     }
 
     return (
@@ -104,6 +60,8 @@ export function EEPROMSection({
                             eID={eKey.eId}
                             index={index}
                             key={`${eKey.eId}-${index}`}
+                            changeHandler={handleSettingsChange}
+                            resetHandler={handleSingleSettingReset}
                         />
                     ))}
                 </fieldset>
