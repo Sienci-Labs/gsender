@@ -189,7 +189,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         label: 'Touch Plate Type',
-                        key: 'widgets.connection.baudrate',
+                        key: 'widgets.probe.probeType',
                         type: 'select',
                         description:
                             "Select the touch plate you're using with your machine (default Standard block)",
@@ -384,16 +384,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         label: 'Delay after start',
-                        key: '',
+                        key: 'workspace.spindleDelay',
                         description:
-                            'Delays all jobs at the start to give time for the spindle to spin up',
+                            'Delays all jobs at the start to give time for the spindle to spin up ($392)',
                         type: 'hybrid',
                         eID: '$392',
                         unit: 's',
                     },
                     {
                         label: 'Minimum Spindle Speed',
-                        key: '',
+                        key: 'widgets.spindle.spindleMin',
                         description:
                             'Match this to the minimum speed your spindle is able to spin at ($31, default 7200)',
                         type: 'hybrid',
@@ -402,16 +402,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Maximum Spindle Speed',
-                        key: '',
+                        key: 'widgets.spindle.spindleMax',
                         description:
                             'Match this to the maximum speed your spindle is able to spin at ($30, default 24000)',
-                        type: 'boolean',
+                        type: 'hybrid',
                         eID: '$30',
                         unit: 'rpm',
                     },
                     {
                         label: 'Minimum Laser Power',
-                        key: '',
+                        key: 'widgets.spindle.laser.minPower',
                         description:
                             'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
                         type: 'hybrid',
@@ -420,7 +420,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Maximum Laser Power',
-                        key: '',
+                        key: 'widgets.spindle.laser.maxPower',
                         description:
                             'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
                         type: 'hybrid',
@@ -429,7 +429,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Laser X Offset',
-                        key: '',
+                        key: 'widgets.spindle.laser.xOffset',
                         description:
                             'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
                         type: 'hybrid',
@@ -438,7 +438,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Laser Y Offset',
-                        key: '',
+                        key: 'widgets.spindle.laser.yOffset',
                         description:
                             'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
                         type: 'hybrid',
@@ -637,7 +637,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         label: 'Resolution',
-                        key: '',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$101',
                         description:
                             'Travel resolution in steps per degree ($103, default 19.75308642)',
                         type: 'hybrid',
@@ -646,7 +646,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Max Speed',
-                        key: '',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$111',
                         description:
                             'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
                         type: 'hybrid',

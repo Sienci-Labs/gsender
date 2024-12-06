@@ -1,5 +1,6 @@
 import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { useEffect, useState } from 'react';
 
 export interface HybridNumberInputProps {
     unit?: string;
@@ -15,19 +16,38 @@ export function HybridNumber({
     eepromKey,
     onChange,
 }: HybridNumberInputProps) {
-    const { firmwareType, connected, rawEEPROM } = useSettings();
+    const { firmwareType, connected, EEPROM, setEEPROM, setSettingsAreDirty } =
+        useSettings();
+    const [eepromObject, setEEPROMObject] = useState({});
 
-    const useEEPROM = connected && firmwareType === 'GrblHAL';
+    const useEEPROM = connected && firmwareType === 'grblHAL';
 
-    function hybridOnChange(v) {}
+    useEffect(() => {
+        let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
+        if (eepromValue && useEEPROM) {
+            value = Number(eepromValue.value);
+            setEEPROMObject(eepromValue);
+            console.log(value);
+        }
+    }, [EEPROM]);
+
+    function hybridOnChange(v) {
+        if (useEEPROM) {
+            const payload = { ...eepromObject, value: v, dirty: true };
+            setEEPROM((prev) => {
+                const updated = [...prev];
+                updated[payload.globalIndex] = payload;
+                return updated;
+            });
+            setSettingsAreDirty(true);
+        } else {
+            onChange(v);
+        }
+    }
 
     // If we're connected and using SLB we use the EEPROM value
     if (useEEPROM) {
-        console.log('using EEPROM');
-        let eepromValue = rawEEPROM[eepromKey];
-        if (eepromValue) {
-            value = eepromValue;
-        }
+        value = eepromObject.value;
     }
 
     return (
@@ -36,7 +56,7 @@ export function HybridNumber({
             index={0}
             subIndex={0}
             unit={unit}
-            onChange={onChange}
+            onChange={hybridOnChange}
         />
     );
 }
