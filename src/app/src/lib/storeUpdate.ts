@@ -1,6 +1,7 @@
 import store from '../store';
 import defaultState from '../store/defaultState';
 import api from '../api';
+import { toast } from 'app/lib/toaster';
 
 export const restoreDefault = async (): Promise<void> => {
     await api.events.clearAll();
@@ -13,11 +14,12 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
 
     // if this is being called for importing settings, need to reload
     // if sync, no reload needed
-    if (!isSync) {
+    /*if (!isSync) {
         setTimeout(() => {
             window.location.reload();
         }, 250);
-    }
+    }*/
+    toast.success('Settings restored');
 };
 
 export const storeUpdate = async (
