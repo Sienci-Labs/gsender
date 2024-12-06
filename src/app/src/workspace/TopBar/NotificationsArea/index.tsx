@@ -9,9 +9,11 @@ import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 import TabList from './TabList';
 import Header from './Header';
+import get from 'lodash/get';
 
 const NotificationsArea = () => {
-    const { notifications = [] } = useWorkspaceState();
+    const workspaceState = useWorkspaceState();
+    const notifications = get(workspaceState, 'notifications', []);
 
     return (
         <Popover>

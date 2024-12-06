@@ -26,8 +26,9 @@ export const storeUpdate = async (
 ): Promise<void> => {
     try {
         const { settings, events = [], state } = JSON.parse(content);
+        console.log(settings);
 
-        await new Promise((resolve, _reject) => {
+        /*await new Promise((resolve, _reject) => {
             // delete all old events
             const res = api.events.clearAll();
             resolve(res);
@@ -37,7 +38,7 @@ export const storeUpdate = async (
                     api.events.create(event),
                 ),
             ]);
-        });
+        });*/
 
         if (settings) {
             restoreSettings(settings, isSync);
@@ -45,6 +46,7 @@ export const storeUpdate = async (
             restoreSettings(state, isSync);
         }
     } catch (error) {
+        console.error(error);
         /**
          *  Possible errors:
          *  1. JSON.parse(content) could not execute
