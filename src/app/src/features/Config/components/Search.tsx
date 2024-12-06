@@ -44,6 +44,7 @@ export function Search() {
                     placeholder="Search Config"
                     value={searchTerm}
                     onChange={onSearchChange}
+                    onSubmit={(e) => e.preventDefault()}
                     ref={inputRef}
                 />
             </div>
