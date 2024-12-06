@@ -33,7 +33,6 @@ export function getFilteredEEPROMSettings(
         const eKey = setting.replace('$', '');
         const halData = get(halDescriptions, `${eKey}`, {
             group: -1,
-            details: '',
         });
         const halGroup = get(halGroups, `${halData.group}.label`, '');
 
