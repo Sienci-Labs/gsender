@@ -28,7 +28,7 @@ import {
 } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
-import { Workspace } from 'app/workspace/definitions';
+import { Notification, Workspace } from 'app/workspace/definitions';
 
 // Types
 
@@ -131,6 +131,7 @@ export interface PreferencesState {
         shouldHold: boolean;
     };
     ipList: Array<string>;
+    notifications: Notification[];
 }
 
 export interface VisualizerState {
