@@ -24,7 +24,6 @@ export function SettingSection({
             const updated = [...prev];
             updated[i].value = v;
             updated[i].dirty = true;
-            console.log(updated[i]);
             return updated;
         });
     };

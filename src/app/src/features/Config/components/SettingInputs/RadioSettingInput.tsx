@@ -19,7 +19,6 @@ export function RadioSettingInput({
 }: RadioSettingInputProps): React.ReactNode {
     value = `${value}`;
     const handler = (e) => {
-        console.log(e);
         onChange(e);
     };
     return (

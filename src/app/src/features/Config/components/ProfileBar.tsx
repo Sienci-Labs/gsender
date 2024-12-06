@@ -89,7 +89,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     <IconFunctionButton
                         icon={<GrRevert />}
                         label="Defaults"
-                        disabled={!connected}
+                        disabled={true}
                     />
                     <IconFunctionButton
                         icon={<PiLightning />}

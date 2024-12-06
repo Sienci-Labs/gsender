@@ -41,7 +41,6 @@ export function Section({
     const filteredSettings = settings.filter((o) =>
         matchesSearchTerm(o, searchTerm),
     );
-    console.log(filteredSettings);
 
     return (
         <div id={id} className={cn({ hidden: filteredSettings.length === 0 })}>

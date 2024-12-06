@@ -7,7 +7,8 @@ const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
 
     useEffect(() => {
         let { value } = setting;
-        value = Number(setting.value) === 1;
+        value = Number(value) === 1;
+        console.log(value);
         setBool(value);
     }, []);
 

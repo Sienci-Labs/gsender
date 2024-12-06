@@ -8,10 +8,7 @@ interface IPSettingInputsProps {
 export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
     function updateIPPortion(index, v) {
         const newIP = [...ip];
-        console.log(newIP);
-        console.log(v);
         newIP[index] = Number(v);
-        console.log(newIP);
         onChange(newIP);
     }
     return (
