@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 
 interface EEPROMSettingRowProps {
     eID: string;
@@ -25,8 +26,13 @@ export function EEPROMSettingRow({
     changeHandler,
     resetHandler,
 }: EEPROMSettingRowProps) {
-    const { EEPROM, machineProfile, firmwareType, setSettingsAreDirty } =
-        useSettings();
+    const {
+        EEPROM,
+        machineProfile,
+        firmwareType,
+        searchTerm,
+        setSettingsAreDirty,
+    } = useSettings();
     if (!EEPROM) {
         return;
     }
@@ -51,6 +57,8 @@ export function EEPROMSettingRow({
             ? `${Number(EEPROMData.value)}` === `${Number(inputDefault)}`
             : EEPROMData.value === inputDefault;
 
+        const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
+
         const detailString = (
             <span>
                 <b>{EEPROMData.setting}</b>
@@ -68,6 +76,9 @@ export function EEPROMSettingRow({
                     'odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center',
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
+                    },
+                    {
+                        hidden: !matchesSearch,
                     },
                 )}
             >

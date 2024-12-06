@@ -97,6 +97,14 @@ export function handleRestoreDefaultClick() {
     });
 }
 
+export function matchesSearchTerm(o, term = '') {
+    // For empty search, we always match
+    if (term.length === 0 || !term) {
+        return true;
+    }
+    return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
+}
+
 export function updateSenderSettings(settings) {}
 
 export function updateAllSettings(settings, eeprom) {
