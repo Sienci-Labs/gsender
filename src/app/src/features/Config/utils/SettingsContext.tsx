@@ -27,6 +27,7 @@ interface iSettingsContext {
     setMachineProfile: (o) => {};
     setEEPROM: (state) => {};
     connected: boolean;
+    settingsAreDirty: boolean;
 }
 
 interface SettingsProviderProps {
@@ -42,6 +43,7 @@ const defaultState = {
     machineProfile: {},
     firmwareType: 'Grbl',
     connected: false,
+    settingsAreDirty: false,
 };
 
 export const SettingsContext =
@@ -102,6 +104,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
     const [machineProfile, setMachineProfile] = useState({});
     const [connected, setConnected] = useState(false);
+    const [settingsAreDirty, setSettingsAreDirty] = useState(false);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -173,6 +176,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         rawEEPROM,
         setMachineProfile,
         connected,
+        settingsAreDirty,
     };
 
     return (

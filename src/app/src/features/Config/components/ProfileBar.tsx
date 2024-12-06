@@ -11,13 +11,14 @@ import { useRef } from 'react';
 import { toast } from 'app/lib/toaster';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
+import cn from 'classnames';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
 }
 
 export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
-    const { rawEEPROM, setEEPROM } = useSettings();
+    const { rawEEPROM, setEEPROM, settingsAreDirty } = useSettings();
     const inputRef = useRef(null);
 
     const connected = useSelector(
@@ -82,7 +83,14 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     />
                 </div>
             </div>
-            <button className="bg-green-600 text-white p-3 text-lg rounded border-gray-500">
+            <button
+                className={cn(
+                    'p-3 text-lg rounded border-gray-500',
+                    { 'bg-gray-300 text-gray-500': !settingsAreDirty },
+                    { 'bg-green-600 text-white': settingsAreDirty },
+                )}
+                disabled={!settingsAreDirty}
+            >
                 Apply Settings
             </button>
             <input

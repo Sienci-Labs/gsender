@@ -3,6 +3,7 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
+import cn from 'classnames';
 
 interface EEPROMSettingRowProps {
     eID: string;
@@ -34,7 +35,14 @@ export function EEPROMSettingRow({ eID, index }: EEPROMSettingRowProps) {
         );
 
         const inputDefault = get(profileDefaults, eID, '-');
-        const isDefault = `${EEPROMData.value}` === `${inputDefault}`;
+        const settingIsNumberValue = !(
+            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
+        );
+
+        const isDefault = settingIsNumberValue
+            ? `${Number(EEPROMData.value)}` === `${Number(inputDefault)}`
+            : EEPROMData.value === inputDefault;
+
         const detailString = (
             <span>
                 <b>{EEPROMData.setting}</b>
@@ -48,7 +56,13 @@ export function EEPROMSettingRow({ eID, index }: EEPROMSettingRowProps) {
         return (
             <div
                 key={`${EEPROMData.key}`}
-                className="odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center"
+                className={cn(
+                    'odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center',
+                    {
+                        'odd:bg-yellow-50 even:bg-yellow-50 border border-yellow-200':
+                            !isDefault,
+                    },
+                )}
             >
                 <span className="w-1/5 text-gray-700">
                     {EEPROMData.description}
