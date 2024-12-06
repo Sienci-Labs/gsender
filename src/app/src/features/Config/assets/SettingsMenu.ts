@@ -298,8 +298,61 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         eId: '$21',
                     },
+                ],
+            },
+            {
+                label: 'Homing Plan',
+                eeprom: [
                     {
-                        eId: '$22',
+                        eId: '$23',
+                    },
+                    {
+                        eId: '$43',
+                    },
+                    {
+                        eId: '$44',
+                    },
+                    {
+                        eId: '$45',
+                    },
+                    {
+                        eId: '$46',
+                    },
+                    {
+                        eId: '$47',
+                    },
+                    {
+                        eId: '$25',
+                    },
+                    {
+                        eId: '$190',
+                    },
+                    {
+                        eId: '$191',
+                    },
+                    {
+                        eId: '$192',
+                    },
+                    {
+                        eId: '$24',
+                    },
+                    {
+                        eId: '$180',
+                    },
+                    {
+                        eId: '$181',
+                    },
+                    {
+                        eId: '$182',
+                    },
+                    {
+                        eId: '$183',
+                    },
+                    {
+                        eId: '$26',
+                    },
+                    {
+                        eId: '$27',
                     },
                 ],
             },
@@ -341,6 +394,148 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 key: '',
                 description: '',
                 type: 'boolean',
+            },
+        ],
+        eeprom: [
+            {
+                label: 'Spindle',
+                eeprom: [
+                    {
+                        eId: '$395',
+                    },
+                    {
+                        eId: '$511',
+                    },
+                    {
+                        eId: '$512',
+                    },
+                    {
+                        eId: '$513',
+                    },
+                    {
+                        eId: '$520',
+                    },
+                    {
+                        eId: '$521',
+                    },
+                    {
+                        eId: '$522',
+                    },
+                    {
+                        eId: '$523',
+                    },
+                ],
+            },
+            {
+                label: 'Spindle PWM',
+                eeprom: [
+                    {
+                        eId: '$9',
+                    },
+                    {
+                        eId: '$16',
+                    },
+                    {
+                        eId: '$33',
+                    },
+                    {
+                        eId: '$34',
+                    },
+                    {
+                        eId: '$35',
+                    },
+                    {
+                        eId: '$36',
+                    },
+                ],
+            },
+            {
+                label: 'Spindle Modbus',
+                eeprom: [
+                    {
+                        eId: '$340',
+                    },
+                    {
+                        eId: '$374',
+                    },
+                    {
+                        eId: '$375',
+                    },
+                    {
+                        eId: '$462',
+                    },
+                    {
+                        eId: '$463',
+                    },
+                    {
+                        eId: '$464',
+                    },
+                    {
+                        eId: '$465',
+                    },
+                    {
+                        eId: '$466',
+                    },
+                    {
+                        eId: '$467',
+                    },
+                    {
+                        eId: '$468',
+                    },
+                    {
+                        eId: '$469',
+                    },
+                    {
+                        eId: '$470',
+                    },
+                    {
+                        eId: '$471',
+                    },
+                    {
+                        eId: '$476',
+                    },
+                    {
+                        eId: '$477',
+                    },
+                    {
+                        eId: '$478',
+                    },
+                    {
+                        eId: '$479',
+                    },
+                ],
+            },
+            {
+                label: 'Laser',
+                eeprom: [
+                    {
+                        eId: '$743',
+                    },
+                    {
+                        eId: '$731',
+                    },
+                    {
+                        eId: '$730',
+                    },
+                    {
+                        eId: '$741',
+                    },
+                    {
+                        eId: '$742',
+                    },
+                    {
+                        eId: '$733',
+                    },
+                    {
+                        eId: '$734',
+                    },
+                    {
+                        eId: '$735',
+                    },
+                    {
+                        eId: '$736',
+                    },
+                ],
             },
         ],
     },
@@ -385,7 +580,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Rotary',
                 eeprom: [
-                    { eId: '$376' },
                     { eId: '$376' },
                     { eId: '$103' },
                     { eId: '$113' },
@@ -473,7 +667,99 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
-    { label: 'Advanced Motors', icon: SiCoronaengine },
-    { label: 'More Settings', icon: MdOutlineReadMore },
-    { label: 'About', icon: CiCircleInfo },
+    {
+        label: 'Advanced Motors',
+        icon: SiCoronaengine,
+        eeprom: [
+            {
+                label: 'Advanced Motors',
+                eeprom: [
+                    { eId: '$0' },
+                    { eId: '$1' },
+                    { eId: '$2' },
+                    { eId: '$4' },
+                    { eId: '$29' },
+                    { eId: '$140' },
+                    { eId: '$141' },
+                    { eId: '$142' },
+                    { eId: '$143' },
+                    { eId: '$200' },
+                    { eId: '$201' },
+                    { eId: '$202' },
+                    { eId: '$203' },
+                    { eId: '$210' },
+                    { eId: '$211' },
+                    { eId: '$212' },
+                    { eId: '$213' },
+                    { eId: '$220' },
+                    { eId: '$221' },
+                    { eId: '$222' },
+                    { eId: '$223' },
+                    { eId: '$338' },
+                    { eId: '$339' },
+                    { eId: '$650' },
+                    { eId: '$651' },
+                    { eId: '$652' },
+                    { eId: '$653' },
+                    { eId: '$654' },
+                    { eId: '$655' },
+                    { eId: '$656' },
+                    { eId: '$657' },
+                    { eId: '$658' },
+                    { eId: '$659' },
+                    { eId: '$660' },
+                    { eId: '$661' },
+                    { eId: '$662' },
+                    { eId: '$663' },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'More Settings',
+        icon: MdOutlineReadMore,
+        eeprom: [
+            {
+                label: 'More Settings',
+                eeprom: [
+                    { eId: '$10' },
+                    { eId: '$11' },
+                    { eId: '$12' },
+                    { eId: '$13' },
+                    { eId: '$14' },
+                    { eId: '$15' },
+                    { eId: '$17' },
+                    { eId: '$18' },
+                    { eId: '$19' },
+                    { eId: '$28' },
+                    { eId: '$39' },
+                    { eId: '$41' },
+                    { eId: '$42' },
+                    { eId: '$56' },
+                    { eId: '$57' },
+                    { eId: '$58' },
+                    { eId: '$60' },
+                    { eId: '$61' },
+                    { eId: '$63' },
+                    { eId: '$64' },
+                    { eId: '$65' },
+                    { eId: '$341' },
+                    { eId: '$342' },
+                    { eId: '$343' },
+                    { eId: '$344' },
+                    { eId: '$345' },
+                    { eId: '$346' },
+                    { eId: '$370' },
+                    { eId: '$372' },
+                    { eId: '$384' },
+                    { eId: '$393' },
+                    { eId: '$398' },
+                    { eId: '$481' },
+                    { eId: '$484' },
+                    { eId: '$486' },
+                    { eId: '$666' },
+                ],
+            },
+        ],
+    },
 ];
