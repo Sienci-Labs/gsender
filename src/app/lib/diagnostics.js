@@ -26,7 +26,7 @@ import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
-import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
@@ -182,6 +182,10 @@ const getOS = () => {
 const getGCodeFile = () => {
     const gcode = get(reduxStore.getState(), 'file.content', '');
     return gcode;
+};
+
+const getGCodeFileName = () => {
+    return get(reduxStore.getState(), 'file.name', 'diagnosticGcode.gcode');
 };
 
 const getMode = () => {
@@ -773,6 +777,11 @@ function generateSupportFile() {
         const zip = new JSZip();
         const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
         const senderSettings = await exportSenderSettings();
+
+        const code = getGCodeFile();
+        if (code.length > 0) {
+            zip.file(getGCodeFileName(), new Blob([code]));
+        }
 
         zip.file(diagnosticPDFLabel, blob);
         zip.file(`gSenderSettings_${currentDate}_${currentTime}.json`, senderSettings);
