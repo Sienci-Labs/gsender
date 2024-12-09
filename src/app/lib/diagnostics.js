@@ -35,6 +35,8 @@ import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from 'app/api';
 import { homingString } from './eeprom';
+import JSZip from 'jszip';
+
 
 const styles = StyleSheet.create({
     body: {
@@ -768,12 +770,30 @@ function generateSupportFile() {
         const currentDate = date.toLocaleDateString().replaceAll('/', '-');
         const currentTime = date.toLocaleTimeString('it-IT').replaceAll(':', '-');
 
-        saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+        const zip = new JSZip();
+        const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+        const senderSettings = await exportSenderSettings();
+
+        zip.file(diagnosticPDFLabel, blob);
+        zip.file(`gSenderSettings_${currentDate}_${currentTime}.json`, senderSettings);
+        zip.generateAsync({ type: 'blob' }).then((content) => {
+            saveAs(content, 'diagnostics_' + currentDate + '_' + currentTime + '.zip');
+        });
     };
 
     return (
         <ToolModalButton icon="fas fa-file-pdf" onClick={submitForm}>Download Now!</ToolModalButton>
     );
+}
+
+async function exportSenderSettings() {
+    const settings = store.get();
+    settings.commandKeys = Object.fromEntries(Object.entries(settings.commandKeys).filter(([key, shortcut]) => shortcut.category !== 'Macros'));
+    delete settings.session;
+    const res = await api.events.fetch();
+    const events = res.body.records;
+    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+    return new Blob([settingsJSON], { type: 'application/json' });
 }
 
 export default generateSupportFile;
