@@ -1023,7 +1023,7 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryParserState.state = true;
                 this.actionTime.queryParserState = now;
-                this.connection.writeln(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
+                this.writeln(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
             }
         }, 500);
 
