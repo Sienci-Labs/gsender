@@ -70,6 +70,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const [optionDescription, setOptionDescription] = useState('');
     const [preHook, setPreHook] = useState(store.get('workspace.toolChangeHooks.preHook'));
     const [postHook, setPostHook] = useState(store.get('workspace.toolChangeHooks.postHook'));
+    //const [combineBlocks, setCombineBlocks] = useState(false);
 
     // Handlers
     const handleToolChange = (selection) => {
@@ -121,8 +122,10 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const handleSaveCode = () => {
         store.set('workspace.toolChangeHooks.preHook', preHook);
         store.set('workspace.toolChangeHooks.postHook', postHook);
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const context = {
             toolChangeOption,
+            ...toolChangeConfig,
             postHook,
             preHook
         };
@@ -136,8 +139,12 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const context = {
             toolChangeOption,
+            ...toolChangeConfig,
+            postHook,
+            preHook
         };
         controller.command('toolchange:context', context);
     }, [toolChangeOption]);
@@ -153,6 +160,18 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                         style={{ marginBottom: '1rem' }}
                     />
                 </TooltipCustom>
+                {
+                    toolChangeOption === 'Code' && (
+                        <TooltipCustom content="Combine the blocks and avoid dialogs on tool changes - useful for ATC configurations" location="default">
+                            <ToggleSwitch
+                                label="Skip Dialog"
+                                checked={state.toolChange.skipDialog}
+                                onChange={actions.toolChange.handleSkipDialog}
+                                style={{ marginBottom: '1rem' }}
+                            />
+                        </TooltipCustom>
+                    )
+                }
                 <small>Strategy to handle M6 tool change commands</small>
                 <div className={styles.addMargin}>
                     <Select

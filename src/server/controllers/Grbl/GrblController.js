@@ -517,7 +517,7 @@ class GrblController {
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -2049,6 +2049,7 @@ class GrblController {
             },
             'toolchange:context': () => {
                 const [context] = args;
+                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {
