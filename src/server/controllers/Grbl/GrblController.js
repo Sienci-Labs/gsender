@@ -346,7 +346,8 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({
@@ -513,7 +514,8 @@ class GrblController {
                         }
                     }
 
-                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
@@ -2133,10 +2135,21 @@ class GrblController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
-        preHook = `G4 P1\n${preHook}`;
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        preHook = `G4 P1\n${preHook}`;
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+        console.log(block);
+        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        if (!skipDialog) {
+            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+        }
 
         this.command('gcode', block);
     }
