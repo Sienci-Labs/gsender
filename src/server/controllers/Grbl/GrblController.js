@@ -2136,9 +2136,10 @@ class GrblController {
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
         let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
-        const block = this.convertGcodeToArray(preHook);
 
         preHook = `G4 P1\n${preHook}`;
+        const block = this.convertGcodeToArray(preHook);
+
         // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
         if (skipDialog) {
             block.push('G4 P1');
@@ -2146,10 +2147,7 @@ class GrblController {
             block.push(POSTHOOK_COMPLETE);
         }
         console.log(block);
-        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
-        if (!skipDialog) {
-            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
-        }
+
 
         this.command('gcode', block);
     }
