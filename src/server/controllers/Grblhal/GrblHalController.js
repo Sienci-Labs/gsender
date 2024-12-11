@@ -488,6 +488,7 @@ class GrblHalController {
                             const count = this.sender.incrementToolChanges();
 
                             setTimeout(() => {
+                                console.log('This is a callback');
                                 // Emit the current state so latest tool info is available
                                 this.runner.setTool(tool?.[2]); // set tool in runner state
                                 this.emit('controller:state', GRBLHAL, this.state, tool?.[2]); // set tool in redux
@@ -503,10 +504,10 @@ class GrblHalController {
                     }
 
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    if (!passthroughM6) {
+                    if (!passthroughM6 || toolChangeOption === 'Code') {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -1022,7 +1023,7 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryParserState.state = true;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
+                this.connection.writeln(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}\n`); // $G equivalent
             }
         }, 500);
 

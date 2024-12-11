@@ -152,14 +152,18 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     return (
         <div style={{ width: '70%' }}>
             <Fieldset legend="Tool Change" className={styles.paddingBottom}>
-                <TooltipCustom content="Send the toolchange line as is. This assumes that your firmware can properly handle both M6 and T commands." location="default">
-                    <ToggleSwitch
-                        label="Passthrough"
-                        checked={state.toolChange.passthrough}
-                        onChange={actions.toolChange.handlePassthroughToggle}
-                        style={{ marginBottom: '1rem' }}
-                    />
-                </TooltipCustom>
+                {
+                    toolChangeOption !== 'Code' && (
+                        <TooltipCustom content="Send the toolchange line as is. This assumes that your firmware can properly handle both M6 and T commands." location="default">
+                            <ToggleSwitch
+                                label="Passthrough"
+                                checked={state.toolChange.passthrough}
+                                onChange={actions.toolChange.handlePassthroughToggle}
+                                style={{ marginBottom: '1rem' }}
+                            />
+                        </TooltipCustom>
+                    )
+                }
                 {
                     toolChangeOption === 'Code' && (
                         <TooltipCustom content="Combine the blocks and avoid dialogs on tool changes - useful for ATC configurations" location="default">
