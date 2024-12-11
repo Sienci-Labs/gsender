@@ -1597,18 +1597,15 @@ class Visualizer extends Component {
             pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
                 this.setState({ layoutIsReversed });
             }),
-            pubsub.subscribe(
-                'gcode:surfacing',
-                async (_, { gcode, name, size }) => {
-                    const file = new File([gcode], name);
-                    await uploadGcodeFileToServer(
-                        file,
-                        controller.port,
-                        VISUALIZER_PRIMARY,
-                    );
-                },
-            ),
-            pubsub.subscribe('file:content', (_, content, size, name) => {
+            pubsub.subscribe('gcode:surfacing', async (_, { gcode, name }) => {
+                const file = new File([gcode], name);
+                await uploadGcodeFileToServer(
+                    file,
+                    controller.port,
+                    VISUALIZER_PRIMARY,
+                );
+            }),
+            pubsub.subscribe('file:content', (_, { content, size, name }) => {
                 this.setState({
                     gcode: {
                         ...this.state.gcode,

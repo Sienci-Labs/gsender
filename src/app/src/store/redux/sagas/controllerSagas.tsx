@@ -34,12 +34,6 @@ import automaticToolChange from 'app/wizards/automaticToolchange';
 import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
 import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import {
-    Toaster,
-    TOASTER_INFO,
-    TOASTER_SUCCESS,
-    TOASTER_UNTIL_CLOSE,
-} from 'app/lib/toaster/ToasterLib';
 // TODO: add worker types
 // @ts-ignore
 import VisualizeWorker from 'app/workers/Visualize.worker';
@@ -92,7 +86,11 @@ import {
 } from '../../definitions';
 import { ControllerSettings } from '../../definitions';
 import { FeederStatus } from 'app/lib/definitions/sender_feeder';
-import { EEPROMDescriptions, MachineProfile } from 'app/definitions/firmware';
+import {
+    EEPROMDescriptions,
+    FIRMWARE_TYPES_T,
+    MachineProfile,
+} from 'app/definitions/firmware';
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
@@ -111,7 +109,7 @@ import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
 
 export function* initialize(): Generator<any, void, any> {
-    let visualizeWorker: typeof VisualizeWorker | null = null;
+    // let visualizeWorker: typeof VisualizeWorker | null = null;
     // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
@@ -280,7 +278,7 @@ export function* initialize(): Generator<any, void, any> {
         // so it can save it and give it to the normal or svg visualizer
 
         // TODO: ensure this is the correct way to do it, try to avoid pubsub as it's deprecated
-        pubsub.publish('file:content', content, size, name);
+        pubsub.publish('file:content', { content, size, name });
         // Processing started for gcodeProcessor
         reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
         reduxStore.dispatch(
@@ -435,48 +433,51 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('serialport:openController', (controllerType) => {
-        const machineProfile: MachineProfile = store.get(
-            'workspace.machineProfile',
-        );
-        const showLineWarnings: boolean = store.get(
-            'widgets.visualizer.showLineWarnings',
-        );
-        const delay: number = store.get('widgets.spindle.delay');
-        // Reset homing run flag to prevent rapid position without running homing
-        reduxStore.dispatch(resetHoming());
+    controller.addListener(
+        'serialport:openController',
+        (controllerType: FIRMWARE_TYPES_T) => {
+            const machineProfile: MachineProfile = store.get(
+                'workspace.machineProfile',
+            );
+            const showLineWarnings: boolean = store.get(
+                'widgets.visualizer.showLineWarnings',
+            );
+            const delay: number = store.get('widgets.spindle.delay');
+            // Reset homing run flag to prevent rapid position without running homing
+            reduxStore.dispatch(resetHoming());
 
-        if (machineProfile) {
-            controller.command('machineprofile:load', machineProfile);
-        }
+            if (machineProfile) {
+                controller.command('machineprofile:load', machineProfile);
+            }
 
-        if (showLineWarnings) {
-            controller.command('settings:updated', { showLineWarnings });
-        }
+            if (showLineWarnings) {
+                controller.command('settings:updated', { showLineWarnings });
+            }
 
-        if (delay !== undefined) {
-            controller.command('settings:updated', { spindleDelay: delay });
-        }
-        const hooks = store.get('workspace.toolChangeHooks', {});
-        const toolChangeOption = store.get(
-            'workspace.toolChangeOption',
-            'Ignore',
-        );
-        const toolChangeContext = {
-            ...hooks,
-            toolChangeOption,
-        };
-        controller.command('toolchange:context', toolChangeContext);
+            if (delay !== undefined) {
+                controller.command('settings:updated', { spindleDelay: delay });
+            }
+            const hooks = store.get('workspace.toolChangeHooks', {});
+            const toolChangeOption = store.get(
+                'workspace.toolChangeOption',
+                'Ignore',
+            );
+            const toolChangeContext = {
+                ...hooks,
+                toolChangeOption,
+            };
+            controller.command('toolchange:context', toolChangeContext);
 
-        store.set('widgets.connection.controller.type', controllerType);
-        reduxStore.dispatch(updateControllerType({ type: controllerType }));
+            store.set('widgets.connection.controller.type', controllerType);
+            reduxStore.dispatch(updateControllerType({ type: controllerType }));
 
-        pubsub.publish('machine:connected');
-    });
+            pubsub.publish('machine:connected');
+        },
+    );
 
     controller.addListener(
         'serialport:close',
-        (options: SerialPortOptions, received: number) => {
+        (options: SerialPortOptions, _received: number) => {
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             reduxStore.dispatch(closeConnection({ port: options.port }));
@@ -487,7 +488,8 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'serialport:closeController',
-        (options: SerialPortOptions, received: number) => {
+        (_options: SerialPortOptions, received: number) => {
+            console.log('controller sagas close controller');
             // if the connection was closed unexpectedly (not by the user),
             // the number of lines sent will be defined.
             // create a pop up so the user can connect to the last active port
@@ -521,11 +523,10 @@ export function* initialize(): Generator<any, void, any> {
                         // TODO: add this back in
                         connectToLastDevice(() => {
                             // prompt recovery, either with homing or a prompt to start from line
-                            // pubsub.publish(
-                            //     'disconnect:recovery',
-                            //     received,
-                            //     homingEnabled,
-                            // );
+                            pubsub.publish('disconnect:recovery', {
+                                received,
+                                homingEnabled,
+                            });
                         });
                     },
                 });
@@ -690,19 +691,13 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
-    pubsub.subscribe('estimate:done', (msg, data) => {
-        estimateWorker?.terminate();
+    pubsub.subscribe('estimate:done', (_msg, _data) => {
+        // estimateWorker?.terminate();
     });
 
     pubsub.subscribe(
         'reparseGCode',
-        (
-            msg: string,
-            content: string,
-            size: number,
-            name: string,
-            visualizer: string,
-        ) => {
+        (_msg: string, { content, size, name, visualizer }) => {
             parseGCode(content, size, name, visualizer);
         },
     );

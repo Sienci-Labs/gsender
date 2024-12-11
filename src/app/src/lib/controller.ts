@@ -59,6 +59,7 @@ export interface ControllerListeners {
     'serialport:change': Array<Function>;
     'serialport:open': Array<Function>;
     'serialport:close': Array<Function>;
+    'serialport:closeController': Array<Function>;
     'serialport:error': Array<Function>;
     'serialport:read': Array<Function>;
     'serialport:write': Array<Function>;
@@ -159,6 +160,7 @@ class Controller {
         'serialport:change': [],
         'serialport:open': [],
         'serialport:close': [],
+        'serialport:closeController': [],
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],
