@@ -385,12 +385,12 @@ class GrblController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
-                this.feeder.reset();
-                this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
-                log.warn('Stopped sending G-code commands in Alarm mode');
-                return;
-            }
+            // if (this.runner.isAlarm()) {
+            //     this.feeder.reset();
+            //     this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
+            //     log.warn('Stopped sending G-code commands in Alarm mode');
+            //     return;
+            // }
 
             line = String(line).trim();
             if (line.length === 0) {
