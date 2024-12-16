@@ -1124,7 +1124,7 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.writeln('$$\n');
+        this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
     }
@@ -1335,7 +1335,7 @@ class GrblHalController {
             setTimeout(async () => {
                 if (this.connection) {
                     await delay(300);
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                    this.connection.writeImmediate(`${String.fromCharCode(0x87)}\n`);
                     this.connection.write('$I\n');
                 }
                 let counter = 3;
