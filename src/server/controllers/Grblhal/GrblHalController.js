@@ -1124,7 +1124,7 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
-        this.writeln('$$');
+        this.writeln('$$\n');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
     }
