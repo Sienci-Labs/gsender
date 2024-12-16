@@ -488,7 +488,6 @@ class GrblHalController {
                             const count = this.sender.incrementToolChanges();
 
                             setTimeout(() => {
-                                console.log('This is a callback');
                                 // Emit the current state so latest tool info is available
                                 this.runner.setTool(tool?.[2]); // set tool in runner state
                                 this.emit('controller:state', GRBLHAL, this.state, tool?.[2]); // set tool in redux
@@ -503,11 +502,11 @@ class GrblHalController {
                         }
                     }
 
-                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    if (!passthroughM6 || toolChangeOption === 'Code') {
+                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -716,7 +715,6 @@ class GrblHalController {
             this.feeder.ack();
             this.feeder.next();
         });
-
 
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
@@ -1034,7 +1032,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write('$G\n'); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
             }
         }, 500);
 
@@ -1336,7 +1334,7 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    await delay(300);
+                    await delay(100);
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
@@ -1348,7 +1346,6 @@ class GrblHalController {
                         return;
                     }
                     if (this.connection) {
-                        this.connection.writeImmediate(String.fromCharCode(0x87));
                         this.connection.write('$I\n');
                     }
                     counter--;
@@ -1619,6 +1616,7 @@ class GrblHalController {
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
+                    // console.log(modalGCode);
 
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
@@ -2122,7 +2120,6 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {
@@ -2190,7 +2187,6 @@ class GrblHalController {
         }
 
         const cmd = data.trim();
-        console.log(cmd);
 
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
@@ -2226,22 +2222,10 @@ class GrblHalController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
+        let { preHook } = this.toolChangeContext || '';
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-
-        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
-        if (skipDialog) {
-            block.push('G4 P1');
-            block.push(...this.convertGcodeToArray(postHook));
-            block.push(POSTHOOK_COMPLETE);
-        }
-        console.log(block);
-
-        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
-        if (!skipDialog) {
-            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
-        }
+        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 
         this.command('gcode', block);
     }
