@@ -110,6 +110,21 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.4.11 (December 16th)
+- Added "Skip Dialog" option to code toolchange which combines both blocks and skips the "Continue" dialog
+- Diagnostics now generates a zip file which includes the original diagnostic PDF, a copy of current gSender settings, and any loaded toolpath for better support.
+- Continuous jogging now bitwise compares homing location to avoid non-XYZ axes causing invalid corner detection.
+- You are now able to update EEPROM values using the firmware tool when in Alarm state.
+- Start from line now starts the spindle after the Z safe movement but before X and Y.
+- Fix for A axis jog keybinds not working on standard GRBL controller.
+- Reverted HAL changes $G using the realtime alternative to reduce instances of error 1 since it was not playing nicely with the new line parser.
+- Fix for available axes and axes count not being emitted properly when disconnecting and reconnecting over ethernet.
+- Auto Zero touch plate probing now properly converts bit diameter when using imperial preferred units and a specific bit size.
+- Available ports are now case insensitive when matching known controller types (Thanks Dymk!)
+- Macros no longer overflow the macro widget.
+- Tweak to 30X30 machine profile for missing acceleration change for $111.
+- Fixed rare situation where connecting to grblHAL controller, disconnecting, and reconnecting to GRBL controller caused invalid laser/spindle mode toggle behaviour.
+
 ### 1.4.10 (October 28, 2024)
 - Jog no longer sends double jog commands on touch devices
 - $G output emitted to UI when connected using grblHAL and manually sent
