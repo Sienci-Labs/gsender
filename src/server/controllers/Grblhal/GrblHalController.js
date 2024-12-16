@@ -154,7 +154,7 @@ class GrblHalController {
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
-            // the firmware doesn't send ok to the parserstate
+            reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
 
@@ -675,6 +675,16 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
+            if (this.actionMask.queryParserState.reply) {
+                if (this.actionMask.replyParserState) {
+                    this.actionMask.replyParserState = false;
+                    this.emit('serialport:read', res.raw);
+                }
+                this.actionMask.queryParserState.reply = false;
+
+                return;
+            }
+
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -706,6 +716,7 @@ class GrblHalController {
             this.feeder.ack();
             this.feeder.next();
         });
+
 
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
@@ -866,10 +877,10 @@ class GrblHalController {
 
 
             this.actionMask.queryParserState.state = false;
+            this.actionMask.queryParserState.reply = true;
 
             if (this.actionMask.replyParserState) {
                 this.emit('serialport:read', res.raw);
-                this.actionMask.replyParserState = false;
             }
         });
 
@@ -1010,20 +1021,20 @@ class GrblHalController {
                     if (timespan >= toleranceTime) {
                         log.debug(`Continue parser state query: timespan=${timespan}ms`);
                         this.actionMask.queryParserState.state = false;
+                        this.actionMask.queryParserState.reply = false;
                     }
                 }
-            } else { // if running, don't send query
-                return;
             }
 
-            if (this.actionMask.queryParserState.state) {
+            if (this.actionMask.queryParserState.state || this.actionMask.queryParserState.reply) {
                 return;
             }
 
             if (this.isOpen()) {
                 this.actionMask.queryParserState.state = true;
+                this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
+                this.connection.write('$G\n'); // $G equivalent
             }
         }, 500);
 
@@ -1210,6 +1221,7 @@ class GrblHalController {
 
     clearActionValues() {
         this.actionMask.queryParserState.state = false;
+        this.actionMask.queryParserState.reply = false;
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
@@ -2178,13 +2190,10 @@ class GrblHalController {
         }
 
         const cmd = data.trim();
-
-        if (cmd === '$G') { // the command you must manually type for grblHAL gcode report is not $G, but x83
-            data = '\x83';
-        }
+        console.log(cmd);
 
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,
