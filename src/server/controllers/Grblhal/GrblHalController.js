@@ -375,12 +375,12 @@ class GrblHalController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
+            /*if (this.runner.isAlarm()) {
                 this.feeder.reset();
                 this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
-            }
+            }*/
 
             line = String(line).trim();
             if (line.length === 0) {
@@ -502,11 +502,11 @@ class GrblHalController {
                         }
                     }
 
-                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                    if (!passthroughM6) {
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    if (!passthroughM6 || toolChangeOption === 'Code') {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -1334,7 +1334,7 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    await delay(100);
+                    await delay(300);
                     this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
@@ -1346,6 +1346,7 @@ class GrblHalController {
                         return;
                     }
                     if (this.connection) {
+                        this.connection.writeImmediate(String.fromCharCode(0x87));
                         this.connection.write('$I\n');
                     }
                     counter--;
@@ -2222,10 +2223,21 @@ class GrblHalController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+
+        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        if (!skipDialog) {
+            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+        }
 
         this.command('gcode', block);
     }
