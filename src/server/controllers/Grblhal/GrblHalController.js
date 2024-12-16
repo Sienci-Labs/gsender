@@ -293,7 +293,7 @@ class GrblHalController {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 500);
+                        }, 1000);
                         return 'G4 P1';
                     }
                     if (line === PAUSE_START) {
