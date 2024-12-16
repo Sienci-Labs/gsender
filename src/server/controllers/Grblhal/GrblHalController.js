@@ -287,14 +287,14 @@ class GrblHalController {
                         log.debug('Finished Pre-hook');
                         this.feeder.hold({ data: '%toolchange' });
                         this.emit('toolchange:preHookComplete', commentString);
-                        return 'G4 P0.5';
+                        return 'G4 P1';
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
                         }, 500);
-                        return 'G4 P0.5';
+                        return 'G4 P1';
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
@@ -482,8 +482,10 @@ class GrblHalController {
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {
-                            this.emit('toolchange:start');
-                            this.runPreChangeHook(commentString);
+                            setTimeout(() => {
+                                this.emit('toolchange:start');
+                                this.runPreChangeHook(commentString);
+                            }, 500);
                         } else {
                             const count = this.sender.incrementToolChanges();
 
