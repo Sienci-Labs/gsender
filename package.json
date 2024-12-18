@@ -371,6 +371,7 @@
     "registry-auth-token": "~3.4.0",
     "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
+    "rollup-plugin-polyfill-node": "^0.13.0",
     "semver": "~6.0.0",
     "serialport": "^10",
     "serve-favicon": "~2.5.0",

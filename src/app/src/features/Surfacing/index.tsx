@@ -11,7 +11,7 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { Switch } from 'app/components/shadcn/Switch';
 
-// import Generator from './utils/surfacingGcodeGenerator';
+import Generator from './utils/surfacingGcodeGenerator';
 import { GcodeViewer } from './components/GcodeViewer';
 
 const SurfacingTool = () => {
@@ -29,11 +29,11 @@ const SurfacingTool = () => {
     const [gcode, setGcode] = useState('');
 
     const handleGenerateGcode = () => {
-        // const generator = new Generator({
-        //     surfacing: dimensions,
-        //     units: 'mm',
-        // });
-        // setGcode(generator.generate());
+        const generator = new Generator({
+            surfacing: dimensions,
+            units: 'mm',
+        });
+        setGcode(generator.generate());
     };
 
     return (
