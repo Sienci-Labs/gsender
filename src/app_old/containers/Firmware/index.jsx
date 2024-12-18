@@ -3,7 +3,7 @@ import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import Modal from 'app/components/Modal';
-import { GRBL_ACTIVE_STATE_IDLE, GRBLHAL, USAGE_TOOL_NAME } from 'app/constants';
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM, GRBLHAL, USAGE_TOOL_NAME } from 'app/constants';
 import store from 'app/store';
 import libController from 'app/lib/controller';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
@@ -73,7 +73,9 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
     }, [libController]);
 
     useEffect(() => {
-        setSettings(getFilteredEEPROM(SETTINGS, eeprom, halDescriptions, halGroups));
+        if (activeState !== GRBL_ACTIVE_STATE_ALARM) {
+            setSettings(getFilteredEEPROM(SETTINGS, eeprom, halDescriptions, halGroups));
+        }
     }, [eeprom, halDescriptions, halGroups]);
 
     const controllerEvents = {
@@ -105,7 +107,7 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
             ), [settings, filterText]
         );
     const isDefault = useMemo(() => settings.every(item => eeprom?.[item?.setting] === item?.value), [settings]);
-    const canSendSettings = useMemo(() => isConnected && activeState === GRBL_ACTIVE_STATE_IDLE, [isConnected, activeState]);
+    const canSendSettings = useMemo(() => isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState), [isConnected, activeState]);
     const hasSettings = controllerSettingsLoaded();
     const data = controller.settings;
     const port = controller.port;
