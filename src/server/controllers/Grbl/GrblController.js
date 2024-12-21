@@ -346,15 +346,18 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                if (!passthroughM6 && _.includes(words, 'M6')) {
+                //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({
                         data: 'M6',
                         comment: commentString
                     }); // Hold reason
 
-                    line = line.replace('M6', '(M6)');
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
 
 
@@ -382,12 +385,12 @@ class GrblController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
-                this.feeder.reset();
-                this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
-                log.warn('Stopped sending G-code commands in Alarm mode');
-                return;
-            }
+            // if (this.runner.isAlarm()) {
+            //     this.feeder.reset();
+            //     this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
+            //     log.warn('Stopped sending G-code commands in Alarm mode');
+            //     return;
+            // }
 
             line = String(line).trim();
             if (line.length === 0) {
@@ -470,8 +473,7 @@ class GrblController {
                 }
 
                 /* Emit event to UI for toolchange handler */
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                if (!passthroughM6 && _.includes(words, 'M6')) {
+                if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
 
                     // No toolchange in check mode
@@ -511,8 +513,13 @@ class GrblController {
                             }, 500);
                         }
                     }
-                    line = line.replace('M6', '(M6)');
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+
+                    //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -2044,6 +2051,7 @@ class GrblController {
             },
             'toolchange:context': () => {
                 const [context] = args;
+                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {
@@ -2127,10 +2135,19 @@ class GrblController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
+
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+        console.log(block);
+
 
         this.command('gcode', block);
     }

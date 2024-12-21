@@ -26,7 +26,7 @@ import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
-import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
@@ -35,6 +35,8 @@ import pkg from '../../package.json';
 import { GRBLHAL, LASER_MODE, METRIC_UNITS, WORKSPACE_MODE } from '../constants';
 import api from 'app/api';
 import { homingString } from './eeprom';
+import JSZip from 'jszip';
+
 
 const styles = StyleSheet.create({
     body: {
@@ -180,6 +182,10 @@ const getOS = () => {
 const getGCodeFile = () => {
     const gcode = get(reduxStore.getState(), 'file.content', '');
     return gcode;
+};
+
+const getGCodeFileName = () => {
+    return get(reduxStore.getState(), 'file.name', 'diagnosticGcode.gcode');
 };
 
 const getMode = () => {
@@ -768,12 +774,35 @@ function generateSupportFile() {
         const currentDate = date.toLocaleDateString().replaceAll('/', '-');
         const currentTime = date.toLocaleTimeString('it-IT').replaceAll(':', '-');
 
-        saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+        const zip = new JSZip();
+        const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+        const senderSettings = await exportSenderSettings();
+
+        const code = getGCodeFile();
+        if (code.length > 0) {
+            zip.file(getGCodeFileName(), new Blob([code]));
+        }
+
+        zip.file(diagnosticPDFLabel, blob);
+        zip.file(`gSenderSettings_${currentDate}_${currentTime}.json`, senderSettings);
+        zip.generateAsync({ type: 'blob' }).then((content) => {
+            saveAs(content, 'diagnostics_' + currentDate + '_' + currentTime + '.zip');
+        });
     };
 
     return (
         <ToolModalButton icon="fas fa-file-pdf" onClick={submitForm}>Download Now!</ToolModalButton>
     );
+}
+
+async function exportSenderSettings() {
+    const settings = store.get();
+    settings.commandKeys = Object.fromEntries(Object.entries(settings.commandKeys).filter(([key, shortcut]) => shortcut.category !== 'Macros'));
+    delete settings.session;
+    const res = await api.events.fetch();
+    const events = res.body.records;
+    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+    return new Blob([settingsJSON], { type: 'application/json' });
 }
 
 export default generateSupportFile;

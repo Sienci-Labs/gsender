@@ -24,7 +24,7 @@
 /* eslint callback-return: 0 */
 import fs from 'fs';
 import path from 'path';
-import bodyParser from 'body-parser';
+//import bodyParser from 'body-parser';
 import cors from 'cors';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
@@ -186,8 +186,24 @@ const appMain = () => {
 
     // Connect's body parsing middleware. This only handles urlencoded and json bodies.
     // https://github.com/expressjs/body-parser
-    app.use(bodyParser.json(settings.middleware['body-parser'].json));
-    app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
+    //app.use(bodyParser.json(settings.middleware['body-parser'].json));
+    //app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
+
+    app.use((req, res, next) => {
+        if (req.path === urljoin(settings.route, 'api/file')) {
+            // Skip body parsing for the file upload route
+            return next();
+        }
+        express.json()(req, res, (err) => {
+            if (err) {
+                return next(err);
+            }
+            express.urlencoded({ extended: true })(req, res, next);
+            return null;
+        });
+
+        return null;
+    });
 
     // For multipart bodies, please use the following modules:
     // - [busboy](https://github.com/mscdex/busboy) and [connect-busboy](https://github.com/mscdex/connect-busboy)
