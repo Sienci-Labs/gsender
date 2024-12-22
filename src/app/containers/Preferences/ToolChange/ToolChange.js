@@ -72,8 +72,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState($13 ? convertToolChangePosition() : store.get('workspace.toolChangePosition'));
-    const initialDescription = TOOLCHANGE_OPTIONS[toolChangeOption.toUpperCase()].description;
-    const [optionDescription, setOptionDescription] = useState(initialDescription);
+    const [optionDescription, setOptionDescription] = useState(TOOLCHANGE_OPTIONS[toolChangeOption.toUpperCase()]?.description);
     const [preHook, setPreHook] = useState(store.get('workspace.toolChangeHooks.preHook'));
     const [postHook, setPostHook] = useState(store.get('workspace.toolChangeHooks.postHook'));
     //const [combineBlocks, setCombineBlocks] = useState(false);
