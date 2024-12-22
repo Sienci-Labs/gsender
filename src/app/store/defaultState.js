@@ -54,7 +54,6 @@ const defaultState = {
         longestTimeRun: 0,
         jobTimes: [],
         toolChange: {
-            passthrough: false,
             skipDialog: false,
         },
         toolChangeOption: 'Ignore',

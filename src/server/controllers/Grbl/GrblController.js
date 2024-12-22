@@ -346,16 +346,14 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
-                //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                 if (_.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
-                    this.feeder.hold({
-                        data: 'M6',
-                        comment: commentString
-                    }); // Hold reason
-
-                    if (!passthroughM6) {
+                    const { toolChangeOption } = this.toolChangeContext;
+                    if (toolChangeOption !== 'Passthrough') {
+                        log.debug('M6 Tool Change');
+                        this.feeder.hold({
+                            data: 'M6',
+                            comment: commentString
+                        }); // Hold reason
                         line = line.replace('M6', '(M6)');
                     }
                 }
@@ -473,7 +471,8 @@ class GrblController {
                 }
 
                 /* Emit event to UI for toolchange handler */
-                if (_.includes(words, 'M6')) {
+                const { toolChangeOption } = this.toolChangeContext;
+                if (_.includes(words, 'M6') && toolChangeOption !== 'Passthrough') {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
 
                     // No toolchange in check mode
@@ -481,8 +480,6 @@ class GrblController {
                     if (currentState === 'Check') {
                         return line.replace('M6', '(M6)');
                     }
-
-                    const { toolChangeOption } = this.toolChangeContext;
 
                     let tool = line.match(toolCommand);
 
@@ -514,11 +511,8 @@ class GrblController {
                         }
                     }
 
-                    //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    if (!passthroughM6) {
-                        line = line.replace('M6', '(M6)');
-                    }
+                    line = line.replace('M6', '(M6)');
+
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
@@ -1759,7 +1753,7 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const [,, spindleOV] = this.state.status.ov;
+                const [, , spindleOV] = this.state.status.ov;
 
                 let diff = value - spindleOV;
                 //Limits for keyboard/gamepad shortcuts
