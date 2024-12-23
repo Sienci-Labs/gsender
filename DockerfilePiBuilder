@@ -1,0 +1,10 @@
+# Create an optized pi builder docker image to reduce build time
+# Usage:
+#    docker buildx build  -f DockerfilePiBuilder . --platform linux/arm64 -t siganberg/gsender-pi-builder:1.0 --push
+FROM --platform=$BUILDPLATFORM node:22-bookworm AS builder
+RUN apt update
+RUN apt-get install npm \
+    libopenjp2-tools \
+    ruby-dev -y
+RUN gem i fpm -f
+RUN yarn global add node-gyp
