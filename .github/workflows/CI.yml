@@ -278,7 +278,7 @@ jobs:
           draft: true
   build-pi:
     name: Build Raspberry PI packages
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: [self-hosted, Linux, ARM64]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
