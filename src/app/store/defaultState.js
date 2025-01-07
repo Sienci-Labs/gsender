@@ -314,6 +314,8 @@ const defaultState = {
             startPosition: START_POSITION_BACK_LEFT,
             spindle: M3,
             cutDirectionFlipped: false,
+            mist: false,
+            flood: false,
             shouldDwell: false,
         },
         visualizer: {
