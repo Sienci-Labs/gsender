@@ -154,7 +154,7 @@ class GrblHalController {
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
-            // the firmware doesn't send ok to the parserstate
+            reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
 
@@ -287,14 +287,14 @@ class GrblHalController {
                         log.debug('Finished Pre-hook');
                         this.feeder.hold({ data: '%toolchange' });
                         this.emit('toolchange:preHookComplete', commentString);
-                        return 'G4 P0.5';
+                        return 'G4 P1';
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 500);
-                        return 'G4 P0.5';
+                        }, 1000);
+                        return 'G4 P1';
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
@@ -342,13 +342,19 @@ class GrblHalController {
                     this.updateSpindleModal(spindleCommand);
                 }
 
-                // // M6 Tool Change
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', true);
-                if (!passthroughM6 && _.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
-                    this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
-                    line = line.replace('M6', '(M6)');
+                // M6 Tool Change
+                if (_.includes(words, 'M6')) {
+                    const { toolChangeOption } = this.toolChangeContext;
+                    if (toolChangeOption !== 'Passthrough') {
+                        log.debug('M6 Tool Change');
+                        this.feeder.hold({
+                            data: 'M6',
+                            comment: commentString
+                        }); // Hold reason
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
+
 
                 if (this.isInRotaryMode) {
                     const containsACommand = A_AXIS_COMMANDS.test(line);
@@ -376,12 +382,12 @@ class GrblHalController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
+            /*if (this.runner.isAlarm()) {
                 this.feeder.reset();
                 this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
-            }
+            }*/
 
             line = String(line).trim();
             if (line.length === 0) {
@@ -405,7 +411,7 @@ class GrblHalController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (1024 - 28), // TODO: Parse this out from OPT
+            bufferSize: (1024 - 100), // TODO: Parse this out from OPT
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
@@ -464,10 +470,9 @@ class GrblHalController {
                 }
 
                 /* Emit event to UI for toolchange handler */
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', true);
-                if (!passthroughM6 && _.includes(words, 'M6')) {
+                const { toolChangeOption } = this.toolChangeContext;
+                if (_.includes(words, 'M6') && toolChangeOption !== 'Passthrough') {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-                    const { toolChangeOption } = this.toolChangeContext;
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
@@ -484,8 +489,10 @@ class GrblHalController {
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {
-                            this.emit('toolchange:start');
-                            this.runPreChangeHook(commentString);
+                            setTimeout(() => {
+                                this.emit('toolchange:start');
+                                this.runPreChangeHook(commentString);
+                            }, 500);
                         } else {
                             const count = this.sender.incrementToolChanges();
 
@@ -504,10 +511,8 @@ class GrblHalController {
                         }
                     }
 
-
                     line = line.replace('M6', '(M6)');
-
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -675,6 +680,16 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
+            if (this.actionMask.queryParserState.reply) {
+                if (this.actionMask.replyParserState) {
+                    this.actionMask.replyParserState = false;
+                    this.emit('serialport:read', res.raw);
+                }
+                this.actionMask.queryParserState.reply = false;
+
+                return;
+            }
+
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -866,10 +881,10 @@ class GrblHalController {
 
 
             this.actionMask.queryParserState.state = false;
+            this.actionMask.queryParserState.reply = true;
 
             if (this.actionMask.replyParserState) {
                 this.emit('serialport:read', res.raw);
-                this.actionMask.replyParserState = false;
             }
         });
 
@@ -1010,18 +1025,18 @@ class GrblHalController {
                     if (timespan >= toleranceTime) {
                         log.debug(`Continue parser state query: timespan=${timespan}ms`);
                         this.actionMask.queryParserState.state = false;
+                        this.actionMask.queryParserState.reply = false;
                     }
                 }
-            } else { // if running, don't send query
-                return;
             }
 
-            if (this.actionMask.queryParserState.state) {
+            if (this.actionMask.queryParserState.state || this.actionMask.queryParserState.reply) {
                 return;
             }
 
             if (this.isOpen()) {
                 this.actionMask.queryParserState.state = true;
+                this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
                 this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
             }
@@ -1210,6 +1225,7 @@ class GrblHalController {
 
     clearActionValues() {
         this.actionMask.queryParserState.state = false;
+        this.actionMask.queryParserState.reply = false;
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
@@ -1324,8 +1340,8 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(async () => {
                 if (this.connection) {
-                    await delay(100);
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                    await delay(300);
+                    this.connection.writeImmediate(`${String.fromCharCode(0x87)}\n`);
                     this.connection.write('$I\n');
                 }
                 let counter = 3;
@@ -1336,6 +1352,7 @@ class GrblHalController {
                         return;
                     }
                     if (this.connection) {
+                        this.connection.writeImmediate(String.fromCharCode(0x87));
                         this.connection.write('$I\n');
                     }
                     counter--;
@@ -1606,6 +1623,7 @@ class GrblHalController {
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
+                    // console.log(modalGCode);
 
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
@@ -2177,12 +2195,8 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        if (cmd === '$G') { // the command you must manually type for grblHAL gcode report is not $G, but x83
-            data = '\x83';
-        }
-
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,
@@ -2215,10 +2229,21 @@ class GrblHalController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+
+        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        if (!skipDialog) {
+            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+        }
 
         this.command('gcode', block);
     }

@@ -441,7 +441,9 @@ class AxesWidget extends PureComponent {
                 preventDefault(event);
             }
 
-            if (axis.a && !isInRotaryMode) {
+            const controllerIsGrbl = this.props.type === 'Grbl';
+
+            if (controllerIsGrbl && axis.a && !isInRotaryMode) {
                 return;
             }
 

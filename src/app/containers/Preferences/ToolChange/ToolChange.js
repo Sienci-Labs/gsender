@@ -51,6 +51,11 @@ export const TOOLCHANGE_OPTIONS = {
         key: 'CODE',
         label: 'Code',
         description: 'Run code before and after the toolchange.'
+    },
+    PASSTHROUGH: {
+        key: 'PASSTHROUGH',
+        label: 'Passthrough',
+        description: 'Send the toolchange line as is. This assumes that your firmware can properly handle both M6 and T commands.'
     }
 };
 
@@ -67,9 +72,10 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState($13 ? convertToolChangePosition() : store.get('workspace.toolChangePosition'));
-    const [optionDescription, setOptionDescription] = useState('');
+    const [optionDescription, setOptionDescription] = useState(TOOLCHANGE_OPTIONS[toolChangeOption.toUpperCase()]?.description);
     const [preHook, setPreHook] = useState(store.get('workspace.toolChangeHooks.preHook'));
     const [postHook, setPostHook] = useState(store.get('workspace.toolChangeHooks.postHook'));
+    //const [combineBlocks, setCombineBlocks] = useState(false);
 
     // Handlers
     const handleToolChange = (selection) => {
@@ -121,8 +127,10 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const handleSaveCode = () => {
         store.set('workspace.toolChangeHooks.preHook', preHook);
         store.set('workspace.toolChangeHooks.postHook', postHook);
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const context = {
             toolChangeOption,
+            ...toolChangeConfig,
             postHook,
             preHook
         };
@@ -136,8 +144,12 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const context = {
             toolChangeOption,
+            ...toolChangeConfig,
+            postHook,
+            preHook
         };
         controller.command('toolchange:context', context);
     }, [toolChangeOption]);
@@ -145,14 +157,7 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     return (
         <div style={{ width: '70%' }}>
             <Fieldset legend="Tool Change" className={styles.paddingBottom}>
-                <TooltipCustom content="Send the toolchange line as is. This assumes that your firmware can properly handle both M6 and T commands." location="default">
-                    <ToggleSwitch
-                        label="Passthrough"
-                        checked={state.toolChange.passthrough}
-                        onChange={actions.toolChange.handlePassthroughToggle}
-                        style={{ marginBottom: '1rem' }}
-                    />
-                </TooltipCustom>
+
                 <small>Strategy to handle M6 tool change commands</small>
                 <div className={styles.addMargin}>
                     <Select
@@ -171,6 +176,19 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                     <p className={styles.description}>{optionDescription}</p>
                 </div>
                 {
+                    toolChangeOption === 'Code' && (
+                        <TooltipCustom content="Combine the blocks and avoid dialogs on tool changes - useful for ATC configurations" location="default">
+                            <ToggleSwitch
+                                label="Skip Dialog"
+                                checked={state.toolChange.skipDialog}
+                                onChange={actions.toolChange.handleSkipDialog}
+                                style={{ marginBottom: '1rem' }}
+                            />
+                        </TooltipCustom>
+                    )
+                }
+                {
+
                     toolChangeOption === 'Fixed Tool Sensor' && (
                         <div>
                             <Input
@@ -202,10 +220,10 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                     toolChangeOption === 'Code' && (
                         <div>
                             <div className={styles.spreadRow}>
-                                <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
+                                <MacroVariableDropdown textarea={preHookRef} label="Before change code" />
                             </div>
                             <textarea
-                                rows="7"
+                                rows="6"
                                 className="form-control"
                                 style={{ resize: 'none' }}
                                 name="preHook"
@@ -214,10 +232,10 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
                                 ref={preHookRef}
                             />
                             <div className={styles.spreadRow} style={{ marginTop: '10px' }}>
-                                <MacroVariableDropdown textarea={postHookRef} label="After change code"/>
+                                <MacroVariableDropdown textarea={postHookRef} label="After change code" />
                             </div>
                             <textarea
-                                rows="7"
+                                rows="6"
                                 className="form-control"
                                 style={{ resize: 'none' }}
                                 name="postHook"

@@ -364,8 +364,10 @@ export function* initialize() {
         }
         const hooks = store.get('workspace.toolChangeHooks', {});
         const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const toolChangeContext = {
             ...hooks,
+            ...toolChangeConfig,
             toolChangeOption
         };
         controller.command('toolchange:context', toolChangeContext);

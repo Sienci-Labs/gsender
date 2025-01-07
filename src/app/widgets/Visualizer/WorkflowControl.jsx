@@ -145,8 +145,10 @@ class WorkflowControl extends PureComponent {
 
         const hooks = store.get('workspace.toolChangeHooks', {});
         const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+        const toolChangeConfig = store.get('workspace.toolChange', {});
         const toolChangeContext = {
             ...hooks,
+            ...toolChangeConfig,
             toolChangeOption
         };
 
