@@ -212,3 +212,7 @@ export interface SerialPortOptions {
     port: string;
     inuse: boolean;
 }
+
+export interface ConsoleState {
+    inputHistory: string[];
+}
