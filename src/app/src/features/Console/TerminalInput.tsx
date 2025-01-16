@@ -27,6 +27,7 @@ const TerminalInput = () => {
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
+                className="w-full"
                 onKeyDown={(e) => {
                     switch (e.key) {
                         case 'Enter': {

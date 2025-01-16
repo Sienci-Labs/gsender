@@ -21,14 +21,14 @@ export const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
     };
 
     return (
-        <div className="absolute top-0 left-0 w-full h-full overflow-auto">
+        <div className="w-full h-full overflow-auto">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">G-code Output</h3>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border border-gray-500"
                 >
                     <Copy className="h-4 w-4" />
                     Copy G-code

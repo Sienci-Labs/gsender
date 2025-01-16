@@ -29,7 +29,7 @@ export enum ConnectionType {
 
 export interface ConnectionProps {
     ports: Port[];
-    // unrecognizedPorts: Port[];
+    unrecognizedPorts: Port[];
     reportedFirmware: FirmwareFlavour;
 }
 
@@ -142,7 +142,7 @@ function Connection(props: ConnectionProps) {
                     connectionState === ConnectionState.ERROR) && (
                     <PortListings
                         connectHandler={onConnectClick}
-                        ports={props.ports /*.concat(props.unrecognizedPorts)*/}
+                        ports={props.ports.concat(props.unrecognizedPorts)}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
@@ -156,12 +156,12 @@ function Connection(props: ConnectionProps) {
 export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
-    // const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
+    const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
     const reportedFirmware = get(store, 'controller.type', 'Grbl');
 
     return {
         ports,
-        // unrecognizedPorts,
+        unrecognizedPorts,
         reportedFirmware,
     };
 })(Connection);
