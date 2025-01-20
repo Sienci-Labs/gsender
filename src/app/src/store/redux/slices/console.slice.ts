@@ -6,6 +6,7 @@ const MAX_HISTORY_SIZE = 1000;
 
 const initialState: ConsoleState = {
     inputHistory: [],
+    history: [],
 };
 
 const consoleSlice = createSlice({
@@ -16,14 +17,19 @@ const consoleSlice = createSlice({
             state.inputHistory = action.payload.slice(-MAX_HISTORY_SIZE);
         },
         addToInputHistory(state, action: PayloadAction<string>) {
-            // Add new entry and remove oldest if exceeding limit
             state.inputHistory = [...state.inputHistory, action.payload].slice(
+                -MAX_HISTORY_SIZE,
+            );
+        },
+        addToHistory(state, action: PayloadAction<string>) {
+            state.history = [...state.history, action.payload].slice(
                 -MAX_HISTORY_SIZE,
             );
         },
     },
 });
 
-export const { setInputHistory, addToInputHistory } = consoleSlice.actions;
+export const { setInputHistory, addToInputHistory, addToHistory } =
+    consoleSlice.actions;
 
 export default consoleSlice.reducer;
