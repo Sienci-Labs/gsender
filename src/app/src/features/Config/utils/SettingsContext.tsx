@@ -1,10 +1,10 @@
 import {
+    gSenderSetting,
     SettingsMenu,
     SettingsMenuSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import store from 'app/store';
 import React, { useEffect, useState } from 'react';
-import { isSubSection } from 'app/features/Config/components/Section.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 
@@ -14,6 +14,8 @@ import {
 } from 'app/features/Config/assets/SettingsDescriptions.ts';
 import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import get from 'lodash/get';
+import defaultStoreState from 'app/store/defaultState';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -21,8 +23,17 @@ interface iSettingsContext {
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
     machineProfile: object;
+    rawEEPROM: object;
     firmwareType: 'Grbl' | 'GrblHAL';
-    setMachineProfile: (o) => {};
+    setMachineProfile: (v) => void;
+    setEEPROM: (v) => void;
+    connected: boolean;
+    settingsAreDirty: boolean;
+    setSettingsAreDirty: (v) => void;
+    searchTerm: string;
+    setSearchTerm: (v) => void;
+    settingsValues: gSenderSetting[];
+    setSettingsValue: (v) => void;
 }
 
 interface SettingsProviderProps {
@@ -34,8 +45,12 @@ const defaultState = {
     settingsToUpdate: {},
     EEPROMToUpdate: {},
     EEPROM: {},
+    rawEEPROM: {},
     machineProfile: {},
     firmwareType: 'Grbl',
+    connected: false,
+    settingsAreDirty: false,
+    settingsValues: [],
 };
 
 export const SettingsContext =
@@ -53,17 +68,17 @@ function fetchStoreValue(key) {
     return store.get(key);
 }
 
+function fetchDefaultValue(key) {
+    return get(defaultStoreState, key, null);
+}
+
 export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
 
-export function applyStoreValues(settings) {}
-
-export function applyEEPROMValues(settings) {}
-
-export function applyNewSettings(settings, eeprom) {}
-
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
+    const globalValueReference = [];
+    let index = 0;
     if (!settingsSections.length) {
         return;
     }
@@ -72,28 +87,29 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
             return;
         }
         ss.settings.map((s) => {
-            if (isSubSection(s)) {
-                if (!s.settings) {
-                    return;
-                }
-                s.settings.map((o) => {
-                    o.value = fetchStoreValue(o.key);
-                });
-            } else {
-                s.value = fetchStoreValue(s.key);
-            }
+            s.settings.map((o) => {
+                o.value = fetchStoreValue(o.key);
+                o.globalIndex = index;
+                o.defaultValue = fetchDefaultValue(o.key);
+                globalValueReference.push({ ...o });
+                index++;
+            });
         });
     });
-    return settingsSections;
+
+    return [settingsSections, globalValueReference];
 }
 
 export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
     const [EEPROM, setEEPROM] = useState<object>([]);
-    const [settingsToUpdate, setSettingsToUpdate] = useState({});
-    const [EEPROMToUpdate, setEEPROMToUpdate] = useState({});
+    const [rawEEPROM, setRawEEPROM] = useState<object>({});
     const [machineProfile, setMachineProfile] = useState({});
+    const [connected, setConnected] = useState(false);
+    const [settingsAreDirty, setSettingsAreDirty] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [settingsValues, setSettingsValues] = useState([]);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -111,10 +127,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         (state: RootState) => state.controller.type,
     );
 
+    const connectionState = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+
     const BASE_SETTINGS =
         controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
-
-    const handleEEPROMChange = (index) => (value) => {};
 
     useEffect(() => {
         const machineProfile = store.get('workspace.machineProfile', {});
@@ -122,9 +140,19 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, []);
 
     useEffect(() => {
-        const populatedSettings = populateSettingsValues(settings);
+        const [populatedSettings, globalValues] =
+            populateSettingsValues(settings);
         setSettings([...populatedSettings]);
+        setSettingsValues([...globalValues]);
+    }, []);
+
+    useEffect(() => {
+        setRawEEPROM(detectedEEPROM);
     }, [detectedEEPROM]);
+
+    useEffect(() => {
+        setConnected(connectionState);
+    }, [connectionState]);
 
     useEffect(() => {
         setEEPROM(
@@ -135,17 +163,23 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 detectedEEPROMGroups,
             ),
         );
-        console.log(EEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     const payload = {
         settings,
-        settingsToUpdate,
-        EEPROMToUpdate,
         EEPROM,
+        setEEPROM,
         machineProfile,
         firmwareType: controllerType,
+        rawEEPROM,
         setMachineProfile,
+        connected,
+        settingsAreDirty,
+        setSettingsAreDirty,
+        searchTerm,
+        setSearchTerm,
+        settingsValues,
+        setSettingsValues,
     };
 
     return (

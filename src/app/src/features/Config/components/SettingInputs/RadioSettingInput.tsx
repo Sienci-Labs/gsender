@@ -9,14 +9,24 @@ export interface RadioSettingInputProps {
     value: string | number;
     index: number;
     subIndex: number;
+    onChange: (v) => void;
 }
 
 export function RadioSettingInput({
     options = [],
     value,
+    onChange,
 }: RadioSettingInputProps): React.ReactNode {
+    value = `${value}`;
+    const handler = (e) => {
+        onChange(e);
+    };
     return (
-        <RadioGroup defaultValue={`${value}`}>
+        <RadioGroup
+            defaultValue={`${value}`}
+            value={value}
+            onValueChange={handler}
+        >
             {options.map((o) => (
                 <div className="flex flex-row gap-2 items-center">
                     <RadioGroupItem value={`${o}`} />

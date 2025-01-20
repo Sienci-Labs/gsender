@@ -29,6 +29,7 @@ interface ControlButtonProps {
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
     fileLoaded: boolean;
+    onStop: () => void;
 }
 
 interface Message {
@@ -49,6 +50,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     activeState,
     isConnected,
     fileLoaded,
+    onStop,
 }) => {
     const isDisabled = (): boolean => {
         if (!isConnected || !fileLoaded) {
@@ -100,6 +102,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         controller.command('gcode:pause');
     };
     const handleStop = (): void => {
+        onStop();
         controller.command('gcode:stop', { force: true });
     };
 

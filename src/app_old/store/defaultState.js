@@ -54,7 +54,8 @@ const defaultState = {
         longestTimeRun: 0,
         jobTimes: [],
         toolChange: {
-            passthrough: false
+            passthrough: false,
+            skipDialog: false,
         },
         toolChangeOption: 'Ignore',
         toolChangePosition: {
@@ -79,7 +80,7 @@ const defaultState = {
                 ]
             }
         },
-        machineProfile: machineProfiles[0],
+        machineProfile: machineProfiles[3],
         probeProfile: {
             xyThickness: 10,
             zThickness: 15,

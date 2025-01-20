@@ -65,6 +65,7 @@ function Connection(props: ConnectionProps) {
         }
 
         const network = type === ConnectionType.ETHERNET;
+        const baud = Number(store.get('widgets.connection.baudrate'));
 
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
@@ -75,7 +76,7 @@ function Connection(props: ConnectionProps) {
             port,
             // firmware,
             {
-                baudrate: 115200,
+                baudrate: baud,
                 network,
             },
             (err: string) => {
@@ -90,7 +91,7 @@ function Connection(props: ConnectionProps) {
         );
 
         connectionConfig.set('port', port);
-        connectionConfig.set('baudrate', 115200);
+        connectionConfig.set('baudrate', baud);
     }
 
     function onDisconnectClick() {

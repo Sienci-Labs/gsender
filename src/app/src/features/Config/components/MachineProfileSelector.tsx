@@ -42,7 +42,7 @@ export function MachineProfileSelector() {
             </SelectTrigger>
             <SelectContent className="bg-white bg-opacity-100">
                 {defaultMachineProfiles.map((o) => (
-                    <SelectItem value={`${o.id}`}>
+                    <SelectItem key={`${o.id}`} value={`${o.id}`}>
                         {humanReadableMachineName(o)}
                     </SelectItem>
                 ))}

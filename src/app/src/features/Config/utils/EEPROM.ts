@@ -9,7 +9,8 @@ import DecimalInput from 'app/features/Config/components/EEPROMInputs/DecimalInp
 import StringInput from 'app/features/Config/components/EEPROMInputs/StringInput.tsx';
 import PasswordInput from 'app/features/Config/components/EEPROMInputs/PasswordInput.tsx';
 import Ipv4Input from 'app/features/Config/components/EEPROMInputs/Ipv4Input.tsx';
-
+import { toast } from 'app/lib/toaster';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
 export const EXCLUSIVE_BITFIELD_ID = 2;
@@ -32,7 +33,6 @@ export function getFilteredEEPROMSettings(
         const eKey = setting.replace('$', '');
         const halData = get(halDescriptions, `${eKey}`, {
             group: -1,
-            details: '',
         });
         const halGroup = get(halGroups, `${halData.group}.label`, '');
 
@@ -48,6 +48,13 @@ export function getFilteredEEPROMSettings(
     });
 }
 
+export const importFirmwareSettings = (file, callback) => {
+    const reader = new FileReader();
+
+    reader.onload = callback;
+    reader.readAsText(file);
+};
+
 export const halDatatypeMap = {
     [BOOLEAN_ID]: BooleanInput,
     [BITFIELD_ID]: BitfieldInput,
@@ -62,6 +69,18 @@ export const halDatatypeMap = {
 };
 
 export const getDatatypeInput = (type, firmware) => {
+    // Translate the old values to new
     type = Number(type);
     return halDatatypeMap[type] || String;
 };
+
+export function generateEEPROMSettings(eeprom) {
+    const toChange = {};
+    eeprom.map((setting) => {
+        if (setting.dirty) {
+            toChange[setting.setting] = setting.value;
+            setting.dirty = false;
+        }
+    });
+    return toChange;
+}

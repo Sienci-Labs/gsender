@@ -343,7 +343,8 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
-                const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
                     this.feeder.hold({
@@ -381,12 +382,12 @@ class GrblController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
-                this.feeder.reset();
-                this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
-                log.warn('Stopped sending G-code commands in Alarm mode');
-                return;
-            }
+            // if (this.runner.isAlarm()) {
+            //     this.feeder.reset();
+            //     this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
+            //     log.warn('Stopped sending G-code commands in Alarm mode');
+            //     return;
+            // }
 
             line = String(line).trim();
             if (line.length === 0) {
@@ -513,11 +514,12 @@ class GrblController {
                         }
                     }
 
-                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -1494,14 +1496,14 @@ class GrblController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
+                    modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
                         modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
                     }
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
-                    modalGCode.push(`F${feedRate} S${spindleRate}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`${modal.motion}`);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
@@ -2057,10 +2059,19 @@ class GrblController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
+
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+        console.log(block);
+
 
         this.command('gcode', block);
     }

@@ -1,11 +1,11 @@
 export const GRBL_HAL_SETTINGS_INPUT_TYPES = {
-    NUMBER: 'number',
-    MASK: 'mask',
-    AXIS_MASK: 'axis-mask',
-    MASK_STATUS_REPORT: 'mask-status-report',
-    SWITCH: 'switch',
-    SELECT: 'select',
-    STRING: 'string',
+    NUMBER: '5',
+    MASK: '1',
+    AXIS_MASK: '4',
+    MASK_STATUS_REPORT: '0',
+    SWITCH: '0',
+    SELECT: '3',
+    STRING: '7',
 };
 
 const { NUMBER, MASK, AXIS_MASK, MASK_STATUS_REPORT, SWITCH, SELECT, STRING } =
@@ -18,8 +18,8 @@ export const GRBL_SETTINGS = [
         description: 'Step pulse time',
         category: 'Motors',
         units: 'μs',
-        description: 'Sets time length per step. Minimum 3usec.',
-        inputType: NUMBER,
+        details: 'Sets time length per step. Minimum 3usec.',
+        dataType: NUMBER,
         min: 0,
         max: 20,
         step: 1,
@@ -29,9 +29,9 @@ export const GRBL_SETTINGS = [
         description: 'Step idle delay',
         category: 'Motors',
         units: 'ms',
-        description:
+        details:
             'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 25,
         max: 255,
         step: 5,
@@ -41,59 +41,58 @@ export const GRBL_SETTINGS = [
         description: 'Step pulse invert',
         category: 'Motors',
         units: 'mask',
-        description:
-            'Inverts the step signal. Set axis bit to invert (00000ZYX).',
-        inputType: AXIS_MASK,
+        details: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
+        dataType: AXIS_MASK,
     },
     {
         setting: '$3',
         description: 'Step direction invert',
         category: 'Motors',
         units: 'mask',
-        description:
+        details:
             'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         setting: '$4',
         description: 'Invert step enable pin',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the stepper driver enable pin signal.',
-        inputType: SWITCH,
+        details: 'Inverts the stepper driver enable pin signal.',
+        dataType: SWITCH,
     },
     {
         setting: '$5',
         description: 'Invert limit pins',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the all of the limit input pins.',
-        inputType: SWITCH,
+        details: 'Inverts the all of the limit input pins.',
+        dataType: SWITCH,
     },
     {
         setting: '$6',
         description: 'Invert probe pin',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the probe input pin signal.',
-        inputType: SWITCH,
+        details: 'Inverts the probe input pin signal.',
+        dataType: SWITCH,
     },
     {
         setting: '$10',
         description: 'Status report options',
         category: 'GRBL',
         units: 'mask',
-        description: 'Alters data included in status reports.',
-        inputType: MASK_STATUS_REPORT,
+        details: 'Alters data included in status reports.',
+        dataType: MASK_STATUS_REPORT,
     },
     {
         setting: '$11',
         description: 'Junction deviation',
         category: 'GRBL',
         units: 'mm',
-        description:
+        details:
             'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0.001,
         step: 0.001,
     },
@@ -102,9 +101,9 @@ export const GRBL_SETTINGS = [
         description: 'Arc tolerance',
         category: 'GRBL',
         units: 'mm',
-        description:
+        details:
             'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0.001,
         step: 0.001,
     },
@@ -113,54 +112,53 @@ export const GRBL_SETTINGS = [
         description: 'Report in inches',
         category: 'GRBL',
         units: 'boolean',
-        description:
+        details:
             'Enables inch units when returning any position and rate value that is not a settings value.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$20',
         description: 'Soft limits enable',
         category: 'Homing',
         units: 'boolean',
-        description:
+        details:
             'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$21',
         description: 'Hard limits enable',
         category: 'Homing',
         units: 'boolean',
-        description:
+        details:
             'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$22',
         description: 'Homing cycle enable',
         category: 'Homing',
         units: 'boolean',
-        description:
-            'Enables homing cycle. Requires limit switches on all axes.',
-        inputType: SWITCH,
+        details: 'Enables homing cycle. Requires limit switches on all axes.',
+        dataType: SWITCH,
     },
     {
         setting: '$23',
         description: 'Homing direction invert',
         category: 'Homing',
         units: 'mask',
-        description:
+        details:
             'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         setting: '$24',
         description: 'Homing locate feed rate',
         category: 'Homing',
         units: 'mm/min',
-        description:
+        details:
             'Feed rate to slowly engage limit switch to determine its location accurately.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 1,
     },
@@ -169,9 +167,9 @@ export const GRBL_SETTINGS = [
         description: 'Homing search seek rate',
         category: 'Homing',
         units: 'mm/min',
-        description:
+        details:
             'Seek rate to quickly find the limit switch before the slower locating phase.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 100,
         step: 100,
     },
@@ -180,9 +178,9 @@ export const GRBL_SETTINGS = [
         description: 'Homing switch debounce delay',
         category: 'Homing',
         units: 'ms',
-        description:
+        details:
             'Sets a short delay between phases of homing cycle to let a switch debounce.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 5,
         max: 255,
         step: 5,
@@ -192,9 +190,9 @@ export const GRBL_SETTINGS = [
         description: 'Homing switch pull-off distance',
         category: 'Homing',
         units: 'mm',
-        description:
+        details:
             "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared.",
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 0.5,
     },
@@ -203,8 +201,8 @@ export const GRBL_SETTINGS = [
         description: 'Maximum spindle speed',
         category: 'Spindle',
         units: 'rpm',
-        description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
-        inputType: NUMBER,
+        details: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
+        dataType: NUMBER,
         min: 100,
         step: 100,
     },
@@ -213,9 +211,9 @@ export const GRBL_SETTINGS = [
         description: 'Minimum spindle speed',
         category: 'Spindle',
         units: 'rpm',
-        description:
+        details:
             'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 1,
     },
@@ -224,17 +222,17 @@ export const GRBL_SETTINGS = [
         description: 'Laser-mode enabled as spindle',
         category: 'Spindle',
         units: 'boolean',
-        description:
+        details:
             'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$100',
         description: 'X-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'X-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'X-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         step: 10,
     },
@@ -243,8 +241,8 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'Y-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'Y-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         step: 10,
     },
@@ -253,8 +251,8 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'Z-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'Z-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         step: 10,
     },
@@ -263,8 +261,8 @@ export const GRBL_SETTINGS = [
         description: 'X-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'X-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'X-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 100,
         step: 100,
     },
@@ -273,8 +271,8 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Y-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'Y-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 100,
         step: 100,
     },
@@ -283,8 +281,8 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Z-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'Z-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 10,
         step: 10,
     },
@@ -293,9 +291,9 @@ export const GRBL_SETTINGS = [
         description: 'X-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -304,9 +302,9 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -315,9 +313,9 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -326,9 +324,9 @@ export const GRBL_SETTINGS = [
         description: 'X-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -337,9 +335,9 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -348,9 +346,9 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         step: 10,
     },
@@ -365,8 +363,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Hostname',
         category: 'NetInterface',
         units: '',
-        description: 'Hostname.',
-        inputType: STRING,
+        details: 'Hostname.',
+        dataType: STRING,
         maxChars: 32,
     },
     {
@@ -376,8 +374,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'IP Mode',
         category: 'NetInterface',
         units: '',
-        description: 'Interface IP mode.',
-        inputType: SELECT,
+        details: 'Interface IP mode.',
+        dataType: SELECT,
         defaultValue: 0,
         values: {
             0: 'Static address',
@@ -392,9 +390,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Interface Gateway Address',
         category: 'NetInterface',
         units: '',
-        description:
+        details:
             'Interface gateway address. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -405,9 +403,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Interface Netmask',
         category: 'NetInterface',
         units: '',
-        description:
+        details:
             'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -419,9 +417,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Interface Netmask',
         category: 'NetInterface',
         units: '',
-        description:
+        details:
             'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
-        inputType: STRING,
+        dataType: STRING,
     },
     {
         // NEW
@@ -430,9 +428,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Telnet port',
         category: 'NetInterface',
         units: '',
-        description:
+        details:
             'Port for serial communication, may be telnet protocol or a simple socket stream.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         max: 65536,
         step: 1,
@@ -444,8 +442,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'HTTP port',
         category: 'NetInterface',
         units: '',
-        description: 'Web server port.',
-        inputType: NUMBER,
+        details: 'Web server port.',
+        dataType: NUMBER,
         min: 0,
         max: 65536,
         step: 1,
@@ -457,9 +455,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Websocket port',
         category: 'NetInterface',
         units: '',
-        description:
+        details:
             'Port for two way communication, typically with web browser. Usually used for serial communication by grbl.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         max: 65536,
         step: 1,
@@ -469,8 +467,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Step pulse time',
         category: 'Motors',
         units: 'μs',
-        description: 'Sets time length per step. Minimum 3usec.',
-        inputType: NUMBER,
+        details: 'Sets time length per step. Minimum 3usec.',
+        dataType: NUMBER,
         min: 3,
         max: 12,
         step: 1,
@@ -480,9 +478,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Step idle delay',
         category: 'Motors',
         units: 'ms',
-        description:
+        details:
             'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 25,
         max: 255,
         step: 5,
@@ -492,42 +490,41 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Step pulse invert',
         category: 'Motors',
         units: 'mask',
-        description:
-            'Inverts the step signal. Set axis bit to invert (00000ZYX).',
-        inputType: AXIS_MASK,
+        details: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
+        dataType: AXIS_MASK,
     },
     {
         setting: '$3',
         description: 'Step direction invert',
         category: 'Motors',
         units: 'mask',
-        description:
+        details:
             'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         setting: '$4',
         description: 'Invert step enable pin',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the stepper driver enable pin signal.',
-        inputType: SWITCH,
+        details: 'Inverts the stepper driver enable pin signal.',
+        dataType: SWITCH,
     },
     {
         setting: '$5',
         description: 'Invert limit pins',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the all of the limit input pins.',
-        inputType: SWITCH,
+        details: 'Inverts the all of the limit input pins.',
+        dataType: SWITCH,
     },
     {
         setting: '$6',
         description: 'Invert probe pin',
         category: 'Pins',
         units: 'boolean',
-        description: 'Inverts the probe input pin signal.',
-        inputType: SWITCH,
+        details: 'Inverts the probe input pin signal.',
+        dataType: SWITCH,
     },
     {
         setting: '$8',
@@ -540,17 +537,17 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Status report options',
         category: 'GRBL',
         units: 'mask',
-        description: 'Alters data included in status reports.',
-        inputType: MASK_STATUS_REPORT,
+        details: 'Alters data included in status reports.',
+        dataType: MASK_STATUS_REPORT,
     },
     {
         setting: '$11',
         description: 'Junction deviation',
         category: 'GRBL',
         units: 'mm',
-        description:
+        details:
             'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0.001,
         max: 0.02,
         step: 0.001,
@@ -560,9 +557,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Arc tolerance',
         category: 'GRBL',
         units: 'mm',
-        description:
+        details:
             'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0.001,
         max: 0.003,
         step: 0.001,
@@ -572,9 +569,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Report in inches',
         category: 'GRBL',
         units: 'boolean',
-        description:
+        details:
             'Enables inch units when returning any position and rate value that is not a settings value.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$14',
@@ -599,9 +596,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Soft limits enable',
         category: 'Homing',
         units: 'boolean',
-        description:
+        details:
             'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         // TODO
@@ -614,9 +611,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Hard limits enable',
         category: 'Homing',
         units: 'mask',
-        description:
+        details:
             'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
-        inputType: MASK,
+        dataType: MASK,
         bits: {
             0: 'Enable Hard Limits',
             1: 'Enable Strict Mode when Hard Limits enabled',
@@ -639,9 +636,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing cycle enable',
         category: 'Homing',
         units: 'mask',
-        description:
-            'Enables homing cycle. Requires limit switches on all axes.',
-        inputType: MASK,
+        details: 'Enables homing cycle. Requires limit switches on all axes.',
+        dataType: MASK,
         bits: {
             0: 'Enable homing.',
             1: 'Enable single axis homing commands.',
@@ -660,18 +656,18 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing direction invert',
         category: 'Homing',
         units: 'mask',
-        description:
+        details:
             'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         setting: '$24',
         description: 'Homing locate feed rate',
         category: 'Homing',
         units: 'mm/min',
-        description:
+        details:
             'Feed rate to slowly engage limit switch to determine its location accurately.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 30,
         step: 1,
@@ -681,9 +677,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing search seek rate',
         category: 'Homing',
         units: 'mm/min',
-        description:
+        details:
             'Seek rate to quickly find the limit switch before the slower locating phase.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 100,
         max: 1000,
         step: 100,
@@ -693,9 +689,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing switch debounce delay',
         category: 'Homing',
         units: 'ms',
-        description:
+        details:
             'Sets a short delay between phases of homing cycle to let a switch debounce.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 5,
         max: 255,
         step: 5,
@@ -705,9 +701,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing switch pull-off distance',
         category: 'Homing',
         units: 'mm',
-        description:
+        details:
             "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared.",
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         max: 5,
         step: 0.5,
@@ -719,8 +715,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'G73 pull-off distance',
         category: 'Homing',
         units: 'mm',
-        description: 'Specifies G73 retract distance in mm.',
-        inputType: NUMBER,
+        details: 'Specifies G73 retract distance in mm.',
+        dataType: NUMBER,
         min: 0,
         step: 0.5,
     },
@@ -731,8 +727,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Step Pulse Delay',
         category: 'Homing',
         units: 'μs',
-        description: 'Stepper pulse delay in microseconds.',
-        inputType: NUMBER,
+        details: 'Stepper pulse delay in microseconds.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -741,8 +737,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Maximum spindle speed',
         category: 'Spindle',
         units: 'rpm',
-        description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
-        inputType: NUMBER,
+        details: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
+        dataType: NUMBER,
         min: 100,
         max: 10000,
         step: 100,
@@ -761,8 +757,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Mode',
         category: 'Spindle',
         units: '',
-        description: 'Specifies Spindle/Laser/Lathe mode',
-        inputType: SELECT,
+        details: 'Specifies Spindle/Laser/Lathe mode',
+        dataType: SELECT,
         defaultValue: 0,
         values: {
             0: 'Normal mode',
@@ -775,9 +771,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Laser-mode enabled as spindle',
         category: 'Spindle',
         units: 'boolean',
-        description:
+        details:
             'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         // TODO default
@@ -786,8 +782,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Frequency',
         category: 'Spindle',
         units: 'Hz',
-        description: 'Spindle PWM frequency in Hz',
-        inputType: NUMBER,
+        details: 'Spindle PWM frequency in Hz',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -798,8 +794,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Duty Cycle',
         category: 'Spindle',
         units: '%',
-        description: 'Spindle off PWM duty cycle in percent',
-        inputType: NUMBER,
+        details: 'Spindle off PWM duty cycle in percent',
+        dataType: NUMBER,
         min: 1,
         max: 100,
         step: 1,
@@ -810,9 +806,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Minimum spindle speed',
         category: 'Spindle',
         units: '%',
-        description:
+        details:
             'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 100,
         step: 1,
@@ -823,8 +819,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Maximum spindle speed',
         category: 'Spindle',
         units: '%',
-        description: 'Maximum spindle speed.',
-        inputType: NUMBER,
+        details: 'Maximum spindle speed.',
+        dataType: NUMBER,
         min: 1,
         max: 100,
         step: 1,
@@ -835,9 +831,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Deenergized Steppers',
         category: 'Spindle',
         units: '%',
-        description:
+        details:
             'Defines which steppers is to be deenergized when motion completes.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
         min: 1,
         max: 100,
         step: 1,
@@ -849,8 +845,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Encoder Pulses',
         category: 'Spindle',
         units: '/revolution',
-        description: 'Spindle encoder pulses per revolution.',
-        inputType: NUMBER,
+        details: 'Spindle encoder pulses per revolution.',
+        dataType: NUMBER,
         min: 1,
         max: 100,
         step: 1,
@@ -868,8 +864,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Printable Command Characters',
         category: 'Spindle',
         units: 'boolean',
-        description: 'Enable printable realtime command characters.',
-        inputType: SWITCH,
+        details: 'Enable printable realtime command characters.',
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -877,9 +873,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Soft Limits Jogging',
         category: 'Motors',
         units: 'boolean',
-        description:
+        details:
             'Enable soft limits for jogging. When enabled jog targets will be limited to machine travel limits for homed axes.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         setting: '$41',
@@ -893,8 +889,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Homing Locate Cycle',
         category: 'Homing',
         units: '',
-        description: 'Number of homing locate cycles.',
-        inputType: NUMBER,
+        details: 'Number of homing locate cycles.',
+        dataType: NUMBER,
         min: 0,
         max: 255,
         step: 1,
@@ -905,9 +901,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -915,9 +911,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -925,9 +921,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -935,9 +931,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -945,9 +941,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -955,9 +951,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Axis Mask',
         category: 'Homing',
         units: '',
-        description:
+        details:
             'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
-        inputType: AXIS_MASK,
+        dataType: AXIS_MASK,
     },
     {
         // NEW
@@ -965,8 +961,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Step Speed',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Jogging step speed in mm/min. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging step speed in mm/min. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -977,8 +973,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Slow Speed',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Jogging slow speed in mm/min. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging slow speed in mm/min. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -989,8 +985,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Fast Speed',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Jogging fast speed in mm/min. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging fast speed in mm/min. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -1001,8 +997,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Step Distance',
         category: 'Motors',
         units: 'mm',
-        description: 'Jogging step distance in mm. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging step distance in mm. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -1013,8 +1009,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Slow Distance',
         category: 'Motors',
         units: 'mm',
-        description: 'Jogging slow distance in mm. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging slow distance in mm. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -1025,8 +1021,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Jogging Fast Distance',
         category: 'Motors',
         units: 'mm',
-        description: 'Jogging fast distance in mm. Used by driver/sender',
-        inputType: NUMBER,
+        details: 'Jogging fast distance in mm. Used by driver/sender',
+        dataType: NUMBER,
         min: 1,
         max: 10000,
         step: 1,
@@ -1050,8 +1046,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Restore Default Overrides',
         category: 'GRBL',
         units: 'boolean',
-        description: 'Restore default overrides when program ends.',
-        inputType: SWITCH,
+        details: 'Restore default overrides when program ends.',
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -1060,9 +1056,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Ignore Safety Door Signal',
         category: 'GRBL',
         units: 'boolean',
-        description:
+        details:
             'Ignore safety door signal when idle. If on only the spindle (laser) will be switched off. May be useful if positioning a laser head with the lid open is needed.',
-        inputType: SWITCH,
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -1071,8 +1067,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Sleep Function',
         category: 'GRBL',
         units: 'boolean',
-        description: 'Enable sleep function.',
-        inputType: SWITCH,
+        details: 'Enable sleep function.',
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -1081,8 +1077,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Disable Laser on Hold',
         category: 'GRBL',
         units: 'boolean',
-        description: 'Disable laser during hold.',
-        inputType: SWITCH,
+        details: 'Disable laser during hold.',
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -1091,8 +1087,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Alarm on Startup',
         category: 'GRBL',
         units: 'boolean',
-        description: 'Force grbl to enter alarm mode on startup.',
-        inputType: SWITCH,
+        details: 'Force grbl to enter alarm mode on startup.',
+        dataType: SWITCH,
     },
     {
         // NEW
@@ -1101,8 +1097,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Allow Feedrate Override',
         category: 'GRBL',
         units: 'boolean',
-        description: 'Allow feed rate override during probing.',
-        inputType: SWITCH,
+        details: 'Allow feed rate override during probing.',
+        dataType: SWITCH,
     },
     // Network Settings
     {
@@ -1121,8 +1117,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Network Service',
         category: 'Network',
         units: '',
-        description: 'Specify Network Service.',
-        inputType: MASK,
+        details: 'Specify Network Service.',
+        dataType: MASK,
         bits: {
             0: 'Telnet',
             1: 'Websocket',
@@ -1142,8 +1138,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Bluetooth Device',
         category: 'Network',
         units: '',
-        description: 'Bluetooth device name.',
-        inputType: STRING,
+        details: 'Bluetooth device name.',
+        dataType: STRING,
         maxChars: 32,
     },
     {
@@ -1153,8 +1149,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Bluetooth Service',
         category: 'Network',
         units: '',
-        description: 'Bluetooth service name.',
-        inputType: STRING,
+        details: 'Bluetooth service name.',
+        dataType: STRING,
         maxChars: 32,
     },
     {
@@ -1170,8 +1166,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi Mode',
         category: 'Network',
         units: '',
-        description: 'Wi-Fi Mode.',
-        inputType: SELECT,
+        details: 'Wi-Fi Mode.',
+        dataType: SELECT,
         defaultValue: 0,
         values: {
             0: 'NULL',
@@ -1187,8 +1183,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi STA SSID',
         category: 'Network',
         units: '',
-        description: 'WiFi STA (Station) SSID.',
-        inputType: STRING,
+        details: 'WiFi STA (Station) SSID.',
+        dataType: STRING,
         maxChars: 64,
     },
     {
@@ -1198,8 +1194,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi STA Password',
         category: 'Network',
         units: '',
-        description: 'WiFi STA (Station) password.',
-        inputType: STRING,
+        details: 'WiFi STA (Station) password.',
+        dataType: STRING,
         maxChars: 32,
     },
     {
@@ -1209,8 +1205,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi AP SSID',
         category: 'Network',
         units: '',
-        description: 'WiFi AP (Access Point) SSID.',
-        inputType: STRING,
+        details: 'WiFi AP (Access Point) SSID.',
+        dataType: STRING,
         maxChars: 64,
     },
     {
@@ -1221,8 +1217,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi AP Password',
         category: 'Network',
         units: '',
-        description: 'WiFi AP (Access Point) password.',
-        inputType: STRING,
+        details: 'WiFi AP (Access Point) password.',
+        dataType: STRING,
         maxChars: 32,
     },
     {
@@ -1232,8 +1228,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi Country',
         category: 'Network',
         units: '',
-        description: 'WiFi AP Country (Access Point).',
-        inputType: STRING,
+        details: 'WiFi AP Country (Access Point).',
+        dataType: STRING,
         maxChars: 3,
     },
     {
@@ -1243,8 +1239,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Wi-Fi AP Channel Password',
         category: 'Network',
         units: '',
-        description: 'WiFi AP Channel (Access Point) password.',
-        inputType: NUMBER,
+        details: 'WiFi AP Channel (Access Point) password.',
+        dataType: NUMBER,
         min: 0,
         max: 11,
         step: 1,
@@ -1256,8 +1252,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle PID Regulator Proportional Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle PID regulator proportional gain.',
-        inputType: NUMBER,
+        details: 'Spindle PID regulator proportional gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1267,8 +1263,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle PID Regulator Integral Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle PID regulator integral gain.',
-        inputType: NUMBER,
+        details: 'Spindle PID regulator integral gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1278,8 +1274,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle PID Regulator Derivative Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle PID regulator derivative gain.',
-        inputType: NUMBER,
+        details: 'Spindle PID regulator derivative gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1289,8 +1285,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle PID Max Output Error',
         category: 'PID',
         units: '',
-        description: 'Spindle PID max output error.',
-        inputType: NUMBER,
+        details: 'Spindle PID max output error.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1300,8 +1296,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle PID Max Output Error',
         category: 'PID',
         units: '',
-        description: 'Spindle PID regulator max integral error.',
-        inputType: NUMBER,
+        details: 'Spindle PID regulator max integral error.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1311,8 +1307,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Sunced Motion PID Regulator Proportional Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle synced motion PID regulator proportional gain.',
-        inputType: NUMBER,
+        details: 'Spindle synced motion PID regulator proportional gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1322,8 +1318,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Sunced Motion PID Regulator Integral Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle synced motion PID regulator integral gain.',
-        inputType: NUMBER,
+        details: 'Spindle synced motion PID regulator integral gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1333,8 +1329,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle Sunced Motion PID Regulator Derivative Gain',
         category: 'PID',
         units: '',
-        description: 'Spindle synced motion PID regulator derivative gain.',
-        inputType: NUMBER,
+        details: 'Spindle synced motion PID regulator derivative gain.',
+        dataType: NUMBER,
         min: 0,
         step: 1,
     },
@@ -1343,8 +1339,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'X-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'X-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'X-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         max: 500,
         step: 10,
@@ -1354,8 +1350,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Y-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'Y-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'Y-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         max: 500,
         step: 10,
@@ -1365,8 +1361,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Z-axis travel resolution',
         category: 'Motors',
         units: 'step/mm',
-        description: 'Z-axis travel resolution in steps per millimeter.',
-        inputType: NUMBER,
+        details: 'Z-axis travel resolution in steps per millimeter.',
+        dataType: NUMBER,
         min: 10,
         max: 500,
         step: 10,
@@ -1376,8 +1372,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'X-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'X-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'X-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 100,
         max: 1500,
         step: 100,
@@ -1387,8 +1383,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Y-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Y-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'Y-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 100,
         max: 1500,
         step: 100,
@@ -1398,8 +1394,8 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Z-axis maximum rate',
         category: 'Motors',
         units: 'mm/min',
-        description: 'Z-axis maximum rate. Used as G0 rapid rate.',
-        inputType: NUMBER,
+        details: 'Z-axis maximum rate. Used as G0 rapid rate.',
+        dataType: NUMBER,
         min: 10,
         max: 1000,
         step: 10,
@@ -1409,9 +1405,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'X-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 15,
         step: 1,
@@ -1421,9 +1417,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Y-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 15,
         step: 1,
@@ -1433,9 +1429,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Z-axis acceleration',
         category: 'Motors',
         units: 'mm/sec^2',
-        description:
+        details:
             'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 15,
         step: 1,
@@ -1445,9 +1441,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'X-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 1500,
         step: 10,
@@ -1457,9 +1453,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Y-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 1500,
         step: 10,
@@ -1469,9 +1465,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Z-axis maximum travel',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 1,
         max: 1500,
         step: 10,
@@ -1502,9 +1498,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Spindle at speed tolerance',
         category: 'Limits',
         units: '%',
-        description:
+        details:
             'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         max: 100,
         step: 10,
@@ -1528,9 +1524,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Manual tool change mode',
         category: 'Limits',
         units: '',
-        description:
+        details:
             'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
-        inputType: SELECT,
+        dataType: SELECT,
         defaultValue: 0,
         values: {
             0: 'Normal',
@@ -1548,9 +1544,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Probing distance',
         category: 'Limits',
         units: 'mm',
-        description:
+        details:
             'Used in mode 1 and 2 when $TPW command is issued and in mode 3.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 10,
     },
@@ -1562,9 +1558,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Probing slow feed rate',
         category: 'Limits',
         units: 'mm/min',
-        description:
+        details:
             'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an accurate tool offset.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 10,
     },
@@ -1576,9 +1572,9 @@ export const GRBL_HAL_SETTINGS = [
         description: 'Probing seek feed rate',
         category: 'Limits',
         units: 'mm/min',
-        description:
+        details:
             'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an initial tool offset. If successful tool is backed off a bit and probing is redone with the slow feed rate from $343.',
-        inputType: NUMBER,
+        dataType: NUMBER,
         min: 0,
         step: 10,
     },

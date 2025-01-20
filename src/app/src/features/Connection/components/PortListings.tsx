@@ -17,6 +17,7 @@ function truncatePortName(port: string): string {
 
 export function PortListings(props: PortListingsProps): JSX.Element {
     const [ip, setIP] = useState<string>('255.255.255.255');
+    const [baud, setBaud] = useState(115200);
 
     useEffect(() => {
         const ip = store.get('widgets.connection.ip', []);
@@ -26,8 +27,10 @@ export function PortListings(props: PortListingsProps): JSX.Element {
 
     store.on('change', () => {
         const ip = store.get('widgets.connection.ip', []);
+        const baudrate = store.get('widgets.connection.baudrate', 115200);
         const ipString = ip.join('.');
         setIP(ipString);
+        setBaud(baudrate);
     });
 
     return (
@@ -56,7 +59,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                             </Tooltip>
                         </span>
                         <span className="text-sm text-gray-600 font-normal">
-                            USB at 115200 baud
+                            USB at {baud} baud
                         </span>
                     </div>
                 </button>

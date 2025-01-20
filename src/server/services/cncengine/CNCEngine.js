@@ -65,6 +65,14 @@ const caseInsensitiveEquals = (str1, str2) => {
     return str1 === str2;
 };
 
+// Case insensitive includes.
+// @param {array} arr Array to check.
+// @param {string} val Value to check for in the array.
+// @return {boolean} True if val is in arr, ignoring case.
+const caseInsensitiveIncludes = (arr, val) => {
+    return arr.some((arrVal) => caseInsensitiveEquals(arrVal, val));
+};
+
 const isValidController = (controller) => (
     // Standard GRBL
     caseInsensitiveEquals(GRBL, controller) ||
@@ -376,7 +384,13 @@ class CNCEngine {
                         const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740', '0FA7'];
                         const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0', '0483'];
                         let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
-                            return validProductIDs.includes(port.productId) && validVendorIDs.includes(port.vendorId);
+                            if (!port.vendorId || !port.productId) {
+                                return false;
+                            }
+                            return (
+                                caseInsensitiveIncludes(validProductIDs, port.productId) &&
+                                caseInsensitiveIncludes(validVendorIDs, port.vendorId)
+                            );
                         });
 
                         const portInfoMapFn = (port) => {

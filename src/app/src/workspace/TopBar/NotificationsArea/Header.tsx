@@ -1,17 +1,20 @@
 import { LuTrash } from 'react-icons/lu';
 
-import store from 'app/store';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import reduxStore from 'app/store/redux';
+import { clearNotifications } from 'app/store/redux/slices/preferences.slice';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 const Header = () => {
-    const { notifications = [] } = useWorkspaceState();
+    const notifications = useTypedSelector(
+        (state) => state.preferences.notifications,
+    );
 
     const handleClearNotifications = () => {
         if (notifications?.length === 0) {
             return;
         }
 
-        store.replace('workspace.notifications', []);
+        reduxStore.dispatch(clearNotifications());
     };
 
     return (

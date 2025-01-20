@@ -134,13 +134,14 @@ class SVGVisualizer extends Component {
         const { state } = this.props;
         const { gcode } = state;
         // reparse file
-        pubsub.publish(
-            'reparseGCode',
-            gcode.content,
-            gcode.size,
-            gcode.name,
-            this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY,
-        );
+        pubsub.publish('reparseGCode', {
+            content: gcode.content,
+            size: gcode.size,
+            name: gcode.name,
+            visualizer: this.props.isSecondary
+                ? VISUALIZER_SECONDARY
+                : VISUALIZER_PRIMARY,
+        });
     }
 
     reloadGCode() {

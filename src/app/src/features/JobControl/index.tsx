@@ -10,6 +10,8 @@ import OutlineButton from './OutlineButton';
 import StartFromLine from './StartFromLine';
 import ProgressArea from './ProgressArea';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
+import { useEffect, useState } from 'react';
+import pubsub from 'pubsub-js';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
@@ -21,6 +23,7 @@ interface JobControlProps {
     feedrate: string;
     spindle: string;
     senderStatus: SenderStatus;
+    fileCompletion: number;
 }
 
 const JobControl: React.FC<JobControlProps> = ({
@@ -33,8 +36,50 @@ const JobControl: React.FC<JobControlProps> = ({
     feedrate,
     spindle,
     senderStatus,
+    fileCompletion,
 }) => {
+    const [lastLine, setLastLine] = useState(1);
+    const [pubsubTokens, setPubsubTokens] = useState([]);
     const disabled = !isConnected || !fileLoaded;
+
+    useEffect(() => {
+        subscribe();
+        return () => {
+            unsubscribe();
+        };
+    });
+
+    useEffect(() => {
+        // if finish time on job exists, then reset the start from line value to 1
+        if (fileCompletion !== 0) {
+            setLastLine(1);
+        }
+    }, [fileCompletion]);
+
+    const subscribe = () => {
+        const tokens = [
+            pubsub.subscribe(
+                'disconnect:recovery',
+                (_msg: string, { received }) => {
+                    if (received) {
+                        setLastLine(received);
+                    }
+                },
+            ),
+        ];
+        setPubsubTokens(pubsubTokens.concat(tokens));
+    };
+
+    const unsubscribe = () => {
+        pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        setPubsubTokens([]);
+    };
+
+    const onStop = () => {
+        setLastLine(senderStatus.received);
+    };
 
     return (
         <div className="relative h-full">
@@ -47,7 +92,10 @@ const JobControl: React.FC<JobControlProps> = ({
                 {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
                     <div className="flex flex-row gap-2 justify-center mb-3 w-full">
                         <OutlineButton disabled={disabled} />
-                        <StartFromLine disabled={disabled} />
+                        <StartFromLine
+                            disabled={disabled}
+                            lastLine={lastLine}
+                        />
                     </div>
                 )}
             </div>
@@ -59,6 +107,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     activeState={activeState}
                     isConnected={isConnected}
                     fileLoaded={fileLoaded}
+                    onStop={onStop}
                 />
                 <ControlButton
                     type={PAUSE}
@@ -66,6 +115,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     activeState={activeState}
                     isConnected={isConnected}
                     fileLoaded={fileLoaded}
+                    onStop={onStop}
                 />
                 <ControlButton
                     type={STOP}
@@ -73,6 +123,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     activeState={activeState}
                     isConnected={isConnected}
                     fileLoaded={fileLoaded}
+                    onStop={onStop}
                 />
             </div>
             <Widget>
@@ -103,6 +154,7 @@ export default connect((store) => {
     const feedrate = get(store, 'controller.state.status.feedrate');
     const spindle = get(store, 'controller.state.status.spindle');
     const senderStatus = get(store, 'controller.sender.status');
+    const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
 
     return {
         fileLoaded,
@@ -114,5 +166,6 @@ export default connect((store) => {
         feedrate,
         spindle,
         senderStatus,
+        fileCompletion,
     };
 })(JobControl);

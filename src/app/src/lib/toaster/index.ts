@@ -1,8 +1,10 @@
 import { toast as sonnerToast } from 'sonner';
 import uuid from 'uuid';
+import get from 'lodash/get';
 
-import store from 'app/store';
 import { Notification } from 'app/workspace/definitions';
+import reduxStore from 'app/store/redux';
+import { setNotifications } from 'app/store/redux/slices/preferences.slice';
 
 type SonnerToastType = typeof sonnerToast;
 
@@ -12,12 +14,13 @@ const saveNotificationToStore = ({
 }: Pick<Notification, 'message' | 'type'>) => {
     const NOTIFICATIONS_LIST_LIMIT = 100;
 
-    const existingNotifications: Notification[] = store.get(
-        'workspace.notifications',
+    const existingNotifications = get(
+        reduxStore.getState(),
+        'preferences.notifications',
         [],
     );
 
-    const notifications = [...existingNotifications];
+    const notifications: Notification[] = [...existingNotifications];
 
     if (notifications.length >= NOTIFICATIONS_LIST_LIMIT) {
         notifications.shift();
@@ -27,11 +30,11 @@ const saveNotificationToStore = ({
         message,
         type,
         status: 'unread',
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         id: uuid.v4(),
     });
 
-    store.replace('workspace.notifications', notifications);
+    reduxStore.dispatch(setNotifications(notifications));
 };
 
 // Create a handler for the proxy

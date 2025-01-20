@@ -6,7 +6,7 @@ import { State } from 'app/store/definitions';
 
 export const useWorkspaceState = () => {
     const [workspace, setWorkspace] = useState<State['workspace']>(
-        store.get('workspace'),
+        store.get('workspace', {}),
     );
 
     useEffect(() => {

@@ -104,7 +104,7 @@ const HalSettings = ({ descriptions, isAlarm }) => {
                                                 </div>
                                             </div>
                                             <div className={styles.settingsControl}>
-                                                <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} disabled={isAlarm} />
+                                                <InputElement info={info} setting={setting} onChange={handleSettingsChange(setting.globalIndex)} />
                                             </div>
                                             <div className={classname(styles['non-default-value'], (isSameAsDefault || !isSienciMachine) ? styles.hide : null)}>
                                                 <Tooltip content={`Default Value: ${defaultValue}`}>
@@ -116,7 +116,6 @@ const HalSettings = ({ descriptions, isAlarm }) => {
                                                         type="button"
                                                         style={{ all: 'unset' }}
                                                         onClick={handleResetToDefaultValue(setting.setting)}
-                                                        disabled={isAlarm}
                                                     >
                                                         <i className="fas fa-undo" style={{ cursor: 'pointer' }} />
                                                     </button>

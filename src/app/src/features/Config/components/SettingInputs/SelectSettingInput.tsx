@@ -11,14 +11,16 @@ export interface SelectSettingInputProps {
     index: number;
     subIndex: number;
     value: string | number;
+    onChange: (v) => void;
 }
 
 export function SelectSettingInput({
     options = [],
     value = '',
+    onChange,
 }: SelectSettingInputProps): React.ReactNode {
     return (
-        <Select>
+        <Select onValueChange={onChange}>
             <SelectTrigger className="bg-white bg-opacity-100">
                 <SelectValue placeholder={`${value}`} />
             </SelectTrigger>

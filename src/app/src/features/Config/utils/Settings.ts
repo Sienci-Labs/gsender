@@ -3,6 +3,9 @@ import store from 'app/store';
 import api from 'app/api';
 import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import { toast } from 'sonner';
+import controller from 'app/lib/controller.ts';
 
 export function exportFirmwareSettings(settings) {
     const output = JSON.stringify(settings);
@@ -92,4 +95,45 @@ export function handleRestoreDefaultClick() {
         confirmLabel: 'Restore Settings',
         onConfirm: restoreDefault,
     });
+}
+
+export function matchesSearchTerm(o, term = '') {
+    // For empty search, we always match
+    if (term.length === 0 || !term) {
+        return true;
+    }
+    return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
+}
+
+export function generateSenderSettings(settings) {
+    const dirtySettings = {};
+    settings.map((s) => {
+        if (s.dirty) {
+            dirtySettings[s.key] = s.value;
+            s.dirty = false;
+        }
+    });
+    return dirtySettings;
+}
+
+export function updateAllSettings(settings, eeprom) {
+    const eepromToChange = generateEEPROMSettings(eeprom);
+    const eepromNumber = Object.keys(eepromToChange).length;
+    if (eepromNumber > 0) {
+        let changedSettings = Object.keys(eepromToChange).map(
+            (k) => `${k}=${eepromToChange[k]}`,
+        );
+        changedSettings.push('$$');
+        controller.command('gcode', changedSettings);
+        toast.success(`Updated ${eepromNumber} EEPROM values.`);
+    }
+
+    const settingsToUpdate = generateSenderSettings(settings);
+    const updateableSettingsNumber = Object.keys(settingsToUpdate).length;
+    if (updateableSettingsNumber > 0) {
+        Object.keys(settingsToUpdate).map((k) => {
+            store.set(k, settingsToUpdate[k]);
+        });
+        toast.success(`Updated ${updateableSettingsNumber} settings.`);
+    }
 }

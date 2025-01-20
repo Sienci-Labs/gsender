@@ -5,13 +5,15 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import TabList from './TabList';
 import Header from './Header';
 
 const NotificationsArea = () => {
-    const { notifications = [] } = useWorkspaceState();
+    const notifications = useTypedSelector(
+        (state) => state.preferences.notifications,
+    );
 
     return (
         <Popover>

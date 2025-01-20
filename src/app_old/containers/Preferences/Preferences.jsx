@@ -183,6 +183,7 @@ class PreferencesPage extends PureComponent {
             ipRange: store.get('widgets.connection.ip', [192, 168, 5, 1]),
             toolChange: {
                 passthrough: store.get('workspace.toolChange.passthrough', false),
+                skipDialog: store.get('workspace.toolChange.skipDialog', false)
             },
             rotary: {
                 firmwareSettings: store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS),
@@ -757,6 +758,15 @@ class PreferencesPage extends PureComponent {
                         passthrough: !toolChange.passthrough
                     }
                 });
+            },
+            handleSkipDialog: () => {
+                const { toolChange } = this.state;
+                this.setState({
+                    toolChange: {
+                        ...toolChange,
+                        skipDialog: !toolChange.skipDialog
+                    }
+                });
             }
         },
         rotary: {
@@ -888,6 +898,7 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
         this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
         store.set('workspace.toolChange.passthrough', toolChange.passthrough);
+        store.set('workspace.toolChange.skipDialog', toolChange.skipDialog);
 
         controller.command('settings:updated', this.state);
 

@@ -16,7 +16,7 @@ export type Notification = {
     message: string;
     type: 'success' | 'error' | 'info' | 'warning';
     status: 'read' | 'unread';
-    timestamp: Date;
+    timestamp: Date | string;
 };
 
 // Interfaces
