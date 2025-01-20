@@ -106,6 +106,13 @@ export interface ConnectionState {
     err: string;
 }
 
+export interface HelperState {
+    active: boolean;
+    minimized: boolean;
+    title: string;
+    metadata: object;
+}
+
 export interface FileInfoState {
     fileLoaded: boolean;
     fileProcessing: boolean;
