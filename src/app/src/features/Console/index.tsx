@@ -1,9 +1,11 @@
+import { useRef } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import Terminal from './Terminal';
 import TerminalInput from './TerminalInput';
 
 import './styles.css';
+import { toast } from 'app/lib/toaster';
 
 type Props = {
     isActive: boolean;
@@ -11,6 +13,15 @@ type Props = {
 
 const Console = ({ isActive }: Props) => {
     const { isConnected } = useTypedSelector((state) => state.connection);
+    const terminalRef = useRef<{ clear: () => void }>(null);
+
+    const handleTerminalClear = () => {
+        if (terminalRef.current) {
+            terminalRef.current.clear();
+
+            toast.info('Console cleared', { position: 'bottom-left' });
+        }
+    };
 
     return (
         <>
@@ -24,8 +35,8 @@ const Console = ({ isActive }: Props) => {
                 </div>
             </div>
             <div className="grid grid-rows-[1fr_auto] absolute gap-2 top-0 left-0 w-full h-full p-1">
-                <Terminal isActive={isActive} />
-                <TerminalInput />
+                <Terminal ref={terminalRef} isActive={isActive} />
+                <TerminalInput onClear={handleTerminalClear} />
             </div>
         </>
     );

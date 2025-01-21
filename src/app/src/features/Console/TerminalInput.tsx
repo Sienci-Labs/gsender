@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
-import { LuCopy } from 'react-icons/lu';
 import { useDispatch } from 'react-redux';
+import { LuCopy } from 'react-icons/lu';
+import { LuEllipsis } from 'react-icons/lu';
+import { LuPaintbrush } from 'react-icons/lu';
 
 import { Button } from 'app/components/shadcn/Button';
 import { Input } from 'app/components/shadcn/Input';
@@ -8,14 +10,24 @@ import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from 'app/components/shadcn/Dropdown';
 
 const COPY_HISTORY_LIMIT = 50;
 
-const TerminalInput = () => {
+type Props = {
+    onClear: () => void;
+};
+
+const TerminalInput = ({ onClear }: Props) => {
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
-    const inputHistory = useTypedSelector(
-        (state) => state.console.inputHistory,
+    const { inputHistory, history } = useTypedSelector(
+        (state) => state.console,
     );
     const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -61,14 +73,21 @@ const TerminalInput = () => {
 
     const handleCopyHistory = async () => {
         try {
-            const lastCommands = inputHistory.slice(-COPY_HISTORY_LIMIT);
+            const lastCommands = history.slice(-COPY_HISTORY_LIMIT);
             await navigator.clipboard.writeText(lastCommands.join('\n'));
 
-            toast.success('Copied last 50 commands to clipboard', {
+            toast.success(
+                `Copied last ${lastCommands.length} commands to clipboard`,
+                {
+                    duration: 3000,
+                    position: 'bottom-left',
+                },
+            );
+        } catch (error) {
+            toast.error('Failed to copy commands to clipboard', {
                 duration: 3000,
                 position: 'bottom-left',
             });
-        } catch (error) {
             console.error('Failed to copy commands to clipboard:', error);
         }
     };
@@ -110,20 +129,42 @@ const TerminalInput = () => {
             />
 
             <Button
-                className="border"
-                onClick={handleCopyHistory}
-                title="Copy last 50 commands"
-            >
-                <LuCopy />
-            </Button>
-
-            <Button
                 variant="default"
                 className="bg-blue-500 text-white w-32"
                 onClick={handleCommandExecute}
             >
                 Run
             </Button>
+
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                        <LuEllipsis />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white">
+                    <DropdownMenuItem>
+                        <Button
+                            variant="outline"
+                            className="w-full flex items-center gap-2"
+                            onClick={handleCopyHistory}
+                        >
+                            <LuCopy />
+                            Copy last 50 commands
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Button
+                            variant="outline"
+                            className="w-full flex items-center gap-2"
+                            onClick={onClear}
+                        >
+                            <LuPaintbrush />
+                            Clear Console
+                        </Button>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 };
