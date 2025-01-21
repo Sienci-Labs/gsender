@@ -12,21 +12,27 @@ interface HelperToggleProps {
 
 export function HelperToggle({ active, title, minimized }: HelperToggleProps) {
     const helperTitle = useSelector((state: RootState) => state.helper.title);
+    const helperEnabled = useSelector(
+        (state: RootState) => state.helper.active,
+    );
     const helperMinimized = useSelector(
         (state: RootState) => state.helper.minimized,
     );
 
+    // Direct user to ongoing action
+    const bringAttention = helperEnabled && helperMinimized;
+
     const handleToggle = () => {
-        console.log('called');
         reduxStore.dispatch(toggleHelperVisibility());
     };
 
     return (
         <button
             type="button"
+            disabled={!helperEnabled}
             onClick={handleToggle}
             className={cn(
-                'flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl p-1 m-2 transition-all duration-1000 opacity-100 border border-transparent',
+                'animate-bounce flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent',
                 {
                     'border bg-blue-200 bg-opacity-10': active,
                     'border-transparent bg-transparent bg-opacity-100':

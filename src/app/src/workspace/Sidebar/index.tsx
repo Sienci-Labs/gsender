@@ -15,7 +15,7 @@ export const Sidebar = () => {
                 { 'w-20': show },
             )}
         >
-            <div className="flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch">
+            <div className="flex flex-col no-padding no-margin justify-end flex-grow self-stretch">
                 <HelperToggle minimized={!show} />
             </div>
             <NavBar show={show} />

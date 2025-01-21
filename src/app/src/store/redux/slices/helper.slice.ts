@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState: HelperState = {
     active: false,
     minimized: true,
-    title: 'Help',
+    title: 'TC (T11)',
     metadata: {},
 };
 
@@ -16,7 +16,6 @@ const HelperStateSlice = createSlice({
             return initialState;
         },
         toggleHelperVisibility: (state) => {
-            console.log('hit');
             state.minimized = !state.minimized;
             return state;
         },
