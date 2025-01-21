@@ -176,7 +176,6 @@ export default class Generator {
     };
 
     toFixedValue(value = 0, amount = 3) {
-        console.log(value.toFixed(amount));
         return Number(value.toFixed(amount));
     }
 
@@ -362,7 +361,6 @@ export default class Generator {
             x: toFixedValue(width - stepoverAmount),
             y: toFixedValue(length - stepoverAmount),
         };
-        console.log(endPos);
 
         const direction = {
             axis: 'Y',
@@ -389,8 +387,6 @@ export default class Generator {
         }
 
         function exitCondition(startPos, endPos, prevStartPos, prevEndPos) {
-            // console.log('endpos: ');
-            // console.log(endPos);
             return endPos.x < startPos.x || endPos.y < startPos.y;
         }
 
@@ -473,7 +469,6 @@ export default class Generator {
             startPosition,
             cutDirectionFlipped,
         );
-        console.log(endPos);
         const spirals = drawSpiral(
             [],
             startPos,
@@ -595,8 +590,6 @@ export default class Generator {
         getNewStartPos,
         getNewEndPos,
     ) => {
-        // console.log('drawSpiral endpos:');
-        // console.log(endPos);
         const { drawSpiral } = this;
         const { axisFactors } = options;
         const { x: xFactor, y: yFactor } = axisFactors;

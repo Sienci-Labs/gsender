@@ -1064,6 +1064,18 @@ class Visualizer extends Component {
 
     getVisibleHeight() {
         const { containerID, isSecondary } = this.props;
+
+        // if (isSecondary) {
+        //     const el = this.node;
+
+        //     const visibleHeight = Math.max(
+        //         Number(el?.parentNode?.clientHeight) || 0,
+        //         360,
+        //     );
+
+        //     return visibleHeight;
+        // }
+
         const container = document.getElementById(containerID);
 
         // when changing screen size to mobile,

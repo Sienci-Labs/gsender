@@ -10,6 +10,7 @@ import {
 } from 'app/components/shadcn/Tabs';
 
 import get from 'lodash/get';
+import pubsub from 'pubsub-js';
 
 import Generator from './utils/surfacingGcodeGenerator';
 import { GcodeViewer } from './components/GcodeViewer';
@@ -25,26 +26,27 @@ import MultiInputBlock from 'app/components/MultiInputBlock';
 import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
 import MachinePosition from './components/MachinePosition';
-import { getWidgetConfigContext } from '../WidgetConfig/WidgetContextProvider';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaCode, FaPlay } from 'react-icons/fa';
+import { Link } from '@tanstack/react-router';
+import Visualizer from '../Visualizer';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const SurfacingTool = () => {
+    const surfacingConfig = new WidgetConfig('surfacing');
+
     const status = useTypedSelector((state) => state?.controller.state?.status);
-    console.log(status?.activeState);
     const isDisabled =
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
-    console.log(isDisabled);
-    const { actions: config } = getWidgetConfigContext();
 
     const [surfacing, setSurfacing]: [
         Surfacing,
         React.Dispatch<Partial<Surfacing>>,
-    ] = useState(config.get('', defaultSurfacingState));
+    ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
 
     const units = store.get('workspace.units');
@@ -52,13 +54,12 @@ const SurfacingTool = () => {
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
     const handleGenerateGcode = () => {
+        saveSurfacing(surfacing, units === IMPERIAL_UNITS);
         const generator = new Generator({
             surfacing: surfacing,
             units: units,
         });
         setGcode(generator.generate());
-
-        saveSurfacing(surfacing, units === IMPERIAL_UNITS);
     };
 
     const onChange = (property: string, value: number) => {
@@ -71,7 +72,7 @@ const SurfacingTool = () => {
 
     const saveSurfacing = (surfacing: Surfacing, needsConvert = false) => {
         if (needsConvert) {
-            config.set('surfacing', {
+            surfacingConfig.set('', {
                 ...surfacing,
                 bitDiameter: convertToMetric(surfacing.bitDiameter),
                 stepover: convertToMetric(surfacing.stepover),
@@ -82,7 +83,7 @@ const SurfacingTool = () => {
                 maxDepth: convertToMetric(surfacing.maxDepth),
             });
         } else {
-            config.set('surfacing', surfacing);
+            surfacingConfig.set('', surfacing);
         }
     };
 
@@ -90,7 +91,7 @@ const SurfacingTool = () => {
         const name = 'gSender_Surfacing';
         const { size } = new File([gcode], name);
 
-        // pubsub.publish('gcode:surfacing', { gcode, name, size });
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
         // onClose();
     };
 
@@ -311,6 +312,11 @@ const SurfacingTool = () => {
                             className="h-[600px] border border-gray-500 rounded"
                         >
                             {/* Add visualization here */}
+                            <Visualizer
+                                gcode={gcode}
+                                surfacing={surfacing}
+                                isSecondary={true}
+                            />
                         </TabsContent>
                     </Tabs>
                 </div>
@@ -324,14 +330,16 @@ const SurfacingTool = () => {
                     >
                         Generate G-code
                     </ToolModalButton>
-                    <ToolModalButton
-                        Icon={FaPlay}
-                        disabled={!!!gcode && isDisabled}
-                        className="m-0"
-                        onClick={loadGcode}
-                    >
-                        Run on Main Visualizer
-                    </ToolModalButton>
+                    <Link to={'/'}>
+                        <ToolModalButton
+                            Icon={FaPlay}
+                            disabled={!!!gcode && isDisabled}
+                            className="m-0"
+                            onClick={loadGcode}
+                        >
+                            Run on Main Visualizer
+                        </ToolModalButton>
+                    </Link>
                 </div>
             </div>
         </div>
