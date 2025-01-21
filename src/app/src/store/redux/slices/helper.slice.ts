@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState: HelperState = {
     active: false,
     minimized: true,
-    title: 'Helper',
+    title: 'Help',
     metadata: {},
 };
 
@@ -15,7 +15,15 @@ const HelperStateSlice = createSlice({
         unloadHelperInfo: () => {
             return initialState;
         },
+        toggleHelperVisibility: (state) => {
+            console.log('hit');
+            state.minimized = !state.minimized;
+            return state;
+        },
     },
 });
+
+export const { unloadHelperInfo, toggleHelperVisibility } =
+    HelperStateSlice.actions;
 
 export default HelperStateSlice.reducer;

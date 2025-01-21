@@ -3,8 +3,8 @@ import { MinimizeHandle } from 'app/features/navbar/components/MinimizeHandle';
 import { useState } from 'react';
 import cx from 'classnames';
 import { NavbarLink } from 'app/features/navbar/components/NavbarLink.tsx';
-import { RiSpeakLine } from 'react-icons/ri';
-``;
+
+import { HelperToggle } from 'app/features/Helper/components/HelperToggle.tsx';
 
 export const Sidebar = () => {
     const [show, setShow] = useState(true);
@@ -15,8 +15,8 @@ export const Sidebar = () => {
                 { 'w-20': show },
             )}
         >
-            <div>
-                <NavbarLink href={''} icon={RiSpeakLine} label="Helper" />
+            <div className="flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch">
+                <HelperToggle minimized={!show} />
             </div>
             <NavBar show={show} />
             <MinimizeHandle

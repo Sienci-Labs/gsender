@@ -21,6 +21,7 @@ import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
+import { Helper } from 'app/features/Helper/index';
 
 const PrimaryVisualizer = ({
     actions,
@@ -96,6 +97,7 @@ const PrimaryVisualizer = ({
                         camera={camera}
                         cameraPosition={cameraPosition}
                     />
+                    <Helper />
                     <WorkspaceSelector />
                 </div>
             </Widget.Content>
