@@ -8,11 +8,13 @@ class GrblHalLineParserResultSpindle {
 
         const nr = line.match(/\[SPINDLE:(.+?)]/);
 
+        const payload = {};
+
         if (!r && !nr) {
             return null;
         }
 
-        const payload = {};
+
         // Handle new spindle update early
         /*
             [SPINDLE:0|0|0|*DIRV|PWM|0.0,1000.0]
@@ -20,6 +22,10 @@ class GrblHalLineParserResultSpindle {
          */
         if (nr) {
             const parts = nr[1].split('|');
+            // Guard again Spindle option in opts
+            if (parts.length < 2) {
+                return null;
+            }
             payload.label = parts[4];
             payload.id = Number(parts[0]);
             payload.capabilities = parts[3];
