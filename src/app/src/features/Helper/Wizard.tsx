@@ -32,6 +32,8 @@ import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
 import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
 import { FaHatWizard } from 'react-icons/fa';
+import reduxStore from 'app/store/redux';
+import { updateHelperState } from 'app/store/redux/slices/helper.slice.ts';
 
 const Wizard = () => {
     const { title, visible, minimized, activeStep, overlay, steps } =
@@ -45,6 +47,9 @@ const Wizard = () => {
             updateSubstepOverlay(
                 { activeStep: 0, activeSubstep: 0 },
                 instructions.steps,
+            );
+            reduxStore.dispatch(
+                updateHelperState({ active: true, metadata: {} }),
             );
         });
     }, []);

@@ -27,7 +27,7 @@ const HelperStateSlice = createSlice({
     },
 });
 
-export const { unloadHelperInfo, toggleHelperVisibility } =
+export const { updateHelperState, unloadHelperInfo, toggleHelperVisibility } =
     HelperStateSlice.actions;
 
 export default HelperStateSlice.reducer;

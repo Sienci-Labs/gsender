@@ -4,10 +4,6 @@ class GrblHalLineParserResultSpindle {
         // new match for updated spindle data
         const nr = line.match(/\[SPINDLE:(.+?)]/);
 
-        console.log(nr);
-
-        const nr = line.match(/\[SPINDLE:(.+?)]/);
-
         const payload = {};
 
         if (!r && !nr) {
