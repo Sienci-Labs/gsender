@@ -16,6 +16,9 @@ class GrblHalLineParserResultSpindle {
          */
         if (nr) {
             const parts = nr[1].split('|');
+            if (parts.length < 2) {
+                return null;
+            }
             payload.label = parts[4];
             payload.id = Number(parts[0]);
             payload.capabilities = parts[3];
