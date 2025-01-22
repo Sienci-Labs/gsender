@@ -221,5 +221,6 @@ export interface SerialPortOptions {
 }
 
 export interface ConsoleState {
+    history: string[];
     inputHistory: string[];
 }
