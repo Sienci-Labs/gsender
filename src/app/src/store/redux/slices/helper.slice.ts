@@ -19,6 +19,11 @@ const HelperStateSlice = createSlice({
             state.minimized = !state.minimized;
             return state;
         },
+        updateHelperState: (state, payload) => {
+            const { active, metadata } = payload;
+            state.active = active;
+            state.metadata = metadata;
+        }
     },
 });
 
