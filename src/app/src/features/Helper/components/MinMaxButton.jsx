@@ -22,9 +22,8 @@
  */
 
 import React from 'react';
-import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
-import styles from '../index.styl';
-
+import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
+import styles from '../index.module.styl';
 
 const MinMaxButton = () => {
     const { minimized } = useWizardContext();
@@ -36,11 +35,11 @@ const MinMaxButton = () => {
             onClick={() => toggleMinimized(minimized)}
             style={{ marginRight: 5 }}
         >
-            {
-                !minimized
-                    ? <i className="fas fa-minus" />
-                    : <i className="fas fa-plus" />
-            }
+            {!minimized ? (
+                <i className="fas fa-minus" />
+            ) : (
+                <i className="fas fa-plus" />
+            )}
         </button>
     );
 };

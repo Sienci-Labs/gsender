@@ -23,13 +23,14 @@
 
 import React from 'react';
 import cx from 'classnames';
-import SubstepCompletionIndicator from 'app/components/Wizard/components/SubstepCompletionIndicator';
-import { useWizardContext } from 'app/components/Wizard/context';
+import SubstepCompletionIndicator from 'app/features/Helper/components/SubstepCompletionIndicator';
+import { useWizardContext } from 'app/features/Helper/context';
 import Actions from './Actions';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Substep = ({ step, index, stepIndex }) => {
-    const { activeSubstep, activeStep, completedStep, completedSubStep } = useWizardContext();
+    const { activeSubstep, activeStep, completedStep, completedSubStep } =
+        useWizardContext();
 
     // // State calculation
     /*
@@ -37,25 +38,32 @@ const Substep = ({ step, index, stepIndex }) => {
         - on or before the last completed step
         - on the step after the completed one, but on a substep that is on or before a completed substep
     */
-    const stepComplete = (stepIndex <= completedStep || (stepIndex === completedStep + 1 && index <= completedSubStep));
+    const stepComplete =
+        stepIndex <= completedStep ||
+        (stepIndex === completedStep + 1 && index <= completedSubStep);
     const stepIsActive = stepIndex === activeStep && index === activeSubstep;
     const futureStep = !stepIsActive && !stepComplete;
 
     return (
-        <div className={cx(styles.substepWrapper,
-            { [styles.substepComplete]: stepComplete,
+        <div
+            className={cx(styles.substepWrapper, {
+                [styles.substepComplete]: stepComplete,
                 [styles.substepActive]: stepIsActive,
-                [styles.substepPending]: futureStep })
-        }
+                [styles.substepPending]: futureStep,
+            })}
         >
-            <SubstepCompletionIndicator completed={stepComplete} future={futureStep} active={stepIsActive} />
+            <SubstepCompletionIndicator
+                completed={stepComplete}
+                future={futureStep}
+                active={stepIsActive}
+            />
             <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
                 <span className={styles.substepTitle}>{step.title}</span>
                 <div className={cx({ [styles.hidden]: futureStep })}>
                     <span className={styles.substepDescription}>
-                        {
-                            typeof step.description === 'function' ? step.description() : step.description
-                        }
+                        {typeof step.description === 'function'
+                            ? step.description()
+                            : step.description}
                     </span>
                     <div>
                         <Actions
@@ -68,7 +76,6 @@ const Substep = ({ step, index, stepIndex }) => {
                 </div>
             </div>
         </div>
-
     );
 };
 

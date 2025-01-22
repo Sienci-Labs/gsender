@@ -22,37 +22,54 @@
  */
 
 import React, { useEffect } from 'react';
-import styles from 'app/components/Wizard/index.styl';
+import styles from './index.module.styl';
 import pubsub from 'pubsub-js';
-import Instructions from 'app/components/Wizard/components/Instructions';
-import Stepper from 'app/components/Wizard/components/Stepper';
-import { useWizardContext, useWizardAPI } from 'app/components/Wizard/context';
+import Instructions from 'app/features/Helper/components/Instructions';
+import Stepper from 'app/features/Helper/components/Stepper';
+import { useWizardContext, useWizardAPI } from 'app/features/Helper/context';
 import cx from 'classnames';
-import MinMaxButton from 'app/components/Wizard/components/MinMaxButton';
-import CancelButton from 'app/components/Wizard/components/CancelButton';
+import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
+import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
-
+import { FaHatWizard } from 'react-icons/fa';
 
 const Wizard = () => {
-    const { title, visible, minimized, activeStep, overlay, steps } = useWizardContext();
+    const { title, visible, minimized, activeStep, overlay, steps } =
+        useWizardContext();
     const { load, updateSubstepOverlay } = useWizardAPI();
 
-    useEffect(
-        () => {
-            pubsub.subscribe('wizard:load', (_, payload) => {
-                const { instructions, title } = payload;
-                load(instructions, title);
-                updateSubstepOverlay({ activeStep: 0, activeSubstep: 0 }, instructions.steps);
-            });
-        },
-        []
-    );
+    useEffect(() => {
+        pubsub.subscribe('wizard:load', (_, payload) => {
+            const { instructions, title } = payload;
+            load(instructions, title);
+            updateSubstepOverlay(
+                { activeStep: 0, activeSubstep: 0 },
+                instructions.steps,
+            );
+        });
+    }, []);
 
     return (
         <>
-            <div className={cx({ [styles.hidden]: !visible, [styles.overlay]: !minimized && overlay })} />
-            <div className={cx({ [styles.hidden]: !visible, [styles.wrapper]: !minimized })}>
-                <div className={cx({ [styles.hidden]: !visible || !overlay, [styles.infoMsgContainer]: !minimized && overlay })}>
+            <div
+                className={cx({
+                    [styles.hidden]: !visible,
+                    [styles.overlay]: !minimized && overlay,
+                })}
+            />
+            <div
+                className={cx({
+                    [styles.hidden]: !visible,
+                    [styles.wrapper]: !minimized,
+                })}
+            >
+                tester
+                <div
+                    className={cx({
+                        [styles.hidden]: !visible || !overlay,
+                        [styles.infoMsgContainer]: !minimized && overlay,
+                    })}
+                >
                     <div className={styles.infoMsgHeading}>
                         Widgets are disabled
                     </div>
@@ -60,9 +77,18 @@ const Wizard = () => {
                         Please use the button(s) in the wizard instead.
                     </div>
                 </div>
-                <div className={cx({ [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized, [styles.wizardWrapper]: !minimized })}>
+                <div
+                    className={cx({
+                        [styles.hidden]: !visible,
+                        [styles.minimizedWrapper]: minimized,
+                        [styles.wizardWrapper]: !minimized,
+                    })}
+                >
                     <div className={styles.wizardTitle}>
-                        <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
+                        <h1>
+                            <FaHatWizard /> {title} - Step {activeStep + 1} of{' '}
+                            {steps.length}
+                        </h1>
                         <div style={{ display: 'flex' }}>
                             <MinMaxButton />
                             <CancelButton />
@@ -75,15 +101,19 @@ const Wizard = () => {
                             enterActive: styles.maximizeActive,
                             enterDone: styles.maximizeDone,
                             exitActive: styles.minimizeActive,
-                            exitDone: styles.minimizeDone
+                            exitDone: styles.minimizeDone,
                         }}
                     >
-                        <div id="wizContent" className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
+                        <div
+                            id="wizContent"
+                            className={cx(styles.wizardContent, {
+                                [styles.hidden]: minimized,
+                            })}
+                        >
                             <Stepper />
                             <Instructions />
                         </div>
                     </CSSTransition>
-
                 </div>
             </div>
         </>

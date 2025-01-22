@@ -2,9 +2,9 @@ import { HelperState } from 'app/store/definitions.ts';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: HelperState = {
-    active: false,
+    active: true,
     minimized: true,
-    title: 'TC (T11)',
+    title: 'Helper',
     metadata: {},
 };
 

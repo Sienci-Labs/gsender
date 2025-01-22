@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import styles from '../index.styl';
+import styles from '../index.module.styl';
 
 const Step = ({ step, index = 1, active, complete }) => {
     const getTitleClass = () => {
@@ -47,11 +47,21 @@ const Step = ({ step, index = 1, active, complete }) => {
     return (
         <div className={active ? styles['step-active'] : styles.step}>
             <div className={styles[getStepIndexClass()]}>
-                {complete ? <i className="fas fa-check" /> : (index + 1)}
+                {complete ? <i className="fas fa-check" /> : index + 1}
             </div>
             <div className={styles.stepText}>
-                <span className={styles[getTitleClass()]}>Step {index + 1}</span>
-                <span className={active ? styles['stepperDescription-active'] : styles.stepperDescription}>{step.title}</span>
+                <span className={styles[getTitleClass()]}>
+                    Step {index + 1}
+                </span>
+                <span
+                    className={
+                        active
+                            ? styles['stepperDescription-active']
+                            : styles.stepperDescription
+                    }
+                >
+                    {step.title}
+                </span>
             </div>
         </div>
     );
