@@ -1485,8 +1485,8 @@ video {
 .grid-rows-\[1fr_1fr_1fr\] {
   grid-template-rows: 1fr 1fr 1fr !important;
 }
-.grid-rows-\[5fr_1fr\] {
-  grid-template-rows: 5fr 1fr !important;
+.grid-rows-\[1fr_auto\] {
+  grid-template-rows: 1fr auto !important;
 }
 .flex-row {
   flex-direction: row !important;
