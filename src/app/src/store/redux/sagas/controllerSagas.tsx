@@ -553,6 +553,8 @@ export function* initialize(): Generator<any, void, any> {
             comment,
         };
 
+        console.log(context);
+
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
@@ -591,6 +593,8 @@ export function* initialize(): Generator<any, void, any> {
                 title,
                 instructions,
             });
+
+            red;
         }
     });
 
