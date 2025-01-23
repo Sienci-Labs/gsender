@@ -87,7 +87,7 @@ const Wizard = () => {
                     })}
                 >
                     <div className={styles.wizardTitle}>
-                        <h1>
+                        <h1 className="flex flex-row gap-2 items-center justify-center">
                             <FaHatWizard /> {title} - Step {activeStep + 1} of{' '}
                             {steps.length}
                         </h1>

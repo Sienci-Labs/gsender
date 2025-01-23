@@ -23,6 +23,7 @@
 
 import React from 'react';
 import styles from '../index.module.styl';
+import { FaCheck } from 'react-icons/fa';
 
 const Step = ({ step, index = 1, active, complete }) => {
     const getTitleClass = () => {
@@ -45,9 +46,9 @@ const Step = ({ step, index = 1, active, complete }) => {
     };
 
     return (
-        <div className={active ? styles['step-active'] : styles.step}>
+        <div className={active ? styles.stepActive : styles.step}>
             <div className={styles[getStepIndexClass()]}>
-                {complete ? <i className="fas fa-check" /> : index + 1}
+                {complete ? <FaCheck /> : index + 1}
             </div>
             <div className={styles.stepText}>
                 <span className={styles[getTitleClass()]}>
@@ -56,7 +57,7 @@ const Step = ({ step, index = 1, active, complete }) => {
                 <span
                     className={
                         active
-                            ? styles['stepperDescription-active']
+                            ? styles.stepperDescriptionActive
                             : styles.stepperDescription
                     }
                 >

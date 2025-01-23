@@ -28,6 +28,8 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI } from 'app/features/Helper/context';
 import StepButton from 'app/features/Helper/components/StepButton';
 import styles from '../index.module.styl';
+import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa6';
 
 const Controls = () => {
     const {
@@ -58,7 +60,7 @@ const Controls = () => {
                     scrollToActiveStep(activeValues);
                 }}
             >
-                <i className="fas fa-arrow-left" />
+                <FaArrowLeft />
                 Back
             </StepButton>
             <StepButton
@@ -70,7 +72,7 @@ const Controls = () => {
                 disabled={hasIncompleteActions() || isNotIdle()}
             >
                 Complete
-                <i className="fas fa-arrow-right" />
+                <FaArrowRight />
             </StepButton>
         </div>
     );
