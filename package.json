@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-2",
+  "version": "1.5.0-Edge-3",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -122,11 +122,11 @@
       "target": [
         "dmg"
       ],
-      "icon": "electron-build/icon-edge.icns"
+      "icon": "electron-build/icon.icns"
     },
     "dmg": {
       "background": "electron-build/background.png",
-      "icon": "electron-build/icon-edge.icns",
+      "icon": "electron-build/icon.icns",
       "iconSize": 80,
       "iconTextSize": 12,
       "contents": [
@@ -147,7 +147,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "electron-build/icon-edge.ico"
+      "icon": "electron-build/icon.ico"
     },
     "linux": {
       "category": "Utility",
