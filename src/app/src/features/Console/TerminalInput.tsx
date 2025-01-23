@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { LuCopy } from 'react-icons/lu';
-import { LuEllipsis } from 'react-icons/lu';
 import { LuPaintbrush } from 'react-icons/lu';
+import { FaEllipsisH } from 'react-icons/fa';
 
 import { Button } from 'app/components/shadcn/Button';
 import { Input } from 'app/components/shadcn/Input';
@@ -138,7 +138,7 @@ const TerminalInput = ({ onClear }: Props) => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline">
-                        <LuEllipsis />
+                        <FaEllipsisH />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white">

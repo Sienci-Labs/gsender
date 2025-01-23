@@ -19,6 +19,7 @@ import { Route as rootRoute } from './routes/__root'
 const ToolsLazyImport = createFileRoute('/tools')()
 const SurfacingLazyImport = createFileRoute('/surfacing')()
 const StatsLazyImport = createFileRoute('/stats')()
+const SquaringLazyImport = createFileRoute('/squaring')()
 const FirmwareLazyImport = createFileRoute('/firmware')()
 const ConfigurationLazyImport = createFileRoute('/configuration')()
 const IndexLazyImport = createFileRoute('/')()
@@ -42,6 +43,12 @@ const StatsLazyRoute = StatsLazyImport.update({
   path: '/stats',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/stats.lazy').then((d) => d.Route))
+
+const SquaringLazyRoute = SquaringLazyImport.update({
+  id: '/squaring',
+  path: '/squaring',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/squaring.lazy').then((d) => d.Route))
 
 const FirmwareLazyRoute = FirmwareLazyImport.update({
   id: '/firmware',
@@ -86,6 +93,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FirmwareLazyImport
       parentRoute: typeof rootRoute
     }
+    '/squaring': {
+      id: '/squaring'
+      path: '/squaring'
+      fullPath: '/squaring'
+      preLoaderRoute: typeof SquaringLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/stats': {
       id: '/stats'
       path: '/stats'
@@ -116,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
@@ -125,6 +140,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
@@ -135,6 +151,7 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
   '/tools': typeof ToolsLazyRoute
@@ -146,16 +163,25 @@ export interface FileRouteTypes {
     | '/'
     | '/configuration'
     | '/firmware'
+    | '/squaring'
     | '/stats'
     | '/surfacing'
     | '/tools'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/configuration' | '/firmware' | '/stats' | '/surfacing' | '/tools'
+  to:
+    | '/'
+    | '/configuration'
+    | '/firmware'
+    | '/squaring'
+    | '/stats'
+    | '/surfacing'
+    | '/tools'
   id:
     | '__root__'
     | '/'
     | '/configuration'
     | '/firmware'
+    | '/squaring'
     | '/stats'
     | '/surfacing'
     | '/tools'
@@ -166,6 +192,7 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ConfigurationLazyRoute: typeof ConfigurationLazyRoute
   FirmwareLazyRoute: typeof FirmwareLazyRoute
+  SquaringLazyRoute: typeof SquaringLazyRoute
   StatsLazyRoute: typeof StatsLazyRoute
   SurfacingLazyRoute: typeof SurfacingLazyRoute
   ToolsLazyRoute: typeof ToolsLazyRoute
@@ -175,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   ConfigurationLazyRoute: ConfigurationLazyRoute,
   FirmwareLazyRoute: FirmwareLazyRoute,
+  SquaringLazyRoute: SquaringLazyRoute,
   StatsLazyRoute: StatsLazyRoute,
   SurfacingLazyRoute: SurfacingLazyRoute,
   ToolsLazyRoute: ToolsLazyRoute,
@@ -193,6 +221,7 @@ export const routeTree = rootRoute
         "/",
         "/configuration",
         "/firmware",
+        "/squaring",
         "/stats",
         "/surfacing",
         "/tools"
@@ -206,6 +235,9 @@ export const routeTree = rootRoute
     },
     "/firmware": {
       "filePath": "firmware.lazy.tsx"
+    },
+    "/squaring": {
+      "filePath": "squaring.lazy.tsx"
     },
     "/stats": {
       "filePath": "stats.lazy.tsx"
