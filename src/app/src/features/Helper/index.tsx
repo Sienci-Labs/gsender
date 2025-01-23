@@ -10,12 +10,9 @@ export function Helper() {
 
     return (
         <div
-            className={cn(
-                'absolute top-0 left-0 w-full h-full bg-blue-400 rounded z-30',
-                {
-                    hidden: minimized,
-                },
-            )}
+            className={cn('absolute top-0 left-0 w-full h-full rounded z-30', {
+                hidden: minimized,
+            })}
         >
             <WizardProvider>
                 <Wizard />

@@ -2,7 +2,7 @@ import { HelperState } from 'app/store/definitions.ts';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: HelperState = {
-    active: true,
+    active: false,
     minimized: true,
     title: 'Helper',
     metadata: {},
@@ -23,11 +23,28 @@ const HelperStateSlice = createSlice({
             const { active, metadata } = payload;
             state.active = active;
             state.metadata = metadata;
-        }
+            state.minimized = false;
+            return state;
+        },
+        enableHelper: (state) => {
+            state.active = true;
+            state.minimized = false;
+            return state;
+        },
+        disableHelper: (state) => {
+            state.active = false;
+            state.minimized = true;
+            return state;
+        },
     },
 });
 
-export const { updateHelperState, unloadHelperInfo, toggleHelperVisibility } =
-    HelperStateSlice.actions;
+export const {
+    enableHelper,
+    disableHelper,
+    updateHelperState,
+    unloadHelperInfo,
+    toggleHelperVisibility,
+} = HelperStateSlice.actions;
 
 export default HelperStateSlice.reducer;

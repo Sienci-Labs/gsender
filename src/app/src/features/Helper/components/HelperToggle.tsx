@@ -32,16 +32,17 @@ export function HelperToggle({ active, title, minimized }: HelperToggleProps) {
             disabled={!helperEnabled}
             onClick={handleToggle}
             className={cn(
-                'animate-bounce flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent',
+                'flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent',
                 {
-                    'border bg-blue-200 bg-opacity-10': active,
+                    'border bg-orange-200 bg-opacity-30 animate-bounce':
+                        helperEnabled,
                     'border-transparent bg-transparent bg-opacity-100':
                         minimized,
                 },
             )}
         >
             <RiSpeakLine
-                className={`text-4xl ${active ? 'text-blue-600' : 'text-gray-600'}`}
+                className={`text-4xl ${helperEnabled ? 'text-orange-600' : 'text-gray-600'}`}
             />
             <span className={cn('', { 'opacity-0': minimized })}>
                 {helperTitle}
