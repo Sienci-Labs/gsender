@@ -112,8 +112,7 @@
       "installerSidebar": "electron-build/sidebar.bmp",
       "createDesktopShortcut": false,
       "createStartMenuShortcut": false,
-      "include": "electron-build/installer.nsh",
-      "icon": "electron-build/icon-edge.ico"
+      "include": "electron-build/installer.nsh"
     },
     "publish": {
       "provider": "github"
@@ -148,7 +147,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "electron-build/icon.ico"
+      "icon": "electron-build/icon-edge.ico"
     },
     "linux": {
       "category": "Utility",
