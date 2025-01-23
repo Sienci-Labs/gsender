@@ -112,7 +112,8 @@
       "installerSidebar": "electron-build/sidebar.bmp",
       "createDesktopShortcut": false,
       "createStartMenuShortcut": false,
-      "include": "electron-build/installer.nsh"
+      "include": "electron-build/installer.nsh",
+      "icon": "electron-build/icon-edge.ico"
     },
     "publish": {
       "provider": "github"
@@ -122,11 +123,11 @@
       "target": [
         "dmg"
       ],
-      "icon": "electron-build/icon.icns"
+      "icon": "electron-build/icon-edge.icns"
     },
     "dmg": {
       "background": "electron-build/background.png",
-      "icon": "electron-build/icon.icns",
+      "icon": "electron-build/icon-edge.icns",
       "iconSize": 80,
       "iconTextSize": 12,
       "contents": [
