@@ -20,6 +20,7 @@ const ToolsLazyImport = createFileRoute('/tools')()
 const SurfacingLazyImport = createFileRoute('/surfacing')()
 const StatsLazyImport = createFileRoute('/stats')()
 const SquaringLazyImport = createFileRoute('/squaring')()
+const MovementTuningLazyImport = createFileRoute('/movement-tuning')()
 const FirmwareLazyImport = createFileRoute('/firmware')()
 const ConfigurationLazyImport = createFileRoute('/configuration')()
 const IndexLazyImport = createFileRoute('/')()
@@ -49,6 +50,14 @@ const SquaringLazyRoute = SquaringLazyImport.update({
   path: '/squaring',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/squaring.lazy').then((d) => d.Route))
+
+const MovementTuningLazyRoute = MovementTuningLazyImport.update({
+  id: '/movement-tuning',
+  path: '/movement-tuning',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/movement-tuning.lazy').then((d) => d.Route),
+)
 
 const FirmwareLazyRoute = FirmwareLazyImport.update({
   id: '/firmware',
@@ -93,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FirmwareLazyImport
       parentRoute: typeof rootRoute
     }
+    '/movement-tuning': {
+      id: '/movement-tuning'
+      path: '/movement-tuning'
+      fullPath: '/movement-tuning'
+      preLoaderRoute: typeof MovementTuningLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/squaring': {
       id: '/squaring'
       path: '/squaring'
@@ -130,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/movement-tuning': typeof MovementTuningLazyRoute
   '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
@@ -140,6 +157,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/movement-tuning': typeof MovementTuningLazyRoute
   '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
@@ -151,6 +169,7 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/configuration': typeof ConfigurationLazyRoute
   '/firmware': typeof FirmwareLazyRoute
+  '/movement-tuning': typeof MovementTuningLazyRoute
   '/squaring': typeof SquaringLazyRoute
   '/stats': typeof StatsLazyRoute
   '/surfacing': typeof SurfacingLazyRoute
@@ -163,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuration'
     | '/firmware'
+    | '/movement-tuning'
     | '/squaring'
     | '/stats'
     | '/surfacing'
@@ -172,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuration'
     | '/firmware'
+    | '/movement-tuning'
     | '/squaring'
     | '/stats'
     | '/surfacing'
@@ -181,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/configuration'
     | '/firmware'
+    | '/movement-tuning'
     | '/squaring'
     | '/stats'
     | '/surfacing'
@@ -192,6 +214,7 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   ConfigurationLazyRoute: typeof ConfigurationLazyRoute
   FirmwareLazyRoute: typeof FirmwareLazyRoute
+  MovementTuningLazyRoute: typeof MovementTuningLazyRoute
   SquaringLazyRoute: typeof SquaringLazyRoute
   StatsLazyRoute: typeof StatsLazyRoute
   SurfacingLazyRoute: typeof SurfacingLazyRoute
@@ -202,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   ConfigurationLazyRoute: ConfigurationLazyRoute,
   FirmwareLazyRoute: FirmwareLazyRoute,
+  MovementTuningLazyRoute: MovementTuningLazyRoute,
   SquaringLazyRoute: SquaringLazyRoute,
   StatsLazyRoute: StatsLazyRoute,
   SurfacingLazyRoute: SurfacingLazyRoute,
@@ -221,6 +245,7 @@ export const routeTree = rootRoute
         "/",
         "/configuration",
         "/firmware",
+        "/movement-tuning",
         "/squaring",
         "/stats",
         "/surfacing",
@@ -235,6 +260,9 @@ export const routeTree = rootRoute
     },
     "/firmware": {
       "filePath": "firmware.lazy.tsx"
+    },
+    "/movement-tuning": {
+      "filePath": "movement-tuning.lazy.tsx"
     },
     "/squaring": {
       "filePath": "squaring.lazy.tsx"
