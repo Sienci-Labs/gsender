@@ -2,6 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { FaMicrochip } from 'react-icons/fa';
 import { LuPencilRuler } from 'react-icons/lu';
+import { AiFillTool } from 'react-icons/ai';
 
 import ToolCard from 'app/components/ToolCard';
 
@@ -36,6 +37,13 @@ function Tools() {
                     description="Use this tool to ensure your machine is squared correctly"
                     icon={LuPencilRuler}
                     link="/squaring"
+                />
+
+                <ToolCard
+                    title="Movement Tuning"
+                    description="Use this tool adjust the movement of your machine"
+                    icon={AiFillTool}
+                    link="/movement-tuning"
                 />
             </div>
         </div>
