@@ -47,6 +47,7 @@ import {
     ShuttleEvent,
 } from 'app/lib/definitions/shortcuts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { toast } from 'app/lib/toaster';
 
 interface Props {
     state: State;
@@ -99,12 +100,7 @@ const RunProbe = ({ actions, state }: Props) => {
                     return;
                 }
 
-                Toaster.pop({
-                    msg: 'Probe Confirmed Manually',
-                    type: TOASTER_INFO,
-                    duration: 5000,
-                    icon: 'fa-satellite-dish',
-                });
+                toast.info('Probe Confirmed Manually');
 
                 actions.setProbeConnectivity(true);
             },
@@ -116,12 +112,7 @@ const RunProbe = ({ actions, state }: Props) => {
         // console.log(probeCommands);
 
         actions.runProbeCommands(probeCommands);
-        Toaster.pop({
-            msg: 'Initiated probing cycle',
-            type: TOASTER_INFO,
-            duration: 5000,
-            icon: 'fa-satellite-dish',
-        });
+        toast.info('Initiated probing cycle');
         actions.onOpenChange(false);
     };
 

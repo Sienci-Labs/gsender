@@ -365,7 +365,6 @@ const SpindleWidget = () => {
             } else {
                 enableLaserMode();
             }
-            console.log(newMode);
             pubsub.publish('spindle:mode', newMode);
         },
         sendM3: () => {

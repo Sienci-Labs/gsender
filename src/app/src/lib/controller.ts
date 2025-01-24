@@ -59,6 +59,7 @@ export interface ControllerListeners {
     'serialport:change': Array<Function>;
     'serialport:open': Array<Function>;
     'serialport:close': Array<Function>;
+    'serialport:closeController': Array<Function>;
     'serialport:error': Array<Function>;
     'serialport:read': Array<Function>;
     'serialport:write': Array<Function>;
@@ -159,6 +160,7 @@ class Controller {
         'serialport:change': [],
         'serialport:open': [],
         'serialport:close': [],
+        'serialport:closeController': [],
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],
@@ -398,12 +400,7 @@ class Controller {
     // @param {string} [options.controllerType] One of: 'Grbl', 'Smoothe', 'TinyG'. Defaults to 'Grbl'.
     // @param {number} [options.baudrate] Defaults to 115200.
     // @param {function} [callback] Called after a connection is opened.
-    openPort(
-        port: string,
-        controllerType: string,
-        options: object,
-        callback: Function,
-    ): void {
+    openPort(port: string, options: object, callback: Function): void {
         // if (typeof options !== 'object') {
         //     options = {};
         //     callback = options;
@@ -411,8 +408,7 @@ class Controller {
         if (typeof callback !== 'function') {
             callback = noop;
         }
-        this.socket &&
-            this.socket.emit('open', port, controllerType, options, callback);
+        this.socket && this.socket.emit('open', port, options, callback);
     }
 
     // Closes an open connection.

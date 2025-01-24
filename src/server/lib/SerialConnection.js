@@ -41,7 +41,7 @@ const defaultSettings = Object.freeze({
     rtscts: false,
     xon: false,
     xoff: false,
-    xany: false
+    xany: false,
 });
 
 const toIdent = (options) => {
@@ -83,7 +83,7 @@ class SerialConnection extends EventEmitter {
                 }
             }
             this.emit('error', err);
-        }
+        },
     };
 
     constructor(options) {
@@ -93,7 +93,9 @@ class SerialConnection extends EventEmitter {
 
         if (writeFilter) {
             if (typeof writeFilter !== 'function') {
-                throw new TypeError(`"writeFilter" must be a function: ${writeFilter}`);
+                throw new TypeError(
+                    `"writeFilter" must be a function: ${writeFilter}`,
+                );
             }
 
             this.writeFilter = writeFilter;
@@ -102,7 +104,9 @@ class SerialConnection extends EventEmitter {
         const settings = Object.assign({}, defaultSettings, rest);
 
         if (settings.port) {
-            throw new TypeError('"port" is an unknown option, did you mean "path"?');
+            throw new TypeError(
+                '"port" is an unknown option, did you mean "path"?',
+            );
         }
 
         if (!settings.path) {
@@ -110,11 +114,15 @@ class SerialConnection extends EventEmitter {
         }
 
         if (settings.baudrate) {
-            throw new TypeError('"baudrate" is an unknown option, did you mean "baudRate"?');
+            throw new TypeError(
+                '"baudrate" is an unknown option, did you mean "baudRate"?',
+            );
         }
 
         if (typeof settings.baudRate !== 'number') {
-            throw new TypeError(`"baudRate" must be a number: ${settings.baudRate}`);
+            throw new TypeError(
+                `"baudRate" must be a number: ${settings.baudRate}`,
+            );
         }
 
         if (DATABITS.indexOf(settings.dataBits) < 0) {
@@ -131,7 +139,9 @@ class SerialConnection extends EventEmitter {
 
         FLOWCONTROLS.forEach((control) => {
             if (typeof settings[control] !== 'boolean') {
-                throw new TypeError(`"${control}" is not boolean: ${settings[control]}`);
+                throw new TypeError(
+                    `"${control}" is not boolean: ${settings[control]}`,
+                );
             }
         });
 
@@ -139,8 +149,8 @@ class SerialConnection extends EventEmitter {
             settings: {
                 enumerable: true,
                 value: settings,
-                writable: false
-            }
+                writable: false,
+            },
         });
     }
 
@@ -169,7 +179,9 @@ class SerialConnection extends EventEmitter {
         const looksLikeIP = path.match(expr);
 
         if (this.port && !looksLikeIP) {
-            const err = new Error(`Cannot open serial port "${this.settings.path}"`);
+            const err = new Error(
+                `Cannot open serial port "${this.settings.path}"`,
+            );
             callback(err);
             return;
         }
@@ -182,7 +194,6 @@ class SerialConnection extends EventEmitter {
             callback(err);
             return;
         }
-
 
         if (network || looksLikeIP) {
             console.log('telnet');
@@ -209,7 +220,7 @@ class SerialConnection extends EventEmitter {
                 path,
                 baudRate,
                 ...rest,
-                autoOpen: false
+                autoOpen: false,
             });
             this.addPortListeners();
             this.port.open(callback);
@@ -228,7 +239,9 @@ class SerialConnection extends EventEmitter {
     // @param {function} callback The error-first callback.
     close(callback) {
         if (!this.port) {
-            const err = new Error(`Cannot close serial port "${this.settings.path}"`);
+            const err = new Error(
+                `Cannot close serial port "${this.settings.path}"`,
+            );
             callback && callback(err);
             return;
         }
@@ -262,6 +275,10 @@ class SerialConnection extends EventEmitter {
 
     writeImmediate(data) {
         this.port.write(data);
+    }
+
+    setWriteFilter(writeFilter) {
+        this.writeFilter = writeFilter;
     }
 }
 

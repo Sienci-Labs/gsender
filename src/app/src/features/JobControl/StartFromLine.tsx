@@ -9,7 +9,6 @@ import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import { updateJobOverrides } from 'app/store/redux/slices/visualizer.slice';
 import controller from 'app/lib/controller';
 import { store as reduxStore } from 'app/store/redux';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import {
     Dialog,
     DialogContent,
@@ -19,17 +18,19 @@ import {
 import Tooltip from 'app/components/Tooltip';
 import { Input } from 'app/components/shadcn/Input';
 import { FaPlay } from 'react-icons/fa';
+import { toast } from 'app/lib/toaster';
 
 type StartFromLineProps = {
     disabled: boolean;
+    lastLine: number;
 };
 
-const StartFromLine = ({ disabled }: StartFromLineProps) => {
+const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const [state, setState] = useState({
         showModal: false,
         needsRecovery: false,
-        value: 0,
+        value: lastLine,
         waitForHoming: false,
         safeHeight:
             store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS
@@ -57,11 +58,7 @@ const StartFromLine = ({ disabled }: StartFromLineProps) => {
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
-        Toaster.pop({
-            msg: 'Running Start From Specific Line Command',
-            type: TOASTER_SUCCESS,
-            duration: 2000,
-        });
+        toast.info('Running Start From Specific Line Command');
     };
 
     return (

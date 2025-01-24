@@ -45,6 +45,7 @@ import GeneralArea from '../components/GeneralArea';
 
 import styles from '../index.module.styl';
 import { collectUserUsageData } from '../../../lib/heatmap';
+import { toast } from 'app/lib/toaster';
 
 const Events = ({ active }) => {
     const [programStartEvent, setProgramStartEvent] = useState(null);
@@ -75,10 +76,7 @@ const Events = ({ active }) => {
                 setStartEnabled(programStartEvent.enabled);
             }
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Start event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Start event');
         }
     };
 
@@ -92,10 +90,7 @@ const Events = ({ active }) => {
                 setEndEnabled(programEndEvent.enabled);
             }
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program End event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program End event');
         }
     };
 
@@ -109,10 +104,7 @@ const Events = ({ active }) => {
                 setPauseEnabled(programPauseEvent.enabled);
             }
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Pause event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Pause event');
         }
     };
     const toggleResumeEvent = async () => {
@@ -125,10 +117,7 @@ const Events = ({ active }) => {
                 setResumeEnabled(programResumeEvent.enabled);
             }
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Resume event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Resume event');
         }
     };
 
@@ -147,15 +136,9 @@ const Events = ({ active }) => {
                 const { record } = res.body;
                 setProgramStartEvent(record);
             }
-            Toaster.pop({
-                msg: 'Updated Program Start event',
-                type: TOASTER_SUCCESS,
-            });
+            toast.info('Updated Program Start event');
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Start event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Start event');
         }
     };
 
@@ -174,15 +157,9 @@ const Events = ({ active }) => {
                 const { record } = res.body;
                 setProgramEndEvent(record);
             }
-            Toaster.pop({
-                msg: 'Updated Program Stop event',
-                type: TOASTER_SUCCESS,
-            });
+            toast.info('Updated Program Stop event');
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Stop event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Stop event');
         }
     };
 
@@ -201,15 +178,9 @@ const Events = ({ active }) => {
                 const { record } = res.body;
                 setProgramPauseEvent(record);
             }
-            Toaster.pop({
-                msg: 'Updated Program Pause event',
-                type: TOASTER_SUCCESS,
-            });
+            toast.info('Updated Program Pause event');
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Pause event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Pause event');
         }
     };
 
@@ -228,15 +199,9 @@ const Events = ({ active }) => {
                 const { record } = res.body;
                 setProgramResumeEvent(record);
             }
-            Toaster.pop({
-                msg: 'Updated Program Resume event',
-                type: TOASTER_SUCCESS,
-            });
+            toast.info('Updated Program Resume event');
         } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to update Program Resume event',
-                type: TOASTER_DANGER,
-            });
+            toast.error('Unable to update Program Resume event');
         }
     };
 
@@ -263,10 +228,7 @@ const Events = ({ active }) => {
                 resumeEvent && setProgramResumeCode(resumeEvent.commands);
                 resumeEvent && setResumeEnabled(resumeEvent.enabled);
             } catch (e) {
-                Toaster.pop({
-                    msg: 'Unable to fetch Start/Stop event records',
-                    type: TOASTER_DANGER,
-                });
+                toast.error('Unable to fetch Start/Stop event records');
             }
         }
 

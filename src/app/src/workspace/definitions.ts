@@ -11,6 +11,14 @@ import { GamepadConfig } from 'app/lib/gamepad/definitions';
 export type WORKSPACE_MODE_T =
     (typeof WORKSPACE_MODE)[keyof typeof WORKSPACE_MODE];
 
+export type Notification = {
+    id: string;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    status: 'read' | 'unread';
+    timestamp: Date | string;
+};
+
 // Interfaces
 
 export interface Workspace {
@@ -66,4 +74,5 @@ export interface Workspace {
             storedValue: number;
         };
     };
+    notifications: Notification[];
 }

@@ -28,7 +28,7 @@ import {
 } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
-import { Workspace } from 'app/workspace/definitions';
+import { Notification, Workspace } from 'app/workspace/definitions';
 
 // Types
 
@@ -106,6 +106,13 @@ export interface ConnectionState {
     err: string;
 }
 
+export interface HelperState {
+    active: boolean;
+    minimized: boolean;
+    title: string;
+    metadata: object;
+}
+
 export interface FileInfoState {
     fileLoaded: boolean;
     fileProcessing: boolean;
@@ -131,6 +138,7 @@ export interface PreferencesState {
         shouldHold: boolean;
     };
     ipList: Array<string>;
+    notifications: Notification[];
 }
 
 export interface VisualizerState {
@@ -187,7 +195,7 @@ export interface Session {
     token: string;
 }
 
-export interface DefaultState {
+export interface State {
     session: Session;
     workspace: Workspace;
     widgets: {
@@ -210,4 +218,9 @@ export interface DefaultState {
 export interface SerialPortOptions {
     port: string;
     inuse: boolean;
+}
+
+export interface ConsoleState {
+    history: string[];
+    inputHistory: string[];
 }

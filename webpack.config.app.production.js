@@ -85,7 +85,6 @@ module.exports = {
             test: /\.jsx?$/,
             loader: 'babel-loader',
             options: babelConfig,
-            exclude: /node_modules/
         },
         {
             test: /\.styl$/,

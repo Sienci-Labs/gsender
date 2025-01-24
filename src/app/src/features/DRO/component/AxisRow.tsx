@@ -6,6 +6,18 @@ import {
 import { Button } from 'app/components/Button';
 import { zeroWCS, gotoZero } from '../utils/DRO.ts';
 import { WCSInput } from 'app/features/DRO/component/WCSInput.tsx';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from 'app/components/shadcn/AlertDialog';
 
 interface AxisRowProps {
     axis: Axis;
@@ -23,23 +35,53 @@ export function AxisRow({
     disabled,
     homingMode,
 }: AxisRowProps) {
+    const { shouldWarnZero } = useWorkspaceState();
+
     return (
         <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
-            <Button
-                onClick={() => {
-                    if (homingMode) {
-                        homeAxis(axis);
-                    } else {
-                        zeroWCS(axis, 0);
-                    }
-                }}
-                disabled={disabled}
-                color={homingMode ? 'alt' : 'secondary'}
-            >
-                <span className="font-bold font-mono text-xl transition-all transition-duration-300">
-                    {`${homingMode ? 'H' : ''}${axis}${homingMode ? '' : '0'}`}
-                </span>
-            </Button>
+            {homingMode || !shouldWarnZero ? (
+                <Button
+                    onClick={() => {
+                        if (homingMode) {
+                            homeAxis(axis);
+                        } else {
+                            zeroWCS(axis, 0);
+                        }
+                    }}
+                    disabled={disabled}
+                    color={homingMode ? 'alt' : 'secondary'}
+                >
+                    <span className="font-bold font-mono text-xl transition-all transition-duration-300">
+                        {`${homingMode ? 'H' : ''}${axis}${homingMode ? '' : '0'}`}
+                    </span>
+                </Button>
+            ) : (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button disabled={disabled} color="secondary">
+                            <span className="font-bold font-mono text-xl transition-all transition-duration-300">
+                                {`${axis}0`}
+                            </span>
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Zero {axis} Axis
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to zero the {axis} axis?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => zeroWCS(axis, 0)}>
+                                Continue
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
 
             <WCSInput
                 disabled={disabled}

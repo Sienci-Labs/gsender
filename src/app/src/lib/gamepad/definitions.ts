@@ -1,5 +1,5 @@
-import { AXES_T } from 'features/Axes/definitions';
-import { CommandKeys } from 'lib/definitions/shortcuts';
+import { AXES_T } from 'app/features/Axes/definitions';
+import { CommandKeys } from 'app/lib/definitions/shortcuts';
 
 export interface GamepadDetail {
     detail: {

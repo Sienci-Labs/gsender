@@ -29,8 +29,7 @@ const Footer: React.FC<WidgetProps> = ({ className, ...props }) => (
         {...props}
         className={classNames(
             className,
-            'border-solid border-[1px] border-gray-400' +
-                'bg-white text-gray-900',
+            'border-solid border border-gray-400' + 'bg-white text-gray-900',
         )}
     />
 );

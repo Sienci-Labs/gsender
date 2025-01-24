@@ -3,9 +3,9 @@ import throttle from 'lodash/throttle';
 import uniqueId from 'lodash/uniqueId';
 
 import Button from 'app/components/Button';
-import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 import Line from './Line';
+import { toast } from 'app/lib/toaster';
 
 interface GcodeViewerProps {
     gcode: string;
@@ -16,10 +16,7 @@ const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
         async () => {
             await navigator.clipboard?.writeText(gcode);
 
-            Toaster.pop({
-                msg: 'Copied G-code to Clipboard',
-                type: TOASTER_INFO,
-            });
+            toast.info('Copied G-code to Clipboard');
         },
         2000,
         { trailing: false },

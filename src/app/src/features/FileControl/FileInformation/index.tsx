@@ -6,6 +6,12 @@ import Switch from 'app/components/Switch';
 import Size from './Size';
 import Info from './Info';
 import LoadingAnimation from './LoadingAnimation';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from 'app/components/shadcn/Tooltip';
 
 const FileInformation = () => {
     const { name, size, total, path, fileLoaded, fileProcessing } =
@@ -41,9 +47,27 @@ const FileInformation = () => {
 
     const ToggleOutput = toggleInfo ? Info : Size;
 
+    const extension = name.slice(name.indexOf('.') - 3);
+
     return (
-        <div className="flex flex-col gap-1 justify-center p-3 items-center h-full w-[90%] self-center text-sm">
-            <h2 className="text-lg font-bold">{name}</h2>
+        <div
+            className="flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm max-w-full" /*"flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm"*/
+        >
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className="max-w-full flex flex-row">
+                            <h2
+                                className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap" /*whitespace-break-spaces break-words [line-break:strict] hyphens-none [word-wrap:break-word]*/
+                            >
+                                {name}
+                            </h2>
+                            <h2 className="text-lg font-bold">{extension}</h2>
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>{name}</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
 
             <div className="text-gray-500 flex gap-1 text-sm">
                 <span>{fileSize}</span>
@@ -58,7 +82,7 @@ const FileInformation = () => {
                 </div>
             )}
 
-            <div className="flex gap-2 min-w-64">
+            <div className="flex gap-2 min-w-64 self-center justify-center items-center">
                 <div className="flex flex-col items-center mr-1">
                     <span className="text-gray-500">Info</span>
                     <Switch

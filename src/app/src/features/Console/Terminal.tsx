@@ -1,32 +1,52 @@
-import { useState, useEffect, useRef } from 'react';
+import {
+    useState,
+    useEffect,
+    useRef,
+    useImperativeHandle,
+    forwardRef,
+} from 'react';
 import { Terminal as XtermTerminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';
 import { v4 as uuidv4 } from 'uuid';
+import { useDispatch } from 'react-redux';
 
 import controller, {
     addControllerEvents,
     removeControllerEvents,
 } from 'app/lib/controller';
-import {
-    TERMINAL_GREY,
-    TERMINAL_RED,
-    TERMINAL_ALARM_RED,
-} from 'app/constants/index';
+import { TERMINAL_GREY, TERMINAL_RED, TERMINAL_ALARM_RED } from 'app/constants';
+import { addToHistory } from 'app/store/redux/slices/console.slice';
 
 import '@xterm/xterm/css/xterm.css';
+
+type TerminalRef = {
+    clear: () => void;
+};
 
 type Props = {
     isActive: boolean;
 };
 
-export default function Terminal({ isActive }: Props) {
+const Terminal = (
+    { isActive }: Props,
+    ref: React.ForwardedRef<TerminalRef>,
+) => {
     const terminalRef = useRef<HTMLDivElement>(null);
     const terminalInstance = useRef<XtermTerminal | null>(null);
     const fitAddonInstance = useRef<FitAddon | null>(null);
     const [senderId] = useState(uuidv4());
+    const dispatch = useDispatch();
+
+    useImperativeHandle(ref, () => ({
+        clear: () => {
+            if (terminalInstance.current) {
+                terminalInstance.current.clear();
+            }
+        },
+    }));
 
     useEffect(() => {
         const newTerminal = new XtermTerminal({
@@ -79,6 +99,8 @@ export default function Terminal({ isActive }: Props) {
         if (!terminalInstance.current || !data) {
             return;
         }
+
+        dispatch(addToHistory(data));
 
         if (data.includes('error:')) {
             terminalInstance.current?.writeln(color.xterm(TERMINAL_RED)(data));
@@ -150,10 +172,6 @@ export default function Terminal({ isActive }: Props) {
             } else {
                 writeToTerminal(data);
             }
-
-            // this.terminal.updateTerminalHistory(data);
-
-            // this.throttledRefitTerminal();
         },
         'serialport:read': (data: string) => {
             if (!terminalInstance.current) {
@@ -181,4 +199,6 @@ export default function Terminal({ isActive }: Props) {
             <div ref={terminalRef} className="h-full w-full" />
         </div>
     );
-}
+};
+
+export default forwardRef(Terminal);

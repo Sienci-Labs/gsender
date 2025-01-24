@@ -1,6 +1,7 @@
 import store from '../store';
 import defaultState from '../store/defaultState';
 import api from '../api';
+import { toast } from 'app/lib/toaster';
 
 export const restoreDefault = async (): Promise<void> => {
     await api.events.clearAll();
@@ -13,11 +14,12 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
 
     // if this is being called for importing settings, need to reload
     // if sync, no reload needed
-    if (!isSync) {
+    /*if (!isSync) {
         setTimeout(() => {
             window.location.reload();
         }, 250);
-    }
+    }*/
+    toast.success('Settings restored');
 };
 
 export const storeUpdate = async (
@@ -26,8 +28,9 @@ export const storeUpdate = async (
 ): Promise<void> => {
     try {
         const { settings, events = [], state } = JSON.parse(content);
+        console.log(settings);
 
-        await new Promise((resolve, _reject) => {
+        /*await new Promise((resolve, _reject) => {
             // delete all old events
             const res = api.events.clearAll();
             resolve(res);
@@ -37,7 +40,7 @@ export const storeUpdate = async (
                     api.events.create(event),
                 ),
             ]);
-        });
+        });*/
 
         if (settings) {
             restoreSettings(settings, isSync);
@@ -45,6 +48,7 @@ export const storeUpdate = async (
             restoreSettings(state, isSync);
         }
     } catch (error) {
+        console.error(error);
         /**
          *  Possible errors:
          *  1. JSON.parse(content) could not execute

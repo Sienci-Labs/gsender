@@ -98,7 +98,6 @@ const SettingsList = ({ firmwareType, isAlarm }) => {
                                                     bits={grbl.bits}
                                                     numBits={grbl.numBits}
                                                     requiredBit={grbl.requiredBit}
-                                                    disabled={isAlarm}
                                                 />
                                             </div>
 
@@ -112,7 +111,6 @@ const SettingsList = ({ firmwareType, isAlarm }) => {
                                                         type="button"
                                                         style={{ all: 'unset' }}
                                                         onClick={handleResetToDefaultValue(grbl.setting)}
-                                                        disabled={isAlarm}
                                                     >
                                                         <i className="fas fa-undo" style={{ cursor: 'pointer' }} />
                                                     </button>

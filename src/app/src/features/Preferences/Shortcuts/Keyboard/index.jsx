@@ -41,6 +41,7 @@ import { generateList } from '../utils';
 
 import styles from '../index.module.styl';
 import { collectUserUsageData } from '../../../../lib/heatmap';
+import { toast } from 'app/lib/toaster';
 
 /**
  * Keybinding settings page
@@ -113,11 +114,7 @@ const Keyboard = () => {
 
     const showToast = _.throttle(
         (msg = 'Shortcut Updated') => {
-            Toaster.pop({
-                msg,
-                type: TOASTER_SUCCESS,
-                duration: 3000,
-            });
+            toast.success(msg);
         },
         5000,
         { trailing: false },

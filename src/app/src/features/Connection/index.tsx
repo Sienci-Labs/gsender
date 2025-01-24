@@ -11,6 +11,7 @@ import controller from 'app/lib/controller';
 import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import store from 'app/store';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -28,11 +29,15 @@ export enum ConnectionType {
 
 export interface ConnectionProps {
     ports: Port[];
+    // unrecognizedPorts: Port[];
+    reportedFirmware: FirmwareFlavour;
 }
 
-export type FirmwareFlavour = 'Grbl' | 'grblHAL';
+export type FirmwareFlavour = 'Grbl' | 'grblHAL' | '';
 
 function Connection(props: ConnectionProps) {
+    const connectionConfig = new WidgetConfig('connection');
+
     const [connectionState, setConnectionState] = useState(
         ConnectionState.DISCONNECTED,
     );
@@ -60,6 +65,7 @@ function Connection(props: ConnectionProps) {
         }
 
         const network = type === ConnectionType.ETHERNET;
+        const baud = Number(store.get('widgets.connection.baudrate'));
 
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
@@ -68,9 +74,9 @@ function Connection(props: ConnectionProps) {
         // Attempt connect with callback
         controller.openPort(
             port,
-            firmware,
+            // firmware,
             {
-                baudrate: 115200,
+                baudrate: baud,
                 network,
             },
             (err: string) => {
@@ -83,6 +89,9 @@ function Connection(props: ConnectionProps) {
                 setActivePort(port);
             },
         );
+
+        connectionConfig.set('port', port);
+        connectionConfig.set('baudrate', baud);
     }
 
     function onDisconnectClick() {
@@ -97,11 +106,9 @@ function Connection(props: ConnectionProps) {
         });
     }
 
-    function onSelectFirmware(type: FirmwareFlavour) {
-        setFirmware(type);
-        // TODO: Update saved value;
-        store.set('widgets.connection.controller.type', type);
-    }
+    useEffect(() => {
+        setFirmware(props.reportedFirmware);
+    }, [props.reportedFirmware]);
 
     return (
         <div
@@ -136,9 +143,7 @@ function Connection(props: ConnectionProps) {
                     connectionState === ConnectionState.ERROR) && (
                     <PortListings
                         connectHandler={onConnectClick}
-                        ports={props.ports}
-                        selectedFirmware={firmware}
-                        onFirmwareClick={onSelectFirmware}
+                        ports={props.ports /*.concat(props.unrecognizedPorts)*/}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
@@ -152,8 +157,12 @@ function Connection(props: ConnectionProps) {
 export default connect((store) => {
     const connection = get(store, 'connection', {});
     const ports = get(connection, 'ports', []);
+    // const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
+    const reportedFirmware = get(store, 'controller.type', 'Grbl');
 
     return {
         ports,
+        // unrecognizedPorts,
+        reportedFirmware,
     };
 })(Connection);

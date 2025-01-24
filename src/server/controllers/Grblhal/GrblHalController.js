@@ -27,7 +27,7 @@ import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
 import GcodeToolpath from '../../lib/GcodeToolpath';
-import SerialConnection from '../../lib/SerialConnection';
+// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
@@ -154,7 +154,7 @@ class GrblHalController {
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
-            // the firmware doesn't send ok to the parserstate
+            reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
 
@@ -205,7 +205,8 @@ class GrblHalController {
     // Macro button resume
     programResumeTimeout = null;
 
-    constructor(engine, options) {
+    constructor(engine, connection, options) {
+        log.debug('constructor');
         if (!engine) {
             throw new Error('engine must be specified');
         }
@@ -222,37 +223,33 @@ class GrblHalController {
         };
 
         // Connection
-        this.connection = new SerialConnection({
-            path: port,
-            baudRate: baudrate,
-            rtscts: rtscts,
-            network,
-            writeFilter: (data) => {
-                const line = data.trim();
+        this.connection = connection;
 
-                if (!line) {
-                    return data;
-                }
+        this.connection.setWriteFilter((data) => {
+            const line = data.trim();
 
-                { // Grbl settings: $0-$255
-                    const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
-                    if (r) {
-                        const name = r[1];
-                        const value = Number(r[2]);
-                        if ((name === '$13') && (value >= 0) && (value <= 65535)) {
-                            const nextSettings = {
-                                ...this.runner.settings,
-                                settings: {
-                                    ...this.runner.settings.settings,
-                                    [name]: value ? '1' : '0'
-                                }
-                            };
-                            this.runner.settings = nextSettings; // enforce change
-                        }
-                    }
-                }
+            if (!line) {
                 return data;
             }
+
+            { // Grbl settings: $0-$255
+                const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
+                if (r) {
+                    const name = r[1];
+                    const value = Number(r[2]);
+                    if ((name === '$13') && (value >= 0) && (value <= 65535)) {
+                        const nextSettings = {
+                            ...this.runner.settings,
+                            settings: {
+                                ...this.runner.settings.settings,
+                                [name]: value ? '1' : '0'
+                            }
+                        };
+                        this.runner.settings = nextSettings; // enforce change
+                    }
+                }
+            }
+            return data;
         });
 
         // Event Trigger
@@ -287,14 +284,14 @@ class GrblHalController {
                         log.debug('Finished Pre-hook');
                         this.feeder.hold({ data: '%toolchange' });
                         this.emit('toolchange:preHookComplete', commentString);
-                        return 'G4 P0.5';
+                        return 'G4 P1';
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 500);
-                        return 'G4 P0.5';
+                        }, 1000);
+                        return 'G4 P1';
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
@@ -375,24 +372,22 @@ class GrblHalController {
                 return;
             }
 
-            if (this.runner.isAlarm()) {
+            /*if (this.runner.isAlarm()) {
                 this.feeder.reset();
                 this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
-            }
+            }*/
 
             line = String(line).trim();
             if (line.length === 0) {
                 return;
             }
 
-            this.emit('serialport:write', line + '\n', {
+            this.write(line + '\n', {
                 ...context,
                 source: WRITE_SOURCE_FEEDER
             });
-
-            this.connection.write(line + '\n');
             log.silly(`> ${line}`);
         });
         this.feeder.on('hold', noop);
@@ -404,7 +399,7 @@ class GrblHalController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (1024 - 28), // TODO: Parse this out from OPT
+            bufferSize: (1024 - 100), // TODO: Parse this out from OPT
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
@@ -482,8 +477,10 @@ class GrblHalController {
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {
-                            this.emit('toolchange:start');
-                            this.runPreChangeHook(commentString);
+                            setTimeout(() => {
+                                this.emit('toolchange:start');
+                                this.runPreChangeHook(commentString);
+                            }, 500);
                         } else {
                             const count = this.sender.incrementToolChanges();
 
@@ -502,11 +499,11 @@ class GrblHalController {
                         }
                     }
 
-                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
-                    if (!passthroughM6) {
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    if (!passthroughM6 || toolChangeOption === 'Code') {
                         line = line.replace('M6', '(M6)');
                     }
-                    line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                    //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
                 /**
@@ -550,8 +547,7 @@ class GrblHalController {
 
             this.emit('serialport:read', line);
 
-            this.connection.write(line + '\n');
-            log.silly(`> ${line}`);
+            this.write(line + '\n');
         });
         this.sender.on('hold', noop);
         this.sender.on('unhold', noop);
@@ -674,6 +670,16 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
+            if (this.actionMask.queryParserState.reply) {
+                if (this.actionMask.replyParserState) {
+                    this.actionMask.replyParserState = false;
+                    this.emit('serialport:read', res.raw);
+                }
+                this.actionMask.queryParserState.reply = false;
+
+                return;
+            }
+
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 this.emit('serialport:read', res.raw);
@@ -865,10 +871,10 @@ class GrblHalController {
 
 
             this.actionMask.queryParserState.state = false;
+            this.actionMask.queryParserState.reply = true;
 
             if (this.actionMask.replyParserState) {
                 this.emit('serialport:read', res.raw);
-                this.actionMask.replyParserState = false;
             }
         });
 
@@ -977,10 +983,10 @@ class GrblHalController {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
-                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     this.actionMask.alarmCompleteReport = false;
                 } else {
-                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
                     }
@@ -1009,20 +1015,20 @@ class GrblHalController {
                     if (timespan >= toleranceTime) {
                         log.debug(`Continue parser state query: timespan=${timespan}ms`);
                         this.actionMask.queryParserState.state = false;
+                        this.actionMask.queryParserState.reply = false;
                     }
                 }
-            } else { // if running, don't send query
-                return;
             }
 
-            if (this.actionMask.queryParserState.state) {
+            if (this.actionMask.queryParserState.state || this.actionMask.queryParserState.reply) {
                 return;
             }
 
             if (this.isOpen()) {
                 this.actionMask.queryParserState.state = true;
+                this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
+                this.connection.writeImmediate(`${GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT}`); // $G equivalent
             }
         }, 500);
 
@@ -1209,6 +1215,7 @@ class GrblHalController {
 
     clearActionValues() {
         this.actionMask.queryParserState.state = false;
+        this.actionMask.queryParserState.reply = false;
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
@@ -1275,58 +1282,29 @@ class GrblHalController {
         };
     }
 
-    open(callback = noop) {
-        const { port, baudrate } = this.options;
-
-        // Assertion check
-        if (this.isOpen()) {
-            log.error(`Cannot open serial port "${port}"`);
-            return;
+    open(port, baudrate, refresh, callback = noop) {
+        if (!refresh) {
+            this.connection.on('data', this.connectionEventListener.data);
+            this.connection.on('close', this.connectionEventListener.close);
+            this.connection.on('error', this.connectionEventListener.error);
         }
 
-        this.connection.on('data', this.connectionEventListener.data);
-        this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);
+        callback(); // register controller
 
-        this.connection.open((err) => {
-            if (err) {
-                log.error(`Error opening serial port "${port}":`, err);
-                this.emit('serialport:error', { err: err, port: port });
-                callback(err); // notify error
-                return;
+        this.workflow.stop();
+
+        // Clear action values
+        this.clearActionValues();
+
+        // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
+        // We set controller ready if version found
+        setTimeout(async () => {
+            if (this.connection) {
+                await delay(100);
+                this.connection.writeImmediate(String.fromCharCode(0x87));
+                this.write('$I\n');
             }
-
-            this.emit('serialport:open', {
-                port: port,
-                baudrate: baudrate,
-                controllerType: this.type,
-                inuse: true
-            });
-
-            // Emit a change event to all connected sockets
-            if (this.engine.io) {
-                this.engine.io.emit('serialport:change', {
-                    port: port,
-                    inuse: true
-                });
-            }
-
-            callback(); // register controller
-
-            log.debug(`Connected to serial port "${port}"`);
-            this.workflow.stop();
-
-            // Clear action values
-            this.clearActionValues();
-
-            // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
-            // We set controller ready if version found
-            setTimeout(async () => {
-                if (this.connection) {
-                    await delay(100);
-                    this.connection.writeImmediate(String.fromCharCode(0x87));
-                    this.connection.write('$I\n');
-                }
+            if (!refresh) {
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
@@ -1335,12 +1313,15 @@ class GrblHalController {
                         return;
                     }
                     if (this.connection) {
-                        this.connection.write('$I\n');
+                        this.write('$I\n');
                     }
                     counter--;
                 }, 3000);
-            }, 500);
-        });
+            } else {
+                this.initialized = true;
+                this.initController();
+            }
+        }, 500);
     }
 
     close(callback, received) {
@@ -1359,30 +1340,21 @@ class GrblHalController {
         // Clear initialized flag
         this.initialized = false;
 
-        this.emit('serialport:close', {
+        this.emit('serialport:closeController', {
             port: port,
             inuse: false,
         }, received);
-
-        // Emit a change event to all connected sockets
-        if (this.engine.io) {
-            this.engine.io.emit('serialport:change', {
-                port: port,
-                inuse: false
-            });
-        }
 
         if (this.isClose()) {
             callback(null);
             return;
         }
 
-        this.connection.removeAllListeners();
-        this.connection.close(callback);
+        callback(null);
     }
 
     isOpen() {
-        return this.connection && this.connection.isOpen;
+        return this.connection && this.connection.isOpen();
     }
 
     isClose() {
@@ -1400,20 +1372,6 @@ class GrblHalController {
             return;
         }
 
-        log.debug(`Add socket connection: id=${socket.id}`);
-        this.sockets[socket.id] = socket;
-
-        //
-        // Send data to newly connected client
-        //
-        if (this.isOpen()) {
-            socket.emit('serialport:open', {
-                port: this.options.port,
-                baudrate: this.options.baudrate,
-                controllerType: this.type,
-                inuse: true
-            });
-        }
         if (!_.isEmpty(this.settings)) {
             // controller settings
             socket.emit('controller:settings', GRBLHAL, this.settings);
@@ -1436,22 +1394,8 @@ class GrblHalController {
         }
     }
 
-    removeConnection(socket) {
-        if (!socket) {
-            log.error('The socket parameter is not specified');
-            return;
-        }
-
-        log.debug(`Remove socket connection: id=${socket.id}`);
-        this.sockets[socket.id] = undefined;
-        delete this.sockets[socket.id];
-    }
-
     emit(eventName, ...args) {
-        Object.keys(this.sockets).forEach(id => {
-            const socket = this.sockets[id];
-            socket.emit(eventName, ...args);
-        });
+        this.connection.emitToSockets(eventName, ...args);
     }
 
     consumeFeederCB() {
@@ -1523,7 +1467,7 @@ class GrblHalController {
                 const [lineToStartFrom, zMax, safeHeight = 10] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
-                log.info(startEventEnabled);
+                // log.info(startEventEnabled);
                 this.emit('job:start');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
@@ -1594,17 +1538,18 @@ class GrblHalController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
+                    modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
                         modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
                     }
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
-                    modalGCode.push(`F${feedRate} S${spindleRate}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
+                    // console.log(modalGCode);
 
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
@@ -2176,18 +2121,13 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        if (cmd === '$G') { // the command you must manually type for grblHAL gcode report is not $G, but x83
-            data = '\x83';
-        }
-
         this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
-        this.emit('serialport:write', data, {
+        this.connection.write(data, {
             ...context,
             source: WRITE_SOURCE_CLIENT
         });
-        this.connection.write(data);
         log.silly(`> ${data}`);
     }
 
@@ -2214,10 +2154,21 @@ class GrblHalController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+        let { preHook = '', postHook = '', skipDialog = false } = this.toolChangeContext;
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
-        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+
+        // If we're skipping dialog, combine both blocks and append a toolchange end so the program continues as expected
+        if (skipDialog) {
+            block.push('G4 P1');
+            block.push(...this.convertGcodeToArray(postHook));
+            block.push(POSTHOOK_COMPLETE);
+        }
+
+        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        if (!skipDialog) {
+            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+        }
 
         this.command('gcode', block);
     }

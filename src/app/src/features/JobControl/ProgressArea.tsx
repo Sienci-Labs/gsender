@@ -109,7 +109,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
 
     return (
         <>
-            <div className="w-60 border-solid border-[1px] border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1">
+            <div className="w-60 border-solid border border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1">
                 {/* <img src={Bit} /> */}
                 <div className="flex flex-col gap-0 w-full h-full -mt-6 pl-[34px]">
                     <div
@@ -123,7 +123,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                         </span>
                         <span>%</span>
                     </div>
-                    {/* <div className="h-[35px] w-24 overflow-hidden border-yellow-700 border-[1px]">
+                    {/* <div className="h-[35px] w-24 overflow-hidden border-yellow-700 border">
                         <img
                             src={texture}
                             className="bg-yellow-100 min-w-96 min-h-96 rounded-none"
@@ -132,7 +132,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     <Progress
                         value={percentageValue}
                         Bit={Bit}
-                        className="h-[35px] w-full border-yellow-700 border-[1px] bg-yellow-100 rounded-none ![background-image:_url('texture.png')]"
+                        className="h-[35px] w-full border-yellow-700 border bg-yellow-100 rounded-none ![background-image:_url('texture.png')]"
                     />
                 </div>
                 <TooltipProvider>

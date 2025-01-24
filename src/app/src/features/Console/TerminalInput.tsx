@@ -1,16 +1,38 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { LuCopy } from 'react-icons/lu';
+import { LuPaintbrush } from 'react-icons/lu';
+import { FaEllipsisH } from 'react-icons/fa';
 
 import { Button } from 'app/components/shadcn/Button';
 import { Input } from 'app/components/shadcn/Input';
-
+import { addToInputHistory } from 'app/store/redux/slices/console.slice';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
+import { toast } from 'app/lib/toaster';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from 'app/components/shadcn/Dropdown';
 
-const TerminalInput = () => {
+const COPY_HISTORY_LIMIT = 50;
+
+type Props = {
+    onClear: () => void;
+};
+
+const TerminalInput = ({ onClear }: Props) => {
+    const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
+    const { inputHistory, history } = useTypedSelector(
+        (state) => state.console,
+    );
+    const [historyIndex, setHistoryIndex] = useState(-1);
 
     const handleCommandExecute = () => {
-        const command = inputRef.current.value;
+        const command = inputRef.current?.value;
 
         if (!command) {
             return;
@@ -18,7 +40,56 @@ const TerminalInput = () => {
 
         controller.writeln(command);
 
+        // Use addToInputHistory instead of setInputHistory
+        dispatch(addToInputHistory(command));
+        setHistoryIndex(-1);
         inputRef.current.value = '';
+    };
+
+    const navigateHistory = (direction: 'up' | 'down') => {
+        if (inputHistory.length === 0) return;
+
+        let newIndex = historyIndex;
+
+        if (direction === 'up') {
+            // If we're at -1 (no history selected), start from the most recent command
+            newIndex =
+                historyIndex === -1
+                    ? inputHistory.length - 1
+                    : Math.max(0, historyIndex - 1);
+        } else {
+            // If we're at the bottom of history, clear the input
+            if (historyIndex >= inputHistory.length - 1) {
+                setHistoryIndex(-1);
+                inputRef.current.value = '';
+                return;
+            }
+            newIndex = Math.min(inputHistory.length - 1, historyIndex + 1);
+        }
+
+        setHistoryIndex(newIndex);
+        inputRef.current.value = inputHistory[newIndex];
+    };
+
+    const handleCopyHistory = async () => {
+        try {
+            const lastCommands = history.slice(-COPY_HISTORY_LIMIT);
+            await navigator.clipboard.writeText(lastCommands.join('\n'));
+
+            toast.success(
+                `Copied last ${lastCommands.length} commands to clipboard`,
+                {
+                    duration: 3000,
+                    position: 'bottom-left',
+                },
+            );
+        } catch (error) {
+            toast.error('Failed to copy commands to clipboard', {
+                duration: 3000,
+                position: 'bottom-left',
+            });
+            console.error('Failed to copy commands to clipboard:', error);
+        }
     };
 
     return (
@@ -33,40 +104,28 @@ const TerminalInput = () => {
                             handleCommandExecute();
                             break;
                         }
-                        // TODO: add these back in
-                        // case 'Backspace': {
-                        //     const { value } = e.target;
-                        //     //If there is only one character left and the user has pressed the backspace,
-                        //     //this will mean the value is empty now
-                        //     if (!value || [...value].length === 1) {
-                        //         this.resetTerminalInputIndex();
-                        //     }
-                        //     break;
-                        // }
-                        // case 'ArrowUp': {
-                        //     this.updateInputHistoryIndex(
-                        //         terminalInputIndex - 1,
-                        //     );
-                        //     break;
-                        // }
-
-                        // case 'ArrowDown': {
-                        //     this.updateInputHistoryIndex(
-                        //         terminalInputIndex + 1,
-                        //     );
-                        //     break;
-                        // }
+                        case 'ArrowUp': {
+                            e.preventDefault();
+                            navigateHistory('up');
+                            break;
+                        }
+                        case 'ArrowDown': {
+                            e.preventDefault();
+                            navigateHistory('down');
+                            break;
+                        }
+                        case 'Backspace': {
+                            if (inputRef.current?.value.length <= 1) {
+                                setHistoryIndex(-1);
+                            }
+                            break;
+                        }
                         default: {
                             break;
                         }
                     }
                 }}
             />
-
-            {/* TODO: add copy to clipboard functionality back in */}
-            <Button className="border">
-                <LuCopy />
-            </Button>
 
             <Button
                 variant="default"
@@ -75,6 +134,36 @@ const TerminalInput = () => {
             >
                 Run
             </Button>
+
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                        <FaEllipsisH />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white">
+                    <DropdownMenuItem>
+                        <Button
+                            variant="outline"
+                            className="w-full flex items-center gap-2"
+                            onClick={handleCopyHistory}
+                        >
+                            <LuCopy />
+                            Copy last 50 commands
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Button
+                            variant="outline"
+                            className="w-full flex items-center gap-2"
+                            onClick={onClear}
+                        >
+                            <LuPaintbrush />
+                            Clear Console
+                        </Button>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 };

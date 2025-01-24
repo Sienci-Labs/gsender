@@ -1,12 +1,38 @@
 class GrblHalLineParserResultSpindle {
     static parse(line) {
         const r = line.match(/^(\d+)( - )(.+?)?$/);
+        // new match for updated spindle data
+        const nr = line.match(/\[SPINDLE:(.+?)]/);
 
-        if (!r) {
+        const payload = {};
+
+        if (!r && !nr) {
             return null;
         }
 
-        const payload = {};
+
+        // Handle new spindle update early
+        /*
+            [SPINDLE:0|0|0|*DIRV|PWM|0.0,1000.0]
+            ID | Enabled/Num | TYPE | *(is_current) capabilities | Name | RPMMin,RPMMax]
+         */
+        if (nr) {
+            const parts = nr[1].split('|');
+            // Guard again Spindle option in opts
+            if (parts.length < 2) {
+                return null;
+            }
+            payload.label = parts[4];
+            payload.id = Number(parts[0]);
+            payload.capabilities = parts[3];
+            payload.enabled = payload.capabilities.indexOf('*') > -1;
+            payload.laser = payload.capabilities.indexOf('L') > -1;
+            payload.capabilities = payload.capabilities.replace('*', ''); // Strip out enabled asterisk
+            return {
+                type: GrblHalLineParserResultSpindle,
+                payload
+            };
+        }
 
         payload.order = Number(r[1]); // Order reported from firmware
 
