@@ -44,25 +44,22 @@ const FileInformation = () => {
     };
 
     const fileSize = formatFileSize(size);
-
     const ToggleOutput = toggleInfo ? Info : Size;
-
+    const cutName = name.substring(0, name.indexOf('.') - 3);
     const extension = name.slice(name.indexOf('.') - 3);
 
     return (
-        <div
-            className="flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm max-w-full" /*"flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm"*/
-        >
+        <div className="flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm max-w-full">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="max-w-full flex flex-row">
-                            <h2
-                                className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap" /*whitespace-break-spaces break-words [line-break:strict] hyphens-none [word-wrap:break-word]*/
-                            >
-                                {name}
+                            <h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
+                                {cutName}
                             </h2>
-                            <h2 className="text-lg font-bold">{extension}</h2>
+                            <h2 className="inline-block text-lg font-bold">
+                                {extension}
+                            </h2>
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>{name}</TooltipContent>
