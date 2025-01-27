@@ -58,16 +58,16 @@ class CameraDisplay extends PureComponent {
                         }}
                     />
                     <button
-                        title={i18n._('Right')}
+                        title={i18n._('Left')}
                         type="button"
                         tabIndex={0}
                         className={
-                            cameraPosition === 'Right'
-                                ? `${styles.faceRightActive}`
-                                : `${styles.faceRight}`
+                            cameraPosition === 'Left'
+                                ? `${styles.faceLeftActive}`
+                                : `${styles.faceLeft}`
                         }
                         onClick={(event) => {
-                            camera.toRightSideView();
+                            camera.toLeftSideView();
                         }}
                     />
                     <button
@@ -107,16 +107,16 @@ class CameraDisplay extends PureComponent {
                         className={styles.cornerC2}
                     />
                     <button
-                        title={i18n._('Left')}
+                        title={i18n._('Right')}
                         type="button"
                         tabIndex={0}
                         className={
-                            cameraPosition === 'Left'
+                            cameraPosition === 'Right'
                                 ? `${styles.cornerC2Active}`
                                 : `${styles.cornerC2}`
                         }
                         onClick={(event) => {
-                            camera.toLeftSideView();
+                            camera.toRightSideView();
                         }}
                     />
 
