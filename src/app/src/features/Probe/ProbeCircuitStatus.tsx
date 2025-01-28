@@ -34,7 +34,7 @@ const ProbeCircuitStatus: React.FC<Props> = ({ probeActive, connected }) => {
             {connected && (
                 <div className="w-full flex flex-col justify-center items-center sm:mt-4">
                     <div
-                        className={cx('w-8 h-8 rounded-full bg-robin-950', {
+                        className={cx('w-8 h-8 rounded-full', {
                             'bg-red-500': !probeActive,
                             'bg-green-500': probeActive,
                         })}
