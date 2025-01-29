@@ -536,11 +536,11 @@ const migrateStore = (): void => {
         }
 
         // Fix Auto Zero String
-        const probeType = store.get(
+        const touchplateType = store.get(
             'workspace.probeProfile.touchplateType',
             '',
         );
-        if (probeType === 'Auto Zero Touchplate') {
+        if (touchplateType === 'Auto Zero Touchplate') {
             store.set(
                 'workspace.probeProfile.touchplateType',
                 'AutoZero Touchplate',

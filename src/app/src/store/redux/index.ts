@@ -6,6 +6,7 @@ import file from './slices/fileInfo.slice';
 import visualizer from './slices/visualizer.slice';
 import preferences from './slices/preferences.slice';
 import console from './slices/console.slice';
+import helper from './slices/helper.slice';
 import { sagaMiddleware } from './sagas';
 
 export const store = configureStore({
@@ -16,6 +17,7 @@ export const store = configureStore({
         visualizer,
         preferences,
         console,
+        helper,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(sagaMiddleware),
