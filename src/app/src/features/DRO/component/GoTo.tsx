@@ -9,6 +9,7 @@ import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
 import { Switch } from 'app/components/shadcn/Switch.tsx';
 import { useState } from 'react';
+import controller from 'app/lib/controller';
 
 interface GotoProps {
     units: string;
@@ -32,6 +33,18 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         console.log(movementMode);
     };
 
+    function goToLocation() {
+        console.log('called movement');
+        const code = [];
+        const unitModal = 'G90';
+        const movementModal = movementMode ? 'G91' : 'G90'; // Is G91 enabled?
+        code.push(
+            movementModal,
+            `G0 X${movementPos.x} Y${movementPos.y} Z${movementPos.z}`,
+        );
+        controller.command('gcode:safe', code, unitModal);
+    }
+
     return (
         <Popover>
             <PopoverTrigger
@@ -52,7 +65,9 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         <Switch onClick={onToggleSwap} />
                         <span>G91</span>
                     </div>
-                    <Button color="primary">Go!</Button>
+                    <Button color="primary" onClick={goToLocation}>
+                        Go!
+                    </Button>
                 </div>
             </PopoverContent>
         </Popover>

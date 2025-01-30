@@ -2,6 +2,7 @@ import { FaMicrochip } from 'react-icons/fa';
 import { FaTasks } from 'react-icons/fa';
 import { MdKeyboardCommandKey } from 'react-icons/md';
 import { RiToolsFill } from 'react-icons/ri';
+import { MdChatBubbleOutline } from 'react-icons/md';
 import cx from 'classnames';
 
 import { NavbarLink } from './components/NavbarLink.tsx';
@@ -28,6 +29,12 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     href="/tools"
                     icon={RiToolsFill}
                     label="Tools"
+                    minimized={!show}
+                />
+                <NavbarLink
+                    href="/stats"
+                    icon={MdChatBubbleOutline}
+                    label="Stats/Info"
                     minimized={!show}
                 />
                 <NavbarLink
