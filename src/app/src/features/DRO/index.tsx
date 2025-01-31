@@ -71,8 +71,6 @@ function DRO({
     const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
     const { shouldWarnZero } = useWorkspaceState();
 
-    console.log(singleAxisHoming);
-
     useEffect(() => {
         const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
         setIsRotaryMode(mode);
@@ -225,7 +223,6 @@ export default connect((reduxStore) => {
     const homingEnabled = homingValue > 0;
     const singleAxisValue = homingValue & 2;
     const singleAxisHoming = singleAxisValue > 0;
-    console.log(singleAxisHoming);
 
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
