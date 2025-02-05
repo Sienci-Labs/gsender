@@ -44,14 +44,14 @@ const SurfacingTool = () => {
                 <div>
                     <p>
                         For ideal wasteboard surfacing: know your CNCs exact
-                        movement limits accounting for limit switches and other
-                        add-ons, get nicer and faster cuts using your widest
-                        diameter bit, and consider turning off hard and soft
-                        limits so you don&apos;t encounter alarms or errors.
+                        movement limits (account for limit switches and other
+                        add-ons), use your widest diameter bit for nicer and 
+                        faster cuts, and consider turning off hard and soft 
+                        limits to avoid alarms or errors.
                     </p>
 
                     <div className="flex gap-2 items-center mb-4">
-                        <Label className="min-w-32">X & Y Dimensions</Label>
+                        <Label className="min-w-32">X & Y Size</Label>
 
                         <div className="flex gap-2 items-center">
                             <Input type="number" />
@@ -95,7 +95,7 @@ const SurfacingTool = () => {
                     </div>
 
                     <div className="flex gap-2 items-center mb-4">
-                        <Label className="min-w-32">Feedrate</Label>
+                        <Label className="min-w-32">Feed Rate</Label>
 
                         <div className="flex gap-2 items-center w-full">
                             <Input type="number" />
@@ -104,7 +104,7 @@ const SurfacingTool = () => {
                     </div>
 
                     <div className="flex gap-2 items-center">
-                        <Label className="min-w-32">Stepover</Label>
+                        <Label className="min-w-32">Step Over</Label>
 
                         <div className="flex gap-2 items-center w-full">
                             <Input type="number" />
