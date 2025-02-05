@@ -21,7 +21,7 @@ const VisualizerComponent = ({ gcode }) => {
                 border: '1px solid black',
             }}
         >
-            Click Generate G-code Below
+            Click 'Generate G-code' to see a preview
         </div>
     );
 };
