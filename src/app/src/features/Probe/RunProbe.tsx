@@ -173,20 +173,17 @@ const RunProbe = ({ actions, state }: Props) => {
                     <div className="flex flex-col justify-between pb-4">
                         <div className="text-black leading-snug">
                             <p className="mb-3">
-                                Ensure tool is positioned as shown.
+                                1. Check the tool is positioned correctly (pictured).
                             </p>
                             <p className="mb-3">
-                                To confirm a reliable circuit, touch your plate
-                                to the tool and look for the signal to be
-                                robustly detected (indicated by a green light)
-                                before returning the probe to the probing
-                                position.{'\n'}
+                                2. Lift your touch plate to the tool to check the
+                                circuit is good (indicated by a green light),
+                                then put it back where it was.{'\n'}
                             </p>
                             <p className="mb-3">
-                                Probing cannot be run without confirming the
-                                circuit.
-                            </p>
-                            <p className="mb-3">
+                                3. For some meachines Consider holding your touch plate in place during probing to get a more consistent measurement.
+                                
+                                
                                 Consider holding your touch plate in place
                                 during probing to get a more consistent
                                 measurement.
