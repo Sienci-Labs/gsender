@@ -104,7 +104,7 @@ const SurfacingTool = () => {
                     </div>
 
                     <div className="flex gap-2 items-center">
-                        <Label className="min-w-32">Step Over</Label>
+                        <Label className="min-w-32">Stepover</Label>
 
                         <div className="flex gap-2 items-center w-full">
                             <Input type="number" />
