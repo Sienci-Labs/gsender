@@ -56,10 +56,9 @@ const InputArea = () => {
     return (
         <div style={{ width: '45%' }}>
             <p>
-                Make sure that your tool clears the surface of your material
-                without running into the limits of your Z-axis. You should also
-                use the probing feature to zero your Z-axis to the centerline
-                before surfacing.
+                Before surfacing: probe your rotary unit to zero the Z-axis to
+                its centerline and check that your cutting bit can raise high
+                enough to not run into the material you've mounted.
             </p>
             <Input
                 label="Length"
@@ -136,9 +135,9 @@ const InputArea = () => {
                     }}
                 />
                 <small>
-                    Stepdown applies to both sides of your material so your
-                    stock diameter will be reduced by twice this amount for
-                    every pass.
+                    Stepdown applies to both sides of your material so its
+                    diameter will be reduced by twice this amount for every
+                    pass.
                 </small>
             </div>
 
@@ -195,7 +194,7 @@ const InputArea = () => {
             />
 
             <Input
-                label="Feedrate"
+                label="Feed Rate"
                 units={`${units}/min`}
                 additionalProps={{
                     type: 'number',
@@ -230,10 +229,9 @@ const InputArea = () => {
                 </div>
 
                 <small>
-                    This option creates a more consistent surface finish as your
-                    A axis will spin in only one direction across the entire
-                    length of your material. You will however need to rehome
-                    after surfacing to reset your A axis coordinates.
+                    This option gives a better finish by surfacing the material
+                    in only one direction, but you’ll need to rehome after
+                    surfacing to reset your A-axis position.
                 </small>
             </div>
         </div>
