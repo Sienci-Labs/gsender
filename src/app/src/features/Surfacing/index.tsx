@@ -1,5 +1,22 @@
 import { useState } from 'react';
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { FaCode, FaPlay } from 'react-icons/fa';
+import { Link } from '@tanstack/react-router';
 
+import store from 'app/store';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    IMPERIAL_UNITS,
+    VISUALIZER_PRIMARY,
+} from 'app/constants';
+import { convertToMetric } from 'app/lib/units';
+import MultiInputBlock from 'app/components/MultiInputBlock';
+import cx from 'classnames';
+import { Checkbox } from 'app/components/shadcn/Checkbox';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/shadcn/Input';
 import defaultState from 'app/store/defaultState';
 import {
@@ -9,29 +26,14 @@ import {
     TabsTrigger,
 } from 'app/components/shadcn/Tabs';
 
-import get from 'lodash/get';
-import pubsub from 'pubsub-js';
-
-import Generator from './utils/surfacingGcodeGenerator';
-import { GcodeViewer } from './components/GcodeViewer';
-import store from 'app/store';
-import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    IMPERIAL_UNITS,
-} from 'app/constants';
 import { Surfacing } from './definitions';
-import { convertToMetric } from 'app/lib/units';
-import MultiInputBlock from 'app/components/MultiInputBlock';
-import cx from 'classnames';
-import { Checkbox } from 'app/components/shadcn/Checkbox';
 import MachinePosition from './components/MachinePosition';
-import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { FaCode, FaPlay } from 'react-icons/fa';
-import { Link } from '@tanstack/react-router';
 import Visualizer from '../Visualizer';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import Generator from './utils/surfacingGcodeGenerator';
+import { GcodeViewer } from './components/GcodeViewer';
+import controller from 'app/lib/controller';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
@@ -53,13 +55,20 @@ const SurfacingTool = () => {
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
-    const handleGenerateGcode = () => {
+    const handleGenerateGcode = async () => {
         saveSurfacing(surfacing, units === IMPERIAL_UNITS);
         const generator = new Generator({
             surfacing: surfacing,
             units: units,
         });
-        setGcode(generator.generate());
+
+        const gcode = generator.generate();
+        setGcode(gcode);
+
+        const name = 'gSender_Surfacing';
+        const file = new File([gcode], name);
+
+        uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
     };
 
     const onChange = (property: string, value: number) => {
@@ -98,10 +107,10 @@ const SurfacingTool = () => {
     return (
         <div>
             <div className="flex items-center mb-0 border-solid border-gray-400 h-16">
-                <h3 className="m-0 ml-4">Surfacing Tool</h3>
+                <h2 className="text-2xl font-bold">Surfacing Tool</h2>
             </div>
 
-            <div className="py-2 px-4 bg-gray-200 grid grid-rows-[5fr_1fr] h-full gap-y-4">
+            <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
                         <p className="text-base font-normal mb-4 text-gray-500">
@@ -311,11 +320,10 @@ const SurfacingTool = () => {
                             value="visualizer-preview"
                             className="h-[600px] border border-gray-500 rounded"
                         >
-                            {/* Add visualization here */}
                             <Visualizer
                                 gcode={gcode}
                                 surfacing={surfacing}
-                                isSecondary={true}
+                                // isSecondary
                             />
                         </TabsContent>
                     </Tabs>
