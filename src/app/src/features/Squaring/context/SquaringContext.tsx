@@ -257,19 +257,19 @@ const initialMainSteps: MainStep[] = [
         subSteps: [
             {
                 buttonLabel: 'Measure Distance 1-2',
-                description: 'Enter the distance between points 1 and 2.',
+                description: 'Measure the distance between points 1 and 2.',
                 completed: false,
                 output: null,
             },
             {
                 buttonLabel: 'Measure Distance 2-3',
-                description: 'Enter the distance between points 2 and 3.',
+                description: 'Measure the distance between points 2 and 3.',
                 completed: false,
                 output: null,
             },
             {
                 buttonLabel: 'Measure Distance 1-3',
-                description: 'Enter the distance between points 1 and 3.',
+                description: 'Measure the distance between points 1 and 3.',
                 completed: false,
                 output: null,
             },
