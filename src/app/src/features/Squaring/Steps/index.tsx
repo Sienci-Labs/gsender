@@ -47,32 +47,32 @@ const Steps = () => {
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <div className="space-y-6">
                         <p>
-                            If your y-axis hardstops or endstops aren&apos;t
-                            &apos;in-line&apos; when you autosquare your CNC
-                            manually or during homing then it will skew the
-                            x-axis and produce off-square cuts (see the
-                            picture). You can fix this by shimming the y-axis
-                            plates, realigning the y-axes, or tuning the dual
-                            endstops if your CNC has autosquaring.
+                            If your CNC is making skewed cuts (pictured), 
+                            it&apos;s because the X and Y axes aren&apos;t
+                            squared to each other. This can be fixed.
                         </p>
 
-                        <p>To know how much adjustment is needed, prepare:</p>
+                        <p>
+                            To know how much adjustment is needed, follow the
+                            steps below. Prepare:
+                        </p>
 
                         <ul className="list-disc list-inside">
-                            <li>
-                                Something pointed in the router like an old
-                                tapered bit, v-bit, or a dowel
-                            </li>
                             <li>
                                 3 squares of tape marked with an &apos;X&apos;
                             </li>
                             <li>A long ruler or measuring tape</li>
                             <li>
-                                The CNC positioned somewhere in the front, left
-                                corner with the pointed tip close to the
-                                wasteboard
+                                Put something pointed in the spindle like an old
+                                v-bit, tapered bit, pencil, or a pointed dowel
                             </li>
                         </ul>
+
+                        <p>
+                            Use the jog buttons to position your CNC near its
+                            front, left corner with the pointed tip almost
+                            touching the wasteboard, then continue below.
+                        </p>
 
                         <div className="w-full max-w-96">
                             <Jogging />
@@ -86,9 +86,9 @@ const Steps = () => {
                         />
 
                         <p className="text-gray-600 font-bold">
-                            Since many CNCs run on two independent rails in the
-                            Y-axis, misalignment between these rails can cause
-                            your cutting to become skewed.
+                            If the X and Y axes aren't squared to each other on
+                            your CNC then it will cause your cuts to end up
+                            skewed.
                         </p>
                     </div>
                 </div>
