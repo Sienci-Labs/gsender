@@ -138,6 +138,7 @@ const defaultState: State = {
                 storedValue: null,
             },
         },
+        notifications: [],
     },
     widgets: {
         axes: {

@@ -25,7 +25,7 @@ export interface ProbeProfile {
         y: boolean;
         z: boolean;
     };
-    touchplateType: string;
+    touchplateType: TOUCHPLATE_TYPES_T;
 }
 
 export interface ProbeCommand {

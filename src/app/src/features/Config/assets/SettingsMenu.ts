@@ -13,11 +13,16 @@ import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
-import { CiCircleInfo } from 'react-icons/ci';
+import { IconType } from 'react-icons';
+import {
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_STANDARD,
+    TOUCHPLATE_TYPE_ZERO,
+} from 'app/lib/constants';
 
 export interface SettingsMenuSection {
     label: string;
-    icon: (props) => JSX.Element;
+    icon: IconType;
     settings?: gSenderSubSection[];
     eeprom?: gSenderEEEPROMSettings;
 }
@@ -189,11 +194,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         label: 'Touch Plate Type',
-                        key: 'widgets.probe.probeType',
+                        key: 'workspace.probeProfile.touchplateType',
                         type: 'select',
                         description:
                             "Select the touch plate you're using with your machine (default Standard block)",
-                        options: ['Standard', 'Auto', 'Z Probe'],
+                        options: [
+                            TOUCHPLATE_TYPE_STANDARD,
+                            TOUCHPLATE_TYPE_AUTOZERO,
+                            TOUCHPLATE_TYPE_ZERO,
+                        ],
                     },
                     {
                         label: 'Z Thickness',

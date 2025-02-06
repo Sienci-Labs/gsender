@@ -52,6 +52,7 @@ interface DROProps {
     isConnected: boolean;
     activeState: string;
     preferredUnits: 'in' | 'mm';
+    singleAxisHoming: boolean;
 }
 
 function DRO({
@@ -64,6 +65,7 @@ function DRO({
     activeState,
     preferredUnits,
     homingEnabled,
+    singleAxisHoming,
 }: DROProps): JSX.Element {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
@@ -188,7 +190,7 @@ function DRO({
                         </AlertDialogContent>
                     </AlertDialog>
                 )}
-                {homingEnabled && (
+                {homingEnabled && singleAxisHoming && (
                     <HomingSwitch
                         onChange={toggleHoming}
                         homingValue={homingMode}
@@ -219,6 +221,8 @@ export default connect((reduxStore) => {
     const settings = get(reduxStore, 'controller.settings.settings', {});
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
+    const singleAxisValue = homingValue & 2;
+    const singleAxisHoming = singleAxisValue > 0;
 
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
@@ -241,5 +245,6 @@ export default connect((reduxStore) => {
         workflowState,
         activeState,
         preferredUnits,
+        singleAxisHoming,
     };
 })(DRO);
