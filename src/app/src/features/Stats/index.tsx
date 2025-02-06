@@ -37,7 +37,9 @@ export function Stats() {
                         </StatCard>
                         <div className="grid grid-cols-2">
                             <StatCard>
-                                <CardHeader>Upcoming Maintenance</CardHeader>
+                                <CardHeader link={'/'} linkLabel="Manage">
+                                    Upcoming Maintenance
+                                </CardHeader>
                                 <MaintenancePreview />
                             </StatCard>
                             <StatCard>

@@ -1,7 +1,81 @@
-export function MaintenancePreview() {
+import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
+import { FaCircle } from 'react-icons/fa';
+
+import { tv } from 'tailwind-variants';
+
+function timeRemainingSortComparison(a, b) {
+    const aTimeRemaining = a.rangeEnd - a.currentTime;
+    const bTimeRemaining = b.rangeEnd - b.currentTime;
+
+    if (aTimeRemaining < bTimeRemaining) return -1;
+    if (aTimeRemaining > bTimeRemaining) return 1;
+    return 0;
+}
+
+function remainingTime(task) {
+    return Math.floor(Number(task.rangeEnd) - Number(task.currentTime));
+}
+
+const reminderStyles = tv({
+    base: 'text-3xl flex flex-row gap-8 items-center font-bolt',
+    variants: {
+        color: {
+            Due: 'text-red-500',
+            Soon: 'text-orange-500',
+            Low: 'text-blue-500',
+        },
+    },
+});
+
+function remainingTimeString(remainingTime) {
+    const dueUpper = 4;
+    const soonUpper = 20;
+
+    if (remainingTime < dueUpper) {
+        return 'Due';
+    }
+    if (remainingTime < soonUpper) {
+        return 'Soon';
+    }
+    return 'Low';
+}
+
+function MaintenanceTask({ task }) {
+    const time = remainingTime(task);
+    const reminderString = remainingTimeString(time);
+
     return (
-        <div>
-            <p>maintenance :)</p>
+        <div className="flex flex-row justify-between items-center bg-gray-50 rounded-2xl p-2">
+            <div className={'flex flex-col'}>
+                <span className={reminderStyles({ color: reminderString })}>
+                    {time} hours
+                </span>
+                <span className="text-gray-700">{task.name}</span>
+            </div>
+            <div className={reminderStyles({ color: reminderString })}>
+                {reminderString}
+                <span className="">
+                    <FaCircle />
+                </span>
+            </div>
+        </div>
+    );
+}
+
+export function MaintenancePreview() {
+    const { maintenanceTasks } = useContext(StatContext);
+    // Sort tasks by remaining time and truncate to top 3
+    const sortedTasks = maintenanceTasks
+        .sort(timeRemainingSortComparison)
+        .slice(0, 3);
+    console.log(sortedTasks);
+
+    return (
+        <div className="flex flex-col gap-2">
+            {sortedTasks.map((task) => (
+                <MaintenanceTask key={`task-${task.id}`} task={task} />
+            ))}
         </div>
     );
 }
