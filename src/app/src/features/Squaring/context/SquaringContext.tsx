@@ -183,7 +183,7 @@ const initialMainSteps: MainStep[] = [
                 ],
             },
             {
-                buttonLabel: 'Move Y Axis',
+                buttonLabel: 'Move Y-axis',
                 description: 'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
                 value: 300,
                 completed: false,
