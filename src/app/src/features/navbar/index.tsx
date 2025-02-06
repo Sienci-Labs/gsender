@@ -1,7 +1,6 @@
-import { FaMicrochip } from 'react-icons/fa';
 import { FaTasks } from 'react-icons/fa';
-import { MdKeyboardCommandKey } from 'react-icons/md';
 import { RiToolsFill } from 'react-icons/ri';
+import Carve from './assets/Carve.svg';
 import cx from 'classnames';
 
 import { NavbarLink } from './components/NavbarLink.tsx';
@@ -15,13 +14,14 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
         <>
             <div
                 className={cx(
-                    'flex flex-col no-padding no-margin gap-5 justify-end flex-grow self-stretch',
+                    'grid [grid-template-rows:minmax(0,5fr)_auto_auto] no-padding no-margin gap-0 justify-end flex-grow self-stretch',
                 )}
             >
+                <div className="py-5 border-gray-400 border-r-2"></div>
                 <NavbarLink
                     href="/"
-                    icon={MdKeyboardCommandKey}
-                    label="Control"
+                    svg={Carve}
+                    label="Carve"
                     minimized={!show}
                 />
                 <NavbarLink
