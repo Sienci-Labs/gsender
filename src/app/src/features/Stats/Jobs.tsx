@@ -9,6 +9,7 @@ import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
+import { RunTimePerComPort } from 'app/features/Stats/components/RunTimePerComPort.tsx';
 
 const defaultData = [
     {
@@ -97,8 +98,11 @@ export function Jobs() {
                     <CardHeader>Jobs per Port</CardHeader>
                     <JobsPerComPort />
                 </StatCard>
-                <StatCard>two stat</StatCard>
-                <StatCard>three stat</StatCard>
+                <StatCard>
+                    {' '}
+                    <CardHeader>Run Time per Port</CardHeader>
+                    <RunTimePerComPort />
+                </StatCard>
             </div>
         </div>
     );

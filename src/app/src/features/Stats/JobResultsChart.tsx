@@ -1,0 +1,80 @@
+import { useContext } from 'react';
+import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { Bar } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+);
+
+function aggregateJobsByStatus(jobs) {
+    const finishedJobs = {};
+    const incompleteJobs = {};
+    jobs.forEach((job) => {
+        if (job.jobStatus === 'COMPLETE') {
+            if (!finishedJobs.hasOwnProperty(job.port)) {
+                finishedJobs[job.port] = 0;
+            }
+            finishedJobs[job.port] += 1;
+        } else {
+            if (!incompleteJobs.hasOwnProperty(job.port)) {
+                incompleteJobs[job.port] = 0;
+            }
+            incompleteJobs[job.port] += 1;
+        }
+    });
+    return [finishedJobs, incompleteJobs];
+}
+
+export function JobResultsChart() {
+    const { jobs } = useContext(StatContext);
+    const [finished, unfinished] = aggregateJobsByStatus(jobs);
+    const labels = Object.keys(finished);
+    const finishedJobData = Object.values(finished);
+    const incompleteJobData = Object.values(unfinished);
+
+    console.log(finished);
+    console.log(unfinished);
+
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Complete',
+                data: finishedJobData,
+                backgroundColor: '#659dd2',
+            },
+            {
+                label: 'Incomplete',
+                data: incompleteJobData,
+                backgroundColor: '#C7813F',
+            },
+        ],
+    };
+
+    const options = {
+        scales: {
+            x: {
+                stacked: true,
+            },
+            y: {
+                stacked: true,
+            },
+        },
+    };
+
+    return <Bar data={data} options={options} />;
+}

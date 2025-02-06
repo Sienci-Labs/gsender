@@ -1,5 +1,9 @@
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 function aggregatePortInfo(jobs) {
     const jobAggregate = {};
@@ -16,8 +20,34 @@ function aggregatePortInfo(jobs) {
 
 export function JobsPerComPort() {
     const { jobs } = useContext(StatContext);
-    const [labels, data] = aggregatePortInfo(jobs);
-    console.log(labels);
-    console.log(data);
-    return <div>hi</div>;
+    const [labels, jobData] = aggregatePortInfo(jobs);
+
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Jobs per Com Port',
+                data: jobData,
+                backgroundColor: [
+                    '#7ca7d0',
+                    '#dc2626',
+                    '#bb6a0c',
+                    '#3F85C7',
+                    '#059669',
+                    '#22415e',
+                ],
+            },
+        ],
+    };
+
+    return (
+        <div>
+            <Pie
+                data={data}
+                width={300}
+                height={300}
+                options={{ maintainAspectRatio: false }}
+            />
+        </div>
+    );
 }

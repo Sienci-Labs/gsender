@@ -9,6 +9,7 @@ import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { JobPreviewList } from 'app/features/Stats/components/JobPreviewList.tsx';
 import { MaintenancePreview } from 'app/features/Stats/components/MaintenancePreview.tsx';
 import { Configuration } from 'app/features/Stats/components/Configuration.tsx';
+import { JobResultsChart } from 'app/features/Stats/JobResultsChart.tsx';
 
 export function Stats() {
     return (
@@ -17,10 +18,11 @@ export function Stats() {
                 <h1 className="text-5xl">Your Machine</h1>
                 <StatCard>
                     <div className="grid grid-cols-2">
-                        <div>
+                        <div className="p-4">
                             <CardHeader>Stats</CardHeader>
+                            <JobResultsChart />
                         </div>
-                        <div>
+                        <div className="px-4">
                             <CardHeader>Recent Jobs</CardHeader>
                             <JobPreviewList />
                         </div>
