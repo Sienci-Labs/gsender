@@ -1,5 +1,4 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router';
-// import { UpdateAlert } from 'app/components/UpdateAlert';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import Surfacing from 'app/features/Surfacing';
 
 export const Route = createLazyFileRoute('/surfacing')({
@@ -8,17 +7,7 @@ export const Route = createLazyFileRoute('/surfacing')({
 
 function SurfacingPage() {
     return (
-        <div className="p-4 text-lg font-bold overflow-y-auto h-full">
-            <Link
-                to="/tools"
-                className="text-blue-500 border border-blue-500 rounded-md p-2"
-            >
-                ← Back to Tools
-            </Link>
-
-            {/* <div className="mt-4 flex justify-center">
-                <UpdateAlert />
-            </div> */}
+        <div className="p-4">
             <Surfacing />
         </div>
     );
