@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { tv } from 'tailwind-variants';
 import { CardHeader } from './CardHeader.tsx';
+import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
 const eventRow = tv({
     base: 'flex flex-row items-center justify-between p-2 rounded border-l-4',
@@ -17,12 +18,14 @@ const eventRow = tv({
 export function AlarmPreview() {
     const { alarms } = useContext(StatContext);
     const shortlist = alarms.slice(0, 4);
+
     return (
         <StatCard>
             <CardHeader link={'/'} linkLabel={'View all'}>
                 Alarms and Errors
             </CardHeader>
             <div className="flex flex-col gap-2 justify-around">
+                {shortlist.length == 0 && <EmptyAlarmList />}
                 {shortlist.map((event) => (
                     <div className={eventRow({ color: event.type })}>
                         <span className="font-2xl">

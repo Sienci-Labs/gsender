@@ -5,6 +5,7 @@ import { IoIosWarning } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
 import cx from 'classnames';
 import { convertISOStringToDateAndTime } from 'app/lib/datetime.ts';
+import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
 const colorCodes = {
     ALARM: '#d75f5f',
@@ -61,16 +62,12 @@ export function AlarmListing() {
     const { alarms } = useContext(StatContext);
 
     if (!alarms || alarms.length === 0) {
-        return (
-            <div className="w-full h-80 m-auto text-black align-center justify-center ">
-                No history of alarms or errors
-            </div>
-        );
+        return <EmptyAlarmList />;
     }
 
     return (
         <div className="">
-            <ol className="relative border-s border-gray-200 h-[500px] ms-6">
+            <ol className="relative border-s border-gray-200 h-[500px] ms-6 overflow-y-scroll no-scrollbar">
                 {alarms.map((alarm) => (
                     <AlarmItem key={alarm.id} alarm={alarm} />
                 ))}

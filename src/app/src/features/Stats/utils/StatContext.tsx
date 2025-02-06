@@ -15,8 +15,6 @@ interface FirmwareEvent {
     lineNumber: number;
 }
 
-interface StatContextState {}
-
 const initialState = {
     jobs: [],
     alarms: [],
@@ -64,6 +62,7 @@ export function StatsProvider({ children }) {
         jobAggregate,
         alarms,
         maintenanceTasks,
+        setAlarms,
     };
 
     return (
