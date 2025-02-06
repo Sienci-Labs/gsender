@@ -8,7 +8,7 @@ interface GcodeViewerProps {
     gcode: string;
 }
 
-export const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
+export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
     const gcodeLines = gcode.split('\n');
 
     const handleCopy = async () => {
@@ -21,7 +21,7 @@ export const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
     };
 
     return (
-        <div className="w-full h-full overflow-auto">
+        <div className="w-full h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">G-code Output</h3>
                 <Button
@@ -35,22 +35,24 @@ export const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
                 </Button>
             </div>
 
-            <div className="rounded-md">
-                <pre className="font-mono text-sm">
-                    {gcodeLines.map((line, index) => (
-                        <div
-                            key={index}
-                            className={`py-1 px-2 rounded-sm ${
-                                index % 2 === 0 ? 'bg-gray-200' : ''
-                            }`}
-                        >
-                            <span className="text-muted-foreground mr-4">
-                                {index + 1}
-                            </span>
-                            {line}
-                        </div>
-                    ))}
-                </pre>
+            <div className="relative w-full h-full">
+                <div className="rounded-md absolute top-0 left-0 right-0 bottom-0 overflow-auto">
+                    <pre className="font-mono text-sm">
+                        {gcodeLines.map((line, index) => (
+                            <div
+                                key={Math.random().toString()}
+                                className={`py-1 px-2 rounded-sm ${
+                                    index % 2 === 0 ? 'bg-gray-200' : ''
+                                }`}
+                            >
+                                <span className="text-muted-foreground mr-4">
+                                    {index + 1}
+                                </span>
+                                {line}
+                            </div>
+                        ))}
+                    </pre>
+                </div>
             </div>
         </div>
     );
