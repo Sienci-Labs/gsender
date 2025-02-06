@@ -181,11 +181,8 @@ const RunProbe = ({ actions, state }: Props) => {
                                 then put it back where it was.{'\n'}
                             </p>
                             <p className="mb-3">
-                                3. For some meachines Consider holding your touch plate in place during probing to get a more consistent measurement.
-                                
-                                
-                                Consider holding your touch plate in place
-                                during probing to get a more consistent
+                                3. In some cases, holding the touch plate still
+                                while probing will give a more consistent
                                 measurement.
                             </p>
                         </div>
@@ -204,7 +201,7 @@ const RunProbe = ({ actions, state }: Props) => {
                         >
                             {connectionMade
                                 ? 'Start Probe'
-                                : 'Waiting on probe circuit confirmation...'}
+                                : 'Waiting for probe circuit check...'}
                         </Button>
                     </div>
                     <div className="flex flex-col sm:m-auto sm:mb-4">
