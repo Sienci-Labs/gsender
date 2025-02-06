@@ -55,18 +55,18 @@ const Steps = () => {
                         <p>
                             To know how much adjustment is needed, follow the
                             steps below. Prepare:
+                            
+                            <ul className="list-disc list-inside">
+                                <li>
+                                    3 squares of tape marked with an &apos;X&apos;
+                                </li>
+                                <li>A long ruler or measuring tape</li>
+                                <li>
+                                    Put something pointed in the spindle like an old
+                                    v-bit, tapered bit, pencil, or a pointed dowel
+                                </li>
+                            </ul>
                         </p>
-
-                        <ul className="list-disc list-inside">
-                            <li>
-                                3 squares of tape marked with an &apos;X&apos;
-                            </li>
-                            <li>A long ruler or measuring tape</li>
-                            <li>
-                                Put something pointed in the spindle like an old
-                                v-bit, tapered bit, pencil, or a pointed dowel
-                            </li>
-                        </ul>
 
                         <p>
                             Use the jog buttons to position your CNC near its
