@@ -4,7 +4,7 @@ import { JobPreview } from 'app/features/Stats/components/JobPreview.tsx';
 
 export function JobPreviewList() {
     const { jobs } = useContext(StatContext);
-    const jobShortlist = jobs.slice(0, 7);
+    const jobShortlist = jobs.slice(0, 6);
     return (
         <div className="flex flex-col gap-4">
             {jobShortlist.map((job) => (

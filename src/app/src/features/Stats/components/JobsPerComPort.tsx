@@ -44,8 +44,8 @@ export function JobsPerComPort() {
         <div>
             <Pie
                 data={data}
-                width={300}
-                height={300}
+                width={280}
+                height={280}
                 options={{ maintainAspectRatio: false }}
             />
         </div>

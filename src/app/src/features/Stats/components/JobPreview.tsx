@@ -7,8 +7,8 @@ const statusBadge = tv({
     base: 'rounded-xl border bg-opacity-20 p-1 text-center',
     variants: {
         color: {
-            Success: 'text-green-500 border-green-500 bg-green-500',
-            Failed: 'text-red-500 border-red-500 bg-red-500',
+            Finished: 'text-green-500 border-green-500 bg-green-500',
+            Incomplete: 'text-red-500 border-red-500 bg-red-500',
         },
     },
 });
@@ -19,11 +19,11 @@ function formatDuration(seconds: number) {
 
 export function JobPreview({ file, jobStatus, duration }) {
     const jobComplete = jobStatus === 'COMPLETE';
-    const statusMessage = jobComplete ? 'Success' : 'Failed';
+    const statusMessage = jobComplete ? 'Finished' : 'Incomplete';
     return (
         <div className="grid grid-cols-8 grid-rows-1 gap-4 items-center">
             <span
-                className={cn({
+                className={cn('opacity-70', {
                     'text-red-500': !jobComplete,
                     'text-green-500': jobComplete,
                 })}
