@@ -25,11 +25,13 @@ function StatMenuLink({ label, href, end = false }) {
 
 export function StatMenu() {
     return (
-        <ul className="flex text-sm font-medium text-center text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 rounded w-fit p-1 m-auto">
-            <StatMenuLink label="Overview" href={'/stats'} end={true} />
-            <StatMenuLink label="Jobs" href={'/stats/jobs'} />
-            <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />
-            <StatMenuLink label="Alarms" href={'/stats/alarms'} />
-        </ul>
+        <div className="w-fit mx-auto">
+            <ul className="flex text-sm font-medium text-center text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 rounded p-1">
+                <StatMenuLink label="Overview" href={'/stats'} end={true} />
+                <StatMenuLink label="Jobs" href={'/stats/jobs'} />
+                <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />
+                <StatMenuLink label="Alarms" href={'/stats/alarms'} />
+            </ul>
+        </div>
     );
 }

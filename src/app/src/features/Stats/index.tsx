@@ -14,7 +14,10 @@ import { JobResultsChart } from 'app/features/Stats/JobResultsChart.tsx';
 export function Stats() {
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-4">
-            <div id="mainStats" className="col-span-4 row-span-6 px-8 mb-2 ">
+            <div
+                id="mainStats"
+                className="col-span-4 row-span-6 px-8 mb-2 gap-4 flex flex-col"
+            >
                 <h1 className="text-5xl">Your Machine</h1>
                 <StatCard>
                     <div className="grid grid-cols-2">
@@ -28,7 +31,7 @@ export function Stats() {
                         </div>
                     </div>
                 </StatCard>
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-2 flex flex-row gap-4">
                     <StatCard>
                         <CardHeader link={'/'} linkLabel="Manage">
                             Upcoming Maintenance

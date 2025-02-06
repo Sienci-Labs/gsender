@@ -70,7 +70,7 @@ export function AlarmListing() {
 
     return (
         <div className="">
-            <ol className="relative border-s border-gray-200 h-[500px] overflow-y-auto ms-6">
+            <ol className="relative border-s border-gray-200 h-[500px] ms-6">
                 {alarms.map((alarm) => (
                     <AlarmItem key={alarm.id} alarm={alarm} />
                 ))}
