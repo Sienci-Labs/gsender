@@ -24,7 +24,19 @@ export function MaintenanceEditTaskDialog({
     const [task, setTask] = useState({});
     function handleSubmit(e) {
         e.preventDefault();
-        console.log(e);
+        const description = e.target.description.value;
+        const rangeStart = Number(e.target.startRange.value);
+        const rangeEnd = Number(e.target.endRange.value);
+        const name = e.target.taskName.value;
+
+        const payload = {
+            description,
+            rangeStart,
+            rangeEnd,
+            name,
+            currentTime: 0,
+        };
+        console.log(payload);
     }
 
     useEffect(() => {

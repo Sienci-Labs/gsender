@@ -16,7 +16,7 @@ export function MaintenanceTaskForm({ value = null }) {
                         name="taskName"
                         type="text"
                         placeholder="New Task"
-                        value={hasValue ? value.name : null}
+                        defaultValue={hasValue ? value.name : null}
                     />
                     <p className="text-gray-600 text-xs italic">
                         Keeping these unique makes it easier for you to remember
@@ -38,7 +38,7 @@ export function MaintenanceTaskForm({ value = null }) {
                         name="startRange"
                         type="number"
                         placeholder="1"
-                        value={hasValue ? value.rangeStart : null}
+                        defaultValue={hasValue ? value.rangeStart : null}
                     />
                 </div>
                 <div className="w-1/2 px-3">
@@ -54,7 +54,7 @@ export function MaintenanceTaskForm({ value = null }) {
                         name="endRange"
                         type="number"
                         placeholder="20"
-                        value={hasValue ? value.rangeEnd : null}
+                        defaultValue={hasValue ? value.rangeEnd : null}
                     />
                 </div>
             </div>
