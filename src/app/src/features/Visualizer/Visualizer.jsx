@@ -1346,7 +1346,7 @@ class Visualizer extends Component {
         //Set default camera position to 3D
         this.camera.up.set(0, 0, 1);
         this.camera.position.set(
-            CAMERA_DISTANCE,
+            -CAMERA_DISTANCE,
             -CAMERA_DISTANCE,
             CAMERA_DISTANCE,
         );
@@ -2268,7 +2268,7 @@ class Visualizer extends Component {
 
         this.camera.up.set(0, 0, 1);
         this.camera.position.set(
-            CAMERA_DISTANCE,
+            -CAMERA_DISTANCE,
             -CAMERA_DISTANCE,
             CAMERA_DISTANCE,
         );

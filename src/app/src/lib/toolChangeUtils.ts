@@ -8,10 +8,10 @@ import { ReduxState } from 'store/definitions';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeSettings = store.get('widgets.probe');
-    const probeType = store.get('workspace.probeProfile.touchplateType');
+    const touchplateType = store.get('workspace.probeProfile.touchplateType');
 
     const probeThickness =
-        probeType === TOUCHPLATE_TYPE_AUTOZERO
+        touchplateType === TOUCHPLATE_TYPE_AUTOZERO
             ? '5'
             : probeSettings.zProbeDistance;
 

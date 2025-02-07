@@ -7,7 +7,7 @@ type Props = {
 
 const Workspace = ({ children }: Props) => {
     return (
-        <div className="flex flex-col h-full overflow-y-clip no-scrollbar">
+        <div className="flex flex-col h-full ">
             <TopBar />
 
             <div className="flex h-full no-scrollbar">

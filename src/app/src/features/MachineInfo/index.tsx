@@ -7,6 +7,7 @@ import PinRow from './PinRow';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import ModalRow from './ModalRow';
 import store from 'app/store';
+import { TiPin, TiPinOutline } from 'react-icons/ti';
 
 const MachineInfo = () => {
     const { pins, modals, isConnected } = useTypedSelector((state) => ({
@@ -16,10 +17,18 @@ const MachineInfo = () => {
     }));
     const probeSelection = store.get('widgets.probe.probeCommand');
     const [open, setOpen] = useState(false);
+    const [pinned, setPinned] = useState(false);
+
+    const openCard = (isOpen: boolean) => {
+        if (pinned) {
+            return;
+        }
+        setOpen(isOpen);
+    };
     return (
         <div
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
+            onMouseEnter={() => openCard(true)}
+            onMouseLeave={() => openCard(false)}
             className="w-[30px]"
         >
             <div className={cx('flex flex-col', { 'mt-[30px]': open })}>
@@ -38,9 +47,20 @@ const MachineInfo = () => {
                 })}
             >
                 <CardContent className="-mt-4 -ml-4 p-6 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
-                    <span className="float-left font-bold text-2xl pb-2">
-                        Machine Information
-                    </span>
+                    <div className="flex flex-row w-full justify-between">
+                        <span className="float-left font-bold text-2xl pb-2">
+                            Machine Information
+                        </span>
+                        <div className="text-2xl float-right pt-1 text-gray-600">
+                            {pinned ? (
+                                <TiPin onClick={() => setPinned(!pinned)} />
+                            ) : (
+                                <TiPinOutline
+                                    onClick={() => setPinned(!pinned)}
+                                />
+                            )}
+                        </div>
+                    </div>
                     <div className="grid grid-cols-[3fr_2fr]">
                         <CardDescription className="flex flex-col pr-4">
                             <span className="underline float-left">

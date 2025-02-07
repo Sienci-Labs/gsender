@@ -4,7 +4,7 @@ import {
     FRONT_RIGHT,
     FRONT_LEFT,
     BACK_LEFT,
-} from '../widgets/Location/RapidPosition';
+} from 'app/features/DRO/utils/RapidPosition.ts';
 
 export const homingString = (mask: string): string => {
     let location = '';

@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import { PiFileZipFill } from 'react-icons/pi';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
@@ -37,7 +38,7 @@ import {
 import saveAs from 'file-saver';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
-import ToolModalButton from '../components/ToolModalButton/ToolModalButton';
+import ToolModalButton from 'app/components/ToolModalButton';
 import pkg from '../../package.json';
 import {
     GRBLHAL,
@@ -57,6 +58,7 @@ import {
     ControllerState,
     FileInfoState,
 } from 'app/store/definitions';
+import JSZip from 'jszip';
 
 const styles = StyleSheet.create({
     body: {
@@ -208,6 +210,10 @@ const getOS = (): string => {
 const getGCodeFile = (): string => {
     const gcode: string = get(reduxStore.getState(), 'file.content', '');
     return gcode;
+};
+
+const getGCodeFileName = () => {
+    return get(reduxStore.getState(), 'file.name', 'diagnosticGcode.gcode');
 };
 
 const getMode = (): boolean => {
@@ -842,7 +848,7 @@ function generateSupportFile() {
         </Document>
     );
 
-    const submitForm = async (event: Event) => {
+    const submitDiagnosticForm = async (event: Event) => {
         event.preventDefault(); // prevent page reload
         const blob = await pdf(<SupportFile />).toBlob();
         const date = new Date();
@@ -851,18 +857,54 @@ function generateSupportFile() {
             .toLocaleTimeString('it-IT')
             .replaceAll(':', '-');
 
-        saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+        const zip = new JSZip();
+        const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+        const senderSettings = await exportSenderSettings();
+
+        const code = getGCodeFile();
+        if (code.length > 0) {
+            zip.file(getGCodeFileName(), new Blob([code]));
+        }
+
+        zip.file(diagnosticPDFLabel, blob);
+        zip.file(
+            `gSenderSettings_${currentDate}_${currentTime}.json`,
+            senderSettings,
+        );
+        zip.generateAsync({ type: 'blob' }).then((content) => {
+            saveAs(
+                content,
+                'diagnostics_' + currentDate + '_' + currentTime + '.zip',
+            );
+        });
+
+        //saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
     };
 
     return (
         <ToolModalButton
-            icon="fas fa-file-pdf"
-            onClick={submitForm}
+            icon={<PiFileZipFill />}
+            onClick={submitDiagnosticForm}
             className={null}
         >
-            Download Now!
+            Download Diagnostic File
         </ToolModalButton>
     );
+}
+
+async function exportSenderSettings() {
+    const settings = store.get();
+    settings.commandKeys = Object.fromEntries(
+        Object.entries(settings.commandKeys).filter(
+            ([key, shortcut]) => shortcut.category !== 'Macros',
+        ),
+    );
+    delete settings.session;
+    const res = await api.events.fetch();
+    console.log(res);
+    const events = res.data.records;
+    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+    return new Blob([settingsJSON], { type: 'application/json' });
 }
 
 export default generateSupportFile;

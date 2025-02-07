@@ -1,9 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
+import { StatParent } from 'app/features/Stats/StatParent.tsx';
 
 export const Route = createLazyFileRoute('/stats')({
-    component: () => StatsAndInfo(),
+    component: () => StatParent(),
 });
-
-function StatsAndInfo() {
-    return <div>Stats and Info Section</div>;
-}
