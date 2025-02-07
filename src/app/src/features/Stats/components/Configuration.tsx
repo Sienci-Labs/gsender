@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { homingString } from 'app/lib/eeprom.ts';
 import get from 'lodash/get';
+import {truncatePort} from "app/features/Stats/utils/statUtils.ts";
 
 function ConfigRow({ label, children, connected = false }) {
     return (
@@ -49,7 +50,7 @@ export function Configuration() {
                 <span className="font-normal">30X30</span>
             </div>
             <ConfigRow connected={connected} label={'Connection'}>
-                <b>{connectionPort}</b> at <b>{baudrate}</b> baud
+                <b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud
             </ConfigRow>
             <ConfigRow connected={connected} label={'Axes'}>
                 <b>{axesList.join(', ')}</b>
