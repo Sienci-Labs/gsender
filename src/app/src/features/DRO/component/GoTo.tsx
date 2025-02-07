@@ -8,7 +8,7 @@ import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
 import { Switch } from 'app/components/shadcn/Switch.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
 
 interface GotoProps {
@@ -18,7 +18,7 @@ interface GotoProps {
 }
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
-    const [movementMode, setMovementMode] = useState(false);
+    const [relativeMovement, setRelativeMovement] = useState(false);
     const [movementPos, setMovementPos] = useState({
         x: 0,
         y: 0,
@@ -28,21 +28,55 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         c: 0,
     });
 
+    useEffect(() => {
+        console.log('effect firing');
+        if (relativeMovement) {
+            console.log('abs');
+            setMovementPos({
+                x: 0,
+                y: 0,
+                z: 0,
+                a: 0,
+                b: 0,
+                c: 0,
+            });
+        } else {
+            console.log('relative');
+            setMovementPos({
+                ...movementPos,
+                x: Number(wpos.x),
+                y: Number(wpos.y),
+                z: Number(wpos.y),
+                a: Number(wpos.a),
+            });
+        }
+    }, [relativeMovement]);
+
     const onToggleSwap = () => {
-        setMovementMode(!movementMode);
-        console.log(movementMode);
+        setRelativeMovement(!relativeMovement);
+        console.log(relativeMovement);
     };
 
     function goToLocation() {
         console.log('called movement');
         const code = [];
         const unitModal = 'G90';
-        const movementModal = movementMode ? 'G91' : 'G90'; // Is G91 enabled?
+        const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
         code.push(
             movementModal,
             `G0 X${movementPos.x} Y${movementPos.y} Z${movementPos.z}`,
         );
         controller.command('gcode:safe', code, unitModal);
+    }
+
+    function onValueEdit(e, axis) {
+        const value = e.target.value;
+        console.log(value);
+        const payload = {
+            ...movementPos,
+            [axis]: value,
+        };
+        setMovementPos(payload);
     }
 
     return (
@@ -56,10 +90,30 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
                     <h1>Go To Location</h1>
-                    <UnitInput units={units} label="X" value={wpos.x} />
-                    <UnitInput units={units} label="Y" value={wpos.y} />
-                    <UnitInput units={units} label="Z" value={wpos.z} />
-                    <UnitInput units="deg" label="A" value={wpos.a} />
+                    <UnitInput
+                        units={units}
+                        label="X"
+                        value={movementPos.x}
+                        onChange={(v) => onValueEdit(v, 'x')}
+                    />
+                    <UnitInput
+                        units={units}
+                        label="Y"
+                        value={movementPos.y}
+                        onChange={(v) => onValueEdit(v, 'y')}
+                    />
+                    <UnitInput
+                        units={units}
+                        label="Z"
+                        value={movementPos.z}
+                        onChange={(v) => onValueEdit(v, 'z')}
+                    />
+                    <UnitInput
+                        units="deg"
+                        label="A"
+                        value={movementPos.a}
+                        onChange={(v) => onValueEdit(v, 'a')}
+                    />
                     <div className="flex flex-row text-sm text-gray-400 justify-between">
                         <span>G90</span>
                         <Switch onClick={onToggleSwap} />
