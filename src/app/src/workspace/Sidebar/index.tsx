@@ -18,12 +18,6 @@ export const Sidebar = () => {
                 <HelperToggle minimized={!show} />
             </div>
             <NavBar show={show} />
-            <div className="border-r-2 border-gray-400">
-                <MinimizeHandle
-                    className={cx('z-20')}
-                    onClick={() => setShow(!show)}
-                />
-            </div>
         </div>
     );
 };

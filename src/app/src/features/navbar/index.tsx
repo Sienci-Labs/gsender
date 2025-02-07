@@ -2,6 +2,8 @@ import { FaTasks } from 'react-icons/fa';
 import { RiToolsFill } from 'react-icons/ri';
 import Carve from './assets/Carve.svg';
 import { MdChatBubbleOutline } from 'react-icons/md';
+import { IoSpeedometerOutline } from "react-icons/io5";
+
 import cx from 'classnames';
 
 import { NavbarLink } from './components/NavbarLink.tsx';
@@ -26,17 +28,18 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     minimized={!show}
                 />
                 <NavbarLink
+                    href="/stats"
+                    icon={IoSpeedometerOutline}
+                    label="Stats/Info"
+                    minimized={!show}
+                />
+                <NavbarLink
                     href="/tools"
                     icon={RiToolsFill}
                     label="Tools"
                     minimized={!show}
                 />
-                <NavbarLink
-                    href="/stats"
-                    icon={MdChatBubbleOutline}
-                    label="Stats/Info"
-                    minimized={!show}
-                />
+
                 <NavbarLink
                     href="/configuration"
                     icon={FaTasks}
