@@ -121,7 +121,7 @@ const SortableTable = (props: SortableTableProps) => {
 
     /***** RENDERING *****/
     return (
-        <div className="w-full flex flex-grow-1 flex-col items-center justify-center gap-3 px-4 py-16 ">
+        <div className="w-full flex flex-grow-1 flex-col items-center justify-center gap-3">
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
             <div

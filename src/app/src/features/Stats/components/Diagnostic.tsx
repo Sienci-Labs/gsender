@@ -1,5 +1,4 @@
-import ToolModalButton from 'app/components/ToolModalButton';
-import { PiFileZipFill } from 'react-icons/pi';
+import generateSupportFile from 'app/lib/diagnostics.tsx';
 
 export function Diagnostic() {
     return (
@@ -9,9 +8,7 @@ export function Diagnostic() {
                 can help you better. It contains your machine errors, profile,
                 settings, and more.
             </p>
-            <ToolModalButton icon={<PiFileZipFill />}>
-                Download Diagnostic File
-            </ToolModalButton>
+            {generateSupportFile()}
         </div>
     );
 }

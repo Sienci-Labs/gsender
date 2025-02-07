@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import { PiFileZipFill } from 'react-icons/pi';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
@@ -37,7 +38,7 @@ import {
 import saveAs from 'file-saver';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
-import ToolModalButton from '../components/ToolModalButton/ToolModalButton';
+import ToolModalButton from 'app/components/ToolModalButton';
 import pkg from '../../package.json';
 import {
     GRBLHAL,
@@ -842,7 +843,7 @@ function generateSupportFile() {
         </Document>
     );
 
-    const submitForm = async (event: Event) => {
+    const submitDiagnosticForm = async (event: Event) => {
         event.preventDefault(); // prevent page reload
         const blob = await pdf(<SupportFile />).toBlob();
         const date = new Date();
@@ -856,11 +857,11 @@ function generateSupportFile() {
 
     return (
         <ToolModalButton
-            icon="fas fa-file-pdf"
-            onClick={submitForm}
+            icon={<PiFileZipFill />}
+            onClick={submitDiagnosticForm}
             className={null}
         >
-            Download Now!
+            Download Diagnostic File
         </ToolModalButton>
     );
 }
