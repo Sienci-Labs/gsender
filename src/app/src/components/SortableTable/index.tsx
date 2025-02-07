@@ -153,7 +153,7 @@ const SortableTable = (props: SortableTableProps) => {
                         <button
                             title="Add New"
                             onClick={onAdd}
-                            className="text-green-500 border border-green-500 hover:bg-green-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
+                            className="gap-2 text-green-500 border border-green-500 hover:bg-green-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
                         >
                             <FaPlus />
                             Add New Task

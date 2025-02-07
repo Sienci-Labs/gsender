@@ -61,6 +61,7 @@ export function StatsProvider({ children }) {
         alarms,
         maintenanceTasks,
         setAlarms,
+        setMaintenanceTasks,
     };
 
     return (

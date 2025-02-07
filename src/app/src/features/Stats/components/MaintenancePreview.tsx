@@ -81,6 +81,7 @@ function MaintenanceTask({ task }) {
 
 export function MaintenancePreview({ limit = 3 }) {
     const { maintenanceTasks } = useContext(StatContext);
+    console.log(maintenanceTasks);
     // Sort tasks by remaining time and truncate to top 3
     const sortedTasks = maintenanceTasks
         .sort(timeRemainingSortComparison)

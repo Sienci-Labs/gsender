@@ -5,6 +5,7 @@ import Icon from '@mdi/react';
 import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
 import SortableTable from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
+import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
 
 function determineTime(task) {
     const { rangeStart, rangeEnd, currentTime } = task;
@@ -42,6 +43,7 @@ export function MaintenanceList() {
     const [formattedData, setFormattedData] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
+    const [editID, setEditID] = useState(-1);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -146,16 +148,15 @@ export function MaintenanceList() {
                                 path={mdiCheckOutline}
                                 size={1.5}
                                 color="green"
-                                onClick={() =>
-                                    onClear(info.cell.row.original.id)
-                                }
+                                onClick={() => console.log('clear')}
                             />
                             <Icon
                                 path={mdiPencil}
                                 size={1.5}
-                                onClick={() =>
-                                    onEdit(info.cell.row.original.id)
-                                }
+                                onClick={() => {
+                                    console.log('click?');
+                                    onEdit(info.cell.row.original.id);
+                                }}
                             />
                         </div>
                     );
@@ -175,9 +176,13 @@ export function MaintenanceList() {
         },
     ];
 
-    const onAdd = () => {
+    function onAdd() {
         setShowAddForm(true);
-    };
+    }
+
+    function onEdit(id) {
+        console.log(id);
+    }
 
     return (
         <div>
@@ -191,6 +196,11 @@ export function MaintenanceList() {
             <MaintenanceAddTaskDialog
                 show={showAddForm}
                 toggleShow={setShowAddForm}
+            />
+            <MaintenanceEditTaskDialog
+                show={showEditForm}
+                toggleShow={setShowEditForm}
+                id={editID}
             />
         </div>
     );
