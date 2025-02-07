@@ -1,4 +1,4 @@
-import Toolpath from 'gcode-toolpath';
+import Toolpath from './gcode-toolpath';
 import get from 'lodash/get';
 
 import store from 'app/store';
