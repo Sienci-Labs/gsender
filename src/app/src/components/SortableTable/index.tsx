@@ -13,6 +13,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import React, { useState } from 'react';
 import { Table as BTable } from 'react-bootstrap';
 import styles from './index.module.styl';
+import { FaPlus } from 'react-icons/fa';
 
 interface SortableTableProps {
     defaultData?: object;
@@ -47,10 +48,6 @@ const SortableTable = (props: SortableTableProps) => {
         ];
     */
     const sortBy = props.sortBy || null;
-    const rowColours = props.rowColours || [
-        '#f9f9f9',
-        'rgba(255, 255, 255, 0)',
-    ]; // every other row colours
     const onAdd = props.onAdd || null; // function for when add button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
 
@@ -121,7 +118,7 @@ const SortableTable = (props: SortableTableProps) => {
 
     /***** RENDERING *****/
     return (
-        <div className="w-full flex flex-grow-1 flex-col items-center justify-center gap-3">
+        <div className="w-full flex flex-grow flex-col items-center justify-center gap-3">
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
             <div
@@ -153,8 +150,13 @@ const SortableTable = (props: SortableTableProps) => {
                             float: 'right',
                         }}
                     >
-                        <button title="Add New" onClick={onAdd}>
-                            Add New <i className="fas fa-plus" />
+                        <button
+                            title="Add New"
+                            onClick={onAdd}
+                            className="text-green-500 border border-green-500 hover:bg-green-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
+                        >
+                            <FaPlus />
+                            Add New Task
                         </button>
                     </div>
                 )}
@@ -173,8 +175,7 @@ const SortableTable = (props: SortableTableProps) => {
                     bordered
                     responsive
                     hover
-                    variant="dark"
-                    style={{ tableLayout: 'fixed' }}
+                    className="min-w-full leading-normal"
                 >
                     <thead>
                         {table.getHeaderGroups().map(
@@ -186,11 +187,7 @@ const SortableTable = (props: SortableTableProps) => {
                                         <th
                                             key={header.id}
                                             colSpan={header.colSpan}
-                                            style={{
-                                                width: header.getSize(),
-                                                whiteSpace: 'unset',
-                                                fontWeight: 'bold',
-                                            }}
+                                            className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider"
                                         >
                                             {header.isPlaceholder ? null : (
                                                 <>
@@ -233,9 +230,7 @@ const SortableTable = (props: SortableTableProps) => {
                                 <React.Fragment key={row.id + 'parent'}>
                                     <tr
                                         key={row.id}
-                                        style={{
-                                            backgroundColor: rowColours[i % 2],
-                                        }}
+                                        className="odd:bg-gray-50 even:bg-white"
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <td
@@ -250,6 +245,7 @@ const SortableTable = (props: SortableTableProps) => {
                                                     whiteSpace: 'unset',
                                                     overflowWrap: 'break-word',
                                                 }}
+                                                className="px-5 py-5 border border-gray-200 text-sm"
                                             >
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
@@ -261,10 +257,7 @@ const SortableTable = (props: SortableTableProps) => {
                                     {row.original.subRow && (
                                         <tr
                                             key={row.id + 'subRow'}
-                                            style={{
-                                                backgroundColor:
-                                                    rowColours[i % 2],
-                                            }}
+                                            className="odd:bg-gray-50 even:bg-white"
                                         >
                                             <td
                                                 colSpan={colSpanLength}

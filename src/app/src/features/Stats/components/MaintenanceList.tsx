@@ -4,6 +4,7 @@ import { sortingFns } from '@tanstack/react-table';
 import Icon from '@mdi/react';
 import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
 import SortableTable from 'app/components/SortableTable';
+import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 
 function determineTime(task) {
     const { rangeStart, rangeEnd, currentTime } = task;
@@ -39,6 +40,8 @@ function formatTasks(data) {
 export function MaintenanceList() {
     const { maintenanceTasks } = useContext(StatContext);
     const [formattedData, setFormattedData] = useState([]);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [showEditForm, setShowEditForm] = useState(false);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -173,7 +176,7 @@ export function MaintenanceList() {
     ];
 
     const onAdd = () => {
-        setShowAddModal(true);
+        setShowAddForm(true);
     };
 
     return (
@@ -184,6 +187,10 @@ export function MaintenanceList() {
                 enableSortingRemoval={false}
                 sortBy={sortBy}
                 onAdd={onAdd}
+            />
+            <MaintenanceAddTaskDialog
+                show={showAddForm}
+                toggleShow={setShowAddForm}
             />
         </div>
     );
