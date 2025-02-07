@@ -6,6 +6,8 @@ import {
 } from 'app/components/shadcn/Dialog.tsx';
 import { MaintenanceTaskForm } from 'app/features/Stats/components/MaintenanceTaskForm.tsx';
 import { buttonStyle } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
+import { useContext, useEffect, useState } from 'react';
+import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 
 interface MaintenanceEditTaskDialogProps {
     show: boolean;
@@ -18,10 +20,17 @@ export function MaintenanceEditTaskDialog({
     toggleShow,
     id = -1,
 }: MaintenanceEditTaskDialogProps) {
+    const { maintenanceTasks } = useContext(StatContext);
+    const [task, setTask] = useState({});
     function handleSubmit(e) {
         e.preventDefault();
         console.log(e);
     }
+
+    useEffect(() => {
+        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
+        setTask(selectedTask);
+    }, [id]);
 
     return (
         <Dialog open={show} onOpenChange={toggleShow}>
@@ -30,7 +39,7 @@ export function MaintenanceEditTaskDialog({
                     <DialogTitle>Add New Task</DialogTitle>
                 </DialogHeader>
                 <form className="w-full max-w-lg" onSubmit={handleSubmit}>
-                    <MaintenanceTaskForm />
+                    <MaintenanceTaskForm value={task} />
                     <div className="w-full -mx-3 mb-2 p-2 flex flex-row-reverse gap-4">
                         <button
                             type="submit"
@@ -40,12 +49,19 @@ export function MaintenanceEditTaskDialog({
                         </button>
                         <button
                             className={buttonStyle({ colors: 'secondary' })}
+                            type="button"
                             onClick={(e) => {
                                 e.preventDefault();
                                 toggleShow(false);
                             }}
                         >
                             Cancel
+                        </button>
+                        <button
+                            type="button"
+                            className={buttonStyle({ colors: 'danger' })}
+                        >
+                            Delete
                         </button>
                     </div>
                 </form>

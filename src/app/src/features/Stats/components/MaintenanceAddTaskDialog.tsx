@@ -8,7 +8,7 @@ import {
 import api from 'app/api';
 
 import { tv } from 'tailwind-variants';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import maintenanceActions from '../../../../../app_old/containers/Preferences/Stats/lib/maintenanceApiActions';
 
@@ -18,6 +18,7 @@ export const buttonStyle = tv({
         colors: {
             primary: 'border-transparent text-white bg-blue-500',
             secondary: 'bg-white border-blue-500 text-blue-500',
+            danger: 'text-white border-transparent bg-red-500',
         },
     },
 });

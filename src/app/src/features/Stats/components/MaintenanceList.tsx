@@ -144,20 +144,21 @@ export function MaintenanceList() {
                                 textAlign: 'center',
                             }}
                         >
-                            <Icon
-                                path={mdiCheckOutline}
-                                size={1.5}
-                                color="green"
-                                onClick={() => console.log('clear')}
-                            />
-                            <Icon
-                                path={mdiPencil}
-                                size={1.5}
+                            <button onClick={() => console.log('clear')}>
+                                <Icon
+                                    path={mdiCheckOutline}
+                                    size={1.5}
+                                    color="green"
+                                />
+                            </button>
+
+                            <button
                                 onClick={() => {
-                                    console.log('click?');
                                     onEdit(info.cell.row.original.id);
                                 }}
-                            />
+                            >
+                                <Icon path={mdiPencil} size={1.5} />
+                            </button>
                         </div>
                     );
                 },
@@ -182,6 +183,8 @@ export function MaintenanceList() {
 
     function onEdit(id) {
         console.log(id);
+        setEditID(id);
+        setShowEditForm(true);
     }
 
     return (
