@@ -10,6 +10,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import {truncatePort} from "app/features/Stats/utils/statUtils.ts";
 
 ChartJS.register(
     CategoryScale,
@@ -42,7 +43,8 @@ function aggregateJobsByStatus(jobs) {
 export function JobResultsChart() {
     const { jobs } = useContext(StatContext);
     const [finished, unfinished] = aggregateJobsByStatus(jobs);
-    const labels = Object.keys(finished);
+    const ports = Object.keys(finished);
+    const labels = ports.map(p  => truncatePort(p));
     const finishedJobData = Object.values(finished);
     const incompleteJobData = Object.values(unfinished);
 

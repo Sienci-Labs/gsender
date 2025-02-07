@@ -2,6 +2,8 @@ import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import {truncate} from "lodash";
+import {truncatePort} from "app/features/Stats/utils/statUtils.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -24,9 +26,10 @@ export function RunTimePerComPort() {
     const [ports, runtimes] = aggregateRunTime(jobs);
 
     runtimes.map((runtime) => runtime / 1000);
+    let labels = ports.map((p) => truncatePort(p));
 
     const data = {
-        labels: ports,
+        labels: labels,
         datasets: [
             {
                 label: 'Hours per port',
