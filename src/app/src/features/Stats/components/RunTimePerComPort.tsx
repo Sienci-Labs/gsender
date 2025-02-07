@@ -24,8 +24,6 @@ export function RunTimePerComPort() {
     const [ports, runtimes] = aggregateRunTime(jobs);
 
     runtimes.map((runtime) => runtime / 1000);
-    console.log(ports);
-    console.log(runtimes);
 
     const data = {
         labels: ports,

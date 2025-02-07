@@ -14,7 +14,7 @@ function aggregatePortInfo(jobs) {
         }
         jobAggregate[job.port] = jobAggregate[job.port] + 1;
     });
-    console.log(jobAggregate);
+
     return [Object.keys(jobAggregate), Object.values(jobAggregate)];
 }
 

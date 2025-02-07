@@ -21,7 +21,7 @@ export function AlarmPreview() {
 
     return (
         <StatCard>
-            <CardHeader link={'/'} linkLabel={'View all'}>
+            <CardHeader link={'/stats/alarms'} linkLabel={'View all'}>
                 Alarms and Errors
             </CardHeader>
             <div className="flex flex-col gap-2 justify-around">

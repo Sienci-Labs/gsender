@@ -46,9 +46,6 @@ export function JobResultsChart() {
     const finishedJobData = Object.values(finished);
     const incompleteJobData = Object.values(unfinished);
 
-    console.log(finished);
-    console.log(unfinished);
-
     const data = {
         labels,
         datasets: [

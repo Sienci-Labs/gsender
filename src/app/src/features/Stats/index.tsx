@@ -26,14 +26,19 @@ export function Stats() {
                             <JobResultsChart />
                         </div>
                         <div className="px-4">
-                            <CardHeader>Recent Jobs</CardHeader>
+                            <CardHeader link={'/stats/jobs'} linkLabel={'More'}>
+                                Recent Jobs
+                            </CardHeader>
                             <JobPreviewList />
                         </div>
                     </div>
                 </StatCard>
                 <div className="grid grid-cols-2 flex flex-row gap-4">
                     <StatCard>
-                        <CardHeader link={'/'} linkLabel="Manage">
+                        <CardHeader
+                            link={'/stats/maintenance'}
+                            linkLabel="Manage"
+                        >
                             Upcoming Maintenance
                         </CardHeader>
                         <MaintenancePreview />

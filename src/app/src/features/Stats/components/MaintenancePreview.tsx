@@ -1,7 +1,7 @@
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
 import { FaCircle } from 'react-icons/fa';
-
+import cx from 'classnames';
 import { tv } from 'tailwind-variants';
 
 function timeRemainingSortComparison(a, b) {
@@ -28,6 +28,17 @@ const reminderStyles = tv({
     },
 });
 
+const reminderBGStyles = tv({
+    base: 'bg-opacity-5',
+    variants: {
+        color: {
+            Due: 'bg-red-500',
+            Soon: 'bg-orange-500',
+            Low: 'bg-robin-500',
+        },
+    },
+});
+
 function remainingTimeString(remainingTime) {
     const dueUpper = 4;
     const soonUpper = 20;
@@ -46,7 +57,12 @@ function MaintenanceTask({ task }) {
     const reminderString = remainingTimeString(time);
 
     return (
-        <div className="flex flex-row justify-between items-center bg-gray-50 rounded-2xl p-2">
+        <div
+            className={cx(
+                'flex flex-row justify-between items-center bg-gray-50 rounded-2xl p-2',
+                reminderBGStyles({ color: reminderString }),
+            )}
+        >
             <div className={'flex flex-col'}>
                 <span className={reminderStyles({ color: reminderString })}>
                     {time} hours
@@ -63,13 +79,12 @@ function MaintenanceTask({ task }) {
     );
 }
 
-export function MaintenancePreview() {
+export function MaintenancePreview({ limit = 3 }) {
     const { maintenanceTasks } = useContext(StatContext);
     // Sort tasks by remaining time and truncate to top 3
     const sortedTasks = maintenanceTasks
         .sort(timeRemainingSortComparison)
-        .slice(0, 3);
-    console.log(sortedTasks);
+        .slice(0, limit);
 
     return (
         <div className="flex flex-col gap-2">

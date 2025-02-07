@@ -42,14 +42,12 @@ export function StatsProvider({ children }) {
         const fetchAlarms = async () => {
             const alarmRes = await api.alarmList.fetch();
             const { list } = alarmRes.data;
-            console.log(list);
             setAlarms(list);
         };
 
         const fetchMaintenance = async () => {
             const maintenanceRes = await api.maintenance.fetch();
             setMaintenanceTasks(maintenanceRes.data);
-            console.log(maintenanceRes.data);
         };
 
         fetchJobStats().catch((e) => console.error(e));

@@ -81,9 +81,8 @@ const columnData = [
 
 export function Jobs() {
     const { jobs } = useContext(StatContext);
-    console.log(jobs);
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full">
             <div className="col-span-4 row-span-6 px-8 mb-2">
                 <StatCard>
                     <SortableTable
