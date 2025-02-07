@@ -11,7 +11,6 @@ import { Connection } from 'app/features/Connection/definitions';
 import { Console } from 'app/features/Console/definitions';
 import { JobStatus } from 'app/features/FileControl/definitions';
 import { Location } from 'app/features/Location/definitions';
-import { Macro } from 'app/features/Macro/definitions';
 import { Probe } from 'app/features/Probe/definitions';
 import { Rotary } from 'app/features/Rotary/definitions';
 import { Spindle, SpindleState } from 'app/features/Spindle/definitions';
@@ -205,7 +204,9 @@ export interface State {
         job_status: JobStatus;
         grbl: GRBL;
         location: Location;
-        macro: Macro;
+        macro: {
+            minimized: boolean;
+        };
         probe: Probe;
         rotary: Rotary;
         spindle: SpindleState;

@@ -14,16 +14,22 @@ const MultiInputBlock: React.FC<MultiInputBlockProps> = ({
     divider,
 }) => {
     return (
-        <div className="grid gap-4 grid-cols-[1fr_2fr] items-center">
-            {label && <label className="text-lg self-center">{label}</label>}
+        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center ">
+            {label && (
+                <label className="text-lg self-center font-light">
+                    {label}
+                </label>
+            )}
 
             <div
-                className={`grid ${divider ? 'grid-cols-[4fr_1fr_5fr]' : 'grid-cols-2'} items-center mb-4`}
+                className={`grid ${divider ? 'grid-cols-[4fr_1fr_5fr]' : 'grid-cols-2 gap-2'} w-full items-center mb-4`}
             >
                 {firstComponent}
 
                 {divider && typeof divider === 'string' ? (
-                    <span className="text-center text-2xl">{divider}</span>
+                    <span className="text-center text-xl font-light">
+                        {divider}
+                    </span>
                 ) : (
                     divider
                 )}

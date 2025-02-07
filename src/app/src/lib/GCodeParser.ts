@@ -131,3 +131,19 @@ export const parseLine = (
 
     return result;
 };
+
+export const parseStringSync = (str: string, options: ParseLineOptions) => {
+    const results = [];
+    const lines = str.split('\n');
+
+    for (let i = 0; i < lines.length; ++i) {
+        const line = lines[i].trim();
+        if (line.length === 0) {
+            continue;
+        }
+        const result = parseLine(line, options);
+        results.push(result);
+    }
+
+    return results;
+};
