@@ -58,6 +58,7 @@ import {
     ControllerState,
     FileInfoState,
 } from 'app/store/definitions';
+import JSZip from 'jszip';
 
 const styles = StyleSheet.create({
     body: {
@@ -209,6 +210,10 @@ const getOS = (): string => {
 const getGCodeFile = (): string => {
     const gcode: string = get(reduxStore.getState(), 'file.content', '');
     return gcode;
+};
+
+const getGCodeFileName = () => {
+    return get(reduxStore.getState(), 'file.name', 'diagnosticGcode.gcode');
 };
 
 const getMode = (): boolean => {
@@ -852,7 +857,28 @@ function generateSupportFile() {
             .toLocaleTimeString('it-IT')
             .replaceAll(':', '-');
 
-        saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+        const zip = new JSZip();
+        const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+        const senderSettings = await exportSenderSettings();
+
+        const code = getGCodeFile();
+        if (code.length > 0) {
+            zip.file(getGCodeFileName(), new Blob([code]));
+        }
+
+        zip.file(diagnosticPDFLabel, blob);
+        zip.file(
+            `gSenderSettings_${currentDate}_${currentTime}.json`,
+            senderSettings,
+        );
+        zip.generateAsync({ type: 'blob' }).then((content) => {
+            saveAs(
+                content,
+                'diagnostics_' + currentDate + '_' + currentTime + '.zip',
+            );
+        });
+
+        //saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
     };
 
     return (
@@ -864,6 +890,21 @@ function generateSupportFile() {
             Download Diagnostic File
         </ToolModalButton>
     );
+}
+
+async function exportSenderSettings() {
+    const settings = store.get();
+    settings.commandKeys = Object.fromEntries(
+        Object.entries(settings.commandKeys).filter(
+            ([key, shortcut]) => shortcut.category !== 'Macros',
+        ),
+    );
+    delete settings.session;
+    const res = await api.events.fetch();
+    console.log(res);
+    const events = res.data.records;
+    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+    return new Blob([settingsJSON], { type: 'application/json' });
 }
 
 export default generateSupportFile;
