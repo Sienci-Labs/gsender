@@ -8,25 +8,26 @@ import {
     handleRestoreDefaultClick,
     importSettings,
 } from 'app/features/Config/utils/Settings.ts';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 
 export function ApplicationPreferences() {
     const inputRef = useRef();
     return (
         <fieldset className="flex flex-row gap-x-6 mr-4 border border-gray-200 px-4 py-2">
             <legend className="text-slate-600">gSender Preferences</legend>
-            <IconFunctionButton
+            <ActionButton
                 label="Export"
                 icon={<FiUpload />}
                 onClick={exportSettings}
             />
-            <IconFunctionButton
+            <ActionButton
                 label="Import"
                 icon={<FiDownload />}
                 onClick={() => {
                     inputRef.current.click();
                 }}
             />
-            <IconFunctionButton
+            <ActionButton
                 label="Reset"
                 icon={<GrPowerReset />}
                 onClick={handleRestoreDefaultClick}

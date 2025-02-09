@@ -15,6 +15,7 @@ import { toast } from 'app/lib/toaster';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import cn from 'classnames';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
@@ -64,39 +65,37 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     }
 
     return (
-        <div className="flex flex-row w-full p-4 min-h-1/5 justify-around items-center font-sans">
-            <div className="border border-gray-200 flex flex-row items-center w-3/5 justify-between px-4 py-2">
-                <div className="w-1/4">
-                    <MachineProfileSelector />
-                </div>
+        <div className="fixed shadow flex px-4 rounded z-50 flex-row items-center -translate-x-1/2 max-w-5xl w-full justify-center bottom-16 left-1/2 h-24 bg-white border border-gray-200">
+            <div className="w-1/4">
+                <MachineProfileSelector />
+            </div>
 
-                <div className="flex flex-row gap-10">
-                    <IconFunctionButton
-                        icon={<CiExport />}
-                        label="Export"
-                        onClick={() => exportFirmwareSettings(rawEEPROM)}
-                        disabled={!connected}
-                    />
-                    <IconFunctionButton
-                        icon={<CiImport />}
-                        label="Import"
-                        onClick={() => {
-                            inputRef.current.click();
-                            inputRef.current.value = null;
-                        }}
-                        disabled={!connected}
-                    />
-                    <IconFunctionButton
-                        icon={<GrRevert />}
-                        label="Defaults"
-                        disabled={true}
-                    />
-                    <IconFunctionButton
-                        icon={<PiLightning />}
-                        label="Flash"
-                        disabled={true}
-                    />
-                </div>
+            <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
+                <ActionButton
+                    icon={<CiExport />}
+                    label="Export"
+                    onClick={() => exportFirmwareSettings(rawEEPROM)}
+                    disabled={!connected}
+                />
+                <ActionButton
+                    icon={<CiImport />}
+                    label="Import"
+                    onClick={() => {
+                        inputRef.current.click();
+                        inputRef.current.value = null;
+                    }}
+                    disabled={!connected}
+                />
+                <ActionButton
+                    icon={<GrRevert />}
+                    label="Defaults"
+                    disabled={true}
+                />
+                <ActionButton
+                    icon={<PiLightning />}
+                    label="Flash"
+                    disabled={true}
+                />
             </div>
             <div
                 className={cn(

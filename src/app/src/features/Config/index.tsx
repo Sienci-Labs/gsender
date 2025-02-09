@@ -39,7 +39,7 @@ export function Config() {
                         <Search />
                         <ApplicationPreferences />
                     </div>
-                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll">
+                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll relative">
                         {settings.map((item, index) => {
                             return (
                                 <Section
@@ -52,12 +52,12 @@ export function Config() {
                                 />
                             );
                         })}
+                        <ProfileBar
+                            setShowFlashDialog={() => {
+                                setShowFlashDialog(!showFlashDialog);
+                            }}
+                        />
                     </div>
-                    <ProfileBar
-                        setShowFlashDialog={() => {
-                            setShowFlashDialog(!showFlashDialog);
-                        }}
-                    />
                 </div>
             </div>
         </SettingsProvider>
