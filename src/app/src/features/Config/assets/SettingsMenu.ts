@@ -35,14 +35,15 @@ export type gSenderSettingType =
     | 'text'
     | 'radio'
     | 'ip'
-    | 'hybrid';
+    | 'hybrid'
+    | 'eeprom';
 
 export type gSenderSettingsValues = number | string | boolean;
 
 export interface gSenderSetting {
-    label: string;
+    label?: string;
     type: gSenderSettingType;
-    key: string;
+    key?: string;
     description?: string;
     options?: string[] | number[];
     unit?: string;
