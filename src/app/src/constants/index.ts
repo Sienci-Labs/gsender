@@ -203,7 +203,7 @@ export const ALL_CATEGORIES = [
 ];
 export const SHORTCUT_CATEGORY = {
     // keep in alphabetical order
-    ALL_CATEGORY: 'All',
+    // ALL_CATEGORY: 'All',
     CARVING_CATEGORY: 'Carving',
     OVERRIDES_CATEGORY: 'Overrides',
     VISUALIZER_CATEGORY: 'Visualizer',

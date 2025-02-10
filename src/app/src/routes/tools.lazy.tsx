@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaMicrochip } from 'react-icons/fa';
+import { FaKeyboard, FaMicrochip } from 'react-icons/fa';
 import { LuPencilRuler } from 'react-icons/lu';
 import { AiFillTool } from 'react-icons/ai';
 
@@ -44,6 +44,13 @@ function Tools() {
                     description="Use this tool adjust the movement of your machine"
                     icon={AiFillTool}
                     link="/movement-tuning"
+                />
+
+                <ToolCard
+                    title="Keyboard Shortcuts"
+                    description="Use this tool to adjust the keyboard shortcuts of your machine"
+                    icon={FaKeyboard}
+                    link="/keyboard-shortcuts"
                 />
             </div>
         </div>

@@ -7,6 +7,7 @@ import visualizer from './slices/visualizer.slice';
 import preferences from './slices/preferences.slice';
 import console from './slices/console.slice';
 import helper from './slices/helper.slice';
+import keyboardShortcuts from './slices/keyboardShortcutsSlice';
 import { sagaMiddleware } from './sagas';
 
 export const store = configureStore({
@@ -18,6 +19,7 @@ export const store = configureStore({
         preferences,
         console,
         helper,
+        keyboardShortcuts,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(sagaMiddleware),
