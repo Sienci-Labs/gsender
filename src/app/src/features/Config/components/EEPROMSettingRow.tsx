@@ -83,9 +83,6 @@ export function EEPROMSettingRow({
                 )}
             >
                 <div className="w-1/5 text-gray-700 flex flex-row gap-2 items-center relative">
-                    <span className="text-gray-400 text-4xl opacity-40">
-                        <FaMicrochip />
-                    </span>
                     {EEPROMData.description}
                 </div>
                 <div
@@ -98,7 +95,10 @@ export function EEPROMSettingRow({
                         onChange={changeHandler(EEPROMData.globalIndex)}
                     />
                 </div>
-                <span className="w-1/5 text-xs px-4">
+                <span className="w-1/5 text-xs px-4 flex flex-row gap-2">
+                    <span className="text-gray-400 text-4xl opacity-40">
+                        <FaMicrochip />
+                    </span>
                     {!isDefault && (
                         <button
                             className="text-3xl"

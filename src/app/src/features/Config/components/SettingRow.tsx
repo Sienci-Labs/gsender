@@ -132,7 +132,7 @@ export function SettingRow({
     }
 
     return (
-        <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center text-gray-700">
+        <div className="p-2 flex flex-row items-center odd:bg-gray-100 even:bg-white text-gray-700">
             <span className="w-1/5">{setting.label}</span>
             <span className="w-1/5 text-xs px-4">
                 {returnSettingControl(
@@ -142,7 +142,7 @@ export function SettingRow({
                     changeHandler(populatedValue.globalIndex),
                 )}
             </span>
-            <span></span>
+            <span className="w-1/5 text-xs px-4"></span>
             <span className="text-gray-500 text-sm w-2/5">
                 {setting.description}
             </span>

@@ -93,12 +93,12 @@ const TerminalInput = ({ onClear }: Props) => {
     };
 
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full flex-grow">
             <Input
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
-                className="w-full"
+                className="w-full flex-grow"
                 onKeyDown={(e) => {
                     switch (e.key) {
                         case 'Enter': {
