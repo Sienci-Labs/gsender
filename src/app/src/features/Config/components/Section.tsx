@@ -47,8 +47,7 @@ export function Section({
         <div
             id={id}
             className={cn({
-                'bg-blue-500':
-                    filterEmpty || (!connected && onlyEEPROM(settings)),
+                hidden: filterEmpty || (!connected && onlyEEPROM(settings)),
             })}
         >
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>

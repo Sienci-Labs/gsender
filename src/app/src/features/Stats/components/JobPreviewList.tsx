@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { JobPreview } from 'app/features/Stats/components/JobPreview.tsx';
 
 export function JobPreviewList() {
-    const { jobs } = useContext(StatContext);
+    const { jobs = [] } = useContext(StatContext);
     const jobShortlist = jobs.slice(0, 5);
     return (
         <div className="flex flex-col gap-4">

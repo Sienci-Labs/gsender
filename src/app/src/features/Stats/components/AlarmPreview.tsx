@@ -16,7 +16,7 @@ const eventRow = tv({
 });
 
 export function AlarmPreview() {
-    const { alarms } = useContext(StatContext);
+    const { alarms = [] } = useContext(StatContext);
     const shortlist = alarms.slice(0, 4);
 
     return (

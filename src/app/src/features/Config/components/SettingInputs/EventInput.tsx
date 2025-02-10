@@ -47,9 +47,10 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
         };
 
         fetchCall().catch((e) => {
-            toast.error(`Unable to fetch event data ${eventType}`),
+            toast.error(`Unable to fetch event data ${eventType}`);
         });
     }, []);
+
     return (
         <div className="flex flex-col w-full gap-2">
             <textarea
