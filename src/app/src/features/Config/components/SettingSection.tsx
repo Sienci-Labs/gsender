@@ -6,6 +6,7 @@ import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
+import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
@@ -15,7 +16,7 @@ export function SettingSection({
     settings = [],
     label = null,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
+    const { setSettingsValues, setSettingsAreDirty, searchTerm, connected } =
         useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
@@ -33,7 +34,11 @@ export function SettingSection({
     );
 
     return (
-        <div className={cn({ hidden: filteredSettings.length === 0 })}>
+        <div
+            className={cn({
+                'hidden text-gray-600': filteredSettings.length === 0,
+            })}
+        >
             {label && (
                 <h2 className="text-blue-500 border-bottom border-blue-500">
                     {label}

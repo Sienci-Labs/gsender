@@ -14,8 +14,12 @@ export function Search() {
         setSearchTerm('');
     }
 
+    function onSubmit(e) {
+        e.preventDefault();
+    }
+
     return (
-        <form className="flex items-center min-w-80">
+        <form className="flex items-center min-w-80" onSubmit={onSubmit}>
             <label htmlFor="simple-search" className="sr-only">
                 Search
             </label>

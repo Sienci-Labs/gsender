@@ -10,9 +10,8 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
+import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 
@@ -82,6 +81,9 @@ function returnSettingControl(
                     onChange={handler}
                 />
             );
+        case 'event':
+            return <EventInput eventType={setting.eventType} />;
+
         default:
             return setting.type;
     }
@@ -92,7 +94,8 @@ export function SettingRow({
     index,
     changeHandler,
 }: SettingRowProps): JSX.Element {
-    const { settingsValues, setSettingsAreDirty, setEEPROM } = useSettings();
+    const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
+        useSettings();
 
     const handleSettingsChange = (index) => (value) => {
         setSettingsAreDirty(true);
@@ -109,16 +112,13 @@ export function SettingRow({
         toast.success(`Restored ${setting} to default value of ${value}`);
     }
 
-    const connected = useSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
     const populatedValue = settingsValues[setting.globalIndex] || {};
     // if EEPROM or Hybrid and not connected, show nothing
     if (
         (setting.type === 'eeprom' || setting.type === 'hybrid') &&
         !connected
     ) {
-        return <div>Hidden</div>;
+        return <></>;
     }
 
     if (connected && setting.type === 'eeprom') {

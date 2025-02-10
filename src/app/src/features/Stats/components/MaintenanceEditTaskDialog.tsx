@@ -36,7 +36,6 @@ export function MaintenanceEditTaskDialog({
             name,
             currentTime: 0,
         };
-        console.log(payload);
     }
 
     useEffect(() => {

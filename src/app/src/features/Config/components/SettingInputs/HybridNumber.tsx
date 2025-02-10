@@ -27,7 +27,6 @@ export function HybridNumber({
         if (eepromValue && useEEPROM) {
             value = Number(eepromValue.value);
             setEEPROMObject(eepromValue);
-            console.log(value);
         }
     }, [EEPROM]);
 

@@ -36,7 +36,8 @@ export type gSenderSettingType =
     | 'radio'
     | 'ip'
     | 'hybrid'
-    | 'eeprom';
+    | 'eeprom'
+    | 'event';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -52,6 +53,7 @@ export interface gSenderSetting {
     value?: gSenderSettingsValues;
     defaultValue?: any;
     dirty?: boolean;
+    eventType?: string;
 }
 
 export interface gSenderSubSection {
@@ -166,12 +168,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         settings: [
             {
-                label: 'Motors',
+                label: 'General',
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$3',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$37',
+                    },
+                ],
+            },
+            {
+                label: 'X-axis',
+                settings: [
                     {
                         type: 'eeprom',
                         eID: '$100',
@@ -188,9 +199,51 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$120',
                     },
+                ],
+            },
+            {
+                label: 'Y-axis',
+                settings: [
                     {
                         type: 'eeprom',
-                        eID: '$150',
+                        eID: '$8',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$101',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$151',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$111',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$121',
+                    },
+                ],
+            },
+            {
+                label: 'Z-axis',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$102',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$152',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$112',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$122',
                     },
                 ],
             },
@@ -203,6 +256,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$6',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$668',
+                    },
                     {
                         label: 'Touch Plate Type',
                         key: 'workspace.probeProfile.touchplateType',
@@ -264,18 +325,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'A safe check to make sure your probe is connected correctly',
                         type: 'boolean',
                     },
-                    {
-                        type: 'eeprom',
-                        eID: '$6',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$668',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$',
-                    },
                 ],
             },
         ],
@@ -285,7 +334,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: CiLight,
         settings: [
             {
-                label: 'Status Lights',
+                label: '',
                 settings: [
                     {
                         type: 'eeprom',
@@ -427,6 +476,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        type: 'eeprom',
+                        eID: '$32',
+                    },
+                    {
                         label: 'Delay after start',
                         key: 'workspace.spindleDelay',
                         description:
@@ -452,6 +505,149 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'hybrid',
                         eID: '$30',
                         unit: 'rpm',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$395',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$511',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$512',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$513',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$520',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$521',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$522',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$523',
+                    },
+                ],
+            },
+            {
+                label: 'Spindle PWM',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$9',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$16',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$33',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$34',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$35',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$36',
+                    },
+                ],
+            },
+            {
+                label: 'Spindle Modbus',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$340',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$374',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$375',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$462',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$463',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$464',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$465',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$466',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$467',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$468',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$469',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$470',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$471',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$476',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$477',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$478',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$479',
+                    },
+                ],
+            },
+            {
+                label: 'Laser',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$743',
                     },
                     {
                         label: 'Minimum Laser Power',
@@ -489,162 +685,71 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$742',
                         unit: 'rpm',
                     },
-                ],
-            },
-        ],
-        eeprom: [
-            {
-                label: 'Spindle',
-                eeprom: [
                     {
-                        eId: '$32',
+                        type: 'eeprom',
+                        eID: '$733',
                     },
                     {
-                        eId: '$395',
+                        type: 'eeprom',
+                        eID: '$734',
                     },
                     {
-                        eId: '$511',
+                        type: 'eeprom',
+                        eID: '$735',
                     },
                     {
-                        eId: '$512',
-                    },
-                    {
-                        eId: '$513',
-                    },
-                    {
-                        eId: '$520',
-                    },
-                    {
-                        eId: '$521',
-                    },
-                    {
-                        eId: '$522',
-                    },
-                    {
-                        eId: '$523',
-                    },
-                ],
-            },
-            {
-                label: 'Spindle PWM',
-                eeprom: [
-                    {
-                        eId: '$9',
-                    },
-                    {
-                        eId: '$16',
-                    },
-                    {
-                        eId: '$33',
-                    },
-                    {
-                        eId: '$34',
-                    },
-                    {
-                        eId: '$35',
-                    },
-                    {
-                        eId: '$36',
-                    },
-                ],
-            },
-            {
-                label: 'Spindle Modbus',
-                eeprom: [
-                    {
-                        eId: '$340',
-                    },
-                    {
-                        eId: '$374',
-                    },
-                    {
-                        eId: '$375',
-                    },
-                    {
-                        eId: '$462',
-                    },
-                    {
-                        eId: '$463',
-                    },
-                    {
-                        eId: '$464',
-                    },
-                    {
-                        eId: '$465',
-                    },
-                    {
-                        eId: '$466',
-                    },
-                    {
-                        eId: '$467',
-                    },
-                    {
-                        eId: '$468',
-                    },
-                    {
-                        eId: '$469',
-                    },
-                    {
-                        eId: '$470',
-                    },
-                    {
-                        eId: '$471',
-                    },
-                    {
-                        eId: '$476',
-                    },
-                    {
-                        eId: '$477',
-                    },
-                    {
-                        eId: '$478',
-                    },
-                    {
-                        eId: '$479',
-                    },
-                ],
-            },
-            {
-                label: 'Laser',
-                eeprom: [
-                    {
-                        eId: '$743',
-                    },
-                    {
-                        eId: '$731',
-                    },
-                    {
-                        eId: '$730',
-                    },
-                    {
-                        eId: '$741',
-                    },
-                    {
-                        eId: '$742',
-                    },
-                    {
-                        eId: '$733',
-                    },
-                    {
-                        eId: '$734',
-                    },
-                    {
-                        eId: '$735',
-                    },
-                    {
-                        eId: '$736',
+                        type: 'eeprom',
+                        eID: '$736',
                     },
                 ],
             },
         ],
     },
-    { label: 'Automations', icon: FaRobot },
+    {
+        label: 'Automations',
+        icon: FaRobot,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        label: 'File start',
+                        type: 'event',
+                        eventType: 'gcode:start',
+                        description:
+                            'Runs when you start a job, before the file itself runs',
+                    },
+                    {
+                        label: 'File pause',
+                        type: 'event',
+                        eventType: 'gcode:pause',
+                        description:
+                            "If you'd like to stop accessories or move out of the way when you pause during a job",
+                    },
+                    {
+                        label: 'File resume',
+                        type: 'event',
+                        eventType: 'gcode:resume',
+                        description:
+                            'Ensure that anything you set up for File pause is undone when you resume',
+                    },
+                    {
+                        label: 'File stop',
+                        type: 'event',
+                        eventType: 'gcode:stop',
+                        description:
+                            'A catch-all to ensure that stopped or ended jobs always safely turn everything off',
+                    },
+                ],
+            },
+        ],
+    },
     {
         label: 'Action Buttons',
         icon: RxButton,
         settings: [
             {
-                label: 'Action',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$450' },
                     { type: 'eeprom', eID: '$451' },
@@ -661,7 +766,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: CiMapPin,
         settings: [
             {
-                label: 'Accessories',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$456' },
                     { type: 'eeprom', eID: '$457' },
@@ -679,6 +784,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    { type: 'eeprom', eID: '$376' },
                     {
                         label: 'Resolution',
                         key: 'workspace.rotaryAxis.firmwareSettings.$101',
@@ -697,6 +803,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$113',
                         unit: 'rpm',
                     },
+                    { type: 'eeprom', eID: '$123' },
                     {
                         label: 'Force Hard Limits',
                         key: '',
@@ -711,8 +818,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Updates soft limits when toggling into rotary mode',
                         type: 'boolean',
                     },
-                    { type: 'eeprom', eID: '$376' },
-                    { type: 'eeprom', eID: '$123' },
                 ],
             },
         ],
@@ -804,7 +909,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: SiCoronaengine,
         settings: [
             {
-                label: 'Advanced Motors',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$0' },
                     { type: 'eeprom', eID: '$1' },
@@ -852,7 +957,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: MdOutlineReadMore,
         settings: [
             {
-                label: 'More Settings',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$10' },
                     { type: 'eeprom', eID: '$11' },

@@ -182,7 +182,6 @@ export function MaintenanceList() {
     }
 
     function onEdit(id) {
-        console.log(id);
         setEditID(id);
         setShowEditForm(true);
     }
