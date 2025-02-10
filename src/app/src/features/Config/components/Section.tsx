@@ -52,12 +52,6 @@ export function Section({
                         label={setting.label}
                     />
                 ))}
-                {eeprom && eeprom?.length > 0 && (
-                    <EEPROMSection
-                        label={`${title} EEPROM`}
-                        settings={eeprom}
-                    />
-                )}
             </div>
         </div>
     );
