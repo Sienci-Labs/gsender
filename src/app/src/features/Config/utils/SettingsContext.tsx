@@ -165,6 +165,37 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         );
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
+    // Populate eeprom descriptions as needed
+    useEffect(() => {
+        const globalValueReference = [];
+        let index = 0;
+        if (!settings.length) {
+            return;
+        }
+        settings.map((ss) => {
+            if (!ss || !ss.settings) {
+                return;
+            }
+            ss.settings.map((s) => {
+                s.settings.map((o) => {
+                    if (o.type == 'eeprom') {
+                        let oKey = Number(o.eID.replace('$', ''));
+                        let oEEPROM = detectedEEPROMDescriptions[oKey];
+                        o.description = get(oEEPROM, 'details', '');
+                        o.label = get(oEEPROM, 'description', '');
+                        console.log(o);
+                    }
+                    /*o.value = fetchStoreValue(o.key);
+                    o.globalIndex = index;
+                    o.defaultValue = fetchDefaultValue(o.key);
+                    globalValueReference.push({ ...o });
+                    index++;*/
+                });
+            });
+            console.log(settings);
+        });
+    }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
+
     const payload = {
         settings,
         EEPROM,
