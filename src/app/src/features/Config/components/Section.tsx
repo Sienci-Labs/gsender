@@ -1,22 +1,13 @@
 import React from 'react';
 import {
     gSenderEEEPROMSettings,
-    gSenderSetting,
     gSenderSettings,
     gSenderSubSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
-import { BooleanSettingInput } from 'app/features/Config/components/SettingInputs/BooleanSettingInput.tsx';
-import { SelectSettingInput } from 'app/features/Config/components/SettingInputs/SelectSettingInput.tsx';
-import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
-import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
-import { EEPROMSection } from 'app/features/Config/components/EEPROMSection.tsx';
-import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
-import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
-import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
-import { cn } from 'app/lib/utils.ts';
+import cn from 'classnames';
 import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
 
 interface SectionProps {
@@ -43,16 +34,17 @@ export function Section({
         matchesSearchTerm(o, searchTerm),
     );
 
+    const filterEmpty = filteredSettings.length === 0;
+
     function onlyEEPROM(settings) {
         return settings.filter((o) => o.type !== 'eeprom').length === 0;
     }
     let shownWarning = false;
 
     return (
-        <div id={id} className={''}>
+        <div id={id} className={cn({ 'invisible opacity-0': filterEmpty })}>
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
             <div className="bg-white rounded-xl shadow p-6">
-                {filteredSettings.length === 0 && <EmptySectionWarning />}
                 {settings.map((setting: gSenderSubSection, index) => {
                     if (!connected && onlyEEPROM(setting.settings)) {
                         if (!shownWarning) {
