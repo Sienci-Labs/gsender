@@ -776,7 +776,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
-    { label: 'Tool Changing', icon: IoIosSwap },
+    {
+        label: 'Tool Changing',
+        icon: IoIosSwap,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        type: 'select',
+                        options: [
+                            'Pause',
+                            'Ignore',
+                            'Standard Re-zero',
+                            'Flexible Re-zero',
+                            'Fixed Tool Sensor',
+                            'Code',
+                        ],
+                        key: '',
+                    },
+                ],
+            },
+        ],
+    },
     {
         label: 'Rotary',
         icon: FaArrowsSpin,

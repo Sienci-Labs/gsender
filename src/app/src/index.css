@@ -48,4 +48,9 @@ html,
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
     }
+
+    .fixed-content-area {
+        height: calc(100vh - 64px);
+        max-height: calc(100vh - 64px);
+    }
 }

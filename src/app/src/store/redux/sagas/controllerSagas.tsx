@@ -565,13 +565,13 @@ export function* initialize(): Generator<any, void, any> {
             if (option === 'Standard Re-zero') {
                 title = 'Standard Re-zero Tool Change';
                 instructions = manualToolChange;
-            } else if (option === 'Flexible Re-zero') {
+            } else if (option === '') {
                 title = 'Flexible Re-zero Tool Change';
                 instructions =
                     count > 1
                         ? semiautoToolchangeSecondRun
                         : semiautoToolChange;
-            } else if (option === 'Fixed Tool Sensor') {
+            } else if (option === '') {
                 title = 'Fixed Tool Sensor Tool Change';
                 instructions =
                     count > 1
