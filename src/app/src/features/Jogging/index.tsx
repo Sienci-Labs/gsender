@@ -15,9 +15,11 @@ import get from 'lodash/get';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    SHORTCUT_CATEGORY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
 import includes from 'lodash/includes';
+import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 
 export interface JogValueObject {
     xyStep: number;
@@ -85,6 +87,25 @@ export function Jogging() {
     function updateJogValues(values: JogValueObject) {
         setJogSpeed(values);
     }
+
+    useRegisterShortcut({
+        id: 'jog-xy',
+        description: 'Jog XY',
+        defaultKeys: 'x',
+        category: SHORTCUT_CATEGORY.JOGGING_CATEGORY,
+        onKeyDown: () => {
+            console.log('Single jog step');
+        },
+        onKeyDownHold: () => {
+            console.log('Starting continuous jog');
+        },
+        onKeyUp: () => {
+            console.log('Single jog complete');
+        },
+        onKeyUpHold: () => {
+            console.log('Stopping continuous jog');
+        },
+    });
 
     return (
         <>
