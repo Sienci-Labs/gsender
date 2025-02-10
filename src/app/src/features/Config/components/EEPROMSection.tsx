@@ -62,7 +62,6 @@ export function EEPROMSection({
                     {e.eeprom.map((eKey, index) => (
                         <EEPROMSettingRow
                             eID={eKey.eId}
-                            index={index}
                             key={`${eKey.eId}-${index}`}
                             changeHandler={handleSettingsChange}
                             resetHandler={handleSingleSettingReset}

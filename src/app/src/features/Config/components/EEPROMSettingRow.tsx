@@ -6,10 +6,10 @@ import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
+import { FaMicrochip } from 'react-icons/fa6';
 
 interface EEPROMSettingRowProps {
     eID: string;
-    index: number;
     changeHandler: (value: number) => void;
     resetHandler: (k, v) => void;
 }
@@ -73,7 +73,7 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'odd:bg-robin-100 even:bg-robin-50 p-2 flex flex-row items-center',
+                    'p-2 flex flex-row items-center odd:bg-gray-100 even:bg-white',
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
                     },
@@ -82,9 +82,12 @@ export function EEPROMSettingRow({
                     },
                 )}
             >
-                <span className="w-1/5 text-gray-700">
+                <div className="w-1/5 text-gray-700 flex flex-row gap-2 items-center relative">
+                    <span className="text-gray-400 text-4xl opacity-40">
+                        <FaMicrochip />
+                    </span>
                     {EEPROMData.description}
-                </span>
+                </div>
                 <div
                     className="w-1/5 text-xs px-4"
                     key={`input-${EEPROMData.key}`}

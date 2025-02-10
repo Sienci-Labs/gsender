@@ -10,9 +10,9 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { EEPROMSettingInput } from 'app/features/Config/components/SettingInputs/EEPROMSettingInput.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -80,8 +80,6 @@ function returnSettingControl(
                     onChange={handler}
                 />
             );
-        case 'eeprom':
-            return <EEPROMSettingInput index={index} eId={setting.eID} />;
         default:
             return setting.type;
     }
@@ -105,8 +103,18 @@ export function SettingRow({
         return <div>Hidden</div>;
     }
 
+    if (connected && setting.type === 'eeprom') {
+        return (
+            <EEPROMSettingRow
+                eID={setting.eID}
+                changeHandler={() => {}}
+                resetHandler={() => {}}
+            />
+        );
+    }
+
     return (
-        <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center">
+        <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center text-gray-700">
             <span className="w-1/5">{setting.label}</span>
             <span className="w-1/5 text-xs px-4">
                 {returnSettingControl(

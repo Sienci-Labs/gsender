@@ -155,7 +155,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         type: 'eeprom',
-                        eID: '$666',
+                        eID: '',
                     },
                 ],
             },
@@ -164,27 +164,33 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Motors',
         icon: PiEngine,
-        eeprom: [
+        settings: [
             {
                 label: 'Motors',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$3',
+                        type: 'eeprom',
+                        eID: '$3',
                     },
                     {
-                        eId: '$100',
+                        type: 'eeprom',
+                        eID: '$100',
                     },
                     {
-                        eId: '$150',
+                        type: 'eeprom',
+                        eID: '$150',
                     },
                     {
-                        eId: '$110',
+                        type: 'eeprom',
+                        eID: '$110',
                     },
                     {
-                        eId: '$120',
+                        type: 'eeprom',
+                        eID: '$120',
                     },
                     {
-                        eId: '$150',
+                        type: 'eeprom',
+                        eID: '$150',
                     },
                 ],
             },
@@ -258,21 +264,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'A safe check to make sure your probe is connected correctly',
                         type: 'boolean',
                     },
-                ],
-            },
-        ],
-        eeprom: [
-            {
-                label: 'Probe',
-                eeprom: [
                     {
-                        eId: '$6',
+                        type: 'eeprom',
+                        eID: '$6',
                     },
                     {
-                        eId: '$668',
+                        type: 'eeprom',
+                        eID: '$668',
                     },
                     {
-                        eId: '$',
+                        type: 'eeprom',
+                        eID: '$',
                     },
                 ],
             },
@@ -281,15 +283,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Status Lights',
         icon: CiLight,
-        eeprom: [
+        settings: [
             {
                 label: 'Status Lights',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$664',
+                        type: 'eeprom',
+                        eID: '$664',
                     },
                     {
-                        eId: '$665',
+                        type: 'eeprom',
+                        eID: '$665',
                     },
                 ],
             },
@@ -298,92 +302,118 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Limits and Homing',
         icon: FaHome,
-        eeprom: [
+        settings: [
             {
                 label: 'Limits and Homing',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$5',
+                        type: 'eeprom',
+                        eID: '$5',
                     },
                     {
-                        eId: '$22',
+                        type: 'eeprom',
+                        eID: '$22',
                     },
                     {
-                        eId: '$130',
+                        type: 'eeprom',
+                        eID: '$130',
                     },
                     {
-                        eId: '$131',
+                        type: 'eeprom',
+                        eID: '$131',
                     },
                     {
-                        eId: '$132',
+                        type: 'eeprom',
+                        eID: '$132',
                     },
                     {
-                        eId: '$133',
+                        type: 'eeprom',
+                        eID: '$133',
                     },
                     {
-                        eId: '$20',
+                        type: 'eeprom',
+                        eID: '$20',
                     },
                     {
-                        eId: '$40',
+                        type: 'eeprom',
+                        eID: '$40',
                     },
                     {
-                        eId: '$21',
+                        type: 'eeprom',
+                        eID: '$21',
                     },
                 ],
             },
             {
                 label: 'Homing Plan',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$23',
+                        type: 'eeprom',
+                        eID: '$23',
                     },
                     {
-                        eId: '$43',
+                        type: 'eeprom',
+                        eID: '$43',
                     },
                     {
-                        eId: '$44',
+                        type: 'eeprom',
+                        eID: '$44',
                     },
                     {
-                        eId: '$45',
+                        type: 'eeprom',
+                        eID: '$45',
                     },
                     {
-                        eId: '$46',
+                        eID: '$46',
+                        type: 'eeprom',
                     },
                     {
-                        eId: '$47',
+                        type: 'eeprom',
+                        eID: '$47',
                     },
                     {
-                        eId: '$25',
+                        type: 'eeprom',
+                        eID: '$25',
                     },
                     {
-                        eId: '$190',
+                        type: 'eeprom',
+                        eID: '$190',
                     },
                     {
-                        eId: '$191',
+                        type: 'eeprom',
+                        eID: '$191',
                     },
                     {
-                        eId: '$192',
+                        type: 'eeprom',
+                        eID: '$192',
                     },
                     {
-                        eId: '$24',
+                        type: 'eeprom',
+                        eID: '$24',
                     },
                     {
-                        eId: '$180',
+                        type: 'eeprom',
+                        eID: '$180',
                     },
                     {
-                        eId: '$181',
+                        type: 'eeprom',
+                        eID: '$181',
                     },
                     {
-                        eId: '$182',
+                        type: 'eeprom',
+                        eID: '$182',
                     },
                     {
-                        eId: '$183',
+                        type: 'eeprom',
+                        eID: '$183',
                     },
                     {
-                        eId: '$26',
+                        type: 'eeprom',
+                        eID: '$26',
                     },
                     {
-                        eId: '$27',
+                        type: 'eeprom',
+                        eID: '$27',
                     },
                 ],
             },
@@ -612,16 +642,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Action Buttons',
         icon: RxButton,
-        eeprom: [
+        settings: [
             {
                 label: 'Action',
-                eeprom: [
-                    { eId: '$450' },
-                    { eId: '$451' },
-                    { eId: '$452' },
-                    { eId: '$453' },
-                    { eId: '$454' },
-                    { eId: '$455' },
+                settings: [
+                    { type: 'eeprom', eID: '$450' },
+                    { type: 'eeprom', eID: '$451' },
+                    { type: 'eeprom', eID: '$452' },
+                    { type: 'eeprom', eID: '$453' },
+                    { type: 'eeprom', eID: '$454' },
+                    { type: 'eeprom', eID: '$455' },
                 ],
             },
         ],
@@ -629,14 +659,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Accessory Outputs',
         icon: CiMapPin,
-        eeprom: [
+        settings: [
             {
                 label: 'Accessories',
-                eeprom: [
-                    { eId: '$456' },
-                    { eId: '$457' },
-                    { eId: '$458' },
-                    { eId: '$459' },
+                settings: [
+                    { type: 'eeprom', eID: '$456' },
+                    { type: 'eeprom', eID: '$457' },
+                    { type: 'eeprom', eID: '$458' },
+                    { type: 'eeprom', eID: '$459' },
                 ],
             },
         ],
@@ -681,13 +711,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Updates soft limits when toggling into rotary mode',
                         type: 'boolean',
                     },
+                    { type: 'eeprom', eID: '$376' },
+                    { type: 'eeprom', eID: '$123' },
                 ],
-            },
-        ],
-        eeprom: [
-            {
-                label: 'Rotary',
-                eeprom: [{ eId: '$376' }, { eId: '$123' }],
             },
         ],
     },
@@ -760,22 +786,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Set the IP address for network scanning (default 192.168.5.1)',
                         type: 'ip',
                     },
-                ],
-            },
-        ],
-        eeprom: [
-            {
-                label: 'Ethernet',
-                eeprom: [
-                    { eId: '$301' },
-                    { eId: '$302' },
-                    { eId: '$303' },
-                    { eId: '$304' },
-                    { eId: '$70' },
-                    { eId: '$300' },
-                    { eId: '$305' },
-                    { eId: '$307' },
-                    { eId: '$308' },
+                    { type: 'eeprom', eID: '$301' },
+                    { type: 'eeprom', eID: '$302' },
+                    { type: 'eeprom', eID: '$303' },
+                    { type: 'eeprom', eID: '$304' },
+                    { type: 'eeprom', eID: '$70' },
+                    { type: 'eeprom', eID: '$300' },
+                    { type: 'eeprom', eID: '$305' },
+                    { type: 'eeprom', eID: '$307' },
+                    { type: 'eeprom', eID: '$308' },
                 ],
             },
         ],
@@ -783,47 +802,47 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Advanced Motors',
         icon: SiCoronaengine,
-        eeprom: [
+        settings: [
             {
                 label: 'Advanced Motors',
-                eeprom: [
-                    { eId: '$0' },
-                    { eId: '$1' },
-                    { eId: '$2' },
-                    { eId: '$4' },
-                    { eId: '$29' },
-                    { eId: '$140' },
-                    { eId: '$141' },
-                    { eId: '$142' },
-                    { eId: '$143' },
-                    { eId: '$200' },
-                    { eId: '$201' },
-                    { eId: '$202' },
-                    { eId: '$203' },
-                    { eId: '$210' },
-                    { eId: '$211' },
-                    { eId: '$212' },
-                    { eId: '$213' },
-                    { eId: '$220' },
-                    { eId: '$221' },
-                    { eId: '$222' },
-                    { eId: '$223' },
-                    { eId: '$338' },
-                    { eId: '$339' },
-                    { eId: '$650' },
-                    { eId: '$651' },
-                    { eId: '$652' },
-                    { eId: '$653' },
-                    { eId: '$654' },
-                    { eId: '$655' },
-                    { eId: '$656' },
-                    { eId: '$657' },
-                    { eId: '$658' },
-                    { eId: '$659' },
-                    { eId: '$660' },
-                    { eId: '$661' },
-                    { eId: '$662' },
-                    { eId: '$663' },
+                settings: [
+                    { type: 'eeprom', eID: '$0' },
+                    { type: 'eeprom', eID: '$1' },
+                    { type: 'eeprom', eID: '$2' },
+                    { type: 'eeprom', eID: '$4' },
+                    { type: 'eeprom', eID: '$29' },
+                    { type: 'eeprom', eID: '$140' },
+                    { type: 'eeprom', eID: '$141' },
+                    { type: 'eeprom', eID: '$142' },
+                    { type: 'eeprom', eID: '$143' },
+                    { type: 'eeprom', eID: '$200' },
+                    { type: 'eeprom', eID: '$201' },
+                    { type: 'eeprom', eID: '$202' },
+                    { type: 'eeprom', eID: '$203' },
+                    { type: 'eeprom', eID: '$210' },
+                    { type: 'eeprom', eID: '$211' },
+                    { type: 'eeprom', eID: '$212' },
+                    { type: 'eeprom', eID: '$213' },
+                    { type: 'eeprom', eID: '$220' },
+                    { type: 'eeprom', eID: '$221' },
+                    { type: 'eeprom', eID: '$222' },
+                    { type: 'eeprom', eID: '$223' },
+                    { type: 'eeprom', eID: '$338' },
+                    { type: 'eeprom', eID: '$339' },
+                    { type: 'eeprom', eID: '$650' },
+                    { type: 'eeprom', eID: '$651' },
+                    { type: 'eeprom', eID: '$652' },
+                    { type: 'eeprom', eID: '$653' },
+                    { type: 'eeprom', eID: '$654' },
+                    { type: 'eeprom', eID: '$655' },
+                    { type: 'eeprom', eID: '$656' },
+                    { type: 'eeprom', eID: '$657' },
+                    { type: 'eeprom', eID: '$658' },
+                    { type: 'eeprom', eID: '$659' },
+                    { type: 'eeprom', eID: '$660' },
+                    { type: 'eeprom', eID: '$661' },
+                    { type: 'eeprom', eID: '$662' },
+                    { type: 'eeprom', eID: '$663' },
                 ],
             },
         ],
