@@ -34,7 +34,7 @@ export function Config() {
                     onClick={navigateToSection}
                     activeSection={activeSection}
                 />
-                <div className="flex flex-col h-full max-h-[calc(100vh-64px)] w-4/5">
+                <div className="flex flex-col h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24">
                         <Search />
                         <ApplicationPreferences />

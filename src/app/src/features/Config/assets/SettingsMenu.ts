@@ -166,7 +166,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         settings: [
             {
-                label: 'Motors',
+                label: '',
                 settings: [
                     {
                         type: 'eeprom',
@@ -285,7 +285,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: CiLight,
         settings: [
             {
-                label: 'Status Lights',
+                label: '',
                 settings: [
                     {
                         type: 'eeprom',
@@ -644,7 +644,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: RxButton,
         settings: [
             {
-                label: 'Action',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$450' },
                     { type: 'eeprom', eID: '$451' },
@@ -661,7 +661,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: CiMapPin,
         settings: [
             {
-                label: 'Accessories',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$456' },
                     { type: 'eeprom', eID: '$457' },
@@ -804,7 +804,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: SiCoronaengine,
         settings: [
             {
-                label: 'Advanced Motors',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$0' },
                     { type: 'eeprom', eID: '$1' },
@@ -852,7 +852,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: MdOutlineReadMore,
         settings: [
             {
-                label: 'More Settings',
+                label: '',
                 settings: [
                     { type: 'eeprom', eID: '$10' },
                     { type: 'eeprom', eID: '$11' },

@@ -17,6 +17,7 @@ import { SettingSection } from 'app/features/Config/components/SettingSection.ts
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import { cn } from 'app/lib/utils.ts';
+import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
 
 interface SectionProps {
     title: string;
@@ -36,22 +37,38 @@ export function Section({
     id,
     eeprom = [],
 }: SectionProps) {
-    const { searchTerm } = useSettings();
+    const { searchTerm, connected } = useSettings();
 
     const filteredSettings = settings.filter((o) =>
         matchesSearchTerm(o, searchTerm),
     );
 
+    function onlyEEPROM(settings) {
+        return settings.filter((o) => o.type !== 'eeprom').length === 0;
+    }
+    let shownWarning = false;
+
     return (
-        <div id={id} className={cn({ hidden: filteredSettings.length === 0 })}>
+        <div id={id} className={''}>
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
             <div className="bg-white rounded-xl shadow p-6">
-                {settings.map((setting: gSenderSubSection, index) => (
-                    <SettingSection
-                        settings={setting.settings}
-                        label={setting.label}
-                    />
-                ))}
+                {filteredSettings.length === 0 && <EmptySectionWarning />}
+                {settings.map((setting: gSenderSubSection, index) => {
+                    if (!connected && onlyEEPROM(setting.settings)) {
+                        if (!shownWarning) {
+                            return <EmptySectionWarning />;
+                        } else {
+                            shownWarning = true;
+                            return <></>;
+                        }
+                    }
+                    return (
+                        <SettingSection
+                            settings={setting.settings}
+                            label={setting.label}
+                        />
+                    );
+                })}
             </div>
         </div>
     );

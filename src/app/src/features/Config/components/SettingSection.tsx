@@ -6,6 +6,7 @@ import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
+import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
