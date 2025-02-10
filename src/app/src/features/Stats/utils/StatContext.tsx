@@ -34,7 +34,7 @@ export function StatsProvider({ children }) {
     useEffect(() => {
         const fetchJobStats = async () => {
             const jobStatRes = await api.jobStats.fetch();
-            const { jobs, ...rest } = jobStatRes.data;
+            const { jobs = [], ...rest } = jobStatRes.data;
             setJobs(jobs);
             setJobAggregate(rest);
         };
