@@ -491,148 +491,187 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                 ],
             },
-        ],
-        eeprom: [
             {
                 label: 'Spindle',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$32',
+                        type: 'eeprom',
+                        eID: '$32',
                     },
                     {
-                        eId: '$395',
+                        type: 'eeprom',
+                        eID: '$395',
                     },
                     {
-                        eId: '$511',
+                        type: 'eeprom',
+                        eID: '$511',
                     },
                     {
-                        eId: '$512',
+                        type: 'eeprom',
+                        eID: '$512',
                     },
                     {
-                        eId: '$513',
+                        type: 'eeprom',
+                        eID: '$513',
                     },
                     {
-                        eId: '$520',
+                        type: 'eeprom',
+                        eID: '$520',
                     },
                     {
-                        eId: '$521',
+                        type: 'eeprom',
+                        eID: '$521',
                     },
                     {
-                        eId: '$522',
+                        type: 'eeprom',
+                        eID: '$522',
                     },
                     {
-                        eId: '$523',
+                        type: 'eeprom',
+                        eID: '$523',
                     },
                 ],
             },
             {
                 label: 'Spindle PWM',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$9',
+                        type: 'eeprom',
+                        eID: '$9',
                     },
                     {
-                        eId: '$16',
+                        type: 'eeprom',
+                        eID: '$16',
                     },
                     {
-                        eId: '$33',
+                        type: 'eeprom',
+                        eID: '$33',
                     },
                     {
-                        eId: '$34',
+                        type: 'eeprom',
+                        eID: '$34',
                     },
                     {
-                        eId: '$35',
+                        type: 'eeprom',
+                        eID: '$35',
                     },
                     {
-                        eId: '$36',
-                    },
-                ],
-            },
-            {
-                label: 'Spindle Modbus',
-                eeprom: [
-                    {
-                        eId: '$340',
-                    },
-                    {
-                        eId: '$374',
-                    },
-                    {
-                        eId: '$375',
-                    },
-                    {
-                        eId: '$462',
-                    },
-                    {
-                        eId: '$463',
-                    },
-                    {
-                        eId: '$464',
-                    },
-                    {
-                        eId: '$465',
-                    },
-                    {
-                        eId: '$466',
-                    },
-                    {
-                        eId: '$467',
-                    },
-                    {
-                        eId: '$468',
-                    },
-                    {
-                        eId: '$469',
-                    },
-                    {
-                        eId: '$470',
-                    },
-                    {
-                        eId: '$471',
-                    },
-                    {
-                        eId: '$476',
-                    },
-                    {
-                        eId: '$477',
-                    },
-                    {
-                        eId: '$478',
-                    },
-                    {
-                        eId: '$479',
+                        type: 'eeprom',
+                        eID: '$36',
                     },
                 ],
             },
             {
                 label: 'Laser',
-                eeprom: [
+                settings: [
                     {
-                        eId: '$743',
+                        type: 'eeprom',
+                        eID: '$743',
                     },
                     {
-                        eId: '$731',
+                        type: 'eeprom',
+                        eID: '$731',
                     },
                     {
-                        eId: '$730',
+                        type: 'eeprom',
+                        eID: '$730',
                     },
                     {
-                        eId: '$741',
+                        type: 'eeprom',
+                        eID: '$741',
                     },
                     {
-                        eId: '$742',
+                        type: 'eeprom',
+                        eID: '$742',
                     },
                     {
-                        eId: '$733',
+                        type: 'eeprom',
+                        eID: '$733',
                     },
                     {
-                        eId: '$734',
+                        type: 'eeprom',
+                        eID: '$734',
                     },
                     {
-                        eId: '$735',
+                        type: 'eeprom',
+                        eID: '$735',
                     },
                     {
-                        eId: '$736',
+                        type: 'eeprom',
+                        eID: '$736',
+                    },
+                ],
+            },
+            {
+                label: 'Spindle Modbus',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$340',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$374',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$375',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$462',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$463',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$464',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$465',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$466',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$467',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$468',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$469',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$470',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$471',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$476',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$477',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$478',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$479',
                     },
                 ],
             },

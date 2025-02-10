@@ -56,18 +56,19 @@ export function Section({
                 {settings.map((setting: gSenderSubSection, index) => {
                     if (!connected && onlyEEPROM(setting.settings)) {
                         if (!shownWarning) {
+                            shownWarning = true;
                             return <EmptySectionWarning />;
                         } else {
-                            shownWarning = true;
                             return <></>;
                         }
+                    } else {
+                        return (
+                            <SettingSection
+                                settings={setting.settings}
+                                label={setting.label}
+                            />
+                        );
                     }
-                    return (
-                        <SettingSection
-                            settings={setting.settings}
-                            label={setting.label}
-                        />
-                    );
                 })}
             </div>
         </div>
