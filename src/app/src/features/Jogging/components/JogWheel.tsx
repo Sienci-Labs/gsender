@@ -11,9 +11,12 @@ import {
     xPlusYPlus,
     xMinusYMinus,
     xMinusYPlus,
+    aPlusJog,
+    aMinusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
 
 import cn from 'classnames';
+import { useRegisterShortcuts } from 'app/features/Keyboard/useRegisterShortcuts';
 
 export interface JogWheelProps {
     canClick?: boolean;
@@ -80,6 +83,185 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             onFinish: stopContinuousJog,
         },
     )();
+
+    useRegisterShortcuts([
+        {
+            id: 'jog-x+',
+            title: 'Jog X+',
+            description: 'Move X axis in positive direction',
+            defaultKeys: 'shift+right',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                // Single step jog
+                xPlusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                // Start continuous jog
+                continuousJogAxis({ X: 1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                console.log('jog-x+ up');
+                // Stop continuous jog
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-x-',
+            title: 'Jog X-',
+            description: 'Move X axis in negative direction',
+            defaultKeys: 'shift+left',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                xMinusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ X: -1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-y+',
+            title: 'Jog Y+',
+            description: 'Move Y axis in positive direction',
+            defaultKeys: 'shift+up',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                yPlusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ Y: 1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-y-',
+            title: 'Jog Y-',
+            description: 'Move Y axis in negative direction',
+            defaultKeys: 'shift+down',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                yMinusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ Y: -1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-a+',
+            title: 'Jog A+',
+            description: 'Move A axis in positive direction',
+            defaultKeys: 'shift+right',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                aPlusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ A: 1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-a-',
+            title: 'Jog A-',
+            description: 'Move A axis in negative direction',
+            defaultKeys: 'shift+left',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                aMinusJog(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ A: -1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-x+y+',
+            title: 'Jog X+ Y+',
+            description: 'Move X and Y axis in positive direction',
+            defaultKeys: '',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                xPlusYPlus(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ X: 1, Y: 1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-x-y-',
+            title: 'Jog X- Y-',
+            description: 'Move X and Y axis in negative direction',
+            defaultKeys: '',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                xMinusYMinus(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ X: -1, Y: -1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-x+y-',
+            title: 'Jog X+ Y-',
+            description:
+                'Move X axis in positive direction and Y axis in negative direction',
+            defaultKeys: '',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                xPlusYMinus(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ X: 1, Y: -1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'jog-x-y+',
+            title: 'Jog X- Y+',
+            description:
+                'Move X axis in negative direction and Y axis in positive direction',
+            defaultKeys: '',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                xMinusYPlus(distance, feedrate, false);
+            },
+            onKeyDownHold: () => {
+                continuousJogAxis({ X: -1, Y: 1 }, feedrate);
+            },
+            onKeyUpHold: () => {
+                stopContinuousJog();
+            },
+        },
+        {
+            id: 'stop-jogging',
+            title: 'Stop Jogging',
+            description: 'Stop jogging',
+            defaultKeys: '',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                stopContinuousJog();
+            },
+        },
+    ]);
 
     const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
     const altColourClass = 'fill-robin-500 hover:fill-blue-400';

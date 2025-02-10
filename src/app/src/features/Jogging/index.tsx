@@ -88,25 +88,6 @@ export function Jogging() {
         setJogSpeed(values);
     }
 
-    useRegisterShortcut({
-        id: 'jog-xy',
-        description: 'Jog XY',
-        defaultKeys: 'x',
-        category: SHORTCUT_CATEGORY.JOGGING_CATEGORY,
-        onKeyDown: () => {
-            console.log('Single jog step');
-        },
-        onKeyDownHold: () => {
-            console.log('Starting continuous jog');
-        },
-        onKeyUp: () => {
-            console.log('Single jog complete');
-        },
-        onKeyUpHold: () => {
-            console.log('Stopping continuous jog');
-        },
-    });
-
     return (
         <>
             <div className="mt-4 flex flex-row w-full gap-2 justify-around items-center select-none">

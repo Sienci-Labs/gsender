@@ -22,17 +22,8 @@
  */
 
 import { useEffect, useState } from 'react';
-// import Modal from '@trendmicro/react-modal';
-import combokeys from 'app/lib/combokeys';
-import gamepad, { runAction } from 'app/lib/gamepad';
-import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-// import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
-import ProbeCircuitStatus from './ProbeCircuitStatus';
-import ProbeImage from './ProbeImage';
-import { PROBING_CATEGORY } from '../../constants';
-import useKeybinding from '../../lib/useKeybinding';
-import { Actions, State } from './definitions';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import {
     Dialog,
     DialogContent,
@@ -42,19 +33,20 @@ import {
 import { Button } from 'app/components/shadcn/Button';
 import cx from 'classnames';
 import { GamepadDetail } from 'app/lib/gamepad/definitions';
-import {
-    ShuttleControlEvents,
-    ShuttleEvent,
-} from 'app/lib/definitions/shortcuts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';
 
-interface Props {
+import ProbeCircuitStatus from './ProbeCircuitStatus';
+import ProbeImage from './ProbeImage';
+import { Actions, State } from './definitions';
+import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+
+interface RunProbeProps {
     state: State;
     actions: Actions;
 }
 
-const RunProbe = ({ actions, state }: Props) => {
+const RunProbe = ({ actions, state }: RunProbeProps) => {
     const {
         connectionMade,
         canClick,
@@ -76,26 +68,22 @@ const RunProbe = ({ actions, state }: Props) => {
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
 
-    const shuttleControlEvents: ShuttleControlEvents = {
-        START_PROBE: {
-            title: 'Start Probing',
-            keys: '',
-            cmd: 'START_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+    useRegisterShortcuts([
+        {
+            id: 'start-probe',
+            title: 'Start Probe',
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 startProbe();
             },
         },
-        CONFIRM_PROBE: {
+        {
+            id: 'confirm-probe',
             title: 'Confirm Probe',
-            keys: '',
-            cmd: 'CONFIRM_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 if (connectionMade) {
                     return;
                 }
@@ -105,7 +93,7 @@ const RunProbe = ({ actions, state }: Props) => {
                 actions.setProbeConnectivity(true);
             },
         },
-    };
+    ]);
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();
@@ -117,9 +105,6 @@ const RunProbe = ({ actions, state }: Props) => {
     };
 
     useEffect(() => {
-        addShuttleControlEvents();
-        useKeybinding(shuttleControlEvents);
-
         gamepad.on('gamepad:button', (event: GamepadDetail) =>
             runAction({ event }),
         );
@@ -127,27 +112,8 @@ const RunProbe = ({ actions, state }: Props) => {
         return () => {
             testInterval && clearInterval(testInterval);
             setTestInterval(null);
-            removeShuttleControlEvents();
         };
     }, []);
-
-    const addShuttleControlEvents = () => {
-        combokeys.reload();
-
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
-                .callback;
-            combokeys.on(eventName, callback);
-        });
-    };
-
-    const removeShuttleControlEvents = () => {
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
-                .callback;
-            combokeys.removeListener(eventName, callback);
-        });
-    };
 
     const { touchplateType } = touchplate;
     // const probeCommands = actions.generateProbeCommands();
@@ -173,12 +139,13 @@ const RunProbe = ({ actions, state }: Props) => {
                     <div className="flex flex-col justify-between pb-4">
                         <div className="text-black leading-snug">
                             <p className="mb-3">
-                                1. Check the tool is positioned correctly (pictured).
+                                1. Check the tool is positioned correctly
+                                (pictured).
                             </p>
                             <p className="mb-3">
-                                2. Lift your touch plate to the tool to check the
-                                circuit is good (indicated by a green light),
-                                then put it back where it was.{'\n'}
+                                2. Lift your touch plate to the tool to check
+                                the circuit is good (indicated by a green
+                                light), then put it back where it was.{'\n'}
                             </p>
                             <p className="mb-3">
                                 3. In some cases, holding the touch plate still

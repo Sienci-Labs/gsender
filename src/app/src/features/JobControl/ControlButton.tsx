@@ -19,6 +19,7 @@ import { PiPause } from 'react-icons/pi';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
 import { useEffect, useState } from 'react';
+import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -76,6 +77,36 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 
     useEffect(() => {
         setDisabled(isDisabled());
+    });
+
+    useRegisterShortcut({
+        id: 'start-job',
+        description: 'Start a job',
+        defaultKeys: '~',
+        category: 'CARVING_CATEGORY',
+        onKeyDown: () => {
+            handleRun();
+        },
+    });
+
+    useRegisterShortcut({
+        id: 'pause-job',
+        description: 'Pause a job',
+        defaultKeys: '~',
+        category: 'CARVING_CATEGORY',
+        onKeyDown: () => {
+            handlePause();
+        },
+    });
+
+    useRegisterShortcut({
+        id: 'stop-job',
+        description: 'Stop a job',
+        defaultKeys: '~',
+        category: 'CARVING_CATEGORY',
+        onKeyDown: () => {
+            handleStop();
+        },
     });
 
     const handleRun = (): void => {
