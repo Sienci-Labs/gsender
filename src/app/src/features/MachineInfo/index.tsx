@@ -29,7 +29,7 @@ const MachineInfo = () => {
         <div
             onMouseEnter={() => openCard(true)}
             onMouseLeave={() => openCard(false)}
-            className="w-[30px]"
+            className="z-50 w-[30px]"
         >
             <div className={cx('flex flex-col', { 'mt-[30px]': open })}>
                 <img src={icon} className="w-[30px]" />
