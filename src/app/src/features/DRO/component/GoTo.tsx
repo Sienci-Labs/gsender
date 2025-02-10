@@ -29,9 +29,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     });
 
     useEffect(() => {
-        console.log('effect firing');
         if (relativeMovement) {
-            console.log('abs');
             setMovementPos({
                 x: 0,
                 y: 0,
@@ -41,7 +39,6 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                 c: 0,
             });
         } else {
-            console.log('relative');
             setMovementPos({
                 ...movementPos,
                 x: Number(wpos.x),
@@ -54,11 +51,9 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     const onToggleSwap = () => {
         setRelativeMovement(!relativeMovement);
-        console.log(relativeMovement);
     };
 
     function goToLocation() {
-        console.log('called movement');
         const code = [];
         const unitModal = 'G90';
         const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?

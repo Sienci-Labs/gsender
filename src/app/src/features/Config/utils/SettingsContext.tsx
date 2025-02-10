@@ -167,8 +167,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     // Populate eeprom descriptions as needed
     useEffect(() => {
-        const globalValueReference = [];
-        let index = 0;
         if (!settings.length) {
             return;
         }
@@ -179,20 +177,22 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             ss.settings.map((s) => {
                 s.settings.map((o) => {
                     if (o.type == 'eeprom') {
-                        let oKey = Number(o.eID.replace('$', ''));
-                        let oEEPROM = detectedEEPROMDescriptions[oKey];
-                        o.description = get(oEEPROM, 'details', '');
-                        o.label = get(oEEPROM, 'description', '');
-                        console.log(o);
+                        const eID = get(o, 'eID', null);
+                        if (eID) {
+                            let oKey = Number(eID.replace('$', ''));
+                            let oEEPROM = get(
+                                detectedEEPROMDescriptions,
+                                oKey,
+                                '',
+                            );
+                            if (oEEPROM) {
+                                o.description = get(oEEPROM, 'details', '');
+                                o.label = get(oEEPROM, 'description', '');
+                            }
+                        }
                     }
-                    /*o.value = fetchStoreValue(o.key);
-                    o.globalIndex = index;
-                    o.defaultValue = fetchDefaultValue(o.key);
-                    globalValueReference.push({ ...o });
-                    index++;*/
                 });
             });
-            console.log(settings);
         });
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 

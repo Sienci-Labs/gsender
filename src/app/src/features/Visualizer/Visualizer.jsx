@@ -991,7 +991,6 @@ class Visualizer extends Component {
                 }
             }),
             pubsub.subscribe('outline:start', () => {
-                console.log('Outline called across the void');
                 if (this.outlineRunning) {
                     return;
                 }

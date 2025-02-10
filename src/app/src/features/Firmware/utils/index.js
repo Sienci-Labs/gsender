@@ -152,7 +152,7 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     }
 
     const orderedSettings = getOrderedSettings(machineProfile.id);
-    console.log(orderedSettings);
+
     const hasOrderedSettings = orderedSettings !== null;
 
     const values = [];
@@ -161,7 +161,6 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
     for (let [key, value] of Object.entries(eepromSettings)) {
         console.log(`${key}=${value}`);
         if (hasOrderedSettings && orderedSettings.has(key)) {
-            console.log(`skipping to add later: ${key}`);
             continue;
         }
 
