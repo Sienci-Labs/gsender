@@ -26,13 +26,14 @@ export type ShortcutActions = {
     onKeyUp?: (e: KeyboardEvent) => void;
 };
 
-export interface RegisterShortcutOptions {
+export type RegisterShortcutOptions = {
     id: string;
+    title: string;
     description?: string;
     defaultKeys: string;
-    category: string;
-    onKeyDown?: (e: KeyboardEvent) => void;
-    onKeyDownHold?: (e: KeyboardEvent) => void;
-    onKeyUp?: (e: KeyboardEvent) => void;
-    onKeyUpHold?: (e: KeyboardEvent) => void;
-}
+    category: ShortcutCategory;
+    onKeyDown?: () => void;
+    onKeyDownHold?: () => void;
+    onKeyUp?: () => void;
+    onKeyUpHold?: () => void;
+};
