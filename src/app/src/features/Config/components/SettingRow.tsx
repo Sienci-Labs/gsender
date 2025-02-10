@@ -10,6 +10,9 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { EEPROMSettingInput } from 'app/features/Config/components/SettingInputs/EEPROMSettingInput.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -77,6 +80,8 @@ function returnSettingControl(
                     onChange={handler}
                 />
             );
+        case 'eeprom':
+            return <EEPROMSettingInput index={index} eId={setting.eID} />;
         default:
             return setting.type;
     }
@@ -88,7 +93,17 @@ export function SettingRow({
     changeHandler,
 }: SettingRowProps): JSX.Element {
     const { settingsValues } = useSettings();
+    const connected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
     const populatedValue = settingsValues[setting.globalIndex] || {};
+    // if EEPROM or Hybrid and not connected, show nothing
+    if (
+        (setting.type === 'eeprom' || setting.type === 'hybrid') &&
+        !connected
+    ) {
+        return <div>Hidden</div>;
+    }
 
     return (
         <div className="odd:bg-gray-100 even:bg-white p-2 flex flex-row items-center">

@@ -39,7 +39,7 @@ export function Config() {
                         <Search />
                         <ApplicationPreferences />
                     </div>
-                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll relative no-scrollbar">
+                    <div className="px-10 gap-4 mt-4 mb-36 box-border flex-1 overflow-y-scroll relative no-scrollbar">
                         {settings.map((item, index) => {
                             return (
                                 <Section
