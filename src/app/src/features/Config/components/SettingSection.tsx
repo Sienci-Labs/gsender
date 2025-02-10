@@ -16,7 +16,7 @@ export function SettingSection({
     settings = [],
     label = null,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
+    const { setSettingsValues, setSettingsAreDirty, searchTerm, connected } =
         useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
@@ -36,7 +36,7 @@ export function SettingSection({
     return (
         <div
             className={cn({
-                'invisible opacity-0': filteredSettings.length === 0,
+                'hidden text-gray-600': filteredSettings.length === 0,
             })}
         >
             {label && (

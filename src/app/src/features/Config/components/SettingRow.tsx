@@ -10,9 +10,8 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
+import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 
@@ -82,6 +81,9 @@ function returnSettingControl(
                     onChange={handler}
                 />
             );
+        case 'event':
+            return <EventInput eventType={setting.eventType} />;
+
         default:
             return setting.type;
     }

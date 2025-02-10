@@ -36,7 +36,8 @@ export type gSenderSettingType =
     | 'radio'
     | 'ip'
     | 'hybrid'
-    | 'eeprom';
+    | 'eeprom'
+    | 'event';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -52,6 +53,7 @@ export interface gSenderSetting {
     value?: gSenderSettingsValues;
     defaultValue?: any;
     dirty?: boolean;
+    eventType?: string;
 }
 
 export interface gSenderSubSection {
@@ -703,7 +705,45 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
-    { label: 'Automations', icon: FaRobot },
+    {
+        label: 'Automations',
+        icon: FaRobot,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        label: 'File start',
+                        type: 'event',
+                        eventType: 'gcode:start',
+                        description:
+                            'Runs when you start a job, before the file itself runs',
+                    },
+                    {
+                        label: 'File pause',
+                        type: 'event',
+                        eventType: 'gcode:pause',
+                        description:
+                            "If you'd like to stop accessories or move out of the way when you pause during a job",
+                    },
+                    {
+                        label: 'File resume',
+                        type: 'event',
+                        eventType: 'gcode:resume',
+                        description:
+                            'Ensure that anything you set up for File pause is undone when you resume',
+                    },
+                    {
+                        label: 'File stop',
+                        type: 'event',
+                        eventType: 'gcode:stop',
+                        description:
+                            'A catch-all to ensure that stopped or ended jobs always safely turn everything off',
+                    },
+                ],
+            },
+        ],
+    },
     {
         label: 'Action Buttons',
         icon: RxButton,
