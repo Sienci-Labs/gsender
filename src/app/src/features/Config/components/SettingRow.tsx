@@ -13,6 +13,8 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -90,7 +92,23 @@ export function SettingRow({
     index,
     changeHandler,
 }: SettingRowProps): JSX.Element {
-    const { settingsValues } = useSettings();
+    const { settingsValues, setSettingsAreDirty, setEEPROM } = useSettings();
+
+    const handleSettingsChange = (index) => (value) => {
+        setSettingsAreDirty(true);
+        setEEPROM((prev) => {
+            const updated = [...prev];
+            updated[index].value = value;
+            updated[index].dirty = true;
+            return updated;
+        });
+    };
+
+    function handleSingleSettingReset(setting, value) {
+        controller.command('gcode', [`${setting}=${value}`, '$$']);
+        toast.success(`Restored ${setting} to default value of ${value}`);
+    }
+
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -107,8 +125,8 @@ export function SettingRow({
         return (
             <EEPROMSettingRow
                 eID={setting.eID}
-                changeHandler={() => {}}
-                resetHandler={() => {}}
+                changeHandler={handleSettingsChange}
+                resetHandler={handleSingleSettingReset}
             />
         );
     }
