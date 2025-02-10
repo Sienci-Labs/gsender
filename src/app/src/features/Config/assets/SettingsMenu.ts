@@ -37,7 +37,8 @@ export type gSenderSettingType =
     | 'ip'
     | 'hybrid'
     | 'eeprom'
-    | 'event';
+    | 'event'
+    | 'textarea';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -804,6 +805,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Code',
                         ],
                         key: 'workspace.toolChangeOption',
+                    },
+                    {
+                        type: 'textarea',
+                        key: 'workspace.toolChangeHooks.preHook',
+                        label: 'Before Tool Change',
+                        description:
+                            'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
+                    },
+                    {
+                        type: 'textarea',
+                        key: 'workspace.toolChangeHooks.postHook',
+                        label: 'After Tool Change',
+                        description:
+                            'When using the Code strategy, this code is run after a tool change is completed.',
                     },
                 ],
             },

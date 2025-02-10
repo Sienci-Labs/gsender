@@ -14,6 +14,7 @@ import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRo
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
+import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -83,7 +84,14 @@ function returnSettingControl(
             );
         case 'event':
             return <EventInput eventType={setting.eventType} />;
-
+        case 'textarea':
+            return (
+                <TextAreaInput
+                    value={value as string}
+                    index={index}
+                    onChange={handler}
+                />
+            );
         default:
             return setting.type;
     }
