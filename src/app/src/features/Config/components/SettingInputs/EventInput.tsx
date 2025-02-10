@@ -26,7 +26,6 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
                 trigger: 'gcode',
                 commands: eventCommands,
             });
-            console.log(res);
             const { record } = res.data;
             setEventData(record);
             setCommands(record.commands);
@@ -49,7 +48,6 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
 
         fetchCall().catch((e) => {
             toast.error(`Unable to fetch event data ${eventType}`),
-                console.log(e);
         });
     }, []);
     return (

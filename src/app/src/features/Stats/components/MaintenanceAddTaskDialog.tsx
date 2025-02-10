@@ -40,9 +40,8 @@ export function MaintenanceAddTaskDialog({
             return prev && prev.id > current.id ? prev : current;
         });
         newTask.id = maxIDTask.id + 1;
-        console.log(newTask);
+
         maintenanceTasks.push(newTask);
-        console.log(maintenanceTasks);
         setMaintenanceTasks([...maintenanceTasks]);
         maintenanceActions.update(maintenanceTasks);
         //updateTasks(tasks);
@@ -65,7 +64,6 @@ export function MaintenanceAddTaskDialog({
 
         addTask(payload);
         toggleShow(false);
-        console.log(payload);
     }
     return (
         <Dialog open={show} onOpenChange={toggleShow}>

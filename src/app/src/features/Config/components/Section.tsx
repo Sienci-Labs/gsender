@@ -38,9 +38,7 @@ export function Section({
 
     function onlyEEPROM(settings) {
         let onlyEEPROM = false;
-        settings.map((settingSec) => {
-            console.log(settingSec);
-        });
+        settings.map((settingSec) => {});
         return onlyEEPROM;
     }
     let shownWarning = false;
