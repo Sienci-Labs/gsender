@@ -34,4 +34,5 @@ export interface RegisterShortcutOptions {
     onKeyDown?: (e: KeyboardEvent) => void;
     onKeyDownHold?: (e: KeyboardEvent) => void;
     onKeyUp?: (e: KeyboardEvent) => void;
+    onKeyUpHold?: (e: KeyboardEvent) => void;
 }

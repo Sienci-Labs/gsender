@@ -21,6 +21,7 @@ export function useRegisterShortcut({
     onKeyDown,
     onKeyDownHold,
     onKeyUp,
+    onKeyUpHold,
 }: RegisterShortcutOptions) {
     const dispatch = useDispatch();
     const shortcut = useSelector(
@@ -51,6 +52,7 @@ export function useRegisterShortcut({
             onKeyDown,
             onKeyDownHold,
             onKeyUp,
+            onKeyUpHold,
         });
 
         return () => {
@@ -64,6 +66,7 @@ export function useRegisterShortcut({
         onKeyDown,
         onKeyDownHold,
         onKeyUp,
+        onKeyUpHold,
         dispatch,
     ]);
 
@@ -76,18 +79,12 @@ export function useRegisterShortcut({
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (matchesShortcut(e, shortcut.currentKeys)) {
-                // if (preventDefault) {
-                //     e.preventDefault();
-                // }
                 actionRegistry.executeKeyDown(id, e);
             }
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
             if (matchesShortcut(e, shortcut.currentKeys)) {
-                // if (preventDefault) {
-                //     e.preventDefault();
-                // }
                 actionRegistry.executeKeyUp(id, e);
             }
         };
