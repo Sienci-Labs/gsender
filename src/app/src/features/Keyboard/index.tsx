@@ -55,8 +55,13 @@ const KeyboardShortcuts = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [conflictingIds, setConflictingIds] = useState<string[]>([]);
-    const { capturedKeys, isCapturing, startCapturing, stopCapturing } =
-        useKeyboardCapture();
+    const {
+        capturedKeys,
+        isCapturing,
+        startCapturing,
+        stopCapturing,
+        resetCapture,
+    } = useKeyboardCapture();
 
     const categories = Object.entries(SHORTCUT_CATEGORY).map(
         ([key, label]) => ({
@@ -208,7 +213,7 @@ const KeyboardShortcuts = () => {
                 conflictingIds.includes(shortcut.id) ? 'bg-red-50' : undefined
             }
         >
-            <TableCell>
+            <TableCell className="w-[400px]">
                 <div>
                     <div className="font-medium">{shortcut.title}</div>
                     {shortcut.description && (
@@ -223,14 +228,27 @@ const KeyboardShortcuts = () => {
                     )}
                 </div>
             </TableCell>
-            <TableCell className="w-[700px]">
+            <TableCell className="w-[500px] min-w-[500px]">
                 <div className="flex items-center gap-4">
-                    <div className="w-[150px]">
-                        <kbd className="px-3 py-2 text-sm bg-gray-100 rounded w-full text-center block">
-                            {isCapturing
+                    <div className="w-[150px] min-w-[150px]">
+                        <kbd
+                            className={cn(
+                                'px-3 py-2 text-sm rounded w-full text-center block transition-all',
+                                editingId === shortcut.id
+                                    ? isCapturing
+                                        ? 'bg-blue-50 border-2 border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)] animate-pulse'
+                                        : capturedKeys
+                                          ? 'bg-blue-50 border-2 border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                                          : 'bg-gray-100'
+                                    : 'bg-gray-100',
+                            )}
+                        >
+                            {editingId === shortcut.id
                                 ? capturedKeys
                                     ? formatShortcut(capturedKeys)
-                                    : 'Press keys...'
+                                    : isCapturing
+                                      ? 'Press keys...'
+                                      : formatShortcut(shortcut.currentKeys)
                                 : formatShortcut(shortcut.currentKeys)}
                         </kbd>
                     </div>
@@ -262,6 +280,8 @@ const KeyboardShortcuts = () => {
                                     onClick={() => {
                                         setEditingId(null);
                                         dispatch(setIsEditing(false));
+                                        stopCapturing();
+                                        resetCapture();
                                     }}
                                     variant="ghost"
                                     size="sm"
@@ -278,7 +298,9 @@ const KeyboardShortcuts = () => {
                                     variant="outline"
                                     size="sm"
                                 >
-                                    Edit
+                                    {shortcut.currentKeys === ''
+                                        ? 'Add'
+                                        : 'Edit'}
                                 </Button>
                                 {renderShortcutResetButton(shortcut)}
                             </>
@@ -286,7 +308,7 @@ const KeyboardShortcuts = () => {
                     </div>
                 </div>
             </TableCell>
-            <TableCell>
+            <TableCell className="w-[150px] min-w-[150px]">
                 <span
                     className={cn(
                         'px-2 py-1 rounded-md font-medium inline-block',
@@ -297,7 +319,7 @@ const KeyboardShortcuts = () => {
                     {getCategoryData(shortcut.category).label}
                 </span>
             </TableCell>
-            <TableCell>
+            <TableCell className="w-[100px] min-w-[100px]">
                 <div className="flex items-center gap-2">
                     <Switch
                         checked={shortcut.isActive}
@@ -376,24 +398,8 @@ const KeyboardShortcuts = () => {
                 </TabsList>
 
                 <TabsContent value="all">
-                    <Table className="border border-gray-200">
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Action</TableHead>
-                                <TableHead>Shortcut</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {renderShortcuts(filteredShortcuts)}
-                        </TableBody>
-                    </Table>
-                </TabsContent>
-
-                {categories.map((category) => (
-                    <TabsContent key={category.id} value={category.id}>
-                        <Table className="border border-gray-200">
+                    <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                        <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Action</TableHead>
@@ -403,29 +409,51 @@ const KeyboardShortcuts = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {renderShortcuts(
-                                    category.shortcuts.filter((shortcut) => {
-                                        return searchQuery
-                                            ? shortcut.title
-                                                  .toLowerCase()
-                                                  .includes(
-                                                      searchQuery.toLowerCase(),
-                                                  ) ||
-                                                  shortcut.description
-                                                      ?.toLowerCase()
-                                                      .includes(
-                                                          searchQuery.toLowerCase(),
-                                                      ) ||
-                                                  shortcut.currentKeys
-                                                      .toLowerCase()
-                                                      .includes(
-                                                          searchQuery.toLowerCase(),
-                                                      )
-                                            : true;
-                                    }),
-                                )}
+                                {renderShortcuts(filteredShortcuts)}
                             </TableBody>
                         </Table>
+                    </div>
+                </TabsContent>
+
+                {categories.map((category) => (
+                    <TabsContent key={category.id} value={category.id}>
+                        <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Action</TableHead>
+                                        <TableHead>Shortcut</TableHead>
+                                        <TableHead>Category</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {renderShortcuts(
+                                        category.shortcuts.filter(
+                                            (shortcut) => {
+                                                return searchQuery
+                                                    ? shortcut.title
+                                                          .toLowerCase()
+                                                          .includes(
+                                                              searchQuery.toLowerCase(),
+                                                          ) ||
+                                                          shortcut.description
+                                                              ?.toLowerCase()
+                                                              .includes(
+                                                                  searchQuery.toLowerCase(),
+                                                              ) ||
+                                                          shortcut.currentKeys
+                                                              .toLowerCase()
+                                                              .includes(
+                                                                  searchQuery.toLowerCase(),
+                                                              )
+                                                    : true;
+                                            },
+                                        ),
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </TabsContent>
                 ))}
             </Tabs>
