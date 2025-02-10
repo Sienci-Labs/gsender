@@ -25,5 +25,7 @@ cypress.env.json
 .env.sentry-build-plugin
 
 
+**/application.css
 src/app/src/application.css
 src/app/src/routeTree.gen.ts
+src/app/src/application.css
