@@ -34,12 +34,12 @@ export function Config() {
                     onClick={navigateToSection}
                     activeSection={activeSection}
                 />
-                <div className="flex flex-col h-[800px] w-4/5">
+                <div className="flex flex-col h-full max-h-[calc(100vh-64px)] w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24">
                         <Search />
                         <ApplicationPreferences />
                     </div>
-                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll relative">
+                    <div className="px-10 gap-4 mt-4 box-border flex-1 overflow-y-scroll relative no-scrollbar">
                         {settings.map((item, index) => {
                             return (
                                 <Section

@@ -65,7 +65,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     }
 
     return (
-        <div className="fixed shadow flex px-4 rounded z-50 flex-row items-center -translate-x-1/2 max-w-5xl w-full justify-center bottom-16 left-1/2 h-24 bg-white border border-gray-200">
+        <div className="fixed shadow-inner flex px-4 rounded-lg bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-16 right-14 h-24 border border-gray-200">
             <div className="w-1/4">
                 <MachineProfileSelector />
             </div>
