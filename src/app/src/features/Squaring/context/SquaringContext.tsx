@@ -113,12 +113,12 @@ const initialMainSteps: MainStep[] = [
     {
         title: 'Mark Reference Points',
         description:
-            "First, we'll mark three points on your machine to measure from.",
+            "First, we'll mark three points on your machine in a triangle.",
         subSteps: [
             {
                 buttonLabel: 'Mark Point 1',
                 description:
-                    'Place a piece of tape with an X mark at the current position.',
+                    'Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.',
                 completed: false,
                 output: null,
                 shapeActions: [
@@ -133,8 +133,8 @@ const initialMainSteps: MainStep[] = [
                 ],
             },
             {
-                buttonLabel: 'Move X Axis',
-                description: 'Move the X axis to create a horizontal line.',
+                buttonLabel: 'Move X-axis',
+                description: 'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
                 value: 300,
                 completed: false,
                 output: null,
@@ -160,7 +160,7 @@ const initialMainSteps: MainStep[] = [
             {
                 buttonLabel: 'Mark Point 2',
                 description:
-                    'Place a piece of tape with an X mark at the current position.',
+                    'Now mark the second location with the second piece of tape.',
                 completed: false,
                 output: null,
                 shapeActions: [
@@ -183,8 +183,8 @@ const initialMainSteps: MainStep[] = [
                 ],
             },
             {
-                buttonLabel: 'Move Y Axis',
-                description: 'Move the Y axis to create a vertical line.',
+                buttonLabel: 'Move Y-axis',
+                description: 'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
                 value: 300,
                 completed: false,
                 output: null,
@@ -218,7 +218,7 @@ const initialMainSteps: MainStep[] = [
             {
                 buttonLabel: 'Mark Point 3',
                 description:
-                    'Place a piece of tape with an X mark at the current position.',
+                    'Place the last piece of tape with an X mark at the current position.',
                 completed: false,
                 output: null,
                 shapeActions: [
@@ -253,7 +253,7 @@ const initialMainSteps: MainStep[] = [
     {
         title: 'Take Measurements',
         description:
-            "Now, measure the distances between the points you've marked.",
+            "Now, measure the distances between the points you've marked and enter them below.",
         subSteps: [
             {
                 buttonLabel: 'Measure Distance 1-2',
