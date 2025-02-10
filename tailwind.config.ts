@@ -21,6 +21,9 @@ export default {
       transitionProperty: {
         width: "width",
       },
+      height: {
+        "content-area": "calc(100vh-64px)",
+      },
       colors: {
         robin: {
           50: "#f6f9fc",

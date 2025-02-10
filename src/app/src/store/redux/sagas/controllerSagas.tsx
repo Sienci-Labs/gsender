@@ -593,8 +593,6 @@ export function* initialize(): Generator<any, void, any> {
                 title,
                 instructions,
             });
-
-            red;
         }
     });
 

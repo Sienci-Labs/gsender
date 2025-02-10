@@ -40,7 +40,7 @@ export function SettingSection({
             })}
         >
             {label && (
-                <h2 className="text-blue-500 border-bottom border-blue-500">
+                <h2 className="text-blue-500 border-b border-blue-500 mt-4 text-xl">
                     {label}
                 </h2>
             )}
