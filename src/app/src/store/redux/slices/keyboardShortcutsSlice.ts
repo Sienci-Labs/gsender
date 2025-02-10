@@ -61,6 +61,12 @@ const keyboardShortcutsSlice = createSlice({
             });
             saveShortcuts(state.shortcuts);
         },
+        toggleAllShortcuts: (state) => {
+            Object.keys(state.shortcuts).forEach((id) => {
+                state.shortcuts[id].isActive = !state.shortcuts[id].isActive;
+            });
+            saveShortcuts(state.shortcuts);
+        },
     },
 });
 
@@ -70,6 +76,7 @@ export const {
     resetShortcut,
     setIsEditing,
     resetAllShortcuts,
+    toggleAllShortcuts,
 } = keyboardShortcutsSlice.actions;
 
 export default keyboardShortcutsSlice.reducer;
