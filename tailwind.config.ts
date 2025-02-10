@@ -8,14 +8,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   important: true,
-  purge: {
+  /*purge: {
     enabled: false,
   },
   safelist: [
     {
       pattern: /./, // the "." means "everything"
     },
-  ],
+  ],*/
   theme: {
     extend: {
       transitionProperty: {
