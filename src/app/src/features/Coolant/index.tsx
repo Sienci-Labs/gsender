@@ -1,14 +1,17 @@
-import { IndicatorButton } from 'app/components/IndicatorButton';
+import { connect } from 'react-redux';
 import { FaShower } from 'react-icons/fa6';
 import { FaWater } from 'react-icons/fa';
 import { FaBan } from 'react-icons/fa6';
 import get from 'lodash/get';
-import { connect } from 'react-redux';
+
 import {
     startMist,
     startFlood,
     stopCoolant,
 } from 'app/features/Coolant/utils/actions.ts';
+import { IndicatorButton } from 'app/components/IndicatorButton';
+
+import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -16,6 +19,39 @@ export interface CoolantProps {
 }
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
+    useRegisterShortcuts([
+        {
+            id: 'start-mist',
+            title: 'Start Mist',
+            description: 'Start mist',
+            defaultKeys: '',
+            category: 'COOLANT_CATEGORY',
+            onKeyDown: () => {
+                startMist();
+            },
+        },
+        {
+            id: 'start-flood',
+            title: 'Start Flood',
+            description: 'Start flood',
+            defaultKeys: '',
+            category: 'COOLANT_CATEGORY',
+            onKeyDown: () => {
+                startFlood();
+            },
+        },
+        {
+            id: 'stop-coolant',
+            title: 'Stop Coolant',
+            description: 'Stop coolant',
+            defaultKeys: '',
+            category: 'COOLANT_CATEGORY',
+            onKeyDown: () => {
+                stopCoolant();
+            },
+        },
+    ]);
+
     return (
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-around w-full">

@@ -4,6 +4,7 @@ import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging.ts';
 import store from 'app/store';
 import get from 'lodash/get';
 import { JogValueObject } from 'app/features/Jogging';
+import { useRegisterShortcuts } from 'app/features/Keyboard/useRegisterShortcuts';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;
@@ -35,6 +36,60 @@ interface SpeedSelectorProps {
 export function SpeedSelector({ onClick }: SpeedSelectorProps) {
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
+
+    useRegisterShortcuts([
+        {
+            id: 'jog-speed-rapid-select',
+            title: 'Select Rapid Speed',
+            description: 'Select Rapid speed',
+            defaultKeys: 'shift+v',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                setSelectedSpeed('Rapid');
+            },
+        },
+        {
+            id: 'jog-speed-normal-select',
+            title: 'Select Normal Speed',
+            description: 'Select Normal speed',
+            defaultKeys: 'shift+c',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                setSelectedSpeed('Normal');
+            },
+        },
+        {
+            id: 'jog-speed-precise-select',
+            title: 'Select Precise Speed',
+            description: 'Select Precise speed',
+            defaultKeys: 'shift+x',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                setSelectedSpeed('Precise');
+            },
+        },
+        {
+            id: 'jog-speed-cycle',
+            title: 'Cycle Speed',
+            description: 'Cycle through speeds',
+            defaultKeys: 'shift+z',
+            category: 'JOGGING_CATEGORY',
+            onKeyDown: () => {
+                const presets = [
+                    'Rapid',
+                    'Normal',
+                    'Precise',
+                ] as JoggingSpeedOptions[];
+                const nextIndex =
+                    presets.findIndex((preset) => preset === selectedSpeed) + 1;
+                const key = presets[nextIndex]
+                    ? presets[nextIndex]
+                    : presets[0];
+
+                setSelectedSpeed(key);
+            },
+        },
+    ]);
 
     const rapidActive = selectedSpeed === 'Rapid';
     const normalActive = selectedSpeed === 'Normal';

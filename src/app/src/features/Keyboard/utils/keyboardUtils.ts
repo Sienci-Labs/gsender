@@ -50,6 +50,7 @@ export function eventToShortcut(e: KeyboardEvent): string {
 
 // Convert a shortcut string to a more readable format
 export function formatShortcut(shortcut: string): string {
+    if (shortcut === '') return '...';
     return shortcut
         .split('+')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

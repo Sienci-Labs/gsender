@@ -21,49 +21,45 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import cx from 'classnames';
-import combokeys from 'app/lib/combokeys';
-import gamepad, { runAction } from 'app/lib/gamepad';
-import useKeybinding from '../../lib/useKeybinding';
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
+
+import { Button } from 'app/components/shadcn/Button';
+
+import { METRIC_UNITS } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeDirectionSelection from './ProbeDirectionSelection';
-import {
-    ShuttleControlEvents,
-    ShuttleEvent,
-} from 'app/lib/definitions/shortcuts';
 import { Actions, State } from './definitions';
-import { GamepadDetail } from 'app/lib/gamepad/definitions';
-import { Button } from 'app/components/shadcn/Button';
-
-interface Props {
+import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+interface ProbeProps {
     state: State;
     actions: Actions;
 }
 
-const Probe: React.FC<Props> = ({ state, actions }) => {
-    const shuttleControlEvents: ShuttleControlEvents = {
-        OPEN_PROBE: {
+const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
+    useRegisterShortcuts([
+        {
+            id: 'open-probe',
             title: 'Open Probe',
-            keys: '',
-            cmd: 'OPEN_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 actions.onOpenChange(true);
             },
         },
-        PROBE_ROUTINE_SCROLL_RIGHT: {
+        {
+            id: 'close-probe',
+            title: 'Close Probe',
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+        },
+        {
+            id: 'probe-routine-scroll-right',
             title: 'Probe Routine Scroll Right',
-            keys: '',
-            cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 const { availableProbeCommands, selectedProbeCommand } = state;
 
                 let newIndex = selectedProbeCommand + 1;
@@ -73,14 +69,12 @@ const Probe: React.FC<Props> = ({ state, actions }) => {
                 actions.handleProbeCommandChange(newIndex);
             },
         },
-        PROBE_ROUTINE_SCROLL_LEFT: {
+        {
+            id: 'probe-routine-scroll-left',
             title: 'Probe Routine Scroll Left',
-            keys: '',
-            cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 const { availableProbeCommands, selectedProbeCommand } = state;
 
                 let newIndex = selectedProbeCommand - 1;
@@ -90,14 +84,12 @@ const Probe: React.FC<Props> = ({ state, actions }) => {
                 actions.handleProbeCommandChange(newIndex);
             },
         },
-        PROBE_DIAMETER_SCROLL_UP: {
+        {
+            id: 'probe-diameter-scroll-up',
             title: 'Probe Diameter Scroll Up',
-            keys: '',
-            cmd: 'PROBE_DIAMETER_SCROLL_UP',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 const { toolDiameter, availableTools, units } = state;
                 const toolUnits =
                     units === METRIC_UNITS
@@ -116,14 +108,12 @@ const Probe: React.FC<Props> = ({ state, actions }) => {
                 });
             },
         },
-        PROBE_DIAMETER_SCROLL_DOWN: {
+        {
+            id: 'probe-diameter-scroll-down',
             title: 'Probe Diameter Scroll Down',
-            keys: '',
-            cmd: 'PROBE_DIAMETER_SCROLL_DOWN',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
+            defaultKeys: '',
+            category: 'PROBING_CATEGORY',
+            onKeyDown: () => {
                 const { toolDiameter, availableTools, units } = state;
                 const toolUnits =
                     units === METRIC_UNITS
@@ -142,37 +132,7 @@ const Probe: React.FC<Props> = ({ state, actions }) => {
                 });
             },
         },
-    };
-
-    const addShuttleControlEvents = () => {
-        combokeys.reload();
-
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
-                .callback;
-            combokeys.on(eventName, callback);
-        });
-    };
-
-    const removeShuttleControlEvents = () => {
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
-                .callback;
-            combokeys.removeListener(eventName, callback);
-        });
-    };
-
-    useEffect(() => {
-        addShuttleControlEvents();
-        useKeybinding(shuttleControlEvents);
-        gamepad.on('gamepad:button', (event: GamepadDetail) =>
-            runAction({ event }),
-        );
-
-        return () => {
-            removeShuttleControlEvents();
-        };
-    }, []);
+    ]);
 
     const {
         canClick,

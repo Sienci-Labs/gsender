@@ -18,7 +18,6 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     IMPERIAL_UNITS,
     LASER_MODE,
-    SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
@@ -27,8 +26,8 @@ import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
 import SpindleSelector from './components/SpindleSelector';
-import useKeybinding from '../../lib/useKeybinding';
 import { roundMetric, round } from '../../lib/rounding';
+import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 
 interface SpindleState {
     minimized: boolean;
@@ -565,52 +564,40 @@ const SpindleWidget = () => {
         },
     };
 
-    const shuttleControlEvents = {
-        TOGGLE_SPINDLE_LASER_MODE: {
+    useRegisterShortcuts([
+        {
+            id: 'toggle-spindle-laser-mode',
             title: 'Toggle Mode',
-            keys: '',
-            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: actions.handleModeToggle,
+            description: 'Toggle between spindle and laser mode',
+            defaultKeys: '',
+            category: 'SPINDLE_LASER_CATEGORY',
+            onKeyDown: () => actions.handleModeToggle,
         },
-        CW_LASER_ON: {
+        {
+            id: 'm3-cw-laser-on',
             title: 'CW / Laser On',
-            keys: '',
-            cmd: 'CW_LASER_ON',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () =>
-                state.mode === LASER_MODE
-                    ? actions.sendLaserM3()
-                    : actions.sendM3(),
+            description: 'CW / Laser On',
+            defaultKeys: '',
+            category: 'SPINDLE_LASER_CATEGORY',
+            onKeyDown: () => actions.sendLaserM3,
         },
-        CCW_LASER_TEST: {
+        {
+            id: 'm3-ccw-laser-test',
             title: 'CCW / Laser Test',
-            keys: '',
-            cmd: 'CCW_LASER_TEST',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () =>
-                state.mode === LASER_MODE
-                    ? actions.runLaserTest()
-                    : actions.sendM4(),
+            description: 'CCW / Laser Test',
+            defaultKeys: '',
+            category: 'SPINDLE_LASER_CATEGORY',
+            onKeyDown: () => actions.runLaserTest,
         },
-        STOP_LASER_OFF: {
+        {
+            id: 'stop-laser-off',
             title: 'Stop / Laser Off',
-            keys: '',
-            cmd: 'STOP_LASER_OFF',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: actions.sendM5,
+            description: 'Stop / Laser Off',
+            defaultKeys: '',
+            category: 'SPINDLE_LASER_CATEGORY',
+            onKeyDown: () => actions.sendM5,
         },
-    };
-
-    useKeybinding(shuttleControlEvents);
+    ]);
 
     const active = getSpindleActiveState();
 

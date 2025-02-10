@@ -35,6 +35,8 @@ import {
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
 
+import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
+
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [recentFiles, setRecentFiles] = useState<any[]>([]);
@@ -42,10 +44,36 @@ const ButtonControlGroup = () => {
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
-        pubsub.subscribe((msg, files) => {
-            setRecentFiles(files);
-        }, 'recentFiles');
+        const token = pubsub.subscribe(
+            'recentFiles',
+            (_: string, files: string[]) => {
+                setRecentFiles(files);
+            },
+        );
+        return () => {
+            pubsub.unsubscribe(token);
+        };
     }, []);
+
+    useRegisterShortcut({
+        id: 'load-file',
+        description: 'Load a file',
+        defaultKeys: 'shift+l',
+        category: 'CARVING_CATEGORY',
+        onKeyDown: () => {
+            handleClickLoadFile();
+        },
+    });
+
+    useRegisterShortcut({
+        id: 'unload-file',
+        description: 'Unload a file',
+        defaultKeys: 'shift+k',
+        category: 'CARVING_CATEGORY',
+        onKeyDown: () => {
+            handleCloseFile();
+        },
+    });
 
     const handleLoadFile = async (
         event: React.ChangeEvent<HTMLInputElement>,
