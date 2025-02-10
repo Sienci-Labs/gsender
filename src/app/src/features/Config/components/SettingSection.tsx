@@ -34,7 +34,11 @@ export function SettingSection({
     );
 
     return (
-        <div className={cn({ hidden: filteredSettings.length === 0 })}>
+        <div
+            className={cn({
+                'invisible opacity-0': filteredSettings.length === 0,
+            })}
+        >
             {label && (
                 <h2 className="text-blue-500 border-bottom border-blue-500">
                     {label}

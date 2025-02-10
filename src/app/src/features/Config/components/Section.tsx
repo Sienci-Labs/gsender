@@ -37,19 +37,29 @@ export function Section({
     const filterEmpty = filteredSettings.length === 0;
 
     function onlyEEPROM(settings) {
-        return settings.filter((o) => o.type !== 'eeprom').length === 0;
+        let onlyEEPROM = false;
+        settings.map((settingSec) => {
+            console.log(settingSec);
+        });
+        return onlyEEPROM;
     }
     let shownWarning = false;
 
     return (
-        <div id={id} className={cn({ 'invisible opacity-0': filterEmpty })}>
+        <div
+            id={id}
+            className={cn({
+                'bg-blue-500':
+                    filterEmpty || (!connected && onlyEEPROM(settings)),
+            })}
+        >
             <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
             <div className="bg-white rounded-xl shadow p-6">
                 {settings.map((setting: gSenderSubSection, index) => {
                     if (!connected && onlyEEPROM(setting.settings)) {
                         if (!shownWarning) {
                             shownWarning = true;
-                            return <EmptySectionWarning />;
+                            return <></>;
                         } else {
                             return <></>;
                         }

@@ -166,12 +166,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         settings: [
             {
-                label: '',
+                label: 'General',
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$3',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$37',
+                    },
+                ],
+            },
+            {
+                label: 'X-axis',
+                settings: [
                     {
                         type: 'eeprom',
                         eID: '$100',
@@ -188,9 +197,51 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$120',
                     },
+                ],
+            },
+            {
+                label: 'Y-axis',
+                settings: [
                     {
                         type: 'eeprom',
-                        eID: '$150',
+                        eID: '$8',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$101',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$151',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$111',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$121',
+                    },
+                ],
+            },
+            {
+                label: 'Z-axis',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$102',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$152',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$112',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$122',
                     },
                 ],
             },
@@ -203,6 +254,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$6',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$668',
+                    },
                     {
                         label: 'Touch Plate Type',
                         key: 'workspace.probeProfile.touchplateType',
@@ -263,18 +322,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'A safe check to make sure your probe is connected correctly',
                         type: 'boolean',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$6',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$668',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$',
                     },
                 ],
             },
@@ -427,6 +474,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        type: 'eeprom',
+                        eID: '$32',
+                    },
+                    {
                         label: 'Delay after start',
                         key: 'workspace.spindleDelay',
                         description:
@@ -452,51 +503,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'hybrid',
                         eID: '$30',
                         unit: 'rpm',
-                    },
-                    {
-                        label: 'Minimum Laser Power',
-                        key: 'widgets.spindle.laser.minPower',
-                        description:
-                            'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
-                        type: 'hybrid',
-                        eID: '$731',
-                        unit: '',
-                    },
-                    {
-                        label: 'Maximum Laser Power',
-                        key: 'widgets.spindle.laser.maxPower',
-                        description:
-                            'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
-                        type: 'hybrid',
-                        eID: '$730',
-                        unit: '',
-                    },
-                    {
-                        label: 'Laser X Offset',
-                        key: 'widgets.spindle.laser.xOffset',
-                        description:
-                            'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
-                        type: 'hybrid',
-                        eID: '$741',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Laser Y Offset',
-                        key: 'widgets.spindle.laser.yOffset',
-                        description:
-                            'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
-                        type: 'hybrid',
-                        eID: '$742',
-                        unit: 'rpm',
-                    },
-                ],
-            },
-            {
-                label: 'Spindle',
-                settings: [
-                    {
-                        type: 'eeprom',
-                        eID: '$32',
                     },
                     {
                         type: 'eeprom',
@@ -558,47 +564,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$36',
-                    },
-                ],
-            },
-            {
-                label: 'Laser',
-                settings: [
-                    {
-                        type: 'eeprom',
-                        eID: '$743',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$731',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$730',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$741',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$742',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$733',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$734',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$735',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$736',
                     },
                 ],
             },
@@ -675,6 +640,67 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                 ],
             },
+            {
+                label: 'Laser',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$743',
+                    },
+                    {
+                        label: 'Minimum Laser Power',
+                        key: 'widgets.spindle.laser.minPower',
+                        description:
+                            'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
+                        type: 'hybrid',
+                        eID: '$731',
+                        unit: '',
+                    },
+                    {
+                        label: 'Maximum Laser Power',
+                        key: 'widgets.spindle.laser.maxPower',
+                        description:
+                            'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
+                        type: 'hybrid',
+                        eID: '$730',
+                        unit: '',
+                    },
+                    {
+                        label: 'Laser X Offset',
+                        key: 'widgets.spindle.laser.xOffset',
+                        description:
+                            'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
+                        type: 'hybrid',
+                        eID: '$741',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Laser Y Offset',
+                        key: 'widgets.spindle.laser.yOffset',
+                        description:
+                            'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
+                        type: 'hybrid',
+                        eID: '$742',
+                        unit: 'rpm',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$733',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$734',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$735',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$736',
+                    },
+                ],
+            },
         ],
     },
     { label: 'Automations', icon: FaRobot },
@@ -718,6 +744,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    { type: 'eeprom', eID: '$376' },
                     {
                         label: 'Resolution',
                         key: 'workspace.rotaryAxis.firmwareSettings.$101',
@@ -736,6 +763,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$113',
                         unit: 'rpm',
                     },
+                    { type: 'eeprom', eID: '$123' },
                     {
                         label: 'Force Hard Limits',
                         key: '',
@@ -750,8 +778,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Updates soft limits when toggling into rotary mode',
                         type: 'boolean',
                     },
-                    { type: 'eeprom', eID: '$376' },
-                    { type: 'eeprom', eID: '$123' },
                 ],
             },
         ],
