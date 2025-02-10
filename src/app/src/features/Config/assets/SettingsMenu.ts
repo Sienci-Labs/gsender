@@ -784,7 +784,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        label: 'Passthrough',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.passthrough',
+                        description:
+                            'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands',
+                    },
+                    {
                         type: 'select',
+                        label: 'Strategy',
+                        description:
+                            'Strategy that gSender will use to handle tool change commands *add description of currently selected strategy',
                         options: [
                             'Pause',
                             'Ignore',
@@ -793,7 +803,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Fixed Tool Sensor',
                             'Code',
                         ],
-                        key: '',
+                        key: 'workspace.toolChangeOption',
                     },
                 ],
             },
