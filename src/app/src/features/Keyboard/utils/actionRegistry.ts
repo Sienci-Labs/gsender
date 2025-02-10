@@ -52,7 +52,8 @@ class ActionRegistry {
                 if (this.activeKeys.has(id)) {
                     // Only execute hold action if key is still being held
                     actions.onKeyDownHold?.(e);
-                    // Mark that we're in hold mode
+                    // Prevent keyDown from executing on key up
+                    this.keyDownExecuted.add(id);
                     this.isHoldActive.add(id);
                 }
             }, this.HOLD_DELAY);
@@ -74,17 +75,20 @@ class ActionRegistry {
             clearTimeout(this.holdTimers.get(id));
             this.holdTimers.delete(id);
 
-            // If key was released before hold timer and we haven't executed any action yet
-            if (!this.isHoldActive.has(id)) {
-                actions.onKeyDown?.(e);
-                actions.onKeyUp?.(e);
+            // If key was released before hold timer and keyDown hasn't executed yet
+            if (!this.keyDownExecuted.has(id) && actions.onKeyDown) {
+                actions.onKeyDown(e);
             }
         }
 
-        // If we were in hold mode, execute hold-specific cleanup
+        // Execute the appropriate key up handler
         if (this.isHoldActive.has(id)) {
-            actions.onKeyUpHold?.(e);
+            // If this was a hold action, use onKeyUpHold if available, otherwise fall back to onKeyUp
+            actions.onKeyUpHold?.(e) ?? actions.onKeyUp?.(e);
             this.isHoldActive.delete(id);
+        } else {
+            // For normal key presses, use onKeyUp
+            actions.onKeyUp?.(e);
         }
 
         this.activeKeys.delete(id);
