@@ -61,7 +61,7 @@ export function Stats() {
                 </StatCard>
                 <ExternalLink
                     title={'Resources'}
-                    link={''}
+                    link={'https://resources.sienci.com/view/gs-using-gsender/'}
                     icon={<FaBookBookmark />}
                 >
                     Learn about starting with gSender and how to use specific
@@ -69,12 +69,16 @@ export function Stats() {
                 </ExternalLink>
                 <ExternalLink
                     title={'Community'}
-                    link={''}
+                    link={'https://forum.sienci.com/c/gsender/14'}
                     icon={<ImBubbles4 />}
                 >
                     Have conversations with our friendly and helpful community
                 </ExternalLink>
-                <ExternalLink title={'Github'} link={''} icon={<FaGithub />}>
+                <ExternalLink
+                    title={'Github'}
+                    link={'https://github.com/Sienci-Labs/gsender'}
+                    icon={<FaGithub />}
+                >
                     Submit issues or grab the latest version of gSender
                 </ExternalLink>
                 <AlarmPreview />

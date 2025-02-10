@@ -15,8 +15,10 @@ export function ExternalLink({
     icon,
 }: ExternalLinkProps): JSX.Element {
     return (
-        <Link
-            to={link}
+        <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
             className="drop-shadow-md hover:scale-105 rounded border-top border-2 border-t-blue-500 p-3 border-rounded-t flex flex-row items-center justify-between gap-4 flex-grow"
         >
             <div className={'flex flex-row gap-2 flex-shrink-0'}>
@@ -31,6 +33,6 @@ export function ExternalLink({
             <div className="fill-blue-500 text-blue-500 flex align-end items-center flex-grow-1">
                 <FaExternalLinkAlt />
             </div>
-        </Link>
+        </a>
     );
 }
