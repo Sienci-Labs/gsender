@@ -1540,6 +1540,8 @@ class GrblController {
                         flood: '',
                     };
 
+                    const hasSpindle = modal.spindle !== 'M5';
+
                     if (modal.coolant) {
                         if (modal.coolant.includes('M7')) {
                             coolant.mist = 'M7';
@@ -1570,7 +1572,9 @@ class GrblController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
-                    modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
+                    if (hasSpindle) {
+                        modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
+                    }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
                         modalGCode.push(`G0 G90 G21 A${(Number(aVal) % 360).toFixed(3)}`);
