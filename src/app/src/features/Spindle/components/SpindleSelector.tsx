@@ -34,7 +34,8 @@ const SpindleSelector = ({ spindles, onChange, spindle }: Props) => {
                 placeholder="Default Spindle"
                 value={spindle}
                 onChange={onChange}
-                className="w-full"
+                className="w-full z-10"
+                menuPlacement="top"
             />
         </div>
     );
