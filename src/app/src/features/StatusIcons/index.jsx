@@ -14,7 +14,7 @@ const StatusIcons = () => {
     const [headlessSettings, setHeadlessSettings] = useState({});
 
     useEffect(() => {
-        actions.fetchSettings(setHeadlessSettings);
+        //actions.fetchSettings(setHeadlessSettings);
 
         const gameConnectHandler = () => {
             const gamepads = navigator.getGamepads();

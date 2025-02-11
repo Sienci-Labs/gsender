@@ -28,4 +28,3 @@ cypress.env.json
 **/application.css
 src/app/src/application.css
 src/app/src/routeTree.gen.ts
-src/app/src/application.css

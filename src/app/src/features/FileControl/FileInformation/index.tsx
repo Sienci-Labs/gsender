@@ -45,8 +45,14 @@ const FileInformation = () => {
 
     const fileSize = formatFileSize(size);
     const ToggleOutput = toggleInfo ? Info : Size;
-    const cutName = name.substring(0, name.indexOf('.') - 3);
-    const extension = name.slice(name.indexOf('.') - 3);
+    console.log(name);
+
+    let cutName = '';
+    let extension;
+    if (name && name.length > 0) {
+        cutName = name.substring(0, name.indexOf('.') - 3);
+        extension = name.slice(name.indexOf('.') - 3);
+    }
 
     return (
         <div className="flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm max-w-full">
@@ -72,12 +78,12 @@ const FileInformation = () => {
                 <span>({total} lines)</span>
             </div>
 
-            {path && (
+            {/*path && (
                 <div className="text-gray-500 text-sm">
                     <span>Path</span>
                     <span>{path}</span>
                 </div>
-            )}
+            )*/}
 
             <div className="flex gap-2 min-w-64 self-center justify-center items-center">
                 <div className="flex flex-col items-center mr-1">
