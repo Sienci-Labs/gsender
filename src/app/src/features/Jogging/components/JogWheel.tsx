@@ -92,16 +92,12 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             defaultKeys: 'shift+right',
             category: 'JOGGING_CATEGORY',
             onKeyDown: () => {
-                // Single step jog
                 xPlusJog(distance, feedrate, false);
             },
             onKeyDownHold: () => {
-                // Start continuous jog
                 continuousJogAxis({ X: 1 }, feedrate);
             },
             onKeyUpHold: () => {
-                console.log('jog-x+ up');
-                // Stop continuous jog
                 stopContinuousJog();
             },
         },
@@ -157,7 +153,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             id: 'jog-a+',
             title: 'Jog A+',
             description: 'Move A axis in positive direction',
-            defaultKeys: 'shift+right',
+            defaultKeys: 'shift+1',
             category: 'JOGGING_CATEGORY',
             onKeyDown: () => {
                 aPlusJog(distance, feedrate, false);
@@ -173,7 +169,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             id: 'jog-a-',
             title: 'Jog A-',
             description: 'Move A axis in negative direction',
-            defaultKeys: 'shift+left',
+            defaultKeys: 'shift+2',
             category: 'JOGGING_CATEGORY',
             onKeyDown: () => {
                 aMinusJog(distance, feedrate, false);
