@@ -11,9 +11,11 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
     const notificationColor = colorsMap[notification.type];
 
     return (
-        <div className="min-h-12 max-h-48 flex border bg-gray-200 w-full">
+        <div className="flex border bg-gray-200 w-full">
             <div className={`min-h-full min-w-4 ${notificationColor}`} />
-            <div className="py-2 px-4">{notification.message}</div>
+            <div className="py-2 px-4 flex items-center">
+                {notification.message}
+            </div>
         </div>
     );
 };
