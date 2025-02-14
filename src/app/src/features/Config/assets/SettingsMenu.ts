@@ -350,7 +350,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Limits and Homing',
+        label: 'Homing/Limits',
         icon: FaHome,
         settings: [
             {
