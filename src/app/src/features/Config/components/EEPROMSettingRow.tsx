@@ -95,10 +95,7 @@ export function EEPROMSettingRow({
                         onChange={changeHandler(EEPROMData.globalIndex)}
                     />
                 </div>
-                <span className="w-1/5 text-xs px-4 flex flex-row gap-2">
-                    <span className="text-gray-400 text-4xl opacity-40">
-                        <FaMicrochip />
-                    </span>
+                <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (
                         <button
                             className="text-3xl"
@@ -121,6 +118,9 @@ export function EEPROMSettingRow({
                             <BiReset />
                         </button>
                     )}
+                    <span className="text-robin-500 text-4xl">
+                        <FaMicrochip />
+                    </span>
                 </span>
                 <span className="text-gray-500 text-sm w-2/5">
                     {detailString}

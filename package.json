@@ -348,6 +348,7 @@
     "react-hook-form": "^7.52.2",
     "react-icons": "^5.3.0",
     "react-infinite-tree": "~0.7.1",
+    "react-intersection-observer": "^9.15.1",
     "react-markdown": "^8.0.3",
     "react-qr-code": "^2.0.11",
     "react-redux": "^7.2.4",

@@ -9,10 +9,23 @@ import {
     useSettings,
 } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
+import { useInView, InView } from 'react-intersection-observer';
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
     const [showFlashDialog, setShowFlashDialog] = React.useState(false);
+    const { inViewRef, inView } = useInView({
+        threshold: 0.2,
+    });
+    const [visibleSection, setVisibleSection] = React.useState([]);
+
+    function setInView(inView, entry) {
+        console.log('onChange');
+        if (inView) {
+            console.log(entry);
+            setVisibleSection(entry.target.getAttribute('id'));
+        }
+    }
 
     const { settings } = useSettings();
 
@@ -32,7 +45,7 @@ export function Config() {
                 <Menu
                     menu={SettingsMenu}
                     onClick={navigateToSection}
-                    activeSection={activeSection}
+                    activeSection={visibleSection}
                 />
                 {
                     //h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]
@@ -42,17 +55,31 @@ export function Config() {
                         <Search />
                         <ApplicationPreferences />
                     </div>
-                    <div className="px-10 gap-4 mt-4 mb-36 box-border flex-1 overflow-y-scroll relative no-scrollbar">
+                    <div
+                        className="px-10 gap-4 mt-4 mb-36 box-border flex-1 overflow-y-scroll relative no-scrollbar"
+                        ref={inViewRef}
+                    >
                         {settings.map((item, index) => {
                             return (
-                                <Section
-                                    title={item.label}
-                                    key={`section-${index}`}
-                                    id={`section-${index}`}
-                                    index={index}
-                                    settings={item.settings}
-                                    eeprom={item.eeprom}
-                                />
+                                <InView
+                                    key={`IV-section-${index}`}
+                                    onChange={setInView}
+                                    threshold={0.2}
+                                >
+                                    {({ ref }) => {
+                                        return (
+                                            <Section
+                                                title={item.label}
+                                                key={`section-${index}`}
+                                                id={`section-${index}`}
+                                                index={index}
+                                                settings={item.settings}
+                                                eeprom={item.eeprom}
+                                                ref={ref}
+                                            />
+                                        );
+                                    }}
+                                </InView>
                             );
                         })}
                         <ProfileBar
