@@ -39,6 +39,7 @@ const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const SurfacingTool = () => {
     const surfacingConfig = new WidgetConfig('surfacing');
+    const [tabSwitch, setTabSwitch] = useState(false);
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
@@ -295,38 +296,51 @@ const SurfacingTool = () => {
                             />
                         </div>
                     </div>
-                    <Tabs defaultValue="gcode-viewer">
-                        <TabsList>
-                            <TabsTrigger
-                                value="gcode-viewer"
-                                className="text-blue-500"
-                            >
-                                G-code Viewer
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="visualizer-preview"
-                                className="text-blue-500"
-                            >
-                                Visualizer Preview
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                            value="gcode-viewer"
-                            className="p-4 h-[600px] border border-gray-500 rounded relative"
-                        >
-                            <GcodeViewer gcode={gcode} />
-                        </TabsContent>
-                        <TabsContent
-                            value="visualizer-preview"
-                            className="h-[600px] border border-gray-500 rounded"
+                    <div className="flex flex-col">
+                        <Tabs defaultValue="visualizer-preview">
+                            <TabsList>
+                                <TabsTrigger
+                                    value="visualizer-preview"
+                                    className="text-blue-500"
+                                    onClick={() => setTabSwitch(false)}
+                                >
+                                    Visualizer Preview
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="gcode-viewer"
+                                    className="text-blue-500"
+                                    onClick={() => setTabSwitch(true)}
+                                >
+                                    G-code Viewer
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+
+                        <div
+                            className={cx(
+                                'h-[600px] border border-gray-500 rounded',
+                                {
+                                    hidden: tabSwitch,
+                                },
+                            )}
                         >
                             <Visualizer
                                 gcode={gcode}
                                 surfacing={surfacing}
                                 // isSecondary
                             />
-                        </TabsContent>
-                    </Tabs>
+                        </div>
+                        <div
+                            className={cx(
+                                'p-4 h-[600px] border border-gray-500 rounded relative',
+                                {
+                                    hidden: !tabSwitch,
+                                },
+                            )}
+                        >
+                            <GcodeViewer gcode={gcode} />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-4 w-4/5 m-auto">

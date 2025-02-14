@@ -1,4 +1,5 @@
 import { Label } from 'app/components/Label';
+import { noop } from 'lodash';
 
 interface JogInputProps {
     label: string;
@@ -12,6 +13,7 @@ export function JogInput({ label, currentValue }: JogInputProps) {
             <input
                 className="w-[8ch] border border-gray-200 rounded px-2 text-gray-500"
                 value={currentValue}
+                onChange={noop}
             />
         </div>
     );
