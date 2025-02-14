@@ -8,10 +8,17 @@ import { FaRegKeyboard } from 'react-icons/fa6';
 import gamepad from 'app/lib/gamepad';
 
 import actions from '../RemoteMode/apiActions';
+import { RemoteModeDialog } from 'app/features/RemoteMode';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
     const [headlessSettings, setHeadlessSettings] = useState({});
+    const [showRemoteDialog, setShowRemoteDialog] = useState(false);
+
+    function toggleRemoteModeDialog(e) {
+        e.preventDefault();
+        setShowRemoteDialog(!showRemoteDialog);
+    }
 
     useEffect(() => {
         //actions.fetchSettings(setHeadlessSettings);
@@ -61,9 +68,9 @@ const StatusIcons = () => {
 
     return (
         <div className="flex flex-row gap-4 absolute top-4 right-4">
-            <Link
+            <button
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/configuration'}
+                onClick={toggleRemoteModeDialog}
             >
                 <MdPhonelinkRing
                     className={cx('w-7 h-7', {
@@ -71,7 +78,7 @@ const StatusIcons = () => {
                         'text-green-500': headlessSettings.headlessStatus,
                     })}
                 />
-            </Link>
+            </button>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                 to={'/configuration'}
@@ -89,6 +96,10 @@ const StatusIcons = () => {
                     })}
                 />
             </Link>
+            <RemoteModeDialog
+                showRemote={showRemoteDialog}
+                onClose={() => setShowRemoteDialog(false)}
+            />
         </div>
     );
 };

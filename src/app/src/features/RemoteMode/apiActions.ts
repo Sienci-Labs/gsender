@@ -7,7 +7,7 @@ export interface HeadlessSettings {
     headlessStatus: boolean;
 }
 
-const actions = {
+export const actions = {
     fetchSettings: async (
         setHeadlessSettings: (settings: HeadlessSettings) => void,
         setOldSettings: (settings: HeadlessSettings) => void,
