@@ -15,7 +15,7 @@ export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
     const [showFlashDialog, setShowFlashDialog] = React.useState(false);
     const { inViewRef, inView } = useInView({
-        threshold: 0.3,
+        threshold: 0.2,
     });
     const [visibleSection, setVisibleSection] = React.useState('section-0');
 
@@ -54,7 +54,7 @@ export function Config() {
                         <ApplicationPreferences />
                     </div>
                     <div
-                        className="px-10 gap-4 mt-4 mb-36 box-border flex-1 overflow-y-scroll relative no-scrollbar"
+                        className="px-10 gap-8 mt-4 mb-36 box-border flex flex-col overflow-y-scroll relative no-scrollbar"
                         ref={inViewRef}
                     >
                         {settings.map((item, index) => {
@@ -62,7 +62,7 @@ export function Config() {
                                 <InView
                                     key={`IV-section-${index}`}
                                     onChange={setInView}
-                                    threshold={0.3}
+                                    threshold={0.2}
                                 >
                                     {({ ref }) => {
                                         return (
