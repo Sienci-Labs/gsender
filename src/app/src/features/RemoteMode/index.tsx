@@ -17,6 +17,7 @@ import Button from 'app/components/Button';
 import Toggle from 'app/components/Switch/Toggle.tsx';
 import { useState } from 'react';
 import { toast } from 'app/lib/toaster';
+import { actions } from './apiActions.ts';
 
 export function RemoteModeDialog({ showRemote, onClose }) {
     const [port, setPort] = useState(8000);
@@ -43,6 +44,11 @@ export function RemoteModeDialog({ showRemote, onClose }) {
         e.preventDefault();
 
         onClose(false);
+        actions.saveSettings({
+            ip,
+            port,
+            headlessStatus: remoteEnabled,
+        });
         toast.success('Updated Wireless Control Settings');
     }
 
