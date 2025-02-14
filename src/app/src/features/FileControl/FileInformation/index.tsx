@@ -77,12 +77,12 @@ const FileInformation = () => {
                 <span>({total} lines)</span>
             </div>
 
-            {/*path && (
+            {path && (
                 <div className="text-gray-500 text-sm">
                     <span>Path</span>
                     <span>{path}</span>
                 </div>
-            )*/}
+            )}
 
             <div className="flex gap-2 min-w-64 self-center justify-center items-center">
                 <div className="flex flex-col items-center mr-1">
