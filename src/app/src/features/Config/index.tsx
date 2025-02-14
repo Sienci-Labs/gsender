@@ -15,14 +15,12 @@ export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
     const [showFlashDialog, setShowFlashDialog] = React.useState(false);
     const { inViewRef, inView } = useInView({
-        threshold: 0.2,
+        threshold: 0.3,
     });
-    const [visibleSection, setVisibleSection] = React.useState([]);
+    const [visibleSection, setVisibleSection] = React.useState('section-0');
 
     function setInView(inView, entry) {
-        console.log('onChange');
         if (inView) {
-            console.log(entry);
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }
@@ -64,7 +62,7 @@ export function Config() {
                                 <InView
                                     key={`IV-section-${index}`}
                                     onChange={setInView}
-                                    threshold={0.2}
+                                    threshold={0.3}
                                 >
                                     {({ ref }) => {
                                         return (
