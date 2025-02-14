@@ -16,29 +16,54 @@ import {
 import Button from 'app/components/Button';
 import Toggle from 'app/components/Switch/Toggle.tsx';
 import { useState } from 'react';
+import { toast } from 'app/lib/toaster';
 
 export function RemoteModeDialog({ showRemote, onClose }) {
     const [port, setPort] = useState(8000);
-    const [ips, setIps] = useState(['192.168.0.10']);
+    const [ips, setIps] = useState([]);
     const [ip, setIp] = useState('192.168.0.10');
+    const [remoteEnabled, setRemoteEnabled] = useState(false);
+    const [dirty, setDirty] = useState(false);
+
+    function toggleRemoteMode() {
+        setDirty(true);
+        setRemoteEnabled(!remoteEnabled);
+    }
+
+    function updatePort(e) {
+        e.preventDefault();
+        setPort(e.target.value);
+    }
+
+    function onIPSelect(v) {
+        setIp(v);
+    }
+
+    function saveRemotePreferences(e) {
+        e.preventDefault();
+
+        onClose(false);
+        toast.success('Updated Wireless Control Settings');
+    }
 
     return (
         <Dialog open={showRemote} onOpenChange={onClose}>
             <DialogContent className="bg-white w-[750px] text-sm">
                 <form>
-                    <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                    </DialogHeader>
+                    <DialogHeader></DialogHeader>
                     <div className="grid grid-cols-2 text-gray-600 grid-">
                         <div className="flex flex-col gap-8 px-4">
                             <h1 className="text-2xl text-blue-500">
-                                Enable Wireless CNC Control
+                                Wireless CNC Control
                             </h1>
                             <div className="flex flex-row gap-4 items-center">
                                 <span className="font-bold">
                                     Enable Wireless Control
                                 </span>
-                                <Toggle onChange={() => {}} />
+                                <Toggle
+                                    onChange={toggleRemoteMode}
+                                    checked={remoteEnabled}
+                                />
                             </div>
                             <p>
                                 Choose your settings below. In most cases the
@@ -68,6 +93,7 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                                     className="border border-gray-200 rounded p-2 focus:outline-none w-full"
                                     type="number"
                                     value={port}
+                                    onChange={updatePort}
                                 />
                             </div>
                             <p className={'text-gray-600 text-sm'}>
@@ -76,7 +102,13 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                                 updated.
                             </p>
                             <hr />
-                            <Button color="primary">Save</Button>
+                            <Button
+                                color="primary"
+                                disabled={!dirty}
+                                onClick={saveRemotePreferences}
+                            >
+                                Save
+                            </Button>
                         </div>
 
                         <QRCodeDisplay />

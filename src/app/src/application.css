@@ -1194,6 +1194,9 @@ video {
 .w-2\.5 {
   width: 0.625rem !important;
 }
+.w-2\/3 {
+  width: 66.666667% !important;
+}
 .w-2\/5 {
   width: 40% !important;
 }
