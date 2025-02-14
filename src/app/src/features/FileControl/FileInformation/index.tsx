@@ -45,7 +45,6 @@ const FileInformation = () => {
 
     const fileSize = formatFileSize(size);
     const ToggleOutput = toggleInfo ? Info : Size;
-    console.log(name);
 
     let cutName = '';
     let extension;

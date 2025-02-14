@@ -1098,9 +1098,6 @@ video {
 .h-px {
   height: 1px !important;
 }
-.max-h-48 {
-  max-height: 12rem !important;
-}
 .max-h-6 {
   max-height: 1.5rem !important;
 }
@@ -1121,9 +1118,6 @@ video {
 }
 .min-h-10 {
   min-height: 2.5rem !important;
-}
-.min-h-12 {
-  min-height: 3rem !important;
 }
 .min-h-20 {
   min-height: 5rem !important;
