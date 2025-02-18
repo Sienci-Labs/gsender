@@ -67,7 +67,7 @@ const StatusIcons = () => {
             </Link>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/gamepad-shortcuts'}
+                to={'/gamepad'}
             >
                 <LuGamepad2
                     className={cx('w-7 h-7', {
