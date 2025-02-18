@@ -38,7 +38,8 @@ export type gSenderSettingType =
     | 'hybrid'
     | 'eeprom'
     | 'event'
-    | 'textarea';
+    | 'textarea'
+    | 'wizard';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -79,6 +80,7 @@ export interface gSenderEEPROMSetting {
 
 export interface gSenderEEPROMSettingSection {
     label: string;
+    wizard?: React.ReactNode
     eeprom: gSenderEEPROMSetting[];
 }
 
