@@ -209,9 +209,14 @@ const KeyboardShortcuts = () => {
     const renderShortcutRow = (shortcut: KeyboardShortcut) => (
         <TableRow
             key={shortcut.id}
-            className={
-                conflictingIds.includes(shortcut.id) ? 'bg-red-50' : undefined
-            }
+            className={cn(
+                { 'bg-red-50': conflictingIds.includes(shortcut.id) },
+                {
+                    'bg-gray-300 opacity-50 pointer-events-none':
+                        editingId !== null && shortcut.id !== editingId,
+                },
+                { 'hover:bg-gray-50': editingId === null },
+            )}
         >
             <TableCell className="w-[400px]">
                 <div>
@@ -340,46 +345,38 @@ const KeyboardShortcuts = () => {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
-                <p className="text-gray-600">
-                    Configure keyboard shortcuts for various actions
-                </p>
-                <div className="flex gap-2">
-                    <Input
-                        type="text"
-                        placeholder="Search shortcuts..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="max-w-sm"
-                    />
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline">
-                                Reset All to Default
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Reset All Shortcuts
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Are you sure you want to reset all keyboard
-                                    shortcuts to their default values? This
-                                    action cannot be undone.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={handleResetAllShortcuts}
-                                >
-                                    Reset All
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </div>
+            <div className="flex items-center mb-4 gap-2 justify-end">
+                <Input
+                    type="text"
+                    placeholder="Search shortcuts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="outline">Reset All to Default</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Reset All Shortcuts
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to reset all keyboard
+                                shortcuts to their default values? This action
+                                cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleResetAllShortcuts}
+                            >
+                                Reset All
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
 
             <Tabs defaultValue="all" className="w-full">
