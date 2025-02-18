@@ -19,12 +19,7 @@ import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/shadcn/Input';
 import defaultState from 'app/store/defaultState';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';
@@ -102,15 +97,10 @@ const SurfacingTool = () => {
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
-        // onClose();
     };
 
     return (
-        <div>
-            <div className="flex items-center mb-0 border-solid border-gray-400 h-16">
-                <h2 className="text-2xl font-bold">Surfacing Tool</h2>
-            </div>
-
+        <>
             <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
@@ -364,7 +354,7 @@ const SurfacingTool = () => {
                     </Link>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

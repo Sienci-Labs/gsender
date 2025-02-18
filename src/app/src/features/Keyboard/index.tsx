@@ -341,12 +341,9 @@ const KeyboardShortcuts = () => {
     return (
         <>
             <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
-                <div>
-                    <h1 className="text-2xl font-bold">Keyboard Shortcuts</h1>
-                    <p className="text-gray-600">
-                        Configure keyboard shortcuts for various actions
-                    </p>
-                </div>
+                <p className="text-gray-600">
+                    Configure keyboard shortcuts for various actions
+                </p>
                 <div className="flex gap-2">
                     <Input
                         type="text"
