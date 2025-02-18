@@ -7,6 +7,7 @@ import { Button } from 'app/components/shadcn/Button';
 type PageProps = {
     children: React.ReactNode;
     title: string;
+    description?: string;
     withBorder?: boolean;
     withPadding?: boolean;
     withGoBackButton?: boolean;
@@ -15,6 +16,7 @@ type PageProps = {
 const Page = ({
     children,
     title,
+    description,
     withBorder,
     withPadding = true,
     withGoBackButton,
@@ -31,7 +33,12 @@ const Page = ({
             )}
         >
             <div className="flex items-center justify-between mb-4 pb-4 min-h-12 border-b border-gray-200 rounded-b-lg">
-                <h1 className="text-3xl font-bold">{title}</h1>
+                <div>
+                    <h1 className="text-3xl font-bold">{title}</h1>
+                    {description && (
+                        <p className="text-gray-500">{description}</p>
+                    )}
+                </div>
 
                 {withGoBackButton && (
                     <Button
