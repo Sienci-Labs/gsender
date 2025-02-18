@@ -11,11 +11,19 @@ const linkStyle = tv({
     },
 });
 
-function StatMenuLink({ label, href, end = false }) {
+function StatMenuLink({
+    label,
+    href,
+    end = false,
+}: {
+    label: string;
+    href: string;
+    end?: boolean;
+}) {
     return (
         <li className="me-2">
             <Link to={href} end={end} activeOptions={{ exact: true }}>
-                {({ isActive }) => (
+                {({ isActive }: { isActive: boolean }) => (
                     <span className={linkStyle({ isActive })}>{label}</span>
                 )}
             </Link>
@@ -31,6 +39,7 @@ export function StatMenu() {
                 <StatMenuLink label="Jobs" href={'/stats/jobs'} />
                 <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />
                 <StatMenuLink label="Alarms" href={'/stats/alarms'} />
+                <StatMenuLink label="About" href={'/stats/about'} />
             </ul>
         </div>
     );
