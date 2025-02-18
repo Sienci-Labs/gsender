@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useCanGoBack } from '@tanstack/react-router';
 import { LuArrowLeft } from 'react-icons/lu';
 
 import { Button } from 'app/components/shadcn/Button';
@@ -20,6 +20,8 @@ const Page = ({
     withGoBackButton,
 }: PageProps) => {
     const navigate = useRouter();
+    const canGoBack = useCanGoBack();
+
     return (
         <div
             className={cn(
@@ -30,10 +32,15 @@ const Page = ({
         >
             <div className="flex items-center justify-between mb-4 min-h-12">
                 <h1 className="text-3xl font-bold">{title}</h1>
+
                 {withGoBackButton && (
                     <Button
                         variant="outline"
-                        onClick={() => navigate.history.back()}
+                        onClick={() =>
+                            canGoBack
+                                ? navigate.history.back()
+                                : navigate({ to: '/' })
+                        }
                         size="lg"
                         className="flex items-center justify-center"
                     >
