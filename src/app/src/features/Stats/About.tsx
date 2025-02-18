@@ -1,4 +1,5 @@
 import Markdown from 'react-markdown';
+import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
 import releases from 'app/features/Preferences/About/releases.json';
@@ -110,17 +111,17 @@ const About = () => {
                                 <Markdown
                                     key={element}
                                     components={{
-                                        h3: (props) => (
+                                        h3: (props: ReactMarkdownProps) => (
                                             <h3 className="text-xl font-bold mt-4 underline">
                                                 {props.children}
                                             </h3>
                                         ),
-                                        ul: (props) => (
+                                        ul: (props: ReactMarkdownProps) => (
                                             <ul className="ml-4 list-disc [&>li]:mt-2 ">
                                                 {props.children}
                                             </ul>
                                         ),
-                                        li: (props) => (
+                                        li: (props: ReactMarkdownProps) => (
                                             <li className="leading-7">
                                                 {props.children}
                                             </li>
