@@ -5,9 +5,6 @@ import { MdPhonelinkRing } from 'react-icons/md';
 import { LuGamepad2 } from 'react-icons/lu';
 import { FaRegKeyboard } from 'react-icons/fa6';
 
-import gamepad from 'app/lib/gamepad';
-
-import actions from '../RemoteMode/apiActions';
 import { RemoteModeDialog } from 'app/features/RemoteMode';
 
 const StatusIcons = () => {
@@ -15,7 +12,7 @@ const StatusIcons = () => {
     const [headlessSettings, setHeadlessSettings] = useState({});
     const [showRemoteDialog, setShowRemoteDialog] = useState(false);
 
-    function toggleRemoteModeDialog(e) {
+    function toggleRemoteModeDialog(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         setShowRemoteDialog(!showRemoteDialog);
     }
@@ -47,23 +44,6 @@ const StatusIcons = () => {
                 gameDisconnectHandler,
             );
         };
-
-        // gamepad.on('gamepad:connected', () => {
-        //     console.log('hi');
-        //     setGamePadConnected(true);
-        // });
-        // gamepad.on('gamepad:disconnected', setGamePadConnected(false));
-
-        // return () => {
-        //     gamepad.removeEventListener(
-        //         'gamepad:connected',
-        //         setGamePadConnected(true),
-        //     );
-        //     gamepad.removeEventListener(
-        //         'gamepad:disconnected',
-        //         setGamePadConnected(false),
-        //     );
-        // };
     }, []);
 
     return (
@@ -81,13 +61,13 @@ const StatusIcons = () => {
             </button>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/configuration'}
+                to={'/keyboard-shortcuts'}
             >
                 <FaRegKeyboard className="text-green-500 w-7 h-7" />
             </Link>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/configuration'}
+                to={'/gamepad-shortcuts'}
             >
                 <LuGamepad2
                     className={cx('w-7 h-7', {
