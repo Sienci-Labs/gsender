@@ -19,6 +19,7 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
+import React from "react";
 
 export interface SettingsMenuSection {
     label: string;
@@ -56,6 +57,7 @@ export interface gSenderSetting {
     defaultValue?: any;
     dirty?: boolean;
     eventType?: string;
+    wizard?: React.ReactNode;
 }
 
 export interface gSenderSubSection {
