@@ -29,7 +29,7 @@ const Page = ({
             className={cn(
                 withBorder && 'border',
                 withPadding && 'p-4',
-                'w-full',
+                'w-full flex flex-col h-full',
             )}
         >
             <div className="flex items-center justify-between mb-4 pb-4 min-h-12 border-b border-gray-200 rounded-b-lg">
