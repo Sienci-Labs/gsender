@@ -65,8 +65,12 @@ const About = () => {
 
         if (releaseNotes.length === 0) {
             return (
-                <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center justify-center h-full gap-2">
                     <p>No release notes found</p>
+
+                    <Button onClick={fetchReleaseNotes} variant="outline">
+                        Retry
+                    </Button>
                 </div>
             );
         }
