@@ -140,7 +140,7 @@ export function SettingRow({
     }
 
     return (
-        <div className="p-2 flex flex-row items-center odd:bg-gray-100 even:bg-white text-gray-700">
+        <div className="p-2 flex flex-row items-center odd:bg-gray-100 even:bg-gray-50 text-gray-700">
             <span className="w-1/5">{setting.label}</span>
             <span className="w-1/5 text-xs px-4">
                 {returnSettingControl(

@@ -39,7 +39,7 @@ export function Config() {
 
     return (
         <SettingsProvider>
-            <div className="w-full flex flex-grow-0 shadow bg-gray-50 overflow-y-hidden box-border no-scrollbar">
+            <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar">
                 <Menu
                     menu={SettingsMenu}
                     onClick={navigateToSection}

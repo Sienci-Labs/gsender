@@ -58,7 +58,7 @@ export const Section = React.forwardRef(
                 ref={ref}
             >
                 <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
-                <div className="bg-white rounded-xl shadow p-6">
+                <div className="bg-gray-100 rounded-xl shadow p-6">
                     {settings.map((setting: gSenderSubSection, index) => {
                         if (!connected && onlyEEPROM(setting.settings)) {
                             if (!shownWarning) {
@@ -81,57 +81,3 @@ export const Section = React.forwardRef(
         );
     },
 );
-
-/*
-export const Section = React.forwardRef({
-    title,
-    settings = [],
-    key,
-    id,
-    eeprom = [],
-}: SectionProps, ref)  => {
-    const { searchTerm, connected } = useSettings();
-
-    const filteredSettings = settings.filter((o) =>
-        matchesSearchTerm(o, searchTerm),
-    );
-
-    const filterEmpty = filteredSettings.length === 0;
-
-    function onlyEEPROM(settings) {
-        let onlyEEPROM = false;
-        settings.map((settingSec) => {});
-        return onlyEEPROM;
-    }
-    let shownWarning = false;
-
-    return (
-        <div
-            id={id}
-            className={cn({
-                hidden: filterEmpty || (!connected && onlyEEPROM(settings)),
-            })}
-        >
-            <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
-            <div className="bg-white rounded-xl shadow p-6">
-                {settings.map((setting: gSenderSubSection, index) => {
-                    if (!connected && onlyEEPROM(setting.settings)) {
-                        if (!shownWarning) {
-                            shownWarning = true;
-                            return <></>;
-                        } else {
-                            return <></>;
-                        }
-                    } else {
-                        return (
-                            <SettingSection
-                                settings={setting.settings}
-                                label={setting.label}
-                            />
-                        );
-                    }
-                })}
-            </div>
-        </div>
-    );
-})*/
