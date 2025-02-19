@@ -344,7 +344,7 @@ const KeyboardShortcuts = () => {
     );
 
     return (
-        <>
+        <div className="flex flex-col gap-4 h-full">
             <div className="flex items-center mb-4 gap-2 justify-end">
                 <Input
                     type="text"
@@ -379,20 +379,26 @@ const KeyboardShortcuts = () => {
                 </AlertDialog>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
-                <TabsList className="mb-4 flex flex-wrap h-auto gap-2">
-                    <TabsTrigger value="all">
-                        All Shortcuts ({filteredShortcuts.length})
-                    </TabsTrigger>
-                    {categories.map((category) => (
-                        <TabsTrigger key={category.id} value={category.id}>
-                            {category.label} ({category.shortcuts.length})
+            <div className="relative flex-1 min-h-0">
+                <Tabs
+                    defaultValue="all"
+                    className="flex flex-col absolute inset-0"
+                >
+                    <TabsList className="flex flex-wrap h-auto gap-2 mb-4">
+                        <TabsTrigger value="all">
+                            All Shortcuts ({filteredShortcuts.length})
                         </TabsTrigger>
-                    ))}
-                </TabsList>
+                        {categories.map((category) => (
+                            <TabsTrigger key={category.id} value={category.id}>
+                                {category.label} ({category.shortcuts.length})
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
 
-                <TabsContent value="all">
-                    <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                    <TabsContent
+                        value="all"
+                        className="flex-1 overflow-auto border rounded-md border-gray-200"
+                    >
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -406,12 +412,14 @@ const KeyboardShortcuts = () => {
                                 {renderShortcuts(filteredShortcuts)}
                             </TableBody>
                         </Table>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
 
-                {categories.map((category) => (
-                    <TabsContent key={category.id} value={category.id}>
-                        <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                    {categories.map((category) => (
+                        <TabsContent
+                            key={category.id}
+                            value={category.id}
+                            className="flex-1 overflow-auto border rounded-md border-gray-200"
+                        >
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -447,11 +455,11 @@ const KeyboardShortcuts = () => {
                                     )}
                                 </TableBody>
                             </Table>
-                        </div>
-                    </TabsContent>
-                ))}
-            </Tabs>
-        </>
+                        </TabsContent>
+                    ))}
+                </Tabs>
+            </div>
+        </div>
     );
 };
 

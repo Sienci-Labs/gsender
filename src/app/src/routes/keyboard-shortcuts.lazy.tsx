@@ -10,7 +10,11 @@ export const Route = createLazyFileRoute('/keyboard-shortcuts')({
 
 function KeyboardShortcutsPage() {
     return (
-        <Page title="Keyboard Shortcuts" withGoBackButton>
+        <Page
+            title="Keyboard Shortcuts"
+            description="Configure your keyboard shortcuts for various actions"
+            withGoBackButton
+        >
             <KeyboardShortcuts />
         </Page>
     );
