@@ -2,9 +2,8 @@ import Markdown from 'react-markdown';
 import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
-import releases from 'app/features/Preferences/About/releases.json';
-
 import { version } from 'app-root/package.json';
+import releases from 'app/features/Preferences/About/releases.json';
 
 const About = () => {
     const team = [
@@ -66,18 +65,18 @@ const About = () => {
                 </div>
             </div>
 
-            <div>
+            <p className="text-md md:text-lg">
                 gSender is a free and feature-packed CNC control software,
                 designed to be clean and easy to learn while retaining a depth
                 of capabilities for advanced users. Many thousands of people
                 trust gSender to control their grbl and grblHAL-based CNCs every
                 day, and they keep coming back for its ease of use, engaged
                 community, and reliability.
-            </div>
+            </p>
 
             <div>
                 <h2 className="text-2xl font-bold mb-2">gSender Team</h2>
-                <div>
+                <div className="text-md md:text-lg">
                     {team.map((member, index) => (
                         <span key={member.name}>
                             <strong>{member.name}</strong> ({member.title})
