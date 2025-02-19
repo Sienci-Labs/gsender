@@ -401,6 +401,9 @@ const appMain = () => {
 
         // Log
         app.post(urljoin(settings.route, 'api/log'), api.logs.printLog);
+
+        // Release Notes
+        app.get(urljoin(settings.route, 'api/releasenotes'), api.releaseNotes.fetchReleaseNotes);
     }
 
     // app.get(urljoin(settings.route, '/'), async (req, res) => {
