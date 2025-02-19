@@ -6,6 +6,7 @@ import { version } from 'app-root/package.json';
 
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
 import { Button } from 'app/components/shadcn/Button';
+import { cn } from 'app/lib/utils';
 
 const About = () => {
     const { releaseNotes, status, fetchReleaseNotes } = useGetReleaseNotes();
@@ -82,7 +83,9 @@ const About = () => {
                     components={{
                         h3: (props: ReactMarkdownProps) => (
                             <h3
-                                className={`text-xl font-bold ${index === 0 ? 'bg-blue-100 p-2 rounded' : 'mt-8'} underline`}
+                                className={cn('text-xl font-bold underline', {
+                                    'mt-8': index !== 0,
+                                })}
                             >
                                 {props.children}
                             </h3>
