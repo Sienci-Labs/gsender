@@ -35,7 +35,7 @@ export function SettingSection({
 
     return (
         <div
-            className={cn({
+            className={cn('divide-solid divide-y divide-gray-300', {
                 'hidden text-gray-600': filteredSettings.length === 0,
             })}
         >
