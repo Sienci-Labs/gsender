@@ -26,8 +26,11 @@ export function AlarmPreview() {
             </CardHeader>
             <div className="flex flex-col gap-2 justify-around">
                 {shortlist.length == 0 && <EmptyAlarmList />}
-                {shortlist.map((event) => (
-                    <div className={eventRow({ color: event.type })}>
+                {shortlist.map((event, index) => (
+                    <div
+                        className={eventRow({ color: event.type })}
+                        key={index}
+                    >
                         <span className="font-2xl">
                             {event.type} {event.CODE}
                         </span>

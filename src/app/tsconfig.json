@@ -2,7 +2,12 @@
     "compilerOptions": {
         "target": "ES2021",
         "useDefineForClassFields": true,
-        "lib": ["ES2021", "DOM", "DOM.Iterable", "esnext"],
+        "lib": [
+            "ES2021",
+            "DOM",
+            "DOM.Iterable",
+            "esnext"
+        ],
         "module": "ESNext",
         // "module": "CommonJS",
         "skipLibCheck": true,
@@ -24,11 +29,18 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "forceConsistentCasingInFileNames": true,
-
-        "typeRoots": ["./node_modules/@types", "./src/declarations.d.ts"],
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/declarations.d.ts"
+        ],
         "baseUrl": ".",
         "paths": {
-            "app/*": ["src/*"]
+            "app/*": [
+                "src/*"
+            ],
+            "app-root/*": [
+                "./*"
+            ]
         }
     },
     "ts-node": {
@@ -42,6 +54,8 @@
         "**/*.cjs",
         "**/*.mjs"
     ],
-    "exclude": ["output"]
+    "exclude": [
+        "output"
+    ]
     // "references": [{ "path": "./tsconfig.node.json" }]
 }

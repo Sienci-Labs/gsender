@@ -1,5 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
+
 import Surfacing from 'app/features/Surfacing';
+import Page from 'app/components/Page';
 
 export const Route = createLazyFileRoute('/surfacing')({
     component: SurfacingPage,
@@ -7,8 +9,8 @@ export const Route = createLazyFileRoute('/surfacing')({
 
 function SurfacingPage() {
     return (
-        <div className="p-4">
+        <Page title="Wasteboard Surfacing" withGoBackButton>
             <Surfacing />
-        </div>
+        </Page>
     );
 }

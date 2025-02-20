@@ -7,8 +7,8 @@ export function JobPreviewList() {
     const jobShortlist = jobs.slice(0, 5);
     return (
         <div className="flex flex-col gap-4">
-            {jobShortlist.map((job) => (
-                <JobPreview {...job} />
+            {jobShortlist.map((job, index) => (
+                <JobPreview {...job} key={index} />
             ))}
         </div>
     );
