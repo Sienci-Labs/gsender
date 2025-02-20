@@ -2,7 +2,7 @@ import { useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaCode, FaPlay } from 'react-icons/fa';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 
 import store from 'app/store';
 import {

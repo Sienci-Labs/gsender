@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from 'react-router';
 import { tv } from 'tailwind-variants';
 
 const linkStyle = tv({
@@ -11,14 +11,20 @@ const linkStyle = tv({
     },
 });
 
-function StatMenuLink({ label, href, end = false }) {
+interface StatMenuProps {
+    label: string;
+    href: string;
+    end?: boolean;
+}
+
+function StatMenuLink({ label, href, end = false }: StatMenuProps) {
     return (
         <li className="me-2">
-            <Link to={href} end={end} activeOptions={{ exact: true }}>
-                {({ isActive }) => (
+            <NavLink to={href} end={end}>
+                {({ isActive }: { isActive: boolean }) => (
                     <span className={linkStyle({ isActive })}>{label}</span>
                 )}
-            </Link>
+            </NavLink>
         </li>
     );
 }

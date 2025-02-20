@@ -1,5 +1,5 @@
 import { GoArrowUpRight } from 'react-icons/go';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 
 interface StatLinkProps {
     link: string;

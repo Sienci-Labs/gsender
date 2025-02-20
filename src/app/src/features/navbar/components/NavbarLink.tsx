@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { NavLink } from 'react-router';
 import cn from 'classnames';
 import { IconType } from 'react-icons';
 
@@ -7,13 +7,12 @@ interface NavbarLinkProps {
     icon?: IconType;
     svg?: string;
     label: string;
-    isActive?: boolean;
     minimized?: boolean;
 }
 
 export function NavbarLink(props: NavbarLinkProps) {
     return (
-        <Link to={props.href}>
+        <NavLink to={props.href}>
             {({ isActive }: { isActive: boolean }) => (
                 <div
                     className={cn(
@@ -38,6 +37,6 @@ export function NavbarLink(props: NavbarLinkProps) {
                     </span>
                 </div>
             )}
-        </Link>
+        </NavLink>
     );
 }

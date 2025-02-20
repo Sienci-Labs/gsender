@@ -49,7 +49,7 @@ const JobControl: React.FC<JobControlProps> = ({
         return () => {
             unsubscribe();
         };
-    });
+    }, []);
 
     useEffect(() => {
         // if finish time on job exists, then reset the start from line value to 1
