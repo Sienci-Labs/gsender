@@ -3,9 +3,14 @@ import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
 import { version } from 'app-root/package.json';
-import releases from 'app/features/Preferences/About/releases.json';
+
+import useGetReleaseNotes from './utils/useGetReleaseNotes';
+import { Button } from 'app/components/shadcn/Button';
+import { cn } from 'app/lib/utils';
 
 const About = () => {
+    const { releaseNotes, status, fetchReleaseNotes } = useGetReleaseNotes();
+
     const team = [
         { name: 'Chris T.', title: 'Project Lead' },
         { name: 'Kevin G.', title: 'Lead Dev' },
@@ -23,6 +28,83 @@ const About = () => {
         '../../../images/canada-flag-icon.png',
         import.meta.url,
     );
+
+    const renderReleaseNotes = () => {
+        if (status === 'loading') {
+            return (
+                <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-blue-500" />
+                </div>
+            );
+        }
+
+        if (status === 'error') {
+            return (
+                <div className="flex flex-col gap-2 items-center justify-center h-full">
+                    <p>
+                        There was a problem loading the release notes. Please
+                        try again.
+                    </p>
+                    <p>
+                        If this issue persists, please checkout the release
+                        notes on{' '}
+                        <a
+                            href="https://github.com/Sienci-Labs/gsender/releases"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                        >
+                            GitHub.
+                        </a>
+                    </p>
+                    <Button onClick={fetchReleaseNotes} variant="outline">
+                        Retry
+                    </Button>
+                </div>
+            );
+        }
+
+        if (releaseNotes.length === 0) {
+            return (
+                <div className="flex flex-col items-center justify-center h-full gap-2">
+                    <p>No release notes found</p>
+
+                    <Button onClick={fetchReleaseNotes} variant="outline">
+                        Retry
+                    </Button>
+                </div>
+            );
+        }
+
+        return releaseNotes.map((release, index) => {
+            return (
+                <Markdown
+                    key={release.date}
+                    components={{
+                        h3: (props: ReactMarkdownProps) => (
+                            <h3
+                                className={cn('text-xl font-bold underline', {
+                                    'mt-8': index !== 0,
+                                })}
+                            >
+                                {props.children}
+                            </h3>
+                        ),
+                        ul: (props: ReactMarkdownProps) => (
+                            <ul className="ml-4 list-disc [&>li]:mt-2 ">
+                                {props.children}
+                            </ul>
+                        ),
+                        li: (props: ReactMarkdownProps) => (
+                            <li className="leading-7">{props.children}</li>
+                        ),
+                    }}
+                >
+                    {`### ${release.version} (${release.date})\n\n${release.notes.map((note) => `- ${note}`).join('\n')}`}
+                </Markdown>
+            );
+        });
+    };
 
     return (
         <div className="w-full flex flex-col gap-6 h-full">
@@ -104,33 +186,8 @@ const About = () => {
                 </div>
 
                 <div className="relative h-full">
-                    <div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md px-4 pb-2">
-                        {releases.map((element) => {
-                            return (
-                                <Markdown
-                                    key={element}
-                                    components={{
-                                        h3: (props: ReactMarkdownProps) => (
-                                            <h3 className="text-xl font-bold mt-4 underline">
-                                                {props.children}
-                                            </h3>
-                                        ),
-                                        ul: (props: ReactMarkdownProps) => (
-                                            <ul className="ml-4 list-disc [&>li]:mt-2 ">
-                                                {props.children}
-                                            </ul>
-                                        ),
-                                        li: (props: ReactMarkdownProps) => (
-                                            <li className="leading-7">
-                                                {props.children}
-                                            </li>
-                                        ),
-                                    }}
-                                >
-                                    {element}
-                                </Markdown>
-                            );
-                        })}
+                    <div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md p-4">
+                        {renderReleaseNotes()}
                     </div>
                 </div>
             </div>
