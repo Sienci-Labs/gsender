@@ -112,7 +112,7 @@ function Connection(props: ConnectionProps) {
 
     return (
         <div
-            className="relative group cursor-pointer dropdown"
+            className="relative group cursor-pointer dropdown max-sm:hidden"
             onMouseEnter={refreshPortsOnParentEntry}
         >
             {connectionState !== ConnectionState.CONNECTED && (

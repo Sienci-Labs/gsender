@@ -159,7 +159,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 
     return (
         // calc = half of width + sidebar width
-        <div className="absolute top-0 left-1/2 -ml-[calc(128px-50px)] w-64 z-10 overflow-visible">
+        <div className="absolute top-0 left-1/2 -ml-[calc(128px-50px)] max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
             {' '}
             {/*className="grid grid-cols-[2fr_2fr_2fr]">*/}
             {machineStateRender()}

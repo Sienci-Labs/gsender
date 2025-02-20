@@ -31,7 +31,11 @@ const MachineInfo = () => {
             onMouseLeave={() => openCard(false)}
             className="z-50 w-[30px]"
         >
-            <div className={cx('flex flex-col', { 'mt-[30px]': open })}>
+            <div
+                className={cx('flex flex-col max-sm:hidden', {
+                    'mt-[30px]': open,
+                })}
+            >
                 <img src={icon} className="w-[30px]" />
                 <img
                     src={triangle}
