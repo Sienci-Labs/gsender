@@ -9,7 +9,7 @@ import NotificationsArea from './NotificationsArea';
 
 export const TopBar = () => {
     return (
-        <div className="border p-3 h-16 box-border flex gap-4 items-center bg-gray-50">
+        <div className="border p-3 h-16 box-border flex gap-4 items-center bg-gray-50 visible max-sm:hidden">
             <div className="w-[50px] h-[50px]">
                 <img alt="gSender Logo" src={gSenderIcon} />
             </div>
