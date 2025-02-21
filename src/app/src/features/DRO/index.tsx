@@ -24,7 +24,7 @@ import {
     METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { mapValues } from 'lodash';
+import mapValues from 'lodash/mapValues';
 import { mapPositionToUnits } from 'app/lib/units.ts';
 import { useCallback, useEffect, useState } from 'react';
 import includes from 'lodash/includes';

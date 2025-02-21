@@ -249,7 +249,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             <TopBar />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
-                <div className="w-full">{children}</div>
+                <div className="w-full max-sm:p-4">{children}</div>
             </div>
         </div>
     );
