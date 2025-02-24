@@ -9,7 +9,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
-    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { convertToMetric } from 'app/lib/units';
 import MultiInputBlock from 'app/components/MultiInputBlock';
@@ -19,12 +19,7 @@ import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/shadcn/Input';
 import defaultState from 'app/store/defaultState';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';
@@ -69,7 +64,7 @@ const SurfacingTool = () => {
         const name = 'gSender_Surfacing';
         const file = new File([gcode], name);
 
-        uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
+        uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
     };
 
     const onChange = (property: string, value: number) => {
@@ -327,7 +322,7 @@ const SurfacingTool = () => {
                             <Visualizer
                                 gcode={gcode}
                                 surfacing={surfacing}
-                                // isSecondary
+                                isSecondary
                             />
                         </div>
                         <div
