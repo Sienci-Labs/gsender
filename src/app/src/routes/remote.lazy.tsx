@@ -8,7 +8,10 @@ export const Route = createLazyFileRoute('/remote')({
 function RouteComponent() {
     return (
         <div>
-            <Outlet />
+            <div className="flex flex-col gap-8 min-h-screen">
+                <Outlet />
+            </div>
+
             <BottomNav />
         </div>
     );

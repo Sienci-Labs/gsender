@@ -1,5 +1,5 @@
 import { Label } from 'app/components/Label';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 
 interface JogInputProps {
     label: string;

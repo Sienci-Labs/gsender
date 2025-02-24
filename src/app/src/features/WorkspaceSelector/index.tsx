@@ -43,7 +43,10 @@ export function WorkspaceSelector() {
     }
 
     return (
-        <div className="absolute top-5 left-5 w-[200px]">
+        <div className="absolute top-5 left-5 w-[200px] max-sm:static flex flex-row items-center gap-4">
+            <span className="sm:hidden text-gray-800 text-normal">
+                Workspace:
+            </span>
             <Select
                 onValueChange={onWorkspaceSelect}
                 value={workspace}

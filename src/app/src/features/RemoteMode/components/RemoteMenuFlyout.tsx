@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import cx from 'classnames';
-import { NavLink } from 'react-bootstrap';
 
 export function NavFlyoutLink({
     href,
@@ -57,7 +56,7 @@ export function RemoteMenuFlyout() {
 
             <div
                 className={cx(
-                    'absolute top-14 inset-x-0 transition transform-origin-top-right h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400',
+                    'absolute top-14 inset-x-0 transition transform-origin-top-right h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
                     { hidden: !isOpen },
                 )}
             >
