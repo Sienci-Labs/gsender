@@ -17,6 +17,7 @@ import { Alarms } from './features/Stats/Alarms';
 import { Stats } from './features/Stats';
 import { Jobs } from './features/Stats/Jobs';
 import { Maintenance } from './features/Stats/Maintenance';
+import Page from './components/Page';
 
 export const ReactRoutes = () => {
     return (
@@ -28,15 +29,6 @@ export const ReactRoutes = () => {
                     element={
                         <div className="flex max-h-4/5 overflow-y-clip items-center justify-center no-scrollbar">
                             <Config />
-                        </div>
-                    }
-                />
-                <Route
-                    path="firmware"
-                    element={
-                        <div className="flex justify-center items-center flex-col">
-                            <UpdateAlert />
-                            <Firmware />
                         </div>
                     }
                 />
@@ -90,33 +82,47 @@ export const ReactRoutes = () => {
                 <Route
                     path="keyboard-shortcuts"
                     element={
-                        <div className="p-4">
+                        <Page
+                            title="Keyboard Shortcuts"
+                            description="Configure your keyboard shortcuts for various actions"
+                            withGoBackButton
+                        >
                             <KeyboardShortcuts />
-                        </div>
+                        </Page>
                     }
                 />
                 <Route
                     path="movement-tuning"
                     element={
-                        <div className="p-4">
+                        <Page title="Movement Tuning" withGoBackButton>
                             <MovementTuning />
-                        </div>
+                        </Page>
                     }
                 />
                 <Route
                     path="squaring"
                     element={
-                        <div className="p-4">
+                        <Page title="XY Squaring" withGoBackButton>
                             <Squaring />
-                        </div>
+                        </Page>
                     }
                 />
                 <Route
                     path="surfacing"
                     element={
-                        <div className="p-4">
+                        <Page title="Wasteboard Surfacing" withGoBackButton>
                             <Surfacing />
-                        </div>
+                        </Page>
+                    }
+                />
+                <Route
+                    path="firmware"
+                    element={
+                        <Page title="Firmware (Legacy)" withGoBackButton>
+                            <div className="flex justify-center items-center flex-col">
+                                <Firmware />
+                            </div>
+                        </Page>
                     }
                 />
                 <Route path="stats" element={<StatParent />}>
