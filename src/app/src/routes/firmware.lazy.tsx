@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 
-import { UpdateAlert } from 'app/components/UpdateAlert';
+import Page from 'app/components/Page';
 
 export const Route = createLazyFileRoute('/firmware')({
     component: FirmwarePage,
@@ -10,9 +10,10 @@ import Firmware from 'app/features/Firmware';
 
 function FirmwarePage() {
     return (
-        <div className="flex justify-center items-center flex-col">
-            <UpdateAlert />
-            <Firmware />
-        </div>
+        <Page title="Firmware (Legacy)" withGoBackButton>
+            <div className="flex justify-center items-center flex-col">
+                <Firmware />
+            </div>
+        </Page>
     );
 }

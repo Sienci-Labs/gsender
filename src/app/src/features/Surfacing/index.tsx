@@ -97,15 +97,10 @@ const SurfacingTool = () => {
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
-        // onClose();
     };
 
     return (
-        <div>
-            <div className="flex items-center mb-0 border-solid border-gray-400 h-16">
-                <h2 className="text-2xl font-bold">Surfacing Tool</h2>
-            </div>
-
+        <>
             <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
@@ -359,7 +354,7 @@ const SurfacingTool = () => {
                     </Link>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

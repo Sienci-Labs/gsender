@@ -209,9 +209,14 @@ const KeyboardShortcuts = () => {
     const renderShortcutRow = (shortcut: KeyboardShortcut) => (
         <TableRow
             key={shortcut.id}
-            className={
-                conflictingIds.includes(shortcut.id) ? 'bg-red-50' : undefined
-            }
+            className={cn(
+                { 'bg-red-50': conflictingIds.includes(shortcut.id) },
+                {
+                    'bg-gray-300 opacity-50 pointer-events-none':
+                        editingId !== null && shortcut.id !== editingId,
+                },
+                { 'hover:bg-gray-50': editingId === null },
+            )}
         >
             <TableCell className="w-[400px]">
                 <div>
@@ -339,66 +344,61 @@ const KeyboardShortcuts = () => {
     );
 
     return (
-        <>
-            <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
-                <div>
-                    <h1 className="text-2xl font-bold">Keyboard Shortcuts</h1>
-                    <p className="text-gray-600">
-                        Configure keyboard shortcuts for various actions
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    <Input
-                        type="text"
-                        placeholder="Search shortcuts..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="max-w-sm"
-                    />
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline">
-                                Reset All to Default
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Reset All Shortcuts
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Are you sure you want to reset all keyboard
-                                    shortcuts to their default values? This
-                                    action cannot be undone.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={handleResetAllShortcuts}
-                                >
-                                    Reset All
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </div>
+        <div className="flex flex-col gap-4 h-full">
+            <div className="flex items-center mb-4 gap-2 justify-end">
+                <Input
+                    type="text"
+                    placeholder="Search shortcuts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="outline">Reset All to Default</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Reset All Shortcuts
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to reset all keyboard
+                                shortcuts to their default values? This action
+                                cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleResetAllShortcuts}
+                            >
+                                Reset All
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
-                <TabsList className="mb-4 flex flex-wrap h-auto gap-2">
-                    <TabsTrigger value="all">
-                        All Shortcuts ({filteredShortcuts.length})
-                    </TabsTrigger>
-                    {categories.map((category) => (
-                        <TabsTrigger key={category.id} value={category.id}>
-                            {category.label} ({category.shortcuts.length})
+            <div className="relative flex-1 min-h-0">
+                <Tabs
+                    defaultValue="all"
+                    className="flex flex-col absolute inset-0"
+                >
+                    <TabsList className="flex flex-wrap h-auto gap-2 mb-4">
+                        <TabsTrigger value="all">
+                            All Shortcuts ({filteredShortcuts.length})
                         </TabsTrigger>
-                    ))}
-                </TabsList>
+                        {categories.map((category) => (
+                            <TabsTrigger key={category.id} value={category.id}>
+                                {category.label} ({category.shortcuts.length})
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
 
-                <TabsContent value="all">
-                    <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                    <TabsContent
+                        value="all"
+                        className="flex-1 overflow-auto border rounded-md border-gray-200"
+                    >
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -412,12 +412,14 @@ const KeyboardShortcuts = () => {
                                 {renderShortcuts(filteredShortcuts)}
                             </TableBody>
                         </Table>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
 
-                {categories.map((category) => (
-                    <TabsContent key={category.id} value={category.id}>
-                        <div className="flex-1 overflow-auto border rounded-md border-gray-200 h-[800px]">
+                    {categories.map((category) => (
+                        <TabsContent
+                            key={category.id}
+                            value={category.id}
+                            className="flex-1 overflow-auto border rounded-md border-gray-200"
+                        >
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -453,11 +455,11 @@ const KeyboardShortcuts = () => {
                                     )}
                                 </TableBody>
                             </Table>
-                        </div>
-                    </TabsContent>
-                ))}
-            </Tabs>
-        </>
+                        </TabsContent>
+                    ))}
+                </Tabs>
+            </div>
+        </div>
     );
 };
 

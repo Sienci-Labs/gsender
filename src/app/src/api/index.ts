@@ -423,6 +423,15 @@ const alarmList = {
     },
 };
 
+//
+// Release Notes
+//
+const releaseNotes = {
+    fetch: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/releasenotes');
+    },
+};
+
 export default {
     signin,
     getLatestVersion,
@@ -447,4 +456,5 @@ export default {
     file,
     metrics,
     alarmList,
+    releaseNotes,
 };

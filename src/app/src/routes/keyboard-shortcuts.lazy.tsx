@@ -1,5 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 
+import Page from 'app/components/Page';
+
 import KeyboardShortcuts from '../features/Keyboard';
 
 export const Route = createLazyFileRoute('/keyboard-shortcuts')({
@@ -8,8 +10,12 @@ export const Route = createLazyFileRoute('/keyboard-shortcuts')({
 
 function KeyboardShortcutsPage() {
     return (
-        <div className="p-4">
+        <Page
+            title="Keyboard Shortcuts"
+            description="Configure your keyboard shortcuts for various actions"
+            withGoBackButton
+        >
             <KeyboardShortcuts />
-        </div>
+        </Page>
     );
 }
