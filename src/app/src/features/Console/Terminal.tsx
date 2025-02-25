@@ -5,8 +5,8 @@ import {
     useImperativeHandle,
     forwardRef,
 } from 'react';
-import XtermTerminal from '@xterm/xterm';
-import FitAddon from '@xterm/addon-fit';
+import { Terminal as XtermTerminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';

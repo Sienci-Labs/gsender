@@ -27,7 +27,10 @@ const NotificationsArea = () => {
                     )}
                 </button>
             </PopoverTrigger>
-            <PopoverContent className="w-96 bg-white" align="start">
+            <PopoverContent
+                className="w-96 bg-white max-sm:block"
+                align="start"
+            >
                 <Header />
                 <TabList />
             </PopoverContent>

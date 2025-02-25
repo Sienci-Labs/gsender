@@ -29,9 +29,11 @@ function RouteComponent() {
             <RemoteWidget label="Rotary">
                 <Rotary />
             </RemoteWidget>
-            <RemoteWidget label="Console">
+            {/*
+                            <RemoteWidget label="Console">
                 <Console isActive={true} />
             </RemoteWidget>
+                 */}
         </>
     );
 }
