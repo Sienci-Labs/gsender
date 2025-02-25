@@ -50,7 +50,7 @@ export function ConnectionStateIndicator(
     return (
         <div
             className={cn(
-                'w-[45px] h-[45px] text-5xl flex items-center justify-center',
+                'w-[45px] h-[45px] sm:w-12 sm:h-12 text-5xl flex items-center justify-center',
                 colour,
             )}
         >

@@ -112,7 +112,7 @@ function Connection(props: ConnectionProps) {
 
     return (
         <div
-            className="relative group cursor-pointer dropdown"
+            className="relative group cursor-pointer dropdown z-30"
             onMouseEnter={refreshPortsOnParentEntry}
         >
             {connectionState !== ConnectionState.CONNECTED && (
@@ -122,7 +122,7 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="relative border border-gray-400 bg-gray-100 font-bold  px-4 py-2 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] sm:min-w-0 max-sm:min-w-0">
+            <div className="relative border border-gray-400 bg-gray-100 font-bold  px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] sm:min-w-0 max-sm:min-w-0">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}
