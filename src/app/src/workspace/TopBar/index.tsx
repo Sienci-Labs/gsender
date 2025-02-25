@@ -10,7 +10,7 @@ import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuF
 
 export const TopBar = () => {
     return (
-        <div className="border p-3 h-16 box-border flex gap-4 sm:gap-2 items-center bg-gray-50">
+        <div className="border p-3 h-16 box-border flex gap-4 max-sm:gap-2 items-center bg-gray-50">
             <RemoteMenuFlyout />
             <div className="w-[50px] h-[50px] max-sm:hidden">
                 <img alt="gSender Logo" src={gSenderIcon} />
