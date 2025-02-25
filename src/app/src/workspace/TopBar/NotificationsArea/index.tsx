@@ -9,6 +9,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import TabList from './TabList';
 import Header from './Header';
+import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
 
 const NotificationsArea = () => {
     const notifications = useTypedSelector(
@@ -31,8 +32,7 @@ const NotificationsArea = () => {
                 className="w-96 bg-white max-sm:block"
                 align="start"
             >
-                <Header />
-                <TabList />
+                <NotificationDisplay />
             </PopoverContent>
         </Popover>
     );

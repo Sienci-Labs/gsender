@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import MachineInfo from 'app/features/MachineInfo';
-import NotificationsArea from 'app/workspace/TopBar/NotificationsArea';
+
+import { MachineInfoDisplay } from 'app/features/MachineInfo/MachineInfoDisplay.tsx';
+import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
 
 export const Route = createFileRoute('/remote/info')({
     component: RouteComponent,
@@ -8,9 +9,14 @@ export const Route = createFileRoute('/remote/info')({
 
 function RouteComponent() {
     return (
-        <>
-            <MachineInfo />
-            <NotificationsArea />
-        </>
+        <div className="flex flex-col justify-center gap-8 p-4">
+            <div>
+                <MachineInfoDisplay open={true} pinned={true} />
+            </div>
+
+            <div>
+                <NotificationDisplay />
+            </div>
+        </div>
     );
 }

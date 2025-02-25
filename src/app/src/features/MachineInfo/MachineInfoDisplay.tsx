@@ -29,7 +29,7 @@ export function MachineInfoDisplay({ open, pinned, onClose }) {
                     <span className="float-left font-bold text-2xl pb-2">
                         Machine Information
                     </span>
-                    <div className="text-2xl float-right pt-1 text-gray-600 max-sm:hidden`">
+                    <div className="text-2xl float-right pt-1 text-gray-600 max-sm:hidden">
                         {pinned ? (
                             <TiPin onClick={() => setPinned(!pinned)} />
                         ) : (
