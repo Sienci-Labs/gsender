@@ -64,7 +64,7 @@ const UnlockButton: React.FC<UnlockProps> = ({
         );
 
     return (
-        <div className="flex items-center justify-center pointer-events-auto">
+        <div className="flex items-center justify-center pointer-events-auto z-50">
             <button
                 type="button"
                 className={cx(

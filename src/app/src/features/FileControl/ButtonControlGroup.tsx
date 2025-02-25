@@ -138,7 +138,7 @@ const ButtonControlGroup = () => {
 
     return (
         <div className="relative w-full flex justify-center">
-            <div className="flex border-blue-500 border-2 rounded-md absolute top-[-35px] bg-white shadow-md z-50">
+            <div className="flex border-blue-500 border-2 rounded-md absolute top-[-35px] bg-white shadow-md z-40">
                 <Button
                     type="button"
                     className="border-r-2 rounded-none border-blue-500 flex gap-2 text-base hover:bg-blue-100 transition-colors duration-200"

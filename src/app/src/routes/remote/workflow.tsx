@@ -8,7 +8,7 @@ export const Route = createFileRoute('/remote/workflow')({
 
 function RouteComponent() {
     return (
-        <div className="flex flex-col gap-32 mt-6">
+        <div className="flex flex-col gap-48 mt-6">
             <FileControl />
             <JobControl />
         </div>
