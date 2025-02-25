@@ -96,7 +96,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             <div className="flex relative flex-col items-center">
                 <div
                     className={cx(
-                        'flex w-72 h-[70px] justify-between items-center bg-black [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]', //[border-top:50px_solid_black] [border-left:25px_solid_transparent] [border-right:25px_solid_transparent]",
+                        'flex max-sm:w-40 max-sm:text-normal w-72 h-[70px] justify-between items-center bg-black [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]', //[border-top:50px_solid_black] [border-left:25px_solid_transparent] [border-right:25px_solid_transparent]",
                         {
                             'text-white': !isConnected || !activeState,
                             'bg-gray-500 text-white':
@@ -117,7 +117,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     {isConnected && activeState ? (
                         <>
                             {activeState === GRBL_ACTIVE_STATE_ALARM ? (
-                                <div className="flex w-full flex-row justify-center align-middle items-center font-light text-3xl mb-1">
+                                <div className="flex w-full flex-row justify-center align-middle items-center font-light sm:text-base text-3xl mb-1">
                                     <div className="flex justify-center">
                                         {activeState}
                                         {activeState ===
@@ -132,13 +132,13 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                     </div>
                                 </div>
                             ) : (
-                                <span className="flex w-full font-light text-3xl mb-1 justify-center">
+                                <span className="flex w-full font-light text-3xl max-sm:text-base sm:text-normal mb-1 justify-center">
                                     {message[activeState]}
                                 </span>
                             )}
                         </>
                     ) : (
-                        <h1 className="flex w-full font-light text-3xl mb-1 justify-center">
+                        <h1 className="flex w-full font-light text-3xl max-sm:text-base mb-1 justify-center">
                             Disconnected
                         </h1>
                     )}
