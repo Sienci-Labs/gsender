@@ -25,7 +25,7 @@ export function RemoteMenuFlyout() {
     }
 
     return (
-        <div className="sm:hidden relative flex w-full flex-grow">
+        <div className="sm:hidden relative flex">
             <button
                 className="flex flex-col h-12 w-12 border-2 border-black rounded justify-center items-center group"
                 type="button"
@@ -56,7 +56,7 @@ export function RemoteMenuFlyout() {
 
             <div
                 className={cx(
-                    'absolute top-14 inset-x-0 transition transform-origin-top-right h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
+                    'absolute top-14 inset-x-0 transition transform-origin-top-left w-screen h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
                     { hidden: !isOpen },
                 )}
             >

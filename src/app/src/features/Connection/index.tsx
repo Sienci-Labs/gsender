@@ -112,7 +112,7 @@ function Connection(props: ConnectionProps) {
 
     return (
         <div
-            className="relative group cursor-pointer dropdown max-sm:hidden"
+            className="relative group cursor-pointer dropdown"
             onMouseEnter={refreshPortsOnParentEntry}
         >
             {connectionState !== ConnectionState.CONNECTED && (
@@ -122,19 +122,19 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="relative border border-gray-400 bg-gray-100 font-bold  px-4 py-2 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px]">
+            <div className="relative border border-gray-400 bg-gray-100 font-bold  px-4 py-2 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] sm:min-w-0 max-sm:min-w-0">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}
                 />
                 {connectionState === ConnectionState.DISCONNECTED && (
-                    <span>Connect to CNC</span>
+                    <span className="max-sm:hidden">Connect to CNC</span>
                 )}
                 {connectionState === ConnectionState.CONNECTING && (
-                    <span>Connecting...</span>
+                    <span className="max-sm:hidden">Connecting...</span>
                 )}
                 {connectionState === ConnectionState.ERROR && (
-                    <span>Unable to connect.</span>
+                    <span className="max-sm:hidden">Unable to connect.</span>
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
                     <ConnectionInfo port={activePort} firmwareType={firmware} />
