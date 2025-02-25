@@ -143,7 +143,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                         </h1>
                     )}
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 z-50">
                     {(activeState === GRBL_ACTIVE_STATE_ALARM ||
                         activeState === GRBL_ACTIVE_STATE_HOLD) && (
                         <UnlockButton
