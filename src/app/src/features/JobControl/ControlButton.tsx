@@ -12,7 +12,7 @@ import {
 } from '../../constants';
 import controller from 'app/lib/controller';
 import cx from 'classnames';
-import { includes } from 'lodash';
+import includes from 'lodash/includes';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import { PiPause } from 'react-icons/pi';

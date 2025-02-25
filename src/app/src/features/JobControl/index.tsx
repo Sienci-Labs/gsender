@@ -1,6 +1,6 @@
 import { Widget } from 'app/components/Widget';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import ControlButton from './ControlButton';
