@@ -4,6 +4,8 @@ import { Port } from '../definitions';
 import Tooltip from 'app/components/Tooltip';
 import { useEffect, useState } from 'react';
 import store from 'app/store';
+import { FaArrowAltCircleRight } from 'react-icons/fa';
+import cn from 'classnames';
 
 export interface PortListingsProps {
     ports: Port[];
@@ -44,6 +46,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
 export function PortListings(props: PortListingsProps): JSX.Element {
     const [ip, setIP] = useState<string>('255.255.255.255');
     const [baud, setBaud] = useState(115200);
+    const [openUnrecognized, setOpenUnrecognized] = useState<boolean>(false);
 
     useEffect(() => {
         const ip = store.get('widgets.connection.ip', []);
@@ -58,6 +61,10 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         setIP(ipString);
         setBaud(baudrate);
     });
+
+    function toggleUnrecognizedPorts() {
+        setOpenUnrecognized(!openUnrecognized);
+    }
 
     return (
         <div className="absolute left-0 top-full z-10 bg-white border border-gray w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
@@ -90,18 +97,30 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 </div>
             </button>
             <div className="flex flex-col">
-                <h1 className="text-base text-gray-700 my-2 flex flex-row justify-between">
-                    Unrecognized Ports
-                </h1>
-                {props.unrecognizedPorts.map((port) => {
-                    return (
-                        <PortListingButton
-                            port={port}
-                            connectionHandler={props.connectHandler}
-                            baud={baud}
-                        />
-                    );
-                })}
+                <button
+                    className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
+                    onClick={toggleUnrecognizedPorts}
+                >
+                    <span>Unrecognized Ports</span>
+                    <span>
+                        <FaArrowAltCircleRight />
+                    </span>
+                </button>
+                <div
+                    className={cn('flex flex-col', {
+                        hidden: !openUnrecognized,
+                    })}
+                >
+                    {props.unrecognizedPorts.map((port) => {
+                        return (
+                            <PortListingButton
+                                port={port}
+                                connectionHandler={props.connectHandler}
+                                baud={baud}
+                            />
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

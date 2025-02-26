@@ -36,6 +36,7 @@ import {
     convertSecondsToDHMS,
 } from 'app/lib/datetime';
 import Bit from './assets/Bit.svg';
+//import Bit from './assets/SpinningDrillwithDust.gif';
 
 interface Props {
     senderStatus: SenderStatus;
@@ -132,7 +133,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     <Progress
                         value={percentageValue}
                         Bit={Bit}
-                        className="h-[35px] w-full border-yellow-700 border bg-yellow-100 rounded-none ![background-image:_url('texture.png')]"
+                        className="h-[35px] w-full border-yellow-700 border bg-orange-800 rounded-none ![background-image:_url('texture.png')]"
                     />
                 </div>
                 <TooltipProvider>
