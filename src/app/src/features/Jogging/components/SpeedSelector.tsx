@@ -109,7 +109,7 @@ export function SpeedSelector({ onClick }: SpeedSelectorProps) {
     }, [selectedSpeed]);
 
     return (
-        <div className="flex flex-col bg-white rounded-md border-solid border border-gray-300 p-[2px]`">
+        <div className="flex flex-col bg-white rounded-md border-solid border border-gray-300 p-1">
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedClick('Rapid')}
