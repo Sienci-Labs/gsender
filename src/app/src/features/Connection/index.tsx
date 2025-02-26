@@ -143,7 +143,8 @@ function Connection(props: ConnectionProps) {
                     connectionState === ConnectionState.ERROR) && (
                     <PortListings
                         connectHandler={onConnectClick}
-                        ports={props.ports.concat(props.unrecognizedPorts)}
+                        unrecognizedPorts={props.unrecognizedPorts}
+                        ports={props.ports}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (

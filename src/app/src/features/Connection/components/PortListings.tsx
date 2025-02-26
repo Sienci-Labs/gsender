@@ -8,11 +8,37 @@ import store from 'app/store';
 export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
+    unrecognizedPorts?: Port[];
 }
 
-function truncatePortName(port: string): string {
+function truncatePortName(port: string = ''): string {
     const portName = port.split('/').pop();
     return portName.substring(portName.length - 8, portName.length);
+}
+
+export function PortListingButton({ port, connectionHandler, baud }) {
+    return (
+        <button
+            type="button"
+            className="w-full m-0 p-4 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100"
+            onClick={() => connectionHandler(port.port, ConnectionType.USB)}
+            key={`port-${port.port}`}
+        >
+            <span className="text-4xl">
+                <BsUsbPlug />
+            </span>
+            <div className="flex flex-col gap-1 text-right">
+                <span>
+                    <Tooltip content={port.port}>
+                        {truncatePortName(port.port)}
+                    </Tooltip>
+                </span>
+                <span className="text-sm text-gray-600 font-normal">
+                    USB at {baud} baud
+                </span>
+            </div>
+        </button>
+    );
 }
 
 export function PortListings(props: PortListingsProps): JSX.Element {
@@ -41,28 +67,11 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 </p>
             )}
             {props.ports.map((port) => (
-                <button
-                    type="button"
-                    className="w-full m-0 p-4 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100"
-                    onClick={() =>
-                        props.connectHandler(port.port, ConnectionType.USB)
-                    }
-                    key={`port-${port.port}`}
-                >
-                    <span className="text-4xl">
-                        <BsUsbPlug />
-                    </span>
-                    <div className="flex flex-col gap-1 text-right">
-                        <span>
-                            <Tooltip content={port.port}>
-                                {truncatePortName(port.port)}
-                            </Tooltip>
-                        </span>
-                        <span className="text-sm text-gray-600 font-normal">
-                            USB at {baud} baud
-                        </span>
-                    </div>
-                </button>
+                <PortListingButton
+                    port={port}
+                    connectionHandler={props.connectHandler}
+                    baud={baud}
+                />
             ))}
             <button
                 className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1 w-full"
@@ -80,6 +89,20 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </span>
                 </div>
             </button>
+            <div className="flex flex-col">
+                <h1 className="text-base text-gray-700 my-2 flex flex-row justify-between">
+                    Unrecognized Ports
+                </h1>
+                {props.unrecognizedPorts.map((port) => {
+                    return (
+                        <PortListingButton
+                            port={port}
+                            connectionHandler={props.connectHandler}
+                            baud={baud}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 }
