@@ -402,8 +402,8 @@ class CNCEngine {
                         };
 
                         recognizedPorts = recognizedPorts.map(portInfoMapFn);
-                        //unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
-                        unrecognizedPorts = recognizedPorts;
+                        unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        //unrecognizedPorts = recognizedPorts;
 
                         const networkPorts = this.networkDevices.map((port) => {
                             return {
