@@ -261,22 +261,20 @@ function DRO({
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
                 {!shouldWarnZero ? (
-                    <IconButton
-                        icon={<VscTarget />}
+                    <Button
+                        text="Zero"
+                        icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
-                    >
-                        Zero
-                    </IconButton>
+                    />
                 ) : (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <IconButton
-                                icon={<VscTarget />}
+                            <Button
+                                text="Zero"
+                                icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
-                            >
-                                Zero
-                            </IconButton>
+                            />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
                             <AlertDialogHeader>
