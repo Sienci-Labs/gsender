@@ -7,7 +7,7 @@ import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import debounce from 'lodash/debounce';
 
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import { store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
@@ -20,7 +20,6 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
-import { getRecentFiles } from './utils/recentfiles';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {
@@ -35,6 +34,7 @@ import {
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
 
+import { getRecentFiles } from './utils/recentfiles';
 import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 
 const ButtonControlGroup = () => {
@@ -57,6 +57,7 @@ const ButtonControlGroup = () => {
 
     useRegisterShortcut({
         id: 'load-file',
+        title: 'Load File',
         description: 'Load a file',
         defaultKeys: 'shift+l',
         category: 'CARVING_CATEGORY',
@@ -67,6 +68,7 @@ const ButtonControlGroup = () => {
 
     useRegisterShortcut({
         id: 'unload-file',
+        title: 'Unload File',
         description: 'Unload a file',
         defaultKeys: 'shift+k',
         category: 'CARVING_CATEGORY',
@@ -138,20 +140,18 @@ const ButtonControlGroup = () => {
 
     return (
         <div className="relative w-full flex justify-center">
-            <div className="flex border-blue-500 border-2 rounded-md absolute top-[-35px] bg-white shadow-md z-50">
+            <div className="flex gap-1 rounded-md absolute top-[-35px] bg-white shadow-md z-50">
                 <Button
-                    type="button"
-                    className="border-r-2 rounded-none border-blue-500 flex gap-2 text-base hover:bg-blue-100 transition-colors duration-200"
                     onClick={handleClickLoadFile}
-                >
-                    <FaFolderOpen className="w-6 h-6" /> Load File
-                </Button>
+                    icon={<FaFolderOpen className="w-6 h-6" />}
+                    text="Load File"
+                />
 
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button className="border-r-2 rounded-none border-blue-500 px-1 hover:bg-blue-100 transition-colors duration-200">
-                            <MdKeyboardArrowDown className="w-10 h-10" />
-                        </Button>
+                    <DropdownMenuTrigger>
+                        <Button
+                            icon={<MdKeyboardArrowDown className="w-10 h-10" />}
+                        />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 bg-white">
                         <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
@@ -177,17 +177,13 @@ const ButtonControlGroup = () => {
                 </DropdownMenu>
 
                 <Button
-                    className="border-r-2 rounded-none border-blue-500 px-3 hover:bg-blue-100 transition-colors duration-200"
                     onClick={handleReloadFile}
-                >
-                    <FaRedo className="w-5 h-5" />
-                </Button>
+                    icon={<FaRedo className="w-5 h-5" />}
+                />
 
                 <AlertDialog>
                     <AlertDialogTrigger asChild disabled={!fileLoaded}>
-                        <Button className="rounded-none px-2 hover:bg-blue-100 transition-colors duration-200">
-                            <MdClose className="w-8 h-8" />
-                        </Button>
+                        <Button icon={<MdClose className="w-8 h-8" />} />
                     </AlertDialogTrigger>
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
