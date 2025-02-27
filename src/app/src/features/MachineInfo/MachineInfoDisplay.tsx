@@ -35,7 +35,7 @@ export function MachineInfoDisplay({
                 hidden: !open,
             })}
         >
-            <CardContent className="max-sm:block -mt-4 -ml-4 p-6 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
+            <CardContent className="max-sm:block -mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
                 <div className="flex flex-row w-full justify-between">
                     <span className="float-left font-bold text-2xl pb-2">
                         Machine Information
