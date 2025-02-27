@@ -140,67 +140,96 @@ const ButtonControlGroup = () => {
 
     return (
         <div className="relative w-full flex justify-center">
-            <div className="flex gap-1 rounded-md absolute top-[-35px] bg-white shadow-md z-50">
-                <Button
-                    onClick={handleClickLoadFile}
-                    icon={<FaFolderOpen className="w-6 h-6" />}
-                    text="Load File"
-                />
+            <div className="flex rounded-md absolute top-[-35px] bg-white shadow-md z-50 border-blue-500 border-2 overflow-hidden">
+                <div className="border-r-2 border-blue-500 hover:bg-blue-50 transition-colors group">
+                    <Button
+                        onClick={handleClickLoadFile}
+                        icon={
+                            <FaFolderOpen className="w-5 h-5 group-hover:text-blue-600 transition-colors" />
+                        }
+                        text="Load File"
+                        variant="ghost"
+                        className="h-10 px-4"
+                    />
+                </div>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button
-                            icon={<MdKeyboardArrowDown className="w-10 h-10" />}
-                        />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56 bg-white">
-                        <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
-                        {recentFiles.map((file) => (
-                            <DropdownMenuItem
-                                key={file.filePath}
-                                onClick={() =>
-                                    handleLoadRecentFile(file.filePath)
+                <div className="border-r-2 border-blue-500 hover:bg-blue-50 transition-colors group">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                icon={
+                                    <MdKeyboardArrowDown className="w-10 h-8 group-hover:text-blue-600 transition-colors" />
                                 }
-                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
-                            >
-                                <div className="w-full overflow-hidden">
-                                    <span
-                                        className="block truncate"
-                                        title={file.fileName}
-                                    >
-                                        {file.fileName}
-                                    </span>
-                                </div>
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                variant="ghost"
+                                className="h-10 w-12"
+                            />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56 bg-white">
+                            <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+                            {recentFiles.map((file) => (
+                                <DropdownMenuItem
+                                    key={file.filePath}
+                                    onClick={() =>
+                                        handleLoadRecentFile(file.filePath)
+                                    }
+                                    className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
+                                >
+                                    <div className="w-full overflow-hidden">
+                                        <span
+                                            className="block truncate"
+                                            title={file.fileName}
+                                        >
+                                            {file.fileName}
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-                <Button
-                    onClick={handleReloadFile}
-                    icon={<FaRedo className="w-5 h-5" />}
-                />
+                <div className="border-r-2 border-blue-500 hover:bg-blue-50 transition-colors group">
+                    <Button
+                        onClick={handleReloadFile}
+                        icon={
+                            <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
+                        }
+                        variant="ghost"
+                        className="h-10 w-12"
+                    />
+                </div>
 
-                <AlertDialog>
-                    <AlertDialogTrigger asChild disabled={!fileLoaded}>
-                        <Button icon={<MdClose className="w-8 h-8" />} />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-white">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This will close the current file. Any unsaved
-                                changes will be lost.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleCloseFile}>
-                                Close File
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                <div className="hover:bg-blue-50 transition-colors group">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                icon={
+                                    <MdClose className="w-6 h-6 group-hover:text-blue-600 transition-colors" />
+                                }
+                                variant="ghost"
+                                className="h-10 w-12"
+                                disabled={!fileLoaded}
+                            />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will close the current file. Any
+                                    unsaved changes will be lost.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleCloseFile}>
+                                    Close File
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
 
                 <input
                     ref={fileInputRef}
