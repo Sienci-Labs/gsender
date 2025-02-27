@@ -96,7 +96,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             <div className="flex relative flex-col items-center">
                 <div
                     className={cx(
-                        'flex max-sm:w-40 max-sm:text-normal w-72 h-[70px] justify-between items-center bg-black [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]', //[border-top:50px_solid_black] [border-left:25px_solid_transparent] [border-right:25px_solid_transparent]",
+                        'transition-colors duration-300 ease-in-out flex max-sm:w-40 max-sm:text-normal w-72 h-[70px] justify-between items-center bg-black [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]',
                         {
                             'text-white': !isConnected || !activeState,
                             'bg-gray-500 text-white':
