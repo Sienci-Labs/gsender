@@ -73,7 +73,7 @@ const PrimaryVisualizer = ({
 
                 {showRendering && <Rendering />}
 
-                <div className="h-full w-full absolute top-0 left-0 p-2">
+                <div className="h-full w-full absolute top-0 left-0">
                     <SoftLimitsWarningArea />
                     {WebGL.isWebGLAvailable() ? (
                         <VisualizerWrapper

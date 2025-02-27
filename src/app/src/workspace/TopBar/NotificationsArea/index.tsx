@@ -6,9 +6,6 @@ import {
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-
-import TabList from './TabList';
-import Header from './Header';
 import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
 
 const NotificationsArea = () => {

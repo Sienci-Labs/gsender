@@ -100,7 +100,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                         {
                             'text-white': !isConnected || !activeState,
                             'bg-gray-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_IDLE,
+                                activeState === GRBL_ACTIVE_STATE_IDLE &&
+                                isConnected,
                             'bg-green-600 text-white':
                                 activeState === GRBL_ACTIVE_STATE_RUN ||
                                 activeState === GRBL_ACTIVE_STATE_JOG ||

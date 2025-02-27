@@ -1,6 +1,6 @@
 import { ConnectionState, ConnectionType } from '../index';
 import { PiPlugLight } from 'react-icons/pi';
-import { BsEthernet } from 'react-icons/bs';
+import { BsCheckCircleFill, BsEthernet } from 'react-icons/bs';
 import { BsUsbPlug } from 'react-icons/bs';
 import { GrSatellite } from 'react-icons/gr';
 import { ReactElement } from 'react';
@@ -41,19 +41,26 @@ function getStateColour(state: ConnectionState) {
     }
 }
 
-export function ConnectionStateIndicator(
-    props: ConnectionStateIndicatorProps,
-): JSX.Element {
-    const icon = getIcon(props.type);
-    const colour = getStateColour(props.state);
+export function ConnectionStateIndicator({
+    type,
+    state,
+}: ConnectionStateIndicatorProps) {
+    const icon = getIcon(type);
+    const colour = getStateColour(state);
 
     return (
         <div
             className={cn(
-                'w-[45px] h-[45px] sm:w-12 sm:h-12 text-5xl flex items-center justify-center',
+                'w-[45px] h-[45px] sm:w-12 sm:h-12 text-5xl flex items-center justify-center relative',
                 colour,
+                state === ConnectionState.DISCONNECTED && 'animate-pulse',
             )}
         >
+            {state === ConnectionState.CONNECTED && (
+                <div className="absolute top-[-2px] right-[-2px] ">
+                    <BsCheckCircleFill className="text-green-500 w-4 h-4" />
+                </div>
+            )}
             {icon}
         </div>
     );

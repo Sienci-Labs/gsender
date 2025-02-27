@@ -43,7 +43,7 @@ import {
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
-import {UnitBadge} from "app/features/DRO/component/UnitBadge.tsx";
+import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 
 interface DROProps {
     axes: AxesArray;

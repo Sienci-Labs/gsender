@@ -52,7 +52,7 @@ export function WorkspaceSelector() {
                 value={workspace}
                 disabled={!isConnected}
             >
-                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border border-gray-300">
+                <SelectTrigger className="w-[180px] h-7 bg-white rounded-md border-solid border border-gray-300">
                     <SelectValue placeholder="G54" />
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">
@@ -64,7 +64,7 @@ export function WorkspaceSelector() {
                                     <SelectItem
                                         key={key}
                                         value={key}
-                                        className="bg-white "
+                                        className="bg-white h-8"
                                     >
                                         {`${key} (${value})`}
                                     </SelectItem>

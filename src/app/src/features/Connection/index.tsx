@@ -128,7 +128,9 @@ function Connection(props: ConnectionProps) {
                     type={connectionType}
                 />
                 {connectionState === ConnectionState.DISCONNECTED && (
-                    <span className="max-sm:hidden">Connect to CNC</span>
+                    <span className="max-sm:hidden animate-pulse">
+                        Connect to CNC
+                    </span>
                 )}
                 {connectionState === ConnectionState.CONNECTING && (
                     <span className="max-sm:hidden">Connecting...</span>

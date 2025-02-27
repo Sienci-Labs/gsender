@@ -1,29 +1,28 @@
 import { useState } from 'react';
-import icon from './assets/icon.svg';
-import triangle from './assets/triangle.svg';
 import cx from 'classnames';
+
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import store from 'app/store';
 import { MachineInfoDisplay } from 'app/features/MachineInfo/MachineInfoDisplay.tsx';
+
+import triangle from './assets/triangle.svg';
+import icon from './assets/icon.svg';
 
 const MachineInfo = () => {
     const { isConnected } = useTypedSelector((state) => ({
         isConnected: state.connection.isConnected,
     }));
-    const probeSelection = store.get('widgets.probe.probeCommand');
     const [open, setOpen] = useState(false);
-    const [pinned, setPinned] = useState(false);
+    const [pinned] = useState(false);
 
-    const openCard = (isOpen: boolean) => {
-        if (pinned) {
-            return;
-        }
+    const handleOpenChange = (isOpen: boolean) => {
+        if (pinned) return;
         setOpen(isOpen);
     };
+
     return (
         <div
-            onMouseEnter={() => openCard(true)}
-            onMouseLeave={() => openCard(false)}
+            onMouseEnter={() => handleOpenChange(true)}
+            onMouseLeave={() => handleOpenChange(false)}
             className="z-50 w-[30px]"
         >
             <div
@@ -40,7 +39,11 @@ const MachineInfo = () => {
                     })}
                 ></img>
             </div>
-            <MachineInfoDisplay open={open} pinned={pinned} />
+            <MachineInfoDisplay
+                open={open}
+                pinned={pinned}
+                onClose={() => handleOpenChange(false)}
+            />
         </div>
     );
 };
