@@ -13,10 +13,6 @@ interface TabItem {
 
 const tabs = [
     {
-        label: 'Console',
-        content: Console,
-    },
-    {
         label: 'Probe',
         content: Probe,
     },
@@ -25,16 +21,21 @@ const tabs = [
         content: Macros,
     },
     {
-        label: 'Coolant',
-        content: Coolant,
-    },
-    {
         label: 'Spindle',
         content: Spindle,
     },
     {
+        label: 'Coolant',
+        content: Coolant,
+    },
+
+    {
         label: 'Rotary',
         content: Rotary,
+    },
+    {
+        label: 'Console',
+        content: Console,
     },
 ];
 

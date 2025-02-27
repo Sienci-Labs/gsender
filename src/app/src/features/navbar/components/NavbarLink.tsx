@@ -17,7 +17,7 @@ export function NavbarLink(props: NavbarLinkProps) {
             {({ isActive }: { isActive: boolean }) => (
                 <div
                     className={cn(
-                        'flex flex-col gap-0.5 content-center items-center text-sm group ml-0.5 py-5 opacity-100 border-gray-400',
+                        'flex flex-col gap-0.5 content-center items-center text-sm group ml-1 py-4 opacity-100 border-gray-400',
                         {
                             'border-r-white border-2 border-r-0 [border-radius:5px_0_0_5px] bg-opacity-30 bg-blue-200 [background:linear-gradient(90deg,rgba(121,170,216,0.3)_40%,rgba(255,255,255,1)_100%)] text-blue-600':
                                 isActive,
@@ -25,6 +25,7 @@ export function NavbarLink(props: NavbarLinkProps) {
                             'border-transparent bg-transparent bg-opacity-100':
                                 props.minimized,
                         },
+                        0,
                     )}
                 >
                     {props.icon && (

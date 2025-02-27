@@ -9,6 +9,7 @@ import polyfillNode from 'rollup-plugin-polyfill-node';
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
+
     base: './',
     css: {
         postcss: {

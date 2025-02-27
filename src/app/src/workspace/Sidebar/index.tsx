@@ -10,7 +10,7 @@ export const Sidebar = () => {
     return (
         <div
             className={cx(
-                'flex flex-col justify-around box-border transition-width ease-out duration-1000 w-10 ',
+                'flex flex-col justify-around box-border transition-width ease-out duration-1000 w-10 visible max-sm:hidden',
                 { 'w-20': show },
             )}
         >

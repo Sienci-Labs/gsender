@@ -31,7 +31,11 @@ const SpindleLaserStatus = () => {
     if (!spindleOn) {
         return <></>;
     }
-    return <div className="absolute top-4 left-1/2 flex ml-52">{label}</div>;
+    return (
+        <div className="absolute top-4 left-1/2 flex ml-52 max-sm:hidden">
+            {label}
+        </div>
+    );
 };
 
 export default SpindleLaserStatus;
