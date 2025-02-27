@@ -92,6 +92,8 @@ function returnSettingControl(
                     onChange={handler}
                 />
             );
+        case 'wizard':
+            return setting.wizard();
         default:
             return setting.type;
     }

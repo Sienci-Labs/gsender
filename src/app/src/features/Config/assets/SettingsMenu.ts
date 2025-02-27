@@ -25,6 +25,7 @@ import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinS
 import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/LimitSwitchIndicators.tsx';
 import { SpindleWizard } from 'app/features/Config/components/wizards/SpindleWizard.tsx';
 import { AccessoryOutputWizard } from 'app/features/Config/components/wizards/AccessoryOutputWizard.tsx';
+import { SquaringToolWizard } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -63,12 +64,12 @@ export interface gSenderSetting {
     defaultValue?: any;
     dirty?: boolean;
     eventType?: string;
-    wizard?: React.ReactNode;
+    wizard?: () => JSX.Element;
 }
 
 export interface gSenderSubSection {
     label?: string;
-    Wizard?: React.ReactNode;
+    Wizard?: () => JSX.Element;
     settings?: gSenderSetting[];
 }
 
@@ -85,6 +86,7 @@ export interface gSenderEEPROMSetting {
     format?: string;
     dataType?: number;
     group?: number;
+    wizard?: () => JSX.Element;
 }
 
 export interface gSenderEEPROMSettingSection {
@@ -180,8 +182,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         settings: [
             {
-                label: 'General',
+                label: '',
                 settings: [
+                    {
+                        type: 'wizard',
+                        wizard: SquaringToolWizard,
+                        label: 'Square up CNC rails',
+                        description:
+                            'Misaligned rails can cause 90 degree cuts to come out skewed, use the wizard to fix this.',
+                    },
                     {
                         type: 'eeprom',
                         eID: '$3',
