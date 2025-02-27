@@ -96,32 +96,36 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </span>
                 </div>
             </button>
-            <div className="flex flex-col">
-                <button
-                    className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
-                    onClick={toggleUnrecognizedPorts}
-                >
-                    <span>Unrecognized Ports</span>
-                    <span>
+            {
+                props.unrecognizedPorts.length > 0 && (
+                    <div className="flex flex-col">
+                        <button
+                            className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
+                            onClick={toggleUnrecognizedPorts}
+                        >
+                            <span>Unrecognized Ports</span>
+                            <span>
                         <FaArrowAltCircleRight />
                     </span>
-                </button>
-                <div
-                    className={cn('flex flex-col', {
-                        hidden: !openUnrecognized,
-                    })}
-                >
-                    {props.unrecognizedPorts.map((port) => {
-                        return (
-                            <PortListingButton
-                                port={port}
-                                connectionHandler={props.connectHandler}
-                                baud={baud}
-                            />
-                        );
-                    })}
-                </div>
-            </div>
+                        </button>
+                        <div
+                            className={cn('flex flex-col', {
+                                hidden: !openUnrecognized,
+                            })}
+                        >
+                            {props.unrecognizedPorts.map((port) => {
+                                return (
+                                    <PortListingButton
+                                        port={port}
+                                        connectionHandler={props.connectHandler}
+                                        baud={baud}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )
+            }
         </div>
     );
 }
