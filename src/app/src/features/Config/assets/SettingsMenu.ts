@@ -21,6 +21,7 @@ import {
 } from 'app/lib/constants';
 import React from 'react';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
+import {ProbePinStatus} from "app/features/Config/components/wizards/ProbePinStatus.tsx";
 
 export interface SettingsMenuSection {
     label: string;
@@ -260,6 +261,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Probe',
         icon: MdTouchApp,
+        wizard: ProbePinStatus,
         settings: [
             {
                 label: '',
