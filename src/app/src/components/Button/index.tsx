@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
@@ -14,6 +14,7 @@ export const buttonStyle = tv({
             disabled: 'border-gray-300 bg-gray-100 text-gray-400',
             outline:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white',
+            ghost: 'text-gray-600 border-none shadow-none',
         },
         size: {
             sm: 'h-8 text-sm',
@@ -32,45 +33,48 @@ export const buttonStyle = tv({
 
 export type ButtonVariants = VariantProps<typeof buttonStyle>;
 
-export type ButtonProps = ButtonVariants & {
-    children?: React.ReactNode;
-    icon?: JSX.Element;
-    onClick?: () => void;
-    disabled?: boolean;
-    className?: string;
-    text?: string;
-};
+export type ButtonProps = ButtonVariants &
+    React.ButtonHTMLAttributes<HTMLButtonElement> & {
+        children?: React.ReactNode;
+        icon?: JSX.Element;
+        disabled?: boolean;
+        className?: string;
+        text?: string;
+    };
 
-export const Button = (props: ButtonProps) => {
-    const {
-        variant,
-        size,
-        disabled,
-        className,
-        children,
-        onClick,
-        icon,
-        text,
-        ...rest
-    } = props;
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+    (props, ref) => {
+        const {
+            variant,
+            size,
+            disabled,
+            className,
+            children,
+            icon,
+            text,
+            ...rest
+        } = props;
 
-    return (
-        <ShadcnButton
-            onClick={onClick}
-            className={buttonStyle({ variant, size, disabled, className })}
-            disabled={disabled}
-            {...rest}
-        >
-            {children ? (
-                children
-            ) : (
-                <span className="flex items-center gap-1">
-                    {icon}
-                    {text}
-                </span>
-            )}
-        </ShadcnButton>
-    );
-};
+        return (
+            <ShadcnButton
+                className={buttonStyle({ variant, size, disabled, className })}
+                disabled={disabled}
+                ref={ref}
+                {...rest}
+            >
+                {children ? (
+                    children
+                ) : (
+                    <span className="flex items-center gap-1">
+                        {icon}
+                        {text}
+                    </span>
+                )}
+            </ShadcnButton>
+        );
+    },
+);
+
+Button.displayName = 'Button';
 
 export default Button;
