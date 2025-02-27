@@ -23,6 +23,8 @@ import React from 'react';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
 import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinStatus.tsx';
 import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/LimitSwitchIndicators.tsx';
+import { SpindleWizard } from 'app/features/Config/components/wizards/SpindleWizard.tsx';
+import { AccessoryOutputWizard } from 'app/features/Config/components/wizards/AccessoryOutputWizard.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -483,6 +485,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Spindle/Laser',
         icon: GiTargetLaser,
+        wizard: SpindleWizard,
         settings: [
             {
                 label: '',
@@ -776,6 +779,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Accessory Outputs',
         icon: CiMapPin,
+        wizard: AccessoryOutputWizard,
         settings: [
             {
                 label: '',
