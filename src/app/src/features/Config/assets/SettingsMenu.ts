@@ -19,12 +19,15 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
+import React from 'react';
+import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
 
 export interface SettingsMenuSection {
     label: string;
     icon: IconType;
     settings?: gSenderSubSection[];
     eeprom?: gSenderEEEPROMSettings;
+    wizard?: () => JSX.Element;
 }
 
 export type gSenderSettingType =
@@ -38,7 +41,8 @@ export type gSenderSettingType =
     | 'hybrid'
     | 'eeprom'
     | 'event'
-    | 'textarea';
+    | 'textarea'
+    | 'wizard';
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -55,10 +59,12 @@ export interface gSenderSetting {
     defaultValue?: any;
     dirty?: boolean;
     eventType?: string;
+    wizard?: React.ReactNode;
 }
 
 export interface gSenderSubSection {
     label?: string;
+    Wizard?: React.ReactNode;
     settings?: gSenderSetting[];
 }
 
@@ -79,6 +85,7 @@ export interface gSenderEEPROMSetting {
 
 export interface gSenderEEPROMSettingSection {
     label: string;
+    wizard?: React.ReactNode;
     eeprom: gSenderEEPROMSetting[];
 }
 
@@ -350,7 +357,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Limits and Homing',
+        label: 'Homing/Limits',
         icon: FaHome,
         settings: [
             {
@@ -827,6 +834,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Rotary',
         icon: FaArrowsSpin,
+        wizard: AJogWizard,
         settings: [
             {
                 label: '',

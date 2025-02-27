@@ -22,6 +22,9 @@ import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
 import { Helper } from 'app/features/Helper/index';
+import { FaFeatherAlt } from 'react-icons/fa';
+import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
+import cx from 'classnames';
 
 const PrimaryVisualizer = ({
     actions,
@@ -70,7 +73,7 @@ const PrimaryVisualizer = ({
 
                 {showRendering && <Rendering />}
 
-                <div className="h-full w-full absolute top-0 left-0 p-2">
+                <div className="h-full w-full absolute top-0 left-0">
                     <SoftLimitsWarningArea />
                     {WebGL.isWebGLAvailable() ? (
                         <VisualizerWrapper
@@ -92,6 +95,23 @@ const PrimaryVisualizer = ({
                             </span>
                         </div>
                     )}
+
+                    <div className="absolute left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
+                        <FaFeatherAlt
+                            className={cx('cursor-pointer', {
+                                'text-gray-500': !state.liteMode,
+                            })}
+                            onClick={() => actions.handleLiteModeToggle()}
+                        />
+                        <FiZoomIn
+                            className="cursor-pointer"
+                            onClick={() => actions.camera.zoomIn()}
+                        />
+                        <FiZoomOut
+                            className="cursor-pointer"
+                            onClick={() => actions.camera.zoomOut()}
+                        />
+                    </div>
 
                     <CameraDisplay
                         camera={camera}

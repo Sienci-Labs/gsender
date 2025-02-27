@@ -1,6 +1,6 @@
 import { Widget } from 'app/components/Widget';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import ControlButton from './ControlButton';
@@ -60,6 +60,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     useRegisterShortcut({
         id: 'start-outline',
+        title: 'Start Outline',
         description: 'Start an outline',
         defaultKeys: '$',
         category: 'CARVING_CATEGORY',

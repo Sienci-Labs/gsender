@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { useSelector } from 'react-redux';
 
 import store from 'app/store';

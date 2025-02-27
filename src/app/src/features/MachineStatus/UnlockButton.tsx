@@ -64,11 +64,11 @@ const UnlockButton: React.FC<UnlockProps> = ({
         );
 
     return (
-        <div className="flex items-center justify-center pointer-events-auto">
+        <div className="flex items-center justify-center pointer-events-auto z-50">
             <button
                 type="button"
                 className={cx(
-                    'w-[8.5rem] flex flex-row items-center justify-between p-3 rounded-3xl leading-tight line-s text-white border-solid border opacity-90 hover:opacity-70',
+                    'w-[8.5rem] z-50 flex flex-row items-center justify-between p-3 rounded-3xl leading-tight line-s text-white border-solid border opacity-90 hover:opacity-70',
                     {
                         'border-red-800 bg-red-600 grow [animation:grow_2s_infinite]':
                             activeState === GRBL_ACTIVE_STATE_ALARM,

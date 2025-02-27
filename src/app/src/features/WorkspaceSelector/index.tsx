@@ -43,13 +43,16 @@ export function WorkspaceSelector() {
     }
 
     return (
-        <div className="absolute top-5 left-5 w-[200px]">
+        <div className="absolute top-5 left-5 w-[200px] max-sm:static flex flex-row items-center gap-4">
+            <span className="sm:hidden text-gray-800 text-normal">
+                Workspace:
+            </span>
             <Select
                 onValueChange={onWorkspaceSelect}
                 value={workspace}
                 disabled={!isConnected}
             >
-                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border border-gray-300">
+                <SelectTrigger className="w-[180px] h-7 bg-white rounded-md border-solid border border-gray-300">
                     <SelectValue placeholder="G54" />
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">
@@ -61,7 +64,7 @@ export function WorkspaceSelector() {
                                     <SelectItem
                                         key={key}
                                         value={key}
-                                        className="bg-white "
+                                        className="bg-white h-8"
                                     >
                                         {`${key} (${value})`}
                                     </SelectItem>

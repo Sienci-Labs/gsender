@@ -24,7 +24,7 @@ import {
     METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { mapValues } from 'lodash';
+import mapValues from 'lodash/mapValues';
 import { mapPositionToUnits } from 'app/lib/units.ts';
 import { useCallback, useEffect, useState } from 'react';
 import includes from 'lodash/includes';
@@ -43,6 +43,7 @@ import {
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 
 interface DROProps {
     axes: AxesArray;
@@ -208,7 +209,8 @@ function DRO({
     });
 
     return (
-        <div>
+        <div className="relative">
+            <UnitBadge />
             <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}

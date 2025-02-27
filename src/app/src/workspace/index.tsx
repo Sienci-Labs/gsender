@@ -241,11 +241,11 @@ const Workspace = () => {
     ]);
 
     return (
-        <div className="flex flex-col h-full ">
+        <div className="flex flex-col h-full">
             <TopBar />
-            <div className="flex h-full no-scrollbar">
+            <div className="flex h-full no-scrollbar ">
                 <Sidebar />
-                <div className="w-full">
+                <div className="w-full max-sm:p-4">
                     <Carve />
                     <Outlet />
                 </div>
