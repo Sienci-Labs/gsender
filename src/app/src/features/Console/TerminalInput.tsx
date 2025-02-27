@@ -130,7 +130,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Button
                 variant="primary"
-                className="w-32"
+                className="w-24"
                 onClick={handleCommandExecute}
             >
                 Run
