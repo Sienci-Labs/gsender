@@ -60,6 +60,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     useRegisterShortcut({
         id: 'start-outline',
+        title: 'Start Outline',
         description: 'Start an outline',
         defaultKeys: '$',
         category: 'CARVING_CATEGORY',
