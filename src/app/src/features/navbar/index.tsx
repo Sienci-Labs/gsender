@@ -1,11 +1,9 @@
 import { FaTasks } from 'react-icons/fa';
 import { RiToolsFill } from 'react-icons/ri';
-import Carve from './assets/Carve.svg';
-import { MdChatBubbleOutline } from 'react-icons/md';
-import { IoSpeedometerOutline } from "react-icons/io5";
-
+import { IoSpeedometerOutline } from 'react-icons/io5';
 import cx from 'classnames';
 
+import Carve from './assets/Carve.svg';
 import { NavbarLink } from './components/NavbarLink.tsx';
 
 interface Props {

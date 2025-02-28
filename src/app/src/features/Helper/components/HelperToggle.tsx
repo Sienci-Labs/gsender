@@ -42,9 +42,9 @@ export function HelperToggle({ active, title, minimized }: HelperToggleProps) {
             )}
         >
             <RiSpeakLine
-                className={`text-4xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
+                className={`text-2xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
             />
-            <span className={cn('', { 'opacity-0': minimized })}>
+            <span className={cn('text-xs', { 'opacity-0': minimized })}>
                 {helperTitle}
             </span>
         </button>
