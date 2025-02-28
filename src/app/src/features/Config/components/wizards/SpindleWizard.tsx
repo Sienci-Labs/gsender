@@ -11,10 +11,10 @@ export function SpindleWizard() {
 
     return (
         <div className="flex flex-row gap-2 items-center">
-            <Button color="primary" onClick={startSpindle}>
+            <Button variant="primary" onClick={startSpindle}>
                 M3
             </Button>
-            <Button color="primary" onClick={stopSpindle}>
+            <Button variant="primary" onClick={stopSpindle}>
                 M5
             </Button>
         </div>

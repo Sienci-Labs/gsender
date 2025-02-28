@@ -78,7 +78,7 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'p-2 flex flex-row items-center odd:bg-gray-100 even:bg-white',
+                    'p-2 flex flex-row items-center',
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
                     },

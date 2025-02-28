@@ -1,7 +1,6 @@
 import controller from 'app/lib/controller.ts';
 import Button from 'app/components/Button';
 
-
 interface JogWizardProps {
     axis: string;
     disabled: boolean;
@@ -19,10 +18,10 @@ export function JogWizard({
     };
     return (
         <div className="flex flex-row gap-4 items-center">
-            <Button color="primary" disabled={disabled} onClick={jogMinus}>
+            <Button variant="primary" disabled={disabled} onClick={jogMinus}>
                 Jog {axis}-
             </Button>
-            <Button color="primary" disabled={disabled} onClick={jogPlus}>
+            <Button variant="primary" disabled={disabled} onClick={jogPlus}>
                 Jog {axis}+
             </Button>
         </div>

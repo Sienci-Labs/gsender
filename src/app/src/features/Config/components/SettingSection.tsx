@@ -43,7 +43,7 @@ export function SettingSection({
             })}
         >
             {label && (
-                <div className="flex flex-row gap-8 border-b border-blue-500 mt-4">
+                <div className="flex flex-row gap-8 border-b border-blue-500 mt-4 py-2">
                     <h2 className="text-blue-500  text-xl">{label}</h2>
                     {wizard && wizard()}
                 </div>
