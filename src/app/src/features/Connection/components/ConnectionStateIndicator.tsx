@@ -51,9 +51,9 @@ export function ConnectionStateIndicator({
     return (
         <div
             className={cn(
-                'w-[45px] h-[45px] sm:w-12 sm:h-12 text-5xl flex items-center justify-center relative',
-                colour,
+                'w-8 h-8 sm:w-8 sm:h-8  text-5xl flex items-center justify-center relative',
                 state === ConnectionState.DISCONNECTED && 'animate-pulse',
+                colour,
             )}
         >
             {state === ConnectionState.CONNECTED && (

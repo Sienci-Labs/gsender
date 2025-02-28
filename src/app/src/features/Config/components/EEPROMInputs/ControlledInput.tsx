@@ -1,7 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
+import { Input } from 'app/components/Input';
 
-const ControlledInput = ({ className, value, type = 'decimal', externalOnChange = null, ...rest }) => {
+const ControlledInput = ({
+    className,
+    value,
+    type = 'decimal',
+    externalOnChange = null,
+    ...rest
+}) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);
@@ -46,7 +53,7 @@ const ControlledInput = ({ className, value, type = 'decimal', externalOnChange 
         setLocalValue(inputRef.current.value);
     };
     return (
-        <input
+        <Input
             type={type}
             className={className}
             ref={inputRef}
