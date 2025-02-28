@@ -268,6 +268,7 @@ function DRO({
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
+                        size="sm"
                     />
                 ) : (
                     <AlertDialog>
@@ -304,7 +305,12 @@ function DRO({
                     />
                 )}
 
-                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button
+                    variant="alt"
+                    onClick={goXYAxes}
+                    disabled={!canClick}
+                    size="sm"
+                >
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
