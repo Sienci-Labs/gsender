@@ -20,6 +20,7 @@ import {
 
 import stopSign from './assets/stop.svg';
 import jogWheeelLabels from './assets/labels.svg';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 export interface JogValueObject {
     xyStep: number;
     aStep: number;
@@ -28,7 +29,7 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
-    const [isRotaryMode, setIsRotaryMode] = useState(false);
+    const { mode } = useWorkspaceState();
 
     const axes = useSelector((state: RootState) => {
         const controllerState = state.controller.state;
@@ -74,18 +75,11 @@ export function Jogging() {
         });
     }, []);
 
-    useEffect(() => {
-        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
-        setIsRotaryMode(mode);
-        store.on('change', () => {
-            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
-            setIsRotaryMode(workspaceMode === 'ROTARY');
-        });
-    }, []);
-
     function updateJogValues(values: JogValueObject) {
         setJogSpeed(values);
     }
+
+    const isRotaryMode = mode === 'ROTARY';
 
     return (
         <>
