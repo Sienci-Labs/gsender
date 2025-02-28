@@ -18,6 +18,7 @@ const StatusIcons = () => {
         setShowRemoteDialog(!showRemoteDialog);
     }
 
+    console.log(headlessSettings);
     useEffect(() => {
         actions.fetchSettings(setHeadlessSettings);
 
@@ -81,6 +82,9 @@ const StatusIcons = () => {
                 showRemote={showRemoteDialog}
                 onClose={() => setShowRemoteDialog(false)}
                 setHeadlessSettings={setHeadlessSettings}
+                remoteIp={headlessSettings.ip}
+                remotePort={headlessSettings.port}
+                remoteOn={headlessSettings.headlessStatus}
             />
         </div>
     );
