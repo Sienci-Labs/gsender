@@ -2,12 +2,12 @@ import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
 import { StatCard } from 'app/features/Stats/components/StatCard';
 import { AlarmListing } from 'app/features/Stats/components/AlarmListing.tsx';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import ToolModalButton from 'app/components/ToolModalButton';
 import { FaTrash } from 'react-icons/fa';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import api from 'app/api';
 import { useContext } from 'react';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { Button } from 'app/components/Button';
 
 export function Alarms() {
     const { setAlarms } = useContext(StatContext);
@@ -45,12 +45,13 @@ export function Alarms() {
                             Clear all prior alarms and errors. This action
                             cannot be undone.
                         </p>
-                        <ToolModalButton
-                            icon={<FaTrash />}
+                        <Button
+                            icon={<FaTrash className="text-blue-500 w-4 h-4" />}
                             onClick={deleteAlarms}
-                        >
-                            Clear Alarms and Errors
-                        </ToolModalButton>
+                            text="Clear Alarms and Errors"
+                            size="lg"
+                            className="text-blue-500"
+                        />
                     </div>
                 </StatCard>
             </div>

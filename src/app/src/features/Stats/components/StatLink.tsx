@@ -1,6 +1,8 @@
 import { GoArrowUpRight } from 'react-icons/go';
 import { Link } from '@tanstack/react-router';
 
+import { Button } from 'app/components/Button';
+
 interface StatLinkProps {
     link: string;
     label: string;
@@ -8,12 +10,8 @@ interface StatLinkProps {
 
 export function StatLink({ link, label }: StatLinkProps) {
     return (
-        <Link
-            to={link}
-            className="border border-gray-500 text-gray-700 px-2 rounded flex flex-row gap-1 items-center"
-        >
-            {label}
-            <GoArrowUpRight />
+        <Link to={link}>
+            <Button text={label} icon={<GoArrowUpRight />} size="sm" />
         </Link>
     );
 }
