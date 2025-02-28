@@ -28,7 +28,7 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                 <NavbarLink
                     href="/stats"
                     icon={IoSpeedometerOutline}
-                    label="Stats/Info"
+                    label="Stats"
                     minimized={!show}
                 />
                 <NavbarLink
