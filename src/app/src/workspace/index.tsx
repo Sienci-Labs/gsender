@@ -24,10 +24,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
         const { href } = location;
         if (href === '/#/remote') {
             console.log('MATCHED');
-            redirect({
-                to: '/remote',
-                throw: true,
-            });
+            navigate({ to: '/remote' });
         }
     }, [location]);
 
