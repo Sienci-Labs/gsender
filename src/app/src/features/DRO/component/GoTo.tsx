@@ -64,7 +64,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         controller.command('gcode:safe', code, unitModal);
     }
 
-    function onValueEdit(e, axis) {
+    function onValueEdit(e: React.ChangeEvent<HTMLInputElement>, axis: string) {
         const value = e.target.value;
         console.log(value);
         const payload = {
@@ -76,11 +76,10 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger
-                disabled={disabled}
-                className="border rounded hover:opacity-90 px-3 shadow border-robin-500 text-white bg-robin-500 disabled:bg-gray-300 disabled:border-gray-500 disabled:text-gray-500"
-            >
-                <FaPaperPlane />
+            <PopoverTrigger asChild>
+                <Button variant="alt" disabled={disabled} size="sm">
+                    <FaPaperPlane />
+                </Button>
             </PopoverTrigger>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
