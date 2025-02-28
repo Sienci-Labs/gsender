@@ -1,16 +1,18 @@
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
-import Select, { SingleValue } from 'react-select';
-import Button from 'app/components/Button';
-import insertAtCaret from './insertAtCaret';
+import Select from 'react-select';
 
+import Button from 'app/components/Button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+
 import { MACRO_VARIABLES } from './constants';
+import insertAtCaret from './insertAtCaret';
 
 const MAX_CHARACTERS = 128;
 
@@ -50,7 +52,7 @@ const MacroForm = ({
     const [macroState, setMacroState] = useState<MacroState>({
         name: macroName,
         content: macroContent,
-        details: macroDescription,
+        description: macroDescription,
     });
 
     const nameRef = useRef<HTMLInputElement>(null);
@@ -96,7 +98,7 @@ const MacroForm = ({
 
     return (
         <Dialog open onOpenChange={onCancel}>
-            <DialogContent className="bg-white">
+            <DialogContent className="bg-white w-1/2">
                 <form
                     onSubmit={(event: FormEvent) => {
                         event.preventDefault();
@@ -107,6 +109,11 @@ const MacroForm = ({
                             {id ? 'Edit Macro' : 'Add Macro'}
                         </DialogTitle>
                     </DialogHeader>
+                    <DialogDescription className="mt-1 text-sm text-gray-500">
+                        Macros are a way to store and reuse commands. They can
+                        be used to speed up repetitive tasks and make your CNC
+                        more efficient.
+                    </DialogDescription>
                     <div className="flex flex-col gap-2 my-4">
                         <label>Macro Name</label>
                         <input
@@ -125,9 +132,7 @@ const MacroForm = ({
                             <label>Macro Commands</label>
                             <Select<OptionType>
                                 options={options}
-                                onChange={(
-                                    selectedOption: SingleValue<OptionType>,
-                                ) => {
+                                onChange={(selectedOption: OptionType) => {
                                     const textarea = contentRef.current;
                                     if (textarea && selectedOption) {
                                         insertAtCaret(
@@ -144,7 +149,7 @@ const MacroForm = ({
                                 placeholder="Macro Variables"
                                 value={null}
                                 styles={{
-                                    option: (provided, state) => ({
+                                    option: (provided: any, state: any) => ({
                                         ...provided,
                                         fontSize: '0.875rem',
                                         whiteSpace: 'normal',
@@ -158,24 +163,24 @@ const MacroForm = ({
                                         padding: '10px',
                                         borderBottom: '1px solid #e0e0e0',
                                     }),
-                                    menu: (provided) => ({
+                                    menu: (provided: any) => ({
                                         ...provided,
                                         width: '100%',
                                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                         marginTop: 0,
                                     }),
-                                    group: (provided) => ({
+                                    group: (provided: any) => ({
                                         ...provided,
                                         padding: 0,
                                     }),
-                                    control: (provided) => ({
+                                    control: (provided: any) => ({
                                         ...provided,
                                         minWidth: '150px',
                                         maxWidth: '100%',
                                         border: '1px solid #ccc',
                                         boxShadow: 'none',
                                     }),
-                                    groupHeading: (provided) => ({
+                                    groupHeading: (provided: any) => ({
                                         ...provided,
                                         fontWeight: 'bold',
                                         color: '#333',
@@ -218,7 +223,7 @@ const MacroForm = ({
                                         id,
                                         name,
                                         content,
-                                        description: details,
+                                        description,
                                     });
                                 }
                             }}
