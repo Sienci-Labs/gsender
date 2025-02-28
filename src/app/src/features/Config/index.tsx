@@ -54,7 +54,7 @@ export function Config() {
                         <ApplicationPreferences />
                     </div>
                     <div
-                        className="px-10 gap-8 mt-4 mb-36 box-border flex flex-col overflow-y-scroll relative no-scrollbar"
+                        className="px-10 gap-8 pt-4 mb-36 box-border flex flex-col overflow-y-scroll relative"
                         ref={inViewRef}
                     >
                         {settings.map((item, index) => {
