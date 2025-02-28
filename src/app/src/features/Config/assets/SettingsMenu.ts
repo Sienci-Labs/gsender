@@ -65,6 +65,8 @@ export interface gSenderSetting {
     dirty?: boolean;
     eventType?: string;
     wizard?: () => JSX.Element;
+    toolLink?: string;
+    toolLinkLabel?: string;
 }
 
 export interface gSenderSubSection {
@@ -86,7 +88,8 @@ export interface gSenderEEPROMSetting {
     format?: string;
     dataType?: number;
     group?: number;
-    wizard?: () => JSX.Element;
+    toolLink?: string;
+    toolLinkLabel?: string;
 }
 
 export interface gSenderEEPROMSettingSection {
@@ -207,6 +210,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$100',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -232,6 +237,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$101',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -253,6 +260,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$102',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',

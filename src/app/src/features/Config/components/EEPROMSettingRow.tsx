@@ -7,11 +7,14 @@ import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import { FaMicrochip } from 'react-icons/fa6';
+import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 
 interface EEPROMSettingRowProps {
     eID: string;
     changeHandler: (value: number) => void;
     resetHandler: (k, v) => void;
+    link?: string;
+    linkLabel?: string;
 }
 
 function filterNewlines(data = '') {
@@ -25,6 +28,8 @@ export function EEPROMSettingRow({
     eID,
     changeHandler,
     resetHandler,
+    link = null,
+    linkLabel = null,
 }: EEPROMSettingRowProps) {
     const {
         EEPROM,
@@ -94,6 +99,11 @@ export function EEPROMSettingRow({
                         setting={EEPROMData}
                         onChange={changeHandler(EEPROMData.globalIndex)}
                     />
+                    {link && (
+                        <div>
+                            <ToolLink link={link} label={linkLabel} />
+                        </div>
+                    )}
                 </div>
                 <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (

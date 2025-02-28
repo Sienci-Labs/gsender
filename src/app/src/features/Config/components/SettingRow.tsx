@@ -137,6 +137,8 @@ export function SettingRow({
                 eID={setting.eID}
                 changeHandler={handleSettingsChange}
                 resetHandler={handleSingleSettingReset}
+                linkLabel={setting.toolLink}
+                link={setting.toolLinkLabel}
             />
         );
     }
