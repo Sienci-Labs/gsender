@@ -22,7 +22,14 @@ import controller from 'app/lib/controller.ts';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 
-export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
+export function RemoteModeDialog({
+    showRemote,
+    onClose,
+    setHeadlessSettings,
+    remoteIp,
+    remotePort,
+    remoteOn,
+}) {
     const [port, setPort] = useState(8000);
     const [ip, setIp] = useState('192.168.0.10');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
@@ -31,8 +38,13 @@ export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
 
     useEffect(() => {
+        setIp(remoteIp);
+        setPort(remotePort);
+        setRemoteEnabled(remoteOn);
+    }, [remoteIp, remotePort, remoteOn]);
+
+    useEffect(() => {
         controller.listAllIps();
-        console.log(ipList);
     }, [showRemote]);
 
     function toggleRemoteMode() {
