@@ -478,6 +478,7 @@
     "typescript-eslint": "^7.16.1",
     "url-loader": "~1.1.2",
     "vite-css-modules": "^1.4.2",
+    "vite-plugin-node-polyfills": "^0.23.0",
     "webpack": "~4.47.0",
     "webpack-cli": "~3.3.1",
     "webpack-dev-middleware": "~3.6.2",

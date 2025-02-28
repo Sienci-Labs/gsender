@@ -5,7 +5,7 @@ import tailwindcss from 'tailwindcss';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { patchCssModules } from 'vite-css-modules';
-import polyfillNode from 'rollup-plugin-polyfill-node';
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
@@ -33,7 +33,11 @@ export default defineConfig({
         react(),
         patchCssModules(),
         tailwindcss(),
-        // polyfillNode(),
+        nodePolyfills({
+            // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
+            include: ['process'],
+            globals: { global: true, process: true },
+        }),
     ],
     resolve: {
         alias: {
@@ -42,7 +46,6 @@ export default defineConfig({
         },
     },
     define: {
-        'process.env': {},
     },
     optimizeDeps: {
         include: ['**/*.styl'],
