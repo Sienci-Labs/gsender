@@ -7,8 +7,8 @@ import {
     DialogTitle,
     DialogFooter,
 } from 'app/components/shadcn/Dialog';
-import { Button } from 'app/components/shadcn/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
 import {
     Select,

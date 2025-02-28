@@ -1,10 +1,9 @@
 import { useRouter, createFileRoute } from '@tanstack/react-router';
 
 import Page from 'app/components/Page';
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import ProfileView from 'app/features/Gamepad/ProfileView';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-
 export const Route = createFileRoute('/gamepad/$gamepadProfileId')({
     component: GamepadProfilePage,
 });
@@ -27,9 +26,8 @@ function GamepadProfilePage() {
                     <Button
                         onClick={() => router.navigate({ to: '/gamepad' })}
                         variant="outline"
-                    >
-                        Back to Gamepad Profiles
-                    </Button>
+                        text="Back to Gamepad Profiles"
+                    />
                 </div>
             </Page>
         );

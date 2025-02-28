@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from 'react-redux';
 
-import { Button } from 'app/components/shadcn/Button';
+import Button from 'app/components/Button';
 import {
     Dialog,
     DialogContent,
@@ -117,7 +117,6 @@ export const AddNewProfile = () => {
                             <Button
                                 onClick={handleStartListening}
                                 className="w-full"
-                                variant="outline"
                             >
                                 Start Detecting Gamepad
                             </Button>
@@ -162,8 +161,8 @@ export const AddNewProfile = () => {
 
                                     <div className="flex justify-end space-x-2">
                                         <Button
-                                            variant="outline"
                                             onClick={handleStartListening}
+                                            variant="ghost"
                                         >
                                             Try Again
                                         </Button>

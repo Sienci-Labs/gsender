@@ -30,7 +30,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import cx from 'classnames';
 import { GamepadDetail } from 'app/lib/gamepad/definitions';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
@@ -153,19 +153,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 measurement.
                             </p>
                         </div>
-                        <Button
-                            disabled={!connectionMade}
-                            onClick={startProbe}
-                            className={cx(
-                                'rounded-[0.2rem] border-solid border-2 p-2',
-                                {
-                                    'border-blue-400 bg-white [box-shadow:_2px_2px_1px_var(--tw-shadow-color)] shadow-gray-400':
-                                        connectionMade,
-                                    'border-gray-500 bg-gray-400':
-                                        !connectionMade,
-                                },
-                            )}
-                        >
+                        <Button disabled={!connectionMade} onClick={startProbe}>
                             {connectionMade
                                 ? 'Start Probe'
                                 : 'Waiting for probe circuit check...'}
