@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { actions } from './apiActions.ts';
 
-export function RemoteModeDialog({ showRemote, onClose }) {
+export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
     const [port, setPort] = useState(8000);
     const [ips, setIps] = useState([]);
     const [ip, setIp] = useState('192.168.0.10');
@@ -43,12 +43,14 @@ export function RemoteModeDialog({ showRemote, onClose }) {
     function saveRemotePreferences(e) {
         e.preventDefault();
 
-        onClose(false);
-        actions.saveSettings({
+        const payload = {
             ip,
             port,
             headlessStatus: remoteEnabled,
-        });
+        };
+        onClose(false);
+        actions.saveSettings(payload);
+        setHeadlessSettings(payload);
         toast.success('Updated Wireless Control Settings');
     }
 

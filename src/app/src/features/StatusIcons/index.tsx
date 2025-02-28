@@ -80,6 +80,7 @@ const StatusIcons = () => {
             <RemoteModeDialog
                 showRemote={showRemoteDialog}
                 onClose={() => setShowRemoteDialog(false)}
+                setHeadlessSettings={setHeadlessSettings}
             />
         </div>
     );
