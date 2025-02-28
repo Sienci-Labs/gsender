@@ -15,16 +15,25 @@ import {
 } from 'app/components/shadcn/Select.tsx';
 import Button from 'app/components/Button';
 import Toggle from 'app/components/Switch/Toggle.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { actions } from './apiActions.ts';
+import controller from 'app/lib/controller.ts';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
 export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
     const [port, setPort] = useState(8000);
-    const [ips, setIps] = useState([]);
     const [ip, setIp] = useState('192.168.0.10');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
     const [dirty, setDirty] = useState(false);
+
+    const ipList = useSelector((state: RootState) => state.preferences.ipList);
+
+    useEffect(() => {
+        controller.listAllIps();
+        console.log(ipList);
+    }, [showRemote]);
 
     function toggleRemoteMode() {
         setDirty(true);
@@ -83,8 +92,11 @@ export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
                                     <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
                                         <SelectValue placeholder={ip} />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        {ips.map((o) => (
+                                    <SelectContent
+                                        contentEditable={true}
+                                        className="bg-white"
+                                    >
+                                        {ipList.map((o) => (
                                             <SelectItem
                                                 key={`${o}`}
                                                 value={`${o}`}
