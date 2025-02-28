@@ -56,7 +56,7 @@ export function RemoteMenuFlyout() {
 
             <div
                 className={cx(
-                    'absolute top-14 inset-x-0 transition transform-origin-top-left w-screen h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
+                    'absolute top-14 inset-x-0 transition transform-origin-top-left w-96 h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
                     { hidden: !isOpen },
                 )}
             >

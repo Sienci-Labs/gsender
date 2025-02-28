@@ -7,7 +7,7 @@ export function BottomNavLink({ label, icon, href }) {
     return (
         <Link
             href={href}
-            className="inline-flex flex-col items-center justify-center border-gray-200 border-x hover:bg-gray-50 "
+            className="inline-flex flex-col items-center justify-center border-gray-300 border-x hover:bg-gray-50 "
         >
             <span className="w-5 h-5 mb-2 text-gray-500  group-hover:text-blue-600 text-2xl">
                 {icon}
@@ -21,7 +21,7 @@ export function BottomNavLink({ label, icon, href }) {
 
 export function BottomNav() {
     return (
-        <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-200">
+        <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
             <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
                 <BottomNavLink
                     href="/remote/"
