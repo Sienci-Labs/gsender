@@ -8,11 +8,19 @@ interface JogInputProps {
     onClick?: () => void;
     currentValue: number | string;
 }
+
 export function JogInput({ label, currentValue }: JogInputProps) {
     return (
         <div className="flex flex-row justify-between items-center gap-2">
-            <Label className="min-w-[2ch] text-right">{label}</Label>
-            <Input sizing="sm" value={currentValue} onChange={noop} />
+            <Label className="w-[3ch] text-right whitespace-nowrap">
+                {label}
+            </Label>
+            <Input
+                sizing="sm"
+                value={currentValue}
+                onChange={noop}
+                className="flex-1"
+            />
         </div>
     );
 }
