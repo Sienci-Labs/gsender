@@ -30,11 +30,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
                 <BsUsbPlug />
             </span>
             <div className="flex flex-col gap-1 text-right">
-                <span>
-                    <Tooltip content={port.port}>
-                        {truncatePortName(port.port)}
-                    </Tooltip>
-                </span>
+                <span>{truncatePortName(port.port)}</span>
                 <span className="text-sm text-gray-600 font-normal">
                     USB at {baud} baud
                 </span>

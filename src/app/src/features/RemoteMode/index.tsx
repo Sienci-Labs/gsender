@@ -109,7 +109,7 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                             </p>
                             <hr />
                             <Button
-                                color="primary"
+                                variant="primary"
                                 disabled={!dirty}
                                 onClick={saveRemotePreferences}
                             >
