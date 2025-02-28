@@ -88,7 +88,7 @@ export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
                             </p>
                             <div className="flex flex-row w-full justify-between items-center gap-4">
                                 <span>Addr:</span>
-                                <Select>
+                                <Select onValueChange={onIPSelect}>
                                     <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
                                         <SelectValue placeholder={ip} />
                                     </SelectTrigger>
@@ -131,7 +131,7 @@ export function RemoteModeDialog({ showRemote, onClose, setHeadlessSettings }) {
                             </Button>
                         </div>
 
-                        <QRCodeDisplay />
+                        <QRCodeDisplay address={`${ip}:${port}`} />
                     </div>
                     <DialogFooter></DialogFooter>
                 </form>
