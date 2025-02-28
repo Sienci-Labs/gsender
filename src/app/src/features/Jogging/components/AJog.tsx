@@ -22,7 +22,7 @@ export function AJog({ feedrate, distance, canClick }: JoggerProps) {
         () => continuousJogAxis({ A: -1 }, feedrate),
         {
             threshold: 200,
-            onCancel: () => aMinusJog(feedrate, distance, false),
+            onCancel: () => aMinusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     )();
