@@ -16,6 +16,7 @@ export const actions = {
             let res = await api.remoteSetting.fetch();
             const remote = res.data;
             setHeadlessSettings(remote);
+            console.log(remote);
             setOldSettings(remote);
         } catch (error) {
             console.log(error);
