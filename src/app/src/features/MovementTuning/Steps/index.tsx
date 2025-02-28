@@ -3,8 +3,8 @@ import Select from 'react-select';
 import { LuArrowRight } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
-import { Button } from 'app/components/shadcn/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/Input';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -126,7 +126,10 @@ const Steps = () => {
                                         value: 'z',
                                     },
                                 ]}
-                                onChange={(data) => setSelectedAxis(data.value)}
+                                onChange={(data: {
+                                    label: string;
+                                    value: typeof selectedAxis;
+                                }) => setSelectedAxis(data.value)}
                                 value={{
                                     label: `${selectedAxis.toUpperCase()}-Axis`,
                                     value: selectedAxis,
@@ -143,8 +146,8 @@ const Steps = () => {
                         {!isConnected && (
                             <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
-                                    Please connect to the machine before
-                                    starting the movement tuning wizard.
+                                    Please connect to a device before starting
+                                    the movement tuning wizard.
                                 </p>
                             </div>
                         )}

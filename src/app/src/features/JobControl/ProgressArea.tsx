@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
+import { JSX } from 'react';
 import moment from 'moment';
 
 import {
@@ -29,14 +29,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from 'app/components/shadcn/Tooltip';
-import { Progress } from 'app/components/shadcn/Progress';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import {
     convertMillisecondsToTimeStamp,
     convertSecondsToDHMS,
 } from 'app/lib/datetime';
-import Bit from './assets/Bit.svg';
-//import Bit from './assets/SpinningDrillwithDust.gif';
+
+import WoodcuttingProgress from './WoodcuttingProgress';
 
 interface Props {
     senderStatus: SenderStatus;
@@ -109,14 +108,13 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     const timeComponent = getTimesHTML(timeSplit);
 
     return (
-        <>
-            <div className="w-60 border-solid border border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1">
-                {/* <img src={Bit} /> */}
-                <div className="flex flex-col gap-0 w-full h-full -mt-6 pl-[34px]">
+        <div className="w-64">
+            <div className="border-solid border border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1 pt-1">
+                <div className="flex flex-col gap-0 w-full h-full -mt-6">
                     <div
-                        className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap"
+                        className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap transition-transform duration-200"
                         style={{
-                            transform: `translateX(${percentageValue > 50 ? percentageValue - 60 : percentageValue || 0}%)`,
+                            transform: `translate(${percentageValue > 50 ? percentageValue - 48 : percentageValue || 0}%, 16px)`,
                         }}
                     >
                         <span className="font-bold text-2xl">
@@ -124,24 +122,15 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                         </span>
                         <span>%</span>
                     </div>
-                    {/* <div className="h-[35px] w-24 overflow-hidden border-yellow-700 border">
-                        <img
-                            src={texture}
-                            className="bg-yellow-100 min-w-96 min-h-96 rounded-none"
-                        />
-                    </div> */}
-                    <Progress
-                        value={percentageValue}
-                        Bit={Bit}
-                        className="h-[35px] w-full border-yellow-700 border bg-orange-800 rounded-none ![background-image:_url('texture.png')]"
-                    />
+
+                    <WoodcuttingProgress percentage={percentageValue} />
                 </div>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="flex flex-col text-black justify-center items-center">
+                            <div className="flex flex-col text-black justify-center items-center w-32">
                                 {timeComponent}
-                                <span>remaining</span>
+                                <span className="text-sm">remaining</span>
                             </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-64">
@@ -150,13 +139,13 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     </Tooltip>
                 </TooltipProvider>
             </div>
-            <div className="grid grid-cols-[50%_50%] gap-4 text-gray-500 text-sm whitespace-nowrap w-full">
-                <span className="flex flex-row justify-end items-center">{`${received} / ${total} Lines`}</span>
-                <span className="flex flex-row justify-start items-center">
+            <div className="w-full flex flex-row justify-between gap-2 text-gray-500 text-sm whitespace-nowrap">
+                <span>{`${received} / ${total} Lines`}</span>
+                <span>
                     {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
                 </span>
             </div>
-        </>
+        </div>
     );
 };
 

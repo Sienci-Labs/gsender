@@ -1,7 +1,7 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
 
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 
 interface GcodeViewerProps {
@@ -29,10 +29,9 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
                     size="sm"
                     onClick={handleCopy}
                     className="flex items-center gap-2 border border-gray-500"
-                >
-                    <Copy className="h-4 w-4" />
-                    Copy G-code
-                </Button>
+                    icon={<Copy className="h-4 w-4" />}
+                    text="Copy G-code"
+                />
             </div>
 
             <div className="relative w-full h-full">

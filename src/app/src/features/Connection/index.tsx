@@ -122,13 +122,15 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="relative border border-gray-400 bg-gray-100 font-bold  px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0">
+            <div className="relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}
                 />
                 {connectionState === ConnectionState.DISCONNECTED && (
-                    <span className="max-sm:hidden">Connect to CNC</span>
+                    <span className="max-sm:hidden animate-pulse">
+                        Connect to CNC
+                    </span>
                 )}
                 {connectionState === ConnectionState.CONNECTING && (
                     <span className="max-sm:hidden">Connecting...</span>

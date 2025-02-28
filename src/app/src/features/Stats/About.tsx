@@ -5,7 +5,7 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import { version } from 'app-root/package.json';
 
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import { cn } from 'app/lib/utils';
 
 const About = () => {

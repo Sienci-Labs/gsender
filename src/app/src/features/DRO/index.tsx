@@ -43,7 +43,7 @@ import {
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
-import {UnitBadge} from "app/features/DRO/component/UnitBadge.tsx";
+import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 
 interface DROProps {
     axes: AxesArray;
@@ -211,7 +211,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 px-4 relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {/*homingEnabled && (
@@ -263,22 +263,20 @@ function DRO({
             </div>
             <div className="flex flex-row justify-between w-full mt-2">
                 {!shouldWarnZero ? (
-                    <IconButton
-                        icon={<VscTarget />}
+                    <Button
+                        text="Zero"
+                        icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
-                    >
-                        Zero
-                    </IconButton>
+                    />
                 ) : (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <IconButton
-                                icon={<VscTarget />}
+                            <Button
+                                text="Zero"
+                                icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
-                            >
-                                Zero
-                            </IconButton>
+                            />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
                             <AlertDialogHeader>
@@ -306,7 +304,7 @@ function DRO({
                     />
                 )}
 
-                <Button color="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

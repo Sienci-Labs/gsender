@@ -24,7 +24,8 @@
 import React from 'react';
 import cx from 'classnames';
 
-import { Button } from 'app/components/shadcn/Button';
+import { Button as ShadcnButton } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 
 import { METRIC_UNITS } from '../../constants';
 import ProbeImage from './ProbeImage';
@@ -153,7 +154,7 @@ const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
                     <div className="flex w-full bg-white rounded-md border-solid border border-gray-300 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
-                            <Button
+                            <ShadcnButton
                                 key={command.id}
                                 onClick={() =>
                                     actions.handleProbeCommandChange(index)
@@ -168,7 +169,7 @@ const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
                                 )}
                             >
                                 {command.id.split(' ')[0]}
-                            </Button>
+                            </ShadcnButton>
                         ))}
                     </div>
                     <div
@@ -186,15 +187,6 @@ const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
                         <Button
                             onClick={() => actions.onOpenChange(true)}
                             disabled={!canClick}
-                            className={cx(
-                                'rounded-[0.2rem] border-solid border-2 p-2',
-                                'w-full max-w-[125px] h-[max(30px,3vh)] self-start',
-                                {
-                                    'border-blue-400 bg-white [box-shadow:_1px_1px_3px_var(--tw-shadow-color)] shadow-gray-400':
-                                        canClick,
-                                    'border-gray-500 bg-gray-400': !canClick,
-                                },
-                            )}
                         >
                             Probe
                         </Button>

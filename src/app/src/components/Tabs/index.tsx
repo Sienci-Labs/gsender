@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
+
 interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
@@ -36,8 +38,13 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const scrollTabs = (direction: 'left' | 'right') => {
         if (tabsRef.current) {
             const scrollAmount = 100;
-            tabsRef.current.scrollLeft +=
-                direction === 'left' ? -scrollAmount : scrollAmount;
+            const newScrollLeft =
+                tabsRef.current.scrollLeft +
+                (direction === 'left' ? -scrollAmount : scrollAmount);
+            tabsRef.current.scrollTo({
+                left: newScrollLeft,
+                behavior: 'smooth',
+            });
             checkScrollability();
         }
     };
@@ -72,7 +79,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
             <div className="relative">
                 <div className="flex items-center absolute top-[-47px] left-0 right-0 z-10">
                     <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 mr-2 ${
+                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
                             canScrollLeft
                                 ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'
                                 : 'text-gray-200 cursor-not-allowed'
@@ -80,7 +87,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
                     >
-                        <span>&#9664;</span>
+                        <MdKeyboardArrowLeft className="w-6 h-6" />
                     </button>
                     <div
                         ref={tabsRef}
@@ -96,7 +103,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                 <button
                                     key={item.label}
                                     ref={(el) => (tabRefs.current[index] = el)}
-                                    className={`flex-grow px-4 py-2 text-sm font-medium ${
+                                    className={`flex-grow px-4 py-1 text font-medium ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600'
                                             : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800'
@@ -110,7 +117,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                             ))}
                     </div>
                     <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ml-2 ${
+                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
                             canScrollRight
                                 ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'
                                 : 'text-gray-200 cursor-not-allowed'
@@ -118,7 +125,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}
                     >
-                        <span>&#9654;</span>
+                        <MdKeyboardArrowRight className="w-6 h-6" />
                     </button>
                 </div>
             </div>

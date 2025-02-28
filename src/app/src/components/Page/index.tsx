@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { useRouter } from '@tanstack/react-router';
 import { LuArrowLeft } from 'react-icons/lu';
 
-import { Button } from 'app/components/shadcn/Button';
+import Button from 'app/components/Button';
 
 type PageProps = {
     children: React.ReactNode;

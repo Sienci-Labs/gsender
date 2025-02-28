@@ -1,12 +1,10 @@
-import MachineStatus from 'app/features/MachineStatus/MachineStatus';
 import Connection from 'app/features/Connection';
 import SpindleLaserStatus from 'app/components/SpindleLaserStatus';
+import StatusIcons from 'app/features/StatusIcons';
+import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuFlyout.tsx';
 
 import gSenderIcon from './assets/icon-round.png';
-import MachineInfo from 'app/features/MachineInfo';
-import StatusIcons from 'app/features/StatusIcons';
-import NotificationsArea from './NotificationsArea';
-import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuFlyout.tsx';
+import CenterArea from './CenterArea';
 
 export const TopBar = () => {
     return (
@@ -18,11 +16,7 @@ export const TopBar = () => {
 
             <Connection />
 
-            <MachineInfo />
-
-            <NotificationsArea />
-
-            <MachineStatus />
+            <CenterArea />
 
             <StatusIcons />
 

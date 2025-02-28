@@ -49,7 +49,8 @@ export function AxisRow({
                         }
                     }}
                     disabled={disabled}
-                    color={homingMode ? 'alt' : 'secondary'}
+                    variant={homingMode ? 'alt' : 'secondary'}
+                    size="sm"
                 >
                     <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                         {`${homingMode ? 'H' : ''}${axis}${homingMode ? '' : '0'}`}
@@ -58,7 +59,7 @@ export function AxisRow({
             ) : (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button disabled={disabled} color="secondary">
+                        <Button disabled={disabled} variant="secondary">
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                                 {`${axis}0`}
                             </span>
@@ -97,8 +98,8 @@ export function AxisRow({
             <Button
                 disabled={disabled}
                 onClick={() => gotoZero(axis)}
-                color="alt"
-                className={'px-4'}
+                variant="alt"
+                size="sm"
             >
                 <span className="text-lg font-mono">{axis}</span>
             </Button>

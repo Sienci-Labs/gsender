@@ -1,3 +1,5 @@
+import { Input } from 'app/components/Input';
+
 interface IPSettingInputsProps {
     ip: number[];
     index: number;
@@ -13,32 +15,40 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
     }
     return (
         <div className="flex flex-row gap-2 items-end">
-            <input
+            <Input
                 type="number"
-                className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
+                className="w-[6ch] p-2 text-center"
                 value={ip[0]}
-                onChange={(e) => updateIPPortion(0, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateIPPortion(0, e.target.value)
+                }
             />
             .
-            <input
+            <Input
                 type="number"
-                className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
+                className="w-[6ch] p-2 text-center"
                 value={ip[1]}
-                onChange={(e) => updateIPPortion(1, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateIPPortion(1, e.target.value)
+                }
             />
             .
-            <input
+            <Input
                 type="number"
-                className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
+                className="w-[6ch] p-2 text-center"
                 value={ip[2]}
-                onChange={(e) => updateIPPortion(2, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateIPPortion(2, e.target.value)
+                }
             />
             .
-            <input
+            <Input
                 type="number"
-                className="w-[6ch] p-2 text-center box-border border border-solid border-gray-300 rounded-sm focus:outline-none"
+                className="w-[6ch] p-2 text-center"
                 value={ip[3]}
-                onChange={(e) => updateIPPortion(3, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateIPPortion(3, e.target.value)
+                }
             />
         </div>
     );

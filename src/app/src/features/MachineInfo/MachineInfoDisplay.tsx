@@ -10,7 +10,18 @@ import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import store from 'app/store';
 
-export function MachineInfoDisplay({ open, pinned, onClose }) {
+interface MachineInfoDisplayProps {
+    open: boolean;
+    pinned: boolean;
+    onClose: () => void;
+    setPinned: (pinned: boolean) => void;
+}
+
+export function MachineInfoDisplay({
+    open,
+    pinned,
+    setPinned,
+}: MachineInfoDisplayProps) {
     const { pins, modals, isConnected } = useTypedSelector((state) => ({
         pins: state.controller.state.status?.pinState,
         modals: state.controller.modal,
@@ -24,7 +35,7 @@ export function MachineInfoDisplay({ open, pinned, onClose }) {
                 hidden: !open,
             })}
         >
-            <CardContent className="max-sm:block -mt-4 -ml-4 p-6 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
+            <CardContent className="max-sm:block -mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
                 <div className="flex flex-row w-full justify-between">
                     <span className="float-left font-bold text-2xl pb-2">
                         Machine Information
@@ -80,51 +91,15 @@ export function MachineInfoDisplay({ open, pinned, onClose }) {
                     <CardDescription className="flex flex-col border-l-2 border-l-gray-200 pl-4">
                         <span className="underline float-left">Pins</span>
                         <div className="flex flex-col justify-between items-center">
-                            <PinRow
-                                label="X Limit"
-                                on={pins?.X}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Y Limit"
-                                on={pins?.Y}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Z Limit"
-                                on={pins?.Z}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="A Limit"
-                                on={pins?.A}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Probe/TLS"
-                                on={pins?.P}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Door"
-                                on={pins?.D}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Cycle-Start"
-                                on={pins?.S}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Hold"
-                                on={pins?.H}
-                                isConnected={isConnected}
-                            />
-                            <PinRow
-                                label="Soft-Reset"
-                                on={pins?.R}
-                                isConnected={isConnected}
-                            />
+                            <PinRow label="X Limit" on={pins?.X} />
+                            <PinRow label="Y Limit" on={pins?.Y} />
+                            <PinRow label="Z Limit" on={pins?.Z} />
+                            <PinRow label="A Limit" on={pins?.A} />
+                            <PinRow label="Probe/TLS" on={pins?.P} />
+                            <PinRow label="Door" on={pins?.D} />
+                            <PinRow label="Cycle-Start" on={pins?.S} />
+                            <PinRow label="Hold" on={pins?.H} />
+                            <PinRow label="Soft-Reset" on={pins?.R} />
                         </div>
                     </CardDescription>
                 </div>

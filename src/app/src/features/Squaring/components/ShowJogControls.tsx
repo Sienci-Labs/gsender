@@ -4,7 +4,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-import { Button } from 'app/components/shadcn/Button';
+import Button from 'app/components/Button';
 
 const ShowJogControls = () => {
     return (

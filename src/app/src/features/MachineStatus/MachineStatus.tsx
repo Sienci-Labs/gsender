@@ -96,11 +96,13 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             <div className="flex relative flex-col items-center">
                 <div
                     className={cx(
-                        'flex max-sm:w-40 max-sm:text-normal w-72 h-[70px] justify-between items-center bg-black [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]', //[border-top:50px_solid_black] [border-left:25px_solid_transparent] [border-right:25px_solid_transparent]",
+                        'transition-colors duration-300 ease-in-out flex max-sm:w-40 max-sm:text-normal w-72 h-[70px] justify-between items-center [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]',
                         {
-                            'text-white': !isConnected || !activeState,
+                            'text-white bg-gray-800':
+                                !isConnected || !activeState,
                             'bg-gray-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_IDLE,
+                                activeState === GRBL_ACTIVE_STATE_IDLE &&
+                                isConnected,
                             'bg-green-600 text-white':
                                 activeState === GRBL_ACTIVE_STATE_RUN ||
                                 activeState === GRBL_ACTIVE_STATE_JOG ||
@@ -160,8 +162,6 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     return (
         // calc = half of width + sidebar width
         <div className="absolute top-0 left-1/2 -ml-[calc(128px-50px)] max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
-            {' '}
-            {/*className="grid grid-cols-[2fr_2fr_2fr]">*/}
             {machineStateRender()}
         </div>
     );
