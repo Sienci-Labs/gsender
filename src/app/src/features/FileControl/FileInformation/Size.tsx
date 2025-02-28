@@ -25,9 +25,7 @@ const Size = () => {
             <thead>
                 <tr>
                     <th className="border border-gray-300 px-1 py-0.5"></th>
-                    <th className="border border-gray-300 px-1 py-0.5">
-                        Delta
-                    </th>
+                    <th className="border border-gray-300 px-1 py-0.5">Size</th>
                     <th className="border border-gray-300 px-1 py-0.5">Min</th>
                     <th className="border border-gray-300 px-1 py-0.5">Max</th>
                 </tr>

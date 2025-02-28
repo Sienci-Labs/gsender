@@ -4,8 +4,8 @@ import { LuCopy } from 'react-icons/lu';
 import { LuPaintbrush } from 'react-icons/lu';
 import { FaEllipsisH } from 'react-icons/fa';
 
-import { Button } from 'app/components/shadcn/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/Input';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
@@ -74,6 +74,7 @@ const TerminalInput = ({ onClear }: Props) => {
     const handleCopyHistory = async () => {
         try {
             const lastCommands = history.slice(-COPY_HISTORY_LIMIT);
+
             await navigator.clipboard.writeText(lastCommands.join('\n'));
 
             toast.success(
@@ -98,7 +99,6 @@ const TerminalInput = ({ onClear }: Props) => {
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
-                className="w-full flex-grow"
                 onKeyDown={(e) => {
                     switch (e.key) {
                         case 'Enter': {
@@ -129,8 +129,8 @@ const TerminalInput = ({ onClear }: Props) => {
             />
 
             <Button
-                variant="default"
-                className="bg-blue-500 text-white w-32"
+                variant="primary"
+                className="w-24"
                 onClick={handleCommandExecute}
             >
                 Run
@@ -138,7 +138,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="secondary">
                         <FaEllipsisH />
                     </Button>
                 </DropdownMenuTrigger>

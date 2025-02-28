@@ -3,8 +3,8 @@ import Select from 'react-select';
 import { LuArrowRight } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
-import { Button } from 'app/components/shadcn/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/Input';
 import {
     AlertDialog,
     AlertDialogAction,

@@ -1,17 +1,18 @@
 import { useRef } from 'react';
+
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { toast } from 'app/lib/toaster';
 
 import Terminal from './Terminal';
 import TerminalInput from './TerminalInput';
 
 import './styles.css';
-import { toast } from 'app/lib/toaster';
 
-type Props = {
+type ConsoleProps = {
     isActive: boolean;
 };
 
-const Console = ({ isActive }: Props) => {
+const Console = ({ isActive }: ConsoleProps) => {
     const { isConnected } = useTypedSelector((state) => state.connection);
     const terminalRef = useRef<{ clear: () => void }>(null);
 
@@ -26,7 +27,8 @@ const Console = ({ isActive }: Props) => {
     return (
         <>
             <div
-                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity duration-300 ${isConnected ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity 
+                    duration-300 ${isConnected ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
                 <div className="flex justify-center items-center h-full">
                     <h2 className="text-lg font-bold">

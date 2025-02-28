@@ -38,7 +38,8 @@ import {
 import saveAs from 'file-saver';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
-import ToolModalButton from 'app/components/ToolModalButton';
+// import ToolModalButton from 'app/components/ToolModalButton';
+import { Button } from 'app/components/Button';
 import pkg from '../../package.json';
 import {
     GRBLHAL,
@@ -848,8 +849,7 @@ function generateSupportFile() {
         </Document>
     );
 
-    const submitDiagnosticForm = async (event: Event) => {
-        event.preventDefault(); // prevent page reload
+    const submitDiagnosticForm = async () => {
         const blob = await pdf(<SupportFile />).toBlob();
         const date = new Date();
         const currentDate = date.toLocaleDateString().replaceAll('/', '-');
@@ -882,13 +882,13 @@ function generateSupportFile() {
     };
 
     return (
-        <ToolModalButton
-            icon={<PiFileZipFill />}
+        <Button
+            icon={<PiFileZipFill className="text-blue-500 w-8 h-8" />}
             onClick={submitDiagnosticForm}
-            className={null}
-        >
-            Download Diagnostic File
-        </ToolModalButton>
+            className="text-blue-500"
+            size="lg"
+            text="Download Diagnostic File"
+        />
     );
 }
 

@@ -1,8 +1,8 @@
 import cn from 'classnames';
 import { LuArrowLeft } from 'react-icons/lu';
-
-import { Button } from 'app/components/shadcn/Button';
 import { useNavigate } from 'react-router';
+
+import Button from 'app/components/Button';
 
 type PageProps = {
     children: React.ReactNode;

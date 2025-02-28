@@ -118,11 +118,12 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">
                     <SelectGroup className="bg-white">
-                        {options.map((option, _index) => {
+                        {options.map((option) => {
                             return (
                                 <SelectItem
+                                    key={option.value}
                                     value={option.value}
-                                    className="bg-white "
+                                    className="bg-white"
                                 >
                                     {option.label}
                                 </SelectItem>

@@ -1,5 +1,7 @@
-import { Label } from 'app/components/Label';
 import noop from 'lodash/noop';
+
+import { Label } from 'app/components/Label';
+import { Input } from 'app/components/Input';
 
 interface JogInputProps {
     label: string;
@@ -8,13 +10,9 @@ interface JogInputProps {
 }
 export function JogInput({ label, currentValue }: JogInputProps) {
     return (
-        <div className="flex flex-row justify-between items-center gap-4">
-            <Label className="text-right">{label}</Label>
-            <input
-                className="w-[8ch] border border-gray-200 rounded px-2 text-gray-500"
-                value={currentValue}
-                onChange={noop}
-            />
+        <div className="flex flex-row justify-between items-center gap-2">
+            <Label className="min-w-[2ch] text-right">{label}</Label>
+            <Input sizing="sm" value={currentValue} onChange={noop} />
         </div>
     );
 }

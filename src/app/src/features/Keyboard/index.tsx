@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux';
 import { cn } from 'app/lib/utils';
 
 import { SHORTCUT_CATEGORY } from 'app/constants';
-import { Button } from 'app/components/shadcn/Button';
-import { Input } from 'app/components/shadcn/Input';
+import Button from 'app/components/Button';
+import { Input } from 'app/components/Input';
 import { Switch } from 'app/components/shadcn/Switch';
 import {
     Table,

@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
+import { JSX } from 'react';
 import moment from 'moment';
 
 import {
@@ -104,8 +104,6 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
         ? 0
         : (received / total) * 100;
 
-    // const percentageValue = 51;
-
     const timeSplit = convertSecondsToDHMS(Number(remainingTime));
     const timeComponent = getTimesHTML(timeSplit);
 
@@ -116,7 +114,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     <div
                         className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap transition-transform duration-200"
                         style={{
-                            transform: `translate(${percentageValue > 50 ? percentageValue - 45 : percentageValue || 0}%, 16px)`,
+                            transform: `translate(${percentageValue > 50 ? percentageValue - 48 : percentageValue || 0}%, 16px)`,
                         }}
                     >
                         <span className="font-bold text-2xl">
@@ -130,7 +128,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="flex flex-col text-black justify-center items-center">
+                            <div className="flex flex-col text-black justify-center items-center w-32">
                                 {timeComponent}
                                 <span className="text-sm">remaining</span>
                             </div>

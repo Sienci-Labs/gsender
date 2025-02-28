@@ -1,26 +1,25 @@
-import jogWheeelLabels from './assets/labels.svg';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import includes from 'lodash/includes';
+import get from 'lodash/get';
+
 import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
 import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
-import { useCallback, useEffect, useState } from 'react';
 import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
-import stopSign from './assets/stop.svg';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
 import { FirmwareFlavour } from 'app/features/Connection';
-import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
-import get from 'lodash/get';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
-    SHORTCUT_CATEGORY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import includes from 'lodash/includes';
-import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 
+import stopSign from './assets/stop.svg';
+import jogWheeelLabels from './assets/labels.svg';
 export interface JogValueObject {
     xyStep: number;
     aStep: number;
@@ -122,8 +121,8 @@ export function Jogging() {
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-around flex-shrink">
-                <div className="grid grid-cols-2 gap-1">
+            <div className="flex gap-4">
+                <div className="grid grid-cols-2 gap-x-4">
                     <JogInput label="XY" currentValue={jogSpeed.xyStep} />
                     <JogInput label="Z" currentValue={jogSpeed.zStep} />
                     <JogInput label="at" currentValue={jogSpeed.feedrate} />

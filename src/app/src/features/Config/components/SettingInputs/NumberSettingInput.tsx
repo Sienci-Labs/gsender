@@ -1,9 +1,10 @@
+import { Input } from 'app/components/Input';
 export interface NumberSettingInputProps {
     unit?: string;
     value: number;
     index: number;
     subIndex: number;
-    onChange: (value) => void;
+    onChange: (value: number) => void;
 }
 
 export function NumberSettingInput({
@@ -13,17 +14,15 @@ export function NumberSettingInput({
 }: NumberSettingInputProps) {
     return (
         <div className="ring-1 ring-gray-300 flex flex-row flex-1 rounded">
-            <input
+            <Input
                 type="number"
                 value={value}
                 className="flex-1 p-2 focus:outline-none"
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange(e.target.valueAsNumber)
+                }
+                suffix={unit}
             />
-            {unit && (
-                <span className="flex items-center justify-center min-w-16 px-2 text-xs bg-gray-300 text-gray-700">
-                    {unit}
-                </span>
-            )}
         </div>
     );
 }

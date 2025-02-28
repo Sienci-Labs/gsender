@@ -77,7 +77,7 @@ const RangeSlider = ({
                 <button
                     type="button"
                     className={cx(
-                        'flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
+                        'flex w-14 h-10 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
                         {
                             'border-blue-400 bg-white': !disabled,
                             'border-gray-400 bg-gray-300': disabled,
@@ -110,7 +110,7 @@ const RangeSlider = ({
                 <button
                     type="button"
                     className={cx(
-                        'flex w-10 h-7 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
+                        'flex w-14 h-10 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
                         {
                             'border-blue-400 bg-white': !disabled,
                             'border-gray-400 bg-gray-300': disabled,
@@ -130,7 +130,7 @@ const RangeSlider = ({
                 <button
                     type="button"
                     className={cx(
-                        'flex w-10 h-7 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
+                        'flex w-14 h-10 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
                         {
                             'border-blue-400 bg-white': !disabled,
                             'border-gray-400 bg-gray-300': disabled,
