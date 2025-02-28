@@ -66,7 +66,6 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     function onValueEdit(e: React.ChangeEvent<HTMLInputElement>, axis: string) {
         const value = e.target.value;
-        console.log(value);
         const payload = {
             ...movementPos,
             [axis]: value,

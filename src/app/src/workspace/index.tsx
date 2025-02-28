@@ -1,10 +1,10 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate, redirect } from '@tanstack/react-router';
 
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
 import { toggleAllShortcuts } from 'app/store/redux/slices/keyboardShortcutsSlice';
-
+import { useEffect } from 'react';
 import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -16,6 +16,20 @@ type WorkspaceProps = {
 
 const Workspace = ({ children }: WorkspaceProps) => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        console.log('CALLED NAV');
+        console.log(location);
+        const { href } = location;
+        if (href === '/#/remote') {
+            console.log('MATCHED');
+            redirect({
+                to: '/remote',
+                throw: true,
+            });
+        }
+    }, [location]);
 
     useRegisterShortcuts([
         {
