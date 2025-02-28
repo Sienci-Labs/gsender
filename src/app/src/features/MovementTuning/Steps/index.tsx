@@ -126,7 +126,10 @@ const Steps = () => {
                                         value: 'z',
                                     },
                                 ]}
-                                onChange={(data) => setSelectedAxis(data.value)}
+                                onChange={(data: {
+                                    label: string;
+                                    value: typeof selectedAxis;
+                                }) => setSelectedAxis(data.value)}
                                 value={{
                                     label: `${selectedAxis.toUpperCase()}-Axis`,
                                     value: selectedAxis,

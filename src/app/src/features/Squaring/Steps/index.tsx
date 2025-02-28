@@ -54,7 +54,7 @@ const Steps = () => {
                             squared to each other. This can be fixed.
                         </p>
 
-                        <p>
+                        <div>
                             To know how much adjustment is needed, follow the
                             steps below. Prepare:
                             <ul className="list-disc list-inside">
@@ -69,7 +69,7 @@ const Steps = () => {
                                     dowel
                                 </li>
                             </ul>
-                        </p>
+                        </div>
 
                         <p>
                             Use the jog buttons to position your CNC near its
