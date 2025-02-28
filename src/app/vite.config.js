@@ -9,7 +9,6 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
-
     base: './',
     css: {
         postcss: {
@@ -46,6 +45,11 @@ export default defineConfig({
         },
     },
     define: {
+    },
+    server: {
+        hmr: {
+            overlay: false
+        }
     },
     optimizeDeps: {
         include: ['**/*.styl'],
