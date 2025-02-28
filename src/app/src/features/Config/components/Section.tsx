@@ -60,11 +60,9 @@ export const Section = React.forwardRef(
                 })}
                 ref={ref}
             >
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row gap-8">
                     <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
-                    {
-                        wizard && wizard()
-                    }
+                    {wizard && wizard()}
                 </div>
                 <div className="bg-gray-100 rounded-xl shadow p-6">
                     {settings.map((setting: gSenderSubSection, index) => {
@@ -80,6 +78,7 @@ export const Section = React.forwardRef(
                                 <SettingSection
                                     settings={setting.settings}
                                     label={setting.label}
+                                    wizard={setting.wizard}
                                 />
                             );
                         }

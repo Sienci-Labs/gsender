@@ -26,6 +26,9 @@ import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/Li
 import { SpindleWizard } from 'app/features/Config/components/wizards/SpindleWizard.tsx';
 import { AccessoryOutputWizard } from 'app/features/Config/components/wizards/AccessoryOutputWizard.tsx';
 import { SquaringToolWizard } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
+import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
+import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
+import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -71,7 +74,7 @@ export interface gSenderSetting {
 
 export interface gSenderSubSection {
     label?: string;
-    Wizard?: () => JSX.Element;
+    wizard?: () => JSX.Element;
     settings?: gSenderSetting[];
 }
 
@@ -94,7 +97,7 @@ export interface gSenderEEPROMSetting {
 
 export interface gSenderEEPROMSettingSection {
     label: string;
-    wizard?: React.ReactNode;
+    wizard?: () => JSX.Element;
     eeprom: gSenderEEPROMSetting[];
 }
 
@@ -206,6 +209,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'X-axis',
+                wizard: XJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
@@ -229,6 +233,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Y-axis',
+                wizard: YJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
@@ -256,6 +261,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Z-axis',
+                wizard: ZJogWizard,
                 settings: [
                     {
                         type: 'eeprom',

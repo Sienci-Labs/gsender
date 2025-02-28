@@ -7,14 +7,17 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
 import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
+import React from 'react';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
     label?: string;
+    wizard?: () => JSX.Element;
 }
 export function SettingSection({
     settings = [],
     label = null,
+    wizard,
 }: SettingSectionProps): JSX.Element {
     const { setSettingsValues, setSettingsAreDirty, searchTerm, connected } =
         useSettings();
@@ -40,9 +43,10 @@ export function SettingSection({
             })}
         >
             {label && (
-                <h2 className="text-blue-500 border-b border-blue-500 mt-4 text-xl">
-                    {label}
-                </h2>
+                <div className="flex flex-row gap-8 border-b border-blue-500 mt-4">
+                    <h2 className="text-blue-500  text-xl">{label}</h2>
+                    {wizard && wizard()}
+                </div>
             )}
             {filteredSettings.map((setting) => {
                 return (

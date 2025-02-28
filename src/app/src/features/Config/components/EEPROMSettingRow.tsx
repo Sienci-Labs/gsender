@@ -91,7 +91,7 @@ export function EEPROMSettingRow({
                     {EEPROMData.description}
                 </div>
                 <div
-                    className="w-1/5 text-xs px-4"
+                    className="w-1/5 text-xs px-4 gap-2 flex flex-col"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
