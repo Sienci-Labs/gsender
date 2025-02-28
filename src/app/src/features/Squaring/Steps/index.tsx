@@ -11,6 +11,7 @@ import ResultsStep from './ResultsStep';
 import xySquaringImage from '../assets/XY_squaring_example.jpg';
 import { Jogging } from 'app/features/Jogging';
 import ShowJogControls from '../components/ShowJogControls';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 const Steps = () => {
     const [started, setStarted] = useState(false);
@@ -21,6 +22,7 @@ const Steps = () => {
         goToPreviousMainStep,
         resetSquaring,
     } = useSquaring();
+    const { isConnected } = useTypedSelector((state) => state.connection);
 
     const renderStep = () => {
         switch (currentMainStep) {
@@ -47,7 +49,7 @@ const Steps = () => {
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <div className="space-y-6">
                         <p>
-                            If your CNC is making skewed cuts (pictured), 
+                            If your CNC is making skewed cuts (pictured),
                             it&apos;s because the X and Y axes aren&apos;t
                             squared to each other. This can be fixed.
                         </p>
@@ -55,15 +57,16 @@ const Steps = () => {
                         <p>
                             To know how much adjustment is needed, follow the
                             steps below. Prepare:
-                            
                             <ul className="list-disc list-inside">
                                 <li>
-                                    3 squares of tape marked with an &apos;X&apos;
+                                    3 squares of tape marked with an
+                                    &apos;X&apos;
                                 </li>
                                 <li>A long ruler or measuring tape</li>
                                 <li>
-                                    Put something pointed in the spindle like an old
-                                    v-bit, tapered bit, pencil, or a pointed dowel
+                                    Put something pointed in the spindle like an
+                                    old v-bit, tapered bit, pencil, or a pointed
+                                    dowel
                                 </li>
                             </ul>
                         </p>
@@ -77,6 +80,14 @@ const Steps = () => {
                         <div className="w-full max-w-96">
                             <Jogging />
                         </div>
+                        {!isConnected && (
+                            <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
+                                <p>
+                                    Please connect to a device before starting
+                                    the squaring wizard.
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <div className="flex flex-col gap-4">
                         <img
@@ -92,8 +103,12 @@ const Steps = () => {
                         </p>
                     </div>
                 </div>
+
                 <div className="flex gap-4 shrink-0">
-                    <Button onClick={() => setStarted(true)}>
+                    <Button
+                        onClick={() => setStarted(true)}
+                        disabled={!isConnected}
+                    >
                         Start XY Squaring
                     </Button>
                 </div>
