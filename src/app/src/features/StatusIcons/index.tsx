@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import cx from 'classnames';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 import { MdPhonelinkRing } from 'react-icons/md';
 import { LuGamepad2 } from 'react-icons/lu';
 import { FaRegKeyboard } from 'react-icons/fa6';

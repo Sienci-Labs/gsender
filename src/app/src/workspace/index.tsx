@@ -1,5 +1,3 @@
-import { useLocation, useNavigate, redirect } from '@tanstack/react-router';
-
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
@@ -9,12 +7,10 @@ import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts'
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { WORKSPACE_MODE } from 'app/constants';
+import { Outlet, useNavigate, useLocation } from 'react-router';
+import { Carve } from './Carve';
 
-type WorkspaceProps = {
-    children: React.ReactNode;
-};
-
-const Workspace = ({ children }: WorkspaceProps) => {
+const Workspace = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -190,7 +186,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f1',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/' });
+                navigate('/');
             },
         },
         {
@@ -200,7 +196,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f2',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/stats' });
+                navigate('/stats');
             },
         },
         {
@@ -210,7 +206,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f3',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/configuration' });
+                navigate('/configuration');
             },
         },
         {
@@ -220,7 +216,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f4',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/tools' });
+                navigate('/tools');
             },
         },
         {
@@ -230,7 +226,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f5',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/squaring' });
+                navigate('/squaring');
             },
         },
         {
@@ -240,7 +236,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f6',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/movement-tuning' });
+                navigate('/movement-tuning');
             },
         },
         {
@@ -250,7 +246,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             defaultKeys: 'f7',
             category: 'TOOLBAR_CATEGORY',
             onKeyDown: () => {
-                navigate({ to: '/keyboard-shortcuts' });
+                navigate('/keyboard-shortcuts');
             },
         },
     ]);
@@ -260,7 +256,10 @@ const Workspace = ({ children }: WorkspaceProps) => {
             <TopBar />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
-                <div className="w-full max-sm:p-4">{children}</div>
+                <div className="w-full max-sm:p-4">
+                    <Carve />
+                    <Outlet />
+                </div>
             </div>
         </div>
     );

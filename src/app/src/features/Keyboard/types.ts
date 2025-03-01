@@ -28,7 +28,7 @@ export type ShortcutActions = {
 
 export type RegisterShortcutOptions = {
     id: string;
-    title: string;
+    title?: string;
     description?: string;
     defaultKeys: string;
     category: ShortcutCategory;
