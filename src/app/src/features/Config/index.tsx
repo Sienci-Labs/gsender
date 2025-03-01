@@ -74,6 +74,7 @@ export function Config() {
                                                 settings={item.settings}
                                                 eeprom={item.eeprom}
                                                 ref={ref}
+                                                wizard={item.wizard}
                                             />
                                         );
                                     }}

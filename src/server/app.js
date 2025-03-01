@@ -71,14 +71,6 @@ import {
 
 const log = logger('app');
 
-// export const renderPage = (view = 'index', cb = _noop) => (req, res, next) => {
-//     // Override IE's Compatibility View Settings
-//     // http://stackoverflow.com/questions/6156639/x-ua-compatible-is-set-to-ie-edge-but-it-still-doesnt-stop-compatibility-mode
-//     res.set({ 'X-UA-Compatible': 'IE=edge' });
-
-//     const locals = { ...cb(req, res) };
-//     res.render(view, locals);
-// };
 
 const appMain = () => {
     const app = express();

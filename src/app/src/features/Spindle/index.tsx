@@ -367,7 +367,6 @@ const SpindleWidget = () => {
             pubsub.publish('spindle:mode', newMode);
         },
         sendM3: () => {
-            console.log('sendM3');
             setIsSpindleOn(true);
             controller.command('gcode', `M3 S${state.spindleSpeed}`);
         },

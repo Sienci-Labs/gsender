@@ -28,7 +28,6 @@ export const storeUpdate = async (
 ): Promise<void> => {
     try {
         const { settings, events = [], state } = JSON.parse(content);
-        console.log(settings);
 
         /*await new Promise((resolve, _reject) => {
             // delete all old events

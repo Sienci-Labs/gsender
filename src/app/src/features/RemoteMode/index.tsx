@@ -15,16 +15,37 @@ import {
 } from 'app/components/shadcn/Select.tsx';
 import Button from 'app/components/Button';
 import Toggle from 'app/components/Switch/Toggle.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { actions } from './apiActions.ts';
+import controller from 'app/lib/controller.ts';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
-export function RemoteModeDialog({ showRemote, onClose }) {
+export function RemoteModeDialog({
+    showRemote,
+    onClose,
+    setHeadlessSettings,
+    remoteIp,
+    remotePort,
+    remoteOn,
+}) {
     const [port, setPort] = useState(8000);
-    const [ips, setIps] = useState([]);
     const [ip, setIp] = useState('192.168.0.10');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
     const [dirty, setDirty] = useState(false);
+
+    const ipList = useSelector((state: RootState) => state.preferences.ipList);
+
+    useEffect(() => {
+        setIp(remoteIp);
+        setPort(remotePort);
+        setRemoteEnabled(remoteOn);
+    }, [remoteIp, remotePort, remoteOn]);
+
+    useEffect(() => {
+        controller.listAllIps();
+    }, [showRemote]);
 
     function toggleRemoteMode() {
         setDirty(true);
@@ -43,12 +64,14 @@ export function RemoteModeDialog({ showRemote, onClose }) {
     function saveRemotePreferences(e) {
         e.preventDefault();
 
-        onClose(false);
-        actions.saveSettings({
+        const payload = {
             ip,
             port,
             headlessStatus: remoteEnabled,
-        });
+        };
+        onClose(false);
+        actions.saveSettings(payload);
+        setHeadlessSettings(payload);
         toast.success('Updated Wireless Control Settings');
     }
 
@@ -77,12 +100,15 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                             </p>
                             <div className="flex flex-row w-full justify-between items-center gap-4">
                                 <span>Addr:</span>
-                                <Select>
+                                <Select onValueChange={onIPSelect}>
                                     <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
                                         <SelectValue placeholder={ip} />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        {ips.map((o) => (
+                                    <SelectContent
+                                        contentEditable={true}
+                                        className="bg-white"
+                                    >
+                                        {ipList.map((o) => (
                                             <SelectItem
                                                 key={`${o}`}
                                                 value={`${o}`}
@@ -109,7 +135,7 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                             </p>
                             <hr />
                             <Button
-                                color="primary"
+                                variant="primary"
                                 disabled={!dirty}
                                 onClick={saveRemotePreferences}
                             >
@@ -117,7 +143,7 @@ export function RemoteModeDialog({ showRemote, onClose }) {
                             </Button>
                         </div>
 
-                        <QRCodeDisplay />
+                        <QRCodeDisplay address={`${ip}:${port}`} />
                     </div>
                     <DialogFooter></DialogFooter>
                 </form>

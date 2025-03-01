@@ -21,6 +21,14 @@ import {
 } from 'app/lib/constants';
 import React from 'react';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
+import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinStatus.tsx';
+import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/LimitSwitchIndicators.tsx';
+import { SpindleWizard } from 'app/features/Config/components/wizards/SpindleWizard.tsx';
+import { AccessoryOutputWizard } from 'app/features/Config/components/wizards/AccessoryOutputWizard.tsx';
+import { SquaringToolWizard } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
+import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
+import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
+import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -59,12 +67,14 @@ export interface gSenderSetting {
     defaultValue?: any;
     dirty?: boolean;
     eventType?: string;
-    wizard?: React.ReactNode;
+    wizard?: () => JSX.Element;
+    toolLink?: string;
+    toolLinkLabel?: string;
 }
 
 export interface gSenderSubSection {
     label?: string;
-    Wizard?: React.ReactNode;
+    wizard?: () => JSX.Element;
     settings?: gSenderSetting[];
 }
 
@@ -81,11 +91,13 @@ export interface gSenderEEPROMSetting {
     format?: string;
     dataType?: number;
     group?: number;
+    toolLink?: string;
+    toolLinkLabel?: string;
 }
 
 export interface gSenderEEPROMSettingSection {
     label: string;
-    wizard?: React.ReactNode;
+    wizard?: () => JSX.Element;
     eeprom: gSenderEEPROMSetting[];
 }
 
@@ -176,8 +188,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
         icon: PiEngine,
         settings: [
             {
-                label: 'General',
+                label: '',
                 settings: [
+                    {
+                        type: 'wizard',
+                        wizard: SquaringToolWizard,
+                        label: 'Square up CNC rails',
+                        description:
+                            'Misaligned rails can cause 90 degree cuts to come out skewed, use the wizard to fix this.',
+                    },
                     {
                         type: 'eeprom',
                         eID: '$3',
@@ -190,10 +209,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'X-axis',
+                wizard: XJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$100',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -211,6 +233,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Y-axis',
+                wizard: YJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
@@ -219,6 +242,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$101',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -236,10 +261,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Z-axis',
+                wizard: ZJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$102',
+                        toolLink: 'Tune Correction',
+                        toolLinkLabel: '/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -260,6 +288,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Probe',
         icon: MdTouchApp,
+        wizard: ProbePinStatus,
         settings: [
             {
                 label: '',
@@ -359,6 +388,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Homing/Limits',
         icon: FaHome,
+        wizard: LimitSwitchIndicators,
         settings: [
             {
                 label: 'Limits and Homing',
@@ -479,6 +509,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Spindle/Laser',
         icon: GiTargetLaser,
+        wizard: SpindleWizard,
         settings: [
             {
                 label: '',
@@ -772,6 +803,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Accessory Outputs',
         icon: CiMapPin,
+        wizard: AccessoryOutputWizard,
         settings: [
             {
                 label: '',

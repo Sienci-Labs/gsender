@@ -18,6 +18,7 @@ interface SectionProps {
     index: number;
     settings: gSenderSettings[];
     eeprom?: gSenderEEEPROMSettings;
+    wizard?: () => JSX.Element;
 }
 
 export const Section = React.forwardRef(
@@ -31,6 +32,7 @@ export const Section = React.forwardRef(
             index,
             settings,
             eeprom,
+            wizard = null,
         }: SectionProps,
         ref,
     ) => {
@@ -57,7 +59,10 @@ export const Section = React.forwardRef(
                 })}
                 ref={ref}
             >
-                <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
+                <div className="flex flex-row gap-8 py-2">
+                    <h1 className="mb-2 text-3xl ml-4 font-sans">{title}</h1>
+                    {wizard && wizard()}
+                </div>
                 <div className="bg-gray-100 rounded-xl shadow p-6">
                     {settings.map((setting: gSenderSubSection, index) => {
                         if (!connected && onlyEEPROM(setting.settings)) {
@@ -72,6 +77,7 @@ export const Section = React.forwardRef(
                                 <SettingSection
                                     settings={setting.settings}
                                     label={setting.label}
+                                    wizard={setting.wizard}
                                 />
                             );
                         }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import store from 'app/store';
@@ -9,9 +9,16 @@ export const useWorkspaceState = () => {
         store.get('workspace', {}),
     );
 
+    // Use a ref to track the latest workspace value without triggering effect reruns
+    const workspaceRef = useRef(workspace);
+
+    useEffect(() => {
+        workspaceRef.current = workspace;
+    }, [workspace]);
+
     useEffect(() => {
         const callback = (data: State) => {
-            if (isEqual(workspace, data.workspace)) {
+            if (isEqual(workspaceRef.current, data.workspace)) {
                 return;
             }
 

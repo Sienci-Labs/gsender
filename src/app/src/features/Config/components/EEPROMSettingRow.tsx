@@ -7,11 +7,14 @@ import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import { FaMicrochip } from 'react-icons/fa6';
+import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 
 interface EEPROMSettingRowProps {
     eID: string;
     changeHandler: (value: number) => void;
     resetHandler: (k, v) => void;
+    link?: string;
+    linkLabel?: string;
 }
 
 function filterNewlines(data = '') {
@@ -25,6 +28,8 @@ export function EEPROMSettingRow({
     eID,
     changeHandler,
     resetHandler,
+    link = null,
+    linkLabel = null,
 }: EEPROMSettingRowProps) {
     const {
         EEPROM,
@@ -73,7 +78,7 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'p-2 flex flex-row items-center odd:bg-gray-100 even:bg-white',
+                    'p-2 flex flex-row items-center',
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
                     },
@@ -86,7 +91,7 @@ export function EEPROMSettingRow({
                     {EEPROMData.description}
                 </div>
                 <div
-                    className="w-1/5 text-xs px-4"
+                    className="w-1/5 text-xs px-4 gap-2 flex flex-col"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -94,6 +99,11 @@ export function EEPROMSettingRow({
                         setting={EEPROMData}
                         onChange={changeHandler(EEPROMData.globalIndex)}
                     />
+                    {link && (
+                        <div>
+                            <ToolLink link={link} label={linkLabel} />
+                        </div>
+                    )}
                 </div>
                 <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (

@@ -2,7 +2,7 @@ import QRCode from 'react-qr-code';
 import React from 'react';
 
 export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
-    const safeAddress = `http://${address}/remote`;
+    const safeAddress = `http://${address}/#/remote`;
     return (
         <div className="flex flex-col items-center text-sm text-gray-600 gap-4 px-4 justify-center">
             <h1 className="text-blue-500 text-2xl">Scan QR Code</h1>

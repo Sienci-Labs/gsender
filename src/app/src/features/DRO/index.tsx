@@ -211,7 +211,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between mb-2 relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {/*homingEnabled && (
@@ -268,6 +268,7 @@ function DRO({
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
+                        size="sm"
                     />
                 ) : (
                     <AlertDialog>
@@ -304,7 +305,12 @@ function DRO({
                     />
                 )}
 
-                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button
+                    variant="alt"
+                    onClick={goXYAxes}
+                    disabled={!canClick}
+                    size="sm"
+                >
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

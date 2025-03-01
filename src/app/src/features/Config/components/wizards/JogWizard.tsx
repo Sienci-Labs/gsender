@@ -1,4 +1,5 @@
 import controller from 'app/lib/controller.ts';
+import Button from 'app/components/Button';
 
 interface JogWizardProps {
     axis: string;
@@ -10,19 +11,19 @@ export function JogWizard({
     disabled = false,
 }: JogWizardProps): JSX.Element {
     const jogPlus = () => {
-        controller.command(`$J=G21G91${axis}10F1000`);
+        controller.command('gcode', `$J=G21G91${axis}10F1000`);
     };
     const jogMinus = () => {
-        controller.command(`$J=G21G91${axis}-10F1000`);
+        controller.command('gcode', `$J=G21G91${axis}-10F1000`);
     };
     return (
-        <div>
-            <button disabled={disabled} onClick={jogPlus}>
-                Jog ${axis}-10
-            </button>
-            <button disabled={disabled} onClick={jogMinus}>
-                Jog ${axis}+10
-            </button>
+        <div className="flex flex-row gap-4 items-center">
+            <Button variant="primary" disabled={disabled} onClick={jogMinus}>
+                Jog {axis}-
+            </Button>
+            <Button variant="primary" disabled={disabled} onClick={jogPlus}>
+                Jog {axis}+
+            </Button>
         </div>
     );
 }

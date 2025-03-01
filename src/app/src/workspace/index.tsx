@@ -2,16 +2,27 @@ import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
 import { toggleAllShortcuts } from 'app/store/redux/slices/keyboardShortcutsSlice';
-
+import { useEffect } from 'react';
 import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { WORKSPACE_MODE } from 'app/constants';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Carve } from './Carve';
 
 const Workspace = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        console.log('CALLED NAV');
+        console.log(location);
+        const { href } = location;
+        if (href === '/#/remote') {
+            console.log('MATCHED');
+            navigate({ to: '/remote' });
+        }
+    }, [location]);
 
     useRegisterShortcuts([
         {

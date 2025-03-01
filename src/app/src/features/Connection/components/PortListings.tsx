@@ -30,11 +30,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
                 <BsUsbPlug />
             </span>
             <div className="flex flex-col gap-1 text-right">
-                <span>
-                    <Tooltip content={port.port}>
-                        {truncatePortName(port.port)}
-                    </Tooltip>
-                </span>
+                <span>{truncatePortName(port.port)}</span>
                 <span className="text-sm text-gray-600 font-normal">
                     USB at {baud} baud
                 </span>
@@ -75,6 +71,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
             )}
             {props.ports.map((port) => (
                 <PortListingButton
+                    key={`port-${port.port}`}
                     port={port}
                     connectionHandler={props.connectHandler}
                     baud={baud}
@@ -96,36 +93,35 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     </span>
                 </div>
             </button>
-            {
-                props.unrecognizedPorts.length > 0 && (
-                    <div className="flex flex-col">
-                        <button
-                            className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
-                            onClick={toggleUnrecognizedPorts}
-                        >
-                            <span>Unrecognized Ports</span>
-                            <span>
-                        <FaArrowAltCircleRight />
-                    </span>
-                        </button>
-                        <div
-                            className={cn('flex flex-col', {
-                                hidden: !openUnrecognized,
-                            })}
-                        >
-                            {props.unrecognizedPorts.map((port) => {
-                                return (
-                                    <PortListingButton
-                                        port={port}
-                                        connectionHandler={props.connectHandler}
-                                        baud={baud}
-                                    />
-                                );
-                            })}
-                        </div>
+            {props.unrecognizedPorts.length > 0 && (
+                <div className="flex flex-col">
+                    <button
+                        className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
+                        onClick={toggleUnrecognizedPorts}
+                    >
+                        <span>Unrecognized Ports</span>
+                        <span>
+                            <FaArrowAltCircleRight />
+                        </span>
+                    </button>
+                    <div
+                        className={cn('flex flex-col', {
+                            hidden: !openUnrecognized,
+                        })}
+                    >
+                        {props.unrecognizedPorts.map((port) => {
+                            return (
+                                <PortListingButton
+                                    key={`port-${port.port}`}
+                                    port={port}
+                                    connectionHandler={props.connectHandler}
+                                    baud={baud}
+                                />
+                            );
+                        })}
                     </div>
-                )
-            }
+                </div>
+            )}
         </div>
     );
 }
