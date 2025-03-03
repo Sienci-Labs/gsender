@@ -8,6 +8,8 @@ export const LONG_TRACK = 'LONG_TRACK';
 
 //Rotary setup hole types
 export const HOLE_TYPES = {
+    QUARTER_INCH_TEN_HOLES_400: '',
+    EIGHTH_INCH_TEN_HOLES_400: '',
     QUARTER_INCH_SIX_HOLES: `(0.25_Standard 30in Boring)
     (T6  D=6.35 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
