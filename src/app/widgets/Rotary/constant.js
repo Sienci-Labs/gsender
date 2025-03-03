@@ -3,6 +3,8 @@ export const EIGHTH = '1/8';
 export const SIX = 6;
 export const TEN = 10;
 export const TWO = 2;
+export const SHORT_TRACK = 'SHORT_TRACK';
+export const LONG_TRACK = 'LONG_TRACK';
 
 //Rotary setup hole types
 export const HOLE_TYPES = {

@@ -15,13 +15,13 @@ import customTrackGraphic from '../assets/custom-boring-track-top-view.png';
 
 import styles from './index.styl';
 import { ContentWrapper, Option, MenuTitle, RadioWrapper, WarningBanner } from './styled';
-import { HOLE_TYPES, EIGHTH, QUARTER, SIX, TEN, } from '../constant';
+import { HOLE_TYPES, EIGHTH, QUARTER, SIX, TEN, SHORT_TRACK, LONG_TRACK, } from '../constant';
 import { RotaryContext } from '../Context';
 import { CLOSE_ACTIVE_DIALOG, UPDATE_PHYSICAL_UNIT_SETUP } from '../Context/actions';
 
 const PhysicalUnitSetup = ({ actions }) => {
     const { state: { physicalUnitSetup }, dispatch } = useContext(RotaryContext);
-    const { linesUp, drillBitDiameter, holeCount } = physicalUnitSetup;
+    const { linesUp, drillBitDiameter, holeCount, trackLength } = physicalUnitSetup;
 
     const onSubmit = () => {
         let gcode;
@@ -76,6 +76,10 @@ const PhysicalUnitSetup = ({ actions }) => {
 
     const handleDrillCountSelection = (holeCount) => {
         dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { holeCount } });
+    };
+
+    const handleTrackLengthSelection = (trackLength) => {
+        dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { trackLength } });
     };
 
     const handleDisableRotaryMode = () => {
@@ -191,6 +195,29 @@ const PhysicalUnitSetup = ({ actions }) => {
                                     className={styles.radio}
                                     label="10"
                                     value={TEN}
+                                />
+                            </RadioWrapper>
+                        </RadioGroup>
+                    </Option>
+
+                    <Option disabled={!linesUp}>
+                        <MenuTitle>Extension Track Length</MenuTitle>
+                        <RadioGroup
+                            value={trackLength}
+                            depth={2}
+                            onChange={handleTrackLengthSelection}
+                            size="small"
+                        >
+                            <RadioWrapper>
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="400mm"
+                                    value={SHORT_TRACK}
+                                />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="460mm"
+                                    value={LONG_TRACK}
                                 />
                             </RadioWrapper>
                         </RadioGroup>

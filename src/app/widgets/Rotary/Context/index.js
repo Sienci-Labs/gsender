@@ -17,7 +17,7 @@ import {
     CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC,
     SET_ACTIVE_STOCK_TURNING_TAB
 } from './actions';
-import { QUARTER } from '../constant';
+import { QUARTER, SHORT_TRACK } from '../constant';
 import defaultState from '../../../store/defaultState';
 import { convertToImperial, convertToMetric } from '../../../containers/Preferences/calculate';
 
@@ -34,7 +34,8 @@ const initialState = () => {
         physicalUnitSetup: {
             linesUp: false,
             drillBitDiameter: QUARTER,
-            holeCount: HOLE_COUNT.SIX
+            holeCount: HOLE_COUNT.SIX,
+            trackLength: SHORT_TRACK
         },
         stockTurning: {
             options: { ...defaultStockTurningOptions, ...stockTurningOptions },
