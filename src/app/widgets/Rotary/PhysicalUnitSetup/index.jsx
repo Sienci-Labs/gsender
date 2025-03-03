@@ -200,7 +200,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                         </RadioGroup>
                     </Option>
 
-                    <Option disabled={!linesUp}>
+                    <Option disabled={holeCount !== TEN}>
                         <MenuTitle>Extension Track Length</MenuTitle>
                         <RadioGroup
                             value={trackLength}
