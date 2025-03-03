@@ -46,12 +46,19 @@ const PhysicalUnitSetup = ({ actions }) => {
             gcode = HOLE_TYPES.EIGHTH_INCH_SIX_HOLES;
 
         // ¼” diameter endmill milling 10 holes for 30” track with extension
-        } else if (drillBitDiameter === QUARTER && holeCount === TEN) {
+        } else if (drillBitDiameter === QUARTER && holeCount === TEN && trackLength === LONG_TRACK) {
             gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES;
 
         // ⅛” diameter endmill milling 10 holes for 30” track with extension
-        } else if (drillBitDiameter === EIGHTH && holeCount === TEN) {
+        } else if (drillBitDiameter === EIGHTH && holeCount === TEN && trackLength === LONG_TRACK) {
             gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES;
+        } else if (drillBitDiameter === QUARTER && holeCount === TEN && trackLength === SHORT_TRACK) {
+            gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES_SHORT;
+        // ⅛” diameter endmill milling 10 holes for 30” track with extension
+        } else if (drillBitDiameter === EIGHTH && holeCount === TEN && trackLength === SHORT_TRACK) {
+            gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES_SHORT;
+        } else {
+            console.assert('Invalid combination, check options');
         }
 
         actions.loadGcode(gcode);
