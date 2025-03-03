@@ -15,13 +15,13 @@ import customTrackGraphic from '../assets/custom-boring-track-top-view.png';
 
 import styles from './index.styl';
 import { ContentWrapper, Option, MenuTitle, RadioWrapper, WarningBanner } from './styled';
-import { HOLE_TYPES, EIGHTH, QUARTER, SIX, TEN, } from '../constant';
+import { HOLE_TYPES, EIGHTH, QUARTER, SIX, TEN, SHORT_TRACK, LONG_TRACK, } from '../constant';
 import { RotaryContext } from '../Context';
 import { CLOSE_ACTIVE_DIALOG, UPDATE_PHYSICAL_UNIT_SETUP } from '../Context/actions';
 
 const PhysicalUnitSetup = ({ actions }) => {
     const { state: { physicalUnitSetup }, dispatch } = useContext(RotaryContext);
-    const { linesUp, drillBitDiameter, holeCount } = physicalUnitSetup;
+    const { linesUp, drillBitDiameter, holeCount, trackLength } = physicalUnitSetup;
 
     const onSubmit = () => {
         let gcode;
@@ -46,12 +46,19 @@ const PhysicalUnitSetup = ({ actions }) => {
             gcode = HOLE_TYPES.EIGHTH_INCH_SIX_HOLES;
 
         // ¼” diameter endmill milling 10 holes for 30” track with extension
-        } else if (drillBitDiameter === QUARTER && holeCount === TEN) {
+        } else if (drillBitDiameter === QUARTER && holeCount === TEN && trackLength === LONG_TRACK) {
             gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES;
 
         // ⅛” diameter endmill milling 10 holes for 30” track with extension
-        } else if (drillBitDiameter === EIGHTH && holeCount === TEN) {
+        } else if (drillBitDiameter === EIGHTH && holeCount === TEN && trackLength === LONG_TRACK) {
             gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES;
+        } else if (drillBitDiameter === QUARTER && holeCount === TEN && trackLength === SHORT_TRACK) {
+            gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES_SHORT;
+        // ⅛” diameter endmill milling 10 holes for 30” track with extension
+        } else if (drillBitDiameter === EIGHTH && holeCount === TEN && trackLength === SHORT_TRACK) {
+            gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES_SHORT;
+        } else {
+            console.assert('Invalid combination, check options');
         }
 
         actions.loadGcode(gcode);
@@ -76,6 +83,10 @@ const PhysicalUnitSetup = ({ actions }) => {
 
     const handleDrillCountSelection = (holeCount) => {
         dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { holeCount } });
+    };
+
+    const handleTrackLengthSelection = (trackLength) => {
+        dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { trackLength } });
     };
 
     const handleDisableRotaryMode = () => {
@@ -191,6 +202,29 @@ const PhysicalUnitSetup = ({ actions }) => {
                                     className={styles.radio}
                                     label="10"
                                     value={TEN}
+                                />
+                            </RadioWrapper>
+                        </RadioGroup>
+                    </Option>
+
+                    <Option disabled={holeCount !== TEN}>
+                        <MenuTitle>Extension Track Length</MenuTitle>
+                        <RadioGroup
+                            value={trackLength}
+                            depth={2}
+                            onChange={handleTrackLengthSelection}
+                            size="small"
+                        >
+                            <RadioWrapper>
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="400mm"
+                                    value={SHORT_TRACK}
+                                />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="460mm"
+                                    value={LONG_TRACK}
                                 />
                             </RadioWrapper>
                         </RadioGroup>
