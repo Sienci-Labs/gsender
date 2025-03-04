@@ -515,6 +515,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        type: 'boolean',
+                        label: 'Enable Spindle functionalities',
+                        description:
+                            'Enable Spindle tab and related functionalities on main user interface.',
+                        key: 'workspace.spindleFunctions',
+                    },
+                    {
                         type: 'eeprom',
                         eID: '$32',
                     },
@@ -871,6 +878,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable Rotary Functionalities',
+                        description:
+                            'Enable Rotary tab and related functionalities on main user interface.',
+                        key: 'widgets.rotary.tab.show',
+                    },
                     { type: 'eeprom', eID: '$376' },
                     {
                         label: 'Resolution',
