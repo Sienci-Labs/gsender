@@ -16,10 +16,11 @@ import {
 } from './utils/recentfiles';
 import { toast } from 'app/lib/toaster';
 
-type FileData = {
+export type FileData = {
     data: string;
     name: string;
     path: string;
+    size: number;
 };
 
 const FileControl = () => {
@@ -28,6 +29,8 @@ const FileControl = () => {
             (window as any).ipcRenderer.on(
                 'returned-upload-dialog-data',
                 (_: any, file: FileData) => {
+                    console.log('returned upload dialog');
+                    console.log(file);
                     handleElectronFileUpload(file);
                 },
             );
@@ -38,8 +41,10 @@ const FileControl = () => {
                     _: any,
                     fileMetaData: {
                         result: string;
+                        size: number;
                         name: string;
-                        fullPath: string;
+                        dir: string;
+                        fullPath: any;
                     },
                 ) => {
                     if (!fileMetaData) {
@@ -54,6 +59,7 @@ const FileControl = () => {
                         data: fileMetaData.result,
                         name: fileMetaData.name,
                         path: fileMetaData.fullPath,
+                        size: fileMetaData.size,
                     };
 
                     handleElectronFileUpload(recentFile, true);
@@ -64,16 +70,14 @@ const FileControl = () => {
 
     const handleElectronFileUpload = async (
         file: FileData,
-        isRecentFile = false,
+        _isRecentFile = false,
     ) => {
+        console.log(file);
         const givenFile = new File([file.data], file.name);
 
-        if (isElectron() && isRecentFile) {
+        if (isElectron()) {
             // Assuming these functions are imported or defined elsewhere
-            const recentFile = createRecentFileFromRawPath(
-                file.path,
-                file.name,
-            );
+            const recentFile = createRecentFileFromRawPath(file);
             addRecentFile(recentFile);
         }
 
@@ -90,7 +94,6 @@ const FileControl = () => {
             <Widget.Content>
                 <div className="w-full flex flex-col gap-2">
                     <ButtonControlGroup />
-
                     <FileInformation />
                 </div>
             </Widget.Content>

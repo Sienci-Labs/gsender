@@ -25,10 +25,12 @@ import pubsub from 'pubsub-js';
 
 import store from 'app/store';
 import { toast } from 'app/lib/toaster';
+import { RecentFile } from '../definitions';
+import { FileData } from '..';
 
 export const RECENT_FILE_LIMIT = 5;
 
-export const recentFileExists = (filePath: string, recentFiles: any[]) => {
+export const recentFileExists = (filePath: string, recentFiles: RecentFile[]) => {
     const file = recentFiles.find((file) => file.filePath === filePath);
     return !!file;
 };
@@ -48,17 +50,17 @@ export const createRecentFile = ({
 };
 
 export const createRecentFileFromRawPath = (
-    filePath: string,
-    fileName: string,
+    file: FileData
 ) => {
     return {
-        fileName,
-        filePath,
+        fileName: file.name,
+        filePath: file.path,
+        fileSize: file.size,
         timeUploaded: Date.now(),
     };
 };
 
-export const updateRecentFileDate = (filepath: string, recentFiles: any[]) => {
+export const updateRecentFileDate = (filepath: string, recentFiles: RecentFile[]) => {
     recentFiles.forEach((recentFile) => {
         if (recentFile.filePath === filepath) {
             recentFile.timeUploaded = Date.now();
@@ -67,7 +69,7 @@ export const updateRecentFileDate = (filepath: string, recentFiles: any[]) => {
     return recentFiles;
 };
 
-export const addRecentFile = (fileMetaData: any) => {
+export const addRecentFile = (fileMetaData: RecentFile) => {
     if (fileMetaData === null) {
         toast.error(
             'Unable to load file - file may have been moved or deleted.',
@@ -89,11 +91,11 @@ export const addRecentFile = (fileMetaData: any) => {
     pubsub.publish('recent-files-updated', sortedFiles);
 };
 
-export const getRecentFiles = () => {
+export const getRecentFiles = (): RecentFile[] => {
     return store.get('workspace.recentFiles', []);
 };
 
-export const updateStoredRecentFiles = (recentFiles: any[]) => {
+export const updateStoredRecentFiles = (recentFiles: RecentFile[]) => {
     store.replace('workspace.recentFiles', recentFiles);
 };
 
@@ -111,7 +113,7 @@ export const recentFileSortHandler = (a: any, b: any) => {
     return b.timeUploaded - a.timeUploaded;
 };
 
-export const sortRecentFiles = (recentFiles: any[] = []) => {
+export const sortRecentFiles = (recentFiles: RecentFile[] = []) => {
     return recentFiles.sort(recentFileSortHandler);
 };
 

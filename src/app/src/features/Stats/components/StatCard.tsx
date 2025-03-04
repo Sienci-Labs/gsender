@@ -4,7 +4,7 @@ interface StatCardProps {
     externalLinkText?: string;
 }
 
-export function StatCard({ children, label }: StatCardProps) {
+export function StatCard({ children }: StatCardProps) {
     return (
         <div className="bg-white border border-gray-300 rounded p-2">
             {children}

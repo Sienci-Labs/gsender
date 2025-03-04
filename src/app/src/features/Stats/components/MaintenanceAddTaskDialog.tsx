@@ -5,11 +5,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
-import api from 'app/api';
 
 import { tv } from 'tailwind-variants';
-import { useContext, useEffect } from 'react';
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
+import {
+    MaintenanceTask,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 import maintenanceActions from '../../../../../app_old/containers/Preferences/Stats/lib/maintenanceApiActions';
 
 export const buttonStyle = tv({
@@ -25,8 +27,8 @@ export const buttonStyle = tv({
 
 interface MaintenanceAddTaskDialogProps {
     show: boolean;
-    toggleShow: (b) => void;
-    handleSuccess: (e) => void;
+    toggleShow: (b: boolean) => void;
+    handleSuccess?: () => void;
 }
 
 export function MaintenanceAddTaskDialog({
@@ -35,7 +37,7 @@ export function MaintenanceAddTaskDialog({
 }: MaintenanceAddTaskDialogProps) {
     const { maintenanceTasks, setMaintenanceTasks } = useContext(StatContext);
 
-    const addTask = (newTask) => {
+    const addTask = (newTask: MaintenanceTask) => {
         const maxIDTask = maintenanceTasks.reduce((prev, current) => {
             return prev && prev.id > current.id ? prev : current;
         });
@@ -47,12 +49,18 @@ export function MaintenanceAddTaskDialog({
         //updateTasks(tasks);
     };
 
-    function handleSubmit(e) {
+    function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const description = e.target.description.value;
-        const rangeStart = Number(e.target.startRange.value);
-        const rangeEnd = Number(e.target.endRange.value);
-        const name = e.target.taskName.value;
+        const target = e.target as typeof e.target & {
+            description: { value: string };
+            startRange: { value: string };
+            endRange: { value: string };
+            taskName: { value: string };
+        };
+        const description = target.description.value;
+        const rangeStart = Number(target.startRange.value);
+        const rangeEnd = Number(target.endRange.value);
+        const name = target.taskName.value;
 
         const payload = {
             description,
