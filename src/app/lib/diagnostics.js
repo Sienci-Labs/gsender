@@ -152,23 +152,19 @@ const styles = StyleSheet.create({
 });
 
 const getEEPROMValues = () => {
-    const eeprom = get(reduxStore.getState(), 'controller.settings.settings', {});
-    return eeprom;
+    return get(reduxStore.getState(), 'controller.settings.settings', {});
 };
 
 const getMachineProfile = () => {
-    const machineProfile = store.get('workspace.machineProfile');
-    return machineProfile;
+    return store.get('workspace.machineProfile');
 };
 
 const getGSenderVersion = () => {
-    const version = `${pkg.version}`;
-    return version;
+    return `${pkg.version}`;
 };
 
 const getGRBLInformation = () => {
-    const grblInfo = get(reduxStore.getState(), 'controller', {});
-    return grblInfo;
+    return get(reduxStore.getState(), 'controller', {});
 };
 
 const getOS = () => {
@@ -774,6 +770,12 @@ function generateSupportFile() {
         const currentDate = date.toLocaleDateString().replaceAll('/', '-');
         const currentTime = date.toLocaleTimeString('it-IT').replaceAll(':', '-');
 
+        // grbl EEPROM Settings
+        const eepromSettings = getEEPROMValues();
+        const output = JSON.stringify(eepromSettings, null, 1);
+        const eepromBlob = new Blob([output], { type: 'application/json' });
+        const eepromFileName = `gSender-firmware-settings-${currentDate}-${currentTime}.json`;
+
         const zip = new JSZip();
         const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
         const senderSettings = await exportSenderSettings();
@@ -783,8 +785,9 @@ function generateSupportFile() {
             zip.file(getGCodeFileName(), new Blob([code]));
         }
 
-        zip.file(diagnosticPDFLabel, blob);
-        zip.file(`gSenderSettings_${currentDate}_${currentTime}.json`, senderSettings);
+        zip.file(diagnosticPDFLabel, blob); // Add PDF
+        zip.file(eepromFileName, eepromBlob); // Add EEPROM
+        zip.file(`gSenderSettings_${currentDate}_${currentTime}.json`, senderSettings); // add gSender Settings
         zip.generateAsync({ type: 'blob' }).then((content) => {
             saveAs(content, 'diagnostics_' + currentDate + '_' + currentTime + '.zip');
         });
