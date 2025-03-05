@@ -1,0 +1,43 @@
+FROM --platform=$BUILDPLATFORM siganberg/gsender-pi-builder:1.0 AS builder
+ARG BUILDPLATFORM
+ARG NODE_OPTIONS="--max-old-space-size=8192"
+ARG USE_SYSTEM_FPM="true"
+ARG GITHUB_REF_NAME
+ARG GITHUB_REF_TYPE
+ARG GIT_COMMIT_LOG
+
+WORKDIR /app
+COPY . .
+
+RUN yarn install
+RUN yarn run build
+RUN yarn run build:linux-arm64
+
+# rename package to PI-64Bit
+RUN for f in /app/output/*.deb; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
+RUN for f in /app/output/*.AppImage; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
+
+# copy to release
+RUN mkdir -p release/pi/
+RUN for f in /app/output/*.deb; do cp -af "$f" "$(echo "$f" | sed s/output/release\\/pi/)"; done
+RUN for f in /app/output/*.AppImage; do cp -af "$f" "$(echo "$f" | sed s/output/release\\/pi/)"; done
+
+RUN  if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then \
+        yarn github-release delete \
+            --owner=gSender \
+            --repo=gsender \
+            --tag="${GITHUB_REF_NAME}-latest" \
+            --release-name="${GITHUB_REF_NAME}" \
+            "*-pi*"; \
+        yarn github-release upload \
+            --owner=gSender \
+            --repo=gsender \
+            --tag="${GITHUB_REF_NAME}-latest" \
+            --release-name="${GITHUB_REF_NAME}" \
+            --body="${GIT_COMMIT_LOG}" \
+            releases/pi/*; \
+    fi
+
+FROM scratch AS artifact
+COPY --from=builder /app/output/*.deb .
+COPY --from=builder /app/output/*.AppImage .
