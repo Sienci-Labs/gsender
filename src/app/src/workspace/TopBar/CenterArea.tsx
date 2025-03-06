@@ -2,6 +2,7 @@ import MachineInfo from 'app/features/MachineInfo';
 import MachineStatus from 'app/features/MachineStatus/MachineStatus';
 
 import NotificationsArea from './NotificationsArea';
+import { UnlockButton } from 'app/features/UnlockButton';
 
 const CenterArea = () => {
     return (
@@ -13,6 +14,7 @@ const CenterArea = () => {
             </div>
 
             <MachineStatus />
+            <UnlockButton />
         </div>
     );
 };

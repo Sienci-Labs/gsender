@@ -5,6 +5,7 @@ import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuF
 
 import gSenderIcon from './assets/icon-round.png';
 import CenterArea from './CenterArea';
+import { UnlockButton } from 'app/features/UnlockButton';
 
 export const TopBar = () => {
     return (
@@ -19,6 +20,7 @@ export const TopBar = () => {
             <CenterArea />
 
             <StatusIcons />
+            <UnlockButton />
 
             <SpindleLaserStatus />
         </div>
