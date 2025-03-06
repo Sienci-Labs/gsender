@@ -22,7 +22,7 @@ export function UnlockButton() {
         <div className="text-4xl">
             <button
                 className={cx('group text-gray-400', {
-                    'animate-pulse text-orange-500': isHold,
+                    'animate-pulse text-yellow-600': isHold,
                 })}
                 onClick={unlockFirmware}
             >
