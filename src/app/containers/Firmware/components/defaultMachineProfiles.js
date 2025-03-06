@@ -30,7 +30,7 @@ export default [
     {
         id: 0,
         company: 'Sienci Labs',
-        name: 'Altmill 4x4',
+        name: 'AltMill 4x4',
         type: '',
         version: '',
         mm: {
@@ -56,7 +56,7 @@ export default [
     {
         id: 1,
         company: 'Sienci Labs',
-        name: 'Altmill 4x4 + Spindle',
+        name: 'AltMill 4x4 + Spindle',
         type: '',
         version: '',
         mm: {
@@ -82,7 +82,7 @@ export default [
     {
         id: 2,
         company: 'Sienci Labs',
-        name: 'Altmill 2x4',
+        name: 'AltMill 2x4',
         type: '',
         version: '',
         mm: {
@@ -108,7 +108,7 @@ export default [
     {
         id: 3,
         company: 'Sienci Labs',
-        name: 'Altmill 2x4 + Spindle',
+        name: 'AltMill 2x4 + Spindle',
         type: '',
         version: '',
         mm: {
