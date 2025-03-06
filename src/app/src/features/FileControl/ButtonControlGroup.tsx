@@ -36,11 +36,14 @@ import {
 
 import { getRecentFiles } from './utils/recentfiles';
 import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
+import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [recentFiles, setRecentFiles] = useState<any[]>([]);
     const { fileLoaded, path } = useTypedSelector((state) => state.file);
+
+    const usingElectron = isElectron();
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
@@ -116,7 +119,7 @@ const ButtonControlGroup = () => {
         (window as any).ipcRenderer?.send('load-recent-file', { filePath });
     };
 
-    const handleReloadFile = debounce(() => {
+    const handleFileReload = debounce(() => {
         if (!fileLoaded) {
             return;
         }
@@ -189,13 +192,9 @@ const ButtonControlGroup = () => {
                 </div>
 
                 <div className="border-r-2 border-blue-500 hover:bg-blue-50 transition-colors group">
-                    <Button
-                        onClick={handleReloadFile}
-                        icon={
-                            <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
-                        }
-                        variant="ghost"
-                        className="h-10 w-12"
+                    <ReloadFileAlert
+                        fileLoaded={fileLoaded && usingElectron}
+                        handleFileReload={handleFileReload}
                     />
                 </div>
 

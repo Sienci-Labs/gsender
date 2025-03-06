@@ -85,6 +85,7 @@ const FileControl = () => {
 
         reduxStore.dispatch(updateFileInfo({ path: file.path }));
     };
+
     return (
         <Widget>
             <Widget.Content>
