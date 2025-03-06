@@ -2,8 +2,7 @@ import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import cn from 'classnames';
 import { WizardProvider } from 'app/features/Helper/context';
-import Wizard from 'app/features/Helper/Wizard.tsx';
-import React from 'react';
+import HelperWrapper from './HelperWrapper';
 
 export function Helper() {
     const minimized = useSelector((state: RootState) => state.helper.minimized);
@@ -15,7 +14,7 @@ export function Helper() {
             })}
         >
             <WizardProvider>
-                <Wizard />
+                <HelperWrapper />
             </WizardProvider>
         </div>
     );

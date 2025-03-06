@@ -22,61 +22,46 @@
  */
 
 import styles from './index.module.styl';
-import Instructions from 'app/features/Helper/components/Instructions';
-import Stepper from 'app/features/Helper/components/Stepper';
-import { useWizardContext } from 'app/features/Helper/context';
+import { useWizardContext, useWizardAPI } from 'app/features/Helper/context';
 import cx from 'classnames';
-import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
-import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
-import { FaHatWizard } from 'react-icons/fa';
+import { FaInfoCircle, FaTimes } from 'react-icons/fa';
+import reduxStore from 'app/store/redux';
+import { disableHelper } from 'app/store/redux/slices/helper.slice.ts';
 
-const Wizard = () => {
-    const { title, visible, minimized, activeStep, overlay, steps } =
-        useWizardContext();
+const HelperInfo = ({ payload }) => {
+    const { visible, minimized } = useWizardContext();
+    const { setVisible } = useWizardAPI();
+    const { title, description } = payload;
+
+    const closeHelper = () => {
+        setVisible(false);
+        reduxStore.dispatch(disableHelper());
+    };
 
     return (
         <>
             <div
                 className={cx({
                     [styles.hidden]: !visible,
-                    [styles.overlay]: !minimized && overlay,
-                })}
-            />
-            <div
-                className={cx({
-                    [styles.hidden]: !visible,
-                    [styles.wrapper]: !minimized,
+                    'absolute top-1/3 left-4 w-1/2 -translate-y-2/3 z-50 flex flex-col justify-between':
+                        !minimized,
                 })}
             >
                 <div
                     className={cx({
-                        [styles.hidden]: !visible || !overlay,
-                        [styles.infoMsgContainer]: !minimized && overlay,
-                    })}
-                >
-                    <div className={styles.infoMsgHeading}>
-                        Widgets are disabled
-                    </div>
-                    <div className={styles.infoMsg}>
-                        Please use the button(s) in the wizard instead.
-                    </div>
-                </div>
-                <div
-                    className={cx({
                         [styles.hidden]: !visible,
                         [styles.minimizedWrapper]: minimized,
-                        [styles.wizardWrapper]: !minimized,
+                        'bg-white rounded flex flex-col content-end overflow-hidden z-50':
+                            !minimized,
                     })}
                 >
                     <div className={styles.wizardTitle}>
                         <h1 className="flex flex-row gap-2 items-center justify-center">
-                            <FaHatWizard /> {title} - Step {activeStep + 1} of{' '}
-                            {steps.length}
+                            <FaInfoCircle /> {title}
                         </h1>
-                        <div style={{ display: 'flex' }}>
-                            <MinMaxButton />
-                            <CancelButton />
+                        <div className="flex cursor-pointer">
+                            <FaTimes onClick={() => closeHelper()} />
                         </div>
                     </div>
                     <CSSTransition
@@ -91,12 +76,14 @@ const Wizard = () => {
                     >
                         <div
                             id="wizContent"
-                            className={cx(styles.wizardContent, {
-                                [styles.hidden]: minimized,
-                            })}
+                            className={cx(
+                                'flex p-4 justify-stretch items-stretch flex-grow',
+                                {
+                                    [styles.hidden]: minimized,
+                                },
+                            )}
                         >
-                            <Stepper />
-                            <Instructions />
+                            <span>{description}</span>
                         </div>
                     </CSSTransition>
                 </div>
@@ -105,4 +92,4 @@ const Wizard = () => {
     );
 };
 
-export default Wizard;
+export default HelperInfo;
