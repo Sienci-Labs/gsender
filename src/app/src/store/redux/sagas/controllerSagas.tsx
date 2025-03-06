@@ -362,6 +362,7 @@ export function* initialize(): Generator<any, void, any> {
         (type: string, state: any, tool: TOOL) => {
             // if state is the same, don't update the prev and current state
             if (currentState !== state.status.activeState) {
+                prevState = currentState;
                 currentState = state.status.activeState;
             }
             if (tool) {

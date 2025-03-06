@@ -15,6 +15,16 @@ interface FirmwareEvent {
     lineNumber: number;
 }
 
+export interface MaintenanceTask {
+    id?: number;
+    description: string;
+    rangeStart: number;
+    rangeEnd: number;
+    name: string;
+    currentTime: number;
+    subRow?: string;
+}
+
 const initialState = {
     jobs: [],
     alarms: [],

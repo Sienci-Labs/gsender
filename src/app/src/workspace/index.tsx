@@ -9,6 +9,7 @@ import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts'
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { WORKSPACE_MODE } from 'app/constants';
+import { Alerts } from './Alerts';
 
 type WorkspaceProps = {
     children: React.ReactNode;
@@ -260,6 +261,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
             <TopBar />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
+                <Alerts />
                 <div className="w-full max-sm:p-4">{children}</div>
             </div>
         </div>
