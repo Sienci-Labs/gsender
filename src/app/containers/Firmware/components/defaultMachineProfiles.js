@@ -25,7 +25,6 @@ import * as longMillGrblEEPROM from '../eeprom/grbl/longmill';
 import * as longMillGrblHALEEPROM from '../eeprom/grblHAL/longmill';
 import * as millOneGrblEEPROM from '../eeprom/grbl/millone';
 import * as altmillSettings from '../eepromFiles/Altmill';
-import { DEFAULT_2X4_SPINDLE_KIT } from '../eepromFiles/Altmill';
 
 export default [
     {
