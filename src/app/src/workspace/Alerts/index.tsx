@@ -34,8 +34,6 @@ export const Alerts = () => {
         };
     }, []);
 
-    console.log(showMaintenanceAlert);
-
     return (
         <>
             {showMaintenanceAlert && (

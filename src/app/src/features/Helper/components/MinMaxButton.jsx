@@ -24,6 +24,7 @@
 import React from 'react';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import styles from '../index.module.styl';
+import { FaMinus, FaPlus } from 'react-icons/fa';
 
 const MinMaxButton = () => {
     const { minimized } = useWizardContext();
@@ -36,9 +37,9 @@ const MinMaxButton = () => {
             style={{ marginRight: 5 }}
         >
             {!minimized ? (
-                <i className="fas fa-minus" />
+                <FaMinus className="bg-transparent" />
             ) : (
-                <i className="fas fa-plus" />
+                <FaPlus className="bg-transparent" />
             )}
         </button>
     );

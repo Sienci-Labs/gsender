@@ -23,18 +23,20 @@
 
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
-import { useWizardContext, useWizardAPI } from 'app/features/Helper/context';
+import { useWizardAPI } from 'app/features/Helper/context';
 import reduxStore from 'app/store/redux';
-import { enableHelper } from 'app/store/redux/slices/helper.slice.ts';
+import {
+    disableInfoHelper,
+    enableInfoHelper,
+    enableWizard,
+} from 'app/store/redux/slices/helper.slice.ts';
 import Wizard from './Wizard';
 import HelperInfo from './HelperInfo';
 
 const HelperWrapper = () => {
-    const { visible } = useWizardContext();
-    const { load, updateSubstepOverlay, setVisible } = useWizardAPI();
-
-    const [showInfoOnly, setShowInfoOnly] = useState(false);
+    const { load, updateSubstepOverlay } = useWizardAPI();
     const [infoPayload, setInfoPayload] = useState({});
+    const [infoVisible, setInfoVisible] = useState(false);
 
     useEffect(() => {
         const tokens = [
@@ -45,14 +47,12 @@ const HelperWrapper = () => {
                     { activeStep: 0, activeSubstep: 0 },
                     instructions.steps,
                 );
-                setShowInfoOnly(false);
-                reduxStore.dispatch(enableHelper());
+                reduxStore.dispatch(enableWizard());
             }),
             pubsub.subscribe('helper:info', (_, payload) => {
-                setShowInfoOnly(true);
                 setInfoPayload(payload);
-                setVisible(true);
-                reduxStore.dispatch(enableHelper());
+                setInfoVisible(true);
+                reduxStore.dispatch(enableInfoHelper());
             }),
         ];
 
@@ -63,13 +63,21 @@ const HelperWrapper = () => {
         };
     }, []);
 
-    console.log(visible);
-
-    const getComponent = () => {
-        return showInfoOnly ? <HelperInfo payload={infoPayload} /> : <Wizard />;
+    const closeInfoHelper = () => {
+        setInfoVisible(false);
+        reduxStore.dispatch(disableInfoHelper());
     };
 
-    return <>{visible && getComponent()}</>;
+    return (
+        <>
+            <HelperInfo
+                payload={infoPayload}
+                infoVisible={infoVisible}
+                onClose={closeInfoHelper}
+            />
+            <Wizard />
+        </>
+    );
 };
 
 export default HelperWrapper;
