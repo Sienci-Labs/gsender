@@ -20,7 +20,12 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import _get from 'lodash/get';
+
+import store from 'app/store';
+
 import { METRIC_UNITS } from '../../constants';
+import defaultState from '../../store/defaultState';
 
 const CALC_UNIT = 25.4;
 
@@ -51,4 +56,37 @@ export const convertAllPresetsUnits = (units, jog) => {
     const convertedPrecise = convertPresetUnits(units, precise);
 
     return { rapid: convertedRapid, normal: convertedNormal, precise: convertedPrecise };
+};
+
+
+export const getSafeJogState = () => {
+    const defaultJogState = _get(defaultState, 'widgets.axes.jog');
+    const jogState = store.get('widgets.axes.jog');
+
+    // Ensure all required properties exist by falling back to defaultJogState
+    const safeJogState = {
+        rapid: {
+            feedrate: jogState?.rapid?.feedrate ?? defaultJogState.rapid.feedrate,
+            xyStep: jogState?.rapid?.xyStep ?? defaultJogState.rapid.xyStep,
+            xaStep: jogState?.rapid?.xaStep ?? defaultJogState.rapid.xaStep,
+            zStep: jogState?.rapid?.zStep ?? defaultJogState.rapid.zStep,
+            aStep: jogState?.rapid?.aStep ?? defaultJogState.rapid.aStep
+        },
+        normal: {
+            feedrate: jogState?.normal?.feedrate ?? defaultJogState.normal.feedrate,
+            xyStep: jogState?.normal?.xyStep ?? defaultJogState.normal.xyStep,
+            xaStep: jogState?.normal?.xaStep ?? defaultJogState.normal.xaStep,
+            zStep: jogState?.normal?.zStep ?? defaultJogState.normal.zStep,
+            aStep: jogState?.normal?.aStep ?? defaultJogState.normal.aStep
+        },
+        precise: {
+            feedrate: jogState?.precise?.feedrate ?? defaultJogState.precise.feedrate,
+            xyStep: jogState?.precise?.xyStep ?? defaultJogState.precise.xyStep,
+            xaStep: jogState?.precise?.xaStep ?? defaultJogState.precise.xaStep,
+            zStep: jogState?.precise?.zStep ?? defaultJogState.precise.zStep,
+            aStep: jogState?.precise?.aStep ?? defaultJogState.precise.aStep
+        }
+    };
+
+    return safeJogState;
 };
