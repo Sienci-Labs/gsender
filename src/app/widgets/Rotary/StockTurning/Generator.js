@@ -1,6 +1,6 @@
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import { METRIC_UNITS, STOCK_TURNING_METHOD } from 'app/constants';
+import { METRIC_UNITS, STOCK_TURNING_METHOD, WORKSPACE_MODE } from 'app/constants';
 
 import defaultState from '../../../store/defaultState';
 
@@ -13,7 +13,7 @@ export class StockTurningGenerator {
 
         const newStartHeight = Number((newOptions.startHeight / 2).toFixed(2));
         const newFinalHeight = Number((newOptions.finalHeight / 2).toFixed(2));
-        const feedrate = this.processValue(newOptions.feedrate);
+        const feedrate = newOptions.feedrate;
 
         // Checking for odd and even number of passes for full spiral is done later
         if ((newStartHeight - newOptions.stepdown <= newFinalHeight) && !newOptions.enableRehoming) { // check if one pass
@@ -305,9 +305,12 @@ export class StockTurningGenerator {
     }
 
     processValue(value) {
-        const workspaceUnits = store.get('workspace.units');
+        const workspace = store.get('workspace', { units: 'mm', mode: WORKSPACE_MODE.DEFAULT });
 
-        if (workspaceUnits === 'in') {
+        const isInInches = workspace.units === 'in';
+        const isInRotaryMode = workspace.mode === WORKSPACE_MODE.ROTARY;
+
+        if (isInInches && isInRotaryMode) {
             return +((value / 25.4).toFixed(3));
         }
 
