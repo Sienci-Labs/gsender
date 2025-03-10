@@ -3,6 +3,7 @@ import { IoLockOpenOutline } from 'react-icons/io5';
 import { RootState } from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import cx from 'classnames';
+import get from 'lodash/get';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import controller from 'app/lib/controller.ts';
 
@@ -14,7 +15,7 @@ export function UnlockButton() {
     const status = useTypedSelector(
         (state: RootState) => state.controller.state.status,
     );
-    const activeState = status.activeState;
+    const activeState = get(status, 'activeState', 'Idle');
 
     const isHold = activeState === GRBL_ACTIVE_STATE_HOLD;
     console.log(isHold);
