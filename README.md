@@ -110,7 +110,15 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.4.11 (December 16th)
+### 1.4.12 (March 10th, 2025)
+- Added new machine profiles for Altmill 2X4
+- Added support for new rotary track options
+- Added fallback for jog values in cases where they were undefined.
+- Added EEPROM settings export with diagnostic
+- Fixed stepover for rotary surfacing on closed loop motors converting unnecessarily
+- 
+
+### 1.4.11 (December 16th, 2024)
 - Added "Skip Dialog" option to code toolchange which combines both blocks and skips the "Continue" dialog
 - Diagnostics now generates a zip file which includes the original diagnostic PDF, a copy of current gSender settings, and any loaded toolpath for better support.
 - Continuous jogging now bitwise compares homing location to avoid non-XYZ axes causing invalid corner detection.
