@@ -116,7 +116,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Added fallback for jog values in cases where they were undefined.
 - Added EEPROM settings export with diagnostic
 - Fixed stepover for rotary surfacing on closed loop motors converting unnecessarily
-- 
+- Dialog on code option now shows on grbl controller
 
 ### 1.4.11 (December 16th, 2024)
 - Added "Skip Dialog" option to code toolchange which combines both blocks and skips the "Continue" dialog
