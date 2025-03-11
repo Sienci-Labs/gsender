@@ -25,8 +25,13 @@ import cx from 'classnames';
 import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
+import { FileData } from '..';
 
-const FileInformation = () => {
+interface Props {
+    handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
+}
+
+const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
     const { name, size, total, path, fileLoaded, fileProcessing } =
         useTypedSelector((state) => state.file);
 
@@ -78,7 +83,7 @@ const FileInformation = () => {
                     {recentFiles.map((file) => (
                         <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
                             <div className="flex flex-row items-center gap-1">
-                                <GoFileCode className="text-3xl text-gray-400 ml-1 cursor-pointer" />
+                                <GoFileCode className="text-3xl text-gray-400 ml-1" />
                                 <div className="flex flex-col">
                                     <span>{file.fileName}</span>
                                     <span className="text-gray-500 text-xs">
@@ -87,7 +92,19 @@ const FileInformation = () => {
                                 </div>
                             </div>
                             <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
-                                <RiFolderUploadLine />
+                                <RiFolderUploadLine
+                                    onClick={() =>
+                                        handleElectronFileUpload(
+                                            {
+                                                name: file.fileName,
+                                                data: file.fileData,
+                                                size: file.fileSize,
+                                                path: file.filePath,
+                                            },
+                                            true,
+                                        )
+                                    }
+                                />
                             </div>
                         </div>
                     ))}

@@ -62,7 +62,7 @@ const FileControl = () => {
                         size: fileMetaData.size,
                     };
 
-                    handleElectronFileUpload(recentFile, true);
+                    handleElectronFileUpload(recentFile);
                 },
             );
         }
@@ -70,12 +70,12 @@ const FileControl = () => {
 
     const handleElectronFileUpload = async (
         file: FileData,
-        _isRecentFile = false,
+        isRecentFile = false,
     ) => {
         console.log(file);
         const givenFile = new File([file.data], file.name);
 
-        if (isElectron()) {
+        if (isElectron() && !isRecentFile) {
             // Assuming these functions are imported or defined elsewhere
             const recentFile = createRecentFileFromRawPath(file);
             addRecentFile(recentFile);
@@ -94,7 +94,9 @@ const FileControl = () => {
             <Widget.Content>
                 <div className="w-full flex flex-col gap-2">
                     <ButtonControlGroup />
-                    <FileInformation />
+                    <FileInformation
+                        handleElectronFileUpload={handleElectronFileUpload}
+                    />
                 </div>
             </Widget.Content>
         </Widget>

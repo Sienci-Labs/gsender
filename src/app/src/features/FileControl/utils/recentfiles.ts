@@ -35,24 +35,25 @@ export const recentFileExists = (filePath: string, recentFiles: RecentFile[]) =>
     return !!file;
 };
 
-export const createRecentFile = ({
-    name,
-    dir,
-}: {
-    name: string;
-    dir: string;
-}) => {
-    return {
-        fileName: name,
-        filePath: `${dir}\\${name}`,
-        timeUploaded: Date.now(),
-    };
-};
+// export const createRecentFile = ({
+//     name,
+//     dir,
+// }: {
+//     name: string;
+//     dir: string;
+// }): RecentFile => {
+//     return {
+//         fileName: name,
+//         filePath: `${dir}\\${name}`,
+//         timeUploaded: Date.now(),
+//     };
+// };
 
 export const createRecentFileFromRawPath = (
     file: FileData
-) => {
+): RecentFile => {
     return {
+        fileData: file.data,
         fileName: file.name,
         filePath: file.path,
         fileSize: file.size,
