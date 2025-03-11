@@ -21,77 +21,64 @@
  *
  */
 
-import React, { useEffect } from 'react';
 import styles from './index.module.styl';
-import pubsub from 'pubsub-js';
 import Instructions from 'app/features/Helper/components/Instructions';
 import Stepper from 'app/features/Helper/components/Stepper';
-import { useWizardContext, useWizardAPI } from 'app/features/Helper/context';
+import { useWizardContext } from 'app/features/Helper/context';
 import cx from 'classnames';
 import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
 import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
 import { FaHatWizard } from 'react-icons/fa';
-import reduxStore from 'app/store/redux';
-import { enableHelper } from 'app/store/redux/slices/helper.slice.ts';
 
 const Wizard = () => {
     const { title, visible, minimized, activeStep, overlay, steps } =
         useWizardContext();
-    const { load, updateSubstepOverlay } = useWizardAPI();
-
-    useEffect(() => {
-        pubsub.subscribe('wizard:load', (_, payload) => {
-            const { instructions, title } = payload;
-            load(instructions, title);
-            updateSubstepOverlay(
-                { activeStep: 0, activeSubstep: 0 },
-                instructions.steps,
-            );
-            reduxStore.dispatch(enableHelper());
-        });
-    }, []);
 
     return (
         <>
             <div
                 className={cx({
-                    [styles.hidden]: !visible,
+                    hidden: !visible,
                     [styles.overlay]: !minimized && overlay,
                 })}
             />
             <div
                 className={cx({
-                    [styles.hidden]: !visible,
-                    [styles.wrapper]: !minimized,
+                    hidden: !visible,
+                    'absolute top-1/2 left-4 w4/5 [transform:translate(0,-50%)] z-[9999] flex flex-col justify-between [transition:all_300ms_ease]':
+                        !minimized,
                 })}
             >
                 <div
                     className={cx({
-                        [styles.hidden]: !visible || !overlay,
-                        [styles.infoMsgContainer]: !minimized && overlay,
+                        hidden: !visible || !overlay,
+                        'px-1 py-4 flex flex-col justify-center items-center z-[9999] bg-amber-100 rounded content-start':
+                            !minimized && overlay,
                     })}
                 >
-                    <div className={styles.infoMsgHeading}>
+                    <div className="text-black text-center text-xl/relaxed font-bold z-[9999]">
                         Widgets are disabled
                     </div>
-                    <div className={styles.infoMsg}>
+                    <div className="text-black text-center text-sm/relaxed z-[9999]">
                         Please use the button(s) in the wizard instead.
                     </div>
                 </div>
                 <div
                     className={cx({
-                        [styles.hidden]: !visible,
-                        [styles.minimizedWrapper]: minimized,
-                        [styles.wizardWrapper]: !minimized,
+                        hidden: !visible,
+                        'absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-[9999]':
+                            minimized,
+                        'bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-[9999] duration-300 ease-linear transition-all':
+                            !minimized,
                     })}
                 >
-                    <div className={styles.wizardTitle}>
-                        <h1 className="flex flex-row gap-2 items-center justify-center">
+                    <div className="border-b border-b-slate-400 p-2 flex flex-row justify-between items-center">
+                        <h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-slate-600 font-bold text-xl">
                             <FaHatWizard /> {title} - Step {activeStep + 1} of{' '}
                             {steps.length}
                         </h1>
-                        <div style={{ display: 'flex' }}>
+                        <div className="flex">
                             <MinMaxButton />
                             <CancelButton />
                         </div>
@@ -108,9 +95,12 @@ const Wizard = () => {
                     >
                         <div
                             id="wizContent"
-                            className={cx(styles.wizardContent, {
-                                [styles.hidden]: minimized,
-                            })}
+                            className={cx(
+                                'flex flex-row h-[calc(100%-40px)] justify-items-stretch items-stretch justify-stretch flex-grow',
+                                {
+                                    hidden: minimized,
+                                },
+                            )}
                         >
                             <Stepper />
                             <Instructions />
