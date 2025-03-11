@@ -25,7 +25,7 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 import _ from 'lodash';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
-import { disableHelper } from 'app/store/redux/slices/helper.slice';
+import { disableWizard } from 'app/store/redux/slices/helper.slice';
 import reduxStore from 'app/store/redux';
 
 const WizardContext = createContext({});
@@ -159,7 +159,7 @@ export const WizardProvider = ({ children }) => {
                         setSteps([]);
                         setStepCount(0);
                         setMinimized(false);
-                        reduxStore.dispatch(disableHelper());
+                        reduxStore.dispatch(disableWizard());
                         return {};
                     }
                 } else {
@@ -289,7 +289,7 @@ export const WizardProvider = ({ children }) => {
                 setStepCount(0);
                 setMinimized(false);
                 setIsLoading(false);
-                reduxStore.dispatch(disableHelper());
+                reduxStore.dispatch(disableWizard());
 
                 Toaster.clear();
             },

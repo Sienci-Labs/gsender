@@ -27,13 +27,8 @@ import { store as reduxStore } from '../../store/redux';
 import { GRBLHAL } from 'app/constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from 'app/components/shadcn/Tooltip';
 import { ALARM_CODE } from './definitions';
+import pubsub from 'pubsub-js';
 
 const getCodeDescription = (code: number | 'Homing' = 1): string => {
     const controllerType: string = get(
@@ -50,19 +45,21 @@ const getCodeDescription = (code: number | 'Homing' = 1): string => {
 
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
     const alarmDescription = getCodeDescription(code);
+
+    const sendAlarmDescription = () => {
+        pubsub.publish('helper:info', {
+            title: 'Alarm Code ' + code,
+            description: alarmDescription,
+        });
+    };
+
     return (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
-                        <FaQuestion className="text-xl text-gray-600" />
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-64">
-                    {alarmDescription}
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
+            <FaQuestion
+                className="text-xl text-gray-600 cursor-pointer"
+                onClick={sendAlarmDescription}
+            />
+        </div>
     );
 };
 
