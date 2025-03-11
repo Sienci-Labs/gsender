@@ -24,7 +24,8 @@
 import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { FaMinus, FaPlus, FaRedo } from 'react-icons/fa';
-import cx from 'classnames';
+
+import Button from 'app/components/Button';
 
 export interface RangeSliderProps {
     [key: string]: any;
@@ -74,20 +75,13 @@ const RangeSlider = ({
         <div className="flex flex-col items-center gap-2 justify-center w-full">
             {textComponent}
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 shadow-inner">
-                <button
+                <Button
                     type="button"
-                    className={cx(
-                        'flex w-14 h-10 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
-                        {
-                            'border-blue-400 bg-white': !disabled,
-                            'border-gray-400 bg-gray-300': disabled,
-                        },
-                    )}
                     onClick={() => onButtonPress(defaultPercentage)}
                     disabled={disabled}
-                >
-                    <FaRedo />
-                </button>
+                    size="sm"
+                    icon={<FaRedo />}
+                />
                 <Slider.Root
                     className="flex relative items-center w-full h-6"
                     defaultValue={defaultPercentage}
@@ -107,15 +101,8 @@ const RangeSlider = ({
                     </Slider.Track>
                     <Slider.Thumb className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none" />
                 </Slider.Root>
-                <button
+                <Button
                     type="button"
-                    className={cx(
-                        'flex w-14 h-10 items-center justify-center rounded-s-3xl rounded-e-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
-                        {
-                            'border-blue-400 bg-white': !disabled,
-                            'border-gray-400 bg-gray-300': disabled,
-                        },
-                    )}
                     onClick={() => {
                         if (percentage[0] - step < min) {
                             return;
@@ -124,18 +111,11 @@ const RangeSlider = ({
                         onButtonPress([newValue]);
                     }}
                     disabled={disabled}
-                >
-                    <FaMinus />
-                </button>
-                <button
+                    size="sm"
+                    icon={<FaMinus />}
+                />
+                <Button
                     type="button"
-                    className={cx(
-                        'flex w-14 h-10 items-center justify-center rounded-e-3xl rounded-s-none text-center p-1 m-0 font-bold border-solid border bg-opacity-60 text-black',
-                        {
-                            'border-blue-400 bg-white': !disabled,
-                            'border-gray-400 bg-gray-300': disabled,
-                        },
-                    )}
                     onClick={() => {
                         if (percentage[0] + step > max) {
                             return;
@@ -144,9 +124,9 @@ const RangeSlider = ({
                         onButtonPress([newValue]);
                     }}
                     disabled={disabled}
-                >
-                    <FaPlus />
-                </button>
+                    size="sm"
+                    icon={<FaPlus />}
+                />
             </div>
         </div>
     );

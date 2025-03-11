@@ -56,16 +56,11 @@ export function RemoteMenuFlyout() {
 
             <div
                 className={cx(
-                    'absolute top-14 inset-x-0 transition transform-origin-top-left h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
+                    'absolute top-14 inset-x-0 transition transform-origin-top-left w-96 h-screen md:hidden p-2 flex flex-col bg-transparent divide divide-y divide-gray-400 z-20',
                     { hidden: !isOpen },
                 )}
             >
-                <NavFlyoutLink href={''} label={'I'} />
-                <NavFlyoutLink href={''} label={"Don't"} />
-                <NavFlyoutLink href={''} label={'Know'} />
-                <NavFlyoutLink href={''} label={'What'} />
-                <NavFlyoutLink href={''} label={'Goes'} />
-                <NavFlyoutLink href={''} label={'Here'} />
+                <NavFlyoutLink href={'/remote'} label={'Home'} />
             </div>
         </div>
     );

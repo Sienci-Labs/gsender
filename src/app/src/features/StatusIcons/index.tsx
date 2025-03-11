@@ -6,6 +6,7 @@ import { LuGamepad2 } from 'react-icons/lu';
 import { FaRegKeyboard } from 'react-icons/fa6';
 
 import { RemoteModeDialog } from 'app/features/RemoteMode';
+import actions from 'app/features/RemoteMode/apiActions.ts';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
@@ -17,8 +18,9 @@ const StatusIcons = () => {
         setShowRemoteDialog(!showRemoteDialog);
     }
 
+    console.log(headlessSettings);
     useEffect(() => {
-        //actions.fetchSettings(setHeadlessSettings);
+        actions.fetchSettings(setHeadlessSettings);
 
         const gameConnectHandler = () => {
             const gamepads = navigator.getGamepads();
@@ -79,6 +81,10 @@ const StatusIcons = () => {
             <RemoteModeDialog
                 showRemote={showRemoteDialog}
                 onClose={() => setShowRemoteDialog(false)}
+                setHeadlessSettings={setHeadlessSettings}
+                remoteIp={headlessSettings.ip}
+                remotePort={headlessSettings.port}
+                remoteOn={headlessSettings.headlessStatus}
             />
         </div>
     );

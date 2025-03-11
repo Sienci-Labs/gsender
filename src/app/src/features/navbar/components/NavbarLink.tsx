@@ -25,16 +25,19 @@ export function NavbarLink(props: NavbarLinkProps) {
                             'border-transparent bg-transparent bg-opacity-100':
                                 props.minimized,
                         },
-                        0,
                     )}
                 >
                     {props.icon && (
                         <props.icon
-                            className={`text-4xl ${isActive ? 'text-blue-600' : 'text-gray-600'}`}
+                            className={`text-2xl ${isActive ? 'text-blue-600' : 'text-gray-600'}`}
                         />
                     )}
-                    {props.svg && <img src={props.svg} />}
-                    <span className={cn('', { 'opacity-0': props.minimized })}>
+                    {props.svg && <img src={props.svg} className="w-16 h-16" />}
+                    <span
+                        className={cn('text-xs xl:text-sm', {
+                            'opacity-0': props.minimized,
+                        })}
+                    >
                         {props.label}
                     </span>
                 </div>

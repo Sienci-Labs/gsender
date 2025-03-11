@@ -24,6 +24,7 @@
 import path from 'path';
 import pkg from '../../package.json';
 import { languages } from '../../../build.config';
+import os from 'os';
 
 const RC_FILE = pkg.version.includes('EDGE') ? '.edge_rc' : '.sender_rc';
 const SESSION_PATH = '.sienci-sessions';
@@ -31,7 +32,9 @@ const SESSION_PATH = '.sienci-sessions';
 // Secret
 const secret = pkg.version;
 
-const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
+//const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
+const getUserHome = () => os.homedir();
+
 
 export default {
     rcfile: path.resolve(getUserHome(), RC_FILE),

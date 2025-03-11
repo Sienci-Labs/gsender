@@ -2,8 +2,10 @@ import { HelperState } from 'app/store/definitions.ts';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: HelperState = {
-    active: false,
-    minimized: true,
+    wizardActive: false,
+    infoHelperActive: false,
+    wizardMinimized: true,
+    infoHelperMinimized: true,
     title: 'Helper',
     metadata: {},
 };
@@ -15,36 +17,52 @@ const HelperStateSlice = createSlice({
         unloadHelperInfo: () => {
             return initialState;
         },
-        toggleHelperVisibility: (state) => {
-            state.minimized = !state.minimized;
+        toggleWizardVisibility: (state) => {
+            state.wizardMinimized = !state.wizardMinimized;
             return state;
         },
-        updateHelperState: (state, payload) => {
-            const { active, metadata } = payload;
-            state.active = active;
-            state.metadata = metadata;
-            state.minimized = false;
+        toggleInfoHelperVisibility: (state) => {
+            state.infoHelperMinimized = !state.infoHelperMinimized;
             return state;
         },
-        enableHelper: (state) => {
-            state.active = true;
-            state.minimized = false;
+        // updateHelperState: (state, payload) => {
+        //     const { active, metadata } = payload;
+        //     state.wizardActive = active;
+        //     state.metadata = metadata;
+        //     state.minimized = false;
+        //     return state;
+        // },
+        enableWizard: (state) => {
+            state.wizardActive = true;
+            state.wizardMinimized = false;
             return state;
         },
-        disableHelper: (state) => {
-            state.active = false;
-            state.minimized = true;
+        enableInfoHelper: (state) => {
+            state.infoHelperActive = true;
+            state.infoHelperMinimized = false;
+            return state;
+        },
+        disableWizard: (state) => {
+            state.wizardActive = false;
+            state.wizardMinimized = true;
+        },
+        disableInfoHelper: (state) => {
+            state.infoHelperActive = false;
+            state.infoHelperMinimized = true;
             return state;
         },
     },
 });
 
 export const {
-    enableHelper,
-    disableHelper,
-    updateHelperState,
+    enableWizard,
+    enableInfoHelper,
+    disableWizard,
+    disableInfoHelper,
+    // updateHelperState,
     unloadHelperInfo,
-    toggleHelperVisibility,
+    toggleWizardVisibility,
+    toggleInfoHelperVisibility,
 } = HelperStateSlice.actions;
 
 export default HelperStateSlice.reducer;

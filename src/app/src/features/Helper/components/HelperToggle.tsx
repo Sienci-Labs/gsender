@@ -1,7 +1,9 @@
 import cn from 'classnames';
-import React from 'react';
 import { RiSpeakLine } from 'react-icons/ri';
-import { toggleHelperVisibility } from 'app/store/redux/slices/helper.slice';
+import {
+    toggleWizardVisibility,
+    toggleInfoHelperVisibility,
+} from 'app/store/redux/slices/helper.slice';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import reduxStore from 'app/store/redux';
@@ -10,20 +12,36 @@ interface HelperToggleProps {
     minimized: boolean;
 }
 
-export function HelperToggle({ active, title, minimized }: HelperToggleProps) {
-    const helperTitle = useSelector((state: RootState) => state.helper.title);
-    const helperEnabled = useSelector(
-        (state: RootState) => state.helper.active,
-    );
-    const helperMinimized = useSelector(
-        (state: RootState) => state.helper.minimized,
-    );
+export function HelperToggle({ minimized }: HelperToggleProps) {
+    const {
+        wizardActive,
+        infoHelperActive,
+        title: helperTitle,
+        wizardMinimized,
+        infoHelperMinimized,
+    } = useSelector((state: RootState) => state.helper);
+    // const helperTitle = title;
+    const helperEnabled = wizardActive || infoHelperActive;
+
+    // const helperMinimized = wizardMinimized;
 
     // Direct user to ongoing action
-    const bringAttention = helperEnabled && helperMinimized;
+    // const bringAttention = helperEnabled && helperMinimized;
 
     const handleToggle = () => {
-        reduxStore.dispatch(toggleHelperVisibility());
+        // this toggle will always minimize all if one is opened
+        if (wizardMinimized || infoHelperMinimized) {
+            if (wizardMinimized) {
+                reduxStore.dispatch(toggleWizardVisibility());
+            }
+            if (infoHelperMinimized) {
+                reduxStore.dispatch(toggleInfoHelperVisibility());
+            }
+        } else if (!wizardMinimized && !infoHelperMinimized) {
+            // otherwise, if all are minimized, it opens all
+            reduxStore.dispatch(toggleWizardVisibility());
+            reduxStore.dispatch(toggleInfoHelperVisibility());
+        }
     };
 
     return (
@@ -42,9 +60,9 @@ export function HelperToggle({ active, title, minimized }: HelperToggleProps) {
             )}
         >
             <RiSpeakLine
-                className={`text-4xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
+                className={`text-2xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
             />
-            <span className={cn('', { 'opacity-0': minimized })}>
+            <span className={cn('text-xs', { 'opacity-0': minimized })}>
                 {helperTitle}
             </span>
         </button>

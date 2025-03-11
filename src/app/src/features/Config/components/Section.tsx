@@ -37,7 +37,6 @@ export const Section = React.forwardRef(
         ref,
     ) => {
         const { searchTerm, connected } = useSettings();
-        console.log(wizard);
 
         const filteredSettings = settings.filter((o) =>
             matchesSearchTerm(o, searchTerm),

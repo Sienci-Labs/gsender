@@ -11,7 +11,7 @@ export const Route = createLazyFileRoute('/')({
 function Index() {
     return (
         <>
-            <div className="flex h-[75%] pb-10">
+            <div className="flex h-[75%] pb-7">
                 <div className="flex-grow">
                     <Visualizer />
                 </div>
