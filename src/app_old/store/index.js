@@ -244,6 +244,44 @@ const migrateStore = () => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.4.12')) {
+        const getSafeJogState = () => {
+            const defaultJogState = get(defaultState, 'widgets.axes.jog');
+            const jogState = store.get('widgets.axes.jog');
+
+            // Ensure all required properties exist by falling back to defaultJogState
+            const safeJogState = {
+                ...jogState,
+                rapid: {
+                    feedrate: jogState?.rapid?.feedrate ?? defaultJogState.rapid.feedrate,
+                    xyStep: jogState?.rapid?.xyStep ?? defaultJogState.rapid.xyStep,
+                    xaStep: jogState?.rapid?.xaStep ?? defaultJogState.rapid.xaStep,
+                    zStep: jogState?.rapid?.zStep ?? defaultJogState.rapid.zStep,
+                    aStep: jogState?.rapid?.aStep ?? defaultJogState.rapid.aStep
+                },
+                normal: {
+                    feedrate: jogState?.normal?.feedrate ?? defaultJogState.normal.feedrate,
+                    xyStep: jogState?.normal?.xyStep ?? defaultJogState.normal.xyStep,
+                    xaStep: jogState?.normal?.xaStep ?? defaultJogState.normal.xaStep,
+                    zStep: jogState?.normal?.zStep ?? defaultJogState.normal.zStep,
+                    aStep: jogState?.normal?.aStep ?? defaultJogState.normal.aStep
+                },
+                precise: {
+                    feedrate: jogState?.precise?.feedrate ?? defaultJogState.precise.feedrate,
+                    xyStep: jogState?.precise?.xyStep ?? defaultJogState.precise.xyStep,
+                    xaStep: jogState?.precise?.xaStep ?? defaultJogState.precise.xaStep,
+                    zStep: jogState?.precise?.zStep ?? defaultJogState.precise.zStep,
+                    aStep: jogState?.precise?.aStep ?? defaultJogState.precise.aStep
+                }
+            };
+
+            return safeJogState;
+        };
+
+        const jogState = getSafeJogState();
+        store.replace('widgets.axes.jog', jogState);
+    }
+
     // Reset machine profile to default selection for 1.4.1 to prevent ID overlaps
     if (semver.lt(cnc.version, '1.4.10')) {
         const defaultMachineProfile = get(defaultState, 'workspace.machineProfile');

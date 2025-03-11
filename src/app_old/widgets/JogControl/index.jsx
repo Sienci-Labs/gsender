@@ -80,7 +80,12 @@ import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
 import { JoystickLoop, checkThumbsticskAreIdle } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
-import { convertAllPresetsUnits, convertToImperial, convertToMetric } from '../../containers/Preferences/calculate';
+import {
+    convertAllPresetsUnits,
+    convertToImperial,
+    convertToMetric,
+    getSafeJogState
+} from '../../containers/Preferences/calculate';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -971,12 +976,14 @@ class AxesWidget extends PureComponent {
         const { jog, units, selectedSpeed } = this.state;
         const data = store.get('widgets.axes.jog');
 
+        const safeJogState = getSafeJogState();
+
         if (!data) {
             return;
         }
 
-        // convert store data if necessary
-        const jogObj = units === IMPERIAL_UNITS ? convertAllPresetsUnits(units, store.get('widgets.axes.jog')) : data;
+        // convert if necessary
+        const jogObj = units === IMPERIAL_UNITS ? convertAllPresetsUnits(units, safeJogState) : safeJogState;
 
         // if the same as our current state, dont bother changing anything
         if (jog.rapid === jogObj.rapid && jog.normal === jogObj.normal && jog.precise === jogObj.precise) {
@@ -1261,11 +1268,7 @@ class AxesWidget extends PureComponent {
     }
 
     getInitialState() {
-        const initialUnits = store.get('workspace.units', METRIC_UNITS);
-        // convert to imperial if necessary.
-        // we keep track of the current values converted to the correct units,
-        // but the store will always be metric.
-        const { rapid, normal, precise } = initialUnits === IMPERIAL_UNITS ? convertAllPresetsUnits(initialUnits, store.get('widgets.axes.jog')) : store.get('widgets.axes.jog');
+        const { rapid, normal, precise } = getSafeJogState();
 
         return {
             minimized: this.config.get('minimized', false),

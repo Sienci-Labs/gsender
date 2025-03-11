@@ -2074,6 +2074,12 @@ class GrblController {
             block.push(...this.convertGcodeToArray(postHook));
             block.push(POSTHOOK_COMPLETE);
         }
+
+        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        if (!skipDialog) {
+            block.push(`${PREHOOK_COMPLETE} ;${comment}`);
+        }
+
         console.log(block);
 
 
