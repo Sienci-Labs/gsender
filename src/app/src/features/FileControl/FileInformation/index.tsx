@@ -26,6 +26,7 @@ import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
 import { FileData } from '..';
+import isElectron from 'is-electron';
 
 interface Props {
     handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
@@ -48,7 +49,6 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
-        console.log(getRecentFiles());
         fetchJobs();
 
         const tokens = [
@@ -76,52 +76,84 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
 
     if (!fileLoaded) {
         return (
-            <div className="grid grid-cols-[3fr_2fr] gap-8 mt-3 h-full">
-                <div className="flex flex-col gap-2">
-                    <span className="ml-4">Recent Files</span>
+            <div
+                className={cx('mt-3 h-full', {
+                    'grid grid-cols-[3fr_2fr] gap-8': isElectron(),
+                    flex: !isElectron(),
+                })}
+            >
+                {isElectron() && (
+                    <div className="flex flex-col gap-2">
+                        <span className="ml-4">Recent Files</span>
 
-                    {recentFiles.map((file) => (
-                        <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
-                            <div className="flex flex-row items-center gap-1">
-                                <GoFileCode className="text-3xl text-gray-400 ml-1" />
-                                <div className="flex flex-col">
-                                    <span>{file.fileName}</span>
-                                    <span className="text-gray-500 text-xs">
-                                        {file.fileSize}
-                                    </span>
+                        {recentFiles.map((file) => (
+                            <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
+                                <div className="grid grid-cols-[30px_3fr] items-center gap-1">
+                                    <GoFileCode className="text-3xl text-gray-400 ml-1" />
+                                    <div className="grid items-start">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                                                        {file.fileName}
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    {file.fileName}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+
+                                        <span className=" text-gray-500 text-xs">
+                                            {(file.fileSize / 1000000).toFixed(
+                                                2,
+                                            )}
+                                            {' MB'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
+                                    <RiFolderUploadLine
+                                        onClick={() =>
+                                            handleElectronFileUpload(
+                                                {
+                                                    name: file.fileName,
+                                                    data: file.fileData,
+                                                    size: file.fileSize,
+                                                    path: file.filePath,
+                                                },
+                                                true,
+                                            )
+                                        }
+                                    />
                                 </div>
                             </div>
-                            <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
-                                <RiFolderUploadLine
-                                    onClick={() =>
-                                        handleElectronFileUpload(
-                                            {
-                                                name: file.fileName,
-                                                data: file.fileData,
-                                                size: file.fileSize,
-                                                path: file.filePath,
-                                            },
-                                            true,
-                                        )
-                                    }
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
                 <div className="flex flex-col gap-4 text-sm justify-between">
                     {lastJob && (
                         <>
                             <span className="text-base">Last Job</span>
                             <div className="grid grid-rows-3 gap-4 -ml-[2px] text-gray-500 font-bold">
-                                <div className="grid grid-cols-[1fr_5fr] items-start gap-2">
-                                    <LuFileCode2 className="text-lg" />
-                                    <div className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
-                                        <span className="font-bold">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="grid grid-cols-[20px_5fr] items-start gap-2">
+                                                <LuFileCode2 className="text-lg" />
+                                                <div className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                                                    <span className="font-bold">
+                                                        {lastJob.file}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
                                             {lastJob.file}
-                                        </span>
-                                    </div>
-                                </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
                                 <div className="flex flex-row gap-2">
                                     <MdInfoOutline className="text-xl -ml-[1px]" />
                                     <span
