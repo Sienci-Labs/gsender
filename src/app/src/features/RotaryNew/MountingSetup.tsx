@@ -22,6 +22,7 @@ import customTrackGraphic from './assets/custom-boring-track-top-view.png';
 import { HOLE_TYPES } from './utils/mountingSetupMacros';
 
 const MountingSetup = () => {
+    const [open, setOpen] = useState(false);
     const [options, setOptions] = useState({
         'mounting-track-lines-up': {
             label: 'Does the mounting track line up without interference?',
@@ -151,12 +152,16 @@ const MountingSetup = () => {
         toast.info(
             `File added for ${localNumberOfHoles} ${endMillDiameter}" mounting holes`,
         );
+
+        setOpen(false);
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm">Mounting Setup</Button>
+                <Button size="sm" onClick={() => setOpen(true)}>
+                    Mounting Setup
+                </Button>
             </DialogTrigger>
             <DialogContent className="bg-white w-11/12 max-w-6xl">
                 <DialogHeader>
