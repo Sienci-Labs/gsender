@@ -399,9 +399,11 @@ const metrics = {
         });
     },
     updateCollectDataStatus: (
-        options: USER_DATA_COLLECTION_T,
+        collectUserDataStatus: string,
     ): Promise<AxiosResponse> => {
-        return authrequest.post('/api/metrics/collectUserData', options);
+        return authrequest.post('/api/metrics/collectUserData', {
+            collectUserDataStatus,
+        });
     },
     sendUsageData: (options: Record<string, any>): Promise<AxiosResponse> => {
         return authrequest.post('/api/metrics/sendUsageData', options);
