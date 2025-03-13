@@ -1,8 +1,10 @@
-import Visualizer from 'app/features/Visualizer';
-import { Column } from '../Column';
-import { ToolArea } from '../ToolArea';
 import { useLocation } from 'react-router';
 import cx from 'classnames';
+
+import Visualizer from 'app/features/Visualizer';
+
+import { Column } from '../Column';
+import { ToolArea } from '../ToolArea';
 
 export const Carve = () => {
     const { pathname } = useLocation();
@@ -11,7 +13,7 @@ export const Carve = () => {
 
     return (
         <div
-            className={cx('absolute w-[calc(100%-77px)] h-[calc(100%-4rem)]', {
+            className={cx('h-full', {
                 hidden: shouldHide,
             })}
         >
