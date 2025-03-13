@@ -18,7 +18,7 @@ export function UnlockButton() {
     const activeState = get(status, 'activeState', 'Idle');
 
     const isHold = activeState === GRBL_ACTIVE_STATE_HOLD;
-    console.log(isHold);
+
     return (
         <div className="text-4xl">
             <button
