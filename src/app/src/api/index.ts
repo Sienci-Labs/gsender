@@ -398,7 +398,7 @@ const metrics = {
             params: options,
         });
     },
-    toggleCollectDataStatus: (
+    updateCollectDataStatus: (
         options: USER_DATA_COLLECTION_T,
     ): Promise<AxiosResponse> => {
         return authrequest.post('/api/metrics/collectUserData', options);
