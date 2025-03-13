@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Outlet } from 'react-router';
 import Workspace from './workspace';
 import { Config } from './features/Config';
-import { UpdateAlert } from './components/UpdateAlert';
 import Firmware from './features/Firmware';
 import KeyboardShortcuts from './features/Keyboard';
 import MovementTuning from './features/MovementTuning';
@@ -18,6 +17,22 @@ import { Stats } from './features/Stats';
 import { Jobs } from './features/Stats/Jobs';
 import { Maintenance } from './features/Stats/Maintenance';
 import Page from './components/Page';
+import { MachineInfoDisplay } from './features/MachineInfo/MachineInfoDisplay';
+import { NotificationDisplay } from './workspace/TopBar/NotificationsArea/NotificationDisplay';
+import { WorkspaceSelector } from './features/WorkspaceSelector';
+import DRO from './features/DRO';
+import { RemoteWidget } from './components/RemoteWidget';
+import Coolant from './features/Coolant';
+import FileControl from './features/FileControl';
+import JobControl from './features/JobControl';
+import { Jogging } from './features/Jogging';
+import Macros from './features/Macros';
+import Probe from './features/Probe';
+import Rotary from './features/Rotary';
+import Spindle from './features/Spindle';
+import About from './features/Stats/About';
+import { BottomNav } from './features/RemoteMode/components/BottomNav';
+import { noop } from 'lodash';
 
 export const ReactRoutes = () => {
     return (
@@ -130,7 +145,81 @@ export const ReactRoutes = () => {
                     <Route path="alarms" element={<Alarms />} />
                     <Route path="jobs" element={<Jobs />} />
                     <Route path="maintenance" element={<Maintenance />} />
+                    <Route path="about" element={<About />} />
                 </Route>
+            </Route>
+            <Route
+                path="remote"
+                element={
+                    <div>
+                        <div className="flex flex-col gap-8 min-h-screen">
+                            <Outlet />
+                        </div>
+
+                        <BottomNav />
+                    </div>
+                }
+            >
+                <Route
+                    index
+                    element={
+                        <>
+                            <WorkspaceSelector />
+                            <DRO />
+                            <Jogging />
+                        </>
+                    }
+                />
+                <Route
+                    path="info"
+                    element={
+                        <div className="flex flex-col justify-center gap-8 p-4">
+                            <div>
+                                <MachineInfoDisplay
+                                    open={true}
+                                    pinned={true}
+                                    onClose={noop}
+                                    setPinned={noop}
+                                />
+                            </div>
+
+                            <div>
+                                <NotificationDisplay />
+                            </div>
+                        </div>
+                    }
+                />
+                <Route
+                    path="tools"
+                    element={
+                        <>
+                            <RemoteWidget label="Probe">
+                                <Probe />
+                            </RemoteWidget>
+                            <RemoteWidget label="Macros">
+                                <Macros />
+                            </RemoteWidget>
+                            <RemoteWidget label="Spindle">
+                                <Spindle />
+                            </RemoteWidget>
+                            <RemoteWidget label="Coolant">
+                                <Coolant />
+                            </RemoteWidget>
+                            <RemoteWidget label="Rotary">
+                                <Rotary />
+                            </RemoteWidget>
+                        </>
+                    }
+                />
+                <Route
+                    path="workflow"
+                    element={
+                        <div className="flex flex-col gap-48 mt-6">
+                            <FileControl />
+                            <JobControl />
+                        </div>
+                    }
+                />
             </Route>
         </Routes>
     );

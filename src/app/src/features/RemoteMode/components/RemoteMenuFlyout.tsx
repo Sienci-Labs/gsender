@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 import cx from 'classnames';
 
 export function NavFlyoutLink({
@@ -10,7 +10,7 @@ export function NavFlyoutLink({
     label: string;
 }) {
     return (
-        <Link href={href} className="bg-gray-100 p-4 rounded flex flex-row">
+        <Link to={href} className="bg-gray-100 p-4 rounded flex flex-row">
             {label}
         </Link>
     );
