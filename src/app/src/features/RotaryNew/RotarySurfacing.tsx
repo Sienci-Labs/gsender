@@ -20,6 +20,9 @@ import {
     TabsTrigger,
 } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { VISUALIZER_PRIMARY } from 'app/constants';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
 import VisualizerPreview from './components/VisualizerPreview';
@@ -60,6 +63,7 @@ const MM_TO_INCH = 0.0393701;
 
 const RotarySurfacing = () => {
     const { units } = useWorkspaceState();
+    const [open, setOpen] = useState(false);
 
     // Initialize state with appropriate units
     const getInitialState = () => {
@@ -101,18 +105,31 @@ const RotarySurfacing = () => {
 
     const handleGenerateGcode = () => {
         const generator = new StockTurningGenerator({
-            stockLength: surfacingState.length,
-            stepdown: surfacingState.stepdown,
-            bitDiameter: surfacingState.bitDiameter,
-            spindleRPM: surfacingState.spindleRPM,
-            feedrate: surfacingState.feedrate,
-            stepover: surfacingState.stepover,
-            startHeight: surfacingState.startDiameter / 2,
-            finalHeight: surfacingState.finalDiameter / 2,
+            stockLength: +surfacingState.length,
+            stepdown: +surfacingState.stepdown,
+            bitDiameter: +surfacingState.bitDiameter,
+            spindleRPM: +surfacingState.spindleRPM,
+            feedrate: +surfacingState.feedrate,
+            stepover: +surfacingState.stepover,
+            startHeight: +surfacingState.startDiameter,
+            finalHeight: +surfacingState.finalDiameter,
             enableRehoming: surfacingState.enableRehoming,
         });
 
         setGcode(generator.generate());
+    };
+
+    const handleLoadToMainVisualizer = async () => {
+        const file = new File([gcode], 'gSender_Rotary_Surfacing');
+
+        await uploadGcodeFileToServer(
+            file,
+            controller.port,
+            VISUALIZER_PRIMARY,
+        );
+
+        setOpen(false);
+        setGcode('');
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,15 +142,19 @@ const RotarySurfacing = () => {
     };
 
     const handleOpenChange = (open: boolean) => {
+        setOpen(open);
+
         if (!open) {
             setGcode('');
         }
     };
 
     return (
-        <Dialog onOpenChange={handleOpenChange}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button size="sm">Rotary Surfacing</Button>
+                <Button size="sm" onClick={() => setOpen(true)}>
+                    Rotary Surfacing
+                </Button>
             </DialogTrigger>
             <DialogContent className="bg-white w-11/12 max-w-6xl">
                 <DialogHeader>
@@ -270,7 +291,12 @@ const RotarySurfacing = () => {
                     <Button type="submit" onClick={handleGenerateGcode}>
                         Generate G-Code
                     </Button>
-                    <Button disabled={!gcode}>Load to Main Visualizer</Button>
+                    <Button
+                        disabled={!gcode}
+                        onClick={handleLoadToMainVisualizer}
+                    >
+                        Load to Main Visualizer
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
