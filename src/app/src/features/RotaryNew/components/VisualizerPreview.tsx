@@ -1,4 +1,4 @@
-// import Visualizer from 'app/features/Visualizer';
+import Visualizer from 'app/features/Visualizer';
 
 type VisualizerPreviewProps = {
     gcode: string;
@@ -18,7 +18,7 @@ const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
 
     return (
         <div className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md">
-            {/* <Visualizer /> */}
+            <Visualizer gcode={gcode} />
         </div>
     );
 };
