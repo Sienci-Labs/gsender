@@ -471,6 +471,7 @@
     "stylint-loader": "~1.0.0",
     "stylus": "^0.63.0",
     "stylus-loader": "~3.0.2",
+    "tailwindcss-animate": "^1.0.7",
     "tap": "~12.6.2",
     "terser-webpack-plugin": "^4",
     "text-table": "~0.2.0",
