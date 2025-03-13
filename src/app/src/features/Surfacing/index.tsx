@@ -2,14 +2,14 @@ import { useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaCode, FaPlay } from 'react-icons/fa';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 
 import store from 'app/store';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
-    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { convertToMetric } from 'app/lib/units';
 import MultiInputBlock from 'app/components/MultiInputBlock';
@@ -64,7 +64,7 @@ const SurfacingTool = () => {
         const name = 'gSender_Surfacing';
         const file = new File([gcode], name);
 
-        uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
+        uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
     };
 
     const onChange = (property: string, value: number) => {
@@ -317,7 +317,7 @@ const SurfacingTool = () => {
                             <Visualizer
                                 gcode={gcode}
                                 surfacing={surfacing}
-                                // isSecondary
+                                isSecondary
                             />
                         </div>
                         <div

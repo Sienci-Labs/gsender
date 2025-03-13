@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 import { IoSpeedometerOutline } from 'react-icons/io5';
 import { FaTasks } from 'react-icons/fa';
 import { RiToolsFill } from 'react-icons/ri';
@@ -6,7 +6,7 @@ import { RxDashboard } from 'react-icons/rx';
 export function BottomNavLink({ label, icon, href }) {
     return (
         <Link
-            href={href}
+            to={href}
             className="inline-flex flex-col items-center justify-center border-gray-300 border-x hover:bg-gray-50 "
         >
             <span className="w-5 h-5 mb-2 text-gray-500  group-hover:text-blue-600 text-2xl">

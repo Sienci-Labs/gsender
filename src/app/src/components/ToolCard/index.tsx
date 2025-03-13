@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 import { IconType } from 'react-icons';
 
 import { Card, CardTitle, CardDescription } from 'app/components/shadcn/Card';

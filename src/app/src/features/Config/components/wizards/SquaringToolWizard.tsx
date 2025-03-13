@@ -1,5 +1,5 @@
 import { StatLink } from 'app/features/Stats/components/StatLink.tsx';
-import { Link } from '@tanstack/react-router';
+import { Link } from 'react-router';
 import { FaHatWizard } from 'react-icons/fa';
 
 export function ToolLink({ link, label }) {

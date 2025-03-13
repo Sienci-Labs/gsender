@@ -26,20 +26,20 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     minimized={!show}
                 />
                 <NavbarLink
-                    href="/stats"
+                    href="stats"
                     icon={IoSpeedometerOutline}
                     label="Stats"
                     minimized={!show}
                 />
                 <NavbarLink
-                    href="/tools"
+                    href="tools"
                     icon={RiToolsFill}
                     label="Tools"
                     minimized={!show}
                 />
 
                 <NavbarLink
-                    href="/configuration"
+                    href="configuration"
                     icon={FaTasks}
                     label="Config"
                     minimized={!show}
