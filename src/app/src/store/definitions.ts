@@ -106,8 +106,10 @@ export interface ConnectionState {
 }
 
 export interface HelperState {
-    active: boolean;
-    minimized: boolean;
+    wizardActive: boolean;
+    infoHelperActive: boolean;
+    wizardMinimized: boolean
+    infoHelperMinimized: boolean;
     title: string;
     metadata: object;
 }

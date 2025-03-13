@@ -1,14 +1,17 @@
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import {
+    Job,
+    JobAggregate,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
-import {truncate} from "lodash";
-import {truncatePort} from "app/features/Stats/utils/statUtils.ts";
+import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function aggregateRunTime(jobs) {
-    const aggregate = {};
+function aggregateRunTime(jobs: Job[]): [string[], number[]] {
+    const aggregate: JobAggregate = {};
     jobs.map((job) => {
         if (!aggregate.hasOwnProperty(job.port)) {
             aggregate[job.port] = job.duration;

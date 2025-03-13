@@ -2,9 +2,9 @@ import get from 'lodash/get';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
 import { TOUCHPLATE_TYPE_AUTOZERO } from '../lib/constants';
-import { UNITS_GCODE } from 'definitions/general';
-import { ProbeWidgetSettings } from 'features/Probe/definitions';
-import { ReduxState } from 'store/definitions';
+import { UNITS_GCODE } from 'app/definitions/general';
+import { ProbeWidgetSettings } from 'app/features/Probe/definitions';
+import { ReduxState } from 'app/store/definitions';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeSettings = store.get('widgets.probe');

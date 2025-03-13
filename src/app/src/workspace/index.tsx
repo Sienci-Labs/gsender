@@ -1,14 +1,18 @@
+import { useEffect } from 'react';
+
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
 import { toggleAllShortcuts } from 'app/store/redux/slices/keyboardShortcutsSlice';
-import { useEffect } from 'react';
+import { WORKSPACE_MODE } from 'app/constants';
+
 import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { WORKSPACE_MODE } from 'app/constants';
 import { Outlet, useNavigate, useLocation } from 'react-router';
 import { Carve } from './Carve';
+import { Alerts } from './Alerts';
+import DataCollection from '../features/DataCollection';
 
 const Workspace = () => {
     const navigate = useNavigate();
@@ -17,10 +21,10 @@ const Workspace = () => {
     useEffect(() => {
         console.log('CALLED NAV');
         console.log(location);
-        const { href } = location;
-        if (href === '/#/remote') {
+        const { hash } = location;
+        if (hash === '#/remote') {
             console.log('MATCHED');
-            navigate({ to: '/remote' });
+            navigate('/remote');
         }
     }, [location]);
 
@@ -254,8 +258,10 @@ const Workspace = () => {
     return (
         <div className="flex flex-col h-full">
             <TopBar />
+            <DataCollection />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
+                <Alerts />
                 <div className="w-full max-sm:p-4">
                     <Carve />
                     <Outlet />

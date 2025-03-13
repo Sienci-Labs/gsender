@@ -1,5 +1,8 @@
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
-import React, { useContext } from 'react';
+import {
+    FirmwareEvent,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
 
 import { IoIosWarning } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
@@ -7,12 +10,12 @@ import cx from 'classnames';
 import { convertISOStringToDateAndTime } from 'app/lib/datetime.ts';
 import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
-const colorCodes = {
-    ALARM: '#d75f5f',
-    ERROR: '#ff0000',
-};
+// const colorCodes = {
+//     ALARM: '#d75f5f',
+//     ERROR: '#ff0000',
+// };
 
-function AlarmItem({ alarm, key }) {
+function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
     const time = convertISOStringToDateAndTime(alarm.time);
     const isAlarm = alarm.type === 'ALARM';
     return (
@@ -21,6 +24,7 @@ function AlarmItem({ alarm, key }) {
                 'border-l-2 border-red-500': isAlarm,
                 'border-l-2 border-orange-500': !isAlarm,
             })}
+            key={key}
         >
             <span
                 className={cx(

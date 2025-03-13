@@ -7,11 +7,14 @@ import {
 import { MaintenanceTaskForm } from 'app/features/Stats/components/MaintenanceTaskForm.tsx';
 import { buttonStyle } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { useContext, useEffect, useState } from 'react';
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import {
+    MaintenanceTask,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 
 interface MaintenanceEditTaskDialogProps {
     show: boolean;
-    toggleShow: (b) => void;
+    toggleShow: (b: boolean) => void;
     id?: number;
 }
 
@@ -21,13 +24,25 @@ export function MaintenanceEditTaskDialog({
     id = -1,
 }: MaintenanceEditTaskDialogProps) {
     const { maintenanceTasks } = useContext(StatContext);
-    const [task, setTask] = useState({});
-    function handleSubmit(e) {
+    const [task, setTask] = useState<MaintenanceTask>({
+        description: '',
+        rangeStart: null,
+        rangeEnd: null,
+        name: '',
+        currentTime: 0,
+    });
+    function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const description = e.target.description.value;
-        const rangeStart = Number(e.target.startRange.value);
-        const rangeEnd = Number(e.target.endRange.value);
-        const name = e.target.taskName.value;
+        const target = e.target as typeof e.target & {
+            description: { value: string };
+            startRange: { value: string };
+            endRange: { value: string };
+            taskName: { value: string };
+        };
+        const description = target.description.value;
+        const rangeStart = Number(target.startRange.value);
+        const rangeEnd = Number(target.endRange.value);
+        const name = target.taskName.value;
 
         const payload = {
             description,

@@ -1,13 +1,25 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext, useEffect, useState } from 'react';
+import {
+    MaintenanceTask,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 import { sortingFns } from '@tanstack/react-table';
 import Icon from '@mdi/react';
 import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
-import SortableTable from 'app/components/SortableTable';
+import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
 
-function determineTime(task) {
+interface FormattedTask {
+    id: number;
+    part: string;
+    time: number | JSX.Element | 'Due';
+    edit: string;
+    description: string;
+    subRow?: string;
+}
+
+function determineTime(task: MaintenanceTask) {
     const { rangeStart, rangeEnd, currentTime } = task;
     if (currentTime < rangeStart) {
         return rangeStart - Math.floor(currentTime);
@@ -23,10 +35,10 @@ function determineTime(task) {
     }
 }
 
-function formatTasks(data) {
-    const formattedTasks = [];
+function formatTasks(data: MaintenanceTask[]) {
+    const formattedTasks: FormattedTask[] = [];
     data.forEach((task) => {
-        const formattedTask = {
+        const formattedTask: FormattedTask = {
             id: task.id,
             part: task.name,
             time: determineTime(task),
@@ -50,125 +62,121 @@ export function MaintenanceList() {
         setFormattedData(refactor);
     }, [maintenanceTasks]);
 
-    const columns = useMemo(
-        () => [
-            {
-                accessorKey: 'time',
-                header: () => null,
-                cell: (info) => {
-                    if (Number(info.renderValue())) {
-                        return (
-                            <div
-                                style={{
-                                    color: 'green',
-                                    display: 'flex',
-                                    maxHeight: '100%',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    // padding: '50% 0px'
-                                }}
-                            >
-                                {info.renderValue() + ' Hours'}
-                            </div>
-                        );
-                    } else if (info.renderValue() === 'Due') {
-                        return (
-                            <div
-                                style={{
-                                    color: '#E15C00',
-                                    fontStyle: 'bold',
-                                    display: 'flex',
-                                    textAlign: 'center',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    height: '100%',
-                                }}
-                            >
-                                {info.renderValue()}
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div
-                                style={{
-                                    color: 'red',
-                                    fontStyle: 'bold',
-                                    display: 'flex',
-                                    textAlign: 'center',
-                                    alignContent: 'center',
-                                    justifyContent: 'center',
-                                    height: '100%',
-                                }}
-                            >
-                                {info.renderValue()}
-                            </div>
-                        );
-                    }
-                },
-                minSize: 30,
-                maxSize: 30,
-                invertSorting: true,
-                enableSorting: false,
-                filterFn: 'fuzzy',
-                sortingFn: sortingFns.alphanumeric,
-            },
-            {
-                accessorKey: 'part',
-                header: () => null,
-                cell: (info) => {
+    const columns: CustomColumnDef<FormattedTask, any>[] = [
+        {
+            accessorKey: 'time',
+            header: () => null,
+            cell: (info) => {
+                if (Number(info.renderValue())) {
                     return (
                         <div
                             style={{
-                                whiteSpace: 'pre-line',
-                                overflowWrap: 'break-word',
+                                color: 'green',
+                                display: 'flex',
+                                maxHeight: '100%',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                // padding: '50% 0px'
                             }}
                         >
-                            <strong style={{ fontSize: '16px' }}>
-                                {info.cell.row.original.part}
-                            </strong>
-                            <span>{'\n'}</span>
-                            <span>{info.cell.row.original.description}</span>
+                            {info.renderValue() + ' Hours'}
                         </div>
                     );
-                },
-                enableSorting: false,
-            },
-            {
-                accessorKey: 'edit',
-                header: () => null,
-                cell: (info) => {
+                } else if (info.renderValue() === 'Due') {
                     return (
                         <div
                             style={{
-                                flexDirection: 'column',
+                                color: '#E15C00',
+                                fontStyle: 'bold',
+                                display: 'flex',
                                 textAlign: 'center',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
                             }}
                         >
-                            <button onClick={() => console.log('clear')}>
-                                <Icon
-                                    path={mdiCheckOutline}
-                                    size={1.5}
-                                    color="green"
-                                />
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    onEdit(info.cell.row.original.id);
-                                }}
-                            >
-                                <Icon path={mdiPencil} size={1.5} />
-                            </button>
+                            {info.renderValue()}
                         </div>
                     );
-                },
-                enableSorting: false,
-                minSize: 15,
-                maxSize: 15,
+                } else {
+                    return (
+                        <div
+                            style={{
+                                color: 'red',
+                                fontStyle: 'bold',
+                                display: 'flex',
+                                textAlign: 'center',
+                                alignContent: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                            }}
+                        >
+                            {info.renderValue()}
+                        </div>
+                    );
+                }
             },
-        ],
-        [],
-    );
+            minSize: 30,
+            maxSize: 30,
+            invertSorting: true,
+            enableSorting: true,
+            sortingFn: sortingFns.alphanumeric,
+        },
+        {
+            accessorKey: 'part',
+            header: () => null,
+            cell: (info) => {
+                return (
+                    <div
+                        style={{
+                            whiteSpace: 'pre-line',
+                            overflowWrap: 'break-word',
+                        }}
+                    >
+                        <strong style={{ fontSize: '16px' }}>
+                            {info.cell.row.original.part}
+                        </strong>
+                        <span>{'\n'}</span>
+                        <span>{info.cell.row.original.description}</span>
+                    </div>
+                );
+            },
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'edit',
+            header: () => null,
+            cell: (info) => {
+                return (
+                    <div
+                        style={{
+                            flexDirection: 'column',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <button onClick={() => console.log('clear')}>
+                            <Icon
+                                path={mdiCheckOutline}
+                                size={1.5}
+                                color="green"
+                            />
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                onEdit(info.cell.row.original.id);
+                            }}
+                        >
+                            <Icon path={mdiPencil} size={1.5} />
+                        </button>
+                    </div>
+                );
+            },
+            enableSorting: false,
+            minSize: 15,
+            maxSize: 15,
+        },
+    ];
 
     const sortBy = [
         {
@@ -181,7 +189,7 @@ export function MaintenanceList() {
         setShowAddForm(true);
     }
 
-    function onEdit(id) {
+    function onEdit(id: number) {
         setEditID(id);
         setShowEditForm(true);
     }
