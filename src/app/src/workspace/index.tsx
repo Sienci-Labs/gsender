@@ -1,15 +1,17 @@
-import { useLocation, useNavigate, redirect } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
 import { toggleAllShortcuts } from 'app/store/redux/slices/keyboardShortcutsSlice';
-import { useEffect } from 'react';
+import { WORKSPACE_MODE } from 'app/constants';
+
 import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { WORKSPACE_MODE } from 'app/constants';
 import { Alerts } from './Alerts';
+import DataCollection from '../features/DataCollection';
 
 type WorkspaceProps = {
     children: React.ReactNode;
@@ -259,6 +261,7 @@ const Workspace = ({ children }: WorkspaceProps) => {
     return (
         <div className="flex flex-col h-full">
             <TopBar />
+            <DataCollection />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
                 <Alerts />
