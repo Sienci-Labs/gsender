@@ -53,10 +53,10 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
     const portList = useSelector((state: RootState) => state.connection.ports);
 
-    // get Port list, set port, get conection type (if exists)
+    // get Port list, set port, get connection type (if exists)
     useEffect(() => {
         setPorts(portList);
-        setPort[portList[0]];
+        setPort[portList[0].port];
     }, [portList]);
 
     function handlePortSelect(value) {
@@ -84,7 +84,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         <h2 className="text-gray-600 text-sm">Port</h2>
                         <Select onValueChange={handlePortSelect} value={port}>
                             <SelectTrigger className="bg-white bg-opacity-100">
-                                <SelectValue placeholder={ports} />
+                                <SelectValue placeholder={port} />
                             </SelectTrigger>
                             <SelectContent className="bg-white bg-opacity-100">
                                 {ports.map((p) => (
