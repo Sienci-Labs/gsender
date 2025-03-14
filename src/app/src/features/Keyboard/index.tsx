@@ -126,6 +126,228 @@ const KeyboardShortcuts = () => {
         toast.info('All shortcuts reset to default');
     };
 
+    const handlePrintShortcuts = () => {
+        // Group shortcuts by category
+        const shortcutsByCategory: Record<string, KeyboardShortcut[]> = {};
+
+        Object.values(shortcuts)
+            .filter((s) => s.isActive && s.currentKeys)
+            .forEach((shortcut) => {
+                const categoryKey = shortcut.category;
+                const categoryName = getCategoryData(categoryKey).label;
+
+                if (!shortcutsByCategory[categoryName]) {
+                    shortcutsByCategory[categoryName] = [];
+                }
+
+                shortcutsByCategory[categoryName].push(shortcut);
+            });
+
+        try {
+            const oldIframe = document.getElementById('print-shortcuts-frame');
+            if (oldIframe) {
+                document.body.removeChild(oldIframe);
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.id = 'print-shortcuts-frame';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+
+            document.body.appendChild(iframe);
+
+            let printContent = `
+                <div class="header">
+                    <h1>gSender Keyboard Shortcuts</h1>
+                    <p class="subtitle">Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+
+            Object.entries(shortcutsByCategory).forEach(
+                ([category, categoryShortcuts]) => {
+                    const categoryColor =
+                        getCategoryData(
+                            categoryShortcuts[0].category,
+                        ).color.split(' ')[0] || 'bg-gray-100';
+
+                    printContent += `
+                    <div class="category">
+                        <div class="category-header ${categoryColor}">
+                            <h2>${category}</h2>
+                        </div>
+                        <div class="shortcuts">
+                `;
+
+                    categoryShortcuts.forEach((shortcut) => {
+                        const keys = formatShortcut(shortcut.currentKeys);
+                        printContent += `
+                        <div class="shortcut">
+                            <div class="shortcut-info">
+                                <div class="shortcut-title">${shortcut.title}</div>
+                                ${shortcut.description ? `<div class="shortcut-description">${shortcut.description}</div>` : ''}
+                            </div>
+                            <div class="shortcut-keys">${keys}</div>
+                        </div>
+                    `;
+                    });
+
+                    printContent += `
+                        </div>
+                    </div>
+                `;
+                },
+            );
+
+            const iframeDoc = iframe.contentWindow?.document;
+            if (iframeDoc) {
+                iframeDoc.open();
+                iframeDoc.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Keyboard Shortcuts</title>
+                        <style>
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                color: #333;
+                            }
+                            
+                            .header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                padding-bottom: 15px;
+                                border-bottom: 2px solid #eaeaea;
+                            }
+                            
+                            .header h1 {
+                                margin: 0;
+                                font-size: 28px;
+                            }
+                            
+                            .subtitle {
+                                color: #666;
+                                margin-top: 5px;
+                            }
+                            
+                            .category {
+                                margin-bottom: 30px;
+                                page-break-inside: avoid;
+                            }
+                            
+                            .category-header {
+                                padding: 8px 15px;
+                                border-radius: 4px;
+                                margin-bottom: 15px;
+                            }
+                            
+                            .category-header h2 {
+                                margin: 0;
+                                font-size: 18px;
+                                font-weight: 600;
+                            }
+                            
+                            .shortcuts {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+                                gap: 15px;
+                            }
+                            
+                            .shortcut {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 10px 15px;
+                                border: 1px solid #eaeaea;
+                                border-radius: 4px;
+                                background-color: #fafafa;
+                            }
+                            
+                            .shortcut-info {
+                                flex: 1;
+                            }
+                            
+                            .shortcut-title {
+                                font-weight: 500;
+                            }
+                            
+                            .shortcut-description {
+                                font-size: 12px;
+                                color: #666;
+                                margin-top: 3px;
+                            }
+                            
+                            .shortcut-keys {
+                                font-family: monospace;
+                                background-color: #f1f5f9;
+                                padding: 5px 10px;
+                                border-radius: 4px;
+                                border: 1px solid #e2e8f0;
+                                font-weight: 600;
+                                white-space: nowrap;
+                            }
+                            
+                            /* Category colors */
+                            .bg-blue-100 { background-color: #dbeafe; }
+                            .bg-green-100 { background-color: #dcfce7; }
+                            .bg-orange-100 { background-color: #ffedd5; }
+                            .bg-pink-100 { background-color: #fce7f3; }
+                            .bg-cyan-100 { background-color: #cffafe; }
+                            .bg-purple-100 { background-color: #f3e8ff; }
+                            .bg-red-100 { background-color: #fee2e2; }
+                            .bg-yellow-100 { background-color: #fef9c3; }
+                            .bg-gray-100 { background-color: #f3f4f6; }
+                            
+                            @media print {
+                                body {
+                                    font-size: 11px;
+                                }
+                                
+                                .header h1 {
+                                    font-size: 22px;
+                                }
+                                
+                                .category-header h2 {
+                                    font-size: 16px;
+                                }
+                                
+                                .shortcuts {
+                                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                                }
+                                
+                                .shortcut {
+                                    break-inside: avoid;
+                                }
+                                
+                                @page {
+                                    margin: 1cm;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>${printContent}</body>
+                    </html>
+                `);
+                iframeDoc.close();
+
+                iframe.onload = () => {
+                    iframe.contentWindow?.focus();
+                    iframe.contentWindow?.print();
+                };
+            } else {
+                toast.error('Unable to create print document.');
+            }
+        } catch (error) {
+            console.error('Print error:', error);
+            toast.error('Failed to print shortcuts.');
+        }
+    };
+
     const renderShortcutResetButton = (shortcut: KeyboardShortcut) => (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -272,7 +494,7 @@ const KeyboardShortcuts = () => {
                                     onClick={() =>
                                         handleSaveShortcut(shortcut.id)
                                     }
-                                    variant="default"
+                                    variant="primary"
                                     size="sm"
                                     disabled={
                                         !capturedKeys ||
@@ -352,6 +574,9 @@ const KeyboardShortcuts = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                <Button variant="outline" onClick={handlePrintShortcuts}>
+                    Print Shortcuts
+                </Button>
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button variant="outline">Reset All to Default</Button>
