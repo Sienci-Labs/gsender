@@ -13,6 +13,11 @@ export function FlashingProgress({ type }: { type: string }) {
         return notifications.join('\n');
     }
 
+    function addNotification(msg) {
+        console.log(notifications);
+        setNotifications([msg, ...notifications]);
+    }
+
     useEffect(() => {
         controller.addListener('flash:progress', (value, total) => {
             setCurValue(value);
@@ -22,10 +27,8 @@ export function FlashingProgress({ type }: { type: string }) {
         });
 
         controller.addListener('flash:message', (msg) => {
-            console.log(msg);
             let data = `${msg.type}: ${msg.content}`;
-            setNotifications([data, ...notifications]);
-            console.log(notifications)
+            addNotification(data);
         });
 
         controller.addListener('flash:end', () => {
@@ -53,9 +56,11 @@ export function FlashingProgress({ type }: { type: string }) {
     }, []);
     return (
         <>
-            <ProgressBar className={cn({ hidden: type === 'grbl' })}>
-                i'm a progress bar
-            </ProgressBar>
+            <ProgressBar
+                sent={curValue}
+                total={totalSize}
+                className={cn({ hidden: type === 'grbl' })}
+            />
             <textarea
                 cols={70}
                 rows={6}

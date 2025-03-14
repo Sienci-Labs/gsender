@@ -1,7 +1,10 @@
-export function ProgressBar({ total, value, ...rest }) {
+import { Progress } from 'app/components/shadcn/Progress.tsx';
+
+export function ProgressBar({ sent, total }) {
+    const now = sent === 0 && total === 0 ? 0 : (sent / total).toFixed(1) * 100;
     return (
-        <div {...rest}>
-            <p>I am a progress bar</p>
+        <div>
+            <Progress value={now} className="bg-gray-300" />
         </div>
     );
 }
