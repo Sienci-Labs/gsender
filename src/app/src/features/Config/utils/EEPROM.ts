@@ -9,8 +9,6 @@ import DecimalInput from 'app/features/Config/components/EEPROMInputs/DecimalInp
 import StringInput from 'app/features/Config/components/EEPROMInputs/StringInput.tsx';
 import PasswordInput from 'app/features/Config/components/EEPROMInputs/PasswordInput.tsx';
 import Ipv4Input from 'app/features/Config/components/EEPROMInputs/Ipv4Input.tsx';
-import { toast } from 'app/lib/toaster';
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
 export const EXCLUSIVE_BITFIELD_ID = 2;

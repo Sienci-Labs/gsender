@@ -9,33 +9,95 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog.tsx';
-import { Button } from 'app/components/Button';
-import { FaRedo } from 'react-icons/fa';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
+import { GrRevert } from 'react-icons/gr';
+import store from 'app/store';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
+import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import { toast } from 'app/lib/toaster';
+import controller from 'app/lib/controller.ts';
+
+function getMachineProfile(id) {
+    const profile = machineProfiles.find((profile) => profile.id === id);
+    if (!profile) {
+        return null;
+    }
+    return profile;
+}
+
+function restoreEEPROMDefaults(type = '') {
+    let eepromSettings = [];
+
+    const selectedMachineProfile = store.get('workspace.machineProfile');
+    const profile = getMachineProfile(selectedMachineProfile.id);
+    console.log(profile);
+
+    if (type === 'grblHAL') {
+        eepromSettings = profile?.grblHALeepromSettings;
+    } else {
+        eepromSettings = profile?.eepromSettings;
+    }
+    console.log(eepromSettings);
+
+    const hasOrderedSettings = !!profile.orderedSettings;
+
+    const values = [];
+
+    for (let [key, value] of Object.entries(eepromSettings)) {
+        if (hasOrderedSettings && orderedSettings.has(key)) {
+            continue;
+        }
+
+        values.push(`${key}=${value}`);
+    }
+
+    if (hasOrderedSettings) {
+        for (const [k, v] of profile.orderedSettings) {
+            values.push(`${k}=${v}`);
+        }
+    }
+    values.push('$$');
+
+    controller.command('gcode', values);
+
+    toast.success('Restored default settings for your machine.');
+}
 
 export function ReloadFileAlert({ fileLoaded, handleFileReload }) {
+    const isConnected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const controllerType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
+
+    const machineProfile = store.get('workspace.machineProfile', {});
+    console.log(machineProfile);
+    const machineName = `${machineProfile.name} ${machineProfile.type}`;
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button
-                    disabled={!fileLoaded}
-                    icon={
-                        <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
-                    }
-                    variant="ghost"
-                    className="h-10 w-12"
+                <ActionButton
+                    icon={<GrRevert />}
+                    label="Defaults"
+                    disabled={!isConnected}
                 />
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogTitle>Restore Defaults</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will reload the current file from disk.
+                        Are you sure you want to restore your{' '}
+                        <b>{machineName}</b> back to its default state?
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleFileReload}>
-                        Reload File
+                <AlertDialogFooter className={'flex flex-col'}>
+                    <AlertDialogCancel>No</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={() => restoreEEPROMDefaults(controllerType)}
+                    >
+                        Restore Defaults
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
