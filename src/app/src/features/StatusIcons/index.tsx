@@ -18,7 +18,6 @@ const StatusIcons = () => {
         setShowRemoteDialog(!showRemoteDialog);
     }
 
-    console.log(headlessSettings);
     useEffect(() => {
         actions.fetchSettings(setHeadlessSettings);
 

@@ -60,9 +60,7 @@ function startFlash({
 
     const selectedProfile = store.get('workspace.machineProfile', {});
     const machineVersion = get(selectedProfile, 'version', 'MK1');
-    console.log(controllerType);
     const isHal = controllerType === 'grblHAL';
-    console.log(isHal);
 
     controller.flashFirmware(port, machineVersion, isHal, hex);
 }
@@ -84,8 +82,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
     function flashPort() {
         setFlashState(FlashingState.Flashing);
-        console.log(port);
-        console.log(controllerType);
+
         startFlash({
             port,
             hex,
@@ -127,7 +124,6 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
             fileReader.onload = (e) => {
                 const { result } = e.target;
                 if (result && !isCancel) {
-                    console.log(result);
                     setHex(result);
                 }
             };

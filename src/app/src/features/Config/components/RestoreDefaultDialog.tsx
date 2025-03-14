@@ -31,14 +31,12 @@ function restoreEEPROMDefaults(type = '') {
 
     const selectedMachineProfile = store.get('workspace.machineProfile');
     const profile = getMachineProfile(selectedMachineProfile.id);
-    console.log(profile);
 
     if (type === 'grblHAL') {
         eepromSettings = profile?.grblHALeepromSettings;
     } else {
         eepromSettings = profile?.eepromSettings;
     }
-    console.log(eepromSettings);
 
     const hasOrderedSettings = !!profile.orderedSettings;
 

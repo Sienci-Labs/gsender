@@ -493,7 +493,6 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:closeController',
         (_options: SerialPortOptions, received: number) => {
-            console.log('controller sagas close controller');
             // if the connection was closed unexpectedly (not by the user),
             // the number of lines sent will be defined.
             // create a pop up so the user can connect to the last active port

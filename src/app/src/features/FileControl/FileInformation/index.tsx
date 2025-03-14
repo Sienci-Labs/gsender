@@ -55,7 +55,6 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             pubsub.subscribe(
                 'recent-files-updated',
                 (_: string, files: RecentFile[]) => {
-                    console.log(files);
                     setRecentFiles(files);
                 },
             ),

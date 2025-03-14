@@ -30,7 +30,6 @@ const FileControl = () => {
                 'returned-upload-dialog-data',
                 (_: any, file: FileData) => {
                     console.log('returned upload dialog');
-                    console.log(file);
                     handleElectronFileUpload(file);
                 },
             );

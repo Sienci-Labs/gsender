@@ -33,8 +33,6 @@ const useGetReleaseNotes = () => {
         fetchReleaseNotes();
     }, []);
 
-    console.log(releaseNotes);
-
     return { releaseNotes, status, fetchReleaseNotes };
 };
 
