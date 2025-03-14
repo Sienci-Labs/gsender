@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import _throttle from 'lodash/throttle';
 import cn from 'classnames';
+import { ProgressBar } from 'app/components/ProgressBar';
 
 export function FlashingProgress({ type }: { type: string }) {
     const [curValue, setCurValue] = useState(0);
@@ -24,6 +25,7 @@ export function FlashingProgress({ type }: { type: string }) {
             console.log(msg);
             let data = `${msg.type}: ${msg.content}`;
             setNotifications([data, ...notifications]);
+            console.log(notifications)
         });
 
         controller.addListener('flash:end', () => {
@@ -51,9 +53,9 @@ export function FlashingProgress({ type }: { type: string }) {
     }, []);
     return (
         <>
-            <p className={cn({ hidden: type === 'grbl' })}>
+            <ProgressBar className={cn({ hidden: type === 'grbl' })}>
                 i'm a progress bar
-            </p>
+            </ProgressBar>
             <textarea
                 cols={70}
                 rows={6}

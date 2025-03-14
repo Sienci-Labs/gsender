@@ -50,7 +50,7 @@ const SLB_DFU_PORT = {
 function startFlash({
     port,
     hex = null,
-    controllerType = 'grbl',
+    controllerType = '',
 }: startFlashOptions) {
     if (!port) {
         toast.error(
@@ -60,8 +60,9 @@ function startFlash({
 
     const selectedProfile = store.get('workspace.machineProfile', {});
     const machineVersion = get(selectedProfile, 'version', 'MK1');
-
+    console.log(controllerType);
     const isHal = controllerType === 'grblHAL';
+    console.log(isHal);
 
     controller.flashFirmware(port, machineVersion, isHal, hex);
 }
@@ -83,6 +84,8 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
     function flashPort() {
         setFlashState(FlashingState.Flashing);
+        console.log(port);
+        console.log(controllerType);
         startFlash({
             port,
             hex,
@@ -240,7 +243,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             <b>Continue?</b>
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
-                            <Button>No</Button>
+                            <Button onClick={toggleShow}>No</Button>
                             <Button variant="primary" onClick={flashPort}>
                                 Yes
                             </Button>
