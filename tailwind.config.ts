@@ -8,6 +8,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   important: true,
+  /*
   purge: {
     enabled: false,
   },
@@ -15,7 +16,7 @@ export default {
     {
       pattern: /./, // the "." means "everything"
     },
-  ],
+  ],*/
   theme: {
     extend: {
       transitionProperty: {
@@ -105,7 +106,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-  ],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
