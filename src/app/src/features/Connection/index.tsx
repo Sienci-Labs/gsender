@@ -112,7 +112,7 @@ function Connection(props: ConnectionProps) {
 
     return (
         <div
-            className="relative group cursor-pointer dropdown z-30"
+            className="relative group cursor-pointer dropdown z-50"
             onMouseEnter={refreshPortsOnParentEntry}
         >
             {connectionState !== ConnectionState.CONNECTED && (

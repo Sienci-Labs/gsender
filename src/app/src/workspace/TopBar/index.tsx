@@ -20,7 +20,6 @@ export const TopBar = () => {
             <CenterArea />
 
             <StatusIcons />
-            <UnlockButton />
 
             <SpindleLaserStatus />
         </div>

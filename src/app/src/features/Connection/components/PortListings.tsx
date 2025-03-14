@@ -63,7 +63,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
     }
 
     return (
-        <div className="absolute left-0 top-full z-10 bg-white border border-gray w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
+        <div className="absolute left-0 top-full z-50 bg-white border border-gray w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found

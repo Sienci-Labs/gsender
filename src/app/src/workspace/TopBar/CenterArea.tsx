@@ -13,8 +13,9 @@ const CenterArea = () => {
                 <MachineInfo />
             </div>
 
-            <MachineStatus />
-            <UnlockButton />
+            <div className="relative">
+                <MachineStatus />
+            </div>
         </div>
     );
 };

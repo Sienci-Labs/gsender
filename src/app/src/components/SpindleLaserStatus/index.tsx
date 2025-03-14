@@ -32,7 +32,7 @@ const SpindleLaserStatus = () => {
         return <></>;
     }
     return (
-        <div className="absolute top-4 left-1/2 flex ml-52 max-sm:hidden">
+        <div className="absolute top-4 left-1/2 flex ml-72 max-sm:hidden">
             {label}
         </div>
     );

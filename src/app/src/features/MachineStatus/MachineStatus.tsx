@@ -27,6 +27,7 @@ import get from 'lodash/get';
 import controller from '../../lib/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import UnlockButton from './UnlockButton';
+import { UnlockButton as SmallUnlockButton } from 'app/features/UnlockButton';
 import {
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
@@ -72,6 +73,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
         } else if (alarmCode === 'Homing' || alarmCode === 11) {
             controller.command('homing');
             return;
+        } else if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+            return controller.command('cyclestart');
         }
         controller.command('unlock');
     };
@@ -94,6 +97,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 
         return (
             <div className="flex relative flex-col items-center">
+                <SmallUnlockButton />
                 <div
                     className={cx(
                         'transition-colors duration-100 ease-in-out flex max-sm:w-40 max-sm:text-normal w-72 h-[60px] justify-between items-center [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]',
