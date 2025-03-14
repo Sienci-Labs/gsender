@@ -36,28 +36,28 @@ export function RapidPositionButtons() {
     }
 
     return (
-        <div className=" absolute justify-center items-center -top-1 left-1/2 -translate-x-1/2 text-blue-500">
+        <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500">
             <div className="grid grid-cols-2 text-3xl gap-2 font-bold">
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 rapidButtonTransform"
                     onClick={() => jogToCorner(BACK_LEFT)}
                 >
-                    <img src={blVector} alt="Back Left Rapid Position Icon" />
+                    <img src={blVector} className={""} alt="Back Left Rapid Position Icon" />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 rapidButtonTransform"
                     onClick={() => jogToCorner(BACK_RIGHT)}
                 >
                     <img src={brVector} alt="Back Right Rapid Position Icon" />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 rapidButtonTransform"
                     onClick={() => jogToCorner(FRONT_LEFT)}
                 >
                     <img src={flVector} alt="Front Right Rapid Position Icon" />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 rapidButtonTransform"
                     onClick={() => jogToCorner(FRONT_RIGHT)}
                 >
                     <img src={frVector} alt="Front Left Rapid Position Icon" />
