@@ -1,5 +1,4 @@
 import { FaExternalLinkAlt } from 'react-icons/fa';
-import { Link } from '@tanstack/react-router';
 
 interface ExternalLinkProps {
     title: string;

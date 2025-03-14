@@ -49,6 +49,7 @@ const defaultState: State = {
     workspace: {
         units: METRIC_UNITS,
         reverseWidgets: false,
+        spindleFunctions: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,

@@ -2,6 +2,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { FaCircleXmark } from 'react-icons/fa6';
 import cn from 'classnames';
 import { tv } from 'tailwind-variants';
+import { JOB_STATUS_T } from '../utils/StatContext';
 
 const statusBadge = tv({
     base: 'rounded-xl border bg-opacity-20 p-1 text-center',
@@ -17,7 +18,15 @@ function formatDuration(seconds: number) {
     return new Date(seconds).toISOString().slice(11, 19);
 }
 
-export function JobPreview({ file, jobStatus, duration }) {
+export function JobPreview({
+    file,
+    jobStatus,
+    duration,
+}: {
+    file: string;
+    jobStatus: JOB_STATUS_T;
+    duration: number;
+}) {
     const jobComplete = jobStatus === 'COMPLETE';
     const statusMessage = jobComplete ? 'Finished' : 'Incomplete';
     return (

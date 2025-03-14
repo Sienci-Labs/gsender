@@ -1,9 +1,13 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 import api from 'app/api';
+import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { JOB_STATUS, JOB_TYPES } from 'app/constants';
 
 type EventType = 'ALARM' | 'ERROR';
+export type JOB_TYPES_T = (typeof JOB_TYPES)[keyof typeof JOB_TYPES];
+export type JOB_STATUS_T = (typeof JOB_STATUS)[keyof typeof JOB_STATUS];
 
-interface FirmwareEvent {
+export interface FirmwareEvent {
     id: string;
     type: EventType;
     source: string;
@@ -13,6 +17,22 @@ interface FirmwareEvent {
     controller: string;
     line: string;
     lineNumber: number;
+    subRow?: string;
+}
+
+export interface Job {
+    id?: string;
+    type: JOB_TYPES_T;
+    file: string;
+    path: string | null;
+    port: string;
+    controller: FIRMWARE_TYPES_T;
+    startTime: Date;
+    endTime: Date | null;
+    duration: number;
+    jobStatus: JOB_STATUS_T;
+    totalLines: number;
+    subRow?: string;
 }
 
 export interface MaintenanceTask {
@@ -25,7 +45,18 @@ export interface MaintenanceTask {
     subRow?: string;
 }
 
-const initialState = {
+export interface JobAggregate {
+    [key: string]: number;
+}
+
+const initialState: {
+    jobs: Job[];
+    alarms: FirmwareEvent[];
+    maintenanceTasks: MaintenanceTask[];
+    jobAggregate: JobAggregate;
+    setAlarms?: React.Dispatch<React.SetStateAction<FirmwareEvent[]>>;
+    setMaintenanceTasks?: React.Dispatch<React.SetStateAction<any[]>>;
+} = {
     jobs: [],
     alarms: [],
     maintenanceTasks: [],
@@ -34,8 +65,8 @@ const initialState = {
 
 export const StatContext = createContext(initialState);
 
-export function StatsProvider({ children }) {
-    const [jobs, setJobs] = useState([]);
+export function StatsProvider({ children }: { children: ReactNode }) {
+    const [jobs, setJobs] = useState<Job[]>([]);
     const [alarms, setAlarms] = useState<FirmwareEvent[]>([]);
     const [maintenanceTasks, setMaintenanceTasks] = useState([]);
     const [jobAggregate, setJobAggregate] = useState({});

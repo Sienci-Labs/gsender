@@ -40,12 +40,13 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
         });
 
         let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
+        socket.emit('flash:message', { type: 'Info', content: `Starting Arduino flash on port ${flashPort}.` });
         avrgirl.flash(imageHex, (error) => {
             if (error) {
                 socket.emit('task:error', error);
                 log.debug(`${error} Error flashing board`);
             } else {
-                socket.emit('message', flashPort);
+                socket.emit('flash:end', flashPort);
                 log.debug('Flash successful');
             }
         });

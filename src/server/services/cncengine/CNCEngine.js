@@ -559,7 +559,7 @@ class CNCEngine {
             });
 
             socket.on('flash:start', (flashPort, imageType, isHal = false, data = null) => {
-                log.debug('flash-start called');
+                log.debug(`Flashing ${flashPort}, isHal: ${isHal}, imageType: ${imageType}`);
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
@@ -596,6 +596,7 @@ class CNCEngine {
                     // handle HAL behaviour - send DFU command
                     if (isHal) {
                         // Do hal flash
+                        log.debug('writing to close using DFU');
                         controller.writeln('$DFU');
 
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);

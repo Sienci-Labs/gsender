@@ -5,6 +5,6 @@ declare module 'memoize-one';
 declare module 'gamepad.js';
 declare module 'gcode-interpreter';
 declare module 'classnames';
-declare module '@tanstack/react-router';
+// declare module '@tanstack/react-router';
 declare module 'react-select';
 declare module 'chained-function';

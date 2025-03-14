@@ -297,11 +297,12 @@ function DRO({
                         </AlertDialogContent>
                     </AlertDialog>
                 )}
-                {homingEnabled && singleAxisHoming && (
+                {homingEnabled && (
                     <HomingSwitch
                         onChange={toggleHoming}
                         homingValue={homingMode}
                         disabled={!canClick}
+                        singleAxisHoming={singleAxisHoming}
                     />
                 )}
 

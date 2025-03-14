@@ -9,6 +9,9 @@ import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import store from 'app/store';
+import Toggle from 'app/components/Switch/Toggle.tsx';
+import controller from 'app/lib/controller.ts';
+import get from 'lodash/get';
 
 interface MachineInfoDisplayProps {
     open: boolean;
@@ -22,12 +25,39 @@ export function MachineInfoDisplay({
     pinned,
     setPinned,
 }: MachineInfoDisplayProps) {
-    const { pins, modals, isConnected } = useTypedSelector((state) => ({
-        pins: state.controller.state.status?.pinState,
-        modals: state.controller.modal,
-        isConnected: state.connection.isConnected,
-    }));
+    const { pins, modals, isConnected, settings } = useTypedSelector(
+        (state) => ({
+            pins: state.controller.state.status?.pinState,
+            modals: state.controller.modal,
+            isConnected: state.connection.isConnected,
+            settings: state.controller.settings,
+        }),
+    );
     const probeSelection = store.get('widgets.probe.probeCommand');
+    const stepperState = get(settings, 'settings.$1', '0');
+
+    const handleStepperMotorToggle = (value) => {
+        if (!controller.settings?.settings) {
+            return;
+        }
+
+        if (value) {
+            store.replace(
+                'workspace.diagnostics.stepperMotor.storedValue',
+                controller.settings.settings.$1,
+            );
+            controller.command('gcode', ['$1=255', '$$']);
+            return;
+        }
+
+        const storedValue = store.get(
+            'workspace.diagnostics.stepperMotor.storedValue',
+            50,
+        );
+
+        controller.command('gcode', [`$1=${storedValue}`, '$$']);
+        store.replace('workspace.diagnostics.stepperMotor.storedValue', null);
+    };
 
     return (
         <Card
@@ -102,6 +132,14 @@ export function MachineInfoDisplay({
                             <PinRow label="Soft-Reset" on={pins?.R} />
                         </div>
                     </CardDescription>
+                </div>
+                <div className="flex flex-row gap-4 items-center mt-4">
+                    <span className="text-gray-500">Lock Stepper Motors</span>
+                    <Toggle
+                        onChange={handleStepperMotorToggle}
+                        checked={stepperState === '255'}
+                        disabled={!isConnected}
+                    />
                 </div>
             </CardContent>
         </Card>

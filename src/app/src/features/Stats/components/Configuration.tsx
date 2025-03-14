@@ -1,11 +1,19 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { homingString } from 'app/lib/eeprom.ts';
 import get from 'lodash/get';
-import {truncatePort} from "app/features/Stats/utils/statUtils.ts";
+import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 
-function ConfigRow({ label, children, connected = false }) {
+function ConfigRow({
+    label,
+    children,
+    connected = false,
+}: {
+    label: string;
+    children: ReactNode;
+    connected: boolean;
+}) {
     return (
         <div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3">
             <div className="text-gray-700 bg-white pr-2">{label}</div>

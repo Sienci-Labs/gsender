@@ -7,10 +7,14 @@ type InputProps = ComponentProps<'input'> & {
     suffix?: ReactNode;
     label?: string | ReactNode;
     sizing?: 'sm' | 'md' | 'lg';
+    wrapperClassName?: string;
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, suffix, label, sizing = 'md', ...props }, ref) => {
+    (
+        { wrapperClassName, className, suffix, label, sizing = 'md', ...props },
+        ref,
+    ) => {
         const inputSize = {
             sm: 'h-8 text-sm px-2',
             md: 'h-10 text-md px-3',
@@ -18,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         }[sizing];
 
         return (
-            <div className="flex flex-col gap-2 w-full">
+            <div className={cn('flex flex-col gap-2 w-full', wrapperClassName)}>
                 {label && (
                     <label
                         className={cn('text-sm font-medium text-gray-700 mb-2')}

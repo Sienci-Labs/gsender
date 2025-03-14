@@ -53,4 +53,8 @@ html,
         height: calc(100vh - 64px);
         max-height: calc(100vh - 64px);
     }
+
+    .rapidButtonTransform {
+        transform:  scale(1.4) translatex(-20px) perspective(160px) rotateX(55deg);
+    }
 }

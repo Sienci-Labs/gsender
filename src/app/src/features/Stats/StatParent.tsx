@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router';
+import { Outlet } from 'react-router';
 import { StatsProvider } from 'app/features/Stats/utils/StatContext.tsx';
 import { StatMenu } from 'app/features/Stats/components/StatMenu.tsx';
 
