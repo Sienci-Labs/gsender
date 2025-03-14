@@ -28,18 +28,19 @@ export function UnlockButton() {
         <div className="text-4xl absolute top-3 left-72">
             <button
                 className={cx('group text-gray-400', {
-                    'animate-pulse text-yellow-600': activateUnlockButton,
+                    'text-yellow-600 bg-orange-200 bg-opacity-10 rounded':
+                        activateUnlockButton,
                 })}
                 onClick={() => unlockFirmware(activeState)}
             >
                 <IoLockOpenOutline
                     className={cx('hidden group-hover:block', {
-                        '': activateUnlockButton,
+                        'animate-pulse': activateUnlockButton,
                     })}
                 />
                 <IoLockClosedOutline
                     className={cx('group-hover:hidden', {
-                        '': activateUnlockButton,
+                        'animate-pulse': activateUnlockButton,
                     })}
                 />
             </button>
