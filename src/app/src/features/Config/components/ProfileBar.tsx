@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
+import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
@@ -93,11 +94,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     }}
                     disabled={!connected}
                 />
-                <ActionButton
-                    icon={<GrRevert />}
-                    label="Defaults"
-                    disabled={true}
-                />
+                <ReloadFileAlert />
                 <ActionButton
                     icon={<PiLightning />}
                     label="Flash"
