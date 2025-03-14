@@ -76,7 +76,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
     const [file, setFile] = useState('');
     const [hex, setHex] = useState(new ArrayBuffer(1));
     const [flashState, setFlashState] = useState<FlashingState>(
-        FlashingState.Flashing,
+        FlashingState.Idle,
     );
 
     const portList = useSelector((state: RootState) => state.connection.ports);
@@ -230,7 +230,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
                             <Button>No</Button>
-                            <Button variant="primary">Yes</Button>
+                            <Button variant="primary" onClick={flashPort}>Yes</Button>
                         </div>
                     </div>
                     <div
