@@ -1,6 +1,10 @@
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
-import { METRIC_UNITS, STOCK_TURNING_METHOD } from 'app/constants';
+import {
+    METRIC_UNITS,
+    STOCK_TURNING_METHOD,
+    WORKSPACE_MODE,
+} from 'app/constants';
 
 import defaultState from '../../../store/defaultState';
 import { Rotary } from 'app/features/Rotary/definitions';
@@ -21,7 +25,6 @@ export class StockTurningGenerator {
 
         const newStartHeight = Number((newOptions.startHeight / 2).toFixed(2));
         const newFinalHeight = Number((newOptions.finalHeight / 2).toFixed(2));
-        const feedrate = this.processValue(newOptions.feedrate);
 
         // Checking for odd and even number of passes for full spiral is done later
         if (
@@ -37,7 +40,6 @@ export class StockTurningGenerator {
         this.options = {
             ...newOptions,
             method,
-            feedrate,
             startHeight: newStartHeight,
             finalHeight: newFinalHeight,
         };
@@ -338,9 +340,15 @@ export class StockTurningGenerator {
     }
 
     processValue(value: number) {
-        const workspaceUnits = store.get('workspace.units');
+        const workspace = store.get('workspace', {
+            units: 'mm',
+            mode: WORKSPACE_MODE.DEFAULT,
+        });
 
-        if (workspaceUnits === 'in') {
+        const isInInches = workspace.units === 'in';
+        const isInRotaryMode = workspace.mode === WORKSPACE_MODE.ROTARY;
+
+        if (isInInches && isInRotaryMode) {
             return +(value / 25.4).toFixed(3);
         }
 
