@@ -15,6 +15,8 @@ import store from 'app/store';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import { toast } from 'app/lib/toaster';
+import controller from 'app/lib/controller.ts';
 
 function getMachineProfile(id) {
     const profile = machineProfiles.find((profile) => profile.id === id);
@@ -24,25 +26,50 @@ function getMachineProfile(id) {
     return profile;
 }
 
-function restoreEEPROMDefaults(type) {
+function restoreEEPROMDefaults(type = '') {
     let eepromSettings = [];
 
-    const machineProfile = store.get('workspace.machineProfile');
-    const profile = getMachineProfile(machineProfile.id);
+    const selectedMachineProfile = store.get('workspace.machineProfile');
+    const profile = getMachineProfile(selectedMachineProfile.id);
     console.log(profile);
+
     if (type === 'grblHAL') {
-        eepromSettings =
-            machineProfile?.grblHALeepromSettings ?? defaultGRBLHALSettings;
+        eepromSettings = profile?.grblHALeepromSettings;
     } else {
-        eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+        eepromSettings = profile?.eepromSettings;
+    }
+    console.log(eepromSettings);
+
+    const hasOrderedSettings = !!profile.orderedSettings;
+
+    const values = [];
+
+    for (let [key, value] of Object.entries(eepromSettings)) {
+        if (hasOrderedSettings && orderedSettings.has(key)) {
+            continue;
+        }
+
+        values.push(`${key}=${value}`);
     }
 
-    const value = [];
+    if (hasOrderedSettings) {
+        for (const [k, v] of profile.orderedSettings) {
+            values.push(`${k}=${v}`);
+        }
+    }
+    values.push('$$');
+
+    controller.command('gcode', values);
+
+    toast.success('Restored default settings for your machine.');
 }
 
-export function ReloadFileAlert({ fileLoaded, handleFileReload }) {
+export function RestoreDefaultDialog({ fileLoaded, handleFileReload }) {
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
+    );
+    const controllerType = useSelector(
+        (state: RootState) => state.controller.type,
     );
 
     const machineProfile = store.get('workspace.machineProfile', {});
@@ -67,7 +94,9 @@ export function ReloadFileAlert({ fileLoaded, handleFileReload }) {
                 </AlertDialogHeader>
                 <AlertDialogFooter className={'flex flex-col'}>
                     <AlertDialogCancel>No</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleFileReload}>
+                    <AlertDialogAction
+                        onClick={() => restoreEEPROMDefaults(controllerType)}
+                    >
                         Restore Defaults
                     </AlertDialogAction>
                 </AlertDialogFooter>

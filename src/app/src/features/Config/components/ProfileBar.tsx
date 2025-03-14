@@ -18,6 +18,7 @@ import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
+import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
@@ -94,7 +95,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     }}
                     disabled={!connected}
                 />
-                <ReloadFileAlert />
+                <RestoreDefaultDialog />
                 <ActionButton
                     icon={<PiLightning />}
                     label="Flash"
