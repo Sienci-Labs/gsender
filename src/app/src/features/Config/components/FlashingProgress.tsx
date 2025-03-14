@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import _throttle from 'lodash/throttle';
+import cn from 'classnames';
 
-export function FlashingProgress() {
+export function FlashingProgress({ type }: { type: string }) {
     const [curValue, setCurValue] = useState(0);
     const [totalSize, setTotalSize] = useState(0);
     const [notifications, setNotifications] = useState<string[]>([]);
+
+    function getNotifications() {
+        return notifications.join('\n');
+    }
+
     useEffect(() => {
         controller.addListener('flash:progress', (value, total) => {
             setCurValue(value);
@@ -15,6 +21,7 @@ export function FlashingProgress() {
         });
 
         controller.addListener('flash:message', (msg) => {
+            console.log(msg);
             let data = `${msg.type}: ${msg.content}`;
             setNotifications([data, ...notifications]);
         });
@@ -44,12 +51,15 @@ export function FlashingProgress() {
     }, []);
     return (
         <>
-            <p>i'm a progress bar</p>
+            <p className={cn({ hidden: type === 'grbl' })}>
+                i'm a progress bar
+            </p>
             <textarea
                 cols={70}
                 rows={6}
                 readOnly={true}
                 className="outline-none focus:outline-none resize-none border"
+                value={getNotifications()}
             />
         </>
     );

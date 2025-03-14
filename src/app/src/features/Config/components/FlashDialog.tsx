@@ -98,6 +98,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
     // On show, refresh ports
     useEffect(() => {
         controller.listPorts();
+        setFlashState(FlashingState.Idle);
     }, [show]);
 
     useEffect(() => {
@@ -156,7 +157,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
     return (
         <Dialog open={show} onOpenChange={toggleShow}>
-            <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col justify-center items-center">
+            <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Flash Firmware</DialogTitle>
                 </DialogHeader>
@@ -165,55 +166,65 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         This feature exists to flash firmware onto a compatible
                         SLB or Arduino-based device.
                     </p>
-                    <div className="flex flex-col">
-                        <h2 className="text-gray-600 text-sm">Port</h2>
-                        <Select onValueChange={handlePortSelect} value={port}>
-                            <SelectTrigger className="bg-white bg-opacity-100">
-                                <SelectValue placeholder={port} />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white bg-opacity-100">
-                                {ports.map((p) => (
-                                    <SelectItem key={p.port} value={p.port}>
-                                        {p.port}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="flex flex-col">
-                        <h2 className="text-gray-600 text-sm">
-                            Controller Type
-                        </h2>
-                        <Select
-                            onValueChange={handleTypeSelect}
-                            value={controllerType}
-                        >
-                            <SelectTrigger className="bg-white bg-opacity-100">
-                                <SelectValue placeholder={'grblHAL'} />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white bg-opacity-100">
-                                {CONTROLLER_TYPES.map((p) => (
-                                    <SelectItem key={p} value={p}>
-                                        {p}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
                     <div
-                        className={cn('flex flex-col', {
-                            invisible: controllerType === 'grbl',
+                        className={cn('flex flex-col gap-4', {
+                            hidden: flashState !== FlashingState.Idle,
                         })}
                     >
-                        <h2 className="text-gray-600 text-sm">Hex File</h2>
-                        <input
-                            type="file"
-                            id="firmware_image"
-                            accept=".hex"
-                            ref={fileInputRef}
-                            onChange={handleFileUpload}
-                        />
+                        <div className="flex flex-col">
+                            <h2 className="text-gray-600 text-sm">Port</h2>
+                            <Select
+                                onValueChange={handlePortSelect}
+                                value={port}
+                            >
+                                <SelectTrigger className="bg-white bg-opacity-100">
+                                    <SelectValue placeholder={port} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white bg-opacity-100">
+                                    {ports.map((p) => (
+                                        <SelectItem key={p.port} value={p.port}>
+                                            {p.port}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex flex-col">
+                            <h2 className="text-gray-600 text-sm">
+                                Controller Type
+                            </h2>
+                            <Select
+                                onValueChange={handleTypeSelect}
+                                value={controllerType}
+                            >
+                                <SelectTrigger className="bg-white bg-opacity-100">
+                                    <SelectValue placeholder={'grblHAL'} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white bg-opacity-100">
+                                    {CONTROLLER_TYPES.map((p) => (
+                                        <SelectItem key={p} value={p}>
+                                            {p}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div
+                            className={cn('flex flex-col', {
+                                invisible: controllerType === 'grbl',
+                            })}
+                        >
+                            <h2 className="text-gray-600 text-sm">Hex File</h2>
+                            <input
+                                type="file"
+                                id="firmware_image"
+                                accept=".hex"
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                            />
+                        </div>
                     </div>
+
                     <div
                         className={cn(
                             'bg-yellow-100 bg-opacity-60 border border-t border-b border-b-yellow-500 border-t-yellow-500 mt-8 p-4 flex flex-col gap-2',
@@ -230,19 +241,30 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
                             <Button>No</Button>
-                            <Button variant="primary" onClick={flashPort}>Yes</Button>
+                            <Button variant="primary" onClick={flashPort}>
+                                Yes
+                            </Button>
                         </div>
                     </div>
                     <div
                         className={cn(
-                            { collapse: flashState === FlashingState.Idle },
+                            { hidden: flashState === FlashingState.Idle },
                             {
                                 'flex flex-col visible expand':
                                     flashState === FlashingState.Flashing,
                             },
                         )}
                     >
-                        <FlashingProgress />
+                        <FlashingProgress type={controllerType} />
+                    </div>
+                    <div
+                        className={cn('flex items-center justify-center', {
+                            hidden: flashState !== FlashingState.Complete,
+                        })}
+                    >
+                        <Button variant="primary" onClick={toggleShow}>
+                            Close
+                        </Button>
                     </div>
                 </div>
             </DialogContent>
