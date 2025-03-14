@@ -235,8 +235,8 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             </div>
 
             {path && (
-                <div className="text-gray-500 text-sm">
-                    <span>Path</span>
+                <div className="text-gray-500 text-xs">
+                    <span>Path: </span>
                     <span>{path}</span>
                 </div>
             )}
