@@ -35,6 +35,7 @@ import { BottomNav } from './features/RemoteMode/components/BottomNav';
 import { noop } from 'lodash';
 import Gamepad from './features/Gamepad';
 import GamepadProfilePage from './features/Gamepad/ProfilePage';
+import { TopBar } from 'app/workspace/TopBar';
 
 export const ReactRoutes = () => {
     return (
@@ -176,8 +177,9 @@ export const ReactRoutes = () => {
             <Route
                 path="remote"
                 element={
-                    <div>
-                        <div className="flex flex-col gap-8 min-h-screen">
+                    <div className="flex flex-col gap-2">
+                        <TopBar />
+                        <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
                         </div>
 
