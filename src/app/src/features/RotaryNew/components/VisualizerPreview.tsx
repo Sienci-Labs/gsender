@@ -1,10 +1,28 @@
+import { useEffect } from 'react';
+
 import Visualizer from 'app/features/Visualizer';
+import { useDispatch } from 'react-redux';
+import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
+import {
+    SURFACING_VISUALIZER_CONTAINER_ID,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
+} from 'app/constants';
 
 type VisualizerPreviewProps = {
     gcode: string;
 };
 
 const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(setCurrentVisualizer(VISUALIZER_SECONDARY));
+        return () => {
+            dispatch(setCurrentVisualizer(VISUALIZER_PRIMARY));
+        };
+    }, []);
+
     if (!gcode) {
         return (
             <div className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md p-4">
@@ -17,8 +35,11 @@ const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
     }
 
     return (
-        <div className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md">
-            <Visualizer gcode={gcode} />
+        <div
+            className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md"
+            id={SURFACING_VISUALIZER_CONTAINER_ID}
+        >
+            <Visualizer isSecondary />
         </div>
     );
 };
