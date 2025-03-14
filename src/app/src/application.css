@@ -1445,6 +1445,9 @@ video {
 .max-w-6 {
   max-width: 1.5rem !important;
 }
+.max-w-60 {
+  max-width: 15rem !important;
+}
 .max-w-64 {
   max-width: 16rem !important;
 }
