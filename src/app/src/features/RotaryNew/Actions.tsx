@@ -2,6 +2,7 @@ import Button from 'app/components/Button';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import { getUnitModal } from 'app/lib/toolChangeUtils';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import RotarySurfacing from './RotarySurfacing';
 import MountingSetup from './MountingSetup';
@@ -11,6 +12,10 @@ import {
 } from './utils/probeCommands';
 
 const Actions = () => {
+    const isConnected = useTypedSelector(
+        (state) => state.connection.isConnected,
+    );
+
     const runProbing = (name = 'rotary', commands: string) => {
         toast.info(`Running ${name} probing commands`);
 
@@ -25,6 +30,7 @@ const Actions = () => {
             <Button
                 size="sm"
                 onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}
+                disabled={!isConnected}
             >
                 Probe Rotary Z-Axis
             </Button>
@@ -33,6 +39,7 @@ const Actions = () => {
                 onClick={() =>
                     runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
                 }
+                disabled={!isConnected}
             >
                 Y-Axis Alignment
             </Button>
