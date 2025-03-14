@@ -69,7 +69,7 @@ const CONTROLLER_TYPES = ['grbl', 'grblHAL'];
 
 export function FlashDialog({ show, toggleShow }: flashDialogProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [controllerType, setControllerType] = useState('');
+    const [controllerType, setControllerType] = useState('grbl');
     const [port, setPort] = useState('');
     const [ports, setPorts] = useState([]);
     const [file, setFile] = useState('');
@@ -197,7 +197,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 value={controllerType}
                             >
                                 <SelectTrigger className="bg-white bg-opacity-100">
-                                    <SelectValue placeholder={'grblHAL'} />
+                                    <SelectValue placeholder="Select board type" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white bg-opacity-100">
                                     {CONTROLLER_TYPES.map((p) => (

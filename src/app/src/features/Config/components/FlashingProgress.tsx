@@ -51,9 +51,10 @@ export function FlashingProgress({ type }: { type: string }) {
 
         return () => {
             controller.removeListener('flash:progress');
+            controller.removeListener('flash:message');
             controller.removeListener('task:error');
         };
-    }, []);
+    }, [notifications]);
     return (
         <>
             <ProgressBar
