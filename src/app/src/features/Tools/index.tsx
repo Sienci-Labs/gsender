@@ -6,7 +6,8 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
-import RotaryNew from '../RotaryNew';
+import RotaryNew from '../Rotary';
+
 interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
