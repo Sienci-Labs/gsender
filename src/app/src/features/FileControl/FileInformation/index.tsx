@@ -27,6 +27,7 @@ import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
 import { FileData } from '..';
 import isElectron from 'is-electron';
+import get from 'lodash/get';
 
 interface Props {
     handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
@@ -85,49 +86,50 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                     <div className="flex flex-col gap-2">
                         <span className="ml-4">Recent Files</span>
 
-                        {recentFiles.map((file) => (
-                            <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
-                                <div className="grid grid-cols-[30px_3fr] items-center gap-1">
-                                    <GoFileCode className="text-3xl text-gray-400 ml-1" />
-                                    <div className="grid items-start">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                        {recentFiles.map((file) => {
+                            const size = get(file, 'fileSize', 0);
+                            return (
+                                <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
+                                    <div className="grid grid-cols-[30px_3fr] items-center gap-1">
+                                        <GoFileCode className="text-3xl text-gray-400 ml-1" />
+                                        <div className="grid items-start">
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                                                            {file.fileName}
+                                                        </span>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
                                                         {file.fileName}
-                                                    </span>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    {file.fileName}
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
 
-                                        <span className=" text-gray-500 text-xs">
-                                            {(file.fileSize / 1000000).toFixed(
-                                                2,
-                                            )}
-                                            {' MB'}
-                                        </span>
+                                            <span className=" text-gray-500 text-xs">
+                                                {(size / 1000000).toFixed(2)}
+                                                {' MB'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
+                                        <RiFolderUploadLine
+                                            onClick={() =>
+                                                handleElectronFileUpload(
+                                                    {
+                                                        name: file.fileName,
+                                                        data: file.fileData,
+                                                        size: file.fileSize,
+                                                        path: file.filePath,
+                                                    },
+                                                    true,
+                                                )
+                                            }
+                                        />
                                     </div>
                                 </div>
-                                <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
-                                    <RiFolderUploadLine
-                                        onClick={() =>
-                                            handleElectronFileUpload(
-                                                {
-                                                    name: file.fileName,
-                                                    data: file.fileData,
-                                                    size: file.fileSize,
-                                                    path: file.filePath,
-                                                },
-                                                true,
-                                            )
-                                        }
-                                    />
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
                 <div className="flex flex-col gap-4 text-sm justify-between">
@@ -211,7 +213,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
     }
 
     return (
-        <div className="flex flex-col gap-1 justify-center p-3 items-center h-full self-center text-sm max-w-full">
+        <div className="flex flex-col gap-1 justify-center p-2 items-center h-full self-center text-sm max-w-full">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
