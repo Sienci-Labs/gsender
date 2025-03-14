@@ -6,6 +6,7 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
+import RotaryNew from '../RotaryNew';
 interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
@@ -28,10 +29,13 @@ const tabs = [
         label: 'Coolant',
         content: Coolant,
     },
-
     {
         label: 'Rotary',
         content: Rotary,
+    },
+    {
+        label: 'New',
+        content: RotaryNew,
     },
     {
         label: 'Console',

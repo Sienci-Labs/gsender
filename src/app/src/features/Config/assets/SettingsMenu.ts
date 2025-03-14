@@ -8,7 +8,7 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap } from 'react-icons/io';
+import { IoIosSwap, IoMdMove } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
@@ -746,6 +746,99 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$736',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Jogging Presets',
+        icon: IoMdMove,
+        settings: [
+            {
+                label: 'Rapid',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.rapid.xyStep',
+                        type: 'number',
+                        description:
+                            "Rapid jogging amount in the XY axes.",
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.rapid.zStep',
+                        description:
+                            'Rapid jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.rapid.aStep',
+                        description:
+                            'Rapid jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                ],
+            },
+            {
+                label: 'Normal',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.normal.xyStep',
+                        type: 'number',
+                        description:
+                            "Normal jogging amount in the XY axes.",
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.normal.zStep',
+                        description:
+                            'Normal jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.normal.aStep',
+                        description:
+                            'Normal jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                ],
+            },
+            {
+                label: 'Precise',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.precise.xyStep',
+                        type: 'number',
+                        description:
+                            "Precise jogging amount in the XY axes.",
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.precise.zStep',
+                        description:
+                            'Precise jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.precise.aStep',
+                        description:
+                            'Precise jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'mm',
                     },
                 ],
             },

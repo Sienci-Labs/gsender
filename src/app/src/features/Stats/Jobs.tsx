@@ -1,7 +1,11 @@
-import SortableTable from 'app/components/SortableTable';
+import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
-import React, { useContext } from 'react';
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
+import {
+    Job,
+    JOB_STATUS_T,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
@@ -11,20 +15,21 @@ import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
 import { RunTimePerComPort } from 'app/features/Stats/components/RunTimePerComPort.tsx';
 
-const defaultData = [
+const defaultData: Job[] = [
     {
         type: JOB_TYPES.JOB,
         file: '',
         path: null,
-        lines: 0,
+        totalLines: 0,
         port: '',
         controller: GRBL,
         startTime: new Date(),
         endTime: null,
         jobStatus: JOB_STATUS.COMPLETE,
+        duration: 0,
     },
 ];
-const columnData = [
+const columnData: CustomColumnDef<Job, any>[] = [
     {
         accessorKey: 'file',
         header: () => 'File Name',
@@ -32,7 +37,7 @@ const columnData = [
     {
         accessorKey: 'duration',
         header: () => 'Duration',
-        cell: (info) => {
+        cell: (info: { renderValue: () => number }) => {
             const ms = Number(info.renderValue());
             return convertMillisecondsToTimeStamp(ms);
         },
@@ -48,7 +53,7 @@ const columnData = [
     {
         accessorKey: 'startTime',
         header: () => 'Start Time',
-        cell: (info) => {
+        cell: (info: { renderValue: () => Date }) => {
             const [yyyy, mm, dd, hh, mi, ss] = info
                 .renderValue()
                 .toString()
@@ -67,7 +72,7 @@ const columnData = [
     {
         accessorKey: 'jobStatus',
         header: () => 'Status',
-        cell: (info) => {
+        cell: (info: { renderValue: () => JOB_STATUS_T }) => {
             return info.renderValue() === JOB_STATUS.COMPLETE ? (
                 <Icon path={mdiCheckBold} size={1} />
             ) : (
@@ -81,6 +86,7 @@ const columnData = [
 
 export function Jobs() {
     const { jobs } = useContext(StatContext);
+    console.log(jobs);
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full">
             <div className="col-span-4 row-span-6 px-8 mb-2">

@@ -107,6 +107,7 @@ import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
+import { Job } from 'app/features/Stats/utils/StatContext';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -140,7 +141,7 @@ export function* initialize(): Generator<any, void, any> {
                 newJobStats.jobsCancelled += 1;
             }
             newJobStats.totalRuntime += status.timeRunning;
-            const job = {
+            const job: Job = {
                 id:
                     jobStats.jobs.length > 0
                         ? jobStats.jobs.length.toString()
@@ -163,6 +164,8 @@ export function* initialize(): Generator<any, void, any> {
             };
             newJobStats.jobs.push(job);
             api.jobStats.update(newJobStats);
+            console.log('last job');
+            pubsub.publish('lastJob', job);
         } catch (error) {
             console.error(error);
         }

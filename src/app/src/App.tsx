@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { RouterProvider } from '@tanstack/react-router';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { store as reduxStore } from 'app/store/redux';
@@ -9,10 +8,9 @@ import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
-import { createRouter } from './router';
 import { Toaster } from './components/shadcn/Sonner';
-
-const router = createRouter();
+import { ReactRoutes } from './react-routes';
+import { BrowserRouter } from 'react-router';
 
 function App() {
     useEffect(() => {
@@ -48,7 +46,9 @@ function App() {
                     theme="light"
                     visibleToasts={5}
                 />
-                <RouterProvider router={router} />
+                <BrowserRouter>
+                    <ReactRoutes />
+                </BrowserRouter>
             </ReduxProvider>
         </>
     );

@@ -37,10 +37,11 @@ import {
 import { getRecentFiles } from './utils/recentfiles';
 import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
+import { RecentFile } from './definitions';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [recentFiles, setRecentFiles] = useState<any[]>([]);
+    const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
     const { fileLoaded, path } = useTypedSelector((state) => state.file);
 
     const usingElectron = isElectron();
@@ -48,8 +49,8 @@ const ButtonControlGroup = () => {
     useEffect(() => {
         setRecentFiles(getRecentFiles());
         const token = pubsub.subscribe(
-            'recentFiles',
-            (_: string, files: string[]) => {
+            'recent-files-updated',
+            (_: string, files: RecentFile[]) => {
                 setRecentFiles(files);
             },
         );

@@ -8,30 +8,98 @@ import {
     getFacetedRowModel,
     getFacetedUniqueValues,
     getFacetedMinMaxValues,
+    ColumnDef,
+    FilterFn,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 import React, { useState } from 'react';
 import { Table as BTable } from 'react-bootstrap';
 import styles from './index.module.styl';
 import { FaPlus } from 'react-icons/fa';
+import cx from 'classnames';
 
-interface SortableTableProps {
-    defaultData?: object;
+/*
+    Columns must be in the format:
+        [
+            {
+                accessorKey: 'insert whatever key you want here',
+            },
+        ]
+    The documentation for this package is kind of confusing for the new v8, so I'll list the rest of the options I've used here:
+        header/footer
+            - params: none
+            - return value: the header/footer for the column
+        cell
+            - params: info
+            - return value: what goes in the cell
+        size/minSize/maxSize
+            - value: number
+            - determines the size of the column
+        invertSorting
+            - value: boolean
+            - default: false
+            - inverts the default sorting for the column
+        enableSorting
+            - value: boolean
+            - default: true
+            - changes whether the user is allowed to click on the header to sort the column
+        filterFn
+            - value: function or key of predetermined functions
+            - the function used to filter the entries in the table
+            - (i just use 'fuzzy' every time)
+        sortingFn
+            - value: function
+            - the function used to sort the rows in the column
+            - (you can import sortingFns from '@tanstack/react-table' to use premade ones)
+    I also have a custom property:
+        disableColSpan
+            - value: boolean
+            - if this is enabled, the column span of the previous columns will stop at this column
+                - ex. if you want the subrow to only span 2 columns, you can add disableColSpan to column 3
+                        |--------|--------|----|
+                        |Part    |Time    |Edit|
+                        |-----------------|----|
+                        |this is a subrow |    |
+                        |-----------------|----|
+                      this can set you up to do other cool things, like making column 3 span 2 rows using rowSpan!
+                        |--------|--------|----|
+                        |Part    |Time    |Edit|
+                        |-----------------|    |
+                        |this is a subrow |    |
+                        |-----------------|----|
+*/
+
+interface CustomDefOptions {
+    disableColSpan?: boolean;
+}
+
+export type CustomColumnDef<
+    TData extends { subRow?: string }, // this is... not the best, but the way I implemented subrows originally makes this very gross in typescript
+    // we're not using subrows currently so I'm keeping it like this and leaving it's improvement as TODO
+    TValue,
+> = ColumnDef<TData, TValue> & CustomDefOptions;
+
+interface SortableTableProps<TData extends { subRow?: string }, TValue> {
+    defaultData?: TData[];
     height?: string;
     width?: string;
-    columns?: object[];
-    data: object[];
+    columns?: CustomColumnDef<TData, TValue>[];
+    data: TData[];
     enableSortingRemoval?: boolean;
     rowColours?: string[];
     onAdd?: () => void;
-    disableColSpan?: boolean;
-    sortBy?: () => void;
-    rowSpan?: [];
+    sortBy?: {
+        id: string;
+        desc: boolean;
+    }[];
+    rowSpan?: Map<any, any>;
 }
-const SortableTable = (props: SortableTableProps) => {
+const SortableTable = <TData extends { subRow?: string }, TValue>(
+    props: SortableTableProps<TData, TValue>,
+) => {
     // set defaults
     const data = props.data || []; // array of data objects
-    const columns = props.columns || []; // format above
+    const columns = props.columns; // format above
     const defaultData = props.defaultData || []; // same as data
     const height = props.height || '520px';
     const width = props.width || '760px';
@@ -62,7 +130,7 @@ const SortableTable = (props: SortableTableProps) => {
     const colSpanLength = stopIndex;
 
     /***** FUNCTIONS *****/
-    const fuzzyFilter = (row, columnId, value, addMeta) => {
+    const fuzzyFilter: FilterFn<TData> = (row, columnId, value, addMeta) => {
         // Rank the item
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const itemRank = rankItem(row.getValue(columnId), value);
@@ -225,7 +293,7 @@ const SortableTable = (props: SortableTableProps) => {
                         )}
                     </thead>
                     <tbody>
-                        {table.getRowModel().rows.map((row, i) => {
+                        {table.getRowModel().rows.map((row, _i) => {
                             return (
                                 <React.Fragment key={row.id + 'parent'}>
                                     <tr
@@ -238,7 +306,7 @@ const SortableTable = (props: SortableTableProps) => {
                                                 rowSpan={
                                                     rowSpan.get(
                                                         cell.column.columnDef
-                                                            .accessorKey,
+                                                            .id, // id has replaced accessorKey
                                                     ) || 1
                                                 }
                                                 style={{
@@ -284,34 +352,46 @@ const SortableTable = (props: SortableTableProps) => {
                 ].join(' ')}
             >
                 <button
-                    className="rounded border p-1"
+                    className={cx('rounded border p-1', {
+                        block: currentPage > 1,
+                        hidden: currentPage <= 1,
+                    })}
                     onClick={() => table.setPageIndex(0)}
                     disabled={!table.getCanPreviousPage()}
-                    display={currentPage > 1 ? 'block' : 'hidden'}
+                    // display={currentPage > 1 ? 'block' : 'hidden'}
                 >
                     {'<<'}
                 </button>
                 <button
-                    className="rounded border p-1"
+                    className={cx('rounded border p-1', {
+                        block: currentPage > 1,
+                        hidden: currentPage <= 1,
+                    })}
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
-                    display={currentPage > 1 ? 'block' : 'hidden'}
+                    // display={currentPage > 1 ? 'block' : 'hidden'}
                 >
                     {'<'}
                 </button>
                 <button
-                    className="rounded border p-1"
+                    className={cx('rounded border p-1', {
+                        block: currentPage < maxPages,
+                        hidden: currentPage >= maxPages,
+                    })}
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
-                    display={currentPage < maxPages ? 'block' : 'hidden'}
+                    // display={currentPage < maxPages ? 'block' : 'hidden'}
                 >
                     {'>'}
                 </button>
                 <button
-                    className="rounded border p-1"
+                    className={cx('rounded border p-1', {
+                        block: currentPage < maxPages,
+                        hidden: currentPage >= maxPages,
+                    })}
                     onClick={() => table.setPageIndex(maxPages - 1)}
                     disabled={!table.getCanNextPage()}
-                    display={currentPage < maxPages ? 'block' : 'hidden'}
+                    // display={currentPage < maxPages ? 'block' : 'hidden'}
                 >
                     {'>>'}
                 </button>

@@ -18,9 +18,7 @@ const SecondaryVisualizer = ({
     showRendering,
 }) => {
     return (
-        <div
-            style={{ border: '1px solid black', height: '100%', width: '100%' }}
-        >
+        <>
             {showLoading && <Loading />}
             {showRendering && <Rendering />}
 
@@ -35,7 +33,7 @@ const SecondaryVisualizer = ({
                     isSecondary={true}
                 />
             )}
-        </div>
+        </>
     );
 };
 

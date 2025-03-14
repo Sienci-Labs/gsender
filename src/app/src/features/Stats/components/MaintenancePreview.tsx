@@ -1,10 +1,13 @@
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import {
+    MaintenanceTask as Task,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
 import { FaCircle } from 'react-icons/fa';
 import cx from 'classnames';
 import { tv } from 'tailwind-variants';
 
-function timeRemainingSortComparison(a, b) {
+function timeRemainingSortComparison(a: Task, b: Task) {
     const aTimeRemaining = a.rangeEnd - a.currentTime;
     const bTimeRemaining = b.rangeEnd - b.currentTime;
 
@@ -13,7 +16,7 @@ function timeRemainingSortComparison(a, b) {
     return 0;
 }
 
-function remainingTime(task) {
+function remainingTime(task: Task) {
     return Math.floor(Number(task.rangeEnd) - Number(task.currentTime));
 }
 
@@ -39,7 +42,7 @@ const reminderBGStyles = tv({
     },
 });
 
-function remainingTimeString(remainingTime) {
+function remainingTimeString(remainingTime: number) {
     const dueUpper = 4;
     const soonUpper = 20;
 
@@ -52,7 +55,7 @@ function remainingTimeString(remainingTime) {
     return 'Low';
 }
 
-function MaintenanceTask({ task }) {
+function MaintenanceTask({ task }: { task: Task }) {
     const time = remainingTime(task);
     const reminderString = remainingTimeString(time);
 
