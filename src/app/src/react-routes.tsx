@@ -9,7 +9,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
 import { LuPencilRuler } from 'react-icons/lu';
 import { AiFillTool } from 'react-icons/ai';
 import { Alarms } from './features/Stats/Alarms';
@@ -33,6 +33,8 @@ import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
 import { noop } from 'lodash';
+import Gamepad from './features/Gamepad';
+import GamepadProfilePage from './features/Gamepad/ProfilePage';
 
 export const ReactRoutes = () => {
     return (
@@ -90,6 +92,13 @@ export const ReactRoutes = () => {
                                     icon={FaKeyboard}
                                     link="/keyboard-shortcuts"
                                 />
+
+                                <ToolCard
+                                    title="Gamepad"
+                                    description="Use this tool to adjust the keyboard shortcuts of your machine"
+                                    icon={FaGamepad}
+                                    link="/gamepad"
+                                />
                             </div>
                         </div>
                     }
@@ -129,6 +138,22 @@ export const ReactRoutes = () => {
                             <Surfacing />
                         </Page>
                     }
+                />
+                <Route
+                    path="gamepad"
+                    element={
+                        <Page
+                            title="Gamepad"
+                            description="Manage your gamepad profiles here"
+                            withGoBackButton
+                        >
+                            <Gamepad />
+                        </Page>
+                    }
+                />
+                <Route
+                    path="gamepad/:gamepadProfileId"
+                    element={<GamepadProfilePage />}
                 />
                 <Route
                     path="firmware"
