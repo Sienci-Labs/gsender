@@ -114,30 +114,57 @@ const MountingSetup = () => {
         let gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
         let localNumberOfHoles = numberOfHoles;
 
-        const setupKey = `${linesUp}-${endMillDiameter}-${numberOfHoles}`;
+        const setupKey = `${linesUp}-${endMillDiameter}-${numberOfHoles}-${extensionTrackLength}`;
 
         switch (setupKey) {
-            case 'does-not-line-up-quarter-inch-six':
-            case 'does-not-line-up-quarter-inch-ten':
+            // Custom mounting solution cases (2 holes)
+            case 'does-not-line-up-quarter-inch-six-four-hundred':
+            case 'does-not-line-up-quarter-inch-six-six-hundred':
+            case 'does-not-line-up-quarter-inch-ten-four-hundred':
+            case 'does-not-line-up-quarter-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
                 localNumberOfHoles = 'two';
                 break;
-            case 'does-not-line-up-eighth-inch-six':
-            case 'does-not-line-up-eighth-inch-ten':
+
+            case 'does-not-line-up-eighth-inch-six-four-hundred':
+            case 'does-not-line-up-eighth-inch-six-six-hundred':
+            case 'does-not-line-up-eighth-inch-ten-four-hundred':
+            case 'does-not-line-up-eighth-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.DOESNT_LINE_UP_EIGHTH;
                 localNumberOfHoles = 'two';
                 break;
-            case 'lines-up-quarter-inch-six':
+
+            // Standard 30" track with 6 holes
+            case 'lines-up-quarter-inch-six-four-hundred':
+            case 'lines-up-quarter-inch-six-six-hundred':
                 gcode = HOLE_TYPES.QUARTER_INCH_SIX_HOLES;
                 break;
-            case 'lines-up-eighth-inch-six':
+
+            case 'lines-up-eighth-inch-six-four-hundred':
+            case 'lines-up-eighth-inch-six-six-hundred':
                 gcode = HOLE_TYPES.EIGHTH_INCH_SIX_HOLES;
                 break;
-            case 'lines-up-quarter-inch-ten':
+
+            // 30" track with extension (10 holes)
+            case 'lines-up-quarter-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES;
                 break;
-            case 'lines-up-eighth-inch-ten':
+
+            case 'lines-up-eighth-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES;
+                break;
+
+            // 30" track with shorter extension
+            case 'lines-up-quarter-inch-ten-four-hundred':
+                gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES_SHORT;
+                break;
+
+            case 'lines-up-eighth-inch-ten-four-hundred':
+                gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES_SHORT;
+                break;
+
+            default:
+                console.assert(false, 'Invalid combination, check options');
                 break;
         }
 
@@ -149,9 +176,7 @@ const MountingSetup = () => {
             VISUALIZER_PRIMARY,
         );
 
-        toast.info(
-            `File added for ${localNumberOfHoles} ${endMillDiameter}" mounting holes`,
-        );
+        toast.info('Loaded rotary mounting setup macro');
 
         setOpen(false);
     };
