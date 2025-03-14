@@ -95,6 +95,11 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         setPorts([...portList, SLB_DFU_PORT]);
     }, [portList]);
 
+    // On show, refresh ports
+    useEffect(() => {
+        controller.listPorts();
+    }, [show]);
+
     useEffect(() => {
         controller.addListener('flash:end', () => {
             setFlashState(FlashingState.Complete);

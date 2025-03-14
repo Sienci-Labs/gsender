@@ -10,7 +10,7 @@ import {
     updateAllSettings,
 } from 'app/features/Config/utils/Settings';
 import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
@@ -32,6 +32,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         settingsValues,
     } = useSettings();
     const inputRef = useRef(null);
+    const [flashOpen, setFlashOpen] = useState(false);
 
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
@@ -40,6 +41,10 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     function updateSettingsHandler() {
         updateAllSettings(settingsValues, EEPROM);
         setSettingsAreDirty(false);
+    }
+
+    function toggleFlash() {
+        setFlashOpen(!flashOpen);
     }
 
     function importEEPROMSettings(e) {
@@ -67,7 +72,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
 
     return (
         <div className="fixed shadow-inner flex px-4 rounded-lg bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 right-14 h-24 border border-gray-200">
-            <FlashDialog show={true} toggleShow={() => {}} />
+            <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
             <div className="w-1/4">
                 <MachineProfileSelector />
             </div>
@@ -96,7 +101,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                 <ActionButton
                     icon={<PiLightning />}
                     label="Flash"
-                    disabled={!connected}
+                    onClick={toggleFlash}
                 />
             </div>
             <div
