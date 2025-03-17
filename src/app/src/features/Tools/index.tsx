@@ -6,7 +6,6 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
-import RotaryNew from '../Rotary';
 
 interface TabItem {
     label: string;
@@ -33,10 +32,6 @@ const tabs = [
     {
         label: 'Rotary',
         content: Rotary,
-    },
-    {
-        label: 'New',
-        content: RotaryNew,
     },
     {
         label: 'Console',
