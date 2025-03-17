@@ -4,13 +4,24 @@ import { useEffect, useState } from 'react';
 import MaintenanceAlert from './MaintenanceAlert';
 import pubsub from 'pubsub-js';
 import JobEndModal from './JobEndModal';
+import store from 'app/store';
 
 export const Alerts = () => {
+    const [modalEnabled, setModalEnabled] = useState(
+        store.get('widgets.visualizer.jobEndModal'),
+    );
     const [showMaintenanceAlert, setShowMaintenanceAlert] = useState(false);
     const [showJobEndModal, setShowJobEndModal] = useState(false);
     const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
     const [job, setJob] = useState<Job>(null);
     const [errors, setErrors] = useState([]);
+
+    const handleStoreChange = () => {
+        setShowJobEndModal(false);
+        setShowMaintenanceAlert(false);
+        setModalEnabled(store.get('widgets.visualizer.jobEndModal'));
+    };
+
     useEffect(() => {
         const tokens = [
             pubsub.subscribe('job:end', (_, data) => {
@@ -18,19 +29,15 @@ export const Alerts = () => {
                 setErrors(errors);
                 api.maintenance.fetch().then((res) => {
                     const taskList: MaintenanceTask[] = res.data;
-                    console.log(taskList);
                     let shouldAlert = false;
                     for (const task of taskList) {
                         const { rangeStart, currentTime } = task;
-                        console.log('start: ' + rangeStart);
-                        console.log('current time: ' + currentTime);
                         if (currentTime >= rangeStart) {
                             shouldAlert = true;
                             break;
                         }
                     }
                     if (shouldAlert) {
-                        console.log('made it');
                         setTasks(taskList);
                         setShowMaintenanceAlert(true);
                     }
@@ -41,31 +48,38 @@ export const Alerts = () => {
                 setShowJobEndModal(true);
             }),
         ];
+
+        store.on('change', handleStoreChange);
         return () => {
             tokens.forEach((token) => {
                 pubsub.unsubscribe(token);
             });
+            store.removeListener('change', handleStoreChange);
         };
     }, []);
 
     return (
         <>
-            {showJobEndModal && (
-                <JobEndModal
-                    job={job}
-                    errors={errors}
-                    showModal={showJobEndModal}
-                    setShowModal={setShowJobEndModal}
-                    onClose={() => setShowJobEndModal(false)}
-                />
-            )}
-            {showMaintenanceAlert && (
-                <MaintenanceAlert
-                    tasks={tasks}
-                    showModal={showMaintenanceAlert}
-                    setShowModal={setShowMaintenanceAlert}
-                    onClose={() => setShowMaintenanceAlert(false)}
-                />
+            {modalEnabled && (
+                <>
+                    {showJobEndModal && (
+                        <JobEndModal
+                            job={job}
+                            errors={errors}
+                            showModal={showJobEndModal}
+                            setShowModal={setShowJobEndModal}
+                            onClose={() => setShowJobEndModal(false)}
+                        />
+                    )}
+                    {showMaintenanceAlert && (
+                        <MaintenanceAlert
+                            tasks={tasks}
+                            showModal={showMaintenanceAlert}
+                            setShowModal={setShowMaintenanceAlert}
+                            onClose={() => setShowMaintenanceAlert(false)}
+                        />
+                    )}
+                </>
             )}
         </>
     );

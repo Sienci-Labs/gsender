@@ -162,6 +162,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                     },
                     {
+                        label: 'Enable popup for Job End & Maintenance Alerts',
+                        key: 'widgets.visualizer.jobEndModal',
+                        description:
+                            'Show a pop up with job details after a job finishes, and another popup to alert you of maintenance tasks that are due.',
+                        type: 'boolean',
+                    },
+                    {
                         label: 'Safe Height',
                         key: 'workspace.safeRetractHeight',
                         type: 'number',

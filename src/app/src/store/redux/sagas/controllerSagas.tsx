@@ -164,7 +164,6 @@ export function* initialize(): Generator<any, void, any> {
             };
             newJobStats.jobs.push(job);
             api.jobStats.update(newJobStats);
-            console.log('last job');
             pubsub.publish('lastJob', job);
         } catch (error) {
             console.error(error);

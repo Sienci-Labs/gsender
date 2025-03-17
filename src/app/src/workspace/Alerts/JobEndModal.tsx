@@ -10,6 +10,7 @@ import {
 import { Button } from 'app/components/shadcn/Button';
 import { JOB_STATUS } from 'app/constants';
 import { Job } from 'app/features/Stats/utils/StatContext';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import cx from 'classnames';
 import { uniqueId } from 'lodash';
 
@@ -51,7 +52,7 @@ const JobEndModal: React.FC<Props> = ({
                                 </div>
                                 <div>
                                     <strong>Time:</strong>
-                                    <span>{` ${job.duration}\n`}</span>
+                                    <span>{` ${convertMillisecondsToTimeStamp(job.duration)}\n`}</span>
                                 </div>
                                 <strong>{'Errors:\n'}</strong>
 
