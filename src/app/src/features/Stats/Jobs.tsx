@@ -33,6 +33,13 @@ const columnData: CustomColumnDef<Job, any>[] = [
     {
         accessorKey: 'file',
         header: () => 'File Name',
+        cell: (info: { renderValue: () => string }) => {
+            return (
+                <>
+                    <div className="break-all">{info.renderValue()}</div>
+                </>
+            );
+        },
     },
     {
         accessorKey: 'duration',

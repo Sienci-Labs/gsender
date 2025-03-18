@@ -93,6 +93,7 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
         desc: boolean;
     }[];
     rowSpan?: Map<any, any>;
+    pagination?: boolean;
 }
 const SortableTable = <TData extends { subRow?: string }, TValue>(
     props: SortableTableProps<TData, TValue>,
@@ -118,6 +119,10 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
     const sortBy = props.sortBy || null;
     const onAdd = props.onAdd || null; // function for when add button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
+    const pagination =
+        props.pagination !== null && props.pagination !== undefined
+            ? props.pagination
+            : true; // boolean for having pagination. default is true
 
     // stop col span from first col that has it disabled
     let stopIndex = 0;
@@ -162,17 +167,19 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             globalFilter,
             sorting,
         },
-        initialState: {
-            pagination: {
-                pageSize: 15,
-                pageIndex: 0,
-            },
-        },
+        initialState: pagination
+            ? {
+                  pagination: {
+                      pageSize: 15,
+                      pageIndex: 0,
+                  },
+              }
+            : {},
         onSortingChange: setSorting,
         enableSortingRemoval: enableSortingRemoval,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: pagination ? getPaginationRowModel() : null,
         onGlobalFilterChange: setGlobalFilter,
         globalFilterFn: fuzzyFilter,
         getFilteredRowModel: getFilteredRowModel(),
@@ -345,120 +352,122 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                 </BTable>
             </div>
             {/* buttons */}
-            <div
-                className={[
-                    'flex items-center gap-2',
-                    styles.navContainer,
-                ].join(' ')}
-            >
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage > 1,
-                        hidden: currentPage <= 1,
-                    })}
-                    onClick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                    // display={currentPage > 1 ? 'block' : 'hidden'}
-                >
-                    {'<<'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage > 1,
-                        hidden: currentPage <= 1,
-                    })}
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    // display={currentPage > 1 ? 'block' : 'hidden'}
-                >
-                    {'<'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage < maxPages,
-                        hidden: currentPage >= maxPages,
-                    })}
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                    // display={currentPage < maxPages ? 'block' : 'hidden'}
-                >
-                    {'>'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage < maxPages,
-                        hidden: currentPage >= maxPages,
-                    })}
-                    onClick={() => table.setPageIndex(maxPages - 1)}
-                    disabled={!table.getCanNextPage()}
-                    // display={currentPage < maxPages ? 'block' : 'hidden'}
-                >
-                    {'>>'}
-                </button>
-                {/* label */}
-                <span
-                    className="flex items-center gap-1"
-                    style={{ marginLeft: '10px' }}
-                >
-                    {'Page '}
-                    <strong>
-                        {currentPage} of {maxPages}
-                    </strong>
-                </span>
-                {/* jump to page */}
+            {pagination && (
                 <div
-                    className="flex items-center gap-1"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        float: 'right',
-                    }}
+                    className={[
+                        'flex items-center gap-2',
+                        styles.navContainer,
+                    ].join(' ')}
                 >
-                    <span style={{ marginRight: '5px' }}>
-                        {'Jump to page: '}
-                        <input
-                            type="number"
-                            defaultValue={currentPage}
-                            onChange={(e) => {
-                                setPageNum(
-                                    e.target.value
-                                        ? Number(e.target.value) - 1
-                                        : 0,
-                                );
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    table.setPageIndex(pageNum);
-                                }
-                            }}
-                            className={[
-                                'w-16 rounded border p-1 ',
-                                styles.input,
-                            ].join(' ')}
-                            min="1"
-                            max={maxPages}
-                            style={{ minWidth: '60px' }}
-                        />
+                    <button
+                        className={cx('rounded border p-1', {
+                            block: currentPage > 1,
+                            hidden: currentPage <= 1,
+                        })}
+                        onClick={() => table.setPageIndex(0)}
+                        disabled={!table.getCanPreviousPage()}
+                        // display={currentPage > 1 ? 'block' : 'hidden'}
+                    >
+                        {'<<'}
+                    </button>
+                    <button
+                        className={cx('rounded border p-1', {
+                            block: currentPage > 1,
+                            hidden: currentPage <= 1,
+                        })}
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                        // display={currentPage > 1 ? 'block' : 'hidden'}
+                    >
+                        {'<'}
+                    </button>
+                    <button
+                        className={cx('rounded border p-1', {
+                            block: currentPage < maxPages,
+                            hidden: currentPage >= maxPages,
+                        })}
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                        // display={currentPage < maxPages ? 'block' : 'hidden'}
+                    >
+                        {'>'}
+                    </button>
+                    <button
+                        className={cx('rounded border p-1', {
+                            block: currentPage < maxPages,
+                            hidden: currentPage >= maxPages,
+                        })}
+                        onClick={() => table.setPageIndex(maxPages - 1)}
+                        disabled={!table.getCanNextPage()}
+                        // display={currentPage < maxPages ? 'block' : 'hidden'}
+                    >
+                        {'>>'}
+                    </button>
+                    {/* label */}
+                    <span
+                        className="flex items-center gap-1"
+                        style={{ marginLeft: '10px' }}
+                    >
+                        {'Page '}
+                        <strong>
+                            {currentPage} of {maxPages}
+                        </strong>
                     </span>
-                    <div style={{ marginRight: '5px' }}>|</div>
-                    {/*** PAGE SIZE ***/}
-                    <div>
-                        {'Entries/Page: '}
-                        <select
-                            value={table.getState().pagination.pageSize}
-                            onChange={(e) => {
-                                table.setPageSize(Number(e.target.value));
-                            }}
-                        >
-                            {[15, 30, 50, 75, 100].map((pageSize) => (
-                                <option key={pageSize} value={pageSize}>
-                                    Show {pageSize}
-                                </option>
-                            ))}
-                        </select>
+                    {/* jump to page */}
+                    <div
+                        className="flex items-center gap-1"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            float: 'right',
+                        }}
+                    >
+                        <span style={{ marginRight: '5px' }}>
+                            {'Jump to page: '}
+                            <input
+                                type="number"
+                                defaultValue={currentPage}
+                                onChange={(e) => {
+                                    setPageNum(
+                                        e.target.value
+                                            ? Number(e.target.value) - 1
+                                            : 0,
+                                    );
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        table.setPageIndex(pageNum);
+                                    }
+                                }}
+                                className={[
+                                    'w-16 rounded border p-1 ',
+                                    styles.input,
+                                ].join(' ')}
+                                min="1"
+                                max={maxPages}
+                                style={{ minWidth: '60px' }}
+                            />
+                        </span>
+                        <div style={{ marginRight: '5px' }}>|</div>
+                        {/*** PAGE SIZE ***/}
+                        <div>
+                            {'Entries/Page: '}
+                            <select
+                                value={table.getState().pagination.pageSize}
+                                onChange={(e) => {
+                                    table.setPageSize(Number(e.target.value));
+                                }}
+                            >
+                                {[15, 30, 50, 75, 100].map((pageSize) => (
+                                    <option key={pageSize} value={pageSize}>
+                                        Show {pageSize}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
