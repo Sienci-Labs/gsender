@@ -25,7 +25,7 @@ export function UpdateBadge({ hidden }) {
 
 export function IconUpdater() {
     const [releaseNotes, setReleaseNotes] = useState({});
-    const [showUpdater, setShowUpdater] = useState(true);
+    const [showUpdater, setShowUpdater] = useState(false);
 
     useEffect(() => {
         if (isElectron()) {

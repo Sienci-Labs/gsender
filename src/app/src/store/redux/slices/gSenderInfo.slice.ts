@@ -7,7 +7,7 @@ const initialState: gSenderInfo = {
         releaseNotes: [],
         releaseDate: '',
     },
-    hasUpdate: false,
+    hasUpdate: true,
 };
 
 const gSenderInfoSlice = createSlice({

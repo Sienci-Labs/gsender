@@ -30,6 +30,8 @@ export interface Workspace {
     jobsCancelled: number;
     timeSpentRunning: number;
     longestTimeRun: number;
+    spindleFunctions: boolean;
+    park: object;
     jobTimes: number[];
     toolChange: {
         passthrough: boolean;

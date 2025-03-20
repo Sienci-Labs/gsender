@@ -1,13 +1,15 @@
 import { Button } from 'app/components/Button';
-import { FaDownload } from 'react-icons/fa';
+import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
+import { ExternalLink } from 'app/features/Stats/components/ExternalLink.tsx';
+import { StatLink } from 'app/features/Stats/components/StatLink.tsx';
 
 export function DownloadGSender({ version = '1.5.0' }) {
     return (
         <div
-            className="p-4 mb-4 text-blue-800 border border-blue-500 rounded-lg bg-blue-50 bg-opacity-50 w-1/2 mx-auto text-center "
+            className=" mb-4 text-blue-800 border border-blue-500 rounded-lg bg-blue-50 bg-opacity-50  text-center mt-8"
             role="alert"
         >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center p-4">
                 <svg
                     className="shrink-0 w-4 h-4 me-2"
                     aria-hidden="true"
@@ -22,7 +24,7 @@ export function DownloadGSender({ version = '1.5.0' }) {
                     gSender v{version} available to download!
                 </h3>
             </div>
-            <div className="mt-2 mb-4 text-sm">
+            <div className="mt-2 mb-4 text-sm flex flex-col gap-2">
                 <p>
                     Clicking the below button will update gSender to version{' '}
                     {version}.
@@ -31,8 +33,24 @@ export function DownloadGSender({ version = '1.5.0' }) {
                     It is recommended you backup your EEPROM values and settings
                     before updating.
                 </p>
+                <p>
+                    <a
+                        className="text-sm text-blue-500 underline text-center"
+                        href="https://resources.sienci.com/view/gs-installation/#gsender-updates"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <div className="flex items-center gap-1 text-center justify-center">
+                            <span>
+                                Read our documentation on updating to learn
+                                more.
+                            </span>
+                            <FaExternalLinkAlt />
+                        </div>
+                    </a>
+                </p>
             </div>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center border-t border-t-blue-500 py-4">
                 <Button type="button" variant="primary" className="gap-2">
                     <FaDownload />
                     <span>Update to v{version} now!</span>
