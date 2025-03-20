@@ -139,6 +139,7 @@ const defaultState: State = {
                 storedValue: null,
             },
         },
+        park: { x: 0, y: 0, z: 0 },
         notifications: [],
     },
     widgets: {

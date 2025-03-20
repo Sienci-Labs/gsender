@@ -12,8 +12,7 @@ import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { IconButton } from 'app/components/IconButton';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
-
-//import { LuParkingSquare } from 'react-icons/lu';
+import { LuSquareParking } from 'react-icons/lu';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
@@ -44,6 +43,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
+import { Parking } from 'app/features/DRO/component/Parking.tsx';
 
 interface DROProps {
     axes: AxesArray;
@@ -211,13 +211,13 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-48 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
-                {/*homingEnabled && (
-                    <IconButton icon={<LuParkingSquare />} color="primary" />
+                {homingEnabled && (
+                    <Parking />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
-                )*/}
+                )}
             </div>
             <div className="w-full flex flex-row justify-between px-3">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>

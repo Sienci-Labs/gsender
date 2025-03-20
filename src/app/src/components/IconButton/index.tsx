@@ -9,9 +9,10 @@ export interface IconButtonProps extends ButtonProps {
 export function IconButton(props: IconButtonProps): JSX.Element {
     return (
         <button
-            className={buttonStyle(props)}
+            className={buttonStyle({ variant: 'alt' })}
             onClick={props.onClick}
             disabled={props.disabled}
+            variant="alt"
         >
             <span className="flex flex-row gap-1 items-center">
                 <span className="text-xl">{props.icon}</span>

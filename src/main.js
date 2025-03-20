@@ -200,7 +200,11 @@ const main = () => {
         store.set("bounds", window.getBounds());
       });
 
+      // Include release notes
+      autoUpdater.fullChangelog = true;
+
       autoUpdater.on("update-available", (info) => {
+        log.info(JSON.stringify(info));
         setTimeout(() => {
           window.webContents.send("update_available", info);
         }, 5000);
