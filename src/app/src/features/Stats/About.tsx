@@ -7,9 +7,19 @@ import { version } from 'app-root/package.json';
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
 import { Button } from 'app/components/Button';
 import { cn } from 'app/lib/utils';
+import { RootState } from 'app/store/redux';
+import { useSelector } from 'react-redux';
+import { UpdateGSender } from 'app/features/Stats/components/UpdateGSender.tsx';
 
 const About = () => {
     const { releaseNotes, status, fetchReleaseNotes } = useGetReleaseNotes();
+
+    const updateReleaseNotes = useSelector(
+        (state: RootState) => state.gSenderInfo.releaseNotes,
+    );
+    const hasUpdate = useSelector(
+        (state: RootState) => state.gSenderInfo.hasUpdate,
+    );
 
     const team = [
         { name: 'Chris T.', title: 'Project Lead' },
@@ -74,6 +84,10 @@ const About = () => {
                     </Button>
                 </div>
             );
+        }
+
+        if (hasUpdate) {
+            return <UpdateGSender />;
         }
 
         return releaseNotes.map((release, index) => {
@@ -167,30 +181,32 @@ const About = () => {
                     ))}
                 </div>
             </div>
+            {hasUpdate && <UpdateGSender notes={updateReleaseNotes} />}
+            {!hasUpdate && (
+                <div className="h-full flex flex-col gap-2">
+                    <div className="flex gap-2 items-center justify-between">
+                        <h2 className="text-2xl font-bold">Release Notes</h2>
 
-            <div className="h-full flex flex-col gap-2">
-                <div className="flex gap-2 items-center justify-between">
-                    <h2 className="text-2xl font-bold">Release Notes</h2>
+                        <a
+                            className="text-sm text-blue-500 underline"
+                            href="https://github.com/Sienci-Labs/gsender"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <div className="flex items-center gap-1">
+                                <span>See all latest updates made</span>
+                                <FaExternalLinkAlt />
+                            </div>
+                        </a>
+                    </div>
 
-                    <a
-                        className="text-sm text-blue-500 underline"
-                        href="https://github.com/Sienci-Labs/gsender"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <div className="flex items-center gap-1">
-                            <span>See all latest updates made</span>
-                            <FaExternalLinkAlt />
+                    <div className="relative h-full">
+                        <div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md p-4">
+                            {renderReleaseNotes()}
                         </div>
-                    </a>
-                </div>
-
-                <div className="relative h-full">
-                    <div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md p-4">
-                        {renderReleaseNotes()}
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

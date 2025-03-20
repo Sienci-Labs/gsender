@@ -291,6 +291,7 @@
     "gcode-toolpath": "~2.2.0",
     "gsap": "^3.11.5",
     "hogan.js": "~3.0.2",
+    "html-react-parser": "^5.2.2",
     "http-proxy": "~1.18.1",
     "hull.js": "^1.0.5",
     "humanize-duration": "^3.31.0",

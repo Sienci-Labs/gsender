@@ -1011,6 +1011,9 @@ video {
 .grid {
   display: grid !important;
 }
+.\!hidden {
+  display: none !important;
+}
 .hidden {
   display: none !important;
 }
