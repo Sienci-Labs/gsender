@@ -259,9 +259,15 @@ try {
     log.error(e);
 }
 
+console.log('default state:');
+console.log(defaultState.widgets.visualizer);
+
 store.state = normalizeState(
     merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {}),
 );
+
+console.log('results:');
+console.log(store.state.widgets.visualizer);
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on(

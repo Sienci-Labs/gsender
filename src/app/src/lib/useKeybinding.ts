@@ -48,7 +48,7 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
                 !currentCommandKeys[defaultShuttle.cmd]
             ) {
                 // add to store
-                let updatedCommandKeys = currentCommandKeys;
+                let updatedCommandKeys = JSON.parse(JSON.stringify(currentCommandKeys));
                 const key = defaultShuttle.keys || '';
 
                 updatedCommandKeys[defaultShuttle.cmd] = {

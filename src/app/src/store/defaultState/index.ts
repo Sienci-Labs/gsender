@@ -31,6 +31,7 @@ import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
+    LIGHTWEIGHT_OPTIONS,
 } from '../../constants';
 
 import machineProfiles from './machineProfiles';
@@ -321,6 +322,7 @@ const defaultState: State = {
             minimized: false,
             // 3D View
             liteMode: false,
+            liteOption: LIGHTWEIGHT_OPTIONS.LIGHT,
             disabled: false,
             disabledLite: false,
             minimizeRenders: false,

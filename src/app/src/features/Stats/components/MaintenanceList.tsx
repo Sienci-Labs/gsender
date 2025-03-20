@@ -202,6 +202,7 @@ export function MaintenanceList() {
                 enableSortingRemoval={false}
                 sortBy={sortBy}
                 onAdd={onAdd}
+                pagination={false}
             />
             <MaintenanceAddTaskDialog
                 show={showAddForm}

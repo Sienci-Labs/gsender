@@ -24,6 +24,7 @@ export type Notification = {
 export interface Workspace {
     units: UNITS_EN;
     reverseWidgets: boolean;
+    spindleFunctions: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;
     jobsFinished: number;
@@ -37,12 +38,12 @@ export interface Workspace {
         passthrough: boolean;
     };
     toolChangeOption:
-        | 'Ignore'
-        | 'Pause'
-        | 'Standard Re-zero'
-        | 'Flexible Re-zero'
-        | 'Fixed Tool Sensor'
-        | 'Code';
+    | 'Ignore'
+    | 'Pause'
+    | 'Standard Re-zero'
+    | 'Flexible Re-zero'
+    | 'Fixed Tool Sensor'
+    | 'Code';
     toolChangePosition: BasicPosition;
     toolChangeHooks: {
         preHook: string;
