@@ -19,7 +19,6 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
-import React from 'react';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
 import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinStatus.tsx';
 import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/LimitSwitchIndicators.tsx';
@@ -29,6 +28,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
+import { LIGHTWEIGHT_OPTIONS } from 'app/constants';
 
 export interface SettingsMenuSection {
     label: string;
@@ -1074,6 +1074,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
                         type: 'boolean',
                     },
+                    {
+                        label: 'Lightweight options',
+                        key: 'widgets.visualizer.liteOption',
+                        description: 'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
+                        type: 'select',
+                        options: [LIGHTWEIGHT_OPTIONS.LIGHT, LIGHTWEIGHT_OPTIONS.EVERYTHING],
+                    }
                 ],
             },
         ],

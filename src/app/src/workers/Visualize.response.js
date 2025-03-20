@@ -5,6 +5,7 @@ import isNumber from 'lodash/isNumber';
 
 import store from 'app/store';
 import {
+    LIGHTWEIGHT_OPTIONS,
     RENDER_RENDERED,
     RENDER_RENDERING,
     VISUALIZER_SECONDARY,
@@ -73,13 +74,20 @@ export const visualizeResponse = async ({ data }) => {
 export const shouldVisualize = () => {
     const liteMode = store.get('widgets.visualizer.liteMode', false);
     const isDisabled = liteMode
-        ? store.get('widgets.visualizer.disabledLite')
+        ? store.get(
+              'widgets.visualizer.liteOption',
+              LIGHTWEIGHT_OPTIONS.LIGHT,
+          ) === LIGHTWEIGHT_OPTIONS.EVERYTHING
         : store.get('widgets.visualizer.disabled');
     return !isDisabled;
 };
 
 export const shouldVisualizeSVG = () => {
     const liteMode = store.get('widgets.visualizer.liteMode', false);
-    const SVGEnabled = store.get('widgets.visualizer.SVGEnabled', false);
+    const SVGEnabled =
+        store.get(
+            'widgets.visualizer.liteOption',
+            LIGHTWEIGHT_OPTIONS.LIGHT,
+        ) === LIGHTWEIGHT_OPTIONS.LIGHT;
     return liteMode && SVGEnabled;
 };
