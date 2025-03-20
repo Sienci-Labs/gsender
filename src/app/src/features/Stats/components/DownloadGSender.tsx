@@ -1,9 +1,13 @@
 import { Button } from 'app/components/Button';
 import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
-import { ExternalLink } from 'app/features/Stats/components/ExternalLink.tsx';
-import { StatLink } from 'app/features/Stats/components/StatLink.tsx';
+import { useState } from 'react';
 
-export function DownloadGSender({ version = '1.5.0' }) {
+export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
+    const [canClick, setCanClick] = useState(true);
+    function updateGSender() {
+        setCanClick(false);
+    }
+
     return (
         <div
             className=" mb-4 text-blue-800 border border-blue-500 rounded-lg bg-blue-50 bg-opacity-50  text-center mt-8"
@@ -53,7 +57,8 @@ export function DownloadGSender({ version = '1.5.0' }) {
             <div className="flex items-center justify-center border-t border-t-blue-500 py-4">
                 <Button type="button" variant="primary" className="gap-2">
                     <FaDownload />
-                    <span>Update to v{version} now!</span>
+                    {canClick && <span>Update to v{version} now!</span>}
+                    {!canClick && <span>Downloading ({downloadPercent}%)</span>}
                 </Button>
             </div>
         </div>

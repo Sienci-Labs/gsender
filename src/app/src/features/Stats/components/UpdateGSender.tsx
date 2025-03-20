@@ -10,6 +10,7 @@ export function UpdateGSender({
         releaseDate: '2025-03-11T14:28:46.936Z',
         releaseNotes: [],
     },
+    downloadPercent,
 }) {
     const [version, setVersion] = useState<string>('');
     const [releaseNotes, setReleaseNotes] = useState('');
@@ -29,7 +30,10 @@ export function UpdateGSender({
 
     return (
         <div className="grid grid-cols-3 grid-rows-1 gap-4">
-            <DownloadGSender version={version} />
+            <DownloadGSender
+                version={version}
+                downloadPercent={downloadPercent}
+            />
             <div className="col-span-2 flex flex-col">
                 <div className="flex gap-2 items-center justify-between">
                     <h2 className="text-2xl font-bold">
