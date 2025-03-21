@@ -256,7 +256,7 @@ const Workspace = () => {
     ]);
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full dark:bg-slate-800">
             <TopBar />
             <DataCollection />
             <div className="flex h-full no-scrollbar ">
