@@ -22,7 +22,7 @@ export function ReloadFileAlert({ fileLoaded, handleFileReload }) {
                         <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
                     }
                     variant="ghost"
-                    className="h-10 w-12"
+                    className="h-10 w-12 rounded-none"
                 />
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-white">
