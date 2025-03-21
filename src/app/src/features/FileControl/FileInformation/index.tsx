@@ -146,7 +146,9 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                 >
                     {lastJob && (
                         <>
-                            <span className="text-base">Last Job</span>
+                            <span className="text-base text-gray-900 dark:text-gray-300">
+                                Last Job
+                            </span>
                             <div className="grid grid-rows-3 gap-4 -ml-[2px] text-gray-500 font-bold">
                                 <TooltipProvider>
                                     <Tooltip>
@@ -224,7 +226,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
     }
 
     return (
-        <div className="flex flex-col gap-1 justify-center p-2 items-center h-full self-center text-sm max-w-full">
+        <div className="flex flex-col gap-1 justify-center p-2 items-center h-full self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>

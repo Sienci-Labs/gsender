@@ -163,10 +163,14 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                     'grid grid-cols-[1fr_2fr] gap-[1px] items-center h-12 w-24 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
                     '[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500',
                     {
-                        'bg-gray-300 text-gray-600': disabled,
-                        'bg-green-600 text-white': !disabled && type === START,
-                        'bg-orange-400 text-white': !disabled && type === PAUSE,
-                        'bg-red-500 text-white': !disabled && type === STOP,
+                        'bg-gray-300 text-gray-600 dark:bg-dark dark:text-gray-400':
+                            disabled,
+                        'bg-green-600 dark:bg-green-700 text-white':
+                            !disabled && type === START,
+                        'bg-orange-400 dark:bg-orange-700 text-white':
+                            !disabled && type === PAUSE,
+                        'bg-red-500 dark:bg-red-700 text-white':
+                            !disabled && type === STOP,
                     },
                 )}
                 title={type}

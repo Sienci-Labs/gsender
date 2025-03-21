@@ -9,12 +9,11 @@ export const buttonStyle = tv({
         variant: {
             primary: 'border-blue-500 text-white bg-blue-500',
             secondary:
-                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white',
+                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200',
             alt: 'bg-robin-500 text-white border-robin-500',
-            disabled: 'border-gray-300 bg-gray-100 text-gray-400',
             outline:
-                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white',
-            ghost: 'text-gray-600 border-none shadow-none',
+                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark text-black dark:text-white',
+            ghost: 'text-gray-600 dark:text-gray-300 border-none shadow-none',
         },
         size: {
             sm: 'h-8 text-sm',
@@ -22,7 +21,7 @@ export const buttonStyle = tv({
             lg: 'h-12 text-lg',
         },
         disabled: {
-            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300',
+            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark',
         },
     },
     defaultVariants: {

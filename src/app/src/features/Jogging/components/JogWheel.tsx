@@ -259,9 +259,12 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
         },
     ]);
 
-    const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
-    const altColourClass = 'fill-robin-500 hover:fill-blue-400';
-    const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
+    const standardColourClass =
+        'fill-blue-500 hover:fill-blue-600 dark:fill-blue-600 dark:hover:fill-blue-400';
+    const altColourClass =
+        'fill-robin-500 hover:fill-robin-400 dark:fill-robin-500 dark:hover:fill-robin-300';
+    const disabledColorClass =
+        'fill-gray-400 hover:fill-gray-400 dark:fill-gray-700 dark:hover:fill-gray-600';
 
     return (
         <svg
@@ -275,28 +278,24 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             <path
                 id="xPlusYMinus"
                 d="M180.191 140.859C171.562 157.794 157.794 171.562 140.859 180.191L100 100L180.191 140.859Z"
-                fill="#689AC9"
                 className={cn(canClick ? altColourClass : disabledColorClass)}
                 {...xPlusYMinusHandlers}
             />
             <path
                 id="xMinusYMinus"
                 d="M59.1408 180.191C42.2063 171.562 28.438 157.794 19.8094 140.859L100 100L59.1408 180.191Z"
-                fill="#689AC9"
                 className={cn(canClick ? altColourClass : disabledColorClass)}
                 {...xMinusYMinusHandlers}
             />
             <path
                 id="xMinusYPlus"
                 d="M19.8094 59.1409C28.438 42.2063 42.2063 28.438 59.1408 19.8094L100 100L19.8094 59.1409Z"
-                fill="#689AC9"
                 className={cn(canClick ? altColourClass : disabledColorClass)}
                 {...xMinusYPlusHandlers}
             />
             <path
                 id="xPlusYPlus"
                 d="M140.859 19.8094C157.794 28.438 171.562 42.2063 180.191 59.1409L100 100L140.859 19.8094Z"
-                fill="#689AC9"
                 className={cn(canClick ? altColourClass : disabledColorClass)}
                 {...xPlusYPlusHandlers}
             />

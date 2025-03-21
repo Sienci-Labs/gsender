@@ -68,9 +68,10 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                 className={cx(
                     'rounded-[0.2rem] border-solid border-2 text-base px-2',
                     {
-                        'border-blue-400 bg-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
+                        'border-blue-400 bg-white dark:bg-dark dark:text-gray-300 [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
                             !disabled,
-                        'border-gray-500 bg-gray-400': disabled,
+                        'border-gray-500 bg-gray-400 dark:bg-dark dark:text-gray-400':
+                            disabled,
                     },
                 )}
                 onClick={() =>

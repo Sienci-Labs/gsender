@@ -72,9 +72,9 @@ const RangeSlider = ({
         <div></div>
     );
     return (
-        <div className="flex flex-col items-center gap-2 justify-center w-full">
+        <div className="flex flex-col items-center gap-2 justify-center w-full text-gray-900 dark:text-gray-300">
             {textComponent}
-            <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 shadow-inner">
+            <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 dark:bg-dark shadow-inner">
                 <Button
                     type="button"
                     onClick={() => onButtonPress(defaultPercentage)}
@@ -94,7 +94,7 @@ const RangeSlider = ({
                     disabled={disabled}
                     {...props}
                 >
-                    <Slider.Track className="h-4 bg-gray-400 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]">
+                    <Slider.Track className="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]">
                         <Slider.Range
                             className={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
                         />

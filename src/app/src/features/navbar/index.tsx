@@ -6,11 +6,7 @@ import cx from 'classnames';
 import Carve from './assets/Carve.svg';
 import { NavbarLink } from './components/NavbarLink.tsx';
 
-interface Props {
-    show: boolean;
-}
-
-export const NavBar: React.FC<Props> = ({ show = false }) => {
+export const NavBar = () => {
     return (
         <>
             <div
@@ -18,31 +14,19 @@ export const NavBar: React.FC<Props> = ({ show = false }) => {
                     'grid [grid-template-rows:minmax(0,5fr)_auto_auto] no-padding no-margin gap-0 justify-end flex-grow self-stretch',
                 )}
             >
-                <div className="py-5 border-gray-400 border-r-2"></div>
-                <NavbarLink
-                    href="/"
-                    svg={Carve}
-                    label="Carve"
-                    minimized={!show}
-                />
+                <div className="py-5 border-gray-400 border-r-2 dark:border-gray-700"></div>
+                <NavbarLink href="/" svg={Carve} label="Carve" />
                 <NavbarLink
                     href="stats"
                     icon={IoSpeedometerOutline}
                     label="Stats"
-                    minimized={!show}
                 />
-                <NavbarLink
-                    href="tools"
-                    icon={RiToolsFill}
-                    label="Tools"
-                    minimized={!show}
-                />
+                <NavbarLink href="tools" icon={RiToolsFill} label="Tools" />
 
                 <NavbarLink
                     href="configuration"
                     icon={FaTasks}
                     label="Config"
-                    minimized={!show}
                 />
             </div>
         </>

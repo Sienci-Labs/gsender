@@ -36,7 +36,7 @@ const Info = () => {
     const formattedEstimatedTime = formatEstimatedTime(estimatedTime);
 
     return (
-        <div>
+        <div className="text-gray-900 dark:text-gray-300">
             <div className="flex gap-1">
                 <span className="font-bold">Estimated Time</span>
                 <span>{formattedEstimatedTime}</span>

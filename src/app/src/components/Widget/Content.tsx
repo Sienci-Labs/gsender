@@ -29,9 +29,9 @@ const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
         {...props}
         className={classNames(
             className,
-            'flex items-stretch border-solid border border-gray-300 relative rounded-lg ' +
-                'p-2 h-full min-w-80 max-sm:w-full max-sm:min-w-full bg-gray-100 ' +
-                '[@media(max-width: 639px),(max-device-width: 639px)]: px-2',
+            `flex items-stretch border-solid border border-gray-300 dark:border-gray-700 dark:bg-dark
+                relative rounded-lg p-2 h-full min-w-80 max-sm:w-full max-sm:min-w-full 
+                bg-gray-100 [@media(max-width: 639px),(max-device-width: 639px)]: px-2`,
         )}
     />
 );

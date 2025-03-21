@@ -105,8 +105,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                     ref={(el) => (tabRefs.current[index] = el)}
                                     className={`flex-grow pt-1 px-4 text font-medium ${
                                         activeTab === item.label
-                                            ? 'text-blue-600 border-b-2 border-blue-600'
-                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800'
+                                            ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
+                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
                                     }`}
                                     onClick={() =>
                                         handleTabClick(item.label, index)

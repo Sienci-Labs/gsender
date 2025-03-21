@@ -54,7 +54,7 @@ export const ReactRoutes = () => {
                     path="tools"
                     element={
                         <div className="p-4">
-                            <p className="text-lg font-semibold mb-4">
+                            <p className="text-lg font-semibold mb-4 dark:text-white">
                                 Choose a tool to get started...
                             </p>
 
