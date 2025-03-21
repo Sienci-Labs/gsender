@@ -214,6 +214,10 @@ const main = () => {
         window.webContents.send("updated_error", err);
       });
 
+      autoUpdater.on("download-progress", (info) => {
+        window.webContents.send("update_download_progress", info.percent);
+      });
+
       ipcMain.once("restart_app", async () => {
         await autoUpdater.downloadUpdate();
         autoUpdater.quitAndInstall(false, false);

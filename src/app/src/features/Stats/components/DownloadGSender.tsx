@@ -1,11 +1,15 @@
 import { Button } from 'app/components/Button';
 import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import { useState } from 'react';
+import isElectron from 'is-electron';
 
 export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
     const [canClick, setCanClick] = useState(true);
     function updateGSender() {
         setCanClick(false);
+        if (isElectron()) {
+            window.ipcRenderer.send('restart_app');
+        }
     }
 
     return (
@@ -55,7 +59,12 @@ export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
                 </p>
             </div>
             <div className="flex items-center justify-center border-t border-t-blue-500 py-4">
-                <Button type="button" variant="primary" className="gap-2">
+                <Button
+                    type="button"
+                    variant="primary"
+                    className="gap-2"
+                    onClick={updateGSender}
+                >
                     <FaDownload />
                     {canClick && <span>Update to v{version} now!</span>}
                     {!canClick && <span>Downloading ({downloadPercent}%)</span>}

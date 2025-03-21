@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import { DownloadGSender } from 'app/features/Stats/components/DownloadGSender.tsx';
 import { FaExternalLinkAlt } from 'react-icons/fa';
+import isElectron from 'is-electron';
 
 export function UpdateGSender({
     notes = {
@@ -10,11 +11,23 @@ export function UpdateGSender({
         releaseDate: '2025-03-11T14:28:46.936Z',
         releaseNotes: [],
     },
-    downloadPercent,
 }) {
     const [version, setVersion] = useState<string>('');
     const [releaseNotes, setReleaseNotes] = useState('');
     const [releaseDate, setReleaseDate] = useState<string>('');
+    const [downloadPercent, setDownloadPercent] = useState<number>(0);
+
+    useEffect(() => {
+        if (isElectron()) {
+            window.ipcRenderer.on(
+                'update_download_progress',
+                (t, percentage) => {
+                    console.log(percentage);
+                    setDownloadPercent(percentage);
+                },
+            );
+        }
+    }, []);
 
     useEffect(() => {
         console.log(notes);
