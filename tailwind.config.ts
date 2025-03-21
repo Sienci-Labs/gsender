@@ -2,12 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   content: [
-    "./src/app/src/**/*.{js,ts,jsx,tsx}",
-    "./src/app/index.html",
+    "./src/**/*.{js,ts,jsx,tsx,html}",
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "!**/node_modules/**",
   ],
   important: true,
+  darkMode: "class",
   /*
   purge: {
     enabled: false,
@@ -26,6 +26,7 @@ export default {
         "content-area": "calc(100vh-64px)",
       },
       colors: {
+        dark: '#0f172a',
         robin: {
           50: "#f6f9fc",
           100: "#ecf2f8",
