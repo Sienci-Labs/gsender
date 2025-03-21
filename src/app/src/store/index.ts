@@ -195,6 +195,9 @@ const merge = (base: any, saved: any): any => {
 
     // if they are both not objects, use saved. migration will be made later if needed
     if ((!baseIsObject || baseIsArray) && (!savedIsObject || savedIsArray)) {
+        if (saved === undefined) { // but if the saved version doesnt exist, use base
+            return base;
+        }
         return saved;
         // if one is an object and the other isn't, then default structure changed, so use base
     } else if (!baseIsObject || baseIsArray || !savedIsObject || savedIsArray) {
@@ -259,15 +262,9 @@ try {
     log.error(e);
 }
 
-console.log('default state:');
-console.log(defaultState.widgets.visualizer);
-
 store.state = normalizeState(
     merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {}),
 );
-
-console.log('results:');
-console.log(store.state.widgets.visualizer);
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on(
