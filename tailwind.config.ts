@@ -26,7 +26,11 @@ export default {
         "content-area": "calc(100vh-64px)",
       },
       colors: {
-        dark: '#0f172a',
+        dark: {
+          DEFAULT: '#0f172a',
+          darker: '#020617',
+          lighter: '#334155',
+        },
         robin: {
           50: "#f6f9fc",
           100: "#ecf2f8",
