@@ -19,7 +19,7 @@ export function SpeedSelectButton({
 }: SpeedSelectButtonProps) {
     return (
         <button
-            className={cn('text-sm px-2 py-1 rounded', {
+            className={cn('text-sm px-2 py-2 rounded', {
                 'bg-blue-400 bg-opacity-30': active,
             })}
             onClick={onClick}
@@ -30,10 +30,10 @@ export function SpeedSelectButton({
 }
 
 interface SpeedSelectorProps {
-    onClick?: (values: JogValueObject) => void;
+    handleClick: (values: JogValueObject, speed: JoggingSpeedOptions) => void;
 }
 
-export function SpeedSelector({ onClick }: SpeedSelectorProps) {
+export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
 
@@ -96,6 +96,7 @@ export function SpeedSelector({ onClick }: SpeedSelectorProps) {
     const preciseActive = selectedSpeed === 'Precise';
 
     function handleSpeedClick(speed: JoggingSpeedOptions) {
+        // save old values to config
         setSelectedSpeed(speed);
     }
 
@@ -105,11 +106,11 @@ export function SpeedSelector({ onClick }: SpeedSelectorProps) {
         const jogValues = store.get('widgets.axes.jog', {});
         const key = selectedSpeed.toLowerCase();
         const newSpeeds = get(jogValues, key, {});
-        onClick(newSpeeds);
+        handleClick(newSpeeds, selectedSpeed);
     }, [selectedSpeed]);
 
     return (
-        <div className="flex flex-col bg-white rounded-md border-solid border border-gray-300 p-1 w-32">
+        <div className="flex flex-col bg-white rounded-md border-solid border border-gray-300 p-0.5 w-32">
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedClick('Rapid')}
