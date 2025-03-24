@@ -31,7 +31,7 @@ export function IndicatorButton({
         >
             <span
                 className={cn('text-blue-300', {
-                    'animate-pulse': active,
+                    'animate-pulse dark:text-white': active,
                 })}
             >
                 {icon}
