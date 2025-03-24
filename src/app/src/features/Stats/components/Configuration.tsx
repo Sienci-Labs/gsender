@@ -15,9 +15,11 @@ function ConfigRow({
     connected: boolean;
 }) {
     return (
-        <div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3">
-            <div className="text-gray-700 bg-white pr-2">{label}</div>
-            <div className="bg-white pl-2">
+        <div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-white dark:bg-dark">
+            <div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
+                {label}
+            </div>
+            <div className="bg-white pl-2 dark:text-white dark:bg-dark">
                 {connected ? children : <b>-</b>}
             </div>
         </div>
@@ -53,7 +55,7 @@ export function Configuration() {
 
     return (
         <div className="flex flex-col gap-1">
-            <div className="font-bold mb-2">
+            <div className="font-bold mb-2 dark:text-white">
                 Sienci Labs LongMill MK2{' '}
                 <span className="font-normal">30X30</span>
             </div>

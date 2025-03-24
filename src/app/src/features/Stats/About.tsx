@@ -83,20 +83,25 @@ const About = () => {
                     components={{
                         h3: (props: ReactMarkdownProps) => (
                             <h3
-                                className={cn('text-xl font-bold underline', {
-                                    'mt-8': index !== 0,
-                                })}
+                                className={cn(
+                                    'text-xl font-bold underline dark:text-white',
+                                    {
+                                        'mt-8': index !== 0,
+                                    },
+                                )}
                             >
                                 {props.children}
                             </h3>
                         ),
                         ul: (props: ReactMarkdownProps) => (
-                            <ul className="ml-4 list-disc [&>li]:mt-2 ">
+                            <ul className="ml-4 list-disc [&>li]:mt-2 dark:text-white">
                                 {props.children}
                             </ul>
                         ),
                         li: (props: ReactMarkdownProps) => (
-                            <li className="leading-7">{props.children}</li>
+                            <li className="leading-7 dark:text-white">
+                                {props.children}
+                            </li>
                         ),
                     }}
                 >
@@ -116,20 +121,22 @@ const About = () => {
                         width={125}
                         height={125}
                     />
-                    <div>
+                    <div className="dark:text-white">
                         <h1 className="text-3xl font-bold">gSender</h1>
-                        <p className="text-sm text-gray-500">By Sienci Labs</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-white">
+                            By Sienci Labs
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-white">
                             Version {version}
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col items-end gap-2 text-sm">
-                    <p className=" text-gray-500">
+                    <p className=" text-gray-500 dark:text-white">
                         Copyright © {new Date().getFullYear()} Sienci Labs Inc.
                     </p>
                     <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-white">
                             Made in Canada
                         </span>
                         <img src={canadaFlag.href} alt="Canada Flag" />
@@ -147,7 +154,7 @@ const About = () => {
                 </div>
             </div>
 
-            <p className="text-md md:text-lg">
+            <p className="text-md md:text-lg dark:text-white">
                 gSender is a free and feature-packed CNC control software,
                 designed to be clean and easy to learn while retaining a depth
                 of capabilities for advanced users. Many thousands of people
@@ -156,7 +163,7 @@ const About = () => {
                 community, and reliability.
             </p>
 
-            <div>
+            <div className="dark:text-white">
                 <h2 className="text-2xl font-bold mb-2">gSender Team</h2>
                 <div className="text-md md:text-lg">
                     {team.map((member, index) => (
@@ -170,7 +177,9 @@ const About = () => {
 
             <div className="h-full flex flex-col gap-2">
                 <div className="flex gap-2 items-center justify-between">
-                    <h2 className="text-2xl font-bold">Release Notes</h2>
+                    <h2 className="text-2xl font-bold dark:text-white">
+                        Release Notes
+                    </h2>
 
                     <a
                         className="text-sm text-blue-500 underline"

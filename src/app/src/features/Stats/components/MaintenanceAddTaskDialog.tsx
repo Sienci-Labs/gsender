@@ -19,7 +19,8 @@ export const buttonStyle = tv({
     variants: {
         colors: {
             primary: 'border-transparent text-white bg-blue-500',
-            secondary: 'bg-white border-blue-500 text-blue-500',
+            secondary:
+                'bg-white border-blue-500 text-blue-500 dark:bg-dark dark:text-white dark:border-dark-lighter',
             danger: 'text-white border-transparent bg-red-500',
         },
     },
