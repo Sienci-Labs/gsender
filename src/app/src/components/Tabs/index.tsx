@@ -81,8 +81,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
                             canScrollLeft
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'
-                                : 'text-gray-200 cursor-not-allowed'
+                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
+                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
                         }`}
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
@@ -119,8 +119,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
                             canScrollRight
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600'
-                                : 'text-gray-200 cursor-not-allowed'
+                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
+                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
                         }`}
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}
