@@ -16,7 +16,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import Tooltip from 'app/components/Tooltip';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 
@@ -101,7 +101,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 disconnection, mechanical malfunction, or other
                                 failures
                             </p>
-                            <p className="mb-0 text-black">
+                            <p className="mb-0 text-black dark:text-white">
                                 Your job was last stopped around line:{' '}
                                 <b>{state.value}</b> on a g-code file with a
                                 total of <b>{/* lineTotal */}</b> lines
@@ -119,7 +119,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             )}
                         </div>
                         <div className="mb-4">
-                            <div className="flex gap-2 items-center">
+                            <div className="grid grid-cols-4 gap-2 items-center">
                                 <label htmlFor="resumeJobLine">
                                     Resume job at line:
                                 </label>
@@ -146,7 +146,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             </div>
                         </div>
                         <div className="mb-4">
-                            <div className="flex gap-2 items-center">
+                            <div className="grid grid-cols-4 gap-2 items-center">
                                 <label htmlFor="safeHeight">
                                     With Safe Height:
                                 </label>
@@ -168,7 +168,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                         className="w-20"
                                     />
                                 </Tooltip>
-                                <span className="text-sm">
+                                <span className="text-sm col-span-2">
                                     (Safe Height is the value above Z max)
                                 </span>
                             </div>
