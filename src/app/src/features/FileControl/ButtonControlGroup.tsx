@@ -172,7 +172,7 @@ const ButtonControlGroup = () => {
                                 onClick={() =>
                                     handleLoadRecentFile(file.filePath)
                                 }
-                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
+                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
                             >
                                 <div className="w-full overflow-hidden">
                                     <span

@@ -264,7 +264,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const altColourClass =
         'fill-robin-500 hover:fill-robin-400 dark:fill-robin-500 dark:hover:fill-robin-300';
     const disabledColorClass =
-        'fill-gray-400 hover:fill-gray-400 dark:fill-gray-700 dark:hover:fill-gray-600';
+        'fill-gray-500 hover:fill-gray-400 dark:fill-gray-700 cursor-not-allowed';
 
     return (
         <svg

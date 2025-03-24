@@ -34,7 +34,7 @@ const ModalToggle = ({ mode, onChange, ...props }: Props) => {
     const isToggled = mode === LASER_MODE;
 
     return (
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex items-center gap-2 w-full dark:text-white">
             <span>Spindle</span>
             <Switch checked={isToggled} onChange={onChange} {...props} />
             <span>Laser</span>

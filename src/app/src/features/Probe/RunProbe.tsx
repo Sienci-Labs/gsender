@@ -137,7 +137,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 </DialogHeader>
                 <div className="grid grid-cols-[1.5fr_1fr] gap-3 w-[600px] min-h-[200px]">
                     <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug">
+                        <div className="text-black leading-snug dark:text-white">
                             <p className="mb-3">
                                 1. Check the tool is positioned correctly
                                 (pictured).

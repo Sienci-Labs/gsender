@@ -56,7 +56,7 @@ const MacroItem = ({
     );
 
     return (
-        <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2">
+        <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
             {macro.description.trim() ? (
                 <Tooltip content={macro.description}>
                     <MacroButton />
@@ -66,7 +66,7 @@ const MacroItem = ({
             )}
 
             <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded-full">
+                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded-full dark:hover:bg-dark-lighter">
                     <FaEllipsisH className="text-xl" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white p-2 z-50">
