@@ -61,18 +61,20 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     isConnected,
 }) => {
     const unlock = (): void => {
-        if (
-            alarmCode === 1 ||
-            alarmCode === 2 ||
-            alarmCode === 10 ||
-            alarmCode === 14 ||
-            alarmCode === 17
-        ) {
-            controller.command('reset:limit');
-            return;
-        } else if (alarmCode === 'Homing' || alarmCode === 11) {
-            controller.command('homing');
-            return;
+        if (activeState === GRBL_ACTIVE_STATE_ALARM) {
+            if (
+                alarmCode === 1 ||
+                alarmCode === 2 ||
+                alarmCode === 10 ||
+                alarmCode === 14 ||
+                alarmCode === 17
+            ) {
+                controller.command('reset:limit');
+                return;
+            } else if (alarmCode === 'Homing' || alarmCode === 11) {
+                controller.command('homing');
+                return;
+            }
         } else if (activeState === GRBL_ACTIVE_STATE_HOLD) {
             return controller.command('cyclestart');
         }
