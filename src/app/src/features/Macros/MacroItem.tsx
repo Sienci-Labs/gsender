@@ -44,7 +44,7 @@ const MacroButton = ({ onMacroRun, disabled, macro }) => {
                     disabled && 'opacity-50 cursor-not-allowed'
                 }`,
                 {
-                    'animated-background bg-gradient-to-r from-green-500 via-green-500 to-green-100 bg-opacity-50':
+                    'animate-gradient bg-gradient-to-r from-green-500 via-green-500 to-green-100':
                         running,
                 },
             )}

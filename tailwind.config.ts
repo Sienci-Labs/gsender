@@ -100,20 +100,14 @@ export default {
           "75%": { transform: "translate(-5px, 5px) rotate(-5deg)" },
           "100%": { transform: "translate(0, 0) rotate(0deg)" },
         },
-        "gradient-x": {
-          "0%, 100%": {
-            "background-size": "200% 200%",
-            "background-position": "left center",
-          },
-          "50%": {
-            "background-size": "200% 200%",
-            "background-position": "right center",
-          },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
         },
       },
       animation: {
         attention: "attention 1s ease-in-out infinite",
-        "gradient-x": "gradient-x 15s ease infinite",
+        gradient: "gradient-shift 15s ease infinite",
       },
     },
   },

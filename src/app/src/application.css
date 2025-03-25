@@ -1598,6 +1598,19 @@ video {
 .animate-bounce {
   animation: bounce 1s infinite !important;
 }
+@keyframes gradient-shift {
+
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+.animate-gradient {
+  animation: gradient-shift 15s ease infinite !important;
+}
 @keyframes ping {
 
   75%, 100% {
