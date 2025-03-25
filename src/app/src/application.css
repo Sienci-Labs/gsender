@@ -2448,8 +2448,20 @@ video {
   --tw-gradient-to: rgb(63 133 199 / 0) var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
+.from-green-500 {
+  --tw-gradient-from: #059669 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(5 150 105 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.via-green-500 {
+  --tw-gradient-to: rgb(5 150 105 / 0)  var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #059669 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
 .to-blue-800 {
   --tw-gradient-to: #265077 var(--tw-gradient-to-position) !important;
+}
+.to-green-100 {
+  --tw-gradient-to: #69c0a5 var(--tw-gradient-to-position) !important;
 }
 .to-robin-300 {
   --tw-gradient-to: #a1c0dd var(--tw-gradient-to-position) !important;
@@ -3328,6 +3340,13 @@ input[type='number'] {
 }
 .\[transition\:all_300ms_ease\] {
   transition: all 300ms ease !important;
+}
+
+
+@property --border-angle {
+    inherits: false;
+    initial-value: 0deg;
+    syntax: '<angle>';
 }
 
 body,

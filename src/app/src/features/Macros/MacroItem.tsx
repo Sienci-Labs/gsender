@@ -7,8 +7,10 @@ import {
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
+import cn from 'classnames';
 
 import { toast } from 'app/lib/toaster';
+import { useState } from 'react';
 
 interface Macro {
     id: string;
@@ -23,6 +25,34 @@ interface MacroItemProps {
     onDelete: (id: string) => void;
     disabled?: boolean;
 }
+
+const MacroButton = ({ onMacroRun, disabled, macro }) => {
+    const [running, setRunning] = useState<boolean>(false);
+
+    const run = () => {
+        setRunning(true);
+        onMacroRun();
+        setTimeout(() => setRunning(false), 4000);
+    };
+
+    return (
+        <button
+            onClick={run}
+            disabled={disabled}
+            className={cn(
+                `flex-grow text-left p-2 rounded-md ${
+                    disabled && 'opacity-50 cursor-not-allowed'
+                }`,
+                {
+                    'animated-background bg-gradient-to-r from-green-500 via-green-500 to-green-100 bg-opacity-50':
+                        running,
+                },
+            )}
+        >
+            {running ? 'Running...' : macro.name}
+        </button>
+    );
+};
 
 /**
  * Macro Item Component
@@ -43,27 +73,17 @@ const MacroItem = ({
         toast.info(`Started running macro '${macro.name}'!`);
     };
 
-    const MacroButton = () => (
-        <button
-            onClick={onMacroRun}
-            disabled={disabled}
-            className={`flex-grow text-left ${
-                disabled && 'opacity-50 cursor-not-allowed'
-            }`}
-        >
-            {macro.name}
-        </button>
-    );
-
     return (
-        <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2">
-            {macro.description.trim() ? (
-                <Tooltip content={macro.description}>
-                    <MacroButton />
+        <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200">
+            {
+                <Tooltip content={macro.description.trim()}>
+                    <MacroButton
+                        onMacroRun={onMacroRun}
+                        disabled={disabled}
+                        macro={macro}
+                    />
                 </Tooltip>
-            ) : (
-                <MacroButton />
-            )}
+            }
 
             <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded-full">

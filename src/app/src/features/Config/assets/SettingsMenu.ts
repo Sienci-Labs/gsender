@@ -473,6 +473,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         type: 'eeprom',
+                        eID: '$170',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$171',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$172',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$173',
+                    },
+                    {
+                        type: 'eeprom',
                         eID: '$190',
                     },
                     {
@@ -510,6 +526,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$27',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$347',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$348',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$349',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$350',
                     },
                 ],
             },
@@ -786,7 +818,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.rapid.aStep',
                         description: 'Rapid jogging amount in the A axis.',
                         type: 'number',
-                        unit: 'mm',
+                        unit: '°',
                     },
                 ],
             },
@@ -812,7 +844,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.normal.aStep',
                         description: 'Normal jogging amount in the A axis.',
                         type: 'number',
-                        unit: 'mm',
+                        unit: '°',
                     },
                 ],
             },
@@ -838,7 +870,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.precise.aStep',
                         description: 'Precise jogging amount in the A axis.',
                         type: 'number',
-                        unit: 'mm',
+                        unit: '°',
                     },
                 ],
             },
@@ -1111,6 +1143,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$141' },
                     { type: 'eeprom', eID: '$142' },
                     { type: 'eeprom', eID: '$143' },
+                    { type: 'eeprom', eID: '$160' },
+                    { type: 'eeprom', eID: '$161' },
+                    { type: 'eeprom', eID: '$162' },
+                    { type: 'eeprom', eID: '$163' },
                     { type: 'eeprom', eID: '$200' },
                     { type: 'eeprom', eID: '$201' },
                     { type: 'eeprom', eID: '$202' },
@@ -1139,6 +1175,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$661' },
                     { type: 'eeprom', eID: '$662' },
                     { type: 'eeprom', eID: '$663' },
+                    { type: 'eeprom', eID: '$744' },
+                    { type: 'eeprom', eID: '$745' },
                 ],
             },
         ],
