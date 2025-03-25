@@ -5,6 +5,7 @@ import store from 'app/store';
 import get from 'lodash/get';
 import { JogValueObject } from 'app/features/Jogging';
 import { useRegisterShortcuts } from 'app/features/Keyboard/useRegisterShortcuts';
+import pubsub from 'pubsub-js';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;
@@ -100,13 +101,23 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         setSelectedSpeed(speed);
     }
 
-    // Any time the value swaps, fetch and update the parent
-    useEffect(() => {
-        // get speed, convert units, update UI
+    function updateCurrentJogValues() {
         const jogValues = store.get('widgets.axes.jog', {});
         const key = selectedSpeed.toLowerCase();
         const newSpeeds = get(jogValues, key, {});
         handleClick(newSpeeds, selectedSpeed);
+    }
+
+    // Any time the value swaps, fetch and update the parent
+    useEffect(() => {
+        // get speed, convert units, update UI
+        updateCurrentJogValues();
+
+        const token = pubsub.subscribe('config:saved', updateCurrentJogValues);
+
+        return () => {
+            pubsub.unsubscribe(token);
+        };
     }, [selectedSpeed]);
 
     return (
