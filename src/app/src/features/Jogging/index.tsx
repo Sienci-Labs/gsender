@@ -175,10 +175,6 @@ export function Jogging() {
                 axisList.a = aStep * axis.a;
             }
 
-            console.log('axisList', axisList);
-            console.log('feedrate', feedrate);
-            console.log('firmware', jogSpeed);
-
             // TODO: Add continuous jogging
             jogAxis(axisList, feedrate);
         },
