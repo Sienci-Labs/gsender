@@ -35,7 +35,6 @@ import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
 import { colorsResponse } from 'app/workers/colors.response';
 import controller from 'app/lib/controller';
-import gamepad, { runAction } from 'app/lib/gamepad';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -676,13 +675,6 @@ class Visualizer extends Component {
                 }));
             }, 0);
         }
-
-        gamepad.on('gamepad:button', (event) => {
-            runAction({
-                event,
-                shuttleControlEvents: this.shuttleControlEvents,
-            });
-        });
     }
 
     componentWillUnmount() {
@@ -1027,47 +1019,6 @@ class Visualizer extends Component {
     };
 
     shuttleControlEvents = {
-        LOAD_FILE: {
-            title: 'Load File',
-            keys: ['shift', 'l'].join('+'),
-            gamepadKeys: '0',
-            keysName: 'A',
-            cmd: 'LOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: debounce(() => {
-                if (this.workflowControl) {
-                    this.workflowControl.handleClickUpload();
-                }
-            }, 300),
-        },
-        UNLOAD_FILE: {
-            title: 'Unload File',
-            keys: ['shift', 'k'].join('+'),
-            gamepadKeys: '1',
-            keysName: 'B',
-            cmd: 'UNLOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                this.actions.closeModal();
-                this.actions.unloadGCode();
-                this.actions.reset();
-            },
-        },
-        TEST_RUN: {
-            title: 'Test Run',
-            keys: '#',
-            cmd: 'TEST_RUN',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                controller.command('gcode:test');
-            },
-        },
         RUN_OUTLINE: {
             title: 'Run Outline',
             keys: '',
@@ -1095,18 +1046,6 @@ class Visualizer extends Component {
             category: CARVING_CATEGORY,
             callback: this.shuttleControlFunctions.START_JOB,
         },
-        START_JOB_ALT: {
-            title: 'Start Job (Alt)',
-            keys: ['ctrl', '`'].join('+'),
-            cmd: 'START_JOB_ALT',
-            payload: {
-                type: GRBLHAL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.START_JOB,
-        },
         PAUSE_JOB: {
             title: 'Pause Job',
             keys: '!',
@@ -1115,18 +1054,6 @@ class Visualizer extends Component {
             cmd: 'PAUSE_JOB',
             payload: {
                 type: GRBL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.PAUSE_JOB,
-        },
-        PAUSE_JOB_ALT: {
-            title: 'Pause Job (Alt)',
-            keys: ['ctrl', '1'].join('+'),
-            cmd: 'PAUSE_JOB_ALT',
-            payload: {
-                type: GRBLHAL,
             },
             preventDefault: true,
             isActive: true,
@@ -1356,7 +1283,16 @@ class Visualizer extends Component {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
-                document.execCommand('copy');
+                const selection = window.getSelection();
+                if (selection && selection.toString()) {
+                    navigator.clipboard
+                        .writeText(selection.toString())
+                        .catch((err) => {
+                            console.error('Failed to copy to clipboard: ', err);
+                            // Fallback to execCommand if clipboard API fails
+                            document.execCommand('copy');
+                        });
+                }
             },
         },
         PASTE: {
@@ -1367,7 +1303,29 @@ class Visualizer extends Component {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
-                document.execCommand('paste');
+                navigator.clipboard
+                    .readText()
+                    .then((text) => {
+                        const activeElement =
+                            document.activeElement as HTMLElement;
+                        if (activeElement && 'value' in activeElement) {
+                            const input = activeElement as HTMLInputElement;
+                            const start = input.selectionStart || 0;
+                            const end = input.selectionEnd || 0;
+                            input.value =
+                                input.value.substring(0, start) +
+                                text +
+                                input.value.substring(end);
+                            input.selectionStart = input.selectionEnd =
+                                start + text.length;
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(
+                            'Failed to read clipboard contents: ',
+                            err,
+                        );
+                    });
             },
         },
         UNDO: {
@@ -1378,7 +1336,10 @@ class Visualizer extends Component {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
+                // Try to use document.execCommand as fallback since clipboard API doesn't support undo
                 document.execCommand('undo');
+                // NOTE: The Clipboard API doesn't have a direct method for undo operations.
+                // We could implement a custom undo stack?
             },
         },
         TOGGLE_SHORTCUTS: {
@@ -1451,7 +1412,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT,
         },
         VISUALIZER_ZOOM_FIT: {
-            title: 'Zoom In',
+            title: 'Zoom Fit',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },
