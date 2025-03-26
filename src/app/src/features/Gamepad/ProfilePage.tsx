@@ -16,7 +16,7 @@ function GamepadProfilePage() {
         state.gamepad.profiles.find((p) => p.id === gamepadProfileId),
     );
 
-    if (profile) {
+    if (!profile) {
         return (
             <Page title="Gamepad Profile Not Found" withGoBackButton>
                 <div className="flex flex-col gap-4 items-center">
