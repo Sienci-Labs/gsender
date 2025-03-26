@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 
-import gamepad from '../gamepad';
-import { GamepadDetail, GamepadProfile } from '../gamepad/definitions';
+import GamepadManager from '../gamepad';
+import { GamepadDetail } from '../gamepad/definitions';
 
 export const useGamepadListener = ({
     profile,
     axisThreshold,
 }: {
-    profile: GamepadProfile;
+    profile: string[];
     axisThreshold: number;
 }) => {
     const [buttons, setButtons] = useState<Array<GamepadButton>>([]);
     const [axes, setAxes] = useState(null);
 
     useEffect(() => {
-        gamepad.start();
+        const gamepad = GamepadManager.getInstance();
 
         gamepad.on('gamepad:button', buttonListener);
         gamepad.on('gamepad:axis', axisListener);
@@ -28,7 +28,7 @@ export const useGamepadListener = ({
     const buttonListener = ({ detail }: GamepadDetail): void => {
         const { gamepad } = detail;
 
-        if (profile && !profile.id.includes(gamepad.id)) {
+        if (profile && !profile.includes(gamepad.id)) {
             console.error('Gamepad profile not found');
             return;
         }
@@ -36,10 +36,10 @@ export const useGamepadListener = ({
         setButtons([...detail.gamepad.buttons]);
     };
 
-    const axisListener = ({ detail }: GamepadDetail): void => {
-        const { gamepad } = detail;
+    const axisListener = ({ detail }: { detail: GamepadDetail }): void => {
+        const { gamepad } = detail.detail;
 
-        if (profile && !profile.id.includes(gamepad.id)) {
+        if (profile && !profile.includes(gamepad.id)) {
             console.error('Gamepad profile not found');
             return;
         }
