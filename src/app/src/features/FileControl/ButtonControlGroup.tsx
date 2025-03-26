@@ -6,12 +6,13 @@ import { MdClose } from 'react-icons/md';
 import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 
 import { Button } from 'app/components/Button';
 import { store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import { VISUALIZER_PRIMARY } from 'app/constants';
+import { CARVING_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     DropdownMenu,
@@ -38,6 +39,7 @@ import { getRecentFiles } from './utils/recentfiles';
 import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 import { RecentFile } from './definitions';
+import useKeybinding from 'app/lib/useKeybinding';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,6 +56,9 @@ const ButtonControlGroup = () => {
                 setRecentFiles(files);
             },
         );
+
+        useKeybinding(shuttleControlEvents);
+
         return () => {
             pubsub.unsubscribe(token);
         };
@@ -80,6 +85,43 @@ const ButtonControlGroup = () => {
             handleCloseFile();
         },
     });
+
+    const shuttleControlEvents = {
+        LOAD_FILE: {
+            title: 'Load File',
+            keys: ['shift', 'l'].join('+'),
+            gamepadKeys: '0',
+            keysName: 'A',
+            cmd: 'LOAD_FILE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: throttle(
+                () => {
+                    handleClickLoadFile();
+                },
+                300,
+                { leading: true, trailing: false },
+            ),
+        },
+        UNLOAD_FILE: {
+            title: 'Unload File',
+            keys: ['shift', 'k'].join('+'),
+            gamepadKeys: '1',
+            keysName: 'B',
+            cmd: 'UNLOAD_FILE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: throttle(
+                () => {
+                    handleCloseFile();
+                },
+                300,
+                { leading: true, trailing: false },
+            ),
+        },
+    };
 
     const handleLoadFile = async (
         event: React.ChangeEvent<HTMLInputElement>,
