@@ -1,15 +1,26 @@
 import { useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router';
+import get from 'lodash/get';
 
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import store from 'app/store';
 import { toggleAllShortcuts } from 'app/store/redux/slices/keyboardShortcutsSlice';
-import { WORKSPACE_MODE } from 'app/constants';
+import {
+    GENERAL_CATEGORY,
+    GRBL_ACTIVE_STATE_ALARM,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBLHAL,
+    LOCATION_CATEGORY,
+    WORKSPACE_MODE,
+} from 'app/constants';
+import GamepadManager from 'app/lib/gamepad';
+import useKeybinding from 'app/lib/useKeybinding';
 
 import { useRegisterShortcuts } from '../features/Keyboard/useRegisterShortcuts';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { Outlet, useNavigate, useLocation } from 'react-router';
+
 import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
@@ -19,14 +30,145 @@ const Workspace = () => {
     const location = useLocation();
 
     useEffect(() => {
-        console.log('CALLED NAV');
-        console.log(location);
         const { hash } = location;
         if (hash === '#/remote') {
-            console.log('MATCHED');
             navigate('/remote');
         }
     }, [location]);
+
+    useEffect(() => {
+        GamepadManager.initialize();
+
+        useKeybinding(shuttleControlEvents);
+
+        return () => {
+            GamepadManager.cleanup();
+        };
+    }, []);
+
+    const shuttleControlFunctions = {
+        CONTROLLER_COMMAND: (_: Event, { command }: any) => {
+            const state = get(reduxStore.getState(), 'controller.state.status');
+            const activeState = get(state, 'activeState', 'Idle');
+            const alarmCode = get(state, 'alarmCode', 0);
+
+            console.log('command', command);
+
+            const commandIsValidForAlarmState = [
+                'reset',
+                'reset:limit',
+                'homing',
+            ].includes(command);
+            const isInAlarmState = activeState === GRBL_ACTIVE_STATE_ALARM;
+            // feedhold, cyclestart, homing, unlock, reset
+            if (
+                (commandIsValidForAlarmState && isInAlarmState) ||
+                (command !== 'reset:limit' &&
+                    activeState === GRBL_ACTIVE_STATE_IDLE)
+            ) {
+                // unlock + reset on alarm 1 and 2, just unlock on others
+                if (
+                    activeState === GRBL_ACTIVE_STATE_ALARM &&
+                    alarmCode !== 1 &&
+                    alarmCode !== 2
+                ) {
+                    command = 'unlock';
+                }
+                controller.command(command);
+            }
+        },
+    };
+
+    const shuttleControlEvents = {
+        CONTROLLER_COMMAND_UNLOCK: {
+            title: 'Unlock',
+            keys: '$',
+            cmd: 'CONTROLLER_COMMAND_UNLOCK',
+            payload: {
+                command: 'reset:limit',
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_RESET: {
+            title: 'Soft Reset',
+            keys: '%',
+            cmd: 'CONTROLLER_COMMAND_RESET',
+            payload: {
+                command: 'reset',
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_HOMING: {
+            title: 'Homing',
+            keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_HOMING',
+            payload: {
+                command: 'homing',
+            },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_REALTIME_REPORT: {
+            title: 'Realtime Report',
+            keys: '`',
+            cmd: 'CONTROLLER_COMMAND_REALTIME_REPORT',
+            payload: {
+                command: 'realtime_report',
+                type: GRBLHAL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_ERROR_CLEAR: {
+            title: 'Error Clear',
+            keys: '*',
+            cmd: 'CONTROLLER_COMMAND_ERROR_CLEAR',
+            payload: {
+                command: 'error_clear',
+                type: GRBLHAL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT: {
+            title: 'Toolchange Acknowledgement',
+            keys: ['ctrl', 'alt', 'command', 'a'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT',
+            payload: {
+                command: 'toolchange:acknowledge',
+                type: GRBLHAL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+        CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE: {
+            title: 'Virtual Stop Toggle',
+            keys: ['ctrl', '8'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE',
+            payload: {
+                command: 'virtual_stop_toggle',
+                type: GRBLHAL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: shuttleControlFunctions.CONTROLLER_COMMAND,
+        },
+    };
 
     useRegisterShortcuts([
         {
