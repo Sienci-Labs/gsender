@@ -6,7 +6,7 @@ import { Input as ShadcnInput } from 'app/components/shadcn/Input';
 type InputProps = ComponentProps<'input'> & {
     suffix?: ReactNode;
     label?: string | ReactNode;
-    sizing?: 'sm' | 'md' | 'lg';
+    sizing?: 'xs' | 'sm' | 'md' | 'lg';
     wrapperClassName?: string;
 };
 
@@ -16,6 +16,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         ref,
     ) => {
         const inputSize = {
+            xs: 'h-6 text-sm px-2',
             sm: 'h-8 text-sm px-2',
             md: 'h-10 text-md px-3',
             lg: 'h-12 text-lg px-4',
