@@ -23,7 +23,6 @@
 
 import { useEffect, useState } from 'react';
 
-import gamepad, { runAction } from 'app/lib/gamepad';
 import {
     Dialog,
     DialogContent,
@@ -32,7 +31,6 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/Button';
 import cx from 'classnames';
-import { GamepadDetail } from 'app/lib/gamepad/definitions';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';
 
@@ -40,6 +38,8 @@ import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
 import { Actions, State } from './definitions';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import { PROBING_CATEGORY } from 'app/constants';
+import useKeybinding from 'app/lib/useKeybinding';
 
 interface RunProbeProps {
     state: State;
@@ -67,6 +67,41 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     }
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
+
+    // useEffect(() => {
+    //     useKeybinding(shuttleControlEvents);
+    // }, []);
+
+    const shuttleControlEvents = {
+        START_PROBE: {
+            title: 'Start Probing',
+            keys: '',
+            cmd: 'START_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => startProbe(),
+        },
+        CONFIRM_PROBE: {
+            title: 'Confirm Probe',
+            keys: '',
+            cmd: 'CONFIRM_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                if (connectionMade) {
+                    return;
+                }
+
+                toast.info('Probe Confirmed Manually');
+
+                actions.setProbeConnectivity(true);
+            },
+        },
+    };
+
+    //     useKeybinding(shuttleControlEvents);
 
     useRegisterShortcuts([
         {
@@ -105,10 +140,6 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     };
 
     useEffect(() => {
-        gamepad.on('gamepad:button', (event: GamepadDetail) =>
-            runAction({ event }),
-        );
-
         return () => {
             testInterval && clearInterval(testInterval);
             setTestInterval(null);

@@ -21,8 +21,9 @@
  *
  */
 
-import React, { useState } from 'react';
+import { useState, useEffect, KeyboardEvent } from 'react';
 import cx from 'classnames';
+import { X, Plus } from 'lucide-react';
 
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
@@ -30,9 +31,6 @@ import {
     PROBE_TYPE_TIP,
     PROBE_TYPE_DIAMETER,
 } from 'app/lib/constants';
-
-import { METRIC_UNITS } from '../../constants';
-import { Actions, AvailableTool, ProbeCommand, State } from './definitions';
 import { UNITS_EN } from 'app/definitions/general';
 import {
     Select,
@@ -43,6 +41,18 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select';
 
+import { Input } from 'app/components/Input';
+import { Button } from 'app/components/Button';
+
+import { METRIC_UNITS } from '../../constants';
+import { Actions, AvailableTool, ProbeCommand, State } from './definitions';
+
+type CustomValue = {
+    value: string;
+    label: string;
+    isCustom: boolean;
+};
+
 interface Props {
     actions: Actions;
     state: State;
@@ -50,22 +60,22 @@ interface Props {
 }
 
 const convertAvailableTools = (tools: AvailableTool[], units: UNITS_EN) => {
-    const optionLabels = [];
-
-    for (let tool of tools) {
-        let diameter =
-            units === METRIC_UNITS
-                ? tool.metricDiameter
-                : tool.imperialDiameter;
-        optionLabels.push({
-            value: `${diameter}`,
-            label: `${diameter} ${units}`,
-        });
-    }
-    return optionLabels;
+    return tools.map((tool) => ({
+        value: String(
+            tool[
+                units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'
+            ],
+        ),
+        label: String(
+            tool[
+                units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'
+            ],
+        ),
+        isCustom: false,
+    }));
 };
 
-const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
+const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const { _setToolDiameter, _setProbeType } = actions;
     let { availableTools, units, touchplate, toolDiameter } = state;
     const { touchplateType } = touchplate;
@@ -75,6 +85,14 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
             ? 'Auto'
             : String(toolDiameter),
     );
+    const [customValues, setCustomValues] = useState<CustomValue[]>(() => {
+        const saved = localStorage.getItem('probeCustomValues');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
+    }, [customValues]);
 
     const tools = [...availableTools];
 
@@ -89,49 +107,124 @@ const ProbeDiameter: React.FC<Props> = ({ actions, state, probeCommand }) => {
         setValue(value);
     };
 
+    const handleCreateOption = (inputValue: string) => {
+        const newValue = Number(inputValue);
+        if (isNaN(newValue)) return;
+
+        const newCustomValue: CustomValue = {
+            value: inputValue,
+            label: inputValue,
+            isCustom: true,
+        };
+
+        setCustomValues((prev) => [...prev, newCustomValue]);
+        handleChange(inputValue);
+    };
+
+    const handleDeleteOption = (valueToDelete: string) => {
+        setCustomValues((prev) =>
+            prev.filter((v) => v.value !== valueToDelete),
+        );
+        if (value === valueToDelete) {
+            const firstTool = tools[0];
+            if (firstTool) {
+                const diameter =
+                    units === METRIC_UNITS
+                        ? firstTool.metricDiameter
+                        : firstTool.imperialDiameter;
+                handleChange(String(diameter));
+            }
+        }
+    };
+
     const options = [];
 
     const toolsObjects = convertAvailableTools(tools, units);
 
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
         options.push(
-            { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
-            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
+            { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, isCustom: false },
+            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, isCustom: false },
         );
     }
 
-    options.push(...toolsObjects);
+    options.push(...toolsObjects, ...customValues);
 
     return (
-        <div
-            className={cx('flex flex-row w-full items-center justify-center', {
-                hidden: !probeCommand.tool,
-            })}
-        >
-            <Select
-                onValueChange={handleChange}
-                value={value}
-                disabled={!probeCommand.tool}
-            >
-                <SelectTrigger className="w-[180px] bg-white rounded-md border-solid border border-gray-300">
-                    <SelectValue placeholder="Select a Probe Type" />
-                </SelectTrigger>
-                <SelectContent className="flex-1 bg-white">
-                    <SelectGroup className="bg-white">
-                        {options.map((option) => {
-                            return (
-                                <SelectItem
+        <div className={cx('w-full', { hidden: !probeCommand.tool })}>
+            <div className="flex flex-col space-y-2">
+                <Select
+                    value={value}
+                    onValueChange={handleChange}
+                    disabled={!probeCommand.tool}
+                >
+                    <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Select diameter" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                        <SelectGroup>
+                            {options.map((option) => (
+                                <div
                                     key={option.value}
-                                    value={option.value}
-                                    className="bg-white"
+                                    className="flex items-center justify-between"
                                 >
-                                    {option.label}
-                                </SelectItem>
-                            );
-                        })}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+                                    <SelectItem value={option.value}>
+                                        {option.label} {units}
+                                    </SelectItem>
+                                    {option.isCustom && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteOption(
+                                                    option.value,
+                                                );
+                                            }}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
+                        </SelectGroup>
+                        <div className="p-2 border-t">
+                            <div className="flex items-center space-x-2">
+                                <Input
+                                    type="number"
+                                    placeholder={`Custom diameter (${units})`}
+                                    onKeyDown={(
+                                        e: KeyboardEvent<HTMLInputElement>,
+                                    ) => {
+                                        if (e.key === 'Enter') {
+                                            handleCreateOption(
+                                                e.currentTarget.value,
+                                            );
+                                            e.currentTarget.value = '';
+                                        }
+                                    }}
+                                    sizing="sm"
+                                />
+                                <Button
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                        const input = e.currentTarget
+                                            .previousElementSibling as HTMLInputElement;
+                                        if (input && input.value) {
+                                            handleCreateOption(input.value);
+                                            input.value = '';
+                                        }
+                                    }}
+                                    size="sm"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     );
 };

@@ -27,18 +27,119 @@ import cx from 'classnames';
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
 
-import { METRIC_UNITS } from '../../constants';
+import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeDirectionSelection from './ProbeDirectionSelection';
 import { Actions, State } from './definitions';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import useKeybinding from 'app/lib/useKeybinding';
 interface ProbeProps {
     state: State;
     actions: Actions;
 }
 
 const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
+    const shuttleControlEvents = {
+        OPEN_PROBE: {
+            title: 'Toggle Probe Dialog',
+            keys: '',
+            cmd: 'OPEN_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => actions.onOpenChange(!state.show),
+        },
+        PROBE_ROUTINE_SCROLL_RIGHT: {
+            title: 'Probe Routine Scroll Right',
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { availableProbeCommands, selectedProbeCommand } = state;
+
+                let newIndex = selectedProbeCommand + 1;
+                if (availableProbeCommands.length <= newIndex) {
+                    newIndex = 0;
+                }
+                actions.handleProbeCommandChange(newIndex);
+            },
+        },
+        PROBE_ROUTINE_SCROLL_LEFT: {
+            title: 'Probe Routine Scroll Left',
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { availableProbeCommands, selectedProbeCommand } = state;
+
+                let newIndex = selectedProbeCommand - 1;
+                if (newIndex < 0) {
+                    newIndex = availableProbeCommands.length - 1;
+                }
+                actions.handleProbeCommandChange(newIndex);
+            },
+        },
+        PROBE_DIAMETER_SCROLL_UP: {
+            title: 'Probe Diameter Scroll Up',
+            keys: '',
+            cmd: 'PROBE_DIAMETER_SCROLL_UP',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { toolDiameter, availableTools, units } = state;
+                const toolUnits =
+                    units === METRIC_UNITS
+                        ? 'metricDiameter'
+                        : 'imperialDiameter';
+                const currIndex = availableTools.findIndex(
+                    (element) => element[toolUnits] === toolDiameter,
+                );
+
+                let newIndex = currIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = availableTools.length - 1;
+                }
+                actions._setToolDiameter({
+                    value: availableTools[newIndex][`${toolUnits}`],
+                });
+            },
+        },
+        PROBE_DIAMETER_SCROLL_DOWN: {
+            title: 'Probe Diameter Scroll Down',
+            keys: '',
+            cmd: 'PROBE_DIAMETER_SCROLL_DOWN',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { toolDiameter, availableTools, units } = state;
+                const toolUnits =
+                    units === METRIC_UNITS
+                        ? 'metricDiameter'
+                        : 'imperialDiameter';
+                const currIndex = availableTools.findIndex(
+                    (element) => element[toolUnits] === toolDiameter,
+                );
+
+                let newIndex = currIndex + 1;
+                if (newIndex >= availableTools.length) {
+                    newIndex = 0;
+                }
+                actions._setToolDiameter({
+                    value: availableTools[newIndex][`${toolUnits}`],
+                });
+            },
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+
     useRegisterShortcuts([
         {
             id: 'open-probe',
