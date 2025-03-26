@@ -158,6 +158,8 @@ const MacroWidget = ({
                 const res = await api.macros.fetch();
                 const { records: macros } = res.data;
                 setMacros(macros);
+                actions.closeModal();
+                toast.success(`Updated macro '${name}'`);
             } catch (err) {
                 // Ignore error
             }

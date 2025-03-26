@@ -44,7 +44,7 @@ const MacroButton = ({ onMacroRun, disabled, macro }) => {
                     disabled && 'opacity-50 cursor-not-allowed'
                 }`,
                 {
-                    'animate-gradient bg-gradient-to-r from-green-500 via-green-500 to-green-100':
+                    'animate-pulse duration-75 once bg-gradient-to-r from-green-500 via-green-500 to-green-100':
                         running,
                 },
             )}

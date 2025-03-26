@@ -1598,19 +1598,6 @@ video {
 .animate-bounce {
   animation: bounce 1s infinite !important;
 }
-@keyframes gradient-shift {
-
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-}
-.animate-gradient {
-  animation: gradient-shift 15s ease infinite !important;
-}
 @keyframes ping {
 
   75%, 100% {
@@ -3208,6 +3195,9 @@ video {
 .duration-300 {
   transition-duration: 300ms !important;
 }
+.duration-75 {
+  transition-duration: 75ms !important;
+}
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -3260,6 +3250,9 @@ video {
 }
 .duration-300 {
   animation-duration: 300ms !important;
+}
+.duration-75 {
+  animation-duration: 75ms !important;
 }
 .ease-in-out {
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
