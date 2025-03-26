@@ -21,9 +21,8 @@ import { PiPause } from 'react-icons/pi';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
 import { useEffect, useState } from 'react';
-import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 import useKeybinding from 'app/lib/useKeybinding';
-import combokeys from 'app/lib/combokeys';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -42,7 +41,7 @@ interface Message {
 }
 
 interface Icons {
-    [key: MACHINE_CONTROL_BUTTONS_T]: JSX.Element;
+    [key: MACHINE_CONTROL_BUTTONS_T]: React.ReactNode;
 }
 
 interface OnClick {
@@ -83,57 +82,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         setDisabled(isDisabled());
     });
 
-    useEffect(() => {
-        addShuttleControlEvents();
-        return () => {
-            removeShuttleControlEvents();
-        };
-    }, []);
-
-    const addShuttleControlEvents = () => {
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = shuttleControlEvents[eventName].callback;
-            combokeys.on(eventName, callback);
-        });
-    };
-
-    const removeShuttleControlEvents = () => {
-        Object.keys(shuttleControlEvents).forEach((eventName) => {
-            const callback = shuttleControlEvents[eventName].callback;
-            combokeys.removeListener(eventName, callback);
-        });
-    };
-
-    useRegisterShortcut({
-        id: 'start-job',
-        description: 'Start a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleRun();
-        },
-    });
-
-    useRegisterShortcut({
-        id: 'pause-job',
-        description: 'Pause a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handlePause();
-        },
-    });
-
-    useRegisterShortcut({
-        id: 'stop-job',
-        description: 'Stop a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleStop();
-        },
-    });
-
     const shuttleControlEvents = {
         START_JOB: {
             title: 'Start Job',
@@ -148,7 +96,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
-                console.log('START_JOB');
                 handleRun();
             },
         },
@@ -184,6 +131,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     };
 
     useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const handleRun = (): void => {
         console.assert(

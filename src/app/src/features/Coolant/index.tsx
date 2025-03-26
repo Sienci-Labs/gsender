@@ -11,10 +11,9 @@ import {
 } from 'app/features/Coolant/utils/actions.ts';
 import { IndicatorButton } from 'app/components/IndicatorButton';
 
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { COOLANT_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
-import { useEffect } from 'react';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -22,39 +21,6 @@ export interface CoolantProps {
 }
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
-    useRegisterShortcuts([
-        {
-            id: 'start-mist',
-            title: 'Start Mist',
-            description: 'Start mist',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                startMist();
-            },
-        },
-        {
-            id: 'start-flood',
-            title: 'Start Flood',
-            description: 'Start flood',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                startFlood();
-            },
-        },
-        {
-            id: 'stop-coolant',
-            title: 'Stop Coolant',
-            description: 'Stop coolant',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                stopCoolant();
-            },
-        },
-    ]);
-
     const shuttleControlEvents = {
         MIST_COOLANT: {
             title: 'Mist Coolant',
@@ -85,9 +51,8 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         },
     };
 
-    useEffect(() => {
-        useKeybinding(shuttleControlEvents);
-    }, []);
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     return (
         <div className="flex flex-col justify-around items-center h-full">

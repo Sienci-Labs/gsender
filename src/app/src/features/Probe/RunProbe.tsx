@@ -37,9 +37,9 @@ import { toast } from 'app/lib/toaster';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
 import { Actions, State } from './definitions';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { PROBING_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 interface RunProbeProps {
     state: State;
@@ -101,34 +101,8 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         },
     };
 
-    //     useKeybinding(shuttleControlEvents);
-
-    useRegisterShortcuts([
-        {
-            id: 'start-probe',
-            title: 'Start Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                startProbe();
-            },
-        },
-        {
-            id: 'confirm-probe',
-            title: 'Confirm Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                if (connectionMade) {
-                    return;
-                }
-
-                toast.info('Probe Confirmed Manually');
-
-                actions.setProbeConnectivity(true);
-            },
-        },
-    ]);
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();

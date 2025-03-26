@@ -36,10 +36,10 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 
 import { getRecentFiles } from './utils/recentfiles';
-import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 import { RecentFile } from './definitions';
 import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,34 +57,10 @@ const ButtonControlGroup = () => {
             },
         );
 
-        useKeybinding(shuttleControlEvents);
-
         return () => {
             pubsub.unsubscribe(token);
         };
     }, []);
-
-    useRegisterShortcut({
-        id: 'load-file',
-        title: 'Load File',
-        description: 'Load a file',
-        defaultKeys: 'shift+l',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleClickLoadFile();
-        },
-    });
-
-    useRegisterShortcut({
-        id: 'unload-file',
-        title: 'Unload File',
-        description: 'Unload a file',
-        defaultKeys: 'shift+k',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleCloseFile();
-        },
-    });
 
     const shuttleControlEvents = {
         LOAD_FILE: {
@@ -122,6 +98,9 @@ const ButtonControlGroup = () => {
             ),
         },
     };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const handleLoadFile = async (
         event: React.ChangeEvent<HTMLInputElement>,

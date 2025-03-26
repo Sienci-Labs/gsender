@@ -32,8 +32,8 @@ import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeDirectionSelection from './ProbeDirectionSelection';
 import { Actions, State } from './definitions';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 interface ProbeProps {
     state: State;
     actions: Actions;
@@ -139,102 +139,7 @@ const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
     };
 
     useKeybinding(shuttleControlEvents);
-
-    useRegisterShortcuts([
-        {
-            id: 'open-probe',
-            title: 'Open Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                actions.onOpenChange(true);
-            },
-        },
-        {
-            id: 'close-probe',
-            title: 'Close Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-        },
-        {
-            id: 'probe-routine-scroll-right',
-            title: 'Probe Routine Scroll Right',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { availableProbeCommands, selectedProbeCommand } = state;
-
-                let newIndex = selectedProbeCommand + 1;
-                if (availableProbeCommands.length <= newIndex) {
-                    newIndex = 0;
-                }
-                actions.handleProbeCommandChange(newIndex);
-            },
-        },
-        {
-            id: 'probe-routine-scroll-left',
-            title: 'Probe Routine Scroll Left',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { availableProbeCommands, selectedProbeCommand } = state;
-
-                let newIndex = selectedProbeCommand - 1;
-                if (newIndex < 0) {
-                    newIndex = availableProbeCommands.length - 1;
-                }
-                actions.handleProbeCommandChange(newIndex);
-            },
-        },
-        {
-            id: 'probe-diameter-scroll-up',
-            title: 'Probe Diameter Scroll Up',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { toolDiameter, availableTools, units } = state;
-                const toolUnits =
-                    units === METRIC_UNITS
-                        ? 'metricDiameter'
-                        : 'imperialDiameter';
-                const currIndex = availableTools.findIndex(
-                    (element) => element[toolUnits] === toolDiameter,
-                );
-
-                let newIndex = currIndex - 1;
-                if (newIndex < 0) {
-                    newIndex = availableTools.length - 1;
-                }
-                actions._setToolDiameter({
-                    value: availableTools[newIndex][`${toolUnits}`],
-                });
-            },
-        },
-        {
-            id: 'probe-diameter-scroll-down',
-            title: 'Probe Diameter Scroll Down',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { toolDiameter, availableTools, units } = state;
-                const toolUnits =
-                    units === METRIC_UNITS
-                        ? 'metricDiameter'
-                        : 'imperialDiameter';
-                const currIndex = availableTools.findIndex(
-                    (element) => element[toolUnits] === toolDiameter,
-                );
-
-                let newIndex = currIndex + 1;
-                if (newIndex >= availableTools.length) {
-                    newIndex = 0;
-                }
-                actions._setToolDiameter({
-                    value: availableTools[newIndex][`${toolUnits}`],
-                });
-            },
-        },
-    ]);
+    useShuttleEvents(shuttleControlEvents);
 
     const {
         canClick,

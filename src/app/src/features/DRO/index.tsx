@@ -47,10 +47,9 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import useKeybinding from 'app/lib/useKeybinding';
-
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 interface DROProps {
     axes: AxesArray;
     mposController: DROPosition;
@@ -88,8 +87,6 @@ function DRO({
             const workspaceMode = store.get('workspace.mode', 'DEFAULT');
             setIsRotaryMode(workspaceMode === 'ROTARY');
         });
-
-        useKeybinding(shuttleControlEvents);
     }, []);
 
     const shuttleControlEvents = {
@@ -197,108 +194,8 @@ function DRO({
         },
     };
 
-    useRegisterShortcuts([
-        {
-            id: 'zero-x',
-            title: 'Zero X Axis',
-            description: 'Zero the X axis',
-            defaultKeys: 'shift+w',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('X', 0);
-            },
-        },
-        {
-            id: 'zero-y',
-            title: 'Zero Y Axis',
-            description: 'Zero the Y axis',
-            defaultKeys: 'shift+e',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('Y', 0);
-            },
-        },
-        {
-            id: 'zero-z',
-            title: 'Zero Z Axis',
-            description: 'Zero the Z axis',
-            defaultKeys: 'shift+r',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('Z', 0);
-            },
-        },
-        {
-            id: 'zero-a',
-            title: 'Zero A Axis',
-            description: 'Zero the A axis',
-            defaultKeys: 'shift+t',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('A', 0);
-            },
-        },
-        {
-            id: 'zero-all',
-            title: 'Zero All Axes',
-            description: 'Zero all axes',
-            defaultKeys: 'shift+y',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroAllAxes();
-            },
-        },
-        {
-            id: 'goto-zero-x',
-            title: 'Go to Zero X',
-            description: 'Go to zero X',
-            defaultKeys: 'shift+s',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('X');
-            },
-        },
-        {
-            id: 'goto-zero-y',
-            title: 'Go to Zero Y',
-            description: 'Go to zero Y',
-            defaultKeys: 'shift+d',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('Y');
-            },
-        },
-        {
-            id: 'goto-zero-z',
-            title: 'Go to Zero Z',
-            description: 'Go to zero Z',
-            defaultKeys: 'shift+f',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('Z');
-            },
-        },
-        {
-            id: 'goto-zero-a',
-            title: 'Go to Zero A',
-            description: 'Go to zero A',
-            defaultKeys: 'shift+g',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('A');
-            },
-        },
-        {
-            id: 'goto-xy-zero',
-            title: 'Go XY',
-            description: 'Go XY',
-            defaultKeys: 'shift+a',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                goXYAxes();
-            },
-        },
-    ]);
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     function toggleHoming() {
         setHomingMode(!homingMode);

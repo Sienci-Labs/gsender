@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { UNITS_EN } from 'app/definitions/general';
 import { mapPositionToUnits } from 'app/lib/units';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 
 interface OverridesProps {
     ovF: number;
@@ -81,109 +80,6 @@ const Overrides: React.FC<OverridesProps> = ({
         }, 500);
         return () => clearTimeout(timer);
     }, [ovS]);
-
-    useRegisterShortcuts([
-        {
-            id: 'feed-override-plus-plus',
-            title: 'Feed Override ++',
-            description: 'Feed Override ++',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvF(localOvF + 10);
-            },
-        },
-        {
-            id: 'feed-override-plus',
-            title: 'Feed Override +',
-            description: 'Feed Override +',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvF(localOvF + 1);
-            },
-        },
-        {
-            id: 'feed-override-minus',
-            title: 'Feed Override -',
-            description: 'Feed Override -',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvF(localOvF - 1);
-            },
-        },
-        {
-            id: 'feed-override-minus-minus',
-            title: 'Feed Override --',
-            description: 'Feed Override --',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvF(localOvF - 10);
-            },
-        },
-        {
-            id: 'spindle-override-plus-plus',
-            title: 'Spindle Override ++',
-            description: 'Spindle Override ++',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvS(localOvS + 10);
-            },
-        },
-        {
-            id: 'spindle-override-plus',
-            title: 'Spindle Override +',
-            description: 'Spindle Override +',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvS(localOvS + 1);
-            },
-        },
-        {
-            id: 'spindle-override-minus',
-            title: 'Spindle Override -',
-            description: 'Spindle Override -',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvS(localOvS - 1);
-            },
-        },
-        {
-            id: 'spindle-override-minus-minus',
-            title: 'Spindle Override --',
-            description: 'Spindle Override --',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvS(localOvS - 10);
-            },
-        },
-        {
-            id: 'feed-override-reset',
-            title: 'Feed Override Reset',
-            description: 'Feed Override Reset',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvF(0);
-            },
-        },
-        {
-            id: 'spindle-override-reset',
-            title: 'Spindle Override Reset',
-            description: 'Spindle Override Reset',
-            defaultKeys: '',
-            category: 'OVERRIDES_CATEGORY',
-            onKeyDown: () => {
-                setLocalOvS(0);
-            },
-        },
-    ]);
 
     return (
         <div
