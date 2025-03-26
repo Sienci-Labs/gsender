@@ -1,4 +1,6 @@
 import {
+    CARVING_CATEGORY,
+    GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
@@ -20,6 +22,8 @@ import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
 import { useEffect, useState } from 'react';
 import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
+import useKeybinding from 'app/lib/useKeybinding';
+import combokeys from 'app/lib/combokeys';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -79,6 +83,27 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         setDisabled(isDisabled());
     });
 
+    useEffect(() => {
+        addShuttleControlEvents();
+        return () => {
+            removeShuttleControlEvents();
+        };
+    }, []);
+
+    const addShuttleControlEvents = () => {
+        Object.keys(shuttleControlEvents).forEach((eventName) => {
+            const callback = shuttleControlEvents[eventName].callback;
+            combokeys.on(eventName, callback);
+        });
+    };
+
+    const removeShuttleControlEvents = () => {
+        Object.keys(shuttleControlEvents).forEach((eventName) => {
+            const callback = shuttleControlEvents[eventName].callback;
+            combokeys.removeListener(eventName, callback);
+        });
+    };
+
     useRegisterShortcut({
         id: 'start-job',
         description: 'Start a job',
@@ -108,6 +133,57 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             handleStop();
         },
     });
+
+    const shuttleControlEvents = {
+        START_JOB: {
+            title: 'Start Job',
+            keys: '~',
+            gamepadKeys: '9',
+            keysName: 'Start',
+            cmd: 'START_JOB',
+            payload: {
+                type: GRBL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                console.log('START_JOB');
+                handleRun();
+            },
+        },
+        PAUSE_JOB: {
+            title: 'Pause Job',
+            keys: '!',
+            gamepadKeys: '2',
+            keysName: 'X',
+            cmd: 'PAUSE_JOB',
+            payload: {
+                type: GRBL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                handlePause();
+            },
+        },
+        STOP_JOB: {
+            title: 'Stop Job',
+            keys: '@',
+            gamepadKeys: '3',
+            keysName: 'Y',
+            cmd: 'STOP_JOB',
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                handleStop();
+            },
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
 
     const handleRun = (): void => {
         console.assert(
