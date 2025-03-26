@@ -19,8 +19,13 @@ import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import store from 'app/store';
 import {
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
+    AXIS_A,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    LOCATION_CATEGORY,
     METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
@@ -44,6 +49,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
+import useKeybinding from 'app/lib/useKeybinding';
 
 interface DROProps {
     axes: AxesArray;
@@ -82,7 +88,114 @@ function DRO({
             const workspaceMode = store.get('workspace.mode', 'DEFAULT');
             setIsRotaryMode(workspaceMode === 'ROTARY');
         });
+
+        useKeybinding(shuttleControlEvents);
     }, []);
+
+    const shuttleControlEvents = {
+        ZERO_X_AXIS: {
+            title: 'Zero X Axis',
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_X_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_X },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('X', 0),
+        },
+        ZERO_Y_AXIS: {
+            title: 'Zero Y Axis',
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_Y_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Y },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('Y', 0),
+        },
+        ZERO_Z_AXIS: {
+            title: 'Zero Z Axis',
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'ZERO_Z_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Z },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('Z', 0),
+        },
+        ZERO_A_AXIS: {
+            id: 72,
+            title: 'Zero A Axis',
+            keys: ['shift', '0'].join('+'),
+            cmd: 'ZERO_A_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('A', 0),
+        },
+        ZERO_ALL_AXIS: {
+            title: 'Zero All',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_ALL_AXIS',
+            payload: { axis: 'all' },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroAllAxes(),
+        },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A Zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_A] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('A'),
+        },
+        GO_TO_X_AXIS_ZERO: {
+            title: 'Go to X Zero',
+            keys: ['shift', 's'].join('+'),
+            cmd: 'GO_TO_X_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_X] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('X'),
+        },
+        GO_TO_Y_AXIS_ZERO: {
+            title: 'Go to Y Zero',
+            keys: ['shift', 'd'].join('+'),
+            cmd: 'GO_TO_Y_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Y] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('Y'),
+        },
+        GO_TO_Z_AXIS_ZERO: {
+            title: 'Go to Z Zero',
+            keys: ['shift', 'f'].join('+'),
+            cmd: 'GO_TO_Z_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Z] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('Z'),
+        },
+        GO_TO_XY_AXIS_ZERO: {
+            title: 'Go to XY Zero',
+            keys: ['shift', 'a'].join('+'),
+            cmd: 'GO_TO_XY_AXIS_ZERO',
+            payload: { axisList: [AXIS_X, AXIS_Y] },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => goXYAxes(),
+        },
+    };
 
     useRegisterShortcuts([
         {
