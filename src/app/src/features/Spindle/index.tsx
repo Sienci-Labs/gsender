@@ -6,7 +6,6 @@ import pubsub from 'pubsub-js';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { updatePartialControllerSettings } from 'app/store/redux/slices/controller.slice';
 import store from 'app/store';
-import gamepad, { runAction } from 'app/lib/gamepad';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import { convertToImperial } from 'app/lib/units';
@@ -18,6 +17,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     IMPERIAL_UNITS,
     LASER_MODE,
+    SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
@@ -28,6 +28,7 @@ import ActiveIndicator from './components/ActiveIndicator';
 import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import useKeybinding from 'app/lib/useKeybinding';
 
 interface SpindleState {
     minimized: boolean;
@@ -145,14 +146,13 @@ const SpindleWidget = () => {
     }, []);
 
     useEffect(() => {
-        const handleGamepadButton = (event: GamepadEvent) =>
-            // @ts-ignore
-            runAction({ event, shuttleControlEvents });
-        gamepad.on('gamepad:button', handleGamepadButton);
-
-        return () => {
-            gamepad.off('gamepad:button', handleGamepadButton);
-        };
+        // const handleGamepadButton = (event: GamepadEvent) =>
+        //     // @ts-ignore
+        //     runAction({ event, shuttleControlEvents });
+        // gamepad.on('gamepad:button', handleGamepadButton);
+        // return () => {
+        //     gamepad.off('gamepad:button', handleGamepadButton);
+        // };
     }, []);
 
     useEffect(() => {
@@ -562,6 +562,57 @@ const SpindleWidget = () => {
             return p;
         },
     };
+
+    const shuttleControlEvents = {
+        TOGGLE_SPINDLE_LASER_MODE: {
+            title: 'Toggle Between Spindle and Laser Mode',
+            keys: '',
+            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => actions.handleModeToggle(),
+        },
+        CW_LASER_ON: {
+            title: 'CW / Laser On',
+            keys: '',
+            cmd: 'CW_LASER_ON',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                state.mode === LASER_MODE
+                    ? actions.sendLaserM3()
+                    : actions.sendM3();
+            },
+        },
+        CCW_LASER_TEST: {
+            title: 'CCW / Laser Test',
+            keys: '',
+            cmd: 'CCW_LASER_TEST',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                state.mode === LASER_MODE
+                    ? actions.runLaserTest()
+                    : actions.sendM4();
+            },
+        },
+        STOP_LASER_OFF: {
+            title: 'Stop / Laser Off',
+            keys: '',
+            cmd: 'STOP_LASER_OFF',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                actions.sendM5();
+            },
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
 
     useRegisterShortcuts([
         {
