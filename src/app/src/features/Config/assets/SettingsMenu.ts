@@ -400,7 +400,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         wizard: LimitSwitchIndicators,
         settings: [
             {
-                label: 'Limits and Homing',
+                label: '',
                 settings: [
                     {
                         type: 'eeprom',
@@ -1067,6 +1067,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Jogging Presets',
                 settings: [],
+            },
+            {
+                label: 'Shortcuts',
+                settings: [
+                    {
+                        label: 'Keyboard',
+                        type: 'api',
+                        description:
+                            'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
+                    },
+                    {
+                        label: 'Gamepad',
+                        type: 'api',
+                        description:
+                            'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
+                    },
+                ],
             },
             {
                 label: 'Visualizer',
