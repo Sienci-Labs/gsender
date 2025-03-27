@@ -374,7 +374,7 @@ const main = () => {
         window.webContents.send("get-data-" + widget);
       });
 
-      ipcMain.on("recieve-data", (event, msg) => {
+      ipcMain.on("receive-data", (event, msg) => {
         const { widget, data } = msg;
         windowManager.childWindows.forEach((window) => {
           window.webContents.send("recieve-data-" + widget, data);

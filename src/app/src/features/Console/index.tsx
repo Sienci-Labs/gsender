@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';
@@ -8,6 +8,7 @@ import TerminalInput from './TerminalInput';
 
 import './styles.css';
 import { ConsolePopout } from 'app/features/Console/components/ConsolePopout.tsx';
+import isElectron from 'is-electron';
 
 type ConsoleProps = {
     isActive: boolean;
@@ -24,6 +25,23 @@ const Console = ({ isActive }: ConsoleProps) => {
             toast.info('Console cleared', { position: 'bottom-left' });
         }
     };
+
+    function registerIPCListeners() {
+        // send state of this console to the new window
+        window.ipcRenderer.on('get-data-console', (event) => {
+            const data = { state: this.state, port: controller.port };
+            window.ipcRenderer.send('receive-data', {
+                widget: 'console',
+                data: data,
+            });
+        });
+    }
+
+    useEffect(() => {
+        if (isElectron()) {
+            registerIPCListeners();
+        }
+    }, []);
 
     return (
         <>

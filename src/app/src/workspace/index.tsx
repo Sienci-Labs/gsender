@@ -20,6 +20,7 @@ const Workspace = () => {
 
     useEffect(() => {
         const { hash } = location;
+        console.log(hash);
         if (hash === '#/remote') {
             navigate('/remote');
         } else if (hash === '#/console') {
