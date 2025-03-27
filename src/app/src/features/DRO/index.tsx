@@ -211,7 +211,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-48 relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (

@@ -22,6 +22,8 @@ const Workspace = () => {
         const { hash } = location;
         if (hash === '#/remote') {
             navigate('/remote');
+        } else if (hash === '#/console') {
+            navigate('/console');
         }
     }, [location]);
 

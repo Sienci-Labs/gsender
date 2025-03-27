@@ -36,6 +36,7 @@ import { noop } from 'lodash';
 import Gamepad from './features/Gamepad';
 import GamepadProfilePage from './features/Gamepad/ProfilePage';
 import { TopBar } from 'app/workspace/TopBar';
+import Console from 'app/features/Console';
 
 export const ReactRoutes = () => {
     return (
@@ -174,6 +175,7 @@ export const ReactRoutes = () => {
                     <Route path="about" element={<About />} />
                 </Route>
             </Route>
+            <Route path="console" element={<Console isActive={true} />}></Route>
             <Route
                 path="remote"
                 element={

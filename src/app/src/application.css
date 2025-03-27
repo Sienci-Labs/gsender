@@ -1391,9 +1391,6 @@ video {
 .min-w-12 {
   min-width: 3rem !important;
 }
-.min-w-16 {
-  min-width: 4rem !important;
-}
 .min-w-20 {
   min-width: 5rem !important;
 }
@@ -1812,6 +1809,9 @@ video {
 }
 .gap-3 {
   gap: 0.75rem !important;
+}
+.gap-36 {
+  gap: 9rem !important;
 }
 .gap-4 {
   gap: 1rem !important;
