@@ -179,6 +179,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Safe Height',
                         key: 'workspace.safeRetractHeight',
                         type: 'number',
+                        unit: 'mm',
                         description:
                             "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
                     },
@@ -333,6 +334,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                         type: 'number',
+                        unit: 'mm',
                     },
                     {
                         label: 'XY Thickness',
@@ -340,6 +342,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                         type: 'number',
+                        unit: 'mm',
                     },
                     {
                         label: 'Z Probe Distance',
@@ -347,6 +350,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                         type: 'number',
+                        unit: 'mm',
                     },
                     {
                         label: 'Fast Find',
@@ -354,6 +358,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Probe speed before the first touch-off (default 150)',
                         type: 'number',
+                        unit: 'mm/min',
                     },
                     {
                         label: 'Slow Find',
@@ -361,6 +366,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Slower speed for more accuracy on second touch-off (default 75)',
                         type: 'number',
+                        unit: 'mm/min',
                     },
                     {
                         label: 'Retraction',
@@ -368,6 +374,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'How far the probe moves away after a successful touch (default 4)',
                         type: 'number',
+                        unit: 'mm',
                     },
                     {
                         label: 'Probe Connection Test',
