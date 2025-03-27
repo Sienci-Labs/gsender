@@ -772,6 +772,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: '',
                     },
                     {
+                        label: 'Laser on during outline',
+                        key: 'widgets.spindle.laser.laserOnOutline',
+                        type: 'boolean',
+                        description:
+                            'See the job position better by turning on the laser at its lowest power while outlining.',
+                    },
+                    {
                         label: 'Laser X Offset',
                         key: 'widgets.spindle.laser.xOffset',
                         description:

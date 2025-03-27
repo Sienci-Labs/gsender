@@ -46,6 +46,7 @@ import {
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
+    LASER_MODE,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -1003,14 +1004,16 @@ class Visualizer extends Component {
                     { type: 'module' },
                 );
 
-                const machineProfile = store.get('workspace.machineProfile');
+                const laserOnOutline = store.get(
+                    'widgets.spindle.laser.laserOnOutline',
+                    false,
+                );
                 const spindleMode = store.get('widgets.spindle.mode');
                 // outline toggled on and currently in laser mode
-                const isLaser =
-                    machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+                const isLaser = laserOnOutline && spindleMode === LASER_MODE;
 
                 outlineWorker.onmessage = ({ data }) => {
-                    outlineResponse({ data }, machineProfile.laserOnOutline);
+                    outlineResponse({ data }, laserOnOutline);
                     // Enable the outline button again
                     this.outlineRunning = false;
                 };

@@ -295,6 +295,7 @@ const defaultState: State = {
             spindleMin: 10000,
             delay: 0,
             laser: {
+                laserOnOutline: false,
                 power: 100,
                 duration: 1,
                 xOffset: 0,
