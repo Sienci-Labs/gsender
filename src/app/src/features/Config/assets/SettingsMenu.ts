@@ -184,6 +184,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
                     },
                     {
+                        label: 'Park Location',
+                        key: 'workspace.park',
+                        type: 'location',
+                        description:
+                            'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
+                    },
+                    {
                         label: 'Send Usage Data',
                         key: '',
                         description:

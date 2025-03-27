@@ -16,6 +16,7 @@ import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import store from 'app/store';
+import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -85,6 +86,8 @@ function returnSettingControl(
             );
         case 'event':
             return <EventInput eventType={setting.eventType} />;
+        case 'location':
+            return <LocationInput value={value as object} onChange={handler} />;
         case 'textarea':
             return (
                 <TextAreaInput
