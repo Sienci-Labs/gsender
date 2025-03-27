@@ -26,24 +26,22 @@ import Button from 'app/components/Button';
 interface MaintenanceEditTaskDialogProps {
     show: boolean;
     toggleShow: (b: boolean) => void;
-    id?: number;
+    currentTask: MaintenanceTask;
 }
 
 export function MaintenanceEditTaskDialog({
     show,
     toggleShow,
-    id = -1,
+    currentTask,
 }: MaintenanceEditTaskDialogProps) {
     const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
         useContext(StatContext);
-    const [task, setTask] = useState<MaintenanceTask>({
-        description: '',
-        rangeStart: null,
-        rangeEnd: null,
-        name: '',
-        currentTime: 0,
-    });
+    const [task, setTask] = useState<MaintenanceTask>(currentTask);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+    useEffect(() => {
+        setTask(currentTask);
+    }, [currentTask]);
 
     const updateTask = (editedTask: MaintenanceTask) => {
         const updatedTasks = maintenanceTasks.map((obj) => {
@@ -97,11 +95,6 @@ export function MaintenanceEditTaskDialog({
         updateTask(payload);
         toggleShow(false);
     }
-
-    useEffect(() => {
-        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
-        setTask(selectedTask);
-    }, [id]);
 
     return (
         <>

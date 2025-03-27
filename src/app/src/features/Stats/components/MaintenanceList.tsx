@@ -66,7 +66,7 @@ export function MaintenanceList() {
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showClearConfirmation, setShowClearConfirmation] = useState(false);
-    const [currentTaskID, setCurrentTaskID] = useState(null);
+    const [currentTask, setCurrentTask] = useState(null);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -213,12 +213,14 @@ export function MaintenanceList() {
     }
 
     function onEdit(id: number) {
-        setCurrentTaskID(id);
+        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
+        setCurrentTask(selectedTask);
         setShowEditForm(true);
     }
 
     function onClear(id: number) {
-        setCurrentTaskID(id);
+        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
+        setCurrentTask(selectedTask);
         setShowClearConfirmation(true);
     }
 
@@ -241,7 +243,7 @@ export function MaintenanceList() {
             <MaintenanceEditTaskDialog
                 show={showEditForm}
                 toggleShow={setShowEditForm}
-                id={currentTaskID}
+                currentTask={currentTask}
             />
             {showClearConfirmation && (
                 <AlertDialog
@@ -255,9 +257,7 @@ export function MaintenanceList() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                                 {'Are you sure you want to reset the maintenance timer for ' +
-                                    maintenanceTasks.find(
-                                        (obj) => obj.id === currentTaskID,
-                                    ).name +
+                                    currentTask.name +
                                     '? Only do this if you have just performed this maintenance task.'}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -267,7 +267,7 @@ export function MaintenanceList() {
                                 onClick={() => {
                                     const updatedTasks = maintenanceTasks.map(
                                         (obj) => {
-                                            if (obj.id === currentTaskID) {
+                                            if (obj.id === currentTask.id) {
                                                 let newObj = obj;
                                                 newObj.currentTime = 0;
                                                 return newObj;
