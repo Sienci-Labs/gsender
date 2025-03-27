@@ -29,6 +29,11 @@ import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.ts
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
 import { LIGHTWEIGHT_OPTIONS } from 'app/constants';
+import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import {
+    GamepadLinkWizard,
+    KeyboardLinkWizard,
+} from 'app/features/Config/components/ShortcutLinkWizards.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -404,10 +409,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'eeprom',
-                        eID: '$5',
-                    },
-                    {
-                        type: 'eeprom',
                         eID: '$22',
                     },
                     {
@@ -731,6 +732,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Laser',
+                wizard: LaserWizard,
                 settings: [
                     {
                         type: 'eeprom',
@@ -787,90 +789,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$736',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        label: 'Jogging Presets',
-        icon: IoMdMove,
-        settings: [
-            {
-                label: 'Rapid',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.rapid.xyStep',
-                        type: 'number',
-                        description: 'Rapid jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.rapid.zStep',
-                        description: 'Rapid jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.rapid.aStep',
-                        description: 'Rapid jogging amount in the A axis.',
-                        type: 'number',
-                        unit: '°',
-                    },
-                ],
-            },
-            {
-                label: 'Normal',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.normal.xyStep',
-                        type: 'number',
-                        description: 'Normal jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.normal.zStep',
-                        description: 'Normal jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.normal.aStep',
-                        description: 'Normal jogging amount in the A axis.',
-                        type: 'number',
-                        unit: '°',
-                    },
-                ],
-            },
-            {
-                label: 'Precise',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.precise.xyStep',
-                        type: 'number',
-                        description: 'Precise jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.precise.zStep',
-                        description: 'Precise jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.precise.aStep',
-                        description: 'Precise jogging amount in the A axis.',
-                        type: 'number',
-                        unit: '°',
                     },
                 ],
             },
@@ -1065,21 +983,121 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Jogging Presets',
-                settings: [],
+                label: 'Rapid Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.rapid.xyStep',
+                        type: 'number',
+                        description: 'Rapid jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.rapid.zStep',
+                        description: 'Rapid jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.rapid.aStep',
+                        description: 'Rapid jogging amount in the A axis.',
+                        type: 'number',
+                        unit: '°',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.rapid.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Normal Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.normal.xyStep',
+                        type: 'number',
+                        description: 'Normal jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.normal.zStep',
+                        description: 'Normal jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.normal.aStep',
+                        description: 'Normal jogging amount in the A axis.',
+                        type: 'number',
+                        unit: '°',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.normal.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Precise Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.precise.xyStep',
+                        type: 'number',
+                        description: 'Precise jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.precise.zStep',
+                        description: 'Precise jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.precise.aStep',
+                        description: 'Precise jogging amount in the A axis.',
+                        type: 'number',
+                        unit: '°',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.precise.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
             },
             {
                 label: 'Shortcuts',
                 settings: [
                     {
                         label: 'Keyboard',
-                        type: 'api',
+                        type: 'wizard',
+                        wizard: KeyboardLinkWizard,
                         description:
                             'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
                     },
                     {
                         label: 'Gamepad',
-                        type: 'api',
+                        type: 'wizard',
+                        wizard: GamepadLinkWizard,
                         description:
                             'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
                     },
