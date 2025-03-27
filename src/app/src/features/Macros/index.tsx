@@ -238,7 +238,6 @@ const MacroWidget = ({
             });
         },
         openEditMacroModal: (id: string) => {
-            console.log('openEditMacroModal', id);
             api.macros.read(id).then((res) => {
                 const { id, name, content, description } = res.data;
                 setEditMacro(res.data);

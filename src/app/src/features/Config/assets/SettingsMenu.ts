@@ -190,10 +190,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Allow gSender to collect your data periodically',
                         type: 'boolean',
                     },
-                    {
-                        type: 'eeprom',
-                        eID: '',
-                    },
                 ],
             },
         ],

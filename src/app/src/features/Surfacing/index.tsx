@@ -68,7 +68,6 @@ const SurfacingTool = () => {
     };
 
     const onChange = (property: string, value: number) => {
-        console.log(value);
         setSurfacing({
             ...surfacing,
             [property]: value,

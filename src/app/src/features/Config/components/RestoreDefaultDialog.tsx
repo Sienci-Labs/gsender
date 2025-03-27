@@ -71,7 +71,6 @@ export function RestoreDefaultDialog({ fileLoaded, handleFileReload }) {
     );
 
     const machineProfile = store.get('workspace.machineProfile', {});
-    console.log(machineProfile);
     const machineName = `${machineProfile.name} ${machineProfile.type}`;
     return (
         <AlertDialog>

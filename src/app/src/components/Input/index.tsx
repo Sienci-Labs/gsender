@@ -33,12 +33,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 )}
                 <div className="relative flex items-center">
                     <ShadcnInput
-                        className={cn('pr-10', inputSize, className)}
+                        className={cn(
+                            'pr-10 text-center text-blue-500',
+                            inputSize,
+                            className,
+                        )}
                         ref={ref}
                         {...props}
                     />
                     {suffix && (
-                        <div className="absolute right-2 flex items-center pointer-events-none text-gray-500">
+                        <div className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-500">
                             {suffix}
                         </div>
                     )}

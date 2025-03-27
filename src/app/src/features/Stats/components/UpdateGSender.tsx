@@ -22,7 +22,6 @@ export function UpdateGSender({
             window.ipcRenderer.on(
                 'update_download_progress',
                 (t, percentage) => {
-                    console.log(percentage);
                     setDownloadPercent(percentage);
                 },
             );
@@ -30,14 +29,12 @@ export function UpdateGSender({
     }, []);
 
     useEffect(() => {
-        console.log(notes);
         setVersion(notes.version);
         setReleaseDate(notes.releaseDate);
         const currentVersionNotes = notes.releaseNotes.find(
             (n) => n.version === notes.version,
         );
 
-        console.log(currentVersionNotes);
         setReleaseNotes(get(currentVersionNotes, 'note', ''));
     }, [notes]);
 

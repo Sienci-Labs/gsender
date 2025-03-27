@@ -19,11 +19,8 @@ const Workspace = () => {
     const location = useLocation();
 
     useEffect(() => {
-        console.log('CALLED NAV');
-        console.log(location);
         const { hash } = location;
         if (hash === '#/remote') {
-            console.log('MATCHED');
             navigate('/remote');
         }
     }, [location]);
