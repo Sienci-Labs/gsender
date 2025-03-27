@@ -1004,7 +1004,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.rapid.aStep',
                         description: 'Rapid jogging amount in the A axis.',
                         type: 'number',
-                        unit: '°',
+                        unit: 'deg',
                     },
                     {
                         label: 'Feedrate',
@@ -1038,7 +1038,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.normal.aStep',
                         description: 'Normal jogging amount in the A axis.',
                         type: 'number',
-                        unit: '°',
+                        unit: 'deg',
                     },
                     {
                         label: 'Feedrate',
@@ -1072,7 +1072,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.axes.jog.precise.aStep',
                         description: 'Precise jogging amount in the A axis.',
                         type: 'number',
-                        unit: '°',
+                        unit: 'deg',
                     },
                     {
                         label: 'Feedrate',
