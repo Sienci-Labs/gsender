@@ -34,6 +34,7 @@ import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
 } from 'app/features/Config/components/ShortcutLinkWizards.tsx';
+import controller from 'app/lib/controller.ts';
 
 export interface SettingsMenuSection {
     label: string;
@@ -77,6 +78,7 @@ export interface gSenderSetting {
     wizard?: () => JSX.Element;
     toolLink?: string;
     toolLinkLabel?: string;
+    disabled?: () => boolean;
 }
 
 export interface gSenderSubSection {
@@ -139,6 +141,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             '9600',
                             '2400',
                         ],
+                        disabled: () => {
+                            return controller.portOpen;
+                        },
                     },
                     {
                         label: 'Reconnect Automatically',

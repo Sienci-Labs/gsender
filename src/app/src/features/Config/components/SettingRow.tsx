@@ -47,6 +47,7 @@ function returnSettingControl(
                     index={index}
                     value={value as string}
                     onChange={handler}
+                    disabled={setting.disabled}
                 />
             );
         case 'number':

@@ -260,6 +260,10 @@ class Controller {
         return !!(this.socket && this.socket.connected);
     }
 
+    get portOpen(): boolean {
+        return this.connected && this.port.length > 0;
+    }
+
     // Establish a connection to the server.
     // @param {string} host
     // @param {object} options
