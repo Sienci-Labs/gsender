@@ -3208,9 +3208,6 @@ video {
 .duration-300 {
   transition-duration: 300ms !important;
 }
-.duration-75 {
-  transition-duration: 75ms !important;
-}
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -3263,9 +3260,6 @@ video {
 }
 .duration-300 {
   animation-duration: 300ms !important;
-}
-.duration-75 {
-  animation-duration: 75ms !important;
 }
 .ease-in-out {
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;

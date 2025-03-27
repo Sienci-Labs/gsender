@@ -49,7 +49,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     color={canClick ? 'primary' : 'disabled'}
                 >
                     <i className="fas fa-redo-alt" />
-                    CW (M3)
+                    For (M3)
                 </Button>
                 <Button
                     onClick={actions.sendM4}
@@ -57,7 +57,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     color={canClick ? 'primary' : 'disabled'}
                 >
                     <i className="fas fa-redo-alt fa-flip-horizontal" />
-                    CCW (M4)
+                    Rev (M4)
                 </Button>
                 <Button
                     onClick={actions.sendM5}
