@@ -88,6 +88,7 @@ export function MaintenanceList() {
                                 alignContent: 'center',
                                 justifyContent: 'center',
                                 // padding: '50% 0px'
+                                textAlign: 'center',
                             }}
                         >
                             {info.renderValue() + ' Hours'}
@@ -120,6 +121,7 @@ export function MaintenanceList() {
                                 alignContent: 'center',
                                 justifyContent: 'center',
                                 height: '100%',
+                                flexDirection: 'column',
                             }}
                         >
                             {info.renderValue()}
@@ -127,8 +129,7 @@ export function MaintenanceList() {
                     );
                 }
             },
-            minSize: 30,
-            maxSize: 30,
+            size: 30,
             invertSorting: true,
             enableSorting: true,
             sortingFn: sortingFns.alphanumeric,
@@ -151,6 +152,15 @@ export function MaintenanceList() {
                         <span>{info.cell.row.original.description}</span>
                     </div>
                 );
+            },
+            enableSorting: false,
+            size: 500,
+        },
+        {
+            accessorKey: 'description',
+            header: () => null,
+            cell: (_info) => {
+                return <></>;
             },
             enableSorting: false,
         },
@@ -188,8 +198,7 @@ export function MaintenanceList() {
                 );
             },
             enableSorting: false,
-            minSize: 15,
-            maxSize: 15,
+            size: 30,
         },
     ];
 
@@ -224,6 +233,8 @@ export function MaintenanceList() {
                 sortBy={sortBy}
                 onAdd={onAdd}
                 pagination={false}
+                searchPlaceholder="Search Tasks..."
+                columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on
             />
             <MaintenanceAddTaskDialog
                 show={showAddForm}
