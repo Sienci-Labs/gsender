@@ -9,6 +9,16 @@ import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
 import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from 'app/components/shadcn/AlertDialog';
 
 interface FormattedTask {
     id: number;
@@ -51,11 +61,12 @@ function formatTasks(data: MaintenanceTask[]) {
 }
 
 export function MaintenanceList() {
-    const { maintenanceTasks } = useContext(StatContext);
+    const { maintenanceTasks, maintenanceActions } = useContext(StatContext);
     const [formattedData, setFormattedData] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
-    const [editID, setEditID] = useState(-1);
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false);
+    const [currentTaskID, setCurrentTaskID] = useState(null);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -154,7 +165,11 @@ export function MaintenanceList() {
                             textAlign: 'center',
                         }}
                     >
-                        <button onClick={() => console.log('clear')}>
+                        <button
+                            onClick={() => {
+                                onClear(info.cell.row.original.id);
+                            }}
+                        >
                             <Icon
                                 path={mdiCheckOutline}
                                 size={1.5}
@@ -190,8 +205,14 @@ export function MaintenanceList() {
     }
 
     function onEdit(id: number) {
-        setEditID(id);
+        console.log('on edit id: ' + id);
+        setCurrentTaskID(id);
         setShowEditForm(true);
+    }
+
+    function onClear(id: number) {
+        setCurrentTaskID(id);
+        setShowClearConfirmation(true);
     }
 
     return (
@@ -211,8 +232,49 @@ export function MaintenanceList() {
             <MaintenanceEditTaskDialog
                 show={showEditForm}
                 toggleShow={setShowEditForm}
-                id={editID}
+                id={currentTaskID}
             />
+            {showClearConfirmation && (
+                <AlertDialog
+                    open={showClearConfirmation}
+                    onOpenChange={setShowClearConfirmation}
+                >
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Reset Maintenance Timer
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {'Are you sure you want to reset the maintenance timer for ' +
+                                    maintenanceTasks.find(
+                                        (obj) => obj.id === currentTaskID,
+                                    ).name +
+                                    '? Only do this if you have just performed this maintenance task.'}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>No</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={() => {
+                                    const updatedTasks = maintenanceTasks.map(
+                                        (obj) => {
+                                            if (obj.id === currentTaskID) {
+                                                let newObj = obj;
+                                                newObj.currentTime = 0;
+                                                return newObj;
+                                            }
+                                            return obj;
+                                        },
+                                    );
+                                    maintenanceActions.update(updatedTasks);
+                                }}
+                            >
+                                Yes
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </div>
     );
 }
