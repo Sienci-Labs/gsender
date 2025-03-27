@@ -10,6 +10,8 @@ interface BooleanSettingInputProps {
 export function BooleanSettingInput({
     value = false,
     onChange,
+    disabled = () => false,
 }: BooleanSettingInputProps) {
-    return <Toggle checked={value} onChange={onChange} />;
+    const isDisabled = disabled();
+    return <Toggle checked={value} onChange={onChange} disabled={isDisabled} />;
 }

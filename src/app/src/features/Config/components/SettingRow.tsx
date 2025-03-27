@@ -38,6 +38,7 @@ function returnSettingControl(
                     value={value as boolean}
                     index={index}
                     onChange={handler}
+                    disabled={setting.disabled}
                 />
             );
         case 'select':

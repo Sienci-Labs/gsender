@@ -35,6 +35,7 @@ import {
     KeyboardLinkWizard,
 } from 'app/features/Config/components/ShortcutLinkWizards.tsx';
 import controller from 'app/lib/controller.ts';
+import get from 'lodash/get';
 
 export interface SettingsMenuSection {
     label: string;
@@ -168,10 +169,30 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Prompt when setting zero',
-                        key: 'widgets.visualizer.showSoftLimitWarning',
+                        key: 'workspace.shouldWarnZero',
                         description:
                             'Useful if you tend to set zero accidentally',
                         type: 'boolean',
+                    },
+                    {
+                        label: 'Warn if beyond soft limits',
+                        key: 'widgets.visualizer.showSoftLimitWarning',
+                        description:
+                            'Be told if your file exceeds your machine limits based on the current zero point (homing and soft limits must be enabled)',
+                        type: 'boolean',
+                        disabled: () => {
+                            const connected = controller.portOpen;
+                            if (!connected) {
+                                return true; // disabled when not connected.
+                            }
+                            const c_settings = get(
+                                controller,
+                                'settings.settings',
+                                {},
+                            );
+                            const $20 = Number(get(c_settings, '$20', 0));
+                            return $20 === 0;
+                        },
                     },
                     {
                         label: 'Enable popup for Job End & Maintenance Alerts',
