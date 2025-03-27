@@ -2653,6 +2653,9 @@ video {
 .pl-24 {
   padding-left: 6rem !important;
 }
+.pl-3 {
+  padding-left: 0.75rem !important;
+}
 .pl-4 {
   padding-left: 1rem !important;
 }
@@ -2667,6 +2670,9 @@ video {
 }
 .pr-2 {
   padding-right: 0.5rem !important;
+}
+.pr-3 {
+  padding-right: 0.75rem !important;
 }
 .pr-4 {
   padding-right: 1rem !important;
@@ -2818,9 +2824,6 @@ video {
 }
 .tracking-tight {
   letter-spacing: -0.025em !important;
-}
-.tracking-wide {
-  letter-spacing: 0.025em !important;
 }
 .tracking-wider {
   letter-spacing: 0.05em !important;

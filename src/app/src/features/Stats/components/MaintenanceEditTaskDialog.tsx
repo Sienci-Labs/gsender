@@ -21,6 +21,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from 'app/components/shadcn/AlertDialog';
+import Button from 'app/components/Button';
 
 interface MaintenanceEditTaskDialogProps {
     show: boolean;
@@ -105,20 +106,20 @@ export function MaintenanceEditTaskDialog({
     return (
         <>
             <Dialog open={show} onOpenChange={toggleShow}>
-                <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col justify-center items-center">
+                <DialogContent className="bg-white w-1/2">
                     <DialogHeader>
                         <DialogTitle>Edit Task</DialogTitle>
                     </DialogHeader>
-                    <form className="w-full max-w-lg" onSubmit={handleSubmit}>
+                    <form className="w-full" onSubmit={handleSubmit}>
                         <MaintenanceTaskForm task={task} />
                         <div className="w-full -mx-3 mb-2 p-2 flex flex-row-reverse gap-4">
-                            <button
+                            <Button
                                 type="submit"
                                 className={buttonStyle({ colors: 'primary' })}
                             >
                                 Save
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 className={buttonStyle({ colors: 'secondary' })}
                                 type="button"
                                 onClick={(e) => {
@@ -127,14 +128,14 @@ export function MaintenanceEditTaskDialog({
                                 }}
                             >
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 type="button"
                                 className={buttonStyle({ colors: 'danger' })}
                                 onClick={(_e) => onDelete()}
                             >
                                 Delete
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </DialogContent>
