@@ -15,8 +15,6 @@ export function MaintenanceTaskForm({ task }: Props) {
         hasValue ? task.rangeStart : 0,
     );
     const [rangeEnd, setRangeEnd] = useState(hasValue ? task.rangeEnd : 1);
-    console.log(task);
-    console.log(name);
 
     useEffect(() => {
         if (task) {

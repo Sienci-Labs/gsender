@@ -37,9 +37,9 @@ function determineTime(task: MaintenanceTask) {
         return 'Due';
     } else {
         return (
-            <div>
+            <div className="flex flex-col items-center text-center justify-center">
                 <Icon path={mdiAlert} size={1} />
-                {' Urgent!'}
+                {'Urgent!'}
             </div>
         );
     }
@@ -121,7 +121,6 @@ export function MaintenanceList() {
                                 alignContent: 'center',
                                 justifyContent: 'center',
                                 height: '100%',
-                                flexDirection: 'column',
                             }}
                         >
                             {info.renderValue()}
@@ -214,7 +213,6 @@ export function MaintenanceList() {
     }
 
     function onEdit(id: number) {
-        console.log('on edit id: ' + id);
         setCurrentTaskID(id);
         setShowEditForm(true);
     }

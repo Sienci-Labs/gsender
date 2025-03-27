@@ -85,12 +85,12 @@ export function MaintenanceEditTaskDialog({
         const name = target.taskName.value;
 
         const payload = {
-            id: id,
+            id: task.id,
             description,
             rangeStart,
             rangeEnd,
             name,
-            currentTime: 0,
+            currentTime: task.currentTime,
         };
 
         updateTask(payload);
