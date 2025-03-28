@@ -29,7 +29,7 @@ export function Alarms() {
         <div className="grid grid-cols-6 grid-rows-6 gap-4">
             <div className="col-span-4 row-span-6 px-8 mb-2">
                 <StatCard>
-                    <CardHeader>Errors and Alarms</CardHeader>
+                    <CardHeader>Alarms & Errors</CardHeader>
                     <AlarmListing />
                 </StatCard>
             </div>
@@ -39,7 +39,7 @@ export function Alarms() {
                     <Diagnostic />
                 </StatCard>
                 <StatCard>
-                    <CardHeader>Clear Alarm List</CardHeader>
+                    <CardHeader>Clear Alarms & Errors</CardHeader>
                     <div className="flex flex-col gap-4">
                         <p className="text-gray-600 text-sm">
                             Clear all prior alarms and errors. This action
