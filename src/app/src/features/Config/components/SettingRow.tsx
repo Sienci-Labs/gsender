@@ -15,6 +15,7 @@ import { EventInput } from 'app/features/Config/components/SettingInputs/EventIn
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
+import store from 'app/store';
 
 interface SettingRowProps {
     setting: gSenderSetting;

@@ -195,6 +195,9 @@ const merge = (base: any, saved: any): any => {
 
     // if they are both not objects, use saved. migration will be made later if needed
     if ((!baseIsObject || baseIsArray) && (!savedIsObject || savedIsArray)) {
+        if (saved === undefined) { // but if the saved version doesnt exist, use base
+            return base;
+        }
         return saved;
         // if one is an object and the other isn't, then default structure changed, so use base
     } else if (!baseIsObject || baseIsArray || !savedIsObject || savedIsArray) {

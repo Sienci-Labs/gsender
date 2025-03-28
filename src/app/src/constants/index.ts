@@ -433,6 +433,13 @@ export const MACHINE_CONTROL_BUTTONS = {
     STOP: STOP,
 };
 
+export const LIGHT = 'Light';
+export const EVERYTHING = 'Everything';
+export const LIGHTWEIGHT_OPTIONS = {
+    LIGHT: LIGHT,
+    EVERYTHING: EVERYTHING
+};
+
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",
 //     HUANYANG_V1: "Huanyang v1",
