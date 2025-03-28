@@ -31,7 +31,7 @@ export function SpeedSelectButton({
 }
 
 interface SpeedSelectorProps {
-    handleClick: (values: JogValueObject, speed: JoggingSpeedOptions) => void;
+    handleClick: (values: JogValueObject) => void;
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
@@ -97,7 +97,6 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     const preciseActive = selectedSpeed === 'Precise';
 
     function handleSpeedClick(speed: JoggingSpeedOptions) {
-        // save old values to config
         setSelectedSpeed(speed);
     }
 
@@ -105,7 +104,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         const jogValues = store.get('widgets.axes.jog', {});
         const key = selectedSpeed.toLowerCase();
         const newSpeeds = get(jogValues, key, {});
-        handleClick(newSpeeds, selectedSpeed);
+        handleClick(newSpeeds);
     }
 
     // Any time the value swaps, fetch and update the parent

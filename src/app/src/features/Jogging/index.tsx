@@ -9,10 +9,7 @@ import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
-import {
-    cancelJog,
-    JoggingSpeedOptions,
-} from 'app/features/Jogging/utils/Jogging.ts';
+import { cancelJog } from 'app/features/Jogging/utils/Jogging.ts';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from 'app/store/redux';
 import {
@@ -24,7 +21,6 @@ import {
 import stopSign from './assets/stop.svg';
 import jogWheeelLabels from './assets/labels.svg';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import debounce from 'lodash/debounce';
 import cx from 'classnames';
 export interface JogValueObject {
     xyStep: number;
@@ -32,14 +28,6 @@ export interface JogValueObject {
     zStep: number;
     feedrate: number;
 }
-
-const debouncedSaveJogSpeed = debounce(
-    (jogSpeed: JogValueObject, selectedSpeed: JoggingSpeedOptions) => {
-        const key = selectedSpeed.toLowerCase();
-        store.replace(`widgets.axes.jog.${key}`, jogSpeed);
-    },
-    500,
-);
 
 export function Jogging() {
     const { mode } = useWorkspaceState();
@@ -74,8 +62,6 @@ export function Jogging() {
         aStep: 0,
         feedrate: 0,
     });
-    const [selectedSpeed, setSelectedSpeed] =
-        useState<JoggingSpeedOptions>('Normal');
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     useEffect(() => {
@@ -90,11 +76,7 @@ export function Jogging() {
         });
     }, []);
 
-    function updateJogValues(
-        values: JogValueObject,
-        speed: JoggingSpeedOptions,
-    ) {
-        setSelectedSpeed(speed);
+    function updateJogValues(values: JogValueObject) {
         setJogSpeed(values);
     }
     function updateXYStep(step: number) {
@@ -105,7 +87,6 @@ export function Jogging() {
             feedrate: jogSpeed.feedrate,
         };
         setJogSpeed(newJogSpeed);
-        debouncedSaveJogSpeed(newJogSpeed, selectedSpeed);
     }
     function updateZStep(step: number) {
         const newJogSpeed = {
@@ -115,7 +96,6 @@ export function Jogging() {
             feedrate: jogSpeed.feedrate,
         };
         setJogSpeed(newJogSpeed);
-        debouncedSaveJogSpeed(newJogSpeed, selectedSpeed);
     }
     function updateAStep(step: number) {
         const newJogSpeed = {
@@ -125,7 +105,6 @@ export function Jogging() {
             feedrate: jogSpeed.feedrate,
         };
         setJogSpeed(newJogSpeed);
-        debouncedSaveJogSpeed(newJogSpeed, selectedSpeed);
     }
     function updateFeedrate(frate: number) {
         const newJogSpeed = {
@@ -135,7 +114,6 @@ export function Jogging() {
             feedrate: frate,
         };
         setJogSpeed(newJogSpeed);
-        debouncedSaveJogSpeed(newJogSpeed, selectedSpeed);
     }
 
     const isRotaryMode = mode === 'ROTARY';
