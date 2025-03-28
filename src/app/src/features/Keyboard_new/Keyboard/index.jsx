@@ -27,7 +27,11 @@ import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import Mousetrap from 'mousetrap';
 
-import { ALL_CATEGORY, USAGE_TOOL_NAME } from 'app/constants';
+import {
+    ALL_CATEGORY,
+    USAGE_TOOL_NAME,
+    SHORTCUT_CATEGORY,
+} from 'app/constants';
 import store from 'app/store';
 import Button from 'app/components/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
@@ -39,6 +43,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import { formatShortcut } from '../helpers';
 
 import CategoryFilter from '../CategoryFilter';
 import ShortcutsTable from '../ShortcutsTable';
@@ -56,6 +61,35 @@ const Keyboard = () => {
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+
+    const formatShortcutForPrint = (shortcut) => {
+        if (!shortcut) return '';
+        return shortcut
+            .split('+')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' + ');
+    };
+
+    const getCategoryData = (category) => {
+        const categoryColors = {
+            GENERAL_CATEGORY: 'bg-blue-100 text-blue-800',
+            JOGGING_CATEGORY: 'bg-green-100 text-green-800',
+            VISUALIZER_CATEGORY: 'bg-orange-100 text-orange-800',
+            TOOLBAR_CATEGORY: 'bg-pink-100 text-pink-800',
+            COOLANT_CATEGORY: 'bg-cyan-100 text-cyan-800',
+            MACRO_CATEGORY: 'bg-purple-100 text-purple-800',
+            PROBING_CATEGORY: 'bg-red-100 text-red-800',
+            SPINDLE_LASER_CATEGORY: 'bg-yellow-100 text-yellow-800',
+            CARVING_CATEGORY: 'bg-green-100 text-green-800',
+            OVERRIDES_CATEGORY: 'bg-blue-100 text-blue-800',
+            LOCATION_CATEGORY: 'bg-gray-100 text-gray-800',
+        };
+
+        return {
+            color: categoryColors[category] || 'bg-gray-100 text-gray-800',
+            label: SHORTCUT_CATEGORY[category] || category,
+        };
+    };
 
     // Initialize shortcuts from allShuttleControlEvents if they're not in store
     useEffect(() => {
@@ -266,16 +300,23 @@ const Keyboard = () => {
         const shortcutsByCategory = {};
 
         Object.values(shortcutsList)
-            .filter((s) => s.isActive && s.currentKeys)
+            .filter((s) => s.isActive && s.keys)
             .forEach((shortcut) => {
-                const categoryKey = shortcut.category;
+                // Get the shortcut data from allShuttleControlEvents if available
+                const shortcutData =
+                    allShuttleControlEvents[shortcut.cmd] || shortcut;
+                const categoryKey = shortcutData.category;
                 const categoryName = getCategoryData(categoryKey).label;
 
                 if (!shortcutsByCategory[categoryName]) {
                     shortcutsByCategory[categoryName] = [];
                 }
 
-                shortcutsByCategory[categoryName].push(shortcut);
+                shortcutsByCategory[categoryName].push({
+                    ...shortcut,
+                    title: shortcutData.title || shortcut.cmd,
+                    category: categoryKey,
+                });
             });
 
         try {
@@ -318,7 +359,7 @@ const Keyboard = () => {
                 `;
 
                     categoryShortcuts.forEach((shortcut) => {
-                        const keys = formatShortcut(shortcut.currentKeys);
+                        const keys = formatShortcutForPrint(shortcut.keys);
                         printContent += `
                         <div class="shortcut">
                             <div class="shortcut-info">
@@ -349,82 +390,86 @@ const Keyboard = () => {
                             body {
                                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                                 margin: 0;
-                                padding: 20px;
+                                padding: 15px;
                                 color: #333;
                             }
                             
                             .header {
                                 text-align: center;
-                                margin-bottom: 30px;
-                                padding-bottom: 15px;
-                                border-bottom: 2px solid #eaeaea;
+                                margin-bottom: 20px;
+                                padding-bottom: 10px;
+                                border-bottom: 1px solid #eaeaea;
                             }
                             
                             .header h1 {
                                 margin: 0;
-                                font-size: 28px;
+                                font-size: 24px;
                             }
                             
                             .subtitle {
                                 color: #666;
-                                margin-top: 5px;
+                                margin-top: 3px;
+                                font-size: 12px;
                             }
                             
                             .category {
-                                margin-bottom: 30px;
+                                margin-bottom: 15px;
                                 page-break-inside: avoid;
                             }
                             
                             .category-header {
-                                padding: 8px 15px;
-                                border-radius: 4px;
-                                margin-bottom: 15px;
+                                padding: 4px 8px;
+                                border-radius: 3px;
+                                margin-bottom: 8px;
                             }
                             
                             .category-header h2 {
                                 margin: 0;
-                                font-size: 18px;
+                                font-size: 14px;
                                 font-weight: 600;
                             }
                             
                             .shortcuts {
                                 display: grid;
-                                grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-                                gap: 15px;
+                                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                                gap: 8px;
                             }
                             
                             .shortcut {
                                 display: flex;
                                 justify-content: space-between;
                                 align-items: center;
-                                padding: 10px 15px;
+                                padding: 6px 8px;
                                 border: 1px solid #eaeaea;
-                                border-radius: 4px;
+                                border-radius: 3px;
                                 background-color: #fafafa;
+                                font-size: 12px;
                             }
                             
                             .shortcut-info {
                                 flex: 1;
+                                margin-right: 8px;
                             }
                             
                             .shortcut-title {
                                 font-weight: 500;
+                                margin-bottom: 2px;
                             }
                             
                             .shortcut-description {
-                                font-size: 12px;
+                                font-size: 11px;
                                 color: #666;
-                                margin-top: 3px;
                             }
                             
                             .shortcut-keys {
                                 font-family: monospace;
                                 background-color: #f1f5f9;
-                                padding: 5px 10px;
-                                border-radius: 4px;
+                                padding: 3px 6px;
+                                border-radius: 3px;
                                 border: 1px solid #e2e8f0;
                                 font-weight: 600;
                                 white-space: nowrap;
+                                font-size: 11px;
                             }
                             
                             /* Category colors */
@@ -440,27 +485,43 @@ const Keyboard = () => {
                             
                             @media print {
                                 body {
-                                    font-size: 11px;
+                                    font-size: 10px;
+                                    padding: 10px;
                                 }
                                 
                                 .header h1 {
-                                    font-size: 22px;
+                                    font-size: 18px;
                                 }
                                 
                                 .category-header h2 {
-                                    font-size: 16px;
+                                    font-size: 12px;
                                 }
                                 
                                 .shortcuts {
-                                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                                    gap: 6px;
                                 }
                                 
                                 .shortcut {
-                                    break-inside: avoid;
+                                    padding: 4px 6px;
+                                    font-size: 10px;
+                                }
+                                
+                                .shortcut-title {
+                                    font-size: 10px;
+                                }
+                                
+                                .shortcut-description {
+                                    font-size: 9px;
+                                }
+                                
+                                .shortcut-keys {
+                                    font-size: 9px;
+                                    padding: 2px 4px;
                                 }
                                 
                                 @page {
-                                    margin: 1cm;
+                                    margin: 0.5cm;
                                 }
                             }
                         </style>
@@ -486,6 +547,10 @@ const Keyboard = () => {
     return (
         <div className="flex flex-col gap-4 h-full dark:text-white">
             <div className="flex gap-4 justify-end">
+                <Button onClick={handlePrintShortcuts}>
+                    <i className="fas fa-print" />
+                    Print Shortcuts
+                </Button>
                 <Button
                     onClick={enableAllShortcuts}
                     disabled={allShortcutsEnabled}
