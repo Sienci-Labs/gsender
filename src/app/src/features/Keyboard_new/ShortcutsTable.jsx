@@ -198,7 +198,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 </TableHeader>
                 <TableBody>
                     {dataSet.map((row) => (
-                        <TableRow key={row.id}>
+                        <TableRow key={row.cmd}>
                             <TableCell>{renderTitleCell(row)}</TableCell>
                             <TableCell>{renderShortcutCell(row)}</TableCell>
                             <TableCell>{renderCategoryCell(row)}</TableCell>
