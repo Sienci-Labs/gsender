@@ -159,7 +159,7 @@ export function SettingRow({
     //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
         <div
-            className={cn('p-2 flex flex-row items-center text-gray-700', {
+            className={cn('p-2 flex flex-row items-center text-gray-700 border-b border-gray-200', {
                 hidden: isHidden,
             })}
         >
