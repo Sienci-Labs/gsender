@@ -14,8 +14,8 @@ import {
 } from 'app/features/DRO/utils/RapidPosition';
 import get from 'lodash/get';
 import { LOCATION_CATEGORY } from 'app/constants';
-import { useEffect } from 'react';
 import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 export function RapidPositionButtons() {
     const homingFlag = useSelector(
@@ -27,10 +27,6 @@ export function RapidPositionButtons() {
     const pullOff = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$27', 1);
     });
-
-    useEffect(() => {
-        useKeybinding(shuttleControlEvents);
-    }, []);
 
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
@@ -84,6 +80,9 @@ export function RapidPositionButtons() {
             callback: () => jogToCorner(FRONT_RIGHT),
         },
     };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     return (
         <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform">
