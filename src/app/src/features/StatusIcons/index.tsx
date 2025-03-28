@@ -8,8 +8,6 @@ import { FaRegKeyboard } from 'react-icons/fa6';
 import { RemoteModeDialog } from 'app/features/RemoteMode';
 import actions from 'app/features/RemoteMode/apiActions.ts';
 
-import DarkMode from '../DarkMode';
-
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
     const [headlessSettings, setHeadlessSettings] = useState({});
@@ -87,8 +85,6 @@ const StatusIcons = () => {
                 remotePort={headlessSettings.port}
                 remoteOn={headlessSettings.headlessStatus}
             />
-
-            <DarkMode />
         </div>
     );
 };
