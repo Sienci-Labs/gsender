@@ -2,6 +2,7 @@ import { createContext, ReactNode, useEffect, useState } from 'react';
 import api from 'app/api';
 import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { JOB_STATUS, JOB_TYPES } from 'app/constants';
+import { AxiosResponse } from 'axios';
 
 type EventType = 'ALARM' | 'ERROR';
 export type JOB_TYPES_T = (typeof JOB_TYPES)[keyof typeof JOB_TYPES];
@@ -54,6 +55,11 @@ const initialState: {
     alarms: FirmwareEvent[];
     maintenanceTasks: MaintenanceTask[];
     jobAggregate: JobAggregate;
+    maintenanceActions?: {
+        update: (
+            newTasks: MaintenanceTask[],
+        ) => Promise<AxiosResponse<any, any>>;
+    };
     setAlarms?: React.Dispatch<React.SetStateAction<FirmwareEvent[]>>;
     setMaintenanceTasks?: React.Dispatch<React.SetStateAction<any[]>>;
 } = {
@@ -96,11 +102,24 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         fetchMaintenance().catch((e) => console.error(e));
     }, []);
 
+    const maintenanceActions = {
+        update: async (newTasks: MaintenanceTask[]) => {
+            try {
+                let res = await api.maintenance.update(newTasks);
+                return res;
+            } catch (error) {
+                console.log(error);
+            }
+            return null;
+        },
+    };
+
     const payload = {
         jobs,
         jobAggregate,
         alarms,
         maintenanceTasks,
+        maintenanceActions,
         setAlarms,
         setMaintenanceTasks,
     };

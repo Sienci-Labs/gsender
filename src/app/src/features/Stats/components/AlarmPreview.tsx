@@ -22,7 +22,7 @@ export function AlarmPreview() {
     return (
         <StatCard>
             <CardHeader link={'/stats/alarms'} linkLabel={'View all'}>
-                Alarms and Errors
+                Alarms & Errors
             </CardHeader>
             <div className="flex flex-col gap-2 justify-around">
                 {shortlist.length == 0 && <EmptyAlarmList />}

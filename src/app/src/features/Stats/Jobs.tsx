@@ -40,6 +40,7 @@ const columnData: CustomColumnDef<Job, any>[] = [
                 </>
             );
         },
+        size: 400,
     },
     {
         accessorKey: 'duration',
@@ -48,14 +49,12 @@ const columnData: CustomColumnDef<Job, any>[] = [
             const ms = Number(info.renderValue());
             return convertMillisecondsToTimeStamp(ms);
         },
-        minSize: 55,
-        maxSize: 55,
+        size: 90,
     },
     {
         accessorKey: 'totalLines',
         header: () => '# Lines',
-        minSize: 50,
-        maxSize: 50,
+        size: 50,
     },
     {
         accessorKey: 'startTime',
@@ -73,8 +72,7 @@ const columnData: CustomColumnDef<Job, any>[] = [
                 </>
             );
         },
-        minSize: 90,
-        maxSize: 90,
+        size: 100,
     },
     {
         accessorKey: 'jobStatus',
@@ -86,15 +84,14 @@ const columnData: CustomColumnDef<Job, any>[] = [
                 <Icon path={mdiClose} size={1} />
             );
         },
-        minSize: 50,
-        maxSize: 50,
+        size: 20,
     },
 ];
 
 export function Jobs() {
     const { jobs } = useContext(StatContext);
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full h-full">
             <div className="col-span-4 row-span-6 px-8 mb-2">
                 <StatCard>
                     <SortableTable
