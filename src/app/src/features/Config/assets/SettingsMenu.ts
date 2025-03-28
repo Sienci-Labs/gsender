@@ -29,7 +29,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { LIGHTWEIGHT_OPTIONS } from 'app/constants';
+import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -218,6 +218,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'location',
                         description:
                             'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
+                    },
+                    {
+                        label: 'Default Firmware',
+                        type: 'select',
+                        key: 'workspace.defaultFirmware',
+                        description:
+                            'If automatic detection of firmware fails on connection, this lets you decide which firmware flavour should gSender use as a default.',
+                        options: [GRBL, GRBLHAL],
                     },
                     {
                         label: 'Send Usage Data',

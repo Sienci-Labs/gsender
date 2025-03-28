@@ -87,14 +87,17 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
-        const { baudrate, rtscts, network } = { ...options };
+        const { baudrate, rtscts, network, defaultFirmware } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
             rtscts: !!rtscts,
+            defaultFirmware,
             network,
         };
+        console.log('FINAL');
+        console.log(this.options);
         this.callback = callback;
         this.engine = engine;
 
@@ -185,10 +188,10 @@ class Connection extends EventEmitter {
                 log.debug('setting interval');
                 this.timeout = setInterval(() => {
                     if (this.count === 5) {
-                        this.controllerType = GRBL;
+                        this.controllerType = this.options.defaultFirmware;
                         this.emit(
                             'firmwareFound',
-                            GRBL,
+                            this.options.defaultFirmware,
                             this.options,
                             this.callback,
                         );

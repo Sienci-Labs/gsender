@@ -32,18 +32,19 @@ export interface Workspace {
     timeSpentRunning: number;
     longestTimeRun: number;
     spindleFunctions: boolean;
+    firmwareDefault: string;
     park: object;
     jobTimes: number[];
     toolChange: {
         passthrough: boolean;
     };
     toolChangeOption:
-    | 'Ignore'
-    | 'Pause'
-    | 'Standard Re-zero'
-    | 'Flexible Re-zero'
-    | 'Fixed Tool Sensor'
-    | 'Code';
+        | 'Ignore'
+        | 'Pause'
+        | 'Standard Re-zero'
+        | 'Flexible Re-zero'
+        | 'Fixed Tool Sensor'
+        | 'Code';
     toolChangePosition: BasicPosition;
     toolChangeHooks: {
         preHook: string;
