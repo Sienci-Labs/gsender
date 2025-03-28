@@ -15,6 +15,7 @@ import { GAMEPAD_MODAL } from '../../utils/constants';
 
 import { get } from 'lodash';
 import classNames from 'classnames';
+import { Input } from 'app/components/Input';
 
 const ButtonActionsTable = () => {
     const {
@@ -118,9 +119,9 @@ const ButtonActionsTable = () => {
 
             if (buttonIsPressed) {
                 return (
-                    <input
+                    <Input
                         defaultValue={row.label}
-                        className="bg-green-500 border-green-500 text-white p-1 w-full rounded"
+                        className="bg-green-500 border-green-500 text-white p-1 w-full rounded dark:bg-dark dark:text-white"
                         onBlur={(e) =>
                             handleButtonLabelChange(row.value, e.target.value)
                         }
@@ -129,7 +130,7 @@ const ButtonActionsTable = () => {
             }
 
             return (
-                <input
+                <Input
                     defaultValue={row.label}
                     className="bg-white border border-gray-300 p-1 w-full rounded"
                     onBlur={(e) =>
@@ -162,8 +163,8 @@ const ButtonActionsTable = () => {
                 macros.find((el) => el.cmd === action);
 
             return (
-                <div className="flex justify-between items-center p-2 border border-gray-300 rounded">
-                    <div className="w-full truncate">
+                <div className="flex justify-between items-center p-2 border border-gray-300 rounded dark:border-gray-700">
+                    <div className="w-full truncate dark:text-white">
                         {event?.title ?? action}
                     </div>
 
@@ -221,7 +222,7 @@ const ButtonActionsTable = () => {
         modifier: (_, row) => {
             return (
                 <div className="flex justify-between items-center p-2">
-                    <div>Activate 2nd Actions</div>
+                    <div className="dark:text-white">Activate 2nd Actions</div>
                     <FaTrash
                         role="button"
                         tabIndex={-1}
@@ -261,7 +262,7 @@ const ButtonActionsTable = () => {
         if (button.value === modifierButton) {
             return (
                 <td
-                    className={`p-2 ${buttonIsPressed ? activeStyles : inactiveStyles}`}
+                    className={`p-2 ${buttonIsPressed ? activeStyles : inactiveStyles} dark:text-white dark:bg-dark`}
                     colSpan={2}
                 >
                     {render.modifier(null, button)}
@@ -306,23 +307,23 @@ const ButtonActionsTable = () => {
     };
 
     return (
-        <table className="w-full border-collapse">
-            <thead>
+        <table className="w-full border-collapse dark:bg-dark">
+            <thead className="dark:text-white">
                 <tr>
                     <th
-                        className="text-left p-2 bg-gray-100 border-b border-gray-300"
+                        className="text-left p-2 bg-gray-100 border-b border-gray-300 dark:bg-dark dark:text-white"
                         style={{ width: '20%', minWidth: '80px' }}
                     >
                         Button
                     </th>
                     <th
-                        className="text-left p-2 bg-gray-100 border-b border-gray-300"
+                        className="text-left p-2 bg-gray-100 border-b border-gray-300 dark:bg-dark dark:text-white"
                         style={{ width: '40%' }}
                     >
                         Action
                     </th>
                     <th
-                        className="text-left p-2 bg-gray-100 border-b border-gray-300"
+                        className="text-left p-2 bg-gray-100 border-b border-gray-300 dark:bg-dark dark:text-white"
                         style={{ width: '40%' }}
                     >
                         2nd Action
@@ -332,7 +333,10 @@ const ButtonActionsTable = () => {
 
             <tbody>
                 {buttonsArr.map((button) => (
-                    <tr key={button.value} className="border-b border-gray-200">
+                    <tr
+                        key={button.value}
+                        className="border-b border-gray-200 dark:border-gray-700"
+                    >
                         <td className="p-2">{render.button(null, button)}</td>
 
                         <Action button={button} />

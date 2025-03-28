@@ -91,7 +91,7 @@ const Profile = ({ data }) => {
                 <input
                     type="text"
                     value={name}
-                    className="rounded text-3xl font-bold hover:border-gray-400 focus:border-gray-400"
+                    className="rounded text-3xl font-bold hover:border-gray-400 focus:border-gray-400 dark:bg-dark dark:text-white"
                     onChange={(e) => setName(e.target.value)}
                     onBlur={handleEditName}
                 />
@@ -117,21 +117,25 @@ const Profile = ({ data }) => {
                 </Button>
             </div>
 
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-4 ">
                 <div className="w-3/5 flex flex-col gap-2">
-                    <h3 className="text-2xl font-bold">Button Actions</h3>
-                    <p>
+                    <h3 className="text-2xl font-bold dark:text-white">
+                        Button Actions
+                    </h3>
+                    <p className="dark:text-white">
                         Assign a &quot;Lockout&quot; button for gamepad safety,
                         or a &quot;2nd Action&quot; button to use like a
                         Function key and give your gamepad double the functions!
                     </p>
-                    <div className="overflow-y-auto h-[400px] bg-white rounded border border-gray-300">
+                    <div className="overflow-y-auto h-[400px] bg-white rounded border border-gray-300 dark:bg-dark dark:border-gray-700">
                         <ButtonActionsTable />
                     </div>
                 </div>
 
                 <div className="w-2/5">
-                    <h3 className="text-2xl font-bold">Joystick Options</h3>
+                    <h3 className="text-2xl font-bold dark:text-white">
+                        Joystick Options
+                    </h3>
                     <JoystickOptions />
                 </div>
             </div>

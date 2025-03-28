@@ -109,13 +109,13 @@ const JoystickOptions = () => {
         <div className="text-base">
             <div className="grid grid-cols-4 items-center gap-2">
                 <div />
-                <div>Action</div>
-                <div>2nd Action</div>
-                <div>Invert</div>
+                <div className="dark:text-white">Action</div>
+                <div className="dark:text-white">2nd Action</div>
+                <div className="dark:text-white">Invert</div>
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 1 Left/Right</div>
+                <div className="dark:text-white">Stick 1 Left/Right</div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -177,7 +177,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 1 Up/Down</div>
+                <div className="dark:text-white">Stick 1 Up/Down</div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -239,7 +239,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 1 Use MPG</div>
+                <div className="dark:text-white">Stick 1 Use MPG</div>
                 <Select
                     styles={
                         stick1PrimaryActionIsUsingMPG &&
@@ -295,7 +295,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 2 Left/Right</div>
+                <div className="dark:text-white">Stick 2 Left/Right</div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -357,7 +357,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 2 Up/Down</div>
+                <div className="dark:text-white">Stick 2 Up/Down</div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -419,7 +419,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Stick 2 Use MPG</div>
+                <div className="dark:text-white">Stick 2 Use MPG</div>
                 <Select
                     styles={
                         stick2PrimaryActionIsUsingMPG &&
@@ -477,7 +477,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Zero Threshold</div>
+                <div className="dark:text-white">Zero Threshold</div>
                 <Input
                     value={zeroThreshold}
                     type="number"
@@ -493,7 +493,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div>Movement Distance Override</div>
+                <div className="dark:text-white">
+                    Movement Distance Override
+                </div>
                 <Input
                     type="number"
                     value={movementDistanceOverride}
