@@ -149,7 +149,6 @@ export const ReactRoutes = () => {
                         <Page
                             title="Gamepad"
                             description="Manage your gamepad profiles here"
-                            withGoBackButton
                         >
                             <Gamepad />
                         </Page>
