@@ -409,8 +409,8 @@ const SpindleWidget = () => {
                 spindle.label === 'SLB_LASER' ? laserMax : state.laser.maxPower;
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
-                setState((prevState) => ({ ...prevState, active: false }));
-            }, duration);
+                actions.sendM5();
+            }, duration * 1000);
         },
         handleHALSpindleSelect: (selectedSpindle: {
             label: string;
