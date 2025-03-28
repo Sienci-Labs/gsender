@@ -769,23 +769,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY',
                         key: 'widgets.axes.jog.rapid.xyStep',
                         type: 'number',
-                        description:
-                            "Rapid jogging amount in the XY axes.",
+                        description: 'Rapid jogging amount in the XY axes.',
                         unit: 'mm',
                     },
                     {
                         label: 'Z',
                         key: 'widgets.axes.jog.rapid.zStep',
-                        description:
-                            'Rapid jogging amount in the Z axis.',
+                        description: 'Rapid jogging amount in the Z axis.',
                         type: 'number',
                         unit: 'mm',
                     },
                     {
                         label: 'A',
                         key: 'widgets.axes.jog.rapid.aStep',
-                        description:
-                            'Rapid jogging amount in the A axis.',
+                        description: 'Rapid jogging amount in the A axis.',
                         type: 'number',
                         unit: 'mm',
                     },
@@ -798,23 +795,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY',
                         key: 'widgets.axes.jog.normal.xyStep',
                         type: 'number',
-                        description:
-                            "Normal jogging amount in the XY axes.",
+                        description: 'Normal jogging amount in the XY axes.',
                         unit: 'mm',
                     },
                     {
                         label: 'Z',
                         key: 'widgets.axes.jog.normal.zStep',
-                        description:
-                            'Normal jogging amount in the Z axis.',
+                        description: 'Normal jogging amount in the Z axis.',
                         type: 'number',
                         unit: 'mm',
                     },
                     {
                         label: 'A',
                         key: 'widgets.axes.jog.normal.aStep',
-                        description:
-                            'Normal jogging amount in the A axis.',
+                        description: 'Normal jogging amount in the A axis.',
                         type: 'number',
                         unit: 'mm',
                     },
@@ -827,23 +821,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY',
                         key: 'widgets.axes.jog.precise.xyStep',
                         type: 'number',
-                        description:
-                            "Precise jogging amount in the XY axes.",
+                        description: 'Precise jogging amount in the XY axes.',
                         unit: 'mm',
                     },
                     {
                         label: 'Z',
                         key: 'widgets.axes.jog.precise.zStep',
-                        description:
-                            'Precise jogging amount in the Z axis.',
+                        description: 'Precise jogging amount in the Z axis.',
                         type: 'number',
                         unit: 'mm',
                     },
                     {
                         label: 'A',
                         key: 'widgets.axes.jog.precise.aStep',
-                        description:
-                            'Precise jogging amount in the A axis.',
+                        description: 'Precise jogging amount in the A axis.',
                         type: 'number',
                         unit: 'mm',
                     },
@@ -1037,6 +1028,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
                         type: 'number',
                     },
+                    {
+                        label: 'Enable Dark Mode',
+                        key: 'workspace.enableDarkMode',
+                        description: 'Enable dark mode for the UI',
+                        type: 'boolean',
+                    },
                 ],
             },
             {
@@ -1077,10 +1074,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
-                        description: 'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
+                        description:
+                            'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
                         type: 'select',
-                        options: [LIGHTWEIGHT_OPTIONS.LIGHT, LIGHTWEIGHT_OPTIONS.EVERYTHING],
-                    }
+                        options: [
+                            LIGHTWEIGHT_OPTIONS.LIGHT,
+                            LIGHTWEIGHT_OPTIONS.EVERYTHING,
+                        ],
+                    },
                 ],
             },
         ],
