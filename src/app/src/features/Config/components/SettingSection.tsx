@@ -38,13 +38,18 @@ export function SettingSection({
 
     return (
         <div
-            className={cn('divide-solid divide-y divide-gray-300', {
-                'hidden text-gray-600': filteredSettings.length === 0,
-            })}
+            className={cn(
+                'divide-solid divide-y divide-gray-300 dark:divide-gray-700',
+                {
+                    'hidden text-gray-600': filteredSettings.length === 0,
+                },
+            )}
         >
             {label && (
                 <div className="flex flex-row gap-8 border-b border-blue-500 mt-4 py-2">
-                    <h2 className="text-blue-500  text-xl">{label}</h2>
+                    <h2 className="text-blue-500 dark:text-white text-xl">
+                        {label}
+                    </h2>
                     {wizard && wizard()}
                 </div>
             )}

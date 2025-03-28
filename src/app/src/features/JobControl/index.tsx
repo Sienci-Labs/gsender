@@ -13,8 +13,6 @@ import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 
-import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
-
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
     activeState: GRBL_ACTIVE_STATES_T;
@@ -58,17 +56,6 @@ const JobControl: React.FC<JobControlProps> = ({
         }
     }, [fileCompletion]);
 
-    useRegisterShortcut({
-        id: 'start-outline',
-        title: 'Start Outline',
-        description: 'Start an outline',
-        defaultKeys: '$',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            pubsub.publish('outline:start');
-        },
-    });
-
     const subscribe = () => {
         const tokens = [
             pubsub.subscribe(
@@ -91,7 +78,7 @@ const JobControl: React.FC<JobControlProps> = ({
     };
 
     const onStop = () => {
-        setLastLine(senderStatus.received);
+        setLastLine(senderStatus?.received);
     };
 
     return (

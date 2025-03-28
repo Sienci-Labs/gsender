@@ -34,7 +34,9 @@ const Page = ({
         >
             <div className="flex items-center justify-between mb-4 pb-4 min-h-20 border-b border-gray-200 rounded-b-lg">
                 <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">
+                        {title}
+                    </h1>
                     {description && (
                         <p className="text-gray-500">{description}</p>
                     )}

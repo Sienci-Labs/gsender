@@ -1,4 +1,5 @@
 import { Label } from 'app/components/Label';
+import { Input } from 'app/components/Input';
 
 export interface UnitInputProps {
     units: string;
@@ -16,15 +17,13 @@ export function UnitInput({
     return (
         <div className="border border-gray-300 rounded flex flex-row items-stretch flex-1 justify-between pl-2">
             {label && <Label className="flex items-center">{label}</Label>}
-            <input
+            <Input
                 type="number"
                 className="w-[7ch] border-none margin-none p-0 focus:border-none focus:outline-none text-center"
                 value={value}
                 onChange={onChange}
+                suffix={units}
             />
-            <span className="text-gray-500 bg-gray-200 p-1 min-w-12 rounded-tr rounded-br text-center text-sm">
-                {units}
-            </span>
         </div>
     );
 }

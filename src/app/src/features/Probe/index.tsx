@@ -488,12 +488,12 @@ const ProbeWidget = () => {
     };
 
     return (
-        <WidgetConfigProvider widgetId="probe">
+        <>
             <div className="relative">
                 <RunProbe state={state} actions={actions} />
                 <Probe state={state} actions={actions} />
             </div>
-        </WidgetConfigProvider>
+        </>
     );
 };
 

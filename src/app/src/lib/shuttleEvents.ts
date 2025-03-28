@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { ShuttleControlEvents, ShuttleEvent } from './definitions/shortcuts';
+import combokeys from './combokeys';
 
 class ShuttleEvents extends React.PureComponent {
     allShuttleControlEvents: ShuttleControlEvents = { MACRO: function () {} };
@@ -21,5 +23,25 @@ class ShuttleEvents extends React.PureComponent {
 }
 
 const shuttleEvents = new ShuttleEvents({});
+
+export const registerShuttleEvents = (
+    shuttleControlEvents: ShuttleControlEvents,
+) => {
+    Object.keys(shuttleControlEvents).forEach((eventName: string) => {
+        const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
+            .callback;
+        combokeys.on(eventName, callback);
+    });
+};
+
+export const unregisterShuttleEvents = (
+    shuttleControlEvents: ShuttleControlEvents,
+) => {
+    Object.keys(shuttleControlEvents).forEach((eventName) => {
+        const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
+            .callback;
+        combokeys.removeListener(eventName, callback);
+    });
+};
 
 export default shuttleEvents;

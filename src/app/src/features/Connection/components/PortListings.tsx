@@ -22,7 +22,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
     return (
         <button
             type="button"
-            className="w-full m-0 p-4 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100"
+            className="w-full m-0 p-4 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
             onClick={() => connectionHandler(port.port, ConnectionType.USB)}
             key={`port-${port.port}`}
         >
@@ -63,7 +63,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
     }
 
     return (
-        <div className="absolute left-0 top-full z-50 bg-white border border-gray w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
+        <div className="absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found
@@ -78,7 +78,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 />
             ))}
             <button
-                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 mt-1 w-full"
+                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 mt-1 w-full"
                 onClick={() => {
                     props.connectHandler(ip, ConnectionType.ETHERNET);
                 }}
@@ -96,7 +96,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
             {props.unrecognizedPorts.length > 0 && (
                 <div className="flex flex-col">
                     <button
-                        className="text-base text-gray-700 my-2 flex flex-row justify-between items-center px-2"
+                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2"
                         onClick={toggleUnrecognizedPorts}
                     >
                         <span>Unrecognized Ports</span>

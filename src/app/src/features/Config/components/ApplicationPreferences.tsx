@@ -13,8 +13,10 @@ import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 export function ApplicationPreferences() {
     const inputRef = useRef();
     return (
-        <fieldset className="flex flex-row gap-x-6 mr-4 border border-gray-200 px-4 py-2">
-            <legend className="text-slate-600">gSender Preferences</legend>
+        <fieldset className="flex flex-row gap-x-6 mr-4 border border-gray-200 px-4 py-2 dark:border-gray-700 dark:text-white">
+            <legend className="text-slate-600 dark:text-white">
+                gSender Preferences
+            </legend>
             <ActionButton
                 label="Export"
                 icon={<FiUpload />}

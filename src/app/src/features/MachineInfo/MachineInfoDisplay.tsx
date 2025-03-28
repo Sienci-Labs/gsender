@@ -65,12 +65,12 @@ export function MachineInfoDisplay({
                 hidden: !open,
             })}
         >
-            <CardContent className="max-sm:block -mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400">
+            <CardContent className="max-sm:block -mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:bg-dark dark:text-white dark:border-dark-lighter">
                 <div className="flex flex-row w-full justify-between">
                     <span className="float-left font-bold text-2xl pb-2">
                         Machine Information
                     </span>
-                    <div className="text-2xl float-right pt-1 text-gray-600 max-sm:hidden">
+                    <div className="text-2xl float-right pt-1 text-gray-600 max-sm:hidden dark:text-white cursor-pointer">
                         {pinned ? (
                             <TiPin onClick={() => setPinned(!pinned)} />
                         ) : (
@@ -134,7 +134,9 @@ export function MachineInfoDisplay({
                     </CardDescription>
                 </div>
                 <div className="flex flex-row gap-4 items-center mt-4">
-                    <span className="text-gray-500">Lock Stepper Motors</span>
+                    <span className="text-gray-500 dark:text-white">
+                        Lock Stepper Motors
+                    </span>
                     <Toggle
                         onChange={handleStepperMotorToggle}
                         checked={stepperState === '255'}

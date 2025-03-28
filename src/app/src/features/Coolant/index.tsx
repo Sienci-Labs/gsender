@@ -11,7 +11,9 @@ import {
 } from 'app/features/Coolant/utils/actions.ts';
 import { IndicatorButton } from 'app/components/IndicatorButton';
 
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import { COOLANT_CATEGORY } from 'app/constants';
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -19,38 +21,38 @@ export interface CoolantProps {
 }
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
-    useRegisterShortcuts([
-        {
-            id: 'start-mist',
-            title: 'Start Mist',
-            description: 'Start mist',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                startMist();
-            },
+    const shuttleControlEvents = {
+        MIST_COOLANT: {
+            title: 'Mist Coolant',
+            keys: '',
+            cmd: 'MIST_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => startMist(),
         },
-        {
-            id: 'start-flood',
-            title: 'Start Flood',
-            description: 'Start flood',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                startFlood();
-            },
+        FLOOD_COOLANT: {
+            title: 'Flood Coolant',
+            keys: '',
+            cmd: 'FLOOD_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => startFlood(),
         },
-        {
-            id: 'stop-coolant',
+        STOP_COOLANT: {
             title: 'Stop Coolant',
-            description: 'Stop coolant',
-            defaultKeys: '',
-            category: 'COOLANT_CATEGORY',
-            onKeyDown: () => {
-                stopCoolant();
-            },
+            keys: '',
+            cmd: 'STOP_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => stopCoolant(),
         },
-    ]);
+    };
+
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     return (
         <div className="flex flex-col justify-around items-center h-full">

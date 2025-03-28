@@ -13,13 +13,15 @@ import Button from 'app/components/Button';
 import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
 import { toast } from 'app/lib/toaster';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import { VISUALIZER_PRIMARY } from 'app/constants';
+import { TOOLBAR_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
 import controller from 'app/lib/controller';
 
 import standardTrackGraphic from './assets/standard-track-top-view.png';
 import extensionTrackGraphic from './assets/extension-track-top-view.png';
 import customTrackGraphic from './assets/custom-boring-track-top-view.png';
 import { HOLE_TYPES } from './utils/mountingSetupMacros';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
 
 const MountingSetup = () => {
     const [open, setOpen] = useState(false);
@@ -180,6 +182,21 @@ const MountingSetup = () => {
 
         setOpen(false);
     };
+
+    const shuttleControlEvents = {
+        TOGGLE_MOUNTING_SETUP: {
+            title: 'Toggle Mounting Setup Display',
+            keys: '',
+            cmd: 'TOGGLE_MOUNTING_SETUP',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => setOpen((prev) => !prev),
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

@@ -46,10 +46,10 @@ const Console = ({ isActive }: ConsoleProps) => {
     return (
         <>
             <div
-                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity 
+                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity dark:text-white dark:bg-dark
                     duration-300 ${isConnected ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
-                <div className="flex justify-center items-center h-full">
+                <div className="flex justify-center items-center h-full ">
                     <h2 className="text-lg font-bold">
                         Not connected to a device
                     </h2>

@@ -106,7 +106,6 @@ function returnSettingControl(
     }
 }
 
-
 export function SettingRow({
     setting,
     index,
@@ -174,9 +173,9 @@ export function SettingRow({
             </span>
             <span className="w-1/5 text-xs px-4"></span>
             <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
-                {setting.description.split('\n').map((line, index) =>
-                    <p >{line}</p>
-                )}
+                {setting.description.split('\n').map((line, index) => (
+                    <p>{line}</p>
+                ))}
             </span>
         </div>
     );

@@ -68,7 +68,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     Stop (M5)
                 </Button>
             </div>
-            <div className="flex flex-row gap-2 justify-center my-2 items-center">
+            <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
                 <span>Speed</span>
                 <Slider
                     value={[state.spindleSpeed]}

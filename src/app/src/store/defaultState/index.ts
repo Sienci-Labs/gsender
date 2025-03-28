@@ -144,6 +144,7 @@ const defaultState: State = {
         },
         park: { x: 0, y: 0, z: 0 },
         notifications: [],
+        enableDarkMode: false,
     },
     widgets: {
         axes: {

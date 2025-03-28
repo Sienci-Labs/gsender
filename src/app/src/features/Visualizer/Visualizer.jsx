@@ -559,7 +559,7 @@ class Visualizer extends Component {
     controllerEvents = {
         gcode_error: _throttle(
             (msg) => {
-                toast.danger(msg);
+                toast.error(msg);
             },
             250,
             { trailing: false },
@@ -2423,7 +2423,7 @@ class Visualizer extends Component {
         }
         return (
             <div
-                className="overflow-hidden h-full w-full rounded"
+                className="overflow-hidden h-full w-full rounded-lg"
                 ref={this.setRef}
             />
         );

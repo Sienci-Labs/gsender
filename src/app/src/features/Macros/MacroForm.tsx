@@ -13,6 +13,7 @@ import {
 
 import { MACRO_VARIABLES } from './constants';
 import insertAtCaret from './insertAtCaret';
+import { Input } from 'app/components/Input';
 
 const MAX_CHARACTERS = 128;
 
@@ -116,11 +117,10 @@ const MacroForm = ({
                     </DialogDescription>
                     <div className="flex flex-col gap-2 my-4">
                         <label>Macro Name</label>
-                        <input
+                        <Input
                             ref={nameRef}
                             maxLength={MAX_CHARACTERS}
                             type="text"
-                            className="border border-gray-300 rounded-md p-2"
                             name="name"
                             value={macroState.name}
                             onChange={handleInputChange}
@@ -193,7 +193,7 @@ const MacroForm = ({
                         <textarea
                             ref={contentRef}
                             rows={10}
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
                             name="content"
                             value={macroState.content}
                             onChange={handleInputChange}
@@ -206,7 +206,7 @@ const MacroForm = ({
                             ref={descriptionRef}
                             rows={4}
                             maxLength={MAX_CHARACTERS}
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
                             name="description"
                             value={macroState.description}
                             onChange={handleInputChange}

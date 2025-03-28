@@ -38,7 +38,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
-import {TOOLCHANGE_OPTIONS} from "app/features/Preferences/ToolChange/ToolChange";
+import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
 
 export interface SettingsMenuSection {
     label: string;
@@ -1002,11 +1002,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'location',
                         label: 'Fixed Sensor Location',
                         key: 'workspace.toolChangePosition',
-                        description: 'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
+                        description:
+                            'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
                         hidden: () => {
-                            const strategy = store.get('workspace.toolChangeOption', '');
-                            return strategy !== 'Fixed Tool Sensor'
-                        }
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Fixed Tool Sensor';
+                        },
                     },
                     {
                         type: 'textarea',
@@ -1015,9 +1019,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
                         hidden: () => {
-                            const strategy = store.get('workspace.toolChangeOption', '');
-                            return strategy !== 'Code'
-                        }
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Code';
+                        },
                     },
                     {
                         type: 'textarea',
@@ -1026,9 +1033,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'When using the Code strategy, this code is run after a tool change is completed.',
                         hidden: () => {
-                            const strategy = store.get('workspace.toolChangeOption', '');
-                            return strategy !== 'Code'
-                        }
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Code';
+                        },
                     },
                 ],
             },
@@ -1100,6 +1110,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
                         type: 'number',
+                    },
+                    {
+                        label: 'Enable Dark Mode',
+                        key: 'workspace.enableDarkMode',
+                        description: 'Enable dark mode for the UI',
+                        type: 'boolean',
                     },
                 ],
             },
