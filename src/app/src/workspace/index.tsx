@@ -11,7 +11,6 @@ import {
     GRBLHAL,
     LOCATION_CATEGORY,
 } from 'app/constants';
-import GamepadManager from 'app/lib/gamepad';
 import useKeybinding from 'app/lib/useKeybinding';
 
 import { Sidebar } from './Sidebar';
@@ -21,6 +20,7 @@ import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useDarkMode } from 'app/hooks/useDarkMode';
 
 const Workspace = () => {
     const navigate = useNavigate();
@@ -33,13 +33,7 @@ const Workspace = () => {
         }
     }, [location]);
 
-    useEffect(() => {
-        GamepadManager.initialize();
-
-        return () => {
-            GamepadManager.cleanup();
-        };
-    }, []);
+    useDarkMode();
 
     const shuttleControlFunctions = {
         CONTROLLER_COMMAND: (_: Event, { command }: any) => {
