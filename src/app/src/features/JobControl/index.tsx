@@ -78,7 +78,7 @@ const JobControl: React.FC<JobControlProps> = ({
     };
 
     const onStop = () => {
-        setLastLine(senderStatus.received);
+        setLastLine(senderStatus?.received);
     };
 
     return (
