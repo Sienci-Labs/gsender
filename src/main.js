@@ -200,7 +200,11 @@ const main = () => {
         store.set("bounds", window.getBounds());
       });
 
+      // Include release notes
+      autoUpdater.fullChangelog = true;
+
       autoUpdater.on("update-available", (info) => {
+        log.info(JSON.stringify(info));
         setTimeout(() => {
           window.webContents.send("update_available", info);
         }, 5000);
@@ -208,6 +212,10 @@ const main = () => {
 
       autoUpdater.on("error", (err) => {
         window.webContents.send("updated_error", err);
+      });
+
+      autoUpdater.on("download-progress", (info) => {
+        window.webContents.send("update_download_progress", info.percent);
       });
 
       ipcMain.once("restart_app", async () => {
@@ -366,7 +374,7 @@ const main = () => {
         window.webContents.send("get-data-" + widget);
       });
 
-      ipcMain.on("recieve-data", (event, msg) => {
+      ipcMain.on("receive-data", (event, msg) => {
         const { widget, data } = msg;
         windowManager.childWindows.forEach((window) => {
           window.webContents.send("recieve-data-" + widget, data);

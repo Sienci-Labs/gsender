@@ -30,8 +30,10 @@ const MarkingStep = () => {
         <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
             <div className="flex flex-col gap-4">
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Instructions</h3>
-                    <p className="text-gray-600">
+                    <h3 className="text-lg font-semibold dark:text-white">
+                        Instructions
+                    </h3>
+                    <p className="text-gray-600 dark:text-white">
                         {currentSubStepData.description}
                     </p>
                 </div>
@@ -51,7 +53,7 @@ const MarkingStep = () => {
                                         ? 'bg-green-50 border border-green-200'
                                         : isPastStep
                                           ? 'bg-blue-50 border border-blue-200'
-                                          : 'bg-gray-50 border border-gray-200'
+                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700'
                                 }`}
                             >
                                 <LuArrowRight
@@ -60,7 +62,7 @@ const MarkingStep = () => {
                                             ? 'bg-green-500 animate-pulse'
                                             : isPastStep
                                               ? 'bg-blue-500'
-                                              : 'bg-gray-300'
+                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
                                     }`}
                                 />
                                 <div className="flex flex-col gap-2 flex-1">

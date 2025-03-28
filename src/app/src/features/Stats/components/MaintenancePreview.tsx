@@ -72,7 +72,9 @@ function MaintenanceTask({ task }: { task: Task }) {
                 <span className={reminderStyles({ color: reminderString })}>
                     {time} hours
                 </span>
-                <span className="text-gray-700">{task.name}</span>
+                <span className="text-gray-700 dark:text-gray-400">
+                    {task.name}
+                </span>
             </div>
             <div className={reminderStyles({ color: reminderString })}>
                 {reminderString}

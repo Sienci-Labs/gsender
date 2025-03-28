@@ -158,6 +158,8 @@ const MacroWidget = ({
                 const res = await api.macros.fetch();
                 const { records: macros } = res.data;
                 setMacros(macros);
+                actions.closeModal();
+                toast.success(`Updated macro '${name}'`);
             } catch (err) {
                 // Ignore error
             }
@@ -236,7 +238,6 @@ const MacroWidget = ({
             });
         },
         openEditMacroModal: (id: string) => {
-            console.log('openEditMacroModal', id);
             api.macros.read(id).then((res) => {
                 const { id, name, content, description } = res.data;
                 setEditMacro(res.data);

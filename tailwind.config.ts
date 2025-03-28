@@ -2,12 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   content: [
-    "./src/app/src/**/*.{js,ts,jsx,tsx}",
-    "./src/app/index.html",
+    "./src/**/*.{js,ts,jsx,tsx,html}",
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "!**/node_modules/**",
   ],
   important: true,
+  darkMode: "class",
   /*
   purge: {
     enabled: false,
@@ -26,6 +26,11 @@ export default {
         "content-area": "calc(100vh-64px)",
       },
       colors: {
+        dark: {
+          DEFAULT: '#0f172a',
+          darker: '#020617',
+          lighter: '#334155',
+        },
         robin: {
           50: "#f6f9fc",
           100: "#ecf2f8",
@@ -100,9 +105,14 @@ export default {
           "75%": { transform: "translate(-5px, 5px) rotate(-5deg)" },
           "100%": { transform: "translate(0, 0) rotate(0deg)" },
         },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         attention: "attention 1s ease-in-out infinite",
+        gradient: "gradient-shift 15s ease infinite",
       },
     },
   },

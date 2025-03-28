@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --border-angle {
+    inherits: false;
+    initial-value: 0deg;
+    syntax: '<angle>';
+}
+@custom-variant dark (&:where(.dark, .dark *));
+
 body,
 html,
 #app {
@@ -45,8 +52,8 @@ html,
     }
     /* Hide scrollbar for IE, Edge and Firefox */
     .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
     }
 
     .fixed-content-area {
@@ -55,6 +62,7 @@ html,
     }
 
     .rapidButtonTransform {
-        transform:  scale(1.4) translatex(-20px) perspective(160px) rotateX(55deg);
+        transform: scale(1.4) translatex(-20px) perspective(160px)
+            rotateX(55deg);
     }
 }

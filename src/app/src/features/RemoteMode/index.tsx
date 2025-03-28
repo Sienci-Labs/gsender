@@ -86,7 +86,7 @@ export function RemoteModeDialog({
                                 Wireless CNC Control
                             </h1>
                             <div className="flex flex-row gap-4 items-center">
-                                <span className="font-bold">
+                                <span className="font-bold dark:text-white">
                                     Enable Wireless Control
                                 </span>
                                 <Toggle
@@ -94,12 +94,12 @@ export function RemoteModeDialog({
                                     checked={remoteEnabled}
                                 />
                             </div>
-                            <p>
+                            <p className="dark:text-white">
                                 Choose your settings below. In most cases the
                                 default values should work:
                             </p>
                             <div className="flex flex-row w-full justify-between items-center gap-4">
-                                <span>Addr:</span>
+                                <span className="dark:text-white">Addr:</span>
                                 <Select onValueChange={onIPSelect}>
                                     <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
                                         <SelectValue placeholder={ip} />
@@ -120,7 +120,7 @@ export function RemoteModeDialog({
                                 </Select>
                             </div>
                             <div className="flex flex-row w-full justify-start items-center gap-4">
-                                <span className="">Port:</span>
+                                <span className="dark:text-white">Port:</span>
                                 <input
                                     className="border border-gray-200 rounded p-2 focus:outline-none w-full"
                                     type="number"
@@ -128,7 +128,7 @@ export function RemoteModeDialog({
                                     onChange={updatePort}
                                 />
                             </div>
-                            <p className={'text-gray-600 text-sm'}>
+                            <p className="dark:text-white text-sm">
                                 <b>Note:</b> Clicking "Save" will ask you to
                                 restart gSender so that the settings can be
                                 updated.

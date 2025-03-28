@@ -15,7 +15,9 @@ import { EventInput } from 'app/features/Config/components/SettingInputs/EventIn
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
-import store from 'app/store';
+import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
+import get from 'lodash/get';
+import cn from 'classnames';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -37,6 +39,7 @@ function returnSettingControl(
                     value={value as boolean}
                     index={index}
                     onChange={handler}
+                    disabled={setting.disabled}
                 />
             );
         case 'select':
@@ -46,6 +49,7 @@ function returnSettingControl(
                     index={index}
                     value={value as string}
                     onChange={handler}
+                    disabled={setting.disabled}
                 />
             );
         case 'number':
@@ -85,6 +89,8 @@ function returnSettingControl(
             );
         case 'event':
             return <EventInput eventType={setting.eventType} />;
+        case 'location':
+            return <LocationInput value={value as object} onChange={handler} />;
         case 'textarea':
             return (
                 <TextAreaInput
@@ -107,6 +113,12 @@ export function SettingRow({
 }: SettingRowProps): JSX.Element {
     const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
         useSettings();
+
+    // Default function to not hidden
+    let isHidden = false;
+    if (setting && setting.hidden) {
+        isHidden = setting.hidden();
+    }
 
     const handleSettingsChange = (index) => (value) => {
         setSettingsAreDirty(true);
@@ -143,9 +155,13 @@ export function SettingRow({
             />
         );
     }
-
+    //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
-        <div className="p-2 flex flex-row items-center text-gray-700">
+        <div
+            className={cn('p-2 flex flex-row items-center text-gray-700', {
+                hidden: isHidden,
+            })}
+        >
             <span className="w-1/5">{setting.label}</span>
             <span className="w-1/5 text-xs px-4">
                 {returnSettingControl(
@@ -156,8 +172,10 @@ export function SettingRow({
                 )}
             </span>
             <span className="w-1/5 text-xs px-4"></span>
-            <span className="text-gray-500 text-sm w-2/5">
-                {setting.description}
+            <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
+                {setting.description.split('\n').map((line, index) => (
+                    <p>{line}</p>
+                ))}
             </span>
         </div>
     );

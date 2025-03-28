@@ -10,7 +10,7 @@ export function TextAreaInput({ value, onChange }: TextAreaInputProps) {
         <textarea
             rows={9}
             value={value}
-            className="block font-mono rounded w-full px-0 text-sm text-gray-800 bg-white border border-gray-200 resize-none focus:outline-none"
+            className="block font-mono rounded w-full px-0 text-xs text-gray-800 bg-white border border-gray-200 resize-none focus:outline-none"
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 onChange(e.target.value)
             }

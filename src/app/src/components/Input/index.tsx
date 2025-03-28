@@ -26,19 +26,25 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <div className={cn('flex flex-col gap-2 w-full', wrapperClassName)}>
                 {label && (
                     <label
-                        className={cn('text-sm font-medium text-gray-700 mb-2')}
+                        className={cn(
+                            'text-sm font-medium text-gray-700 dark:text-white mb-2',
+                        )}
                     >
                         {label}
                     </label>
                 )}
                 <div className="relative flex items-center">
                     <ShadcnInput
-                        className={cn('pr-10', inputSize, className)}
+                        className={cn(
+                            'text-blue-500 pr-10 dark:bg-dark dark:text-white dark:border-gray-500',
+                            inputSize,
+                            className,
+                        )}
                         ref={ref}
                         {...props}
                     />
                     {suffix && (
-                        <div className="absolute right-2 flex items-center pointer-events-none text-gray-500">
+                        <div className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-500 dark:text-white">
                             {suffix}
                         </div>
                     )}

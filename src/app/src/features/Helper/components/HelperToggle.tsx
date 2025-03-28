@@ -7,6 +7,9 @@ import {
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import reduxStore from 'app/store/redux';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 
 interface HelperToggleProps {
     minimized: boolean;
@@ -44,13 +47,30 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
         }
     };
 
+    const shuttleControlEvents = {
+        TOGGLE_INFO_HELPER: {
+            title: 'Toggle Helper Wizard',
+            keys: '',
+            cmd: 'TOGGLE_INFO_HELPER',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => {
+                handleToggle();
+            },
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
+
     return (
         <button
             type="button"
             disabled={!helperEnabled}
             onClick={handleToggle}
             className={cn(
-                'flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent',
+                'flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-gray-400',
                 {
                     'border bg-orange-200 bg-opacity-30 animate-bounce':
                         helperEnabled,

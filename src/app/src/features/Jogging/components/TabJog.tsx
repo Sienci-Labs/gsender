@@ -8,7 +8,8 @@ export interface TabJogProps {
 
 const TabJog = (props: TabJogProps) => {
     const standardColourClass = 'hover:fill-blue-600 fill-blue-500';
-    const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
+    const disabledColorClass =
+        'fill-gray-400 hover:fill-gray-400 dark:fill-gray-700 dark:hover:fill-gray-600';
 
     return (
         <svg

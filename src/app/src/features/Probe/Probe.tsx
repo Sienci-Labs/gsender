@@ -21,119 +21,94 @@
  *
  */
 
-import React from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import cx from 'classnames';
 
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
 
-import { METRIC_UNITS } from '../../constants';
+import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeDirectionSelection from './ProbeDirectionSelection';
 import { Actions, State } from './definitions';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
-interface ProbeProps {
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+
+type ProbeProps = {
     state: State;
     actions: Actions;
-}
+};
 
-const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
-    useRegisterShortcuts([
-        {
-            id: 'open-probe',
-            title: 'Open Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                actions.onOpenChange(true);
-            },
+const Probe = ({ state, actions }: ProbeProps) => {
+    // Use a ref to always have access to the latest state
+    const stateRef = useRef(state);
+    const actionsRef = useRef(actions);
+
+    // Update the refs when state or actions change
+    useEffect(() => {
+        stateRef.current = state;
+        actionsRef.current = actions;
+    }, [state, actions]);
+
+    // Create stable callbacks that always access the latest state via the ref
+    const toggleProbeDialog = useCallback(() => {
+        const { show } = stateRef.current;
+        actionsRef.current.onOpenChange(!show);
+    }, []);
+
+    const probeRoutineScrollRight = useCallback(() => {
+        const { availableProbeCommands, selectedProbeCommand } =
+            stateRef.current;
+        let newIndex = selectedProbeCommand + 1;
+        if (availableProbeCommands.length <= newIndex) {
+            newIndex = 0;
+        }
+        actionsRef.current.handleProbeCommandChange(newIndex);
+    }, []);
+
+    const probeRoutineScrollLeft = useCallback(() => {
+        const { availableProbeCommands, selectedProbeCommand } =
+            stateRef.current;
+        let newIndex = selectedProbeCommand - 1;
+        if (newIndex < 0) {
+            newIndex = availableProbeCommands.length - 1;
+        }
+        actionsRef.current.handleProbeCommandChange(newIndex);
+    }, []);
+
+    const shuttleControlEvents = {
+        OPEN_PROBE: {
+            title: 'Toggle Probe Dialog',
+            keys: '',
+            cmd: 'OPEN_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: toggleProbeDialog,
         },
-        {
-            id: 'close-probe',
-            title: 'Close Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-        },
-        {
-            id: 'probe-routine-scroll-right',
+        PROBE_ROUTINE_SCROLL_RIGHT: {
             title: 'Probe Routine Scroll Right',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { availableProbeCommands, selectedProbeCommand } = state;
-
-                let newIndex = selectedProbeCommand + 1;
-                if (availableProbeCommands.length <= newIndex) {
-                    newIndex = 0;
-                }
-                actions.handleProbeCommandChange(newIndex);
-            },
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: probeRoutineScrollRight,
         },
-        {
-            id: 'probe-routine-scroll-left',
+        PROBE_ROUTINE_SCROLL_LEFT: {
             title: 'Probe Routine Scroll Left',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { availableProbeCommands, selectedProbeCommand } = state;
-
-                let newIndex = selectedProbeCommand - 1;
-                if (newIndex < 0) {
-                    newIndex = availableProbeCommands.length - 1;
-                }
-                actions.handleProbeCommandChange(newIndex);
-            },
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: probeRoutineScrollLeft,
         },
-        {
-            id: 'probe-diameter-scroll-up',
-            title: 'Probe Diameter Scroll Up',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { toolDiameter, availableTools, units } = state;
-                const toolUnits =
-                    units === METRIC_UNITS
-                        ? 'metricDiameter'
-                        : 'imperialDiameter';
-                const currIndex = availableTools.findIndex(
-                    (element) => element[toolUnits] === toolDiameter,
-                );
+    };
 
-                let newIndex = currIndex - 1;
-                if (newIndex < 0) {
-                    newIndex = availableTools.length - 1;
-                }
-                actions._setToolDiameter({
-                    value: availableTools[newIndex][`${toolUnits}`],
-                });
-            },
-        },
-        {
-            id: 'probe-diameter-scroll-down',
-            title: 'Probe Diameter Scroll Down',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                const { toolDiameter, availableTools, units } = state;
-                const toolUnits =
-                    units === METRIC_UNITS
-                        ? 'metricDiameter'
-                        : 'imperialDiameter';
-                const currIndex = availableTools.findIndex(
-                    (element) => element[toolUnits] === toolDiameter,
-                );
-
-                let newIndex = currIndex + 1;
-                if (newIndex >= availableTools.length) {
-                    newIndex = 0;
-                }
-                actions._setToolDiameter({
-                    value: availableTools[newIndex][`${toolUnits}`],
-                });
-            },
-        },
-    ]);
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const {
         canClick,
@@ -152,7 +127,7 @@ const Probe: React.FC<ProbeProps> = ({ state, actions }) => {
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
-                    <div className="flex w-full bg-white rounded-md border-solid border border-gray-300 p-[2px]">
+                    <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <ShadcnButton
                                 key={command.id}

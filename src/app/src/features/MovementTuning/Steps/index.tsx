@@ -86,14 +86,14 @@ const Steps = () => {
             <div className="flex flex-col gap-4">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <div className="space-y-6">
-                        <p>
+                        <p className="dark:text-white">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
                             small amount - say 102mm instead of 100 - then use
                             this tool.
                         </p>
 
-                        <p>
+                        <p className="dark:text-white">
                             Since CNC firmware needs to understand its hardware
                             to make exact movements, small manufacturing
                             variations in the motors, lead screws, pulleys, or
@@ -101,14 +101,14 @@ const Steps = () => {
                             longer distances.
                         </p>
 
-                        <p>
+                        <p className="dark:text-white">
                             By testing for this difference using a marker or
                             tape and a measuring tape, this tool will better
                             tune the firmware to your machine.
                         </p>
 
                         <div className="flex gap-2 items-center">
-                            <label className="min-w-24 font-bold">
+                            <label className="min-w-24 font-bold dark:text-white">
                                 Axis to Tune
                             </label>
                             <Select
@@ -159,7 +159,7 @@ const Steps = () => {
                             className="w-full h-auto border border-gray-200 rounded-lg"
                         />
 
-                        <p className="text-gray-600 font-bold">
+                        <p className="text-gray-600 font-bold dark:text-white">
                             Whichever axis you'll be tuning, please place it in
                             an initial location so that it'll have space to move
                             to the right (for X), backwards (for Y), and
@@ -185,7 +185,7 @@ const Steps = () => {
         if (moveDistance !== measuredDistance) {
             return (
                 <div className="flex flex-col gap-4">
-                    <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg">
+                    <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                         <span>
                             Your {selectedAxis.toUpperCase()}-axis is off by{' '}
                             <strong>
@@ -265,7 +265,7 @@ const Steps = () => {
 
         return (
             <div className="flex flex-col gap-4">
-                <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg">
+                <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
                     <p>
                         Your {selectedAxis.toUpperCase()}-axis is tuned, there
                         is no need to update the steps per mm in the EEPROM
@@ -287,7 +287,7 @@ const Steps = () => {
             <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
                 <div className="flex flex-col gap-4">
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">
+                        <h3 className="text-lg font-semibold dark:text-white">
                             Mark Reference Points
                         </h3>
                     </div>
@@ -299,7 +299,7 @@ const Steps = () => {
                                     ? 'bg-green-50 border border-green-200'
                                     : markLocationCompleted
                                       ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200'
+                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                             }`}
                         >
                             <LuArrowRight
@@ -308,7 +308,7 @@ const Steps = () => {
                                         ? 'bg-green-500 animate-pulse'
                                         : markLocationCompleted
                                           ? 'bg-blue-500'
-                                          : 'bg-gray-300'
+                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
                                 }`}
                             />
                             <div className="flex flex-col gap-2 flex-1">
@@ -337,12 +337,12 @@ const Steps = () => {
                         </div>
 
                         <div
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                                 currentStep === 1
                                     ? 'bg-green-50 border border-green-200'
                                     : moveAxisCompleted
                                       ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200'
+                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                             }`}
                         >
                             <LuArrowRight
@@ -351,7 +351,7 @@ const Steps = () => {
                                         ? 'bg-green-500 animate-pulse'
                                         : moveAxisCompleted
                                           ? 'bg-blue-500'
-                                          : 'bg-gray-300'
+                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
                                 }`}
                             />
                             <div className="flex flex-col gap-2 flex-1">
@@ -373,7 +373,7 @@ const Steps = () => {
                                                 ? 'bg-green-500 hover:bg-green-600'
                                                 : moveAxisCompleted
                                                   ? 'bg-blue-500'
-                                                  : 'bg-gray-300'
+                                                  : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
                                         } text-white`}
                                     >
                                         Move {selectedAxis.toUpperCase()}-axis
@@ -405,7 +405,7 @@ const Steps = () => {
                                     ? 'bg-green-50 border border-green-200'
                                     : setTravelCompleted
                                       ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200'
+                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                             }`}
                         >
                             <LuArrowRight
@@ -414,7 +414,7 @@ const Steps = () => {
                                         ? 'bg-green-500 animate-pulse'
                                         : setTravelCompleted
                                           ? 'bg-blue-500'
-                                          : 'bg-gray-300'
+                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
                                 }`}
                             />
                             <div className="flex flex-col gap-2 flex-1">
@@ -460,7 +460,7 @@ const Steps = () => {
                         </div>
                     </div>
 
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-white">
                         {currentStep === 0 &&
                             'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'}
                         {currentStep === 1 &&
@@ -471,7 +471,9 @@ const Steps = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <h3 className="text-lg font-semibold">Diagram</h3>
+                    <h3 className="text-lg font-semibold dark:text-white">
+                        Diagram
+                    </h3>
                     <img
                         src={stepImage}
                         alt="Movement Tuning Step"

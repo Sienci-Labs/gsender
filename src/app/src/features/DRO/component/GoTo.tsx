@@ -10,6 +10,7 @@ import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
 import { Switch } from 'app/components/shadcn/Switch.tsx';
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
+import { IconButton } from 'app/components/IconButton';
 
 interface GotoProps {
     units: string;
@@ -76,9 +77,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="alt" disabled={disabled} size="sm">
-                    <FaPaperPlane />
-                </Button>
+                <IconButton icon={<FaPaperPlane />} disabled={false} />
             </PopoverTrigger>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
@@ -108,9 +107,9 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         onChange={(v) => onValueEdit(v, 'a')}
                     />
                     <div className="flex flex-row text-sm text-gray-400 justify-between">
-                        <span>G90</span>
+                        <span>ABS</span>
                         <Switch onClick={onToggleSwap} />
-                        <span>G91</span>
+                        <span>INC</span>
                     </div>
                     <Button color="primary" onClick={goToLocation}>
                         Go!

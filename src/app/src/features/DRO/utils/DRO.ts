@@ -53,7 +53,35 @@ export function zeroAllAxes() {
 }
 
 export function goXYAxes() {
-    controller.command('gcode', `G90 G0 X0 Y0`);
+    const commands: string[] = [];
+    const settings = get(controller.settings, 'settings', {});
+    const homingSetting = Number(get(settings, '$22', 0));
+    const homingEnabled = homingSetting !== 0;
+
+    const retractHeight = Number(store.get('workspace.safeRetractHeight', -1));
+
+    if (retractHeight !== 0) {
+        if (homingEnabled) {
+            const currentZ = Number(get(controller, 'state.status.mpos.z', 0));
+            const retract = Math.abs(retractHeight) * -1;
+            // only move Z if it is less than Z0-SafeHeight
+            if (currentZ < retract) {
+                commands.push(`G53 G0 Z${retract}`);
+            }
+        } else {
+            commands.push('G91');
+            commands.push(`G0Z${retractHeight}`);
+        }
+    }
+
+    commands.push(`G90 G0 X0 Y0`);
+
+    if (retractHeight !== 0 && !homingEnabled) {
+        commands.push(`G91 G0 Z${retractHeight * -1}`);
+        commands.push('G90');
+    }
+
+    controller.command('gcode:safe', commands);
 }
 
 export function gotoZero(axis: string) {
@@ -66,8 +94,7 @@ export function gotoZero(axis: string) {
 
     if (retractHeight !== 0 && axis !== 'Z') {
         if (homingEnabled) {
-            // TODO:  Replace this with machine Z pos
-            const currentZ = Number(0);
+            const currentZ = Number(get(controller, 'state.status.mpos.z', 0));
             const retract = Math.abs(retractHeight) * -1;
             // only move Z if it is less than Z0-SafeHeight
             if (currentZ < retract) {

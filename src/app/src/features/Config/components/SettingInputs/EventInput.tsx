@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import api from 'app/api';
+import ToggleSwitch from 'app/components/Switch';
 
 interface EventInputProps {
     eventType: string;
@@ -12,6 +13,21 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
 
     function onChange(e) {
         setCommands(e.target.value);
+    }
+
+    async function toggleEvent(e) {
+        const event = { ...eventData };
+
+        try {
+            event.enabled = !event.enabled;
+
+            setEventData(event);
+            await api.events.update(event.event, {
+                enabled: event.enabled,
+            });
+        } catch (e) {
+            console.assert(e);
+        }
     }
 
     async function onSave(e) {
@@ -53,6 +69,13 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
 
     return (
         <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-row justify-between items-center">
+                <span>Enabled:</span>
+                <ToggleSwitch
+                    checked={eventData.enabled}
+                    onChange={toggleEvent}
+                />
+            </div>
             <textarea
                 rows={8}
                 value={eventCommands}

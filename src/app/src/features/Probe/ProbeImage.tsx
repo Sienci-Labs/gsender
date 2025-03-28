@@ -75,7 +75,7 @@ const ProbeImage: React.FC<Props> = ({
             <img
                 alt="Probe Block orientation guide image"
                 src={imgSrc}
-                className={'w-[15vh] my-0 mx-auto'}
+                className={'w-[15vh] my-0 mx-auto dark:invert'}
             />
         </div>
     );

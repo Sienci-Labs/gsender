@@ -21,7 +21,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from 'app/components/shadcn/AlertDialog';
-import Button from 'app/components/Button';
+// import Button from 'app/components/Button';
 
 interface MaintenanceEditTaskDialogProps {
     show: boolean;
@@ -106,13 +106,13 @@ export function MaintenanceEditTaskDialog({
                     <form className="w-full" onSubmit={handleSubmit}>
                         <MaintenanceTaskForm task={task} />
                         <div className="w-full -mx-3 mb-2 p-2 flex flex-row-reverse gap-4">
-                            <Button
+                            <button
                                 type="submit"
                                 className={buttonStyle({ colors: 'primary' })}
                             >
                                 Save
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                                 className={buttonStyle({ colors: 'secondary' })}
                                 type="button"
                                 onClick={(e) => {
@@ -121,14 +121,14 @@ export function MaintenanceEditTaskDialog({
                                 }}
                             >
                                 Cancel
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                                 type="button"
                                 className={buttonStyle({ colors: 'danger' })}
                                 onClick={(_e) => onDelete()}
                             >
                                 Delete
-                            </Button>
+                            </button>
                         </div>
                     </form>
                 </DialogContent>

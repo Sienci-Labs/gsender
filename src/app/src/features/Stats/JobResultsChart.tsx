@@ -79,5 +79,5 @@ export function JobResultsChart() {
         },
     };
 
-    return <Bar data={data} options={options} />;
+    return <Bar data={data} options={options} className="dark:text-white" />;
 }

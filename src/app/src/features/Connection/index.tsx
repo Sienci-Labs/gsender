@@ -12,6 +12,7 @@ import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import store from 'app/store';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import {GRBL} from "app/constants";
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -66,6 +67,7 @@ function Connection(props: ConnectionProps) {
 
         const network = type === ConnectionType.ETHERNET;
         const baud = Number(store.get('widgets.connection.baudrate'));
+        const defaultFirmware = store.get('workspace.defaultFirmware', GRBL);
 
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
@@ -78,6 +80,7 @@ function Connection(props: ConnectionProps) {
             {
                 baudrate: baud,
                 network,
+                defaultFirmware,
             },
             (err: string) => {
                 if (err) {
@@ -122,7 +125,7 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0">
+            <div className="relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}

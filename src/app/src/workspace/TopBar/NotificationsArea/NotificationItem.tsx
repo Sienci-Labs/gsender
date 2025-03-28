@@ -11,7 +11,7 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
     const notificationColor = colorsMap[notification.type];
 
     return (
-        <div className="flex border bg-gray-200 w-full">
+        <div className="flex border bg-gray-200 w-full dark:bg-dark-lighter dark:text-white dark:border-dark-lighter">
             <div className={`min-h-full min-w-4 ${notificationColor}`} />
             <div className="py-2 px-4 flex items-center">
                 {notification.message}

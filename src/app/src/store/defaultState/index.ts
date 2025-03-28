@@ -32,6 +32,7 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
+    GRBL,
 } from '../../constants';
 
 import machineProfiles from './machineProfiles';
@@ -57,6 +58,7 @@ const defaultState: State = {
         jobsCancelled: 0,
         timeSpentRunning: 0,
         longestTimeRun: 0,
+        defaultFirmware: GRBL,
         jobTimes: [],
         toolChange: {
             passthrough: false,
@@ -140,7 +142,9 @@ const defaultState: State = {
                 storedValue: null,
             },
         },
+        park: { x: 0, y: 0, z: 0 },
         notifications: [],
+        enableDarkMode: false,
     },
     widgets: {
         axes: {
@@ -294,6 +298,7 @@ const defaultState: State = {
             spindleMin: 10000,
             delay: 0,
             laser: {
+                laserOnOutline: false,
                 power: 100,
                 duration: 1,
                 xOffset: 0,

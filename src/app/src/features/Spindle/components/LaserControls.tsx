@@ -25,6 +25,7 @@ import React from 'react';
 
 import Button from 'app/components/Button';
 import Slider from './Slider';
+import { Input } from 'app/components/Input';
 
 type Props = {
     actions: LaserActions;
@@ -87,15 +88,15 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                 step={1}
                 onChange={actions.handleLaserPowerChange}
             />
-            <div className="flex gap-2 justify-center items-center my-2">
+            <div className="flex gap-2 justify-center items-center my-2 dark:text-white">
                 <label>Test Duration:</label>
                 <div className="flex gap-2">
-                    <input
+                    <Input
                         value={laser.duration}
                         onChange={actions.handleLaserDurationChange}
                         className="z-0 text-center text-blue-500 text-xl"
+                        suffix="sec"
                     />
-                    <span className="ml-2">s</span>
                 </div>
             </div>
         </div>
