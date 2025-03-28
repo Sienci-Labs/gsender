@@ -1951,6 +1951,9 @@ video {
 .whitespace-nowrap {
   white-space: nowrap !important;
 }
+.whitespace-pre {
+  white-space: pre !important;
+}
 .text-nowrap {
   text-wrap: nowrap !important;
 }

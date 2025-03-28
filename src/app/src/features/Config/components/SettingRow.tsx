@@ -106,6 +106,7 @@ function returnSettingControl(
     }
 }
 
+
 export function SettingRow({
     setting,
     index,
@@ -155,7 +156,7 @@ export function SettingRow({
             />
         );
     }
-
+    //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
         <div
             className={cn('p-2 flex flex-row items-center text-gray-700', {
@@ -172,8 +173,10 @@ export function SettingRow({
                 )}
             </span>
             <span className="w-1/5 text-xs px-4"></span>
-            <span className="text-gray-500 text-sm w-2/5">
-                {setting.description}
+            <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
+                {setting.description.split('\n').map((line, index) =>
+                    <p >{line}</p>
+                )}
             </span>
         </div>
     );

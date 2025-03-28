@@ -38,6 +38,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
+import {TOOLCHANGE_OPTIONS} from "app/features/Preferences/ToolChange/ToolChange";
 
 export interface SettingsMenuSection {
     label: string;
@@ -69,7 +70,7 @@ export interface gSenderSetting {
     label?: string;
     type: gSenderSettingType;
     key?: string;
-    description?: string;
+    description?: string | any[];
     options?: string[] | number[];
     unit?: string;
     eID?: string;
@@ -986,7 +987,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'select',
                         label: 'Strategy',
                         description:
-                            'Strategy that gSender will use to handle tool change commands *add description of currently selected strategy',
+                            'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length.  Limit switches required.\n\nCode runs blocks before and after the toolchange',
                         options: [
                             'Pause',
                             'Ignore',
@@ -998,11 +999,25 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangeOption',
                     },
                     {
+                        type: 'location',
+                        label: 'Fixed Sensor Location',
+                        key: 'workspace.toolChangePosition',
+                        description: 'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
+                        hidden: () => {
+                            const strategy = store.get('workspace.toolChangeOption', '');
+                            return strategy !== 'Fixed Tool Sensor'
+                        }
+                    },
+                    {
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',
                         label: 'Before Tool Change',
                         description:
                             'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
+                        hidden: () => {
+                            const strategy = store.get('workspace.toolChangeOption', '');
+                            return strategy !== 'Code'
+                        }
                     },
                     {
                         type: 'textarea',
@@ -1010,6 +1025,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'After Tool Change',
                         description:
                             'When using the Code strategy, this code is run after a tool change is completed.',
+                        hidden: () => {
+                            const strategy = store.get('workspace.toolChangeOption', '');
+                            return strategy !== 'Code'
+                        }
                     },
                 ],
             },
