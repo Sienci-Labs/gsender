@@ -34,7 +34,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 <div className="relative flex items-center">
                     <ShadcnInput
                         className={cn(
-                            'pr-10 text-center text-blue-500',
+                            'pr-10 text-blue-500',
                             inputSize,
                             className,
                         )}

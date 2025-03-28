@@ -15,6 +15,7 @@ import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
+    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -36,6 +37,7 @@ import {
 } from 'app/features/Config/components/ShortcutLinkWizards.tsx';
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
+import store from 'app/store';
 
 export interface SettingsMenuSection {
     label: string;
@@ -80,6 +82,7 @@ export interface gSenderSetting {
     toolLink?: string;
     toolLinkLabel?: string;
     disabled?: () => boolean;
+    hidden?: () => boolean;
 }
 
 export interface gSenderSubSection {
@@ -364,6 +367,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                         type: 'number',
                         unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'XY Thickness',
@@ -372,6 +383,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                         type: 'number',
                         unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
                     },
                     {
                         label: 'Z Probe Distance',
@@ -380,6 +399,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                         type: 'number',
                         unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Fast Find',
@@ -388,6 +415,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Probe speed before the first touch-off (default 150)',
                         type: 'number',
                         unit: 'mm/min',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Slow Find',
@@ -396,6 +431,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Slower speed for more accuracy on second touch-off (default 75)',
                         type: 'number',
                         unit: 'mm/min',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Retraction',
@@ -404,6 +447,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'How far the probe moves away after a successful touch (default 4)',
                         type: 'number',
                         unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Probe Connection Test',

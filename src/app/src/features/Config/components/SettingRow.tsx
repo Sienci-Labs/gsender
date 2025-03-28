@@ -15,8 +15,9 @@ import { EventInput } from 'app/features/Config/components/SettingInputs/EventIn
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
-import store from 'app/store';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
+import get from 'lodash/get';
+import cn from 'classnames';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -113,6 +114,12 @@ export function SettingRow({
     const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
         useSettings();
 
+    // Default function to not hidden
+    let isHidden = false;
+    if (setting && setting.hidden) {
+        isHidden = setting.hidden();
+    }
+
     const handleSettingsChange = (index) => (value) => {
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
@@ -150,7 +157,11 @@ export function SettingRow({
     }
 
     return (
-        <div className="p-2 flex flex-row items-center text-gray-700">
+        <div
+            className={cn('p-2 flex flex-row items-center text-gray-700', {
+                hidden: isHidden,
+            })}
+        >
             <span className="w-1/5">{setting.label}</span>
             <span className="w-1/5 text-xs px-4">
                 {returnSettingControl(
