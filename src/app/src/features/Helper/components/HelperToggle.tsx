@@ -7,6 +7,9 @@ import {
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import reduxStore from 'app/store/redux';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 
 interface HelperToggleProps {
     minimized: boolean;
@@ -43,6 +46,23 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
             reduxStore.dispatch(toggleInfoHelperVisibility());
         }
     };
+
+    const shuttleControlEvents = {
+        TOGGLE_INFO_HELPER: {
+            title: 'Toggle Helper Wizard',
+            keys: '',
+            cmd: 'TOGGLE_INFO_HELPER',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => {
+                handleToggle();
+            },
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     return (
         <button
