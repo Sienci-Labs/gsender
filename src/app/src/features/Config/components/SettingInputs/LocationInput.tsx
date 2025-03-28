@@ -3,6 +3,8 @@ import { FiTarget } from 'react-icons/fi';
 import { Input } from 'app/components/Input';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import { FaChartLine } from "react-icons/fa";
+import controller from "app/lib/controller.ts";
 
 export interface LocationInputProps {
     value: object;
@@ -26,6 +28,17 @@ export function LocationInput({
             z: Number(mpos.z),
         };
         onChange(location);
+    }
+
+    function gotoLocation() {
+        const code = []
+        const location = value
+        code.push(
+            `G53 G0 Z-1`,
+            `G53 G0 X${location.x} Y${location.y}`,
+            `G53 G0 Z${location.z}`
+        )
+        controller.command('gcode', code);
     }
 
     function updateSpecificAxes(e, axis: string) {
@@ -61,13 +74,17 @@ export function LocationInput({
                     onChange={(e) => updateSpecificAxes(e, 'z')}
                 />
             </div>
-            <Button
-                className="flex flex-row gap-2 items-center"
-                onClick={grabLocation}
-            >
-                <FiTarget />
-                Grab Location
-            </Button>
+            <div className="flex flex-row justify-between">
+                <Button
+                    className="flex flex-row gap-2 items-center"
+                    onClick={grabLocation}
+                >
+                    <FiTarget />
+                    Grab
+                </Button>
+                <Button variant="primary" className="flex flex-row gap-2 items-center" onClick={gotoLocation}> <FaChartLine />Go To</Button>
+            </div>
+
         </div>
     );
 }

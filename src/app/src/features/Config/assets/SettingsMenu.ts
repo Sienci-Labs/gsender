@@ -1235,13 +1235,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: ['Light', 'Dark'],
                     },
                     {
-                        label: 'Lightweight mode',
-                        key: 'widgets.visualizer.liteMode',
-                        description:
-                            'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
-                        type: 'boolean',
-                    },
-                    {
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
