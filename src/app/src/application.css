@@ -726,10 +726,6 @@ video {
   right: -1.25rem !important;
 }
 
-.-start-6 {
-  inset-inline-start: -1.5rem !important;
-}
-
 .-top-1 {
   top: -0.25rem !important;
 }
@@ -760,6 +756,10 @@ video {
 
 .left-0 {
   left: 0px !important;
+}
+
+.left-1 {
+  left: 0.25rem !important;
 }
 
 .left-1\/2 {
@@ -1147,8 +1147,8 @@ video {
   margin-right: 1rem !important;
 }
 
-.ms-12 {
-  margin-inline-start: 3rem !important;
+.ms-16 {
+  margin-inline-start: 4rem !important;
 }
 
 .ms-2 {
@@ -1157,10 +1157,6 @@ video {
 
 .ms-3 {
   margin-inline-start: 0.75rem !important;
-}
-
-.ms-6 {
-  margin-inline-start: 1.5rem !important;
 }
 
 .mt-0 {
@@ -2670,10 +2666,6 @@ video {
   border-right-width: 2px !important;
 }
 
-.border-s {
-  border-inline-start-width: 1px !important;
-}
-
 .border-t {
   border-top-width: 1px !important;
 }
@@ -3507,6 +3499,10 @@ video {
   padding-left: 6rem !important;
 }
 
+.pl-3 {
+  padding-left: 0.75rem !important;
+}
+
 .pl-4 {
   padding-left: 1rem !important;
 }
@@ -3525,6 +3521,10 @@ video {
 
 .pr-2 {
   padding-right: 0.5rem !important;
+}
+
+.pr-3 {
+  padding-right: 0.75rem !important;
 }
 
 .pr-4 {
@@ -3726,10 +3726,6 @@ video {
 
 .tracking-tight {
   letter-spacing: -0.025em !important;
-}
-
-.tracking-wide {
-  letter-spacing: 0.025em !important;
 }
 
 .tracking-wider {
@@ -5363,6 +5359,11 @@ html,
   border-top-color: rgb(63 133 199 / var(--tw-border-opacity, 1)) !important;
 }
 
+.dark\:bg-blue-200:is(.dark *) {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(121 170 216 / var(--tw-bg-opacity, 1)) !important;
+}
+
 .dark\:bg-blue-900:is(.dark *) {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(32 67 100 / var(--tw-bg-opacity, 1)) !important;
@@ -5421,6 +5422,11 @@ html,
 .dark\:bg-yellow-950:is(.dark *) {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(66 32 6 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.dark\:bg-blue-800:is(.dark *) {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(38 80 119 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:fill-gray-700:is(.dark *) {

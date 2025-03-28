@@ -162,8 +162,8 @@ export function SettingRow({
                 hidden: isHidden,
             })}
         >
-            <span className="w-1/5">{setting.label}</span>
-            <span className="w-1/5 text-xs px-4">
+            <span className="w-1/5 dark:text-gray-400">{setting.label}</span>
+            <span className="w-1/5 text-xs px-4 dark:text-gray-200">
                 {returnSettingControl(
                     setting,
                     populatedValue.value,
