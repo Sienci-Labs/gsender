@@ -317,12 +317,7 @@ function DRO({
                     />
                 )}
 
-                <Button
-                    variant="alt"
-                    onClick={goXYAxes}
-                    disabled={!canClick}
-                    size="sm"
-                >
+                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
