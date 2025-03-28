@@ -484,7 +484,7 @@ const Keyboard = () => {
     };
 
     return (
-        <div className="flex flex-col gap-4 h-full">
+        <div className="flex flex-col gap-4 h-full dark:text-white">
             <div className="flex gap-4 justify-end">
                 <Button
                     onClick={enableAllShortcuts}
@@ -521,7 +521,7 @@ const Keyboard = () => {
                     open={showEditModal}
                     onOpenChange={(open) => !open && closeModal()}
                 >
-                    <DialogContent className="bg-gray-300 p-6 w-3/4 max-w-[800px]">
+                    <DialogContent className="p-6 w-3/4 max-w-[800px]">
                         <DialogHeader>
                             <DialogTitle>Edit Shortcut</DialogTitle>
 
