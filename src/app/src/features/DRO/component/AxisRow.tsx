@@ -59,7 +59,11 @@ export function AxisRow({
             ) : (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button disabled={disabled} variant="secondary">
+                        <Button
+                            disabled={disabled}
+                            variant="secondary"
+                            size="sm"
+                        >
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                                 {`${axis}0`}
                             </span>
