@@ -61,12 +61,13 @@ function formatTasks(data: MaintenanceTask[]) {
 }
 
 export function MaintenanceList() {
-    const { maintenanceTasks, maintenanceActions } = useContext(StatContext);
+    const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
+        useContext(StatContext);
     const [formattedData, setFormattedData] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showClearConfirmation, setShowClearConfirmation] = useState(false);
-    const [currentTask, setCurrentTask] = useState(null);
+    const [currentTask, setCurrentTask] = useState<MaintenanceTask>(null);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -275,6 +276,11 @@ export function MaintenanceList() {
                                             return obj;
                                         },
                                     );
+                                    setCurrentTask({
+                                        currentTime: 0,
+                                        ...currentTask,
+                                    });
+                                    setMaintenanceTasks(updatedTasks);
                                     maintenanceActions.update(updatedTasks);
                                 }}
                             >

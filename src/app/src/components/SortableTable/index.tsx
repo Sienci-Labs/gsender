@@ -188,7 +188,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: pagination ? getPaginationRowModel() : null,
         onGlobalFilterChange: setGlobalFilter,
-        globalFilterFn: fuzzyFilter,
+        globalFilterFn: 'includesString', // this gives a lot more targetted results than the fuzzy filter
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
