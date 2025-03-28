@@ -41,8 +41,6 @@ const Workspace = () => {
             const activeState = get(state, 'activeState', 'Idle');
             const alarmCode = get(state, 'alarmCode', 0);
 
-            console.log('command', command);
-
             const commandIsValidForAlarmState = [
                 'reset',
                 'reset:limit',
