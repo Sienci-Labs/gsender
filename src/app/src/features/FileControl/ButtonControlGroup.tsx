@@ -44,8 +44,13 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
     const { fileLoaded, path } = useTypedSelector((state) => state.file);
+
+    useEffect(() => {
+        fileLoadedRef.current = fileLoaded;
+    }, [fileLoaded]);
 
     const usingElectron = isElectron();
 
@@ -90,13 +95,17 @@ const ButtonControlGroup = () => {
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: throttle(
-                () => {
-                    handleCloseFile();
-                },
-                300,
-                { leading: true, trailing: false },
-            ),
+            callback: () => {
+                if (!fileLoadedRef.current) {
+                    return;
+                }
+                controller.command('gcode:unload');
+                reduxStore.dispatch(unloadFileInfo());
+                pubsub.publish('unload:file');
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+            },
         },
     };
 
