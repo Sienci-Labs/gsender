@@ -5,9 +5,10 @@ import { Card, CardTitle, CardDescription } from 'app/components/shadcn/Card';
 
 type ToolCardProps = {
     title: string;
-    description: string;
-    icon: IconType;
-    link: string;
+    description?: string;
+    icon?: IconType;
+    link?: string;
+    onClick?: () => void;
 };
 
 const ToolCard = ({ title, description, icon: Icon, link }: ToolCardProps) => {
@@ -20,9 +21,11 @@ const ToolCard = ({ title, description, icon: Icon, link }: ToolCardProps) => {
             >
                 <CardTitle className="dark:text-white">{title}</CardTitle>
 
-                <CardDescription className="text-sm text-gray-500">
-                    {description}
-                </CardDescription>
+                {description && (
+                    <CardDescription className="text-sm text-gray-500">
+                        {description}
+                    </CardDescription>
+                )}
 
                 <Icon className="w-14 h-14 dark:text-white" />
             </Card>

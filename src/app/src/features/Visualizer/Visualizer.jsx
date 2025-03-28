@@ -558,7 +558,7 @@ class Visualizer extends Component {
     controllerEvents = {
         gcode_error: _throttle(
             (msg) => {
-                toast.danger(msg);
+                toast.error(msg);
             },
             250,
             { trailing: false },

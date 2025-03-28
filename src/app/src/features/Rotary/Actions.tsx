@@ -10,6 +10,9 @@ import {
     getZAxisProbing,
     getYAxisAlignmentProbing,
 } from './utils/probeCommands';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 
 const Actions = () => {
     const isConnected = useTypedSelector(
@@ -23,6 +26,31 @@ const Actions = () => {
 
         controller.command('gcode:safe', commands, unitModal);
     };
+
+    const shuttleControlEvents = {
+        PROBE_ROTARY_Z_AXIS: {
+            title: 'Run Probe Rotary Z-Axis',
+            keys: '',
+            cmd: 'PROBE_ROTARY_Z_AXIS',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => runProbing('Rotary Z-Axis', getZAxisProbing()),
+        },
+        PROBE_ROTARY_Y_AXIS: {
+            title: 'Run Y-Axis Alignment Probing',
+            keys: '',
+            cmd: 'PROBE_ROTARY_Y_AXIS',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () =>
+                runProbing('Rotary Y-Axis', getYAxisAlignmentProbing()),
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     return (
         <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">

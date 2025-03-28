@@ -1,10 +1,12 @@
-import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
-import shuttleEvents from '../shuttleEvents';
-import store from 'app/store';
 import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
-import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
+import throttle from 'lodash/throttle';
+
+import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
+import store from 'app/store';
 import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
+
+import shuttleEvents from '../shuttleEvents';
+import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 import { toast } from '../toaster';
 
 const macroCallbackDebounce = debounce(
@@ -12,8 +14,6 @@ const macroCallbackDebounce = debounce(
         shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }),
     500,
 );
-let buttonPressDebounce = noop;
-let currentShuttleEvent: ShuttleEvent = null;
 
 class Gamepad extends GamepadListener {
     shouldHold = false;
@@ -128,58 +128,6 @@ class Gamepad extends GamepadListener {
     };
 }
 
-//  TODO:  Remove this when SSL is working correctly
-const getGamepadInstance = ():
-    | Gamepad
-    | { start: () => void; on: () => void; off: () => void } => {
-    if (typeof window === 'undefined') {
-        return {
-            start: () => {},
-            on: () => {},
-            off: () => {},
-        };
-    }
-
-    if (window?.navigator.userAgent.includes('Firefox')) {
-        console.log('Mock gamepad');
-        return {
-            start: () => {},
-            on: () => {},
-            off: () => {},
-        };
-    }
-
-    const gamepadInstance = new Gamepad();
-
-    gamepadInstance.start();
-
-    gamepadInstance.on('gamepad:connected', ({ detail }: GamepadDetail) => {
-        const { gamepad } = detail;
-
-        const profiles: Array<GamepadProfile> = store.get(
-            'workspace.gamepad.profiles',
-        );
-
-        const foundGamepad = profiles.find((profile) =>
-            profile.id.includes(gamepad.id),
-        );
-
-        toast.info(
-            foundGamepad
-                ? `${foundGamepad.name} Connected`
-                : 'New gamepad connected, add it as a profile in your preferences',
-        );
-    });
-
-    gamepadInstance.on('gamepad:disconnected', () => {
-        toast.info('Gamepad Disconnected');
-    });
-
-    return gamepadInstance;
-};
-
-const gamepadInstance = getGamepadInstance();
-
 export const shortcutComboBuilder = (list: Array<string> = []): string => {
     const JOIN_KEY = '+';
 
@@ -211,7 +159,7 @@ export const checkButtonHold = (
 };
 
 export const onGamepadButtonPress = ({ detail }: GamepadDetail): string => {
-    if ((gamepadInstance as Gamepad).shouldHold) {
+    if ((GamepadManager.getInstance() as Gamepad).shouldHold) {
         return null;
     }
 
@@ -235,8 +183,9 @@ export const onGamepadButtonPress = ({ detail }: GamepadDetail): string => {
     );
 
     if (
-        (!detail.pressed && foundAction?.primaryAction?.includes('JOG')) ||
-        foundAction?.secondaryAction?.includes('JOG')
+        !detail.pressed &&
+        (foundAction?.primaryAction?.includes('JOG') ||
+            foundAction?.secondaryAction?.includes('JOG'))
     ) {
         return 'STOP_CONT_JOG';
     }
@@ -268,21 +217,11 @@ export const runAction = ({ event }: { event: GamepadDetail }): void => {
     }
     if (shuttleControlEvents[action]) {
         const shuttleEvent = shuttleControlEvents[action];
+        const shuttleEv = shuttleEvent as ShuttleEvent;
 
-        if ((shuttleEvent as ShuttleEvent)?.callback) {
-            const shuttleEv = shuttleEvent as ShuttleEvent;
-            // gamepads emit many signals on button press, so this stops the shortcut from running a bunch of times
-            if (
-                currentShuttleEvent &&
-                currentShuttleEvent.cmd !== shuttleEv.cmd
-            ) {
-                currentShuttleEvent = shuttleEv;
-                buttonPressDebounce = debounce(() =>
-                    shuttleEv.callback(null, shuttleEv.payload),
-                );
-            }
-            buttonPressDebounce();
-        }
+        const throttledCallback = throttle(shuttleEv.callback, 100);
+
+        throttledCallback(null, shuttleEv.payload);
     } else {
         macroCallbackDebounce(action);
     }
@@ -311,4 +250,88 @@ export const deleteGamepadMacro = (macroID: string): void => {
     });
 };
 
-export default gamepadInstance;
+export type GamepadInstance =
+    | Gamepad
+    | { start: () => void; on: () => void; off: () => void };
+
+class GamepadManager {
+    private static instance: GamepadInstance | null = null;
+    private static connectedListener: (event: GamepadDetail) => void;
+    private static disconnectedListener: () => void;
+    private static buttonListener: (event: GamepadDetail) => void;
+
+    static initialize(): GamepadInstance {
+        if (GamepadManager.instance) {
+            return GamepadManager.instance;
+        }
+
+        const instance = new Gamepad();
+
+        // Store references to the listeners so we can remove them later
+        this.connectedListener = ({ detail }: GamepadDetail) => {
+            const { gamepad } = detail;
+
+            const profiles: GamepadProfile[] = store.get(
+                'workspace.gamepad.profiles',
+                [],
+            );
+
+            const foundGamepad = profiles.find((profile) =>
+                profile.id.includes(gamepad.id),
+            );
+
+            const toastMessage = foundGamepad
+                ? `${foundGamepad.name} Connected`
+                : 'New gamepad connected, add it as a profile in your preferences';
+
+            toast.info(toastMessage);
+        };
+
+        this.disconnectedListener = () => {
+            toast.info('Gamepad disconnected');
+        };
+
+        this.buttonListener = (event: GamepadDetail) => {
+            runAction({ event });
+        };
+
+        instance.on('gamepad:connected', this.connectedListener);
+        instance.on('gamepad:disconnected', this.disconnectedListener);
+        instance.on('gamepad:button', this.buttonListener);
+
+        if (instance instanceof Gamepad) {
+            GamepadManager.instance = instance;
+        }
+
+        return instance;
+    }
+
+    static cleanup() {
+        if (GamepadManager.instance) {
+            // Remove all event listeners before nullifying the instance
+            if (GamepadManager.instance instanceof Gamepad) {
+                GamepadManager.instance.off(
+                    'gamepad:connected',
+                    this.connectedListener,
+                );
+                GamepadManager.instance.off(
+                    'gamepad:disconnected',
+                    this.disconnectedListener,
+                );
+                GamepadManager.instance.off(
+                    'gamepad:button',
+                    this.buttonListener,
+                );
+            }
+            GamepadManager.instance = null;
+        }
+    }
+
+    static getInstance():
+        | Gamepad
+        | { start: () => void; on: () => void; off: () => void } {
+        return GamepadManager.instance || this.initialize();
+    }
+}
+
+export default GamepadManager;
