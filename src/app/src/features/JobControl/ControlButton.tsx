@@ -1,3 +1,16 @@
+import { useEffect, useState } from 'react';
+import cx from 'classnames';
+import includes from 'lodash/includes';
+import pubsub from 'pubsub-js';
+import { PiPause } from 'react-icons/pi';
+import { FiOctagon } from 'react-icons/fi';
+import { IoPlayOutline } from 'react-icons/io5';
+
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { WORKFLOW_STATES_T } from 'app/store/definitions';
+import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
@@ -12,17 +25,6 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
 } from '../../constants';
-import controller from 'app/lib/controller';
-import cx from 'classnames';
-import includes from 'lodash/includes';
-import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import { WORKFLOW_STATES_T } from 'app/store/definitions';
-import { PiPause } from 'react-icons/pi';
-import { FiOctagon } from 'react-icons/fi';
-import { IoPlayOutline } from 'react-icons/io5';
-import { useEffect, useState } from 'react';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -127,6 +129,15 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             callback: () => {
                 handleStop();
             },
+        },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            callback: () => pubsub.publish('outline:start'),
         },
     };
 
