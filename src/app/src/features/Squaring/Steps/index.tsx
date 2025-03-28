@@ -45,7 +45,7 @@ const Steps = () => {
 
     if (!started) {
         return (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 dark:text-white">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <div className="space-y-6">
                         <p>
@@ -96,7 +96,7 @@ const Steps = () => {
                             className="w-full h-auto"
                         />
 
-                        <p className="text-gray-600 font-bold">
+                        <p className="text-gray-600 font-bold dark:text-white">
                             If the X and Y axes aren't squared to each other on
                             your CNC then it will cause your cuts to end up
                             skewed.
@@ -137,8 +137,10 @@ const Steps = () => {
                             {index + 1}
                         </div>
                         <div className="flex-1">
-                            <div className="font-medium">{step.title}</div>
-                            <div className="text-sm text-gray-500">
+                            <div className="font-medium dark:text-white">
+                                {step.title}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-white">
                                 {step.description}
                             </div>
                         </div>
