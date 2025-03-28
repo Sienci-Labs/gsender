@@ -32,7 +32,7 @@ export interface Workspace {
     timeSpentRunning: number;
     longestTimeRun: number;
     spindleFunctions: boolean;
-    firmwareDefault: string;
+    defaultFirmware: string;
     park: object;
     jobTimes: number[];
     toolChange: {

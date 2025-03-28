@@ -58,7 +58,7 @@ const defaultState: State = {
         jobsCancelled: 0,
         timeSpentRunning: 0,
         longestTimeRun: 0,
-        firmwareDefault: GRBL,
+        defaultFirmware: GRBL,
         jobTimes: [],
         toolChange: {
             passthrough: false,
