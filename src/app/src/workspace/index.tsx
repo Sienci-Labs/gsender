@@ -163,6 +163,50 @@ const Workspace = () => {
             category: GENERAL_CATEGORY,
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
+        CUT: {
+            title: 'Cut',
+            keys: ['ctrl', 'x'].join('+'),
+            cmd: 'CUT',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('cut');
+            },
+        },
+        COPY: {
+            title: 'Copy',
+            keys: ['ctrl', 'c'].join('+'),
+            cmd: 'COPY',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('copy');
+            },
+        },
+        PASTE: {
+            title: 'Paste',
+            keys: ['ctrl', 'v'].join('+'),
+            cmd: 'PASTE',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('paste');
+            },
+        },
+        UNDO: {
+            title: 'Undo',
+            keys: ['ctrl', 'z'].join('+'),
+            cmd: 'UNDO',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('undo');
+            },
+        },
     };
 
     useKeybinding(shuttleControlEvents);
