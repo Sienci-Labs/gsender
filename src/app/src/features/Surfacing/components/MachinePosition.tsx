@@ -166,7 +166,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                 </div>
 
                 <div className="flex my-4 justify-between items-center">
-                    <span className="font-light text-sm max-w-20">
+                    <span className="font-light text-sm max-w-20 dark:text-white">
                         Flip Cut Direction
                     </span>
                     <Switch
