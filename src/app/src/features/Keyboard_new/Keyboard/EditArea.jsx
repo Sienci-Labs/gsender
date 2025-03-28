@@ -21,35 +21,23 @@
  *
  */
 
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-
+import { cn } from 'app/lib/utils';
 import { Button } from 'app/components/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
-
 import { formatShortcut } from '../helpers';
+import {
+    FaCheckCircle,
+    FaExclamationCircle,
+    FaInfoCircle,
+} from 'react-icons/fa';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
-/**
- * Keybinding Edit Area Component
- * @param {Object} shortcut Currently selected shortcut to edit
- * @param {Array} shortcuts List of keybind (shortcut) objects
- * @param {Function} switchPages Function to switch pages within parent Keybindings component
- * @param {Function} edit Function to edit currently selected shortcut
- */
-
-export default class EditArea extends Component {
-    static propTypes = {
-        shortcut: PropTypes.object,
-        shortcuts: PropTypes.object,
-        switchPages: PropTypes.func,
-        edit: PropTypes.func,
-        onClose: PropTypes.func,
-    };
-
-    initialState = {
+const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
+    const [state, setState] = useState({
         pressed: false,
         singleKey: '',
         keyCombo: '',
@@ -57,17 +45,10 @@ export default class EditArea extends Component {
         altTriggered: false,
         shiftTriggered: false,
         ctrlTriggered: false,
-        state: { available: false, error: false, message: '' },
-    };
+        status: { available: false, error: false, message: '' },
+    });
 
-    state = this.initialState;
-
-    /**
-     * Function to build shortcut key combination
-     * @param {KeyboardEvent} e The keyboard object containing all keyboard related attributes and methods
-     */
-    buildCombo = (e) => {
-        //Key map for mousetrap package
+    const buildCombo = (e) => {
         const keyMap = {
             Backspace: 'backspace',
             Tab: 'tab',
@@ -85,22 +66,22 @@ export default class EditArea extends Component {
             Insert: 'ins',
             End: 'end',
             Home: 'home',
-        }[e.key];
+        };
 
-        const key = keyMap || e.key.toLowerCase();
+        const key = keyMap[e.key] || e.key.toLowerCase();
 
-        //Ignore trigger keys
         if (triggerKeys.includes(e.key)) {
             return [];
         }
 
-        this.setState({
+        setState((prev) => ({
+            ...prev,
             pressed: true,
             metaTriggered: false,
             altTriggered: false,
             shiftTriggered: false,
             ctrlTriggered: false,
-        });
+        }));
 
         const keys = {
             metaKey: { label: 'command', triggered: e.metaKey },
@@ -110,46 +91,27 @@ export default class EditArea extends Component {
         };
 
         let keyCombo = '';
-        if (keys.metaKey.triggered) {
-            keyCombo += `${keys.metaKey.label}+`;
-        }
-
-        if (keys.altKey.triggered) {
-            keyCombo += `${keys.altKey.label}+`;
-        }
-
-        if (keys.ctrlKey.triggered) {
-            keyCombo += `${keys.ctrlKey.label}+`;
-        }
-
-        // Do not add shift to the combo if one of the numbers on the main area of the keyboard are clicked
-        // This will prevent the keycombo from being set as shift + ! for example, which mousetrap won't understand
-        // (ex. shift + 1 = !)
+        if (keys.metaKey.triggered) keyCombo += `${keys.metaKey.label}+`;
+        if (keys.altKey.triggered) keyCombo += `${keys.altKey.label}+`;
+        if (keys.ctrlKey.triggered) keyCombo += `${keys.ctrlKey.label}+`;
         if (keys.shiftKey.triggered && !e.code.includes('Digit')) {
             keyCombo += `${keys.shiftKey.label}+`;
         }
-
         keyCombo += key;
 
         return [key, keyCombo];
     };
 
-    /**
-     * Function to listen to keydowns and generate new keybinding command combo
-     * @param {KeyboardEvent} e The keyboard object containing all keyboard related attributes and methods
-     */
-    outputKeys = (e) => {
+    const outputKeys = (e) => {
         e.preventDefault();
+        const [singleKey, keyCombo] = buildCombo(e);
 
-        const [singleKey, keyCombo] = this.buildCombo(e);
+        if (!keyCombo) return;
 
-        if (!keyCombo) {
-            return;
-        }
+        const foundShortcut = Object.entries(shortcuts)
+            .filter(([_, shortcut]) => shortcut.isActive)
+            .find(([_, shortcut]) => shortcut.keys === keyCombo);
 
-        const foundShortcut = Object.entries(this.props.shortcuts)
-            .filter(([key, shortcut]) => shortcut.isActive)
-            .find(([key, shortcut]) => shortcut.keys === keyCombo);
         const keyState = {
             singleKey,
             keyCombo,
@@ -160,214 +122,208 @@ export default class EditArea extends Component {
         };
 
         if (foundShortcut) {
-            if (foundShortcut[1].keys !== this.props.shortcut.keys) {
+            if (foundShortcut[1].keys !== shortcut.keys) {
                 const title = allShuttleControlEvents[foundShortcut[1].cmd]
                     ? allShuttleControlEvents[foundShortcut[1].cmd].title
                     : foundShortcut[1].title;
-                this.setState({
+                setState((prev) => ({
+                    ...prev,
                     ...keyState,
-                    state: {
+                    status: {
                         available: false,
                         error: true,
                         message: `This shortcut is already in use by action "${title}"`,
                     },
-                });
+                }));
             } else {
-                //If it found itself, return to original state
-                this.setState({
+                setState((prev) => ({
+                    ...prev,
                     ...keyState,
-                    state: { available: false, error: false, message: '' },
-                });
+                    status: { available: false, error: false, message: '' },
+                }));
             }
             return;
         }
 
-        this.setState({
+        setState((prev) => ({
+            ...prev,
             ...keyState,
-            state: {
+            status: {
                 available: true,
                 error: false,
                 message: 'Shortcut is Available',
             },
-        });
+        }));
     };
 
-    /**
-     * Function to edit shortcut with new key combo, function invokes parent function received in props
-     */
-    handleEdit = () => {
-        const { shortcut, edit } = this.props;
-        const { keyCombo } = this.state;
+    useEffect(() => {
+        document.addEventListener('keydown', outputKeys);
+        return () => document.removeEventListener('keydown', outputKeys);
+    }, []);
 
-        edit({ ...shortcut, keys: keyCombo });
+    const handleEdit = () => {
+        edit({ ...shortcut, isActive: true, keys: state.keyCombo });
     };
 
-    componentDidMount() {
-        document.addEventListener('keydown', this.outputKeys);
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('keydown', this.outputKeys);
-    }
-
-    /**
-     * Function to output information window with dynamic message and styling
-     */
-    infoWindowOutput = () => {
-        const { state } = this.state;
-
-        if (state.available) {
-            return (
-                <div className="bg-green-100 text-green-800 p-2 rounded flex items-center">
-                    <i className="fas fa-check-circle mr-2" />{' '}
-                    <p>{state.message}</p>
-                </div>
-            );
-        }
-
-        if (state.error) {
-            return (
-                <div className="bg-red-100 text-red-800 p-2 rounded flex items-center">
-                    <i className="fas fa-exclamation-circle mr-2" />{' '}
-                    <p>{state.message}</p>
-                </div>
-            );
-        }
-
-        return (
-            <div className="bg-gray-100 text-gray-800 p-2 rounded flex items-center">
-                <i className="fas fa-info-circle mr-2" /> <p>&nbsp;</p>
-            </div>
-        );
-    };
-
-    displayShortcut = () => {
-        const { shortcut } = this.props;
-
+    const displayShortcut = () => {
         const shortcutArray = shortcut.keys.split('+');
-
         let cleanedShortcut = null;
 
-        //If there is an empty value as the last element in the shorcut array,
-        //that means a plus key is supposed to be there, but it was filtered out
-        //due to keys.split
+        if (shortcut.keys === '') {
+            return <span className="text-gray-500">None</span>;
+        }
+
         if (shortcutArray[shortcutArray.length - 1] === '') {
             cleanedShortcut = shortcutArray.filter((item) => item !== '');
-
             if (shortcutArray[0]) {
                 cleanedShortcut.push('+');
             }
         }
 
-        const output = cleanedShortcut
+        return cleanedShortcut
             ? formatShortcut(cleanedShortcut)
             : formatShortcut(shortcutArray);
-
-        return output;
     };
 
-    render() {
-        const {
-            pressed,
-            singleKey,
-            shiftTriggered,
-            altTriggered,
-            metaTriggered,
-            ctrlTriggered,
-            state,
-        } = this.state;
-        const { onClose, shortcut } = this.props;
+    const title = allShuttleControlEvents[shortcut.cmd]
+        ? allShuttleControlEvents[shortcut.cmd].title
+        : shortcut.title;
 
-        const infoWindowOutput = this.infoWindowOutput();
+    const renderNewShortcut = () => {
+        if (!state.pressed) {
+            return (
+                <div className="h-12 flex items-center justify-center">
+                    <span className="text-blue-500 animate-pulse">
+                        Press Some Keys...
+                    </span>
+                </div>
+            );
+        }
 
-        const output = pressed ? (
-            formatShortcut([singleKey])
-        ) : (
-            <span className="text-blue-500 animate-pulse">
-                Press Some Keys...
-            </span>
-        );
-
-        const shortcutkeys = this.displayShortcut();
-
-        const title = allShuttleControlEvents[shortcut.cmd]
-            ? allShuttleControlEvents[shortcut.cmd].title
-            : shortcut.title;
+        const keys = [];
+        if (state.metaTriggered) keys.push('command');
+        if (state.ctrlTriggered) keys.push('ctrl');
+        if (state.altTriggered) keys.push('alt');
+        if (state.shiftTriggered) keys.push('shift');
+        if (state.singleKey) keys.push(state.singleKey);
 
         return (
-            <div className="p-4">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <h4 className="text-center font-medium">Action</h4>
-                    <h4 className="text-center font-medium">
-                        Current Shortcut
-                    </h4>
+            <div className="h-12 flex items-center justify-center space-x-1">
+                {keys.map((key, index) => (
+                    <React.Fragment key={key}>
+                        <span
+                            className={cn(
+                                'px-3 py-1 rounded-md font-medium min-w-[4rem] text-center bg-gray-700 text-gray-100',
+                            )}
+                        >
+                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </span>
+                        {index < keys.length - 1 && (
+                            <span className="text-gray-100 w-4 text-center">
+                                +
+                            </span>
+                        )}
+                    </React.Fragment>
+                ))}
+            </div>
+        );
+    };
 
-                    <h4 className="text-center">{title}</h4>
-                    <h4 className="text-center">{shortcutkeys}</h4>
-                </div>
-
-                <div className="mb-4">
-                    <div className="text-center">
-                        <h4 className="mb-2">New Shorcut:</h4>
-                        <h4>{output}</h4>
+    return (
+        <>
+            <div className="space-y-6">
+                {/* Header Section */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Action
+                        </h4>
+                        <h4 className="text-lg font-semibold text-gray-900">
+                            {title}
+                        </h4>
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-500 mb-1">
+                            Current Shortcut
+                        </h4>
+                        <h4 className="text-lg font-semibold text-gray-900">
+                            {displayShortcut()}
+                        </h4>
                     </div>
                 </div>
 
-                <div className="flex justify-center space-x-2 mb-4">
-                    <label
-                        className={
-                            ctrlTriggered
-                                ? 'bg-blue-500 text-white px-2 py-1 rounded'
-                                : 'bg-gray-200 text-gray-600 px-2 py-1 rounded'
-                        }
-                    >
-                        Ctrl
-                    </label>
-                    <label
-                        className={
-                            shiftTriggered
-                                ? 'bg-blue-500 text-white px-2 py-1 rounded'
-                                : 'bg-gray-200 text-gray-600 px-2 py-1 rounded'
-                        }
-                    >
-                        Shift
-                    </label>
-                    <label
-                        className={
-                            altTriggered
-                                ? 'bg-blue-500 text-white px-2 py-1 rounded'
-                                : 'bg-gray-200 text-gray-600 px-2 py-1 rounded'
-                        }
-                    >
-                        Alt
-                    </label>
-                    <label
-                        className={
-                            metaTriggered
-                                ? 'bg-blue-500 text-white px-2 py-1 rounded'
-                                : 'bg-gray-200 text-gray-600 px-2 py-1 rounded'
-                        }
-                    >
-                        Command
-                    </label>
+                {/* New Shortcut Section */}
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">
+                        New Shortcut:
+                    </h4>
+                    <div className="min-h-[4rem] flex items-center justify-center">
+                        {renderNewShortcut()}
+                    </div>
                 </div>
 
-                {infoWindowOutput}
+                {/* Status Message */}
+                <div className="min-h-[3.5rem]">
+                    {state.status.message && (
+                        <div
+                            className={cn(
+                                'p-4 rounded-lg flex items-center justify-center space-x-2',
+                                state.status.available
+                                    ? 'bg-green-50 text-green-700'
+                                    : state.status.error
+                                      ? 'bg-red-50 text-red-700'
+                                      : 'bg-gray-50 text-gray-700',
+                            )}
+                        >
+                            {state.status.available ? (
+                                <FaCheckCircle className="text-green-500" />
+                            ) : state.status.error ? (
+                                <FaExclamationCircle className="text-red-500" />
+                            ) : (
+                                <FaInfoCircle className="text-gray-500" />
+                            )}
+                            <span>{state.status.message}</span>
+                        </div>
+                    )}
+                </div>
 
-                <div className="flex justify-center mt-8">
-                    <Button btnSize="lg" btnStyle="default" onClick={onClose}>
-                        Cancel
+                {/* Action Buttons */}
+                <div className="flex justify-center space-x-4 pt-4">
+                    <Button
+                        onClick={handleEdit}
+                        disabled={!state.status.available}
+                        className={cn(
+                            'px-6 py-2 rounded-md font-medium transition-colors duration-200',
+                            state.status.available
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed',
+                        )}
+                    >
+                        Update Shortcut
                     </Button>
                     <Button
-                        btnSize="lg"
-                        btnStyle="primary"
-                        disabled={!state.available}
-                        onClick={this.handleEdit}
+                        onClick={onClose}
+                        className="px-6 py-2 rounded-md font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
                     >
-                        Save Changes
+                        Cancel
                     </Button>
                 </div>
             </div>
-        );
-    }
-}
+        </>
+    );
+};
+
+EditArea.propTypes = {
+    shortcut: PropTypes.shape({
+        cmd: PropTypes.string.isRequired,
+        keys: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        isActive: PropTypes.bool.isRequired,
+    }).isRequired,
+    shortcuts: PropTypes.object.isRequired,
+    switchPages: PropTypes.func.isRequired,
+    edit: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+};
+
+export default EditArea;

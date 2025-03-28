@@ -35,6 +35,7 @@ import { toast } from 'app/lib/toaster';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
@@ -55,6 +56,42 @@ const Keyboard = () => {
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+
+    // Initialize shortcuts from allShuttleControlEvents if they're not in store
+    useEffect(() => {
+        const currentShortcuts = store.get('commandKeys', {});
+        const updatedShortcuts = { ...currentShortcuts };
+
+        // Add any missing shortcuts from allShuttleControlEvents
+        Object.entries(allShuttleControlEvents).forEach(([key, event]) => {
+            if (
+                key !== 'MACRO' &&
+                key !== 'STOP_CONT_JOG' &&
+                !updatedShortcuts[key]
+            ) {
+                updatedShortcuts[key] = {
+                    cmd: event.cmd,
+                    keys: event.keys || '',
+                    isActive: event.isActive ?? true,
+                    category: event.category,
+                    title: event.title,
+                    preventDefault: event.preventDefault ?? false,
+                    payload: event.payload,
+                    callback: event.callback,
+                };
+            }
+        });
+
+        // Only update if there are new shortcuts
+        if (
+            Object.keys(updatedShortcuts).length >
+            Object.keys(currentShortcuts).length
+        ) {
+            store.replace('commandKeys', updatedShortcuts);
+            setShortcutsList(updatedShortcuts);
+            setDataSet(updatedShortcuts);
+        }
+    }, [allShuttleControlEvents]);
 
     const filter = (category, shortcuts) => {
         const allShortcuts = shortcuts || shortcutsList;
@@ -139,6 +176,7 @@ const Keyboard = () => {
         //Replace old keybinding item with new one
         const updatedShortcuts = _.cloneDeep(shortcutsList);
         updatedShortcuts[shortcut.cmd] = shortcut;
+
         updateKeybindings(updatedShortcuts, showToast);
     };
 
@@ -147,9 +185,6 @@ const Keyboard = () => {
         const shortcutInUse = Object.entries(updatedShortcutsList)
             .filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd)
             .find(([key, keybinding]) => keybinding.keys === shortcut.keys);
-        if (shortcutInUse && shortcut.isActive) {
-            shortcut.keys = '';
-        }
 
         updatedShortcutsList[shortcut.cmd] = shortcut;
         updateKeybindings(updatedShortcutsList, showToast);
@@ -226,6 +261,228 @@ const Keyboard = () => {
 
     const datasetList = generateList(dataSet);
 
+    const handlePrintShortcuts = () => {
+        // Group shortcuts by category
+        const shortcutsByCategory = {};
+
+        Object.values(shortcutsList)
+            .filter((s) => s.isActive && s.currentKeys)
+            .forEach((shortcut) => {
+                const categoryKey = shortcut.category;
+                const categoryName = getCategoryData(categoryKey).label;
+
+                if (!shortcutsByCategory[categoryName]) {
+                    shortcutsByCategory[categoryName] = [];
+                }
+
+                shortcutsByCategory[categoryName].push(shortcut);
+            });
+
+        try {
+            const oldIframe = document.getElementById('print-shortcuts-frame');
+            if (oldIframe) {
+                document.body.removeChild(oldIframe);
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.id = 'print-shortcuts-frame';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+
+            document.body.appendChild(iframe);
+
+            let printContent = `
+                <div class="header">
+                    <h1>gSender Keyboard Shortcuts</h1>
+                    <p class="subtitle">Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+
+            Object.entries(shortcutsByCategory).forEach(
+                ([category, categoryShortcuts]) => {
+                    const categoryColor =
+                        getCategoryData(
+                            categoryShortcuts[0].category,
+                        ).color.split(' ')[0] || 'bg-gray-100';
+
+                    printContent += `
+                    <div class="category">
+                        <div class="category-header ${categoryColor}">
+                            <h2>${category}</h2>
+                        </div>
+                        <div class="shortcuts">
+                `;
+
+                    categoryShortcuts.forEach((shortcut) => {
+                        const keys = formatShortcut(shortcut.currentKeys);
+                        printContent += `
+                        <div class="shortcut">
+                            <div class="shortcut-info">
+                                <div class="shortcut-title">${shortcut.title}</div>
+                                ${shortcut.description ? `<div class="shortcut-description">${shortcut.description}</div>` : ''}
+                            </div>
+                            <div class="shortcut-keys">${keys}</div>
+                        </div>
+                    `;
+                    });
+
+                    printContent += `
+                        </div>
+                    </div>
+                `;
+                },
+            );
+
+            const iframeDoc = iframe.contentWindow?.document;
+            if (iframeDoc) {
+                iframeDoc.open();
+                iframeDoc.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Keyboard Shortcuts</title>
+                        <style>
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                color: #333;
+                            }
+                            
+                            .header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                padding-bottom: 15px;
+                                border-bottom: 2px solid #eaeaea;
+                            }
+                            
+                            .header h1 {
+                                margin: 0;
+                                font-size: 28px;
+                            }
+                            
+                            .subtitle {
+                                color: #666;
+                                margin-top: 5px;
+                            }
+                            
+                            .category {
+                                margin-bottom: 30px;
+                                page-break-inside: avoid;
+                            }
+                            
+                            .category-header {
+                                padding: 8px 15px;
+                                border-radius: 4px;
+                                margin-bottom: 15px;
+                            }
+                            
+                            .category-header h2 {
+                                margin: 0;
+                                font-size: 18px;
+                                font-weight: 600;
+                            }
+                            
+                            .shortcuts {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+                                gap: 15px;
+                            }
+                            
+                            .shortcut {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 10px 15px;
+                                border: 1px solid #eaeaea;
+                                border-radius: 4px;
+                                background-color: #fafafa;
+                            }
+                            
+                            .shortcut-info {
+                                flex: 1;
+                            }
+                            
+                            .shortcut-title {
+                                font-weight: 500;
+                            }
+                            
+                            .shortcut-description {
+                                font-size: 12px;
+                                color: #666;
+                                margin-top: 3px;
+                            }
+                            
+                            .shortcut-keys {
+                                font-family: monospace;
+                                background-color: #f1f5f9;
+                                padding: 5px 10px;
+                                border-radius: 4px;
+                                border: 1px solid #e2e8f0;
+                                font-weight: 600;
+                                white-space: nowrap;
+                            }
+                            
+                            /* Category colors */
+                            .bg-blue-100 { background-color: #dbeafe; }
+                            .bg-green-100 { background-color: #dcfce7; }
+                            .bg-orange-100 { background-color: #ffedd5; }
+                            .bg-pink-100 { background-color: #fce7f3; }
+                            .bg-cyan-100 { background-color: #cffafe; }
+                            .bg-purple-100 { background-color: #f3e8ff; }
+                            .bg-red-100 { background-color: #fee2e2; }
+                            .bg-yellow-100 { background-color: #fef9c3; }
+                            .bg-gray-100 { background-color: #f3f4f6; }
+                            
+                            @media print {
+                                body {
+                                    font-size: 11px;
+                                }
+                                
+                                .header h1 {
+                                    font-size: 22px;
+                                }
+                                
+                                .category-header h2 {
+                                    font-size: 16px;
+                                }
+                                
+                                .shortcuts {
+                                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                                }
+                                
+                                .shortcut {
+                                    break-inside: avoid;
+                                }
+                                
+                                @page {
+                                    margin: 1cm;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>${printContent}</body>
+                    </html>
+                `);
+                iframeDoc.close();
+
+                iframe.onload = () => {
+                    iframe.contentWindow?.focus();
+                    iframe.contentWindow?.print();
+                };
+            } else {
+                toast.error('Unable to create print document.');
+            }
+        } catch (error) {
+            console.error('Print error:', error);
+            toast.error('Failed to print shortcuts.');
+        }
+    };
+
     return (
         <div className="flex flex-col gap-4 h-full">
             <div className="flex gap-4 justify-end">
@@ -264,11 +521,13 @@ const Keyboard = () => {
                     open={showEditModal}
                     onOpenChange={(open) => !open && closeModal()}
                 >
-                    <DialogContent className="bg-gray-300 p-6">
+                    <DialogContent className="bg-gray-300 p-6 w-3/4 max-w-[800px]">
                         <DialogHeader>
-                            <DialogTitle className="text-center mb-4">
-                                Edit Shortcut
-                            </DialogTitle>
+                            <DialogTitle>Edit Shortcut</DialogTitle>
+
+                            <DialogDescription>
+                                Update the keybinding for this shortcut
+                            </DialogDescription>
                         </DialogHeader>
 
                         <EditArea
