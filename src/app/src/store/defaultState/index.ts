@@ -141,6 +141,7 @@ const defaultState: State = {
             },
         },
         notifications: [],
+        enableDarkMode: false,
     },
     widgets: {
         axes: {

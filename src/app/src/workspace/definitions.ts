@@ -36,12 +36,12 @@ export interface Workspace {
         passthrough: boolean;
     };
     toolChangeOption:
-    | 'Ignore'
-    | 'Pause'
-    | 'Standard Re-zero'
-    | 'Flexible Re-zero'
-    | 'Fixed Tool Sensor'
-    | 'Code';
+        | 'Ignore'
+        | 'Pause'
+        | 'Standard Re-zero'
+        | 'Flexible Re-zero'
+        | 'Fixed Tool Sensor'
+        | 'Code';
     toolChangePosition: BasicPosition;
     toolChangeHooks: {
         preHook: string;
@@ -76,4 +76,5 @@ export interface Workspace {
         };
     };
     notifications: Notification[];
+    enableDarkMode: boolean;
 }
