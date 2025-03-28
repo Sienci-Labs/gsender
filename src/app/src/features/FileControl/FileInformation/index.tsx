@@ -84,19 +84,21 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             >
                 {isElectron() && (
                     <div className="flex flex-col gap-2">
-                        <span className="ml-4">Recent Files</span>
+                        <span className="ml-4 dark:text-white">
+                            Recent Files
+                        </span>
 
                         {recentFiles.map(
                             (file, index) =>
                                 index < 3 && (
-                                    <div className="flex flex-row border justify-between border-gray-300 rounded items-center h-10">
+                                    <div className="flex flex-row border justify-between border-gray-300 dark:border-gray-600 rounded items-center h-10">
                                         <div className="grid grid-cols-[30px_3fr] items-center gap-1">
-                                            <GoFileCode className="text-3xl text-gray-400 ml-1" />
+                                            <GoFileCode className="text-3xl text-gray-400 ml-1 dark:text-white" />
                                             <div className="grid items-start">
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                                                            <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
                                                                 {file.fileName}
                                                             </span>
                                                         </TooltipTrigger>
@@ -106,7 +108,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                                                     </Tooltip>
                                                 </TooltipProvider>
 
-                                                <span className=" text-gray-500 text-xs">
+                                                <span className=" text-gray-500 text-xs dark:text-gray-400">
                                                     {(file.fileSize
                                                         ? file.fileSize /
                                                           1000000
