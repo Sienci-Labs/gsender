@@ -98,7 +98,13 @@
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "extraResources": [
-      "./node_modules/@electron/remote/**"
+      {
+        "from": "./node_modules/@electron/remote/",
+        "to": "./node_modules/@electron/remote/",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
       "buildResources": "electron-build",
@@ -439,8 +445,8 @@
     "css-split-webpack-plugin": "~0.2.6",
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
-    "electron": "^33.2.0",
-    "electron-builder": "~23.6.0",
+    "electron": "^35.1.2",
+    "electron-builder": "~26.0.12",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",
