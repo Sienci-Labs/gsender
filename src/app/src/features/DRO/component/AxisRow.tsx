@@ -38,7 +38,7 @@ export function AxisRow({
     const { shouldWarnZero } = useWorkspaceState();
 
     return (
-        <div className="border border-gray-200 rounded w-full flex flex-row items-stretch justify-between flex-1">
+        <div className="border border-gray-200 dark:border-gray-700 rounded w-full flex flex-row items-stretch justify-between flex-1">
             {homingMode || !shouldWarnZero ? (
                 <Button
                     onClick={() => {
@@ -59,7 +59,11 @@ export function AxisRow({
             ) : (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button disabled={disabled} variant="secondary">
+                        <Button
+                            disabled={disabled}
+                            variant="secondary"
+                            size="sm"
+                        >
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                                 {`${axis}0`}
                             </span>

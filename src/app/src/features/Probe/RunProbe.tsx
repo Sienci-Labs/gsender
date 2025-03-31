@@ -23,7 +23,6 @@
 
 import { useEffect, useState } from 'react';
 
-import gamepad, { runAction } from 'app/lib/gamepad';
 import {
     Dialog,
     DialogContent,
@@ -32,14 +31,15 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/Button';
 import cx from 'classnames';
-import { GamepadDetail } from 'app/lib/gamepad/definitions';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';
 
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
 import { Actions, State } from './definitions';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
+import { PROBING_CATEGORY } from 'app/constants';
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 interface RunProbeProps {
     state: State;
@@ -68,22 +68,28 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
 
-    useRegisterShortcuts([
-        {
-            id: 'start-probe',
-            title: 'Start Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
-                startProbe();
-            },
+    // useEffect(() => {
+    //     useKeybinding(shuttleControlEvents);
+    // }, []);
+
+    const shuttleControlEvents = {
+        START_PROBE: {
+            title: 'Start Probing',
+            keys: '',
+            cmd: 'START_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => startProbe(),
         },
-        {
-            id: 'confirm-probe',
+        CONFIRM_PROBE: {
             title: 'Confirm Probe',
-            defaultKeys: '',
-            category: 'PROBING_CATEGORY',
-            onKeyDown: () => {
+            keys: '',
+            cmd: 'CONFIRM_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
                 if (connectionMade) {
                     return;
                 }
@@ -93,7 +99,10 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 actions.setProbeConnectivity(true);
             },
         },
-    ]);
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();
@@ -105,10 +114,6 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     };
 
     useEffect(() => {
-        gamepad.on('gamepad:button', (event: GamepadDetail) =>
-            runAction({ event }),
-        );
-
         return () => {
             testInterval && clearInterval(testInterval);
             setTestInterval(null);
@@ -137,7 +142,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 </DialogHeader>
                 <div className="grid grid-cols-[1.5fr_1fr] gap-3 w-[600px] min-h-[200px]">
                     <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug">
+                        <div className="text-black leading-snug dark:text-white">
                             <p className="mb-3">
                                 1. Check the tool is positioned correctly
                                 (pictured).

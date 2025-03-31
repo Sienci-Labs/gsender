@@ -109,7 +109,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
 
     return (
         <div className="w-64">
-            <div className="border-solid border border-gray-500 rounded-sm bg-gray-100 gap-2 flex flex-row justify-between items-center pr-1 pt-1">
+            <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
                 <div className="flex flex-col gap-0 w-full h-full -mt-6">
                     <div
                         className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap transition-transform duration-200"
@@ -128,7 +128,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="flex flex-col text-black justify-center items-center w-32">
+                            <div className="flex flex-col  justify-center items-center w-32">
                                 {timeComponent}
                                 <span className="text-sm">remaining</span>
                             </div>

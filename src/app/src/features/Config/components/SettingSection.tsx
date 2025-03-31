@@ -46,7 +46,7 @@ export function SettingSection({
                 <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
                     <span className="text-blue-500  text-xl">{label}</span>
                     {wizard && wizard()}
-                </legend>
+                </div>
             )}
             {filteredSettings.map((setting) => {
                 return (

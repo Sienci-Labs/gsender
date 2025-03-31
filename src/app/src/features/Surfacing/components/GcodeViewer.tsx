@@ -41,7 +41,9 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
                             <div
                                 key={Math.random().toString()}
                                 className={`py-1 px-2 rounded-sm ${
-                                    index % 2 === 0 ? 'bg-gray-200' : ''
+                                    index % 2 === 0
+                                        ? 'bg-gray-200 dark:bg-dark-lighter'
+                                        : ''
                                 }`}
                             >
                                 <span className="text-muted-foreground mr-4">

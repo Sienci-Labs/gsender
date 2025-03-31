@@ -584,8 +584,8 @@ export default [
     {
         id: 54,
         company: 'Sienci Labs',
-        name: 'Altmill 48X48',
-        type: '',
+        name: 'Altmill',
+        type: '48X48',
         version: '',
         mm: {
             width: 1260,
@@ -610,8 +610,8 @@ export default [
     {
         id: 55,
         company: 'Sienci Labs',
-        name: 'Altmill 48X48 + Spindle',
-        type: '',
+        name: 'Altmill',
+        type: '48X48 + Spindle',
         version: '',
         mm: {
             width: 49.6,

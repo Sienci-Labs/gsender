@@ -30,7 +30,7 @@ export function JobPreview({
     const jobComplete = jobStatus === 'COMPLETE';
     const statusMessage = jobComplete ? 'Finished' : 'Incomplete';
     return (
-        <div className="grid grid-cols-8 grid-rows-1 gap-4 items-center">
+        <div className="grid grid-cols-8 grid-rows-1 gap-4 items-center dark:text-white">
             <span
                 className={cn('opacity-70', {
                     'text-red-500': !jobComplete,

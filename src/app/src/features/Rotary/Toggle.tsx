@@ -1,4 +1,4 @@
-import { Switch } from 'app/components/shadcn/Switch';
+import Switch from 'app/components/Switch';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
@@ -17,11 +17,11 @@ const Toggle = () => {
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 dark:text-white">
             {controllerType === 'grblHAL' && <span>4-Axis</span>}
             <Switch
                 checked={mode === WORKSPACE_MODE.ROTARY}
-                onCheckedChange={handleToggle}
+                onChange={handleToggle}
             />
             <span>Rotary</span>
         </div>

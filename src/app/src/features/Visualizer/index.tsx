@@ -35,7 +35,6 @@ import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
 import { colorsResponse } from 'app/workers/colors.response';
 import controller from 'app/lib/controller';
-import gamepad, { runAction } from 'app/lib/gamepad';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -676,13 +675,6 @@ class Visualizer extends Component {
                 }));
             }, 0);
         }
-
-        gamepad.on('gamepad:button', (event) => {
-            runAction({
-                event,
-                shuttleControlEvents: this.shuttleControlEvents,
-            });
-        });
     }
 
     componentWillUnmount() {
@@ -1027,127 +1019,6 @@ class Visualizer extends Component {
     };
 
     shuttleControlEvents = {
-        LOAD_FILE: {
-            title: 'Load File',
-            keys: ['shift', 'l'].join('+'),
-            gamepadKeys: '0',
-            keysName: 'A',
-            cmd: 'LOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: debounce(() => {
-                if (this.workflowControl) {
-                    this.workflowControl.handleClickUpload();
-                }
-            }, 300),
-        },
-        UNLOAD_FILE: {
-            title: 'Unload File',
-            keys: ['shift', 'k'].join('+'),
-            gamepadKeys: '1',
-            keysName: 'B',
-            cmd: 'UNLOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                this.actions.closeModal();
-                this.actions.unloadGCode();
-                this.actions.reset();
-            },
-        },
-        TEST_RUN: {
-            title: 'Test Run',
-            keys: '#',
-            cmd: 'TEST_RUN',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                controller.command('gcode:test');
-            },
-        },
-        RUN_OUTLINE: {
-            title: 'Run Outline',
-            keys: '',
-            cmd: 'RUN_OUTLINE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (this.workflowControl) {
-                    this.workflowControl.runOutline();
-                }
-            },
-        },
-        START_JOB: {
-            title: 'Start Job',
-            keys: '~',
-            gamepadKeys: '9',
-            keysName: 'Start',
-            cmd: 'START_JOB',
-            payload: {
-                type: GRBL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.START_JOB,
-        },
-        START_JOB_ALT: {
-            title: 'Start Job (Alt)',
-            keys: ['ctrl', '`'].join('+'),
-            cmd: 'START_JOB_ALT',
-            payload: {
-                type: GRBLHAL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.START_JOB,
-        },
-        PAUSE_JOB: {
-            title: 'Pause Job',
-            keys: '!',
-            gamepadKeys: '2',
-            keysName: 'X',
-            cmd: 'PAUSE_JOB',
-            payload: {
-                type: GRBL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.PAUSE_JOB,
-        },
-        PAUSE_JOB_ALT: {
-            title: 'Pause Job (Alt)',
-            keys: ['ctrl', '1'].join('+'),
-            cmd: 'PAUSE_JOB_ALT',
-            payload: {
-                type: GRBLHAL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: this.shuttleControlFunctions.PAUSE_JOB,
-        },
-        STOP_JOB: {
-            title: 'Stop Job',
-            keys: '@',
-            gamepadKeys: '3',
-            keysName: 'Y',
-            cmd: 'STOP_JOB',
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (this.workflowControl) {
-                    this.workflowControl.handleOnStop();
-                }
-            },
-        },
         FEEDRATE_OVERRIDE_P: {
             title: 'Feed +',
             keys: '',
@@ -1337,50 +1208,6 @@ class Visualizer extends Component {
             category: VISUALIZER_CATEGORY,
             callback: () => this.actions.handleLiteModeToggle(),
         },
-        CUT: {
-            title: 'Cut',
-            keys: ['ctrl', 'x'].join('+'),
-            cmd: 'CUT',
-            preventDefault: true,
-            isActive: true,
-            category: GENERAL_CATEGORY,
-            callback: () => {
-                document.execCommand('cut');
-            },
-        },
-        COPY: {
-            title: 'Copy',
-            keys: ['ctrl', 'c'].join('+'),
-            cmd: 'COPY',
-            preventDefault: true,
-            isActive: true,
-            category: GENERAL_CATEGORY,
-            callback: () => {
-                document.execCommand('copy');
-            },
-        },
-        PASTE: {
-            title: 'Paste',
-            keys: ['ctrl', 'v'].join('+'),
-            cmd: 'PASTE',
-            preventDefault: true,
-            isActive: true,
-            category: GENERAL_CATEGORY,
-            callback: () => {
-                document.execCommand('paste');
-            },
-        },
-        UNDO: {
-            title: 'Undo',
-            keys: ['ctrl', 'z'].join('+'),
-            cmd: 'UNDO',
-            preventDefault: true,
-            isActive: true,
-            category: GENERAL_CATEGORY,
-            callback: () => {
-                document.execCommand('undo');
-            },
-        },
         TOGGLE_SHORTCUTS: {
             title: 'Toggle Shortcuts',
             keys: '^',
@@ -1451,7 +1278,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT,
         },
         VISUALIZER_ZOOM_FIT: {
-            title: 'Zoom In',
+            title: 'Zoom Fit',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },

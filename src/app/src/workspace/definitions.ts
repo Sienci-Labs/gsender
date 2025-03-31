@@ -79,4 +79,5 @@ export interface Workspace {
         };
     };
     notifications: Notification[];
+    enableDarkMode: boolean;
 }

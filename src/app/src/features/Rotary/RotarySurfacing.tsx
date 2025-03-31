@@ -21,12 +21,14 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
-import { VISUALIZER_PRIMARY } from 'app/constants';
+import { TOOLBAR_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
 import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
 
 const InputArea = ({
     children,
@@ -148,6 +150,21 @@ const RotarySurfacing = () => {
             setGcode('');
         }
     };
+
+    const shuttleControlEvents = {
+        TOGGLE_ROTARY_SURFACING: {
+            title: 'Toggle Rotary Surfacing Display',
+            keys: '',
+            cmd: 'TOGGLE_ROTARY_SURFACING',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => setOpen((prev) => !prev),
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>

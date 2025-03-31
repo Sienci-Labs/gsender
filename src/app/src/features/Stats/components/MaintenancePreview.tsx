@@ -16,17 +16,14 @@ function timeRemainingSortComparison(a: Task, b: Task) {
     return 0;
 }
 
-function remainingTime(task: Task) {
-    return Math.floor(Number(task.rangeEnd) - Number(task.currentTime));
-}
-
 const reminderStyles = tv({
     base: 'text-3xl flex flex-row gap-8 items-center font-bolt',
     variants: {
         color: {
-            Due: 'text-red-500',
-            Soon: 'text-orange-500',
-            Low: 'text-blue-500',
+            'Urgent!': 'text-red-500',
+            Due: 'text-orange-500',
+            Soon: 'text-robin-500',
+            Low: 'text-green-500',
         },
     },
 });
@@ -35,21 +32,26 @@ const reminderBGStyles = tv({
     base: 'bg-opacity-5',
     variants: {
         color: {
-            Due: 'bg-red-500',
-            Soon: 'bg-orange-500',
-            Low: 'bg-robin-500',
+            'Urgent!': 'bg-red-500',
+            Due: 'bg-orange-500',
+            Soon: 'bg-robin-500',
+            Low: 'bg-green-500',
         },
     },
 });
 
-function remainingTimeString(remainingTime: number) {
-    const dueUpper = 4;
-    const soonUpper = 20;
+function remainingTime(task: Task) {
+    const { rangeStart, currentTime } = task;
+    return rangeStart - Math.floor(currentTime);
+}
 
-    if (remainingTime < dueUpper) {
+function remainingTimeString(task: Task) {
+    const { currentTime, rangeStart, rangeEnd } = task;
+    if (currentTime > rangeEnd) {
+        return 'Urgent!';
+    } else if (currentTime >= rangeStart && currentTime <= rangeEnd) {
         return 'Due';
-    }
-    if (remainingTime < soonUpper) {
+    } else if (currentTime >= rangeStart - 10 && currentTime < rangeStart) {
         return 'Soon';
     }
     return 'Low';
@@ -57,7 +59,7 @@ function remainingTimeString(remainingTime: number) {
 
 function MaintenanceTask({ task }: { task: Task }) {
     const time = remainingTime(task);
-    const reminderString = remainingTimeString(time);
+    const reminderString = remainingTimeString(task);
 
     return (
         <div
@@ -70,7 +72,9 @@ function MaintenanceTask({ task }: { task: Task }) {
                 <span className={reminderStyles({ color: reminderString })}>
                     {time} hours
                 </span>
-                <span className="text-gray-700">{task.name}</span>
+                <span className="text-gray-700 dark:text-gray-400">
+                    {task.name}
+                </span>
             </div>
             <div className={reminderStyles({ color: reminderString })}>
                 {reminderString}
