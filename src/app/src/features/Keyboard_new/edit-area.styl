@@ -1,0 +1,241 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.wrapper {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+.edit-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto 2rem auto;
+}
+
+.new-shortcut {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+@keyframes glowEffect {
+    from  {
+        primary = #1f2937;
+        color: primary;
+        border-bottom: 2px solid primary;
+    }
+
+    to {
+        secondary = #3e85c7;
+        color: secondary;
+        border-bottom: 2px solid secondary;
+    }
+}
+
+.glowing-text {
+    animation: glowEffect 1s ease-in-out infinite alternate;
+}
+
+.trigger-keys {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+
+    margin: 2rem auto;
+    font-weight: bold;
+
+    label {
+        font-size: 1.75rem;
+        text-decoration: underline;
+        text-decoration-color: rgba(0,0,0,0);
+    }
+
+    .active {
+        color: #3e85c7;
+        text-decoration-color: rgba(#3e85c7, 1);
+    }
+
+    .disabled {
+        color: #9ca3af;
+    }
+}
+
+info-window() {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: center;
+    border: 2px solid black;
+    padding: 1rem;
+
+    p {
+        color: black;
+        font-size: 1.25rem;
+        margin: 0;
+    }
+
+    i {
+        font-size: 1.5rem;
+    }
+}
+
+.info-window-area {
+    info-window()
+}
+
+.info-window-area-error {
+    info-window()
+    color: red;
+    border: 2px solid red;
+}
+
+.info-window-area-success {
+    info-window()
+    color: #3e85c7;
+    border: 2px solid #3e85c7;
+}
+
+.button-group-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-subtitle {
+    color: #3e85c7;
+    font-size: 1.5rem;
+    text-align: center;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.shortcut-combo-column {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: center;
+    height: 100%;
+}
+
+.action-icon {
+    $color = #2b5d8b;
+    align-self: center;
+    color: $color;
+    font-size: 1.15rem !important;
+    width: 15px;
+
+    &:hover {
+        color: lighten($color, 25);
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+.delete-icon {
+    $color = #f00;
+    align-self: center;
+    color: $color;
+    font-size: 1.15rem !important;
+
+    &:hover {
+        color: lighten($color, 25);
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+.disabled-icon {
+    outline: none;
+    color: rgba(#f00, 0.5);
+    cursor: not-allowed !important;
+}
+
+.icon-area {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.category {
+    categoryMixin(backgroundColor = none, color = black, border = none) {
+        font-weight: bold;
+        background-color: backgroundColor;
+        color: rgba(color, 0.9);
+        text-align: center;
+        padding: 5px;
+        border-radius: 25px;
+        border: border;
+    }
+
+    categoryMixin();
+
+    $lightenAmount = 20;
+
+    &-green {
+        categoryMixin(lighten(green, $lightenAmount));
+    }
+    &-blue {
+        categoryMixin(lighten(blue, $lightenAmount), white);
+    }
+    &-pink {
+        categoryMixin(pink);
+    }
+    &-orange {
+        categoryMixin(lighten(orange, $lightenAmount));
+    }
+    &-red {
+        categoryMixin(lighten(red, $lightenAmount));
+    }
+    &-purple {
+        categoryMixin(lighten(purple, $lightenAmount), white);
+    }
+    &-black {
+        categoryMixin(lighten(black, $lightenAmount), white);
+    }
+    &-grey {
+        categoryMixin(lighten(grey, $lightenAmount));
+    }
+    &-ship-cove {
+        categoryMixin(#778da9, white);
+    }
+    &-light-blue {
+        categoryMixin(dodgerblue);
+    }
+    &-darkRed {
+        categoryMixin(darken(red, $lightenAmount), white);
+    }
+}

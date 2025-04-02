@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-5",
+  "version": "1.5.0-Edge-6",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -70,7 +70,7 @@
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
     "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
-    "dev": "npm run build-dev && npm run start-dev",
+    "dev": "concurrently --kill-others-on-fail --names \"build-dev,tailwind\" \"npm run build-dev && npm run start-dev\" \"npm run tailwind-dev\"",
     "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
     "lint": "concurrently --kill-others-on-fail --names \"eslint,stylint\"\"yarn run eslint\" \"yarn run stylint\"",
     "eslint": "npm run eslint:build",
@@ -291,6 +291,7 @@
     "gcode-toolpath": "~2.2.0",
     "gsap": "^3.11.5",
     "hogan.js": "~3.0.2",
+    "html-react-parser": "^5.2.2",
     "http-proxy": "~1.18.1",
     "hull.js": "^1.0.5",
     "humanize-duration": "^3.31.0",

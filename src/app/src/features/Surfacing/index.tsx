@@ -17,7 +17,7 @@ import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import defaultState from 'app/store/defaultState';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
@@ -68,7 +68,6 @@ const SurfacingTool = () => {
     };
 
     const onChange = (property: string, value: number) => {
-        console.log(value);
         setSurfacing({
             ...surfacing,
             [property]: value,
@@ -104,7 +103,7 @@ const SurfacingTool = () => {
             <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
-                        <p className="text-base font-normal mb-4 text-gray-500">
+                        <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit
                             switches and other add-ons, get nicer and faster
@@ -202,7 +201,7 @@ const SurfacingTool = () => {
                             <Input
                                 label="Bit Diameter"
                                 type="number"
-                                units={units}
+                                suffix={units}
                                 className={inputStyle}
                                 value={surfacing.bitDiameter}
                                 onChange={(e) =>
@@ -232,7 +231,7 @@ const SurfacingTool = () => {
                                 }
                                 secondComponent={
                                     <div className="flex items-center gap-2 justify-center">
-                                        <span className="text-lg font-light">
+                                        <span className="text-lg font-light dark:text-white">
                                             Delay
                                         </span>
                                         <Checkbox
@@ -276,7 +275,7 @@ const SurfacingTool = () => {
                         </div>
 
                         <div className="flex items-center justify-between">
-                            <span className="text-lg font-light">
+                            <span className="text-lg font-light dark:text-white">
                                 Start Position
                             </span>
 

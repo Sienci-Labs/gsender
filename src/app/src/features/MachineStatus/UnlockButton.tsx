@@ -41,7 +41,10 @@ const UnlockButton: React.FC<UnlockProps> = ({
     onClick,
 }) => {
     const getButtonText = (): string => {
-        if (alarmCode === 11 || alarmCode === 'Homing') {
+        if (
+            activeState === GRBL_ACTIVE_STATE_ALARM &&
+            (alarmCode === 11 || alarmCode === 'Homing')
+        ) {
             return 'Click to Run Homing';
         }
         return 'Click to Unlock Machine';

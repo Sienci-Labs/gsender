@@ -29,7 +29,6 @@ const FileControl = () => {
             (window as any).ipcRenderer.on(
                 'returned-upload-dialog-data',
                 (_: any, file: FileData) => {
-                    console.log('returned upload dialog');
                     handleElectronFileUpload(file);
                 },
             );
@@ -71,7 +70,6 @@ const FileControl = () => {
         file: FileData,
         isRecentFile = false,
     ) => {
-        console.log(file);
         const givenFile = new File([file.data], file.name);
 
         if (isElectron() && !isRecentFile) {

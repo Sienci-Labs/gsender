@@ -67,6 +67,11 @@ export interface ControllerSettings {
     alarms: BasicObject;
 }
 
+export interface gSenderInfo {
+    releaseNotes: object;
+    hasUpdate: boolean;
+}
+
 export interface ControllerState {
     type: string;
     settings: ControllerSettings;
@@ -108,7 +113,7 @@ export interface ConnectionState {
 export interface HelperState {
     wizardActive: boolean;
     infoHelperActive: boolean;
-    wizardMinimized: boolean
+    wizardMinimized: boolean;
     infoHelperMinimized: boolean;
     title: string;
     metadata: object;

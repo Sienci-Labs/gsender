@@ -24,12 +24,16 @@ export type Notification = {
 export interface Workspace {
     units: UNITS_EN;
     reverseWidgets: boolean;
+    spindleFunctions: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;
     jobsFinished: number;
     jobsCancelled: number;
     timeSpentRunning: number;
     longestTimeRun: number;
+    spindleFunctions: boolean;
+    defaultFirmware: string;
+    park: object;
     jobTimes: number[];
     toolChange: {
         passthrough: boolean;
@@ -75,4 +79,5 @@ export interface Workspace {
         };
     };
     notifications: Notification[];
+    enableDarkMode: boolean;
 }

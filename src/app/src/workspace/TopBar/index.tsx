@@ -5,15 +5,13 @@ import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuF
 
 import gSenderIcon from './assets/icon-round.png';
 import CenterArea from './CenterArea';
-import { UnlockButton } from 'app/features/UnlockButton';
+import { IconUpdater } from 'app/features/IconUpdater';
 
 export const TopBar = () => {
     return (
-        <div className="border p-3 h-14 box-border flex gap-4 max-sm:gap-2 items-center bg-gray-50">
+        <div className="border p-3 h-14 box-border flex gap-4 max-sm:gap-2 items-center bg-gray-50 dark:bg-dark dark:border-gray-700">
             <RemoteMenuFlyout />
-            <div className="w-[40px] h-[40px] max-sm:hidden">
-                <img alt="gSender Logo" src={gSenderIcon} />
-            </div>
+            <IconUpdater />
 
             <Connection />
 

@@ -1,0 +1,68 @@
+.shortcut-item {
+    display: flex
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.active {
+    color: white;
+    background-color: rgb(75, 181, 67);
+}
+
+.shortcut-item-empty {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.shortcut-item-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.button-render {
+    width: 100%;
+    color: white;
+    background-color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center;
+    padding: 0.25rem;
+
+    &:focus-visible, &:hover {
+        transition: 250ms ease-in-out;
+        background-color: white;
+        border: 1px solid #ccc;
+        outline: none;
+        color: black;
+    }
+}
+
+.button-render-active {
+    @extend .button-render;
+
+    background-color: rgb(75, 181, 67);
+    border-color: rgb(75, 181, 67);
+}
+
+.table-header {
+    color: #777;
+    background-color: #EEEEEE;
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+}
+
+.table-cell {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+}
+
+.lockout-modifier {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}

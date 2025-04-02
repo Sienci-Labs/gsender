@@ -17,6 +17,7 @@ export type RegisteredGamepadButton = {
     buttonIndex: number;
     isActive: boolean;
     preventDefault: boolean;
+    actions: GamepadAction[];
 };
 
 export type GamepadProfile = {
@@ -24,14 +25,13 @@ export type GamepadProfile = {
     name: string;
     gamepadId: string;
     buttonMappings: Record<number, GamepadAction>;
-    axisSettings: Record<number, AxisSettings>;
+    axisSettings: Record<number, AxisSetting>;
     deadzone: number;
 };
 
-export type AxisSettings = {
+export type AxisSetting = {
+    axis: JogAxis;
     invert: boolean;
-    sensitivity: number;
-    deadzone: number;
 };
 
 export type JogAxis = 'X' | 'Y' | 'Z' | 'A';

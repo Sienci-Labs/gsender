@@ -158,6 +158,7 @@ const Terminal = (
             const { source, __sender__ } = context;
 
             if (__sender__ === senderId || !terminalInstance.current) {
+                console.log('This branch');
                 return;
             }
 

@@ -9,6 +9,16 @@ import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
 import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from 'app/components/shadcn/AlertDialog';
 
 interface FormattedTask {
     id: number;
@@ -27,9 +37,9 @@ function determineTime(task: MaintenanceTask) {
         return 'Due';
     } else {
         return (
-            <div>
+            <div className="flex flex-col items-center text-center justify-center">
                 <Icon path={mdiAlert} size={1} />
-                {' Urgent!'}
+                {'Urgent!'}
             </div>
         );
     }
@@ -51,11 +61,13 @@ function formatTasks(data: MaintenanceTask[]) {
 }
 
 export function MaintenanceList() {
-    const { maintenanceTasks } = useContext(StatContext);
+    const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
+        useContext(StatContext);
     const [formattedData, setFormattedData] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
-    const [editID, setEditID] = useState(-1);
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false);
+    const [currentTask, setCurrentTask] = useState<MaintenanceTask>(null);
 
     useEffect(() => {
         const refactor = formatTasks(maintenanceTasks);
@@ -77,6 +89,7 @@ export function MaintenanceList() {
                                 alignContent: 'center',
                                 justifyContent: 'center',
                                 // padding: '50% 0px'
+                                textAlign: 'center',
                             }}
                         >
                             {info.renderValue() + ' Hours'}
@@ -116,8 +129,7 @@ export function MaintenanceList() {
                     );
                 }
             },
-            minSize: 30,
-            maxSize: 30,
+            size: 30,
             invertSorting: true,
             enableSorting: true,
             sortingFn: sortingFns.alphanumeric,
@@ -142,6 +154,15 @@ export function MaintenanceList() {
                 );
             },
             enableSorting: false,
+            size: 500,
+        },
+        {
+            accessorKey: 'description',
+            header: () => null,
+            cell: (_info) => {
+                return <></>;
+            },
+            enableSorting: false,
         },
         {
             accessorKey: 'edit',
@@ -154,7 +175,11 @@ export function MaintenanceList() {
                             textAlign: 'center',
                         }}
                     >
-                        <button onClick={() => console.log('clear')}>
+                        <button
+                            onClick={() => {
+                                onClear(info.cell.row.original.id);
+                            }}
+                        >
                             <Icon
                                 path={mdiCheckOutline}
                                 size={1.5}
@@ -173,8 +198,7 @@ export function MaintenanceList() {
                 );
             },
             enableSorting: false,
-            minSize: 15,
-            maxSize: 15,
+            size: 30,
         },
     ];
 
@@ -190,8 +214,15 @@ export function MaintenanceList() {
     }
 
     function onEdit(id: number) {
-        setEditID(id);
+        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
+        setCurrentTask(selectedTask);
         setShowEditForm(true);
+    }
+
+    function onClear(id: number) {
+        const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
+        setCurrentTask(selectedTask);
+        setShowClearConfirmation(true);
     }
 
     return (
@@ -202,6 +233,9 @@ export function MaintenanceList() {
                 enableSortingRemoval={false}
                 sortBy={sortBy}
                 onAdd={onAdd}
+                pagination={false}
+                searchPlaceholder="Search Tasks..."
+                columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on
             />
             <MaintenanceAddTaskDialog
                 show={showAddForm}
@@ -210,8 +244,52 @@ export function MaintenanceList() {
             <MaintenanceEditTaskDialog
                 show={showEditForm}
                 toggleShow={setShowEditForm}
-                id={editID}
+                currentTask={currentTask}
             />
+            {showClearConfirmation && (
+                <AlertDialog
+                    open={showClearConfirmation}
+                    onOpenChange={setShowClearConfirmation}
+                >
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Reset Maintenance Timer
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {'Are you sure you want to reset the maintenance timer for ' +
+                                    currentTask.name +
+                                    '? Only do this if you have just performed this maintenance task.'}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>No</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={() => {
+                                    const updatedTasks = maintenanceTasks.map(
+                                        (obj) => {
+                                            if (obj.id === currentTask.id) {
+                                                let newObj = obj;
+                                                newObj.currentTime = 0;
+                                                return newObj;
+                                            }
+                                            return obj;
+                                        },
+                                    );
+                                    setCurrentTask({
+                                        currentTime: 0,
+                                        ...currentTask,
+                                    });
+                                    setMaintenanceTasks(updatedTasks);
+                                    maintenanceActions.update(updatedTasks);
+                                }}
+                            >
+                                Yes
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </div>
     );
 }

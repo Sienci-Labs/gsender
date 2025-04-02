@@ -1,4 +1,19 @@
+import { useEffect, useState } from 'react';
+import cx from 'classnames';
+import includes from 'lodash/includes';
+import pubsub from 'pubsub-js';
+import { PiPause } from 'react-icons/pi';
+import { FiOctagon } from 'react-icons/fi';
+import { IoPlayOutline } from 'react-icons/io5';
+
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { WORKFLOW_STATES_T } from 'app/store/definitions';
+import controller from 'app/lib/controller';
 import {
+    CARVING_CATEGORY,
+    GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
@@ -10,16 +25,6 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
 } from '../../constants';
-import controller from 'app/lib/controller';
-import cx from 'classnames';
-import includes from 'lodash/includes';
-import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import { WORKFLOW_STATES_T } from 'app/store/definitions';
-import { PiPause } from 'react-icons/pi';
-import { FiOctagon } from 'react-icons/fi';
-import { IoPlayOutline } from 'react-icons/io5';
-import { useEffect, useState } from 'react';
-import { useRegisterShortcut } from '../Keyboard/useRegisterShortcut';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -38,7 +43,7 @@ interface Message {
 }
 
 interface Icons {
-    [key: MACHINE_CONTROL_BUTTONS_T]: JSX.Element;
+    [key: MACHINE_CONTROL_BUTTONS_T]: React.ReactNode;
 }
 
 interface OnClick {
@@ -79,35 +84,65 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         setDisabled(isDisabled());
     });
 
-    useRegisterShortcut({
-        id: 'start-job',
-        description: 'Start a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleRun();
+    const shuttleControlEvents = {
+        START_JOB: {
+            title: 'Start Job',
+            keys: '~',
+            gamepadKeys: '9',
+            keysName: 'Start',
+            cmd: 'START_JOB',
+            payload: {
+                type: GRBL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                handleRun();
+            },
         },
-    });
+        PAUSE_JOB: {
+            title: 'Pause Job',
+            keys: '!',
+            gamepadKeys: '2',
+            keysName: 'X',
+            cmd: 'PAUSE_JOB',
+            payload: {
+                type: GRBL,
+            },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                handlePause();
+            },
+        },
+        STOP_JOB: {
+            title: 'Stop Job',
+            keys: '@',
+            gamepadKeys: '3',
+            keysName: 'Y',
+            cmd: 'STOP_JOB',
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                handleStop();
+            },
+        },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            callback: () => pubsub.publish('outline:start'),
+        },
+    };
 
-    useRegisterShortcut({
-        id: 'pause-job',
-        description: 'Pause a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handlePause();
-        },
-    });
-
-    useRegisterShortcut({
-        id: 'stop-job',
-        description: 'Stop a job',
-        defaultKeys: '~',
-        category: 'CARVING_CATEGORY',
-        onKeyDown: () => {
-            handleStop();
-        },
-    });
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
 
     const handleRun = (): void => {
         console.assert(
@@ -163,10 +198,14 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                     'grid grid-cols-[1fr_2fr] gap-[1px] items-center h-12 w-24 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
                     '[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500',
                     {
-                        'bg-gray-300 text-gray-600': disabled,
-                        'bg-green-600 text-white': !disabled && type === START,
-                        'bg-orange-400 text-white': !disabled && type === PAUSE,
-                        'bg-red-500 text-white': !disabled && type === STOP,
+                        'bg-gray-300 text-gray-600 dark:bg-dark dark:text-gray-400':
+                            disabled,
+                        'bg-green-600 dark:bg-green-700 text-white':
+                            !disabled && type === START,
+                        'bg-orange-400 dark:bg-orange-700 text-white':
+                            !disabled && type === PAUSE,
+                        'bg-red-500 dark:bg-red-700 text-white':
+                            !disabled && type === STOP,
                     },
                 )}
                 title={type}

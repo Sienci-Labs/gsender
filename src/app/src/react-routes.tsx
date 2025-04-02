@@ -2,7 +2,8 @@ import { Routes, Route, Outlet } from 'react-router';
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
-import KeyboardShortcuts from './features/Keyboard';
+// import KeyboardShortcuts from './features/Keyboard';
+import KeyboardShortcuts from './features/Keyboard_new';
 import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
 import { StatParent } from './features/Stats/StatParent';
@@ -33,9 +34,11 @@ import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
 import { noop } from 'lodash';
-import Gamepad from './features/Gamepad';
+import Gamepad from './features/Gamepad_new';
 import GamepadProfilePage from './features/Gamepad/ProfilePage';
 import { TopBar } from 'app/workspace/TopBar';
+import Console from 'app/features/Console';
+import Profile from './features/Gamepad_new/Profile';
 
 export const ReactRoutes = () => {
     return (
@@ -54,7 +57,7 @@ export const ReactRoutes = () => {
                     path="tools"
                     element={
                         <div className="p-4">
-                            <p className="text-lg font-semibold mb-4">
+                            <p className="text-lg font-semibold mb-4 dark:text-white">
                                 Choose a tool to get started...
                             </p>
 
@@ -146,16 +149,12 @@ export const ReactRoutes = () => {
                         <Page
                             title="Gamepad"
                             description="Manage your gamepad profiles here"
-                            withGoBackButton
                         >
                             <Gamepad />
                         </Page>
                     }
                 />
-                <Route
-                    path="gamepad/:gamepadProfileId"
-                    element={<GamepadProfilePage />}
-                />
+                <Route path="gamepad/:gamepadProfileId" element={<Profile />} />
                 <Route
                     path="firmware"
                     element={
@@ -174,6 +173,7 @@ export const ReactRoutes = () => {
                     <Route path="about" element={<About />} />
                 </Route>
             </Route>
+            <Route path="console" element={<Console isActive={true} />}></Route>
             <Route
                 path="remote"
                 element={

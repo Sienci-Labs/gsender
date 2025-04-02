@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { LuBell } from 'react-icons/lu';
 
 import {
@@ -7,14 +8,33 @@ import {
 } from 'app/components/shadcn/Popover';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { GENERAL_CATEGORY } from 'app/constants';
 
 const NotificationsArea = () => {
+    const [open, setOpen] = useState(false);
     const notifications = useTypedSelector(
         (state) => state.preferences.notifications,
     );
 
+    const shuttleControlEvents = {
+        DISPLAY_NOTIFICATIONS: {
+            title: 'Toggle Notifications Display',
+            keys: '',
+            cmd: 'DISPLAY_NOTIFICATIONS',
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => setOpen((prev) => !prev),
+        },
+    };
+
+    useKeybinding(shuttleControlEvents);
+    useShuttleEvents(shuttleControlEvents);
+
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <button className="relative max-sm:hidden">
                     <LuBell className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />

@@ -12,15 +12,19 @@ import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { IconButton } from 'app/components/IconButton';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
-
-//import { LuParkingSquare } from 'react-icons/lu';
+import { LuSquareParking } from 'react-icons/lu';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import store from 'app/store';
 import {
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
+    AXIS_A,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    LOCATION_CATEGORY,
     METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
@@ -42,9 +46,11 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
-import { useRegisterShortcuts } from '../Keyboard/useRegisterShortcuts';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
+import { Parking } from 'app/features/DRO/component/Parking.tsx';
 
+import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 interface DROProps {
     axes: AxesArray;
     mposController: DROPosition;
@@ -84,108 +90,113 @@ function DRO({
         });
     }, []);
 
-    useRegisterShortcuts([
-        {
-            id: 'zero-x',
+    const shuttleControlEvents = {
+        ZERO_X_AXIS: {
             title: 'Zero X Axis',
-            description: 'Zero the X axis',
-            defaultKeys: 'shift+w',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('X', 0);
-            },
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_X_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_X },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('X', 0),
         },
-        {
-            id: 'zero-y',
+        ZERO_Y_AXIS: {
             title: 'Zero Y Axis',
-            description: 'Zero the Y axis',
-            defaultKeys: 'shift+e',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('Y', 0);
-            },
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_Y_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Y },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('Y', 0),
         },
-        {
-            id: 'zero-z',
+        ZERO_Z_AXIS: {
             title: 'Zero Z Axis',
-            description: 'Zero the Z axis',
-            defaultKeys: 'shift+r',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('Z', 0);
-            },
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'ZERO_Z_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Z },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('Z', 0),
         },
-        {
-            id: 'zero-a',
+        ZERO_A_AXIS: {
+            id: 72,
             title: 'Zero A Axis',
-            description: 'Zero the A axis',
-            defaultKeys: 'shift+t',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroWCS('A', 0);
-            },
+            keys: ['shift', '0'].join('+'),
+            cmd: 'ZERO_A_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroWCS('A', 0),
         },
-        {
-            id: 'zero-all',
-            title: 'Zero All Axes',
-            description: 'Zero all axes',
-            defaultKeys: 'shift+y',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                zeroAllAxes();
-            },
+        ZERO_ALL_AXIS: {
+            title: 'Zero All',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_ALL_AXIS',
+            payload: { axis: 'all' },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => zeroAllAxes(),
         },
-        {
-            id: 'goto-zero-x',
-            title: 'Go to Zero X',
-            description: 'Go to zero X',
-            defaultKeys: 'shift+s',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('X');
-            },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A Zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_A] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('A'),
         },
-        {
-            id: 'goto-zero-y',
-            title: 'Go to Zero Y',
-            description: 'Go to zero Y',
-            defaultKeys: 'shift+d',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('Y');
-            },
+        GO_TO_X_AXIS_ZERO: {
+            title: 'Go to X Zero',
+            keys: ['shift', 's'].join('+'),
+            cmd: 'GO_TO_X_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_X] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('X'),
         },
-        {
-            id: 'goto-zero-z',
-            title: 'Go to Zero Z',
-            description: 'Go to zero Z',
-            defaultKeys: 'shift+f',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('Z');
-            },
+        GO_TO_Y_AXIS_ZERO: {
+            title: 'Go to Y Zero',
+            keys: ['shift', 'd'].join('+'),
+            cmd: 'GO_TO_Y_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Y] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('Y'),
         },
-        {
-            id: 'goto-zero-a',
-            title: 'Go to Zero A',
-            description: 'Go to zero A',
-            defaultKeys: 'shift+g',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                gotoZero('A');
-            },
+        GO_TO_Z_AXIS_ZERO: {
+            title: 'Go to Z Zero',
+            keys: ['shift', 'f'].join('+'),
+            cmd: 'GO_TO_Z_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Z] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => gotoZero('Z'),
         },
-        {
-            id: 'goto-xy-zero',
-            title: 'Go XY',
-            description: 'Go XY',
-            defaultKeys: 'shift+a',
-            category: 'LOCATION_CATEGORY',
-            onKeyDown: () => {
-                goXYAxes();
-            },
+        GO_TO_XY_AXIS_ZERO: {
+            title: 'Go to XY Zero',
+            keys: ['shift', 'a'].join('+'),
+            cmd: 'GO_TO_XY_AXIS_ZERO',
+            payload: { axisList: [AXIS_X, AXIS_Y] },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => goXYAxes(),
         },
-    ]);
+    };
+
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     function toggleHoming() {
         setHomingMode(!homingMode);
@@ -211,13 +222,13 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-between relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
-                {/*homingEnabled && (
-                    <IconButton icon={<LuParkingSquare />} color="primary" />
+                {homingEnabled && (
+                    <Parking />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
-                )*/}
+                )}
             </div>
             <div className="w-full flex flex-row justify-between px-3">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
@@ -306,12 +317,7 @@ function DRO({
                     />
                 )}
 
-                <Button
-                    variant="alt"
-                    onClick={goXYAxes}
-                    disabled={!canClick}
-                    size="sm"
-                >
+                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

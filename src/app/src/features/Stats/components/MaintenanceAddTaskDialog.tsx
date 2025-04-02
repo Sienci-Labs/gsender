@@ -12,14 +12,15 @@ import {
     MaintenanceTask,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
-import maintenanceActions from '../../../../../app_old/containers/Preferences/Stats/lib/maintenanceApiActions';
+// import maintenanceActions from '../../../../../app_old/containers/Preferences/Stats/lib/maintenanceApiActions';
 
 export const buttonStyle = tv({
     base: 'inline-flex items-center px-6 py-3 border text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out',
     variants: {
         colors: {
             primary: 'border-transparent text-white bg-blue-500',
-            secondary: 'bg-white border-blue-500 text-blue-500',
+            secondary:
+                'bg-white border-blue-500 text-blue-500 dark:bg-dark dark:text-white dark:border-dark-lighter',
             danger: 'text-white border-transparent bg-red-500',
         },
     },
@@ -35,7 +36,8 @@ export function MaintenanceAddTaskDialog({
     show,
     toggleShow,
 }: MaintenanceAddTaskDialogProps) {
-    const { maintenanceTasks, setMaintenanceTasks } = useContext(StatContext);
+    const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
+        useContext(StatContext);
 
     const addTask = (newTask: MaintenanceTask) => {
         const maxIDTask = maintenanceTasks.reduce((prev, current) => {
@@ -75,11 +77,11 @@ export function MaintenanceAddTaskDialog({
     }
     return (
         <Dialog open={show} onOpenChange={toggleShow}>
-            <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col justify-center items-center">
+            <DialogContent className="bg-white w-1/2">
                 <DialogHeader>
                     <DialogTitle>Add New Task</DialogTitle>
                 </DialogHeader>
-                <form className="w-full max-w-lg" onSubmit={handleSubmit}>
+                <form className="w-full" onSubmit={handleSubmit}>
                     <MaintenanceTaskForm />
                     <div className="w-full -mx-3 mb-2 p-2 flex flex-row-reverse gap-4">
                         <button

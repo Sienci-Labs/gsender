@@ -40,6 +40,7 @@ import PasswordInput from '../components/HalSettings/inputs/PasswordInput';
 import Ipv4Input from '../components/HalSettings/inputs/Ipv4Input';
 import machineProfiles from '../components/defaultMachineProfiles';
 import { toast } from 'app/lib/toaster';
+import store from 'app/store/index';
 
 export const FirmwareContext = createContext({});
 
@@ -56,7 +57,7 @@ export const connectToLastDevice = (callback) => {
 
     const port = connectionConfig.get('port');
     const baudrate = connectionConfig.get('baudrate');
-    const controllerType = connectionConfig.get('controller.type') || GRBL;
+    const defaultFirmware = store.get('workspace.defaultFirmware', GRBL);
 
     const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
 
@@ -67,6 +68,7 @@ export const connectToLastDevice = (callback) => {
             baudrate,
             rtscts: false,
             network: isNetwork,
+            defaultFirmware,
         },
         (err) => {
             if (err) {

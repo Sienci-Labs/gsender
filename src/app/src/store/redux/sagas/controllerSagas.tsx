@@ -58,6 +58,7 @@ import {
     JOB_TYPES,
     JOB_STATUS,
     GRBL,
+    LIGHTWEIGHT_OPTIONS,
 } from 'app/constants';
 import {
     closeConnection,
@@ -164,7 +165,6 @@ export function* initialize(): Generator<any, void, any> {
             };
             newJobStats.jobs.push(job);
             api.jobStats.update(newJobStats);
-            console.log('last job');
             pubsub.publish('lastJob', job);
         } catch (error) {
             console.error(error);
@@ -187,7 +187,12 @@ export function* initialize(): Generator<any, void, any> {
     };
 
     const shouldVisualizeSVG = () => {
-        return store.get('widgets.visualizer.SVGEnabled', false);
+        return (
+            store.get(
+                'widgets.visualizer.liteOption',
+                LIGHTWEIGHT_OPTIONS.LIGHT,
+            ) === LIGHTWEIGHT_OPTIONS.LIGHT
+        );
     };
 
     const parseGCode = async (
@@ -555,8 +560,6 @@ export function* initialize(): Generator<any, void, any> {
             context,
             comment,
         };
-
-        console.log(context);
 
         const { option, count } = context;
         if (option === 'Pause') {

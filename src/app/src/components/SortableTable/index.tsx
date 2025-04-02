@@ -10,6 +10,7 @@ import {
     getFacetedMinMaxValues,
     ColumnDef,
     FilterFn,
+    VisibilityState,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 import React, { useState } from 'react';
@@ -93,6 +94,9 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
         desc: boolean;
     }[];
     rowSpan?: Map<any, any>;
+    pagination?: boolean;
+    searchPlaceholder?: string;
+    columnVisibility?: VisibilityState;
 }
 const SortableTable = <TData extends { subRow?: string }, TValue>(
     props: SortableTableProps<TData, TValue>,
@@ -107,6 +111,9 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
         props.enableSortingRemoval !== undefined
             ? props.enableSortingRemoval
             : true;
+    const searchPlaceholder =
+        props.searchPlaceholder || 'Search all columns...';
+    const columnVisibility = props.columnVisibility || {};
     /*
         const sortBy = [
             {
@@ -118,6 +125,10 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
     const sortBy = props.sortBy || null;
     const onAdd = props.onAdd || null; // function for when add button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
+    const pagination =
+        props.pagination !== null && props.pagination !== undefined
+            ? props.pagination
+            : true; // boolean for having pagination. default is true
 
     // stop col span from first col that has it disabled
     let stopIndex = 0;
@@ -163,18 +174,21 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             sorting,
         },
         initialState: {
-            pagination: {
-                pageSize: 15,
-                pageIndex: 0,
-            },
+            columnVisibility: columnVisibility,
+            pagination: pagination
+                ? {
+                      pageSize: 15,
+                      pageIndex: 0,
+                  }
+                : null,
         },
         onSortingChange: setSorting,
         enableSortingRemoval: enableSortingRemoval,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: pagination ? getPaginationRowModel() : null,
         onGlobalFilterChange: setGlobalFilter,
-        globalFilterFn: fuzzyFilter,
+        globalFilterFn: 'includesString', // this gives a lot more targetted results than the fuzzy filter
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -200,14 +214,15 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                     value={globalSearchText ?? ''}
                     onChange={(e) => {
                         setGlobalSearchText(e.target.value);
+                        setGlobalFilter(e.target.value);
                     }}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             setGlobalFilter(globalSearchText);
                         }
                     }}
-                    className="font-lg border-block border p-2 shadow"
-                    placeholder="Search all columns..."
+                    className="font-lg border-block border p-2 shadow  dark:text-white dark:bg-dark dark:border-dark-lighter"
+                    placeholder={searchPlaceholder}
                 />
                 {onAdd && (
                     <div
@@ -231,233 +246,277 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             </div>
             {/*** TABLE ***/}
             <div
-                style={{
-                    maxHeight: height,
-                    minHeight: height,
-                    marginBottom: '5px',
-                    overflowY: 'scroll',
-                }}
+                className={cx(
+                    'w-full flex flex-grow flex-col items-center justify-center gap-3',
+                    {
+                        hidden: table.getRowModel().rows.length <= 0, // hide table if no search results
+                    },
+                )}
             >
-                <BTable
-                    striped
-                    bordered
-                    responsive
-                    hover
-                    className="min-w-full leading-normal"
-                >
-                    <thead>
-                        {table.getHeaderGroups().map(
-                            (
-                                headerGroup, // we currently only have 1 group
-                            ) => (
-                                <tr key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <th
-                                            key={header.id}
-                                            colSpan={header.colSpan}
-                                            className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                                        >
-                                            {header.isPlaceholder ? null : (
-                                                <>
-                                                    <div
-                                                        {...{
-                                                            className:
-                                                                header.column.getCanSort()
-                                                                    ? 'cursor-pointer select-none'
-                                                                    : '',
-                                                            onClick:
-                                                                header.column.getToggleSortingHandler(),
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            header.column
-                                                                .columnDef
-                                                                .header,
-                                                            header.getContext(),
-                                                        )}
-                                                        {{
-                                                            asc: ' 🔼',
-                                                            desc: ' 🔽',
-                                                        }[
-                                                            header.column
-                                                                .getIsSorted()
-                                                                .toString()
-                                                        ] ?? null}
-                                                    </div>
-                                                </>
-                                            )}
-                                        </th>
-                                    ))}
-                                </tr>
-                            ),
-                        )}
-                    </thead>
-                    <tbody>
-                        {table.getRowModel().rows.map((row, _i) => {
-                            return (
-                                <React.Fragment key={row.id + 'parent'}>
-                                    <tr
-                                        key={row.id}
-                                        className="odd:bg-gray-50 even:bg-white"
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <td
-                                                key={cell.id}
-                                                rowSpan={
-                                                    rowSpan.get(
-                                                        cell.column.columnDef
-                                                            .id, // id has replaced accessorKey
-                                                    ) || 1
-                                                }
-                                                style={{
-                                                    whiteSpace: 'unset',
-                                                    overflowWrap: 'break-word',
-                                                }}
-                                                className="px-5 py-5 border border-gray-200 text-sm"
-                                            >
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                    {row.original.subRow && (
-                                        <tr
-                                            key={row.id + 'subRow'}
-                                            className="odd:bg-gray-50 even:bg-white"
-                                        >
-                                            <td
-                                                colSpan={colSpanLength}
-                                                style={{
-                                                    whiteSpace: 'pre-line',
-                                                    overflowWrap: 'break-word',
-                                                }}
-                                            >
-                                                {row.original.subRow}
-                                            </td>
-                                        </tr>
-                                    )}
-                                </React.Fragment>
-                            );
-                        })}
-                    </tbody>
-                </BTable>
-            </div>
-            {/* buttons */}
-            <div
-                className={[
-                    'flex items-center gap-2',
-                    styles.navContainer,
-                ].join(' ')}
-            >
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage > 1,
-                        hidden: currentPage <= 1,
-                    })}
-                    onClick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                    // display={currentPage > 1 ? 'block' : 'hidden'}
-                >
-                    {'<<'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage > 1,
-                        hidden: currentPage <= 1,
-                    })}
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    // display={currentPage > 1 ? 'block' : 'hidden'}
-                >
-                    {'<'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage < maxPages,
-                        hidden: currentPage >= maxPages,
-                    })}
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                    // display={currentPage < maxPages ? 'block' : 'hidden'}
-                >
-                    {'>'}
-                </button>
-                <button
-                    className={cx('rounded border p-1', {
-                        block: currentPage < maxPages,
-                        hidden: currentPage >= maxPages,
-                    })}
-                    onClick={() => table.setPageIndex(maxPages - 1)}
-                    disabled={!table.getCanNextPage()}
-                    // display={currentPage < maxPages ? 'block' : 'hidden'}
-                >
-                    {'>>'}
-                </button>
-                {/* label */}
-                <span
-                    className="flex items-center gap-1"
-                    style={{ marginLeft: '10px' }}
-                >
-                    {'Page '}
-                    <strong>
-                        {currentPage} of {maxPages}
-                    </strong>
-                </span>
-                {/* jump to page */}
                 <div
-                    className="flex items-center gap-1"
                     style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        float: 'right',
+                        maxHeight: height,
+                        minHeight: height,
+                        maxWidth: width,
+                        minWidth: width,
+                        marginBottom: '5px',
+                        overflowY: 'scroll',
                     }}
                 >
-                    <span style={{ marginRight: '5px' }}>
-                        {'Jump to page: '}
-                        <input
-                            type="number"
-                            defaultValue={currentPage}
-                            onChange={(e) => {
-                                setPageNum(
-                                    e.target.value
-                                        ? Number(e.target.value) - 1
-                                        : 0,
+                    <BTable
+                        striped
+                        bordered
+                        responsive
+                        hover
+                        className="min-w-full leading-normal"
+                    >
+                        <thead>
+                            {table.getHeaderGroups().map(
+                                (
+                                    headerGroup, // we currently only have 1 group
+                                ) => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <th
+                                                key={header.id}
+                                                colSpan={header.colSpan}
+                                                className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-white dark:bg-dark-lighter"
+                                            >
+                                                {header.isPlaceholder ? null : (
+                                                    <>
+                                                        <div
+                                                            {...{
+                                                                className:
+                                                                    header.column.getCanSort()
+                                                                        ? 'cursor-pointer select-none'
+                                                                        : '',
+                                                                onClick:
+                                                                    header.column.getToggleSortingHandler(),
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                header.column
+                                                                    .columnDef
+                                                                    .header,
+                                                                header.getContext(),
+                                                            )}
+                                                            {{
+                                                                asc: ' 🔼',
+                                                                desc: ' 🔽',
+                                                            }[
+                                                                header.column
+                                                                    .getIsSorted()
+                                                                    .toString()
+                                                            ] ?? null}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ),
+                            )}
+                        </thead>
+                        <tbody>
+                            {table.getRowModel().rows.map((row, _i) => {
+                                return (
+                                    <React.Fragment key={row.id + 'parent'}>
+                                        <tr
+                                            key={row.id}
+                                            className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-white"
+                                        >
+                                            {row
+                                                .getVisibleCells()
+                                                .map((cell) => (
+                                                    <td
+                                                        key={cell.id}
+                                                        rowSpan={
+                                                            rowSpan.get(
+                                                                cell.column
+                                                                    .columnDef
+                                                                    .id, // id has replaced accessorKey
+                                                            ) || 1
+                                                        }
+                                                        style={{
+                                                            whiteSpace: 'unset',
+                                                            overflowWrap:
+                                                                'break-word',
+                                                            width: cell.column.getSize(),
+                                                        }}
+                                                        className="px-5 py-5 border border-gray-200 text-sm"
+                                                    >
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
+                                                        )}
+                                                    </td>
+                                                ))}
+                                        </tr>
+                                        {row.original.subRow && (
+                                            <tr
+                                                key={row.id + 'subRow'}
+                                                className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-white"
+                                            >
+                                                <td
+                                                    colSpan={colSpanLength}
+                                                    style={{
+                                                        whiteSpace: 'pre-line',
+                                                        overflowWrap:
+                                                            'break-word',
+                                                    }}
+                                                >
+                                                    {row.original.subRow}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 );
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    table.setPageIndex(pageNum);
-                                }
-                            }}
-                            className={[
-                                'w-16 rounded border p-1 ',
-                                styles.input,
-                            ].join(' ')}
-                            min="1"
-                            max={maxPages}
-                            style={{ minWidth: '60px' }}
-                        />
-                    </span>
-                    <div style={{ marginRight: '5px' }}>|</div>
-                    {/*** PAGE SIZE ***/}
-                    <div>
-                        {'Entries/Page: '}
-                        <select
-                            value={table.getState().pagination.pageSize}
-                            onChange={(e) => {
-                                table.setPageSize(Number(e.target.value));
+                            })}
+                        </tbody>
+                    </BTable>
+                </div>
+                {/* buttons */}
+                {pagination && (
+                    <div
+                        className={[
+                            'flex items-center gap-2',
+                            styles.navContainer,
+                        ].join(' ')}
+                    >
+                        <button
+                            className={cx(
+                                'rounded border p-1 dark:text-white',
+                                {
+                                    block: currentPage > 1,
+                                    hidden: currentPage <= 1,
+                                },
+                            )}
+                            onClick={() => table.setPageIndex(0)}
+                            disabled={!table.getCanPreviousPage()}
+                            // display={currentPage > 1 ? 'block' : 'hidden'}
+                        >
+                            {'<<'}
+                        </button>
+                        <button
+                            className={cx(
+                                'rounded border p-1 dark:text-white',
+                                {
+                                    block: currentPage > 1,
+                                    hidden: currentPage <= 1,
+                                },
+                            )}
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                            // display={currentPage > 1 ? 'block' : 'hidden'}
+                        >
+                            {'<'}
+                        </button>
+                        <button
+                            className={cx(
+                                'rounded border p-1 dark:text-white',
+                                {
+                                    block: currentPage < maxPages,
+                                    hidden: currentPage >= maxPages,
+                                },
+                            )}
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                            // display={currentPage < maxPages ? 'block' : 'hidden'}
+                        >
+                            {'>'}
+                        </button>
+                        <button
+                            className={cx(
+                                'rounded border p-1 dark:text-white',
+                                {
+                                    block: currentPage < maxPages,
+                                    hidden: currentPage >= maxPages,
+                                },
+                            )}
+                            onClick={() => table.setPageIndex(maxPages - 1)}
+                            disabled={!table.getCanNextPage()}
+                            // display={currentPage < maxPages ? 'block' : 'hidden'}
+                        >
+                            {'>>'}
+                        </button>
+                        {/* label */}
+                        <span
+                            className="flex items-center gap-1 dark:text-white"
+                            style={{ marginLeft: '10px' }}
+                        >
+                            {'Page '}
+                            <strong>
+                                {currentPage} of {maxPages}
+                            </strong>
+                        </span>
+                        {/* jump to page */}
+                        <div
+                            className="flex items-center gap-1"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                float: 'right',
                             }}
                         >
-                            {[15, 30, 50, 75, 100].map((pageSize) => (
-                                <option key={pageSize} value={pageSize}>
-                                    Show {pageSize}
-                                </option>
-                            ))}
-                        </select>
+                            <span
+                                style={{ marginRight: '5px' }}
+                                className="dark:text-white"
+                            >
+                                {'Jump to page: '}
+                                <input
+                                    type="number"
+                                    defaultValue={currentPage}
+                                    onChange={(e) => {
+                                        setPageNum(
+                                            e.target.value
+                                                ? Number(e.target.value) - 1
+                                                : 0,
+                                        );
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            table.setPageIndex(pageNum);
+                                        }
+                                    }}
+                                    className={[
+                                        'w-16 rounded border p-1 ',
+                                        styles.input,
+                                    ].join(' ')}
+                                    min="1"
+                                    max={maxPages}
+                                    style={{ minWidth: '60px' }}
+                                />
+                            </span>
+                            <div
+                                style={{ marginRight: '5px' }}
+                                className="dark:text-white"
+                            >
+                                |
+                            </div>
+                            {/*** PAGE SIZE ***/}
+                            <div>
+                                <span className="dark:text-white mr-1">
+                                    Entries/Page:
+                                </span>
+                                <select
+                                    value={table.getState().pagination.pageSize}
+                                    onChange={(e) => {
+                                        table.setPageSize(
+                                            Number(e.target.value),
+                                        );
+                                    }}
+                                >
+                                    {[15, 30, 50, 75, 100].map((pageSize) => (
+                                        <option key={pageSize} value={pageSize}>
+                                            Show {pageSize}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

@@ -9,7 +9,7 @@ import {
     ShuttleEvent,
 } from './definitions/shortcuts';
 
-const TARGET_NUM_CALLS = 10; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 50; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*
@@ -48,7 +48,9 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
                 !currentCommandKeys[defaultShuttle.cmd]
             ) {
                 // add to store
-                let updatedCommandKeys = currentCommandKeys;
+                let updatedCommandKeys = JSON.parse(
+                    JSON.stringify(currentCommandKeys),
+                );
                 const key = defaultShuttle.keys || '';
 
                 updatedCommandKeys[defaultShuttle.cmd] = {
@@ -96,18 +98,18 @@ function checkNumCalls(): void {
 export function removeOldKeybindings(): void {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const currentCommandKeys: CommandKeys = store.get('commandKeys', {});
-    let updatedCommandKeys = currentCommandKeys;
+    const updatedCommandKeys: CommandKeys = {};
 
-    // remove keybindings that don't exist in any of the shuttleControlEvents arrays
+    // Only keep keybindings that exist in the shuttleControlEvents arrays
     Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
         // if the category doesn't exist, it's not a macro
         // but if it's an old keybinding that still stores the category info, make sure it's not a macro
         if (
-            event === undefined &&
-            (!keybinding.category || keybinding.category !== MACRO_CATEGORY)
+            event !== undefined ||
+            (keybinding.category && keybinding.category === MACRO_CATEGORY)
         ) {
-            delete updatedCommandKeys[key];
+            updatedCommandKeys[key] = keybinding;
         }
     });
     store.replace('commandKeys', updatedCommandKeys);

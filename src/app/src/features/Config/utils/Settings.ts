@@ -6,6 +6,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { toast } from 'sonner';
 import controller from 'app/lib/controller.ts';
+import pubsub from 'pubsub-js';
 
 export function exportFirmwareSettings(settings) {
     const output = JSON.stringify(settings);
@@ -136,4 +137,6 @@ export function updateAllSettings(settings, eeprom) {
         });
         toast.success(`Updated ${updateableSettingsNumber} settings.`);
     }
+
+    pubsub.publish('config:saved');
 }

@@ -30,7 +30,10 @@ import { FileData } from '..';
 
 export const RECENT_FILE_LIMIT = 5;
 
-export const recentFileExists = (filePath: string, recentFiles: RecentFile[]) => {
+export const recentFileExists = (
+    filePath: string,
+    recentFiles: RecentFile[],
+) => {
     const file = recentFiles.find((file) => file.filePath === filePath);
     return !!file;
 };
@@ -49,9 +52,7 @@ export const recentFileExists = (filePath: string, recentFiles: RecentFile[]) =>
 //     };
 // };
 
-export const createRecentFileFromRawPath = (
-    file: FileData
-): RecentFile => {
+export const createRecentFileFromRawPath = (file: FileData): RecentFile => {
     return {
         fileData: file.data,
         fileName: file.name,
@@ -61,7 +62,10 @@ export const createRecentFileFromRawPath = (
     };
 };
 
-export const updateRecentFileDate = (filepath: string, recentFiles: RecentFile[]) => {
+export const updateRecentFileDate = (
+    filepath: string,
+    recentFiles: RecentFile[],
+) => {
     recentFiles.forEach((recentFile) => {
         if (recentFile.filePath === filepath) {
             recentFile.timeUploaded = Date.now();
@@ -93,7 +97,8 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
 };
 
 export const getRecentFiles = (): RecentFile[] => {
-    return store.get('workspace.recentFiles', []);
+    const savedFiles = store.get('workspace.recentFiles', []);
+    return savedFiles.slice(0, 3);
 };
 
 export const updateStoredRecentFiles = (recentFiles: RecentFile[]) => {

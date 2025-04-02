@@ -16,7 +16,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import Tooltip from 'app/components/Tooltip';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 
@@ -68,9 +68,10 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                 className={cx(
                     'rounded-[0.2rem] border-solid border-2 text-base px-2',
                     {
-                        'border-blue-400 bg-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
+                        'border-blue-400 bg-white dark:bg-dark dark:text-gray-300 [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
                             !disabled,
-                        'border-gray-500 bg-gray-400': disabled,
+                        'border-gray-500 bg-gray-400 dark:bg-dark dark:text-gray-400':
+                            disabled,
                     },
                 )}
                 onClick={() =>
@@ -100,7 +101,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 disconnection, mechanical malfunction, or other
                                 failures
                             </p>
-                            <p className="mb-0 text-black">
+                            <p className="mb-0 text-black dark:text-white">
                                 Your job was last stopped around line:{' '}
                                 <b>{state.value}</b> on a g-code file with a
                                 total of <b>{/* lineTotal */}</b> lines
@@ -118,7 +119,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             )}
                         </div>
                         <div className="mb-4">
-                            <div className="flex gap-2 items-center">
+                            <div className="grid grid-cols-4 gap-2 items-center">
                                 <label htmlFor="resumeJobLine">
                                     Resume job at line:
                                 </label>
@@ -145,7 +146,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             </div>
                         </div>
                         <div className="mb-4">
-                            <div className="flex gap-2 items-center">
+                            <div className="grid grid-cols-4 gap-2 items-center">
                                 <label htmlFor="safeHeight">
                                     With Safe Height:
                                 </label>
@@ -167,7 +168,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                         className="w-20"
                                     />
                                 </Tooltip>
-                                <span className="text-sm">
+                                <span className="text-sm col-span-2">
                                     (Safe Height is the value above Z max)
                                 </span>
                             </div>

@@ -1,21 +1,27 @@
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 
-export function SpindleWizard() {
-    function startSpindle() {
-        controller.command('gcode', 'M3 S1000');
-    }
-    function stopSpindle() {
-        controller.command('gcode', 'M5 S0');
-    }
+function startSpindle() {
+    controller.command('gcode', 'M3 S1000');
+}
+function startSpindleCCW() {
+    controller.command('gcode', 'M4 S1000');
+}
+function stopSpindle() {
+    controller.command('gcode', 'M5 S0');
+}
 
+export function SpindleWizard() {
     return (
         <div className="flex flex-row gap-2 items-center">
             <Button variant="primary" onClick={startSpindle}>
-                M3
+                For
+            </Button>
+            <Button variant="primary" onClick={startSpindleCCW}>
+                Rev
             </Button>
             <Button variant="primary" onClick={stopSpindle}>
-                M5
+                Stop
             </Button>
         </div>
     );

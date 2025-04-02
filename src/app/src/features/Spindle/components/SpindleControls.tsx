@@ -49,7 +49,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     color={canClick ? 'primary' : 'disabled'}
                 >
                     <i className="fas fa-redo-alt" />
-                    CW (M3)
+                    For (M3)
                 </Button>
                 <Button
                     onClick={actions.sendM4}
@@ -57,7 +57,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     color={canClick ? 'primary' : 'disabled'}
                 >
                     <i className="fas fa-redo-alt fa-flip-horizontal" />
-                    CCW (M4)
+                    Rev (M4)
                 </Button>
                 <Button
                     onClick={actions.sendM5}
@@ -68,7 +68,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     Stop (M5)
                 </Button>
             </div>
-            <div className="flex flex-row gap-2 justify-center my-2 items-center">
+            <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
                 <span>Speed</span>
                 <Slider
                     value={[state.spindleSpeed]}

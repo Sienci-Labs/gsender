@@ -80,14 +80,14 @@ export function EEPROMSettingRow({
                 className={cn(
                     'p-2 flex flex-row items-center',
                     {
-                        'odd:bg-yellow-50 even:bg-yellow-50 ': !isDefault,
+                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white': !isDefault,
                     },
                     {
                         hidden: !matchesSearch,
                     },
                 )}
             >
-                <div className="w-1/5 text-gray-700 flex flex-row gap-2 items-center relative">
+                <div className="w-1/5 text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
                     {EEPROMData.description}
                 </div>
                 <div

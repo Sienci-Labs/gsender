@@ -14,7 +14,6 @@ export function FlashingProgress({ type }: { type: string }) {
     }
 
     function addNotification(msg) {
-        console.log(notifications);
         setNotifications([msg, ...notifications]);
     }
 

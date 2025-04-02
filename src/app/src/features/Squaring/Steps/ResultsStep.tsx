@@ -28,7 +28,7 @@ const ResultsStep = () => {
         // Tolerable if angle deviation is less than 2 degrees
         if (Math.abs(angle) < 2) {
             return (
-                <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2">
+                <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2 dark:bg-yellow-900 dark:text-white">
                     <p className="font-bold text-lg">
                         Your machine is slightly out of square
                     </p>
@@ -49,7 +49,7 @@ const ResultsStep = () => {
 
         // Noticeably out of square
         return (
-            <div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2">
+            <div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2 dark:bg-red-950 dark:text-white">
                 <p className="font-bold text-lg">
                     Your machine needs adjustment
                 </p>
@@ -71,34 +71,36 @@ const ResultsStep = () => {
             <div className="flex flex-col gap-8">
                 <div className="space-y-6">
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Measurements</h3>
+                        <h3 className="text-lg font-semibold dark:text-white">
+                            Measured Dimensions
+                        </h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <div className="text-sm text-gray-600">
+                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                                <div className="text-sm text-gray-600 dark:text-white">
                                     Bottom Edge (1-2)
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.a}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <div className="text-sm text-gray-600">
+                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                                <div className="text-sm text-gray-600 dark:text-white">
                                     Right Edge (2-3)
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.b}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <div className="text-sm text-gray-600">
+                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                                <div className="text-sm text-gray-600 dark:text-white">
                                     Diagonal (1-3)
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.c}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                                <div className="text-sm text-gray-600">
+                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                                <div className="text-sm text-gray-600 dark:text-white">
                                     Angle Deviation
                                 </div>
                                 <div className="text-xl font-bold">
@@ -109,12 +111,14 @@ const ResultsStep = () => {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Results</h3>
+                        <h3 className="text-lg font-semibold dark:text-white">
+                            Results
+                        </h3>
                         {renderResult()}
                     </div>
 
                     {!isSquare && (
-                        <div className="space-y-4">
+                        <div className="space-y-4 dark:text-white">
                             <h3 className="text-lg font-semibold">
                                 EEPROM Adjustment Recommendations
                             </h3>
@@ -139,7 +143,9 @@ const ResultsStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Visualization</h3>
+                <h3 className="text-lg font-semibold dark:text-white">
+                    Visualization
+                </h3>
                 <TriangleDiagram />
             </div>
         </div>

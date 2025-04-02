@@ -15,11 +15,11 @@ import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
+    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
-import React from 'react';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
 import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinStatus.tsx';
 import { LimitSwitchIndicators } from 'app/features/Config/components/wizards/LimitSwitchIndicators.tsx';
@@ -29,6 +29,16 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
+import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
+import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import {
+    GamepadLinkWizard,
+    KeyboardLinkWizard,
+} from 'app/features/Config/components/ShortcutLinkWizards.tsx';
+import controller from 'app/lib/controller.ts';
+import get from 'lodash/get';
+import store from 'app/store';
+import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
 
 export interface SettingsMenuSection {
     label: string;
@@ -50,6 +60,8 @@ export type gSenderSettingType =
     | 'eeprom'
     | 'event'
     | 'textarea'
+    | 'api'
+    | 'location'
     | 'wizard';
 
 export type gSenderSettingsValues = number | string | boolean;
@@ -58,7 +70,7 @@ export interface gSenderSetting {
     label?: string;
     type: gSenderSettingType;
     key?: string;
-    description?: string;
+    description?: string | any[];
     options?: string[] | number[];
     unit?: string;
     eID?: string;
@@ -70,6 +82,8 @@ export interface gSenderSetting {
     wizard?: () => JSX.Element;
     toolLink?: string;
     toolLinkLabel?: string;
+    disabled?: () => boolean;
+    hidden?: () => boolean;
 }
 
 export interface gSenderSubSection {
@@ -132,6 +146,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             '9600',
                             '2400',
                         ],
+                        disabled: () => {
+                            return controller.portOpen;
+                        },
                     },
                     {
                         label: 'Reconnect Automatically',
@@ -156,17 +173,60 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Prompt when setting zero',
-                        key: 'widgets.visualizer.showSoftLimitWarning',
+                        key: 'workspace.shouldWarnZero',
                         description:
                             'Useful if you tend to set zero accidentally',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Warn if beyond soft limits',
+                        key: 'widgets.visualizer.showSoftLimitWarning',
+                        description:
+                            'Be told if your file exceeds your machine limits based on the current zero point (homing and soft limits must be enabled)',
+                        type: 'boolean',
+                        disabled: () => {
+                            const connected = controller.portOpen;
+                            if (!connected) {
+                                return true; // disabled when not connected.
+                            }
+                            const c_settings = get(
+                                controller,
+                                'settings.settings',
+                                {},
+                            );
+                            const $20 = Number(get(c_settings, '$20', 0));
+                            return $20 === 0;
+                        },
+                    },
+                    {
+                        label: 'Enable popup for Job End & Maintenance Alerts',
+                        key: 'widgets.visualizer.jobEndModal',
+                        description:
+                            'Show a pop up with job details after a job finishes, and another popup to alert you of maintenance tasks that are due.',
                         type: 'boolean',
                     },
                     {
                         label: 'Safe Height',
                         key: 'workspace.safeRetractHeight',
                         type: 'number',
+                        unit: 'mm',
                         description:
                             "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
+                    },
+                    {
+                        label: 'Park Location',
+                        key: 'workspace.park',
+                        type: 'location',
+                        description:
+                            'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
+                    },
+                    {
+                        label: 'Default Firmware',
+                        type: 'select',
+                        key: 'workspace.defaultFirmware',
+                        description:
+                            'If automatic detection of firmware fails on connection, this lets you decide which firmware flavour should gSender use as a default.',
+                        options: [GRBL, GRBLHAL],
                     },
                     {
                         label: 'Send Usage Data',
@@ -174,10 +234,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Allow gSender to collect your data periodically',
                         type: 'boolean',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '',
                     },
                 ],
             },
@@ -319,6 +375,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
                         type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'XY Thickness',
@@ -326,6 +391,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
                         type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
                     },
                     {
                         label: 'Z Probe Distance',
@@ -333,6 +407,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
                         type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Fast Find',
@@ -340,6 +423,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Probe speed before the first touch-off (default 150)',
                         type: 'number',
+                        unit: 'mm/min',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Slow Find',
@@ -347,6 +439,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Slower speed for more accuracy on second touch-off (default 75)',
                         type: 'number',
+                        unit: 'mm/min',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Retraction',
@@ -354,6 +455,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'How far the probe moves away after a successful touch (default 4)',
                         type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using auto touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
                         label: 'Probe Connection Test',
@@ -391,12 +501,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
         wizard: LimitSwitchIndicators,
         settings: [
             {
-                label: 'Limits and Homing',
+                label: '',
                 settings: [
-                    {
-                        type: 'eeprom',
-                        eID: '$5',
-                    },
                     {
                         type: 'eeprom',
                         eID: '$22',
@@ -464,6 +570,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         type: 'eeprom',
+                        eID: '$170',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$171',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$172',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$173',
+                    },
+                    {
+                        type: 'eeprom',
                         eID: '$190',
                     },
                     {
@@ -501,6 +623,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$27',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$347',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$348',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$349',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$350',
                     },
                 ],
             },
@@ -690,6 +828,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
             {
                 label: 'Laser',
+                wizard: LaserWizard,
                 settings: [
                     {
                         type: 'eeprom',
@@ -712,6 +851,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'hybrid',
                         eID: '$730',
                         unit: '',
+                    },
+                    {
+                        label: 'Laser on during outline',
+                        key: 'widgets.spindle.laser.laserOnOutline',
+                        type: 'boolean',
+                        description:
+                            'See the job position better by turning on the laser at its lowest power while outlining.',
                     },
                     {
                         label: 'Laser X Offset',
@@ -746,99 +892,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$736',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        label: 'Jogging Presets',
-        icon: IoMdMove,
-        settings: [
-            {
-                label: 'Rapid',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.rapid.xyStep',
-                        type: 'number',
-                        description:
-                            "Rapid jogging amount in the XY axes.",
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.rapid.zStep',
-                        description:
-                            'Rapid jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.rapid.aStep',
-                        description:
-                            'Rapid jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                ],
-            },
-            {
-                label: 'Normal',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.normal.xyStep',
-                        type: 'number',
-                        description:
-                            "Normal jogging amount in the XY axes.",
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.normal.zStep',
-                        description:
-                            'Normal jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.normal.aStep',
-                        description:
-                            'Normal jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                ],
-            },
-            {
-                label: 'Precise',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.precise.xyStep',
-                        type: 'number',
-                        description:
-                            "Precise jogging amount in the XY axes.",
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.precise.zStep',
-                        description:
-                            'Precise jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.precise.aStep',
-                        description:
-                            'Precise jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'mm',
                     },
                 ],
             },
@@ -934,7 +987,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'select',
                         label: 'Strategy',
                         description:
-                            'Strategy that gSender will use to handle tool change commands *add description of currently selected strategy',
+                            'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length.  Limit switches required.\n\nCode runs blocks before and after the toolchange',
                         options: [
                             'Pause',
                             'Ignore',
@@ -946,11 +999,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangeOption',
                     },
                     {
+                        type: 'location',
+                        label: 'Fixed Sensor Location',
+                        key: 'workspace.toolChangePosition',
+                        description:
+                            'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
+                        hidden: () => {
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Fixed Tool Sensor';
+                        },
+                    },
+                    {
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',
                         label: 'Before Tool Change',
                         description:
                             'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
+                        hidden: () => {
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Code';
+                        },
                     },
                     {
                         type: 'textarea',
@@ -958,6 +1032,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'After Tool Change',
                         description:
                             'When using the Code strategy, this code is run after a tool change is completed.',
+                        hidden: () => {
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Code';
+                        },
                     },
                 ],
             },
@@ -1030,22 +1111,138 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
                         type: 'number',
                     },
+                    {
+                        label: 'Enable Dark Mode',
+                        key: 'workspace.enableDarkMode',
+                        description: 'Enable dark mode for the UI',
+                        type: 'boolean',
+                    },
                 ],
             },
             {
-                label: 'Jogging Presets',
-                settings: [],
+                label: 'Rapid Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.rapid.xyStep',
+                        type: 'number',
+                        description: 'Rapid jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.rapid.zStep',
+                        description: 'Rapid jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.rapid.aStep',
+                        description: 'Rapid jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.rapid.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Normal Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.normal.xyStep',
+                        type: 'number',
+                        description: 'Normal jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.normal.zStep',
+                        description: 'Normal jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.normal.aStep',
+                        description: 'Normal jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.normal.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Precise Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.precise.xyStep',
+                        type: 'number',
+                        description: 'Precise jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.precise.zStep',
+                        description: 'Precise jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.precise.aStep',
+                        description: 'Precise jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feedrate',
+                        key: 'widgets.axes.jog.precise.feedrate',
+                        description:
+                            'Feedrate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Shortcuts',
+                settings: [
+                    {
+                        label: 'Keyboard',
+                        type: 'wizard',
+                        wizard: KeyboardLinkWizard,
+                        description:
+                            'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
+                    },
+                    {
+                        label: 'Gamepad',
+                        type: 'wizard',
+                        wizard: GamepadLinkWizard,
+                        description:
+                            'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
+                    },
+                ],
             },
             {
                 label: 'Visualizer',
                 settings: [
-                    {
-                        label: 'Visualize g-code',
-                        key: 'widgets.visualizer.disabled',
-                        description:
-                            'Only disable if your computer is struggling to run gSender',
-                        type: 'boolean',
-                    },
                     {
                         label: 'Theme',
                         key: 'widgets.visualizer.theme',
@@ -1054,18 +1251,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: ['Light', 'Dark'],
                     },
                     {
-                        label: 'Animate tool',
-                        key: 'widgets.visualizer.minimizeRenders',
+                        label: 'Lightweight options',
+                        key: 'widgets.visualizer.liteOption',
                         description:
-                            'Based on preference, reduces some memory usage',
-                        type: 'boolean',
-                    },
-                    {
-                        label: 'Lightweight mode',
-                        key: 'widgets.visualizer.liteMode',
-                        description:
-                            'Useful in cases where one-off files are slowing down your computer, choose how much of the visualizer you want to disable to keep gSender running smoothly',
-                        type: 'boolean',
+                            'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
+                        type: 'select',
+                        options: [
+                            LIGHTWEIGHT_OPTIONS.LIGHT,
+                            LIGHTWEIGHT_OPTIONS.EVERYTHING,
+                        ],
                     },
                 ],
             },
@@ -1114,6 +1308,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$141' },
                     { type: 'eeprom', eID: '$142' },
                     { type: 'eeprom', eID: '$143' },
+                    { type: 'eeprom', eID: '$160' },
+                    { type: 'eeprom', eID: '$161' },
+                    { type: 'eeprom', eID: '$162' },
+                    { type: 'eeprom', eID: '$163' },
                     { type: 'eeprom', eID: '$200' },
                     { type: 'eeprom', eID: '$201' },
                     { type: 'eeprom', eID: '$202' },
@@ -1142,6 +1340,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$661' },
                     { type: 'eeprom', eID: '$662' },
                     { type: 'eeprom', eID: '$663' },
+                    { type: 'eeprom', eID: '$744' },
+                    { type: 'eeprom', eID: '$745' },
                 ],
             },
         ],

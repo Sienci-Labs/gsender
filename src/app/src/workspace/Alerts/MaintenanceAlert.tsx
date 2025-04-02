@@ -52,7 +52,6 @@ const MaintenanceAlert: React.FC<Props> = ({
     setShowModal,
     onClose,
 }) => {
-    console.log('hi');
     let alertTasks: MaintenanceTask[] = [];
     tasks.forEach((task: MaintenanceTask) => {
         const { rangeStart, currentTime } = task;
