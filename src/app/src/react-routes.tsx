@@ -2,8 +2,7 @@ import { Routes, Route, Outlet } from 'react-router';
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
-// import KeyboardShortcuts from './features/Keyboard';
-import KeyboardShortcuts from './features/Keyboard_new';
+import KeyboardShortcuts from './features/Keyboard';
 import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
 import { StatParent } from './features/Stats/StatParent';
@@ -19,7 +18,7 @@ import { Jobs } from './features/Stats/Jobs';
 import { Maintenance } from './features/Stats/Maintenance';
 import Page from './components/Page';
 import { MachineInfoDisplay } from './features/MachineInfo/MachineInfoDisplay';
-import { NotificationDisplay } from './workspace/TopBar/NotificationsArea/NotificationDisplay';
+import { NotificationDisplay } from './features/NotificationsArea/NotificationDisplay';
 import { WorkspaceSelector } from './features/WorkspaceSelector';
 import DRO from './features/DRO';
 import { RemoteWidget } from './components/RemoteWidget';
@@ -34,11 +33,10 @@ import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
 import { noop } from 'lodash';
-import Gamepad from './features/Gamepad_new';
-import GamepadProfilePage from './features/Gamepad/ProfilePage';
+import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
-import Profile from './features/Gamepad_new/Profile';
+import Profile from './features/Gamepad/Profile';
 
 export const ReactRoutes = () => {
     return (
