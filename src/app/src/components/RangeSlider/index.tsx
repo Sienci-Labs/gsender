@@ -23,7 +23,7 @@
 
 import React, { PointerEventHandler } from 'react';
 import * as Slider from '@radix-ui/react-slider';
-import { FaMinus, FaPlus, FaRedo } from 'react-icons/fa';
+import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
 
 import Button from 'app/components/Button';
 
@@ -80,7 +80,7 @@ const RangeSlider = ({
                     onClick={() => onButtonPress(defaultPercentage)}
                     disabled={disabled}
                     size="sm"
-                    icon={<FaRedo />}
+                    icon={<FaUndo />}
                 />
                 <Slider.Root
                     className="flex relative items-center w-full h-6"

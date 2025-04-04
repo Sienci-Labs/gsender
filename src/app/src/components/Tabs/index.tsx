@@ -25,6 +25,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
         }
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
+
+        window.addEventListener('resize', checkScrollability);
     }, [items]);
 
     const checkScrollability = () => {

@@ -43,14 +43,14 @@ export function WorkspaceSelector() {
     }
 
     return (
-        <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center gap-2">
+        <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center justify-end gap-2">
             <span className="text-gray-400 text-normal">Workspace:</span>
             <Select
                 onValueChange={onWorkspaceSelect}
                 value={workspace}
                 disabled={!isConnected}
             >
-                <SelectTrigger className="w-[180px] h-7 bg-white rounded-md border-solid border border-gray-300">
+                <SelectTrigger className="max-w-28 h-7 bg-white rounded-md border-solid border border-gray-300">
                     <SelectValue placeholder="G54" />
                 </SelectTrigger>
                 <SelectContent className="flex-1 bg-white">

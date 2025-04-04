@@ -27,7 +27,6 @@ import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
 import { FileData } from '..';
 import isElectron from 'is-electron';
-import get from 'lodash/get';
 
 interface Props {
     handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
@@ -228,7 +227,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
     }
 
     return (
-        <div className="flex flex-col gap-1 justify-center p-2 items-center h-full self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col mt-2 justify-center items-start self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -258,7 +257,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                 </div>
             )}
 
-            <div className="flex gap-2 min-w-64 self-center justify-center items-center">
+            <div className="flex gap-2 -mb-3 min-w-64 self-center justify-center items-center">
                 <div className="flex flex-col items-center mr-1">
                     <span className="text-gray-500">Info</span>
                     <Switch
