@@ -257,7 +257,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                 </div>
             )}
 
-            <div className="flex gap-2 -mb-3 min-w-64 self-center justify-center items-center">
+            <div className="flex gap-2 min-w-64 self-center justify-center items-start">
                 <div className="flex flex-col items-center mr-1">
                     <span className="text-gray-500">Info</span>
                     <Switch
@@ -268,7 +268,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                     <span className="text-gray-500">Size</span>
                 </div>
 
-                <div className="w-full h-[115px] overflow-auto">
+                <div className="w-full overflow-auto">
                     <ToggleOutput />
                 </div>
             </div>
