@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { MachineInfoDisplay } from 'app/features/MachineInfo/MachineInfoDisplay.tsx';
-import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
+import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 
 export const Route = createFileRoute('/remote/info')({
     component: RouteComponent,

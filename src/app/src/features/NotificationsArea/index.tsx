@@ -7,7 +7,7 @@ import {
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { NotificationDisplay } from 'app/workspace/TopBar/NotificationsArea/NotificationDisplay.tsx';
+import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { GENERAL_CATEGORY } from 'app/constants';
