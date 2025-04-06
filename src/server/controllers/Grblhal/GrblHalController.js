@@ -341,6 +341,12 @@ class GrblHalController {
 
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', true);
+                    if (passthroughM6) {
+                        log.debug('Passthrough M6 skipping other strategies');
+                        return line;
+                    }
+
                     log.debug('M6 Tool Change');
                     this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
                     line = line.replace('M6', '(M6)');
@@ -458,7 +464,17 @@ class GrblHalController {
                 }
 
                 /* Emit event to UI for toolchange handler */
+
+
                 if (_.includes(words, 'M6')) {
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', true);
+
+
+                    if (passthroughM6) {
+                        log.debug('Sender Passthrough M6 skipping other strategies');
+                        return line;
+                    }
+
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
 
@@ -469,6 +485,7 @@ class GrblHalController {
 
                     let tool = line.match(toolCommand);
 
+                    log.debug(`passthroughM6 value: ${passthroughM6}, toolChange Strategy: ${toolChangeOption}, tool: ${tool}`);
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
@@ -499,8 +516,7 @@ class GrblHalController {
                         }
                     }
 
-                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    if (!passthroughM6 || toolChangeOption === 'Code') {
+                    if (toolChangeOption === 'Code') {
                         line = line.replace('M6', '(M6)');
                     }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
