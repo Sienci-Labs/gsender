@@ -10,6 +10,7 @@ import {
 } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
 import { useInView, InView } from 'react-intersection-observer';
+import {EEPROMNotConnectedWarning} from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -57,6 +58,7 @@ export function Config() {
                         className="px-10 gap-8 pt-4 mb-36 box-border flex flex-col overflow-y-scroll relative"
                         ref={inViewRef}
                     >
+                        <EEPROMNotConnectedWarning />
                         {settings.map((item, index) => {
                             return (
                                 <InView

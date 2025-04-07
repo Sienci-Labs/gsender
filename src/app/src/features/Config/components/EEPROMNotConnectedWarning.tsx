@@ -15,8 +15,7 @@ export function EEPROMNotConnectedWarning() {
             </svg>
             <span className="sr-only">Disconnected</span>
             <div>
-                <span className="font-medium">Disconnected!</span> You must be
-                connected to a machine in order to alter EEPROM values.
+                <span className="font-medium">Disconnected!</span> Some settings may not appear unless connected to a machine.
             </div>
         </div>
     );

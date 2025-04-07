@@ -10,7 +10,7 @@ import controller from 'app/lib/controller';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter, HashRouter } from 'react-router';
 
 function App() {
     useEffect(() => {
@@ -46,9 +46,9 @@ function App() {
                     theme="light"
                     visibleToasts={5}
                 />
-                <BrowserRouter>
+                <HashRouter>
                     <ReactRoutes />
-                </BrowserRouter>
+                </HashRouter>
             </ReduxProvider>
         </>
     );

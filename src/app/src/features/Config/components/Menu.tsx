@@ -1,6 +1,9 @@
 import cn from 'classnames';
 import { MouseEventHandler } from 'react';
 import { SettingsMenuSection } from '../assets/SettingsMenu';
+import {useSelector} from "react-redux";
+import {RootState} from "app/store/redux";
+import {MenuWarning} from "app/features/Config/components/MenuWarning.tsx";
 
 interface MenuProps {
     menu: SettingsMenuSection[];
@@ -52,8 +55,15 @@ function MenuItem({ key, label, active, onClick, icon }: MenuItemProps) {
 }
 
 export function Menu({ menu, onClick, activeSection }: MenuProps) {
+    const isConnected = useSelector((state: RootState) => {
+       return state.connection.isConnected;
+    });
+
     return (
         <div className="flex flex-col w-1/5 items-stretch border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white">
+            {
+                isConnected && <MenuWarning />
+            }
             {menu.map((item, index) => {
                 let active = `section-${index}` === activeSection;
                 return (
