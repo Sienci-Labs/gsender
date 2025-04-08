@@ -56,7 +56,7 @@ export function Config() {
                         <ApplicationPreferences />
                     </div>
                     <div
-                        className="px-10 gap-8 pt-4 mb-36 box-border flex flex-col overflow-y-scroll relative"
+                        className="px-10 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
                         ref={inViewRef}
                     >
                         <EEPROMNotConnectedWarning connected={connected} />
