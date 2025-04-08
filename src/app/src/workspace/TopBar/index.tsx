@@ -2,8 +2,6 @@ import Connection from 'app/features/Connection';
 import SpindleLaserStatus from 'app/components/SpindleLaserStatus';
 import StatusIcons from 'app/features/StatusIcons';
 import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuFlyout.tsx';
-
-import gSenderIcon from './assets/icon-round.png';
 import CenterArea from './CenterArea';
 import { IconUpdater } from 'app/features/IconUpdater';
 

@@ -9,11 +9,7 @@ import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
-import {
-    cancelJog,
-    jogAxis,
-    JoggingSpeedOptions,
-} from 'app/features/Jogging/utils/Jogging.ts';
+import { cancelJog, jogAxis } from 'app/features/Jogging/utils/Jogging.ts';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from 'app/store/redux';
 import {
@@ -101,8 +97,6 @@ export function Jogging() {
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
 
-    const [selectedSpeed, setSelectedSpeed] =
-        useState<JoggingSpeedOptions>('Normal');
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const joystickLoop = useRef<JoystickLoop | null>(null);

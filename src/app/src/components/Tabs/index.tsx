@@ -25,6 +25,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
         }
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
+
+        window.addEventListener('resize', checkScrollability);
     }, [items]);
 
     const checkScrollability = () => {
@@ -103,7 +105,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                 <button
                                     key={item.label}
                                     ref={(el) => (tabRefs.current[index] = el)}
-                                    className={`flex-grow pt-1 px-4 text font-medium ${
+                                    className={`flex-grow pt-1 px-4 text-lg font-medium ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
                                             : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
