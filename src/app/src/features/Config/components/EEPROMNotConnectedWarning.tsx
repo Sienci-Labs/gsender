@@ -1,7 +1,12 @@
-export function EEPROMNotConnectedWarning() {
+import cn from 'classnames';
+
+export function EEPROMNotConnectedWarning({connected}) {
+    console.log(`connected: ${connected}`);
     return (
         <div
-            className="flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50"
+            className={cn("flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50", {
+                hidden: connected,
+            })}
             role="alert"
         >
             <svg

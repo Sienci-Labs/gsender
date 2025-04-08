@@ -11,6 +11,8 @@ import {
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
 import { useInView, InView } from 'react-intersection-observer';
 import {EEPROMNotConnectedWarning} from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
+import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
+import {RootState} from "app/store/redux";
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -18,6 +20,8 @@ export function Config() {
     const { inViewRef, inView } = useInView({
         threshold: 0.2,
     });
+
+    const connected = useTypedSelector((state: RootState) => state.connection.isConnected);
     const [visibleSection, setVisibleSection] = React.useState('section-0');
 
     function setInView(inView, entry) {
@@ -46,9 +50,6 @@ export function Config() {
                     onClick={navigateToSection}
                     activeSection={visibleSection}
                 />
-                {
-                    //h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]
-                }
                 <div className="flex flex-col fixed-content-area w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 dark:bg-dark dark:border-gray-700">
                         <Search />
@@ -58,7 +59,7 @@ export function Config() {
                         className="px-10 gap-8 pt-4 mb-36 box-border flex flex-col overflow-y-scroll relative"
                         ref={inViewRef}
                     >
-                        <EEPROMNotConnectedWarning />
+                        <EEPROMNotConnectedWarning connected={connected} />
                         {settings.map((item, index) => {
                             return (
                                 <InView

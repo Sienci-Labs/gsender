@@ -61,9 +61,6 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
 
     return (
         <div className="flex flex-col w-1/5 items-stretch border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white">
-            {
-                isConnected && <MenuWarning />
-            }
             {menu.map((item, index) => {
                 let active = `section-${index}` === activeSection;
                 return (

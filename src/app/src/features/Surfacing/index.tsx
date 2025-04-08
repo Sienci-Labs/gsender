@@ -99,7 +99,7 @@ const SurfacingTool = () => {
     };
 
     const loadGcode = () => {
-        const name = 'gSender_Surfacing';
+        const name = 'gSender_Surfacing.gcode';
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });

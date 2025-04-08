@@ -151,6 +151,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [detectedEEPROM]);
 
     useEffect(() => {
+        console.log(`connected listener: ${connectionState}`);
         setConnected(connectionState);
     }, [connectionState]);
 
