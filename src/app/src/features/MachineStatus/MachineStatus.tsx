@@ -110,15 +110,19 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 activeState === GRBL_ACTIVE_STATE_IDLE &&
                                 isConnected,
                             'bg-green-600 text-white':
-                                activeState === GRBL_ACTIVE_STATE_RUN ||
-                                activeState === GRBL_ACTIVE_STATE_JOG ||
-                                activeState === GRBL_ACTIVE_STATE_CHECK,
+                                isConnected &&
+                                (activeState === GRBL_ACTIVE_STATE_RUN ||
+                                    activeState === GRBL_ACTIVE_STATE_JOG ||
+                                    activeState === GRBL_ACTIVE_STATE_CHECK),
                             'bg-blue-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_HOME,
+                                activeState === GRBL_ACTIVE_STATE_HOME &&
+                                isConnected,
                             'bg-yellow-600 text-white':
-                                activeState === GRBL_ACTIVE_STATE_HOLD,
+                                activeState === GRBL_ACTIVE_STATE_HOLD &&
+                                isConnected,
                             'bg-red-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_ALARM,
+                                activeState === GRBL_ACTIVE_STATE_ALARM &&
+                                isConnected,
                         },
                     )}
                 >
@@ -152,14 +156,15 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     )}
                 </div>
                 <div className="mt-4 z-50">
-                    {(activeState === GRBL_ACTIVE_STATE_ALARM ||
-                        activeState === GRBL_ACTIVE_STATE_HOLD) && (
-                        <UnlockButton
-                            onClick={unlock}
-                            alarmCode={alarmCode}
-                            activeState={activeState}
-                        />
-                    )}
+                    {isConnected &&
+                        (activeState === GRBL_ACTIVE_STATE_ALARM ||
+                            activeState === GRBL_ACTIVE_STATE_HOLD) && (
+                            <UnlockButton
+                                onClick={unlock}
+                                alarmCode={alarmCode}
+                                activeState={activeState}
+                            />
+                        )}
                 </div>
             </div>
         );
