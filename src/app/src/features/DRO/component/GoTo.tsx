@@ -76,8 +76,8 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
-                <IconButton icon={<FaPaperPlane />} disabled={false} />
+            <PopoverTrigger className="text-xl bg-robin-500 text-white border-robin-500 gap-1 border rounded hover:opacity-90 px-3 shadow">
+                <FaPaperPlane />
             </PopoverTrigger>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">

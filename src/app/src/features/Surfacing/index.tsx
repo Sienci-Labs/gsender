@@ -126,6 +126,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="width"
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -142,7 +143,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="length"
-                                        units={units}
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -165,6 +166,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="skimDepth"
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={cx('rounded', inputStyle)}
@@ -184,7 +186,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="maxDepth"
-                                        units={units}
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={inputStyle}
@@ -260,7 +262,7 @@ const SurfacingTool = () => {
                             <Input
                                 label="Feedrate"
                                 type="number"
-                                units={`${units}/min`}
+                                suffix={`${units}/min`}
                                 className={inputStyle}
                                 value={surfacing.feedrate}
                                 onChange={(e) =>
@@ -272,7 +274,7 @@ const SurfacingTool = () => {
                             <Input
                                 label="Stepover"
                                 type="number"
-                                units="%"
+                                suffix="%"
                                 className={inputStyle}
                                 value={surfacing.stepover}
                                 onChange={(e) =>

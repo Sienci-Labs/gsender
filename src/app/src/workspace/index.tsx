@@ -26,15 +26,15 @@ const Workspace = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
-        const { hash } = location;
-        console.log(hash);
-        if (hash === '#/remote') {
-            navigate('/remote');
-        } else if (hash === '#/console') {
-            navigate('/console');
-        }
-    }, [location]);
+    // useEffect(() => {
+    //     const { hash } = location;
+    //     console.log(hash);
+    //     if (hash === '#/remote') {
+    //         navigate('/remote');
+    //     } else if (hash === '#/console') {
+    //         navigate('/console');
+    //     }
+    // }, [location]);
 
     useDarkMode();
 
