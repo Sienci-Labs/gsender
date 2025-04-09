@@ -37,12 +37,16 @@ export function EEPROMSettingRow({
         firmwareType,
         searchTerm,
         setSettingsAreDirty,
+        eepromIsDefault,
     } = useSettings();
     if (!EEPROM) {
         return;
     }
     const EEPROMData = EEPROM.find((s) => s.setting === eID);
     if (EEPROMData) {
+        const altIsDefault = eepromIsDefault(EEPROMData);
+        console.log(altIsDefault);
+
         const profileDefaults =
             firmwareType === 'Grbl'
                 ? machineProfile.eepromSettings
@@ -78,9 +82,10 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'p-2 flex flex-row items-center',
+                    'p-2 flex flex-row items-center border-b border-gray-200',
                     {
-                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white': !isDefault,
+                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                            !isDefault,
                     },
                     {
                         hidden: !matchesSearch,

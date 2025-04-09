@@ -9,8 +9,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 
 import {
-    GRBL_SETTINGS,
     GRBL_HAL_SETTINGS,
+    GRBL_SETTINGS,
 } from 'app/features/Config/assets/SettingsDescriptions.ts';
 import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
@@ -189,6 +189,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
+            // If filterNonDefault is enabled, make sure the current value equals the default value
+            if (filterNonDefault) {
+                console.log(v);
+                console.log(EEPROM);
+                return true;
+            }
         }
 
         if (searchTerm.length === 0 || !searchTerm) {
@@ -197,6 +203,22 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         return JSON.stringify(v)
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
+    }
+
+    function eepromIsDefault(settingData) {
+        const profileDefaults =
+            controllerType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : machineProfile.grblHALeepromSettings;
+        const inputDefault = get(profileDefaults, settingData.setting, '-');
+        console.log(`default: ${inputDefault}`);
+        const settingIsNumberValue = !(
+            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
+        );
+
+        return settingIsNumberValue
+            ? `${Number(settingData.value)}` === `${Number(inputDefault)}`
+            : settingData.value === inputDefault;
     }
 
     function toggleFilterNonDefault() {
@@ -252,6 +274,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsFilter,
         toggleFilterNonDefault,
         filterNonDefault,
+        eepromIsDefault,
     };
 
     return (
