@@ -720,7 +720,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('sender:M0M1', (opts: { comment: string }) => {
         const { comment = '' } = opts;
         const msg =
-            'Hit ‘Close Window‘ if you want taddSpindleo do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
+            'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
         const content =
             comment.length > 0 ? (
