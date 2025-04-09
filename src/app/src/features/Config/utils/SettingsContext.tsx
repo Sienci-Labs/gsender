@@ -191,9 +191,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (filterNonDefault) {
-                console.log(v);
-                console.log(EEPROM);
-                return true;
+                const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+                if (EEPROMData) {
+                    return !eepromIsDefault(EEPROMData);
+                }
+                return true; // We don't know, default to show
             }
         }
 
