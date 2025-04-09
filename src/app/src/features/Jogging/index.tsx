@@ -545,6 +545,7 @@ export function Jogging() {
         };
 
         const jogCB = (given: Record<string, number>) => {
+            console.log('jogCB', given);
             startJogCommand(given, currentJogSpeed.feedrate, false);
         };
 
@@ -569,7 +570,7 @@ export function Jogging() {
         if (axis.x) {
             axisList.X = axisValue.X * axis.x;
         }
-        if (axis.u) {
+        if (axis.y) {
             axisList.Y = axisValue.Y * axis.y;
         }
         if (axis.z) {
