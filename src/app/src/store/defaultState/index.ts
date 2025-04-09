@@ -32,7 +32,7 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
-    GRBL,
+    GRBLHAL,
 } from '../../constants';
 
 import machineProfiles from './machineProfiles';
@@ -58,7 +58,7 @@ const defaultState: State = {
         jobsCancelled: 0,
         timeSpentRunning: 0,
         longestTimeRun: 0,
-        defaultFirmware: GRBL,
+        defaultFirmware: GRBLHAL,
         jobTimes: [],
         toolChange: {
             passthrough: false,

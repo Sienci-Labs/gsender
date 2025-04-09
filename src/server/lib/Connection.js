@@ -35,7 +35,7 @@ class Connection extends EventEmitter {
                 }
 
                 const grblR = data.match(/.*Grbl.*/);
-                const grblHalR = data.match(/.*\[FIRMWARE:grblHAL\].*/);
+                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/);
 
                 if (grblHalR) {
                     this.controllerType = GRBLHAL;
@@ -47,7 +47,6 @@ class Connection extends EventEmitter {
                     );
                     clearInterval(this.timeout);
                 } else if (grblR) {
-                    log.debug('its grbl');
                     this.controllerType = GRBL;
                     this.emit(
                         'firmwareFound',
@@ -95,8 +94,6 @@ class Connection extends EventEmitter {
             defaultFirmware,
             network,
         };
-        log.debug('FINAL');
-        log.debug(this.options);
         this.callback = callback;
         this.engine = engine;
 
@@ -184,7 +181,6 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
-                log.debug('setting interval');
                 this.timeout = setInterval(() => {
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
@@ -199,7 +195,6 @@ class Connection extends EventEmitter {
                     }
                     this.connection.writeImmediate('$I\n');
                     this.count++;
-                    log.debug(this.count);
                 }, 1000);
             }
         });
