@@ -30,6 +30,7 @@ import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
+import { toast } from 'app/lib/toaster';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -56,8 +57,21 @@ const Steps = () => {
         setMeasuredDistance(100);
     };
 
-    const eepromKey = getEEPROMSettingKey(selectedAxis);
+    const handleUpdateEEPROM = () => {
+        const currentStepsPerMM = Number(settings[eepromKey as EEPROM]);
 
+        const newStepsPerMM = calculateNewStepsPerMM({
+            originalStepsPerMM: currentStepsPerMM,
+            givenDistanceMoved: moveDistance,
+            actualDistanceMoved: measuredDistance,
+        });
+
+        controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`]);
+
+        toast.info('Updated steps-per-mm value');
+    };
+
+    const eepromKey = getEEPROMSettingKey(selectedAxis);
     const currentStepsPerMM = Number(settings[eepromKey as EEPROM]);
 
     const isCompleted =
@@ -248,7 +262,10 @@ const Steps = () => {
                                     <AlertDialogCancel className="border-none">
                                         No, Cancel
                                     </AlertDialogCancel>
-                                    <AlertDialogAction className="border border-blue-500">
+                                    <AlertDialogAction
+                                        className="border border-blue-500"
+                                        onClick={handleUpdateEEPROM}
+                                    >
                                         Yes, Update Steps-Per-MM
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
