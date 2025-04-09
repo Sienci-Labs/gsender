@@ -47,9 +47,6 @@ export const Section = React.forwardRef(
             (a, b) => a + b.settings.length,
             0,
         );
-        console.log(`${title} - ${settingsAvailable}`);
-        console.log(filteredSettings);
-
         return (
             <div
                 id={id}
