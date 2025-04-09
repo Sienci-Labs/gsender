@@ -19,12 +19,8 @@ export function SettingSection({
     label = null,
     wizard,
 }: SettingSectionProps): JSX.Element {
-    const {
-        setSettingsValues,
-        setSettingsAreDirty,
-        searchTerm,
-        settingsFilter,
-    } = useSettings();
+    const { setSettingsValues, setSettingsAreDirty, settingsFilter } =
+        useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
 

@@ -78,6 +78,8 @@ export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
 
+export function getPopulatedMenus(settings: SettingsMenuSection[]) {}
+
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
     const globalValueReference = [];
     let index = 0;
@@ -90,7 +92,7 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
         }
         ss.settings.map((s) => {
             s.settings.map((o) => {
-                if (o.key.length > 0) {
+                if (o.key && o.key.length > 0) {
                     o.value = fetchStoreValue(o.key);
                     o.globalIndex = index;
                     o.defaultValue = fetchDefaultValue(o.key);

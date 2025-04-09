@@ -3,16 +3,16 @@ import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
 import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
-import { SettingsMenu } from './assets/SettingsMenu';
+import { gSenderSubSection, SettingsMenu } from './assets/SettingsMenu';
 import {
     SettingsProvider,
     useSettings,
 } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
 import { useInView, InView } from 'react-intersection-observer';
-import {EEPROMNotConnectedWarning} from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {RootState} from "app/store/redux";
+import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -21,7 +21,11 @@ export function Config() {
         threshold: 0.2,
     });
 
-    const connected = useTypedSelector((state: RootState) => state.connection.isConnected);
+    const { settingsFilter } = useSettings();
+
+    const connected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
     const [visibleSection, setVisibleSection] = React.useState('section-0');
 
     function setInView(inView, entry) {
@@ -31,7 +35,18 @@ export function Config() {
     }
 
     const { settings } = useSettings();
-
+    /*
+    const filteredSettings = settings.map((section) => {
+        const newSection = { ...section };
+        newSection.settings = section.settings.map((ss) => {
+            const fs = { ...ss };
+            fs.settings = fs.settings.filter((o) => settingsFilter(o));
+            return fs;
+        });
+        return newSection;
+    });
+    console.log(filteredSettings);
+    */
     function navigateToSection(
         e: MouseEventHandler<HTMLButtonElement>,
         index: number,
@@ -46,7 +61,7 @@ export function Config() {
         <SettingsProvider>
             <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
                 <Menu
-                    menu={SettingsMenu}
+                    menu={settings}
                     onClick={navigateToSection}
                     activeSection={visibleSection}
                 />
