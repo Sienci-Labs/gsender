@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaCode, FaPlay } from 'react-icons/fa';
@@ -35,11 +35,18 @@ const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 const SurfacingTool = () => {
     const surfacingConfig = new WidgetConfig('surfacing');
     const [tabSwitch, setTabSwitch] = useState(false);
+    const [units, setUnits] = useState('mm');
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+
+    useEffect(() => {
+        const storeUnits = store.get('workspace.units', 'mm');
+        console.log('storeUnits', storeUnits);
+        setUnits(storeUnits);
+    }, []);
 
     const [surfacing, setSurfacing]: [
         Surfacing,
@@ -47,7 +54,7 @@ const SurfacingTool = () => {
     ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
 
-    const units = store.get('workspace.units');
+
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
@@ -92,7 +99,7 @@ const SurfacingTool = () => {
     };
 
     const loadGcode = () => {
-        const name = 'gSender_Surfacing';
+        const name = 'gSender_Surfacing.gcode';
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
@@ -100,7 +107,7 @@ const SurfacingTool = () => {
 
     return (
         <>
-            <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
+            <div className="grid grid-rows-[5fr_1fr] fixed-tool-area box-border">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
                         <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">
@@ -119,6 +126,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="width"
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -135,7 +143,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="length"
-                                        units={units}
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -158,6 +166,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="skimDepth"
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={cx('rounded', inputStyle)}
@@ -177,7 +186,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="maxDepth"
-                                        units={units}
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={inputStyle}
@@ -214,7 +223,7 @@ const SurfacingTool = () => {
                         </div>
                         <div className="flex items-center">
                             <MultiInputBlock
-                                label="Cut Depth & Max"
+                                label="Spindle RPM"
                                 divider=""
                                 firstComponent={
                                     <Input
@@ -253,7 +262,7 @@ const SurfacingTool = () => {
                             <Input
                                 label="Feedrate"
                                 type="number"
-                                units={`${units}/min`}
+                                suffix={`${units}/min`}
                                 className={inputStyle}
                                 value={surfacing.feedrate}
                                 onChange={(e) =>
@@ -265,7 +274,7 @@ const SurfacingTool = () => {
                             <Input
                                 label="Stepover"
                                 type="number"
-                                units="%"
+                                suffix="%"
                                 className={inputStyle}
                                 value={surfacing.stepover}
                                 onChange={(e) =>

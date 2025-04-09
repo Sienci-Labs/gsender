@@ -1,5 +1,3 @@
-import { IconFunctionButton } from 'app/features/Config/components/IconFunctionButton.tsx';
-import { GrRevert } from 'react-icons/gr';
 import { PiLightning } from 'react-icons/pi';
 import { CiImport } from 'react-icons/ci';
 import { CiExport } from 'react-icons/ci';
@@ -17,7 +15,6 @@ import { useSelector } from 'react-redux';
 import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
-import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
 
 interface ProfileBarProps {
@@ -73,38 +70,40 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     }
 
     return (
-        <div className="fixed shadow-inner flex px-4 rounded-lg bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 right-14 h-24 border border-gray-200 dark:bg-dark">
+        <div className="fixed flex px-4 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 right-14 h-16 dark:bg-dark">
             <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
-            <div className="w-1/4">
-                <MachineProfileSelector />
-            </div>
+            <div className="flex flex-row items-center border border-gray-200 h-16 rounded-lg justify-between">
+                <div className="w-1/4 mx-auto">
+                    <MachineProfileSelector />
+                </div>
 
-            <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-                <ActionButton
-                    icon={<CiExport />}
-                    label="Export"
-                    onClick={() => exportFirmwareSettings(rawEEPROM)}
-                    disabled={!connected}
-                />
-                <ActionButton
-                    icon={<CiImport />}
-                    label="Import"
-                    onClick={() => {
-                        inputRef.current.click();
-                        inputRef.current.value = null;
-                    }}
-                    disabled={!connected}
-                />
-                <RestoreDefaultDialog />
-                <ActionButton
-                    icon={<PiLightning />}
-                    label="Flash"
-                    onClick={toggleFlash}
-                />
+                <div className="grid h-full max-w-lg grid-cols-4 font-medium">
+                    <ActionButton
+                        icon={<CiExport />}
+                        label="Export"
+                        onClick={() => exportFirmwareSettings(rawEEPROM)}
+                        disabled={!connected}
+                    />
+                    <ActionButton
+                        icon={<CiImport />}
+                        label="Import"
+                        onClick={() => {
+                            inputRef.current.click();
+                            inputRef.current.value = null;
+                        }}
+                        disabled={!connected}
+                    />
+                    <RestoreDefaultDialog />
+                    <ActionButton
+                        icon={<PiLightning />}
+                        label="Flash"
+                        onClick={toggleFlash}
+                    />
+                </div>
             </div>
             <div
                 className={cn(
-                    'ring rounded relative',
+                    'ring rounded relative ml-4',
                     { 'ring-green-600': settingsAreDirty },
                     { 'ring-gray-300': !settingsAreDirty },
                 )}
@@ -125,16 +124,16 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                 {settingsAreDirty && (
                     <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>
                 )}
+                <input
+                    type="file"
+                    className="hidden"
+                    multiple={false}
+                    accept=".txt,.json"
+                    onChange={importEEPROMSettings}
+                    ref={inputRef}
+                />
             </div>
 
-            <input
-                type="file"
-                className="hidden"
-                multiple={false}
-                accept=".txt,.json"
-                onChange={importEEPROMSettings}
-                ref={inputRef}
-            />
         </div>
     );
 }

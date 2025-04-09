@@ -53,11 +53,13 @@ export function RemoteModeDialog({
     }
 
     function updatePort(e) {
+        setDirty(true)
         e.preventDefault();
         setPort(e.target.value);
     }
 
     function onIPSelect(v) {
+        setDirty(true)
         setIp(v);
     }
 

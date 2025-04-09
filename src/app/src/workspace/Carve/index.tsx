@@ -12,7 +12,7 @@ export const Carve = () => {
     const shouldHide = pathname !== '/';
 
     return (
-        <div className={cx({ hidden: shouldHide })}>
+        <div className={cx({ hidden: shouldHide }, 'h-full')}>
             <div className="flex h-[75%] max-h-[75%] pb-10">
                 <div className="flex-grow">
                     <Visualizer />
