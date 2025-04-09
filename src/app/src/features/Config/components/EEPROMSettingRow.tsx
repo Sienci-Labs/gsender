@@ -44,9 +44,7 @@ export function EEPROMSettingRow({
     }
     const EEPROMData = EEPROM.find((s) => s.setting === eID);
     if (EEPROMData) {
-        const altIsDefault = eepromIsDefault(EEPROMData);
-        console.log(altIsDefault);
-
+        const isDefault = eepromIsDefault(EEPROMData);
         const profileDefaults =
             firmwareType === 'Grbl'
                 ? machineProfile.eepromSettings
@@ -58,13 +56,6 @@ export function EEPROMSettingRow({
         );
 
         const inputDefault = get(profileDefaults, eID, '-');
-        const settingIsNumberValue = !(
-            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
-        );
-
-        const isDefault = settingIsNumberValue
-            ? `${Number(EEPROMData.value)}` === `${Number(inputDefault)}`
-            : EEPROMData.value === inputDefault;
 
         const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 

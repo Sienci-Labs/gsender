@@ -211,7 +211,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 ? machineProfile.eepromSettings
                 : machineProfile.grblHALeepromSettings;
         const inputDefault = get(profileDefaults, settingData.setting, '-');
-        console.log(`default: ${inputDefault}`);
+
         const settingIsNumberValue = !(
             Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
         );

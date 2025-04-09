@@ -63,7 +63,7 @@ export const Section = React.forwardRef(
                     </h1>
                     {wizard && wizard()}
                 </div>
-                <div className="bg-gray-100 rounded-xl shadow p-6 dark:bg-dark dark:text-white">
+                <div className="bg-gray-100 rounded-xl shadow p-6 flex flex-col gap-6 dark:bg-dark dark:text-white">
                     {filteredSettings.map(
                         (setting: gSenderSubSection, index) => {
                             return (
