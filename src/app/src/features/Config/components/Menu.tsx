@@ -38,7 +38,7 @@ function MenuItem({
     return (
         <button
             className={cn(
-                'flex items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500',
+                'flex min-h-8 max-h-14 items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500',
                 {
                     'text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
                         active,
@@ -85,9 +85,9 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
     });
 
     return (
-        // flex flex-col w-1/5 items-stretch border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white
+        //
         <div
-            className="grid grid-cols-1 grid-rows-(--menu-col-length) w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white"
+            className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white"
             style={
                 {
                     '--menu-col-length': originalMenuLength,
