@@ -1,6 +1,6 @@
 import { LuArrowRight } from 'react-icons/lu';
 import Button from 'app/components/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 
@@ -93,13 +93,7 @@ const MarkingStep = () => {
                                                     );
                                                 }
                                             }}
-                                            className={`${
-                                                isCurrentStep
-                                                    ? 'bg-green-500 hover:bg-green-600'
-                                                    : isPastStep
-                                                      ? 'bg-blue-500'
-                                                      : 'bg-gray-300'
-                                            } text-white`}
+                                            variant="primary"
                                         >
                                             {step.buttonLabel}
                                         </Button>
@@ -122,11 +116,8 @@ const MarkingStep = () => {
                                                         disabled={
                                                             !isCurrentStep
                                                         }
-                                                        className="w-24"
+                                                        suffix="mm"
                                                     />
-                                                    <span className="text-gray-500">
-                                                        mm
-                                                    </span>
                                                 </div>
                                             ) : (
                                                 step.output

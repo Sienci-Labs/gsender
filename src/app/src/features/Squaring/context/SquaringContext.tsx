@@ -1,3 +1,4 @@
+import controller from 'app/lib/controller';
 import { createContext, useContext, ReactNode, useState } from 'react';
 
 type Point = {
@@ -134,7 +135,8 @@ const initialMainSteps: MainStep[] = [
             },
             {
                 buttonLabel: 'Move X-axis',
-                description: 'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
+                description:
+                    'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
                 value: 300,
                 completed: false,
                 output: null,
@@ -184,7 +186,8 @@ const initialMainSteps: MainStep[] = [
             },
             {
                 buttonLabel: 'Move Y-axis',
-                description: 'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
+                description:
+                    'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
                 value: 300,
                 completed: false,
                 output: null,
@@ -460,6 +463,7 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const jogMachine = async (axis: string, value: number) => {
+        controller.command('gcode', `G91 G0${axis} ${value}`);
         // TODO: Implement machine control
         console.log(`Jogging ${axis} by ${value}mm`);
     };
