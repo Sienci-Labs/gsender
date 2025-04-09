@@ -99,6 +99,7 @@ const SurfacingTool = () => {
         });
     };
 
+    const saveSurfacing = (surfacing: Surfacing, needsConvert = false) => {
         if (needsConvert) {
             surfacingConfig.set('', {
                 ...surfacing,
@@ -123,7 +124,7 @@ const SurfacingTool = () => {
 
     return (
         <>
-            <div className="grid grid-rows-[5fr_1fr] box-border">
+            <div className="grid grid-rows-[5fr_1fr] fixed-tool-area box-border">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
                         <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">

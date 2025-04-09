@@ -177,6 +177,5 @@ export function convertIfImperial(num: string | number, units = METRIC_UNITS) {
         console.log('converting');
         return convertValueToImperialUnits(num);
     }
-    console.log('no convert');
     return Number(num);
 }
