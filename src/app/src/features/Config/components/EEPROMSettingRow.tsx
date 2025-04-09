@@ -57,7 +57,7 @@ export function EEPROMSettingRow({
 
         const inputDefault = get(profileDefaults, eID, '-');
 
-        const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
+        //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 
         const detailString = (
             <span>
@@ -77,9 +77,6 @@ export function EEPROMSettingRow({
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
                             !isDefault,
-                    },
-                    {
-                        hidden: !matchesSearch,
                     },
                 )}
             >

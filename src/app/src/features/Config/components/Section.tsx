@@ -6,7 +6,6 @@ import {
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
 
 interface SectionProps {
@@ -48,6 +47,8 @@ export const Section = React.forwardRef(
             (a, b) => a + b.settings.length,
             0,
         );
+        console.log(`${title} - ${settingsAvailable}`);
+        console.log(filteredSettings);
 
         return (
             <div

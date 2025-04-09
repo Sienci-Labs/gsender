@@ -195,16 +195,23 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 if (EEPROMData) {
                     return !eepromIsDefault(EEPROMData);
                 }
-                return true; // We don't know, default to show
+                return false; // We don't know, default to hide
             }
         }
 
         if (searchTerm.length === 0 || !searchTerm) {
             return true;
         }
-        return JSON.stringify(v)
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
+
+        // Hide hidden when filtering
+        if ('hidden' in v) {
+            return !v.hidden();
+        }
+
+        if (v)
+            return JSON.stringify(v)
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
     }
 
     function eepromIsDefault(settingData) {
