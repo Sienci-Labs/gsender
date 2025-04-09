@@ -9,7 +9,11 @@ import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx
 import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
 import { AJog } from 'app/features/Jogging/components/AJog.tsx';
 import store from 'app/store';
-import { cancelJog, jogAxis } from 'app/features/Jogging/utils/Jogging.ts';
+import {
+    cancelJog,
+    jogAxis,
+    startJogCommand,
+} from 'app/features/Jogging/utils/Jogging.ts';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from 'app/store/redux';
 import {
@@ -518,10 +522,6 @@ export function Jogging() {
         setJogSpeed(newJogSpeed);
     }
 
-    const startContinuousJog = (params = {}, feedrate = 1000) => {
-        controller.command('jog:start', params, feedrate, units);
-    };
-
     const stopContinuousJog = () => {
         controller.command('jog:stop');
     };
@@ -538,18 +538,18 @@ export function Jogging() {
         }
 
         const axisValue = {
-            x: currentJogSpeed.xyStep,
-            y: currentJogSpeed.xyStep,
-            z: currentJogSpeed.zStep,
-            a: currentJogSpeed.aStep,
+            X: currentJogSpeed.xyStep,
+            Y: currentJogSpeed.xyStep,
+            Z: currentJogSpeed.zStep,
+            A: currentJogSpeed.aStep,
         };
 
         const jogCB = (given: Record<string, number>) => {
-            jogAxis(given, currentJogSpeed.feedrate);
+            startJogCommand(given, currentJogSpeed.feedrate, false);
         };
 
         const startContinuousJogCB = (coordinates: Record<string, number>) => {
-            startContinuousJog(coordinates, currentJogSpeed.feedrate);
+            startJogCommand(coordinates, currentJogSpeed.feedrate, true);
         };
 
         const stopContinuousJogCB = () => {
@@ -567,16 +567,16 @@ export function Jogging() {
         const axisList: Record<string, number> = {};
 
         if (axis.x) {
-            axisList.x = axisValue.x * axis.x;
+            axisList.X = axisValue.X * axis.x;
         }
-        if (axis.y) {
-            axisList.y = axisValue.y * axis.y;
+        if (axis.u) {
+            axisList.Y = axisValue.Y * axis.y;
         }
         if (axis.z) {
-            axisList.z = axisValue.z * axis.z;
+            axisList.Z = axisValue.Z * axis.z;
         }
         if (axis.a) {
-            axisList.a = axisValue.a * axis.a;
+            axisList.A = axisValue.A * axis.a;
         }
 
         jogHelper.current.onKeyDown(axisList, currentJogSpeed.feedrate);
