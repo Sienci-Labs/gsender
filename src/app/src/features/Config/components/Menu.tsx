@@ -1,14 +1,8 @@
 import cn from 'classnames';
 import { MouseEventHandler } from 'react';
-import {
-    gSenderSettings,
-    gSenderSubSection,
-    SettingsMenuSection,
-} from '../assets/SettingsMenu';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { MenuWarning } from 'app/features/Config/components/MenuWarning.tsx';
+import { SettingsMenuSection } from '../assets/SettingsMenu';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import React from 'react';
 
 interface MenuProps {
     menu: SettingsMenuSection[];
@@ -91,7 +85,15 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
     });
 
     return (
-        <div className="flex flex-col w-1/5 items-stretch border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white">
+        // flex flex-col w-1/5 items-stretch border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white
+        <div
+            className="grid grid-cols-1 grid-rows-(--menu-col-length) w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white"
+            style={
+                {
+                    '--menu-col-length': originalMenuLength,
+                } as React.CSSProperties
+            }
+        >
             {filteredSettings.map((item, index) => {
                 const availableSettings = tallySettings(item);
                 let active = `section-${index}` === activeSection;
