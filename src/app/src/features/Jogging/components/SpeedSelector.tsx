@@ -58,6 +58,12 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         handleClick(newSpeeds);
     }
 
+    useEffect(() => {
+        store.on('change', () => {
+            updateCurrentJogValues();
+        });
+    }, []);
+
     // Any time the value swaps, fetch and update the parent
     useEffect(() => {
         // get speed, convert units, update UI
