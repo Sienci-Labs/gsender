@@ -9,9 +9,14 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
+    METRIC_UNITS,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import { convertToMetric } from 'app/lib/units';
+import {
+    convertIfImperial,
+    convertToImperial,
+    convertToMetric,
+} from 'app/lib/units';
 import MultiInputBlock from 'app/components/MultiInputBlock';
 import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
@@ -43,7 +48,7 @@ const SurfacingTool = () => {
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     useEffect(() => {
-        const storeUnits = store.get('workspace.units', 'mm');
+        const storeUnits = store.get('workspace.units', METRIC_UNITS);
         setUnits(storeUnits);
     }, []);
 
@@ -52,6 +57,25 @@ const SurfacingTool = () => {
         React.Dispatch<Partial<Surfacing>>,
     ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
+
+    useEffect(() => {
+        if (units == IMPERIAL_UNITS) {
+            console.log('converting');
+            console.log(surfacing);
+            const convertedSurfacing = {
+                ...surfacing,
+                bitDiameter: convertToImperial(surfacing.bitDiameter),
+                feedrate: convertToImperial(surfacing.feedrate),
+                length: convertToImperial(surfacing.length),
+                width: convertToImperial(surfacing.width),
+                skimDepth: convertToImperial(surfacing.skimDepth),
+                maxDepth: convertToImperial(surfacing.maxDepth),
+            };
+            console.log('converted:');
+            console.log(convertedSurfacing);
+            setSurfacing(convertedSurfacing);
+        }
+    }, [units]);
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
@@ -80,11 +104,11 @@ const SurfacingTool = () => {
     };
 
     const saveSurfacing = (surfacing: Surfacing, needsConvert = false) => {
+        console.log('save called');
         if (needsConvert) {
             surfacingConfig.set('', {
                 ...surfacing,
                 bitDiameter: convertToMetric(surfacing.bitDiameter),
-                stepover: convertToMetric(surfacing.stepover),
                 feedrate: convertToMetric(surfacing.feedrate),
                 length: convertToMetric(surfacing.length),
                 width: convertToMetric(surfacing.width),

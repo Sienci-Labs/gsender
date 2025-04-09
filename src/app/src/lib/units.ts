@@ -170,3 +170,13 @@ export const convertToImperial = (val: number): number => {
 export const convertToMetric = (val: number): number => {
     return Number((val * CALC_UNIT).toFixed(2));
 };
+
+// assume starting imperial,
+export function convertIfImperial(num: string | number, units = METRIC_UNITS) {
+    if (units === IMPERIAL_UNITS) {
+        console.log('converting');
+        return convertValueToImperialUnits(num);
+    }
+    console.log('no convert');
+    return Number(num);
+}
