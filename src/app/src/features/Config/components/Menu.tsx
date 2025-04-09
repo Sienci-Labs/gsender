@@ -23,7 +23,6 @@ interface MenuItemProps {
 }
 
 export function tallySettings(settings: SettingsMenuSection) {
-    console.log(settings);
     return settings.settings.reduce((a, b) => a + b.settings.length, 0);
 }
 

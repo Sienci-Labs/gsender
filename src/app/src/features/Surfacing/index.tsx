@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaCode, FaPlay } from 'react-icons/fa';
@@ -44,7 +44,6 @@ const SurfacingTool = () => {
 
     useEffect(() => {
         const storeUnits = store.get('workspace.units', 'mm');
-        console.log('storeUnits', storeUnits);
         setUnits(storeUnits);
     }, []);
 
@@ -53,7 +52,6 @@ const SurfacingTool = () => {
         React.Dispatch<Partial<Surfacing>>,
     ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
-
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';

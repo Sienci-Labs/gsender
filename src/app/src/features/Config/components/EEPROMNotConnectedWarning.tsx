@@ -1,12 +1,14 @@
 import cn from 'classnames';
 
-export function EEPROMNotConnectedWarning({connected}) {
-    console.log(`connected: ${connected}`);
+export function EEPROMNotConnectedWarning({ connected }) {
     return (
         <div
-            className={cn("flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50", {
-                hidden: connected,
-            })}
+            className={cn(
+                'flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50',
+                {
+                    hidden: connected,
+                },
+            )}
             role="alert"
         >
             <svg
@@ -20,7 +22,8 @@ export function EEPROMNotConnectedWarning({connected}) {
             </svg>
             <span className="sr-only">Disconnected</span>
             <div>
-                <span className="font-medium">Disconnected!</span> Some settings may not appear unless connected to a machine.
+                <span className="font-medium">Disconnected!</span> Some settings
+                may not appear unless connected to a machine.
             </div>
         </div>
     );

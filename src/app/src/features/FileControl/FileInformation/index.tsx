@@ -46,7 +46,6 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
         const { jobs = [] } = jobStatRes.data;
         setLastJob(jobs[jobs.length - 1]);
     };
-    console.log(`name: ${name}`);
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
