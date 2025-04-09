@@ -78,10 +78,10 @@ function MenuItem({
 export function Menu({ menu, onClick, activeSection }: MenuProps) {
     const { settingsFilter } = useSettings();
 
-    console.log(menu);
+    const originalMenuLength = menu.length;
+
     const filteredSettings = menu.map((section) => {
         const newSection = { ...section };
-        console.log(newSection);
         newSection.settings = section.settings.map((ss) => {
             const fs = { ...ss };
             fs.settings = fs.settings.filter((o) => settingsFilter(o));
