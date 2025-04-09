@@ -19,8 +19,12 @@ export function SettingSection({
     label = null,
     wizard,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, searchTerm, connected } =
-        useSettings();
+    const {
+        setSettingsValues,
+        setSettingsAreDirty,
+        searchTerm,
+        settingsFilter,
+    } = useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
 
@@ -32,15 +36,14 @@ export function SettingSection({
         });
     };
 
-    const filteredSettings = settings.filter((o) =>
-        matchesSearchTerm(o, searchTerm),
-    );
-
     return (
         <fieldset
-            className={cn('[&:not(:first-child)]:border [&:not(:first-child)]:border-solid [&:not(:first-child)]:border-gray-300 rounded', {
-                'hidden text-gray-600': filteredSettings.length === 0,
-            })}
+            className={cn(
+                '[&:not(:first-child)]:border [&:not(:first-child)]:border-solid [&:not(:first-child)]:border-gray-300 rounded',
+                {
+                    'hidden text-gray-600': settings.length === 0,
+                },
+            )}
         >
             {label && (
                 <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
@@ -48,7 +51,7 @@ export function SettingSection({
                     {wizard && wizard()}
                 </legend>
             )}
-            {filteredSettings.map((setting) => {
+            {settings.map((setting) => {
                 return (
                     <SettingRow
                         setting={setting}

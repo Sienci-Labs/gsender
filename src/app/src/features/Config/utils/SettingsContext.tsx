@@ -34,6 +34,7 @@ interface iSettingsContext {
     setSearchTerm: (v) => void;
     settingsValues: gSenderSetting[];
     setSettingsValue: (v) => void;
+    settingsFilter: (v) => boolean;
 }
 
 interface SettingsProviderProps {
@@ -51,6 +52,7 @@ const defaultState = {
     connected: false,
     settingsAreDirty: false,
     settingsValues: [],
+    settingsFilter: (v) => true,
 };
 
 export const SettingsContext =
@@ -88,11 +90,13 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
         }
         ss.settings.map((s) => {
             s.settings.map((o) => {
-                o.value = fetchStoreValue(o.key);
-                o.globalIndex = index;
-                o.defaultValue = fetchDefaultValue(o.key);
-                globalValueReference.push({ ...o });
-                index++;
+                if (o.key.length > 0) {
+                    o.value = fetchStoreValue(o.key);
+                    o.globalIndex = index;
+                    o.defaultValue = fetchDefaultValue(o.key);
+                    globalValueReference.push({ ...o });
+                    index++;
+                }
             });
         });
     });
@@ -151,7 +155,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [detectedEEPROM]);
 
     useEffect(() => {
-        console.log(`connected listener: ${connectionState}`);
         setConnected(connectionState);
     }, [connectionState]);
 
@@ -165,6 +168,29 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             ),
         );
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
+
+    /**
+     * Filter for general settings.
+     * Filter EEPROM if not connected
+     * Filter EEPROM if no Value
+     * Filter remaining by matching search term
+     * @param v - The setting to filter
+     */
+    function settingsFilter(v) {
+        if (v.type === 'eeprom' || v.type === 'hybrid') {
+            // Always exclude eeprom/hybrids when not connected
+            if (!connectionState) {
+                return false;
+            }
+        }
+
+        if (searchTerm.length === 0 || !searchTerm) {
+            return true;
+        }
+        return JSON.stringify(v)
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+    }
 
     // Populate eeprom descriptions as needed
     useEffect(() => {
@@ -212,6 +238,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSearchTerm,
         settingsValues,
         setSettingsValues,
+        settingsFilter,
     };
 
     return (
