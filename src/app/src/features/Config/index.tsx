@@ -13,6 +13,7 @@ import { useInView, InView } from 'react-intersection-observer';
 import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
+import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
 
 export function Config() {
     const [activeSection, setActiveSection] = React.useState<number>(0);
@@ -68,6 +69,7 @@ export function Config() {
                 <div className="flex flex-col fixed-content-area w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 dark:bg-dark dark:border-gray-700">
                         <Search />
+                        <FilterDefaultToggle />
                         <ApplicationPreferences />
                     </div>
                     <div

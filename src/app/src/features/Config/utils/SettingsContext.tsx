@@ -16,6 +16,7 @@ import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import defaultStoreState from 'app/store/defaultState';
+import { boolean } from 'zod';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -35,6 +36,7 @@ interface iSettingsContext {
     settingsValues: gSenderSetting[];
     setSettingsValue: (v) => void;
     settingsFilter: (v) => boolean;
+    setFilterNonDefault: () => void;
 }
 
 interface SettingsProviderProps {
@@ -53,6 +55,8 @@ const defaultState = {
     settingsAreDirty: false,
     settingsValues: [],
     settingsFilter: (v) => true,
+    toggleFilterNonDefault: () => {},
+    filterNonDefault: boolean,
 };
 
 export const SettingsContext =
@@ -116,6 +120,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settingsAreDirty, setSettingsAreDirty] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [settingsValues, setSettingsValues] = useState([]);
+    const [filterNonDefault, setFilterNonDefault] = useState(false);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -194,6 +199,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             .includes(searchTerm.toLowerCase());
     }
 
+    function toggleFilterNonDefault() {
+        setFilterNonDefault(!filterNonDefault);
+    }
+
     // Populate eeprom descriptions as needed
     useEffect(() => {
         if (!settings.length) {
@@ -241,6 +250,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsValues,
         setSettingsValues,
         settingsFilter,
+        toggleFilterNonDefault,
+        filterNonDefault,
     };
 
     return (
