@@ -1,9 +1,23 @@
+import { useState } from 'react';
+
+import { store as reduxStore } from 'app/store/redux';
+import Button from 'app/components/Button';
+import controller from 'app/lib/controller';
+
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
-import { calculateHypotenuse, calculateAngle } from '../utils';
+import {
+    calculateHypotenuse,
+    calculateAngle,
+    determineEEPROMAdjustment,
+} from '../utils';
+import { toast } from 'app/lib/toaster';
+
+const FM_LOWER_OFFSET_THRESHOLD = 2; // mm
 
 const ResultsStep = () => {
-    const { triangle } = useSquaring();
+    const { triangle, jogValues } = useSquaring();
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const calculatedHypotenuse = calculateHypotenuse(triangle);
     const hypotenuseDiff = Math.abs(calculatedHypotenuse - triangle.c).toFixed(
@@ -11,6 +25,29 @@ const ResultsStep = () => {
     );
     const angle = calculateAngle(triangle);
     const isSquare = Math.abs(angle) < 0.1; // Less than 0.1 degree deviation
+    const isWithinEEPROMThreshold =
+        Number(hypotenuseDiff) <= FM_LOWER_OFFSET_THRESHOLD;
+
+    const eepromAdjustment = determineEEPROMAdjustment(triangle, jogValues);
+    const { settings } = reduxStore.getState().controller.settings;
+    const currentXSteps = Number(settings.$100);
+    const currentYSteps = Number(settings.$101);
+
+    const handleUpdateEEPROM = async () => {
+        setIsUpdating(true);
+        try {
+            const $100 = eepromAdjustment.x.amount;
+            const $101 = eepromAdjustment.y.amount;
+
+            controller.command('gcode', [`$100=${$100}`, `$101=${$101}`]);
+
+            toast.info('Updated EEPROM values');
+        } catch (error) {
+            console.error('Failed to update EEPROM:', error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
     const renderResult = () => {
         // Machine is square if angle deviation is less than 0.1 degrees
@@ -25,17 +62,17 @@ const ResultsStep = () => {
             );
         }
 
-        // Tolerable if angle deviation is less than 2 degrees
-        if (Math.abs(angle) < 2) {
+        // Tolerable if hypotenuse difference is less than 2mm
+        if (isWithinEEPROMThreshold) {
             return (
                 <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2 dark:bg-yellow-900 dark:text-white">
                     <p className="font-bold text-lg">
                         Your machine is slightly out of square
                     </p>
                     <p>
-                        The deviation is minor ({angle.toFixed(0.5)}°) but you
-                        may want to adjust the right Y-axis rail to achieve
-                        better squareness.
+                        The deviation is minor ({hypotenuseDiff}mm) but you may
+                        want to adjust the right Y-axis rail to achieve better
+                        squareness.
                     </p>
 
                     <p>
@@ -117,25 +154,68 @@ const ResultsStep = () => {
                         {renderResult()}
                     </div>
 
-                    {!isSquare && (
+                    {!isSquare && isWithinEEPROMThreshold && (
                         <div className="space-y-4 dark:text-white">
                             <h3 className="text-lg font-semibold">
                                 EEPROM Adjustment Recommendations
                             </h3>
                             <div className="space-y-2">
-                                You can also adjust your EEPROM settings for
-                                improved accuracy, specifically the steps per mm
-                                values.
-                            </div>
-
-                            <div>
-                                <p>Warning</p>
-
                                 <p>
-                                    If your machine is off by a large amount,
-                                    updating the EEPROM values for improved
-                                    accuracy may cause issues.
+                                    Based on your measurements, we recommend
+                                    updating your steps per mm values to improve
+                                    machine accuracy.
                                 </p>
+
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark">
+                                        <div className="text-sm text-gray-600 dark:text-white">
+                                            X-Axis Steps/mm
+                                        </div>
+                                        <div className="text-xl font-bold">
+                                            Current: {currentXSteps}
+                                        </div>
+                                        <div className="text-xl font-bold text-blue-600">
+                                            Recommended:{' '}
+                                            {eepromAdjustment.x.amount.toFixed(
+                                                3,
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark">
+                                        <div className="text-sm text-gray-600 dark:text-white">
+                                            Y-Axis Steps/mm
+                                        </div>
+                                        <div className="text-xl font-bold">
+                                            Current: {currentYSteps}
+                                        </div>
+                                        <div className="text-xl font-bold text-blue-600">
+                                            Recommended:{' '}
+                                            {eepromAdjustment.y.amount.toFixed(
+                                                3,
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <Button
+                                        onClick={handleUpdateEEPROM}
+                                        disabled={isUpdating}
+                                    >
+                                        {isUpdating
+                                            ? 'Updating...'
+                                            : 'Update EEPROM Settings'}
+                                    </Button>
+                                </div>
+
+                                <div className="mt-4 text-sm text-yellow-600 dark:text-yellow-400">
+                                    <p className="font-bold">Warning</p>
+                                    <p>
+                                        Updating EEPROM values can affect your
+                                        machine's accuracy. Make sure to verify
+                                        the new settings after applying them.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}

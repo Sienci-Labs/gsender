@@ -1,3 +1,4 @@
+import { ButtonVariants } from 'app/components/Button';
 import controller from 'app/lib/controller';
 import { createContext, useContext, ReactNode, useState } from 'react';
 
@@ -38,6 +39,7 @@ type JogValues = {
 
 type SubStep = {
     buttonLabel: string;
+    buttonVariant?: ButtonVariants['variant'];
     description: string;
     completed: boolean;
     value?: number;
@@ -118,6 +120,7 @@ const initialMainSteps: MainStep[] = [
         subSteps: [
             {
                 buttonLabel: 'Mark Point 1',
+                buttonVariant: 'secondary',
                 description:
                     'Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.',
                 completed: false,
@@ -135,6 +138,7 @@ const initialMainSteps: MainStep[] = [
             },
             {
                 buttonLabel: 'Move X-axis',
+                buttonVariant: 'primary',
                 description:
                     'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
                 value: 300,
@@ -318,12 +322,9 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
         if (subStepIndex === 0) return true;
 
         // For other sub-steps, check if all previous sub-steps are completed
-        for (let i = 0; i < subStepIndex; i++) {
-            if (!currentMainStepData.subSteps[i].completed) {
-                return false;
-            }
-        }
-        return true;
+        return currentMainStepData.subSteps
+            .slice(0, subStepIndex)
+            .every((step) => step.completed);
     };
 
     const canGoToNextMainStep = () => {
@@ -464,8 +465,11 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
 
     const jogMachine = async (axis: string, value: number) => {
         controller.command('gcode', `G91 G0${axis} ${value}`);
-        // TODO: Implement machine control
-        console.log(`Jogging ${axis} by ${value}mm`);
+        // Update jogValues based on the axis and value
+        setJogValues((prev) => ({
+            ...prev,
+            [axis.toLowerCase()]: value,
+        }));
     };
 
     const goToNextMainStep = () => {
@@ -485,14 +489,20 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
     const resetSquaring = () => {
         // Create deep copies of initial states to ensure a fresh start
         const freshMainSteps = JSON.parse(JSON.stringify(initialMainSteps));
-        const freshShapes = JSON.parse(JSON.stringify(initialShapes));
+
+        // Reset all substeps to not completed
+        freshMainSteps.forEach((mainStep: MainStep) => {
+            mainStep.subSteps.forEach((subStep: SubStep) => {
+                subStep.completed = false;
+            });
+        });
 
         // Reset all states
         setMainSteps(freshMainSteps);
         setCurrentMainStep(0);
         setCurrentSubStep(0);
         setTriangle({ a: 0, b: 0, c: 0 });
-        setShapes(freshShapes);
+        setShapes(JSON.parse(JSON.stringify(initialShapes)));
         setJogValues({ x: 0, y: 0, z: 0 });
     };
 

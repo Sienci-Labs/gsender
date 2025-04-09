@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Select from 'react-select';
-import { LuArrowRight } from 'react-icons/lu';
+import { LuArrowRight, LuRefreshCw } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
 import { Button } from 'app/components/Button';
@@ -29,6 +29,7 @@ import { Jogging } from '../../Jogging';
 import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
+import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -244,10 +245,10 @@ const Steps = () => {
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>
+                                    <AlertDialogCancel className="border-none">
                                         No, Cancel
                                     </AlertDialogCancel>
-                                    <AlertDialogAction className="bg-blue-500 hover:bg-blue-800 text-white">
+                                    <AlertDialogAction className="border border-blue-500">
                                         Yes, Update Steps-Per-MM
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -255,9 +256,12 @@ const Steps = () => {
                         </AlertDialog>
                     </div>
                     <div className="flex gap-4 shrink-0">
-                        <Button onClick={reset} variant="outline">
-                            Restart Wizard
-                        </Button>
+                        <Button
+                            onClick={reset}
+                            variant="outline"
+                            icon={<LuRefreshCw className="w-4 h-4" />}
+                            text="Restart Wizard"
+                        />
                     </div>
                 </div>
             );
@@ -274,9 +278,12 @@ const Steps = () => {
                 </div>
 
                 <div className="flex gap-4 shrink-0">
-                    <Button onClick={reset} variant="outline">
-                        Restart Wizard
-                    </Button>
+                    <Button
+                        onClick={reset}
+                        variant="outline"
+                        icon={<LuRefreshCw className="w-4 h-4" />}
+                        text="Restart Wizard"
+                    />
                 </div>
             </div>
         );
@@ -322,13 +329,7 @@ const Steps = () => {
                                             setMarkLocationCompleted(true);
                                             setCurrentStep(1);
                                         }}
-                                        className={`${
-                                            currentStep === 0
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : markLocationCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300'
-                                        } text-white`}
+                                        variant="secondary"
                                     >
                                         Mark First Location
                                     </Button>
@@ -362,19 +363,17 @@ const Steps = () => {
                                             moveAxisCompleted
                                         }
                                         onClick={() => {
-                                            controller.command('gcode', [
-                                                `$J=G91 ${selectedAxis}${moveDistance} F1000`,
-                                            ]);
+                                            jogAxis(
+                                                {
+                                                    [selectedAxis.toUpperCase()]:
+                                                        moveDistance,
+                                                },
+                                                1000,
+                                            );
                                             setMoveAxisCompleted(true);
                                             setCurrentStep(2);
                                         }}
-                                        className={`${
-                                            currentStep === 1
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : moveAxisCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                        } text-white`}
+                                        variant="alt"
                                     >
                                         Move {selectedAxis.toUpperCase()}-axis
                                     </Button>
@@ -389,11 +388,9 @@ const Steps = () => {
                                                 )
                                             }
                                             disabled={currentStep !== 1}
-                                            className="w-24"
+                                            className="w-28"
+                                            suffix="mm"
                                         />
-                                        <span className="text-gray-500">
-                                            mm
-                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -428,13 +425,6 @@ const Steps = () => {
                                             setSetTravelCompleted(true);
                                             setCurrentStep(3);
                                         }}
-                                        className={`${
-                                            currentStep === 2
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : setTravelCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300'
-                                        } text-white`}
                                     >
                                         Set Distance Travelled
                                     </Button>
@@ -449,11 +439,9 @@ const Steps = () => {
                                                 )
                                             }
                                             disabled={currentStep !== 2}
-                                            className="w-24"
+                                            className="w-28"
+                                            suffix="mm"
                                         />
-                                        <span className="text-gray-500">
-                                            mm
-                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -483,9 +471,12 @@ const Steps = () => {
             </div>
 
             <div className="flex gap-4 shrink-0">
-                <Button onClick={reset} variant="outline">
-                    Restart Wizard
-                </Button>
+                <Button
+                    onClick={reset}
+                    variant="outline"
+                    icon={<LuRefreshCw className="w-4 h-4" />}
+                    text="Restart Wizard"
+                />
             </div>
         </div>
     );

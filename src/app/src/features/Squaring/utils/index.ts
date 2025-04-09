@@ -40,14 +40,14 @@ export const determineEEPROMAdjustment = (
     const currentYStep = Number($101);
 
     const calculatedXStep = calculateMovement({
-        currentStep: currentXStep,
-        movedDistance: jogValues.x,
+        currentStep: currentYStep,
+        movedDistance: jogValues.y,
         actualDistance: triangle.a,
     });
 
     const calculatedYStep = calculateMovement({
-        currentStep: currentYStep,
-        movedDistance: jogValues.y,
+        currentStep: currentXStep,
+        movedDistance: jogValues.x,
         actualDistance: triangle.b,
     });
 
