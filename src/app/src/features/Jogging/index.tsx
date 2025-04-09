@@ -598,6 +598,8 @@ export function Jogging() {
             const isInRotaryMode =
                 store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
 
+            const firmware = controller.type;
+
             const controllerIsGrbl = firmware === 'Grbl';
 
             if (controllerIsGrbl && axis.a && !isInRotaryMode) {
