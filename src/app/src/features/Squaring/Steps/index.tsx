@@ -162,31 +162,26 @@ const Steps = () => {
             <div className="flex justify-between mt-4 shrink-0">
                 <div className="flex gap-2">
                     <Button
-                        onClick={goToPreviousMainStep}
-                        disabled={currentMainStep === 0}
-                        className="bg-gray-500 hover:bg-gray-600 text-white"
-                    >
-                        Previous Step
-                    </Button>
-                    <Button
-                        onClick={resetSquaring}
-                        className="bg-gray-500 hover:bg-gray-600 text-white flex items-center gap-2"
-                    >
-                        <LuRefreshCw className="w-4 h-4" />
-                        Start Over
-                    </Button>
+                        onClick={() => {
+                            resetSquaring();
+                        }}
+                        icon={<LuRefreshCw className="w-4 h-4" />}
+                        text="Start Over"
+                        variant="ghost"
+                    />
                     <ShowJogControls />
                 </div>
-                <Button
-                    onClick={goToNextMainStep}
-                    disabled={
-                        currentMainStep === mainSteps.length - 1 ||
-                        !isCurrentStepComplete()
-                    }
-                    className="bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-300"
-                >
-                    Next Step
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={goToNextMainStep}
+                        disabled={
+                            currentMainStep === mainSteps.length - 1 ||
+                            !isCurrentStepComplete()
+                        }
+                    >
+                        Next Step
+                    </Button>
+                </div>
             </div>
         </div>
     );

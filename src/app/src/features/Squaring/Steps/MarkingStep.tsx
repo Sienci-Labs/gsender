@@ -93,7 +93,7 @@ const MarkingStep = () => {
                                                     );
                                                 }
                                             }}
-                                            variant="primary"
+                                            variant={step.buttonVariant}
                                         >
                                             {step.buttonLabel}
                                         </Button>
