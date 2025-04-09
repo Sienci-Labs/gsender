@@ -545,7 +545,6 @@ export function Jogging() {
         };
 
         const jogCB = (given: Record<string, number>) => {
-            console.log('jogCB', given);
             startJogCommand(given, currentJogSpeed.feedrate, false);
         };
 
