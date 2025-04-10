@@ -32,7 +32,7 @@ const Page = ({
                 'w-full flex flex-col h-full',
             )}
         >
-            <div className="flex items-center justify-between mb-4 pb-4 min-h-14 border-b border-gray-200 rounded-b-lg">
+            <div className="flex items-center justify-between mb-2 pb-2 min-h-14 border-b border-gray-200 rounded-b-lg">
                 <div>
                     <h1 className="text-3xl font-bold dark:text-white">
                         {title}
@@ -48,7 +48,7 @@ const Page = ({
                         onClick={() =>
                             canGoBack ? navigate(-1) : navigate('/')
                         }
-                        size="lg"
+                        size="md"
                         className="flex items-center justify-center"
                     >
                         <LuArrowLeft className="w-6 h-6 mr-1" />

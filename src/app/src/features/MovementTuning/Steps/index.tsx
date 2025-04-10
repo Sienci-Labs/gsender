@@ -98,9 +98,9 @@ const Steps = () => {
         }[selectedAxis];
 
         return (
-            <div className="flex flex-col gap-4">
-                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
-                    <div className="space-y-6">
+            <div className="flex flex-col gap-4 xl:gap-0">
+                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
+                    <div className="space-y-1 text-xs xl:text-sm">
                         <p className="dark:text-white">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
@@ -159,7 +159,7 @@ const Steps = () => {
                         </div>
 
                         {!isConnected && (
-                            <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
+                            <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
                                     Please connect to a device before starting
                                     the movement tuning wizard.
@@ -171,7 +171,7 @@ const Steps = () => {
                         <img
                             src={starterImage}
                             alt="Movement Tuning Example"
-                            className="w-full h-auto border border-gray-200 rounded-lg"
+                            className="w-[440px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-white">
@@ -482,7 +482,7 @@ const Steps = () => {
                     <img
                         src={stepImage}
                         alt="Movement Tuning Step"
-                        className="w-full h-auto border border-gray-200 rounded-lg"
+                        className="w-[450px] h-auto border border-gray-200 rounded-lg"
                     />
                 </div>
             </div>

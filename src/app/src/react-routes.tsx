@@ -157,7 +157,7 @@ export const ReactRoutes = () => {
                     path="firmware"
                     element={
                         <Page title="Firmware (Legacy)" withGoBackButton>
-                            <div className="flex justify-center items-center flex-col">
+                            <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
                                 <Firmware />
                             </div>
                         </Page>

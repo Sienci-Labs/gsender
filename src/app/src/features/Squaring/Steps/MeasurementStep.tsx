@@ -75,7 +75,7 @@ const MeasurementStep = () => {
                         return (
                             <div
                                 key={step.buttonLabel}
-                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
                                         ? 'bg-green-50 border border-green-200'
                                         : isPastStep
