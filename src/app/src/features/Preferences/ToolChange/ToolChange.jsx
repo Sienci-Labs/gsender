@@ -14,6 +14,7 @@ import Fieldset from '../components/Fieldset';
 import styles from '../index.module.styl';
 import { Button as FunctionButton } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.js';
 
 /*const options = [
     'Ignore',
@@ -139,21 +140,12 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
     const handleSaveCode = () => {
         store.set('workspace.toolChangeHooks.preHook', preHook);
         store.set('workspace.toolChangeHooks.postHook', postHook);
-        const context = {
-            toolChangeOption,
-            postHook,
-            preHook,
-        };
-        controller.command('toolchange:context', context);
-        toast.success('Saved tool change hooks');
+        updateToolchangeContext();
     };
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
-        const context = {
-            toolChangeOption,
-        };
-        controller.command('toolchange:context', context);
+        updateToolchangeContext();
     }, [toolChangeOption]);
 
     return (

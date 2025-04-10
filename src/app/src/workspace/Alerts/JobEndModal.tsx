@@ -12,7 +12,7 @@ import { JOB_STATUS } from 'app/constants';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import cx from 'classnames';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 
 interface Props {
     job: Job;

@@ -41,6 +41,7 @@ import { RecentFile } from './definitions';
 import Divider from './components/Divider';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -118,17 +119,8 @@ const ButtonControlGroup = () => {
         const files = event.target.files;
         const file = files[0];
 
-        const hooks = store.get('workspace.toolChangeHooks', {});
-        const toolChangeOption = store.get(
-            'workspace.toolChangeOption',
-            'Ignore',
-        );
-        const toolChangeContext = {
-            ...hooks,
-            toolChangeOption,
-        };
+        updateToolchangeContext();
 
-        controller.command('toolchange:context', toolChangeContext);
         await uploadGcodeFileToServer(
             file,
             controller.port,

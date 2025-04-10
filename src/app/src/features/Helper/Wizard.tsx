@@ -36,7 +36,7 @@ import controller from 'app/lib/controller.ts';
 // Fetch toolchange settings and send it to backend
 export function updateToolchangeContext() {
     const hooks = store.get('workspace.toolChangeHooks', {});
-    const options = store.get('workspace.toolChangeOptions', {});
+    const options = store.get('workspace.toolChange', {});
     const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
     const context = {
         ...hooks,
