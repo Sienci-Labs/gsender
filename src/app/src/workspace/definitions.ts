@@ -37,6 +37,7 @@ export interface Workspace {
     jobTimes: number[];
     toolChange: {
         passthrough: boolean;
+        skipDialog: boolean;
     };
     toolChangeOption:
         | 'Ignore'

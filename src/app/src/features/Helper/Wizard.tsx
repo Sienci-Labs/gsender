@@ -30,6 +30,22 @@ import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
 import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
 import { FaHatWizard } from 'react-icons/fa';
+import store from 'app/store';
+import controller from 'app/lib/controller.ts';
+
+// Fetch toolchange settings and send it to backend
+export function updateToolchangeContext() {
+    const hooks = store.get('workspace.toolChangeHooks', {});
+    const options = store.get('workspace.toolChangeOptions', {});
+    const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+    const context = {
+        ...hooks,
+        toolChangeOption,
+        ...options,
+    };
+    console.log(context);
+    controller.command('toolchange:context', context);
+}
 
 const Wizard = () => {
     const { title, visible, minimized, activeStep, overlay, steps } =
