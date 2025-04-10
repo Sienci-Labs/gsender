@@ -245,6 +245,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         className={inputStyle}
                                         value={surfacing.spindleRPM}
+                                        suffix={'RPM'}
                                         onChange={(e) =>
                                             onChange(
                                                 'spindleRPM',
