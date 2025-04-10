@@ -62,6 +62,7 @@ const defaultState: State = {
         jobTimes: [],
         toolChange: {
             passthrough: false,
+            skipDialog: false,
         },
         toolChangeOption: 'Ignore',
         toolChangePosition: {

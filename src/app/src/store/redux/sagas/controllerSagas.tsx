@@ -109,6 +109,7 @@ import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -445,6 +446,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:openController',
         (controllerType: FIRMWARE_TYPES_T) => {
+            console.log('this is never called');
             const machineProfile: MachineProfile = store.get(
                 'workspace.machineProfile',
             );
@@ -466,16 +468,8 @@ export function* initialize(): Generator<any, void, any> {
             if (delay !== undefined) {
                 controller.command('settings:updated', { spindleDelay: delay });
             }
-            const hooks = store.get('workspace.toolChangeHooks', {});
-            const toolChangeOption = store.get(
-                'workspace.toolChangeOption',
-                'Ignore',
-            );
-            const toolChangeContext = {
-                ...hooks,
-                toolChangeOption,
-            };
-            controller.command('toolchange:context', toolChangeContext);
+
+            updateToolchangeContext();
 
             store.set('widgets.connection.controller.type', controllerType);
             reduxStore.dispatch(updateControllerType({ type: controllerType }));

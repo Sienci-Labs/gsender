@@ -1,5 +1,5 @@
 import React from 'react';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 
 import styles from './index.module.styl';

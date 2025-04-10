@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 
 import ToggleSwitch from 'app/components/Switch';
 
