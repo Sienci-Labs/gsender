@@ -446,6 +446,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:openController',
         (controllerType: FIRMWARE_TYPES_T) => {
+            console.log('this is never called');
             const machineProfile: MachineProfile = store.get(
                 'workspace.machineProfile',
             );
@@ -467,6 +468,7 @@ export function* initialize(): Generator<any, void, any> {
             if (delay !== undefined) {
                 controller.command('settings:updated', { spindleDelay: delay });
             }
+
             updateToolchangeContext();
 
             store.set('widgets.connection.controller.type', controllerType);
