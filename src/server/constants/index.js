@@ -33,3 +33,22 @@ export const ERR_LENGTH_REQUIRED = 411;
 export const ERR_PRECONDITION_FAILED = 412;
 export const ERR_PAYLOAD_TOO_LARGE = 413;
 export const ERR_INTERNAL_SERVER_ERROR = 500;
+
+// Event Triggers
+export const PROGRAM_START = 'gcode:start';
+export const PROGRAM_END = 'gcode:stop';
+export const PROGRAM_PAUSE = 'gcode:pause';
+export const PROGRAM_RESUME = 'gcode:resume';
+
+export const CONTROLLER_READY = 'controller:ready';
+
+export const FILE_UNLOAD = 'file:unload';
+
+export const FEED_HOLD = 'feedhold';
+export const CYCLE_START = 'cyclestart';
+
+export const HOMING = 'homing';
+export const SLEEP = 'sleep';
+
+export const MACRO_RUN = 'macro:run';
+export const MACRO_LOAD = 'macro:load';

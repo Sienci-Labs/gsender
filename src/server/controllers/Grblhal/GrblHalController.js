@@ -78,7 +78,7 @@ import {
     FILE_UNLOAD,
     ALARM,
     ERROR
-} from '../../constants';
+} from '../../../app/src/constants';
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
@@ -1560,6 +1560,7 @@ class GrblHalController {
 
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
+                    console.log('start event enabled');
                     this.feederCB = () => {
                         // Feeder
                         this.feeder.reset();
