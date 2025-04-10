@@ -2057,6 +2057,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
+                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {

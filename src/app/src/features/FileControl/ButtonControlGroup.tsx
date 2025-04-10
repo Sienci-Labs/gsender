@@ -63,6 +63,10 @@ const ButtonControlGroup = () => {
                 setRecentFiles(files);
             },
         );
+        // Always update context on store change so latest config is present
+        store.on('change', () => {
+            updateToolchangeContext();
+        });
 
         return () => {
             pubsub.unsubscribe(token);
