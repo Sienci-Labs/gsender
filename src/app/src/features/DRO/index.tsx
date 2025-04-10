@@ -9,10 +9,8 @@ import {
     gotoZero,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
-import { IconButton } from 'app/components/IconButton';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
-import { LuSquareParking } from 'react-icons/lu';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
@@ -66,7 +64,6 @@ interface DROProps {
     wposController: DROPosition;
     unitLabel: string;
     homingEnabled: boolean;
-    canClick: boolean;
     workflowState: string;
     isConnected: boolean;
     activeState: string;
@@ -402,7 +399,11 @@ export default connect((reduxStore) => {
         'controller.wpos',
         defaultDROPosition,
     );
-    const axes = get(reduxStore, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
+    const axes: AxesArray = get(reduxStore, 'controller.state.axes.axes', [
+        'X',
+        'Y',
+        'Z',
+    ]);
     const settings = get(reduxStore, 'controller.settings.settings', {});
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
