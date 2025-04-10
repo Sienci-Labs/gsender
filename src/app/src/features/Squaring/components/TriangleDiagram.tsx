@@ -122,7 +122,7 @@ const TriangleDiagram = () => {
     };
 
     return (
-        <div className="relative w-full border border-gray-200 rounded-lg">
+        <div className="relative w-[370px] border border-gray-200 rounded-lg">
             <svg
                 viewBox={`0 0 ${containerWidth} ${containerWidth}`}
                 // className="absolute inset-0 w-full h-full"
@@ -252,23 +252,32 @@ const TriangleDiagram = () => {
             {Object.entries(positions).map(
                 ([key, pos], index) =>
                     getPointVisibility(index) && (
-                        <div
-                            key={key}
-                            className={`absolute w-8 h-8 -ml-4 -mt-4 rounded-full flex items-center justify-center font-bold text-white transition-colors ${
-                                shouldPointPulse(index)
-                                    ? 'bg-green-500 ring-4 ring-green-200 animate-pulse'
-                                    : currentMainStep === 0 &&
-                                        index === currentSubStep
-                                      ? 'bg-green-500 ring-4 ring-green-200'
-                                      : 'bg-blue-500'
-                            }`}
-                            style={{
-                                left: `${(pos.x / containerWidth) * 100}%`,
-                                top: `${(pos.y / containerWidth) * 100}%`,
-                            }}
-                        >
-                            {index + 1}
-                        </div>
+                        <>
+                            <div
+                                key={key}
+                                className={`absolute text-lg w-10 h-10 -ml-5 -mt-5 [transform:rotate(45deg)] [-ms-transform:rotate(45deg)] [-webkit-transform:rotate(45deg)] before:absolute before:-z-1 before:left-1/2 before:w-1/3 before:-ml-[15%] before:h-full after:absolute after:-z-1 after:top-1/2 after:h-1/3 after:-mt-[15%] after:w-full flex items-center justify-center font-bold text-white transition-colors ${
+                                    shouldPointPulse(index)
+                                        ? 'before:bg-green-500 after:bg-green-500 animate-pulse'
+                                        : currentMainStep === 0 &&
+                                            index === currentSubStep
+                                          ? 'before:bg-green-500 after:bg-green-500'
+                                          : 'before:bg-blue-500 after:bg-blue-500'
+                                }`}
+                                style={{
+                                    left: `${(pos.x / containerWidth) * 100}%`,
+                                    top: `${(pos.y / containerWidth) * 100}%`,
+                                }}
+                            />
+                            <div
+                                className="absolute text-lg w-8 h-8 -ml-4 -mt-[15px] flex items-center justify-center font-bold text-white stroke-black"
+                                style={{
+                                    left: `${(pos.x / containerWidth) * 100}%`,
+                                    top: `${(pos.y / containerWidth) * 100}%`,
+                                }}
+                            >
+                                {index + 1}
+                            </div>
+                        </>
                     ),
             )}
         </div>

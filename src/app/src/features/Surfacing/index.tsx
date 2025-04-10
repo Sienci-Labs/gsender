@@ -12,11 +12,7 @@ import {
     METRIC_UNITS,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import {
-    convertIfImperial,
-    convertToImperial,
-    convertToMetric,
-} from 'app/lib/units';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
 import MultiInputBlock from 'app/components/MultiInputBlock';
 import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
@@ -127,7 +123,7 @@ const SurfacingTool = () => {
             <div className="grid grid-rows-[5fr_1fr] fixed-tool-area box-border">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
-                        <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">
+                        <p className="text-xs xl:text-sm font-normal mb-4 xl:mb-2 text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit
                             switches and other add-ons, get nicer and faster
@@ -135,7 +131,7 @@ const SurfacingTool = () => {
                             turning off hard and soft limits so you don&apos;t
                             encounter alarms or errors.
                         </p>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between mb-2">
                             <MultiInputBlock
                                 label="X & Y"
                                 divider="&"
@@ -175,7 +171,7 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-2">
                             <MultiInputBlock
                                 label="Cut Depth & Max"
                                 divider="&"
@@ -223,9 +219,11 @@ const SurfacingTool = () => {
                             />
                         </div>
 
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Bit Diameter
+                            </label>
                             <Input
-                                label="Bit Diameter"
                                 type="number"
                                 suffix={units}
                                 className={inputStyle}
@@ -238,7 +236,7 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-2">
                             <MultiInputBlock
                                 label="Spindle RPM"
                                 divider=""
@@ -247,6 +245,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         className={inputStyle}
                                         value={surfacing.spindleRPM}
+                                        suffix={'RPM'}
                                         onChange={(e) =>
                                             onChange(
                                                 'spindleRPM',
@@ -275,9 +274,11 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Feedrate
+                            </label>
                             <Input
-                                label="Feedrate"
                                 type="number"
                                 suffix={`${units}/min`}
                                 className={inputStyle}
@@ -287,9 +288,11 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Stepover
+                            </label>
                             <Input
-                                label="Stepover"
                                 type="number"
                                 suffix="%"
                                 className={inputStyle}
@@ -333,7 +336,7 @@ const SurfacingTool = () => {
 
                         <div
                             className={cx(
-                                'h-[600px] border border-gray-500 rounded',
+                                'h-[450px] border border-gray-500 rounded',
                                 {
                                     hidden: tabSwitch,
                                 },
@@ -347,7 +350,7 @@ const SurfacingTool = () => {
                         </div>
                         <div
                             className={cx(
-                                'p-4 h-[600px] border border-gray-500 rounded relative',
+                                'p-4 h-[450px] border border-gray-500 rounded relative',
                                 {
                                     hidden: !tabSwitch,
                                 },

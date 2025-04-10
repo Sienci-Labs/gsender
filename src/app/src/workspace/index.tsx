@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router';
+// import { useEffect } from 'react';
+import { Outlet /*, useNavigate, useLocation*/ } from 'react-router';
 import get from 'lodash/get';
 
 import controller from 'app/lib/controller';
@@ -23,8 +23,8 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useDarkMode } from 'app/hooks/useDarkMode';
 
 const Workspace = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
+    // const navigate = useNavigate();
+    // const location = useLocation();
 
     // useEffect(() => {
     //     const { hash } = location;

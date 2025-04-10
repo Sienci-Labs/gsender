@@ -104,15 +104,15 @@ const ResultsStep = () => {
     };
 
     return (
-        <div className="max-w-7xl w-full grid grid-cols-2 gap-8">
-            <div className="flex flex-col gap-8">
-                <div className="space-y-6">
-                    <div className="space-y-4">
+        <div className="max-w-7xl w-full grid">
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-row items-start gap-4">
+                    <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-white">
                             Measured Dimensions
                         </h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
                                 <div className="text-sm text-gray-600 dark:text-white">
                                     Bottom Edge (1-2)
                                 </div>
@@ -120,7 +120,7 @@ const ResultsStep = () => {
                                     {triangle.a}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                            <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
                                 <div className="text-sm text-gray-600 dark:text-white">
                                     Right Edge (2-3)
                                 </div>
@@ -128,7 +128,7 @@ const ResultsStep = () => {
                                     {triangle.b}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                            <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
                                 <div className="text-sm text-gray-600 dark:text-white">
                                     Diagonal (1-3)
                                 </div>
@@ -136,7 +136,7 @@ const ResultsStep = () => {
                                     {triangle.c}mm
                                 </div>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
+                            <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
                                 <div className="text-sm text-gray-600 dark:text-white">
                                     Angle Deviation
                                 </div>
@@ -147,57 +147,54 @@ const ResultsStep = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-white">
                             Results
                         </h3>
                         {renderResult()}
                     </div>
+                </div>
 
-                    {!isSquare && isWithinEEPROMThreshold && (
-                        <div className="space-y-4 dark:text-white">
-                            <h3 className="text-lg font-semibold">
-                                EEPROM Adjustment Recommendations
-                            </h3>
-                            <div className="space-y-2">
-                                <p>
-                                    Based on your measurements, we recommend
-                                    updating your steps per mm values to improve
-                                    machine accuracy.
-                                </p>
-
-                                <div className="grid grid-cols-2 gap-4 mt-4">
-                                    <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark">
-                                        <div className="text-sm text-gray-600 dark:text-white">
-                                            X-Axis Steps/mm
-                                        </div>
-                                        <div className="text-xl font-bold">
-                                            Current: {currentXSteps}
-                                        </div>
-                                        <div className="text-xl font-bold text-blue-600">
-                                            Recommended:{' '}
-                                            {eepromAdjustment.x.amount.toFixed(
-                                                3,
-                                            )}
-                                        </div>
+                {!isSquare && isWithinEEPROMThreshold && (
+                    <div className="flex flex-col justify-center items-start space-y-1 dark:text-white">
+                        <h3 className="text-lg font-semibold">
+                            EEPROM Adjustment Recommendations
+                        </h3>
+                        <div className="space-y-1 w-full">
+                            <p>
+                                Based on your measurements, we recommend
+                                updating your steps per mm values to improve
+                                machine accuracy.
+                            </p>
+                            {/* <div className="grid grid-cols-2 gap-4"> */}
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                                <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
+                                    <div className="text-sm text-gray-600 dark:text-white">
+                                        X-Axis Steps/mm
                                     </div>
-                                    <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark">
-                                        <div className="text-sm text-gray-600 dark:text-white">
-                                            Y-Axis Steps/mm
-                                        </div>
-                                        <div className="text-xl font-bold">
-                                            Current: {currentYSteps}
-                                        </div>
-                                        <div className="text-xl font-bold text-blue-600">
-                                            Recommended:{' '}
-                                            {eepromAdjustment.y.amount.toFixed(
-                                                3,
-                                            )}
-                                        </div>
+                                    <div className="text-xl font-bold">
+                                        Current: {currentXSteps}
+                                    </div>
+                                    <div className="text-xl font-bold text-blue-600">
+                                        Recommended:{' '}
+                                        {eepromAdjustment.x.amount.toFixed(3)}
                                     </div>
                                 </div>
-
-                                <div className="mt-4">
+                                <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
+                                    <div className="text-sm text-gray-600 dark:text-white">
+                                        Y-Axis Steps/mm
+                                    </div>
+                                    <div className="text-xl font-bold">
+                                        Current: {currentYSteps}
+                                    </div>
+                                    <div className="text-xl font-bold text-blue-600">
+                                        Recommended:{' '}
+                                        {eepromAdjustment.y.amount.toFixed(3)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex flex-row gap-4">
+                                <div className="mt-1 xl:mt-4">
                                     <Button
                                         onClick={handleUpdateEEPROM}
                                         disabled={isUpdating}
@@ -208,7 +205,7 @@ const ResultsStep = () => {
                                     </Button>
                                 </div>
 
-                                <div className="mt-4 text-sm text-yellow-600 dark:text-yellow-400">
+                                <div className="mt-1 xl:mt-4 text-sm text-yellow-600 dark:text-yellow-400">
                                     <p className="font-bold">Warning</p>
                                     <p>
                                         Updating EEPROM values can affect your
@@ -218,15 +215,9 @@ const ResultsStep = () => {
                                 </div>
                             </div>
                         </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold dark:text-white">
-                    Visualization
-                </h3>
-                <TriangleDiagram />
+                    </div>
+                    // </div>
+                )}
             </div>
         </div>
     );
