@@ -349,7 +349,7 @@ const SurfacingTool = () => {
                         </div>
                         <div
                             className={cx(
-                                'p-4 h-[600px] border border-gray-500 rounded relative',
+                                'p-4 h-[450px] border border-gray-500 rounded relative',
                                 {
                                     hidden: !tabSwitch,
                                 },
