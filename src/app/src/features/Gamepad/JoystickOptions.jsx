@@ -492,7 +492,7 @@ const JoystickOptions = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-4 items-center mb-2 gap-2">
+            <div className="grid grid-cols-4 items-center gap-2">
                 <div className="dark:text-white">
                     Movement Distance Override
                 </div>

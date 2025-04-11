@@ -69,13 +69,13 @@ const StatusIcons = () => {
             </button>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/keyboard-shortcuts'}
+                to={'/tools/keyboard-shortcuts'}
             >
                 <FaRegKeyboard className="text-green-500 w-7 h-7" />
             </Link>
             <Link
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/gamepad'}
+                to={'/tools/gamepad'}
             >
                 <LuGamepad2
                     className={cx('w-7 h-7', {

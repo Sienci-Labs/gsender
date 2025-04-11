@@ -120,7 +120,7 @@ const SurfacingTool = () => {
 
     return (
         <>
-            <div className="grid grid-rows-[5fr_1fr] fixed-tool-area box-border">
+            <div className="grid grid-rows-[5fr_auto] gap-2">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
                         <p className="text-xs xl:text-sm font-normal mb-4 xl:mb-2 text-gray-500 dark:text-gray-300">
