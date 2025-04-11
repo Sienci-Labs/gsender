@@ -19,7 +19,7 @@ export function Search() {
     }
 
     return (
-        <form className="flex items-center min-w-80" onSubmit={onSubmit}>
+        <form className="flex flex-row items-center " onSubmit={onSubmit}>
             <label htmlFor="simple-search" className="sr-only">
                 Search
             </label>

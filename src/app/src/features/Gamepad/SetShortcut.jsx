@@ -199,7 +199,7 @@ const SetShortcut = () => {
                             className={
                                 action.cmd === currentShortcut
                                     ? 'bg-blue-500 text-white px-3 py-1 rounded'
-                                    : 'bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded'
+                                    : 'bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded dark:bg-dark-lighter'
                             }
                             onClick={() => handleSetAction(action.cmd)}
                             disabled={action.cmd === currentShortcut}
@@ -253,7 +253,7 @@ const SetShortcut = () => {
 
                             <div className="border rounded-md max-h-[600px] overflow-y-auto">
                                 <Table>
-                                    <TableHeader className="sticky top-0 bg-white z-10">
+                                    <TableHeader className="sticky top-0 bg-white z-10 dark:bg-dark-lighter">
                                         <TableRow>
                                             {columns.map((column) => (
                                                 <TableHead

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import WoodBlockBefore from './assets/loading-wood-block.gif';
+import WoodBlockBefore from './assets/loading-wood-block-lines.png';
 import SpinningDrill from './assets/loading-spinning-bit-test2.gif';
 import WoodBlockAfter from './assets/loading-wood-dust-pile.gif';
 

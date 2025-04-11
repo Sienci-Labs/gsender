@@ -45,9 +45,9 @@ const Steps = () => {
 
     if (!started) {
         return (
-            <div className="flex flex-col gap-4 dark:text-white">
-                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
-                    <div className="space-y-6">
+            <div className="flex flex-col gap-2 xl:gap-0 dark:text-white w-full">
+                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
+                    <div className="space-y-1 text-sm">
                         <p>
                             If your CNC is making skewed cuts (pictured),
                             it&apos;s because the X and Y axes aren&apos;t
@@ -77,11 +77,11 @@ const Steps = () => {
                             touching the wasteboard, then continue below.
                         </p>
 
-                        <div className="w-full max-w-96">
+                        <div className="w-full max-w-96 -mt-4">
                             <Jogging />
                         </div>
                         {!isConnected && (
-                            <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
+                            <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
                                     Please connect to a device before starting
                                     the squaring wizard.
@@ -89,11 +89,11 @@ const Steps = () => {
                             </div>
                         )}
                     </div>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 items-center">
                         <img
                             src={xySquaringImage}
                             alt="XY Squaring Example"
-                            className="w-full h-auto"
+                            className="w-[450px] h-auto"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-white">
@@ -117,13 +117,13 @@ const Steps = () => {
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1 xl:gap-3">
             {/* Progress Bar */}
             <div className="flex gap-4 shrink-0">
                 {mainSteps.map((step, index) => (
                     <div
                         key={step.title}
-                        className="flex-1 flex items-center gap-4"
+                        className="grid grid-cols-[1fr_3fr_1fr] items-center gap-4"
                     >
                         <div
                             className={`flex items-center justify-center w-8 h-8 rounded-full font-bold ${
@@ -162,31 +162,26 @@ const Steps = () => {
             <div className="flex justify-between mt-4 shrink-0">
                 <div className="flex gap-2">
                     <Button
-                        onClick={goToPreviousMainStep}
-                        disabled={currentMainStep === 0}
-                        className="bg-gray-500 hover:bg-gray-600 text-white"
-                    >
-                        Previous Step
-                    </Button>
-                    <Button
-                        onClick={resetSquaring}
-                        className="bg-gray-500 hover:bg-gray-600 text-white flex items-center gap-2"
-                    >
-                        <LuRefreshCw className="w-4 h-4" />
-                        Start Over
-                    </Button>
+                        onClick={() => {
+                            resetSquaring();
+                        }}
+                        icon={<LuRefreshCw className="w-4 h-4" />}
+                        text="Start Over"
+                        variant="ghost"
+                    />
                     <ShowJogControls />
                 </div>
-                <Button
-                    onClick={goToNextMainStep}
-                    disabled={
-                        currentMainStep === mainSteps.length - 1 ||
-                        !isCurrentStepComplete()
-                    }
-                    className="bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-300"
-                >
-                    Next Step
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={goToNextMainStep}
+                        disabled={
+                            currentMainStep === mainSteps.length - 1 ||
+                            !isCurrentStepComplete()
+                        }
+                    >
+                        Next Step
+                    </Button>
+                </div>
             </div>
         </div>
     );

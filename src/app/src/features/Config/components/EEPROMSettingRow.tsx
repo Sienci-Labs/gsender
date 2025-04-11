@@ -37,12 +37,14 @@ export function EEPROMSettingRow({
         firmwareType,
         searchTerm,
         setSettingsAreDirty,
+        eepromIsDefault,
     } = useSettings();
     if (!EEPROM) {
         return;
     }
     const EEPROMData = EEPROM.find((s) => s.setting === eID);
     if (EEPROMData) {
+        const isDefault = eepromIsDefault(EEPROMData);
         const profileDefaults =
             firmwareType === 'Grbl'
                 ? machineProfile.eepromSettings
@@ -54,15 +56,8 @@ export function EEPROMSettingRow({
         );
 
         const inputDefault = get(profileDefaults, eID, '-');
-        const settingIsNumberValue = !(
-            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
-        );
 
-        const isDefault = settingIsNumberValue
-            ? `${Number(EEPROMData.value)}` === `${Number(inputDefault)}`
-            : EEPROMData.value === inputDefault;
-
-        const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
+        //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 
         const detailString = (
             <span>
@@ -78,12 +73,10 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'p-2 flex flex-row items-center',
+                    'p-2 flex flex-row items-center border-b border-gray-200',
                     {
-                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white': !isDefault,
-                    },
-                    {
-                        hidden: !matchesSearch,
+                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                            !isDefault,
                     },
                 )}
             >

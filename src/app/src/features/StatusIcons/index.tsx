@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Link } from 'react-router';
-import { MdPhonelinkRing } from 'react-icons/md';
 import { LuGamepad2 } from 'react-icons/lu';
 import { FaRegKeyboard } from 'react-icons/fa6';
+import phone from 'app/workspace/TopBar/assets/phone-hand.svg';
 
 import { RemoteModeDialog } from 'app/features/RemoteMode';
-import actions from 'app/features/RemoteMode/apiActions.ts';
+import actions, {
+    HeadlessSettings,
+} from 'app/features/RemoteMode/apiActions.ts';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
-    const [headlessSettings, setHeadlessSettings] = useState({});
+    const [headlessSettings, setHeadlessSettings] = useState<HeadlessSettings>({
+        ip: '',
+        port: 0,
+        headlessStatus: false,
+    });
     const [showRemoteDialog, setShowRemoteDialog] = useState(false);
 
     function toggleRemoteModeDialog(e: React.MouseEvent<HTMLButtonElement>) {
@@ -53,8 +59,9 @@ const StatusIcons = () => {
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                 onClick={toggleRemoteModeDialog}
             >
-                <MdPhonelinkRing
-                    className={cx('w-7 h-7', {
+                <img
+                    src={phone}
+                    className={cx('w-6 h-7', {
                         'text-gray-400': !headlessSettings.headlessStatus,
                         'text-green-500': headlessSettings.headlessStatus,
                     })}

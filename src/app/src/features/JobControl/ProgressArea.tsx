@@ -70,32 +70,39 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     const getTimesHTML = (
         timeSplit: [number, number, number, number],
     ): JSX.Element => {
-        let time1 = 0;
-        let time2 = 0;
+        let time1 = '';
+        let time2 = '';
         let text1 = '';
         let text2 = '';
         if (timeSplit[0] !== 0) {
-            time1 = timeSplit[0];
+            time1 = `${String(timeSplit[0]).padStart(2, '0')}`;
             text1 = 'd';
-            time2 = timeSplit[1];
+            time2 = `${String(timeSplit[1]).padStart(2, '0')}`;
             text2 = 'hr';
         } else if (timeSplit[1] !== 0) {
-            time1 = timeSplit[1];
+            time1 = `${String(timeSplit[1]).padStart(2, '0')}`;
             text1 = 'hr';
-            time2 = timeSplit[2];
+            time2 = `${String(timeSplit[2]).padStart(2, '0')}`;
             text2 = 'm';
-        } else {
-            time1 = timeSplit[2];
+        } else if (timeSplit[2] !== 0) {
+            time1 = `${String(timeSplit[2]).padStart(2, '0')}`;
             text1 = 'm';
-            time2 = timeSplit[3];
+            time2 = `${String(timeSplit[3]).padStart(2, '0')}`;
             text2 = 's';
+        } else {
+            time1 = `${String(timeSplit[3]).padStart(2, '0')}`;
+            text1 = 's';
+            time2 = null;
+            text2 = null;
         }
         return (
             <div className="flex flex-row justify-center items-end">
                 <span className="text-2xl font-bold">{time1}</span>
                 <span className="text-lg">{text1}</span>
-                <span className="text-2xl font-bold">{time2}</span>
-                <span className="text-lg">{text2}</span>
+                {time2 !== null && (
+                    <span className="text-2xl font-bold">{time2}</span>
+                )}
+                {text2 !== null && <span className="text-lg">{text2}</span>}
             </div>
         );
     };
@@ -107,6 +114,13 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
     const timeSplit = convertSecondsToDHMS(Number(remainingTime));
     const timeComponent = getTimesHTML(timeSplit);
 
+    let translationNumber = '55px';
+    if (percentageValue > 35 && percentageValue <= 50) {
+        translationNumber = (percentageValue || 0) + '%';
+    } else if (percentageValue > 50 && percentageValue < 75) {
+        translationNumber = percentageValue - 40 + '%';
+    }
+
     return (
         <div className="w-64">
             <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
@@ -114,7 +128,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     <div
                         className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap transition-transform duration-200"
                         style={{
-                            transform: `translate(${percentageValue > 50 ? percentageValue - 48 : percentageValue || 0}%, 16px)`,
+                            transform: `translate(${translationNumber}, 16px)`,
                         }}
                     >
                         <span className="font-bold text-2xl">

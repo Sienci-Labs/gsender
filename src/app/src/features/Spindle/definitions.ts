@@ -15,6 +15,7 @@ export interface SpindleState {
     spindleMin: number;
     delay: number;
     laser: {
+        laserOnOutline: boolean,
         power: number;
         duration: number;
         xOffset: number;

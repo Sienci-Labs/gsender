@@ -10,7 +10,7 @@ export interface HeadlessSettings {
 export const actions = {
     fetchSettings: async (
         setHeadlessSettings: (settings: HeadlessSettings) => void,
-        setOldSettings: (settings: HeadlessSettings) => void,
+        setOldSettings?: (settings: HeadlessSettings) => void,
     ) => {
         try {
             let res = await api.remoteSetting.fetch();

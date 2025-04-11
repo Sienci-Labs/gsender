@@ -35,7 +35,7 @@ class Connection extends EventEmitter {
                 }
 
                 const grblR = data.match(/.*Grbl.*/);
-                const grblHalR = data.match(/.*\[FIRMWARE:grblHAL\].*/);
+                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/);
 
                 if (grblHalR) {
                     this.controllerType = GRBLHAL;
@@ -68,9 +68,7 @@ class Connection extends EventEmitter {
                 );
             }
 
-            this.close((err) => {
-                this.destroy(); // Destroy self
-            });
+            this.close(err);
         },
         error: (err) => {
             this.emit('error', err);
@@ -96,8 +94,6 @@ class Connection extends EventEmitter {
             defaultFirmware,
             network,
         };
-        console.log('FINAL');
-        console.log(this.options);
         this.callback = callback;
         this.engine = engine;
 
@@ -185,9 +181,8 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
-                log.debug('setting interval');
                 this.timeout = setInterval(() => {
-                    if (this.count === 5) {
+                    if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
                             'firmwareFound',
@@ -205,13 +200,14 @@ class Connection extends EventEmitter {
         });
     };
 
-    close() {
+    close(err) {
         const { port } = this.options;
 
         // Assertion check
         if (!this.connection) {
             const err = `Serial port "${port}" is not available`;
             log.error(err);
+            this.callback(err);
             return;
         }
 
@@ -230,11 +226,13 @@ class Connection extends EventEmitter {
 
         if (this.isClose()) {
             this.destroy();
+            this.callback(err);
             return;
         }
 
         this.connection.close();
         this.destroy();
+        this.callback(err);
     }
 
     addController = (controller) => {
@@ -310,6 +308,8 @@ class Connection extends EventEmitter {
     }
 
     destroy() {
+        clearInterval(this.timeout);
+
         if (this.controller) {
             this.controller = null;
         }

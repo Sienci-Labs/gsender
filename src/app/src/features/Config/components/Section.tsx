@@ -6,7 +6,6 @@ import {
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
 
 interface SectionProps {
@@ -36,26 +35,23 @@ export const Section = React.forwardRef(
         }: SectionProps,
         ref,
     ) => {
-        const { searchTerm, connected } = useSettings();
+        const { settingsFilter } = useSettings();
 
-        const filteredSettings = settings.filter((o) =>
-            matchesSearchTerm(o, searchTerm),
+        const filteredSettings = settings.map((s: gSenderSubSection) => {
+            const fs = { ...s };
+            fs.settings = fs.settings.filter((o) => settingsFilter(o));
+            return fs;
+        });
+
+        const settingsAvailable = filteredSettings.reduce(
+            (a, b) => a + b.settings.length,
+            0,
         );
-
-        const filterEmpty = filteredSettings.length === 0;
-
-        function onlyEEPROM(settings) {
-            let onlyEEPROM = false;
-            settings.map((settingSec) => {});
-            return onlyEEPROM;
-        }
-        let shownWarning = false;
-
         return (
             <div
                 id={id}
                 className={cn({
-                    hidden: filterEmpty || (!connected && onlyEEPROM(settings)),
+                    hidden: settingsAvailable === 0,
                 })}
                 ref={ref}
             >
@@ -65,16 +61,9 @@ export const Section = React.forwardRef(
                     </h1>
                     {wizard && wizard()}
                 </div>
-                <div className="bg-gray-100 rounded-xl shadow p-6 dark:bg-dark dark:text-white">
-                    {settings.map((setting: gSenderSubSection, index) => {
-                        if (!connected && onlyEEPROM(setting.settings)) {
-                            if (!shownWarning) {
-                                shownWarning = true;
-                                return <></>;
-                            } else {
-                                return <></>;
-                            }
-                        } else {
+                <div className="bg-gray-100 rounded-xl shadow p-6 flex flex-col gap-6 dark:bg-dark dark:text-white">
+                    {filteredSettings.map(
+                        (setting: gSenderSubSection, index) => {
                             return (
                                 <SettingSection
                                     settings={setting.settings}
@@ -82,8 +71,8 @@ export const Section = React.forwardRef(
                                     wizard={setting.wizard}
                                 />
                             );
-                        }
-                    })}
+                        },
+                    )}
                 </div>
             </div>
         );

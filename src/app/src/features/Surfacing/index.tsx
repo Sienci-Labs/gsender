@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaCode, FaPlay } from 'react-icons/fa';
@@ -9,9 +9,10 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
+    METRIC_UNITS,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import { convertToMetric } from 'app/lib/units';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
 import MultiInputBlock from 'app/components/MultiInputBlock';
 import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
@@ -35,11 +36,17 @@ const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 const SurfacingTool = () => {
     const surfacingConfig = new WidgetConfig('surfacing');
     const [tabSwitch, setTabSwitch] = useState(false);
+    const [units, setUnits] = useState('mm');
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+
+    useEffect(() => {
+        const storeUnits = store.get('workspace.units', METRIC_UNITS);
+        setUnits(storeUnits);
+    }, []);
 
     const [surfacing, setSurfacing]: [
         Surfacing,
@@ -47,7 +54,21 @@ const SurfacingTool = () => {
     ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
 
-    const units = store.get('workspace.units');
+    useEffect(() => {
+        if (units == IMPERIAL_UNITS) {
+            const convertedSurfacing = {
+                ...surfacing,
+                bitDiameter: convertToImperial(surfacing.bitDiameter),
+                feedrate: convertToImperial(surfacing.feedrate),
+                length: convertToImperial(surfacing.length),
+                width: convertToImperial(surfacing.width),
+                skimDepth: convertToImperial(surfacing.skimDepth),
+                maxDepth: convertToImperial(surfacing.maxDepth),
+            };
+            setSurfacing(convertedSurfacing);
+        }
+    }, [units]);
+
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
@@ -79,7 +100,6 @@ const SurfacingTool = () => {
             surfacingConfig.set('', {
                 ...surfacing,
                 bitDiameter: convertToMetric(surfacing.bitDiameter),
-                stepover: convertToMetric(surfacing.stepover),
                 feedrate: convertToMetric(surfacing.feedrate),
                 length: convertToMetric(surfacing.length),
                 width: convertToMetric(surfacing.width),
@@ -92,7 +112,7 @@ const SurfacingTool = () => {
     };
 
     const loadGcode = () => {
-        const name = 'gSender_Surfacing';
+        const name = 'gSender_Surfacing.gcode';
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
@@ -100,10 +120,10 @@ const SurfacingTool = () => {
 
     return (
         <>
-            <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
+            <div className="grid grid-rows-[5fr_1fr] fixed-tool-area box-border">
                 <div className="grid grid-cols-[3fr_4fr] gap-8">
                     <div>
-                        <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">
+                        <p className="text-xs xl:text-sm font-normal mb-4 xl:mb-2 text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit
                             switches and other add-ons, get nicer and faster
@@ -111,7 +131,7 @@ const SurfacingTool = () => {
                             turning off hard and soft limits so you don&apos;t
                             encounter alarms or errors.
                         </p>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between mb-2">
                             <MultiInputBlock
                                 label="X & Y"
                                 divider="&"
@@ -119,6 +139,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="width"
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -135,7 +156,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="length"
-                                        units={units}
+                                        suffix={units}
                                         min={1}
                                         max={50000}
                                         className={inputStyle}
@@ -150,7 +171,7 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-2">
                             <MultiInputBlock
                                 label="Cut Depth & Max"
                                 divider="&"
@@ -158,6 +179,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="skimDepth"
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={cx('rounded', inputStyle)}
@@ -177,7 +199,7 @@ const SurfacingTool = () => {
                                     <Input
                                         type="number"
                                         id="maxDepth"
-                                        units={units}
+                                        suffix={units}
                                         min={0.00001}
                                         max={10000}
                                         className={inputStyle}
@@ -197,9 +219,11 @@ const SurfacingTool = () => {
                             />
                         </div>
 
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Bit Diameter
+                            </label>
                             <Input
-                                label="Bit Diameter"
                                 type="number"
                                 suffix={units}
                                 className={inputStyle}
@@ -212,15 +236,16 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-2">
                             <MultiInputBlock
-                                label="Cut Depth & Max"
+                                label="Spindle RPM"
                                 divider=""
                                 firstComponent={
                                     <Input
                                         type="number"
                                         className={inputStyle}
                                         value={surfacing.spindleRPM}
+                                        suffix={'RPM'}
                                         onChange={(e) =>
                                             onChange(
                                                 'spindleRPM',
@@ -249,11 +274,13 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Feedrate
+                            </label>
                             <Input
-                                label="Feedrate"
                                 type="number"
-                                units={`${units}/min`}
+                                suffix={`${units}/min`}
                                 className={inputStyle}
                                 value={surfacing.feedrate}
                                 onChange={(e) =>
@@ -261,11 +288,13 @@ const SurfacingTool = () => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center font-light mb-4">
+                        <div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center font-light mb-2">
+                            <label className="text-lg self-center font-light dark:text-white">
+                                Stepover
+                            </label>
                             <Input
-                                label="Stepover"
                                 type="number"
-                                units="%"
+                                suffix="%"
                                 className={inputStyle}
                                 value={surfacing.stepover}
                                 onChange={(e) =>
@@ -307,7 +336,7 @@ const SurfacingTool = () => {
 
                         <div
                             className={cx(
-                                'h-[600px] border border-gray-500 rounded',
+                                'h-[450px] border border-gray-500 rounded',
                                 {
                                     hidden: tabSwitch,
                                 },
@@ -321,7 +350,7 @@ const SurfacingTool = () => {
                         </div>
                         <div
                             className={cx(
-                                'p-4 h-[600px] border border-gray-500 rounded relative',
+                                'p-4 h-[450px] border border-gray-500 rounded relative',
                                 {
                                     hidden: !tabSwitch,
                                 },

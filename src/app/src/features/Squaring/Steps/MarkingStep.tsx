@@ -1,6 +1,6 @@
 import { LuArrowRight } from 'react-icons/lu';
 import Button from 'app/components/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 
@@ -27,9 +27,9 @@ const MarkingStep = () => {
     };
 
     return (
-        <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
+        <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
             <div className="flex flex-col gap-4">
-                <div className="space-y-4">
+                <div className="space-y-1">
                     <h3 className="text-lg font-semibold dark:text-white">
                         Instructions
                     </h3>
@@ -38,7 +38,7 @@ const MarkingStep = () => {
                     </p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-1 xl:space-y-2">
                     {currentMainStepData.subSteps.map((step, index) => {
                         const isCurrentStep = index === currentSubStep;
                         const isPastStep = index < currentSubStep;
@@ -48,7 +48,7 @@ const MarkingStep = () => {
                         return (
                             <div
                                 key={step.buttonLabel}
-                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
                                         ? 'bg-green-50 border border-green-200'
                                         : isPastStep
@@ -93,13 +93,7 @@ const MarkingStep = () => {
                                                     );
                                                 }
                                             }}
-                                            className={`${
-                                                isCurrentStep
-                                                    ? 'bg-green-500 hover:bg-green-600'
-                                                    : isPastStep
-                                                      ? 'bg-blue-500'
-                                                      : 'bg-gray-300'
-                                            } text-white`}
+                                            variant={step.buttonVariant}
                                         >
                                             {step.buttonLabel}
                                         </Button>
@@ -122,11 +116,8 @@ const MarkingStep = () => {
                                                         disabled={
                                                             !isCurrentStep
                                                         }
-                                                        className="w-24"
+                                                        suffix="mm"
                                                     />
-                                                    <span className="text-gray-500">
-                                                        mm
-                                                    </span>
                                                 </div>
                                             ) : (
                                                 step.output

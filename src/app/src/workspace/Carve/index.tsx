@@ -12,12 +12,8 @@ export const Carve = () => {
     const shouldHide = pathname !== '/';
 
     return (
-        <div
-            className={cx('h-full', {
-                hidden: shouldHide,
-            })}
-        >
-            <div className="flex h-[75%] pb-10">
+        <div className={cx({ hidden: shouldHide }, 'h-full')}>
+            <div className="flex h-[75%] max-h-[75%] pb-10">
                 <div className="flex-grow">
                     <Visualizer />
                 </div>
@@ -27,7 +23,7 @@ export const Carve = () => {
                 </div>
             </div>
 
-            <div className="flex h-[25%] min-h-48">
+            <div className="flex h-[25%] max-h-[25%] min-h-48">
                 <ToolArea />
             </div>
         </div>
