@@ -1709,6 +1709,9 @@ class GrblHalController {
             'unlock': () => {
                 this.writeln('$X');
             },
+            'populateConfig': () => {
+                this.writeln('$$');
+            },
             'reset': () => {
                 this.workflow.stop();
 

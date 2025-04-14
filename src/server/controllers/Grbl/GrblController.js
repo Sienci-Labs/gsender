@@ -561,7 +561,7 @@ class GrblController {
 
             this.emit('serialport:read', line);
 
-            this.connection.write(line + '\n');
+            this.write(line + '\n');
             log.silly(`> ${line}`);
         });
         this.sender.on('hold', noop);
@@ -1646,6 +1646,9 @@ class GrblController {
             },
             'unlock': () => {
                 this.writeln('$X');
+            },
+            'populateConfig': () => {
+                this.writeln('$$');
             },
             'reset': () => {
                 this.workflow.stop();
