@@ -6,10 +6,17 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import controller from 'app/lib/controller.ts';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 
-export function unlockFirmware(state) {
+export function unlockFirmware(
+    state: GRBL_ACTIVE_STATES_T,
+    code: string | number,
+) {
     if (state === GRBL_ACTIVE_STATE_ALARM) {
-        return controller.command('unlock');
+        controller.command('unlock');
+        if (code === 11 || code === 'Homing') {
+            controller.command('populateConfig');
+        }
     }
     controller.command('cyclestart');
 }
@@ -19,6 +26,7 @@ export function UnlockButton() {
         (state: RootState) => state.controller.state.status,
     );
     const activeState = get(status, 'activeState', 'Idle');
+    const alarmCode = get(status, 'alarmCode', 0);
 
     const isHold = activeState === GRBL_ACTIVE_STATE_HOLD;
     const isAlarm = activeState === GRBL_ACTIVE_STATE_ALARM;
@@ -31,7 +39,7 @@ export function UnlockButton() {
                     'text-yellow-600 bg-orange-200 bg-opacity-10 rounded':
                         activateUnlockButton,
                 })}
-                onClick={() => unlockFirmware(activeState)}
+                onClick={() => unlockFirmware(activeState, alarmCode)}
             >
                 <IoLockOpenOutline
                     className={cx('hidden group-hover:block', {
