@@ -4,7 +4,6 @@ import { toast } from 'app/lib/toaster';
 import { getUnitModal } from 'app/lib/toolChangeUtils';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
-import RotarySurfacing from './RotarySurfacing';
 import MountingSetup from './MountingSetup';
 import {
     getZAxisProbing,
@@ -13,8 +12,10 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';
+import { useNavigate } from 'react-router';
 
 const Actions = () => {
+    const navigate = useNavigate();
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
     );
@@ -54,7 +55,12 @@ const Actions = () => {
 
     return (
         <div className="grid grid-cols-2 gap-3">
-            <RotarySurfacing />
+            <Button
+                size="sm"
+                onClick={() => navigate('/tools/rotary-surfacing')}
+            >
+                Rotary Surfacing
+            </Button>
             <Button
                 size="sm"
                 onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}

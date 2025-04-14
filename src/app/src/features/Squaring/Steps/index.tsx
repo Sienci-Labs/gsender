@@ -159,7 +159,7 @@ const Steps = () => {
 
             <div className="flex justify-center">{renderStep()}</div>
 
-            <div className="flex justify-between mt-4 shrink-0">
+            <div className="flex justify-between mt-4 xl:mt-1 shrink-0">
                 <div className="flex gap-2">
                     <Button
                         onClick={() => {

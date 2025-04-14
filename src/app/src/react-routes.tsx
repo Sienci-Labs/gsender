@@ -37,6 +37,7 @@ import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
+import RotarySurfacing from './features/Rotary/RotarySurfacing';
 
 export const ReactRoutes = () => {
     return (
@@ -62,12 +63,12 @@ export const ReactRoutes = () => {
                     <Route
                         index
                         element={
-                            <div className="p-4">
+                            <div className="p-4 fixed-content-area no-scrollbar">
                                 <p className="text-lg font-semibold mb-4 dark:text-white">
                                     Choose a tool to get started...
                                 </p>
 
-                                <div className="grid grid-cols-3 sm:grid-cols-2 gap-4">
+                                <div className="grid lg:grid-cols-3 grid-cols-2 p-1 gap-4 fixed-select-tool-area overflow-y-scroll overflow-x-hidden">
                                     <ToolCard
                                         title="Surfacing"
                                         description="Generate toolpaths to surface and level your material"
@@ -76,17 +77,10 @@ export const ReactRoutes = () => {
                                     />
 
                                     <ToolCard
-                                        title="Firmware"
-                                        description="Update the firmware on your machine"
-                                        icon={FaMicrochip}
-                                        link="/tools/firmware"
-                                    />
-
-                                    <ToolCard
-                                        title="XY Squaring"
-                                        description="Use this tool to ensure your machine is squared correctly"
-                                        icon={LuPencilRuler}
-                                        link="/tools/squaring"
+                                        title="Rotary Surfacing"
+                                        description="Generate toolpaths to surface and level your material"
+                                        icon={GiFlatPlatform}
+                                        link="/tools/rotary-surfacing"
                                     />
 
                                     <ToolCard
@@ -94,6 +88,13 @@ export const ReactRoutes = () => {
                                         description="Use this tool adjust the movement of your machine"
                                         icon={AiFillTool}
                                         link="/tools/movement-tuning"
+                                    />
+
+                                    <ToolCard
+                                        title="XY Squaring"
+                                        description="Use this tool to ensure your machine is squared correctly"
+                                        icon={LuPencilRuler}
+                                        link="/tools/squaring"
                                     />
 
                                     <ToolCard
@@ -109,6 +110,13 @@ export const ReactRoutes = () => {
                                         icon={FaGamepad}
                                         link="/tools/gamepad"
                                     />
+
+                                    <ToolCard
+                                        title="Firmware"
+                                        description="Update the firmware on your machine"
+                                        icon={FaMicrochip}
+                                        link="/tools/firmware"
+                                    />
                                 </div>
                             </div>
                         }
@@ -120,6 +128,7 @@ export const ReactRoutes = () => {
                                 title="Keyboard Shortcuts"
                                 description="Configure your keyboard shortcuts for various actions"
                                 withGoBackButton
+                                withFullPadding
                             >
                                 <KeyboardShortcuts />
                             </Page>
@@ -128,7 +137,11 @@ export const ReactRoutes = () => {
                     <Route
                         path="movement-tuning"
                         element={
-                            <Page title="Movement Tuning" withGoBackButton>
+                            <Page
+                                title="Movement Tuning"
+                                withGoBackButton
+                                withFixedArea
+                            >
                                 <MovementTuning />
                             </Page>
                         }
@@ -136,7 +149,11 @@ export const ReactRoutes = () => {
                     <Route
                         path="squaring"
                         element={
-                            <Page title="XY Squaring" withGoBackButton>
+                            <Page
+                                title="XY Squaring"
+                                withGoBackButton
+                                withFixedArea
+                            >
                                 <Squaring />
                             </Page>
                         }
@@ -144,8 +161,24 @@ export const ReactRoutes = () => {
                     <Route
                         path="surfacing"
                         element={
-                            <Page title="Wasteboard Surfacing" withGoBackButton>
+                            <Page
+                                title="Wasteboard Surfacing"
+                                withGoBackButton
+                                withFixedArea
+                            >
                                 <Surfacing />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="rotary-surfacing"
+                        element={
+                            <Page
+                                title="Rotary Surfacing"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <RotarySurfacing />
                             </Page>
                         }
                     />
@@ -155,6 +188,8 @@ export const ReactRoutes = () => {
                             <Page
                                 title="Gamepad"
                                 description="Manage your gamepad profiles here"
+                                withGoBackButton
+                                withFixedArea
                             >
                                 <Gamepad />
                             </Page>
@@ -167,7 +202,11 @@ export const ReactRoutes = () => {
                     <Route
                         path="firmware"
                         element={
-                            <Page title="Firmware (Legacy)" withGoBackButton>
+                            <Page
+                                title="Firmware (Legacy)"
+                                withGoBackButton
+                                withFixedArea
+                            >
                                 <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
                                     <Firmware />
                                 </div>
