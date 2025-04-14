@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 
 import { Button } from 'app/components/Button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from 'app/components/shadcn/Dialog';
 import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
 import Switch from 'app/components/Switch';
@@ -21,7 +12,12 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
-import { TOOLBAR_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    TOOLBAR_CATEGORY,
+    VISUALIZER_PRIMARY,
+} from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
@@ -29,6 +25,8 @@ import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
+import { useNavigate } from 'react-router';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 const InputArea = ({
     children,
@@ -64,8 +62,12 @@ const DEFAULT_VALUES_MM = {
 const MM_TO_INCH = 0.0393701;
 
 const RotarySurfacing = () => {
+    const navigate = useNavigate();
     const { units } = useWorkspaceState();
-    const [open, setOpen] = useState(false);
+    const status = useTypedSelector((state) => state?.controller.state?.status);
+    const isDisabled =
+        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     // Initialize state with appropriate units
     const getInitialState = () => {
@@ -105,6 +107,9 @@ const RotarySurfacing = () => {
         setSurfacingState(getInitialState());
     }, [units]);
 
+    const inputStyle =
+        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
+
     const handleGenerateGcode = () => {
         const generator = new StockTurningGenerator({
             stockLength: +surfacingState.length,
@@ -130,8 +135,9 @@ const RotarySurfacing = () => {
             VISUALIZER_PRIMARY,
         );
 
-        setOpen(false);
         setGcode('');
+
+        navigate('/');
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,14 +149,6 @@ const RotarySurfacing = () => {
         }));
     };
 
-    const handleOpenChange = (open: boolean) => {
-        setOpen(open);
-
-        if (!open) {
-            setGcode('');
-        }
-    };
-
     const shuttleControlEvents = {
         TOGGLE_ROTARY_SURFACING: {
             title: 'Toggle Rotary Surfacing Display',
@@ -159,7 +157,7 @@ const RotarySurfacing = () => {
             preventDefault: false,
             isActive: true,
             category: TOOLBAR_CATEGORY,
-            callback: () => setOpen((prev) => !prev),
+            callback: () => navigate('/tools/rotary-surfacing'),
         },
     };
 
@@ -167,30 +165,23 @@ const RotarySurfacing = () => {
     useShuttleEvents(shuttleControlEvents);
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                <Button size="sm" onClick={() => setOpen(true)}>
-                    Rotary Surfacing
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white w-11/12 max-w-6xl">
-                <DialogHeader>
-                    <DialogTitle>Rotary Surfacing</DialogTitle>
-                    <DialogDescription>
-                        Make sure that your tool clears the surface of your
-                        material without running into the limits of your Z-axis.{' '}
-                        You should also use the probing feature to zero your
-                        Z-axis to the centerline before surfacing.
-                    </DialogDescription>
-                </DialogHeader>
+        <div>
+            <div className="bg-white w-full flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 xl:gap-2">
+                        <p className="text-sm xl:text-base">
+                            Make sure that your tool clears the surface of your
+                            material without running into the limits of your
+                            Z-axis. You should also use the probing feature to
+                            zero your Z-axis to the centerline before surfacing.
+                        </p>
                         <InputArea label="Length">
                             <Input
                                 id="length"
                                 value={surfacingState.length}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
@@ -200,12 +191,14 @@ const RotarySurfacing = () => {
                                     id="startDiameter"
                                     value={surfacingState.startDiameter}
                                     onChange={handleChange}
+                                    className={inputStyle}
                                     suffix={units}
                                 />
                                 <Input
                                     id="finalDiameter"
                                     value={surfacingState.finalDiameter}
                                     onChange={handleChange}
+                                    className={inputStyle}
                                     suffix={units}
                                 />
                             </div>
@@ -216,6 +209,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.stepdown}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
@@ -225,6 +219,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.bitDiameter}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
@@ -234,6 +229,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.stepover}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix="%"
                             />
                         </InputArea>
@@ -243,6 +239,8 @@ const RotarySurfacing = () => {
                                 value={surfacingState.spindleRPM}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
+                                suffix="RPM"
                             />
                         </InputArea>
                         <InputArea label="Feedrate">
@@ -251,6 +249,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.feedrate}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={`${units}/min`}
                             />
                         </InputArea>
@@ -268,7 +267,7 @@ const RotarySurfacing = () => {
                                     }
                                 />
                             </InputArea>
-                            <div className="text-sm text-gray-500 mt-3">
+                            <div className="text-xs xl:text-sm text-gray-500 mt-3">
                                 This option creates a more consistent surface
                                 finish as your A axis will spin in only one
                                 direction across the entire length of your
@@ -304,19 +303,19 @@ const RotarySurfacing = () => {
                         </TabsContent>
                     </Tabs>
                 </div>
-                <DialogFooter>
+                <div className="flex flex-row gap-4">
                     <Button type="submit" onClick={handleGenerateGcode}>
                         Generate G-Code
                     </Button>
                     <Button
-                        disabled={!gcode}
+                        disabled={!!!gcode || isDisabled}
                         onClick={handleLoadToMainVisualizer}
                     >
                         Load to Main Visualizer
                     </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </div>
+            </div>
+        </div>
     );
 };
 

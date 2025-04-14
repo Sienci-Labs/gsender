@@ -37,6 +37,7 @@ import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
+import RotarySurfacing from './features/Rotary/RotarySurfacing';
 
 export const ReactRoutes = () => {
     return (
@@ -73,6 +74,13 @@ export const ReactRoutes = () => {
                                         description="Generate toolpaths to surface and level your material"
                                         icon={GiFlatPlatform}
                                         link="/tools/surfacing"
+                                    />
+
+                                    <ToolCard
+                                        title="Rotary Surfacing"
+                                        description="Generate toolpaths to surface and level your material"
+                                        icon={GiFlatPlatform}
+                                        link="/tools/rotary-surfacing"
                                     />
 
                                     <ToolCard
@@ -159,6 +167,18 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <Surfacing />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="rotary-surfacing"
+                        element={
+                            <Page
+                                title="Rotary Surfacing"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <RotarySurfacing />
                             </Page>
                         }
                     />
