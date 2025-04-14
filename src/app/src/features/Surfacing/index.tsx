@@ -316,31 +316,34 @@ const SurfacingTool = () => {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-
-                        <div
-                            className={cx('h-[470px] rounded-md', {
-                                hidden: tabSwitch,
-                            })}
-                        >
-                            <VisualizerPreview gcode={gcode} />
-                        </div>
-                        <div
-                            className={cx('h-[470px] rounded-md relative', {
-                                hidden: !tabSwitch,
-                            })}
-                        >
-                            <GcodeViewer gcode={gcode} />
+                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                            <div
+                                className={cx(
+                                    'absolute w-full h-full top-0 left-0 rounded-md',
+                                    {
+                                        invisible: tabSwitch,
+                                    },
+                                )}
+                            >
+                                <VisualizerPreview gcode={gcode} />
+                            </div>
+                            <div
+                                className={cx('h-full rounded-md relative', {
+                                    invisible: !tabSwitch,
+                                })}
+                            >
+                                <GcodeViewer gcode={gcode} />
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex flex-row gap-4">
-                    <Button className="m-0" onClick={handleGenerateGcode}>
+                    <Button onClick={handleGenerateGcode}>
                         Generate G-code
                     </Button>
                     <Button
                         disabled={!!!gcode || isDisabled}
-                        className="m-0"
                         onClick={loadGcode}
                     >
                         Load to Main Visualizer

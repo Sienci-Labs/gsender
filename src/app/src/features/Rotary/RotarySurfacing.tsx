@@ -4,12 +4,7 @@ import { Button } from 'app/components/Button';
 import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
 import Switch from 'app/components/Switch';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
 import {
@@ -27,6 +22,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { useNavigate } from 'react-router';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import cx from 'classnames';
 
 const InputArea = ({
     children,
@@ -101,6 +97,7 @@ const RotarySurfacing = () => {
 
     const [surfacingState, setSurfacingState] = useState(getInitialState());
     const [gcode, setGcode] = useState('');
+    const [tabSwitch, setTabSwitch] = useState(false);
 
     // Update state when units change
     useEffect(() => {
@@ -276,32 +273,50 @@ const RotarySurfacing = () => {
                             </div>
                         </div>
                     </div>
-
-                    <Tabs
-                        defaultValue="visualizer"
-                        className="flex flex-col h-full"
-                    >
-                        <TabsList className="bg-gray-100 w-full">
-                            <TabsTrigger value="visualizer" className="w-full">
-                                Visualizer Preview
-                            </TabsTrigger>
-                            <TabsTrigger value="gcode" className="w-full">
-                                G-Code{' '}
-                                {gcode.length !== 0 ? (
-                                    <span className="text-xs text-gray-500">
-                                        ({gcode.split('\n').length} lines)
-                                    </span>
-                                ) : null}
-                            </TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="gcode" className="h-full">
-                            <GcodeViewer gcode={gcode} />
-                        </TabsContent>
-                        <TabsContent value="visualizer" className="h-full">
-                            <VisualizerPreview gcode={gcode} />
-                        </TabsContent>
-                    </Tabs>
+                    <div className="flex flex-col gap-2">
+                        <Tabs defaultValue="visualizer">
+                            <TabsList className="bg-gray-100 w-full">
+                                <TabsTrigger
+                                    value="visualizer"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(false)}
+                                >
+                                    Visualizer Preview
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="gcode"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(true)}
+                                >
+                                    G-Code{' '}
+                                    {gcode.length !== 0 ? (
+                                        <span className="text-xs text-gray-500">
+                                            ({gcode.split('\n').length} lines)
+                                        </span>
+                                    ) : null}
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                            <div
+                                className={cx(
+                                    'absolute w-full h-full top-0 left-0 rounded-md',
+                                    {
+                                        invisible: tabSwitch,
+                                    },
+                                )}
+                            >
+                                <VisualizerPreview gcode={gcode} />
+                            </div>
+                            <div
+                                className={cx('h-full rounded-md relative', {
+                                    invisible: !tabSwitch,
+                                })}
+                            >
+                                <GcodeViewer gcode={gcode} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="flex flex-row gap-4">
                     <Button type="submit" onClick={handleGenerateGcode}>
