@@ -394,10 +394,10 @@ class GrblController {
                 return;
             }
 
-            // this.emit('serialport:write', line + '\n', {
-            //     ...context,
-            //     source: WRITE_SOURCE_FEEDER
-            // });
+            this.emit('serialport:write', line + '\n', {
+                ...context,
+                source: WRITE_SOURCE_FEEDER
+            });
 
             this.connection.write(line + '\n', {
                 ...context,

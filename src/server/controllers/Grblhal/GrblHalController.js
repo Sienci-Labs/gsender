@@ -384,6 +384,11 @@ class GrblHalController {
                 return;
             }
 
+            this.emit('serialport:write', line + '\n', {
+                ...context,
+                source: WRITE_SOURCE_FEEDER
+            });
+
             this.write(line + '\n', {
                 ...context,
                 source: WRITE_SOURCE_FEEDER
