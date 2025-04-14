@@ -12,6 +12,7 @@ import {
     GRBL_ACTIVE_STATE_JOG,
     TOOLBAR_CATEGORY,
     VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
@@ -120,7 +121,13 @@ const RotarySurfacing = () => {
             enableRehoming: surfacingState.enableRehoming,
         });
 
-        setGcode(generator.generate());
+        const gcode = generator.generate();
+        setGcode(gcode);
+
+        const name = 'gSender_Surfacing';
+        const file = new File([gcode], name);
+
+        uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
     };
 
     const handleLoadToMainVisualizer = async () => {
