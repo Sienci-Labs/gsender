@@ -45,12 +45,16 @@ export default class Generator {
             spindleRPM,
             spindle = M3,
             shouldDwell,
+            mist,
+            flood
         } = { ...defaultSurfacingState, ...surfacing };
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
         const z = getSafeZValue();
 
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
+        const m7 = mist ? ['M7'] : [];
+        const m8 = flood ? ['M8'] : [];
 
         const depth = skimDepth;
         const gcodeArr = [
@@ -59,10 +63,13 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
-            `G0 Z${z}`,
+            'G53 G0 Z-5; Safely retract the spindle first before moving',
             'G0 X0 Y0',
-            `G1 F${feedrate}`,
+            ...m7,
+            ...m8,
             `${spindle} S${spindleRPM}`,
+            `G0 Z${z}`,
+            `G1 F${feedrate}`,
             ...dwell,
             '(Header End)',
             '\n',
@@ -86,8 +93,11 @@ export default class Generator {
 
         gcodeArr.push(...processedGcode);
 
+        const m9 = mist || flood ? ['M9 ;Turn off Coolant'] : [];
+
         gcodeArr.push(
             '(Footer)',
+            ...m9,
             'M5 ;Turn off spindle',
             ...dwell,
             '(End of Footer)',
@@ -116,6 +126,8 @@ export default class Generator {
             type,
             cutDirectionFlipped,
             skimDepth,
+            mist,
+            flood
         } = this.surfacing;
 
         const stepoverPercentage = stepover > 80 ? 80 / 100 : stepover / 100;

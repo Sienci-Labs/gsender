@@ -30,6 +30,8 @@ import InputArea from 'app/components/InputArea';
 import { Button } from 'app/components/Button';
 import VisualizerPreview from './components/VisualizerPreview';
 
+import { Switch } from 'app/components/shadcn/Switch';
+
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const SurfacingTool = () => {
@@ -290,6 +292,38 @@ const SurfacingTool = () => {
                                 />
                             </div>
                         </div>
+                        <InputArea label="Coolant Control">
+                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                                <span className="font-light text-sm max-w-20 dark:text-white">
+                                    Mist (M7)
+                                </span>
+                                <Switch
+                                    onCheckedChange={(value) =>
+                                        setSurfacing({
+                                            ...surfacing,
+                                            mist: value,
+                                        })
+                                    }
+                                    checked={surfacing.mist ?? false}
+                                    className="h-20"
+                                />
+                                <span className="font-light text-sm max-w-20 dark:text-white">
+                                    Flood (M8)
+                                </span>
+                                <Switch
+                                    onCheckedChange={(value) =>
+                                        setSurfacing({
+                                            ...surfacing,
+                                            flood: value,
+                                        })
+                                    }
+                                    checked={surfacing.flood ?? false}
+                                    className="h-20"
+                                />
+                            </div>
+                        </InputArea>
+
+
                     </div>
                     <div className="flex flex-col gap-2">
                         <Tabs defaultValue="visualizer-preview">
