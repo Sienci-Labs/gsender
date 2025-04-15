@@ -390,6 +390,11 @@ class GrblHalController {
                 return;
             }
 
+            this.emit('serialport:write', line + '\n', {
+                ...context,
+                source: WRITE_SOURCE_FEEDER
+            });
+
             this.write(line + '\n', {
                 ...context,
                 source: WRITE_SOURCE_FEEDER
@@ -1724,6 +1729,9 @@ class GrblHalController {
             },
             'unlock': () => {
                 this.writeln('$X');
+            },
+            'populateConfig': () => {
+                this.writeln('$$');
             },
             'reset': () => {
                 this.workflow.stop();

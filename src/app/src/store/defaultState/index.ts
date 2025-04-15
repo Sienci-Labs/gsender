@@ -322,6 +322,8 @@ const defaultState: State = {
             spindle: M3 as SPINDLE,
             cutDirectionFlipped: false,
             shouldDwell: false,
+            flood: false,
+            mist: false
         },
         visualizer: {
             minimized: false,

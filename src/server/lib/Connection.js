@@ -255,7 +255,6 @@ class Connection extends EventEmitter {
         if (!context) {
             context = { source: WRITE_SOURCE_CLIENT };
         }
-        this.emitToSockets('serialport:write', data, context);
         this.connection.write(data, context);
         log.silly(`> ${data}`);
     }
