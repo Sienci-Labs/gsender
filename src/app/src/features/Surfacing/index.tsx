@@ -134,7 +134,7 @@ const SurfacingTool = () => {
                             encounter alarms or errors.
                         </p>
                         <InputArea label="X & Y">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Input
                                     type="number"
                                     id="width"
@@ -150,6 +150,9 @@ const SurfacingTool = () => {
                                         )
                                     }
                                 />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
                                 <Input
                                     type="number"
                                     id="length"
@@ -168,7 +171,7 @@ const SurfacingTool = () => {
                             </div>
                         </InputArea>
                         <InputArea label="Cut Depth & Max">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Input
                                     type="number"
                                     id="skimDepth"
@@ -183,10 +186,10 @@ const SurfacingTool = () => {
                                             Number(e.target.value),
                                         )
                                     }
-                                    // tooltip={{
-                                    //     content: `Default Value: ${defaultValues.skimDepth}`,
-                                    // }}
                                 />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
                                 <Input
                                     type="number"
                                     id="maxDepth"
@@ -194,7 +197,6 @@ const SurfacingTool = () => {
                                     min={0.00001}
                                     max={10000}
                                     className={inputStyle}
-                                    // style={{ ...inputStyles }}
                                     value={surfacing.maxDepth}
                                     onChange={(e) =>
                                         onChange(
@@ -202,9 +204,6 @@ const SurfacingTool = () => {
                                             Number(e.target.value),
                                         )
                                     }
-                                    // tooltip={{
-                                    //     content: `Default Value: ${defaultValues.maxDepth}`,
-                                    // }}
                                 />
                             </div>
                         </InputArea>

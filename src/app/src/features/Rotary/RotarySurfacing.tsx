@@ -190,7 +190,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Start & Final Diameter">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Input
                                     id="startDiameter"
                                     value={surfacingState.startDiameter}
@@ -198,6 +198,9 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix={units}
                                 />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
                                 <Input
                                     id="finalDiameter"
                                     value={surfacingState.finalDiameter}
