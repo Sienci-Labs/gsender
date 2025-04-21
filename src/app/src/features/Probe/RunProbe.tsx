@@ -137,7 +137,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                     },
                 )}
             >
-                <DialogHeader className="text-robin-700 flex items-start justify-center  border-b-[1px] border-gray-400">
+                <DialogHeader className="text-robin-700 flex items-start justify-center">
                     <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
                 </DialogHeader>
                 <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
@@ -158,7 +158,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 measurement.
                             </p>
                         </div>
-                        <Button disabled={!connectionMade} onClick={startProbe}>
+                        <Button variant="primary" disabled={!connectionMade} onClick={startProbe}>
                             {connectionMade
                                 ? 'Start Probe'
                                 : 'Waiting for probe circuit check...'}
