@@ -111,7 +111,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         <Switch onClick={onToggleSwap} />
                         <span>INC</span>
                     </div>
-                    <Button color="primary" onClick={goToLocation}>
+                    <Button variant="primary" onClick={goToLocation}>
                         Go!
                     </Button>
                 </div>
