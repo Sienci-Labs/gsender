@@ -12,11 +12,13 @@ import React from 'react';
 interface SettingSectionProps {
     settings: gSenderSetting[];
     label?: string;
+    connected?: boolean;
     wizard?: () => JSX.Element;
 }
 export function SettingSection({
     settings = [],
     label = null,
+    connected = false,
     wizard,
 }: SettingSectionProps): JSX.Element {
     const { setSettingsValues, setSettingsAreDirty, settingsFilter } =
@@ -44,7 +46,7 @@ export function SettingSection({
             {label && (
                 <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
                     <span className="text-blue-500  text-xl">{label}</span>
-                    {wizard && wizard()}
+                    {connected && wizard && wizard()}
                 </legend>
             )}
             {settings.map((setting) => {

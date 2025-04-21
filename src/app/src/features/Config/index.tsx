@@ -94,6 +94,7 @@ export function Config() {
                                                 settings={item.settings}
                                                 eeprom={item.eeprom}
                                                 ref={ref}
+                                                connected={connected}
                                                 wizard={item.wizard}
                                             />
                                         );
