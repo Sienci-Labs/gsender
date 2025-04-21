@@ -82,7 +82,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         const fetchJobStats = async () => {
             const jobStatRes = await api.jobStats.fetch();
             const { jobs = [], ...rest } = jobStatRes.data;
-            setJobs(jobs);
+            setJobs(jobs.reverse());
             setJobAggregate(rest);
         };
 

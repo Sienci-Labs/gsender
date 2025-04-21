@@ -148,7 +148,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
     }, [customValues]);
 
-    const tools = [...availableTools];
+    const tools = [...availableTools].sort((a, b) => a.metricDiameter - b.metricDiameter);
 
     // Create stable callback that doesn't change on each render
     const handleChange = useCallback((value: string): void => {
@@ -356,6 +356,13 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         );
     }
 
+    function getUnitString(option) {
+        if (option === 'Tip' || option === 'Auto') {
+            return ''
+        }
+        return units
+    }
+
     options.push(...toolsObjects, ...customValues);
 
     return (
@@ -385,7 +392,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                     >
                                         <div className="flex items-center justify-between w-full">
                                             <span>
-                                                {option.label} {units}
+                                                {option.label} {getUnitString(option.value)}
                                             </span>
                                             {option.isCustom && (
                                                 <div
@@ -413,7 +420,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                         <div className="p-2 border-t">
                             <div className="flex items-center space-x-2">
                                 <Input
-                                    type="number"
+                                    type="decimal"
                                     placeholder={`Custom diameter (${units})`}
                                     value={inputValue}
                                     onChange={(e) =>

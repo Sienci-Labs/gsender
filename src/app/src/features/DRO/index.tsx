@@ -289,7 +289,7 @@ function DRO({
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (
-                    <Parking />
+                    <Parking disabled={!canClick} />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
                 )}
             </div>
@@ -380,7 +380,7 @@ function DRO({
                     />
                 )}
 
-                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button variant="alt" onClick={goXYAxes} disabled={!canClick} size="sm">
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
