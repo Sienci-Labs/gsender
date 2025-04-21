@@ -37,7 +37,6 @@ class GrblHalLineParserResultStatus {
         if (!r) {
             return null;
         }
-        console.log(r);
 
         const payload = {};
         //const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;

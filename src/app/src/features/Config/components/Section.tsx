@@ -13,6 +13,7 @@ interface SectionProps {
     children?: React.ReactNode;
     activeSection?: number;
     key: string;
+    connected?: boolean;
     id: string;
     index: number;
     settings: gSenderSettings[];
@@ -30,6 +31,7 @@ export const Section = React.forwardRef(
             id,
             index,
             settings,
+            connected = false,
             eeprom,
             wizard = null,
         }: SectionProps,
@@ -59,13 +61,14 @@ export const Section = React.forwardRef(
                     <h1 className="mb-2 text-3xl ml-4 font-sans dark:text-white">
                         {title}
                     </h1>
-                    {wizard && wizard()}
+                    {connected && wizard && wizard()}
                 </div>
                 <div className="bg-gray-100 rounded-xl shadow p-6 flex flex-col gap-6 dark:bg-dark dark:text-white">
                     {filteredSettings.map(
                         (setting: gSenderSubSection, index) => {
                             return (
                                 <SettingSection
+                                    connected={connected}
                                     settings={setting.settings}
                                     label={setting.label}
                                     wizard={setting.wizard}
