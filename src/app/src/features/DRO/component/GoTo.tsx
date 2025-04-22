@@ -10,7 +10,6 @@ import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
 import { Switch } from 'app/components/shadcn/Switch.tsx';
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
-import { IconButton } from 'app/components/IconButton';
 
 interface GotoProps {
     units: string;
