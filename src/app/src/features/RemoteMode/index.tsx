@@ -81,12 +81,11 @@ export function RemoteModeDialog({
         <Dialog open={showRemote} onOpenChange={onClose}>
             <DialogContent className="bg-white w-[750px] text-sm">
                 <form>
-                    <DialogHeader></DialogHeader>
+                    <DialogHeader>
+                        <DialogTitle>Wireless CNC Control</DialogTitle>
+                    </DialogHeader>
                     <div className="grid grid-cols-2 text-gray-600 grid-">
                         <div className="flex flex-col gap-8 px-4">
-                            <h1 className="text-2xl text-blue-500">
-                                Wireless CNC Control
-                            </h1>
                             <div className="flex flex-row gap-4 items-center">
                                 <span className="font-bold dark:text-white">
                                     Enable Wireless Control

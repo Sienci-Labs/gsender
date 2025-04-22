@@ -56,7 +56,7 @@ export function MaintenanceTaskForm({ task }: Props) {
                         className="block mb-2 dark:text-white"
                         htmlFor="grid-start-range"
                     >
-                        Task Start Range
+                        Task Start Range (Hrs)
                     </label>
                     <input
                         className="border border-gray-300 w-full rounded-md py-3 px-4 mb-3 dark:text-white dark:bg-dark dark:border-dark-lighter" //"appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -73,7 +73,7 @@ export function MaintenanceTaskForm({ task }: Props) {
                         className="block mb-2 dark:text-white"
                         htmlFor="grid-end-range"
                     >
-                        Task End Range
+                        Task End Range (Hrs)
                     </label>
                     <input
                         className="border border-gray-300 w-full rounded-md py-3 px-4 mb-3 dark:text-white dark:bg-dark dark:border-dark-lighter" //"appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"

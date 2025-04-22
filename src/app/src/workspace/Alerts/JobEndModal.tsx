@@ -32,10 +32,10 @@ const JobEndModal: React.FC<Props> = ({
     return (
         <AlertDialog open={showModal} onOpenChange={setShowModal}>
             <AlertDialogContent className="bg-slate-200">
-                <AlertDialogHeader className="flex justify-between items-center">
+                <AlertDialogHeader className="flex items-center">
                     <AlertDialogTitle>Job End</AlertDialogTitle>
                     <AlertDialogDescription>
-                        <div className="w-[400px] min-h-[100px] max-h-[500px] flex flex-col">
+                        <div className="min-h-[100px] max-h-[500px] flex flex-col">
                             <div className="flex flex-col m-2 mt-0 overflow-y-auto float-left">
                                 <div>
                                     <strong>Status:</strong>
@@ -57,11 +57,11 @@ const JobEndModal: React.FC<Props> = ({
                                 <strong>{'Errors:\n'}</strong>
 
                                 {errors.length === 0 ? (
-                                    <span className="flex flex-col m-2 mt-0 overflow-y-auto">
+                                    <span className="flex flex-col m-2 mt-0">
                                         None
                                     </span>
                                 ) : (
-                                    <span className="flex flex-col m-2 mt-0 overflow-y-auto text-red-500">
+                                    <span className="flex flex-col m-2 mt-0 text-red-500">
                                         {errors.map((error) => {
                                             return (
                                                 <span
@@ -76,8 +76,8 @@ const JobEndModal: React.FC<Props> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>
-                        <Button onClick={onClose}>{'Close'}</Button>
+                    <AlertDialogCancel onClick={onClose}>
+                        Close
                     </AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>

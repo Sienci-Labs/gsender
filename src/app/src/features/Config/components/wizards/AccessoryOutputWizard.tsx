@@ -11,6 +11,9 @@ export function AccessoryOutputWizard() {
             <Button variant={'primary'} onClick={() => sendCommand('M3')}>
                 M3
             </Button>
+            <Button variant={'primary'} onClick={() => sendCommand('M4')}>
+                M4
+            </Button>
             <Button variant={'primary'} onClick={() => sendCommand('M5')}>
                 M5
             </Button>

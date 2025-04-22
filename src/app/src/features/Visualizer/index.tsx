@@ -568,6 +568,7 @@ class Visualizer extends Component {
             // instead of calling loadGCode right away,
             // use this pubsub to invoke a refresh of the visualizer wrapper.
             // this removes visual glitches that would otherwise appear.
+            console.log('called toggle');
             pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
