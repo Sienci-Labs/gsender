@@ -5443,6 +5443,11 @@ html,
   border-color: rgb(66 32 6 / var(--tw-border-opacity, 1)) !important;
 }
 
+.dark\:border-white:is(.dark *) {
+  --tw-border-opacity: 1 !important;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity, 1)) !important;
+}
+
 .dark\:border-b-dark-lighter:is(.dark *) {
   --tw-border-opacity: 1 !important;
   border-bottom-color: rgb(51 65 85 / var(--tw-border-opacity, 1)) !important;
@@ -5518,8 +5523,20 @@ html,
   background-color: rgb(66 32 6 / var(--tw-bg-opacity, 1)) !important;
 }
 
+.dark\:bg-transparent:is(.dark *) {
+  background-color: transparent !important;
+}
+
+.dark\:bg-none:is(.dark *) {
+  background-image: none !important;
+}
+
 .dark\:fill-gray-700:is(.dark *) {
   fill: #374151 !important;
+}
+
+.dark\:fill-white:is(.dark *) {
+  fill: #fff !important;
 }
 
 .dark\:text-blue-400:is(.dark *) {
