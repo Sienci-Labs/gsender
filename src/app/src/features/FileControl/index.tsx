@@ -13,13 +13,17 @@ import { updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     addRecentFile,
     createRecentFileFromRawPath,
+    deleteRecentFile,
+    loadRecentFile,
 } from './utils/recentfiles';
 import { toast } from 'app/lib/toaster';
+import { RecentFile } from './definitions';
 
 export type FileData = {
     data: string;
     name: string;
     path: string;
+    dir: string;
     size: number;
 };
 
@@ -58,9 +62,24 @@ const FileControl = () => {
                         name: fileMetaData.name,
                         path: fileMetaData.fullPath,
                         size: fileMetaData.size,
+                        dir: fileMetaData.dir,
                     };
 
-                    handleElectronFileUpload(recentFile);
+                    handleElectronFileUpload(recentFile, true);
+                },
+            );
+            (window as any).ipcRenderer.on(
+                'remove-recent-file',
+                (
+                    _: any,
+                    data: {
+                        err: string;
+                        path: string;
+                    },
+                ) => {
+                    toast.error(data.err);
+
+                    deleteRecentFile(data.path);
                 },
             );
         }
@@ -73,7 +92,6 @@ const FileControl = () => {
         const givenFile = new File([file.data], file.name);
 
         if (isElectron() && !isRecentFile) {
-            // Assuming these functions are imported or defined elsewhere
             const recentFile = createRecentFileFromRawPath(file);
             addRecentFile(recentFile);
         }
@@ -87,13 +105,17 @@ const FileControl = () => {
         reduxStore.dispatch(updateFileInfo({ path: file.path }));
     };
 
+    const handleRecentFileUpload = async (file: RecentFile) => {
+        loadRecentFile(file.filePath);
+    };
+
     return (
         <Widget>
             <Widget.Content>
                 <div className="w-full flex flex-col gap-2">
                     <ButtonControlGroup />
                     <FileInformation
-                        handleElectronFileUpload={handleElectronFileUpload}
+                        handleRecentFileUpload={handleRecentFileUpload}
                     />
                 </div>
             </Widget.Content>
