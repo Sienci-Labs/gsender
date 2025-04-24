@@ -341,9 +341,17 @@ class GrblHalController {
 
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
-                    this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
-                    line = line.replace('M6', '(M6)');
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    console.log(this.toolChangeContext);
+                    console.log(passthroughM6);
+                    if (!passthroughM6) {
+                        log.debug('M6 Tool Change');
+                        this.feeder.hold({
+                            data: 'M6',
+                            comment: commentString
+                        }); // Hold reason
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
 
                 if (this.isInRotaryMode) {
@@ -462,7 +470,6 @@ class GrblHalController {
                     this.updateSpindleModal(spindleCommand);
                 }
 
-                /* Emit event to UI for toolchange handler */
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
