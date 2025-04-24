@@ -43,7 +43,6 @@ export function updateToolchangeContext() {
         toolChangeOption,
         ...options,
     };
-    console.log(context);
     controller.command('toolchange:context', context);
 }
 

@@ -9,7 +9,6 @@ import { GRBLHAL } from 'app/constants';
 
 function longmillAutospinSetup() {
     delay(() => {
-        console.log('ok');
         Confirm({
             title: 'Restart your Controller',
             content:

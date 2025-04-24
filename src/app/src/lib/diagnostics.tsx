@@ -901,7 +901,6 @@ async function exportSenderSettings() {
     );
     delete settings.session;
     const res = await api.events.fetch();
-    console.log(res);
     const events = res.data.records;
     const settingsJSON = JSON.stringify({ settings, events }, null, 3);
     return new Blob([settingsJSON], { type: 'application/json' });

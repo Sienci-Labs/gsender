@@ -9,10 +9,14 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
 import { Button } from 'app/components/Button';
-import {RootState, store as reduxStore} from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import {CARVING_CATEGORY, VISUALIZER_PRIMARY, WORKFLOW_STATE_RUNNING} from 'app/constants';
+import {
+    CARVING_CATEGORY,
+    VISUALIZER_PRIMARY,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     DropdownMenu,
@@ -42,7 +46,7 @@ import Divider from './components/Divider';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import {useSelector} from "react-redux";
+import { useSelector } from 'react-redux';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,8 +59,12 @@ const ButtonControlGroup = () => {
     }, [fileLoaded]);
 
     const usingElectron = isElectron();
-    const connected = useSelector((state: RootState) => state.connection.isConnected);
-    const workflowState = useSelector((state: RootState) => state.controller.workflow.state);
+    const connected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const workflowState = useSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
     const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
     const canClick = !isRunning;
 
