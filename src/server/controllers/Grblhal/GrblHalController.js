@@ -78,7 +78,7 @@ import {
     FILE_UNLOAD,
     ALARM,
     ERROR
-} from '../../constants';
+} from '../../../app/src/constants';
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
@@ -389,6 +389,11 @@ class GrblHalController {
             if (line.length === 0) {
                 return;
             }
+
+            this.emit('serialport:write', line + '\n', {
+                ...context,
+                source: WRITE_SOURCE_FEEDER
+            });
 
             this.write(line + '\n', {
                 ...context,
@@ -809,7 +814,7 @@ class GrblHalController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || this.state.status.subState;
             //const alarm = _.find(this.settings.alarms, { id: code });
-            const alarm = this.settings.alarms[code.toString()];
+            const alarm = this.settings?.alarms && this.settings.alarms[code.toString()];
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -822,7 +827,7 @@ class GrblHalController {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
-            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_HOME) {
+            } else if (this.state?.status?.activeState === GRBL_ACTIVE_STATE_HOME) {
                 errorOrigin = 'Console';
                 line = '$H';
             } else if (outstanding > 0) {
@@ -1565,6 +1570,7 @@ class GrblHalController {
 
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
+                    console.log('start event enabled');
                     this.feederCB = () => {
                         // Feeder
                         this.feeder.reset();
@@ -1712,6 +1718,9 @@ class GrblHalController {
             },
             'unlock': () => {
                 this.writeln('$X');
+            },
+            'populateConfig': () => {
+                this.writeln('$$');
             },
             'reset': () => {
                 this.workflow.stop();
@@ -2062,6 +2071,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
+                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {

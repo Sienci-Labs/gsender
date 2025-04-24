@@ -20,6 +20,7 @@ export function LocationInput({
     onChange,
 }: LocationInputProps) {
     const mpos = useSelector((state: RootState) => state.controller.mpos);
+    const isConnected = useSelector((state: RootState) => state.connection.isConnected);
 
     function grabLocation() {
         const location = {
@@ -57,6 +58,7 @@ export function LocationInput({
                 <span className="text-lg">X:</span>
                 <Input
                     value={value.x}
+                    type="number"
                     onChange={(e) => updateSpecificAxes(e, 'x')}
                 />
             </div>
@@ -64,6 +66,7 @@ export function LocationInput({
                 <span className="text-lg">Y:</span>
                 <Input
                     value={value.y}
+                    type="number"
                     onChange={(e) => updateSpecificAxes(e, 'y')}
                 />
             </div>
@@ -71,6 +74,7 @@ export function LocationInput({
                 <span className="text-lg">Z:</span>
                 <Input
                     value={value.z}
+                    type="number"
                     onChange={(e) => updateSpecificAxes(e, 'z')}
                 />
             </div>
@@ -78,11 +82,12 @@ export function LocationInput({
                 <Button
                     className="flex flex-row gap-2 items-center"
                     onClick={grabLocation}
+                    disabled={!isConnected}
                 >
                     <FiTarget />
                     Grab
                 </Button>
-                <Button variant="primary" className="flex flex-row gap-2 items-center" onClick={gotoLocation}> <FaChartLine />Go To</Button>
+                <Button disabled={!isConnected} variant="primary" className="flex flex-row gap-2 items-center" onClick={gotoLocation}> <FaChartLine />Go To</Button>
             </div>
 
         </div>

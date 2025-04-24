@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react';
 
 import { Button } from 'app/components/Button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from 'app/components/shadcn/Dialog';
 import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
 import Switch from 'app/components/Switch';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
-import { TOOLBAR_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    TOOLBAR_CATEGORY,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
+} from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
@@ -29,6 +21,9 @@ import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
+import { useNavigate } from 'react-router';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import cx from 'classnames';
 
 const InputArea = ({
     children,
@@ -64,8 +59,12 @@ const DEFAULT_VALUES_MM = {
 const MM_TO_INCH = 0.0393701;
 
 const RotarySurfacing = () => {
+    const navigate = useNavigate();
     const { units } = useWorkspaceState();
-    const [open, setOpen] = useState(false);
+    const status = useTypedSelector((state) => state?.controller.state?.status);
+    const isDisabled =
+        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     // Initialize state with appropriate units
     const getInitialState = () => {
@@ -99,11 +98,15 @@ const RotarySurfacing = () => {
 
     const [surfacingState, setSurfacingState] = useState(getInitialState());
     const [gcode, setGcode] = useState('');
+    const [tabSwitch, setTabSwitch] = useState(false);
 
     // Update state when units change
     useEffect(() => {
         setSurfacingState(getInitialState());
     }, [units]);
+
+    const inputStyle =
+        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
     const handleGenerateGcode = () => {
         const generator = new StockTurningGenerator({
@@ -118,7 +121,13 @@ const RotarySurfacing = () => {
             enableRehoming: surfacingState.enableRehoming,
         });
 
-        setGcode(generator.generate());
+        const gcode = generator.generate();
+        setGcode(gcode);
+
+        const name = 'gSender_Surfacing';
+        const file = new File([gcode], name);
+
+        uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
     };
 
     const handleLoadToMainVisualizer = async () => {
@@ -130,8 +139,9 @@ const RotarySurfacing = () => {
             VISUALIZER_PRIMARY,
         );
 
-        setOpen(false);
         setGcode('');
+
+        navigate('/');
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,14 +153,6 @@ const RotarySurfacing = () => {
         }));
     };
 
-    const handleOpenChange = (open: boolean) => {
-        setOpen(open);
-
-        if (!open) {
-            setGcode('');
-        }
-    };
-
     const shuttleControlEvents = {
         TOGGLE_ROTARY_SURFACING: {
             title: 'Toggle Rotary Surfacing Display',
@@ -159,7 +161,7 @@ const RotarySurfacing = () => {
             preventDefault: false,
             isActive: true,
             category: TOOLBAR_CATEGORY,
-            callback: () => setOpen((prev) => !prev),
+            callback: () => navigate('/tools/rotary-surfacing'),
         },
     };
 
@@ -167,45 +169,43 @@ const RotarySurfacing = () => {
     useShuttleEvents(shuttleControlEvents);
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                <Button size="sm" onClick={() => setOpen(true)}>
-                    Rotary Surfacing
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white w-11/12 max-w-6xl">
-                <DialogHeader>
-                    <DialogTitle>Rotary Surfacing</DialogTitle>
-                    <DialogDescription>
-                        Make sure that your tool clears the surface of your
-                        material without running into the limits of your Z-axis.{' '}
-                        You should also use the probing feature to zero your
-                        Z-axis to the centerline before surfacing.
-                    </DialogDescription>
-                </DialogHeader>
+        <div>
+            <div className="bg-white w-full flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 xl:gap-2">
+                        <p className="text-sm xl:text-base">
+                            Make sure that your tool clears the surface of your
+                            material without running into the limits of your
+                            Z-axis. You should also use the probing feature to
+                            zero your Z-axis to the centerline before surfacing.
+                        </p>
                         <InputArea label="Length">
                             <Input
                                 id="length"
                                 value={surfacingState.length}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
                         <InputArea label="Start & Final Diameter">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Input
                                     id="startDiameter"
                                     value={surfacingState.startDiameter}
                                     onChange={handleChange}
+                                    className={inputStyle}
                                     suffix={units}
                                 />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
                                 <Input
                                     id="finalDiameter"
                                     value={surfacingState.finalDiameter}
                                     onChange={handleChange}
+                                    className={inputStyle}
                                     suffix={units}
                                 />
                             </div>
@@ -216,6 +216,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.stepdown}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
@@ -225,6 +226,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.bitDiameter}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={units}
                             />
                         </InputArea>
@@ -234,6 +236,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.stepover}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix="%"
                             />
                         </InputArea>
@@ -243,6 +246,8 @@ const RotarySurfacing = () => {
                                 value={surfacingState.spindleRPM}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
+                                suffix="RPM"
                             />
                         </InputArea>
                         <InputArea label="Feedrate">
@@ -251,6 +256,7 @@ const RotarySurfacing = () => {
                                 value={surfacingState.feedrate}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
+                                className={inputStyle}
                                 suffix={`${units}/min`}
                             />
                         </InputArea>
@@ -268,7 +274,7 @@ const RotarySurfacing = () => {
                                     }
                                 />
                             </InputArea>
-                            <div className="text-sm text-gray-500 mt-3">
+                            <div className="text-xs xl:text-sm text-gray-500 mt-3">
                                 This option creates a more consistent surface
                                 finish as your A axis will spin in only one
                                 direction across the entire length of your
@@ -277,46 +283,64 @@ const RotarySurfacing = () => {
                             </div>
                         </div>
                     </div>
-
-                    <Tabs
-                        defaultValue="visualizer"
-                        className="flex flex-col h-full"
-                    >
-                        <TabsList className="bg-gray-100 w-full">
-                            <TabsTrigger value="visualizer" className="w-full">
-                                Visualizer Preview
-                            </TabsTrigger>
-                            <TabsTrigger value="gcode" className="w-full">
-                                G-Code{' '}
-                                {gcode.length !== 0 ? (
-                                    <span className="text-xs text-gray-500">
-                                        ({gcode.split('\n').length} lines)
-                                    </span>
-                                ) : null}
-                            </TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="gcode" className="h-full">
-                            <GcodeViewer gcode={gcode} />
-                        </TabsContent>
-                        <TabsContent value="visualizer" className="h-full">
-                            <VisualizerPreview gcode={gcode} />
-                        </TabsContent>
-                    </Tabs>
+                    <div className="flex flex-col gap-2">
+                        <Tabs defaultValue="visualizer">
+                            <TabsList className="bg-gray-100 w-full">
+                                <TabsTrigger
+                                    value="visualizer"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(false)}
+                                >
+                                    Visualizer Preview
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="gcode"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(true)}
+                                >
+                                    G-Code{' '}
+                                    {gcode.length !== 0 ? (
+                                        <span className="text-xs text-gray-500">
+                                            ({gcode.split('\n').length} lines)
+                                        </span>
+                                    ) : null}
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                            <div
+                                className={cx(
+                                    'absolute w-full h-full top-0 left-0 rounded-md',
+                                    {
+                                        invisible: tabSwitch,
+                                    },
+                                )}
+                            >
+                                <VisualizerPreview gcode={gcode} />
+                            </div>
+                            <div
+                                className={cx('h-full rounded-md relative', {
+                                    invisible: !tabSwitch,
+                                })}
+                            >
+                                <GcodeViewer gcode={gcode} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <DialogFooter>
+                <div className="flex flex-row gap-4">
                     <Button type="submit" onClick={handleGenerateGcode}>
                         Generate G-Code
                     </Button>
                     <Button
-                        disabled={!gcode}
+                        disabled={!!!gcode || isDisabled}
                         onClick={handleLoadToMainVisualizer}
                     >
                         Load to Main Visualizer
                     </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </div>
+            </div>
+        </div>
     );
 };
 

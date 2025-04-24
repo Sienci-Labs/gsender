@@ -61,6 +61,16 @@ html,
         max-height: calc(100vh - 64px);
     }
 
+    .fixed-tool-area {
+        height: calc(100vh - 224px);
+        max-height: calc(100vh - 224px);
+    }
+
+    .fixed-select-tool-area {
+        height: calc(100vh - 64px - 1.125rem - 3rem);
+        max-height: calc(100vh - 64px - 1.125rem - 3rem);
+    }
+
     .rapidButtonTransform {
         transform: scale(1.4) translatex(-20px) perspective(160px)
             rotateX(55deg);

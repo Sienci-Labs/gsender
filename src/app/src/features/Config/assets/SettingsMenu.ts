@@ -39,6 +39,7 @@ import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
 import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
+import { AutoSpinSetup } from 'app/features/Config/components/wizards/AutoSpinSetup.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -722,6 +723,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$523',
                     },
+                    {
+                        type: 'wizard',
+                        label: 'AutoSpin Setup',
+                        wizard: AutoSpinSetup,
+                        description:
+                            'Configure your EEPROM for the AutoSpin T1.  Remember to power cycle your board after running the wizard.',
+                    },
                 ],
             },
             {
@@ -989,8 +997,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length.  Limit switches required.\n\nCode runs blocks before and after the toolchange',
                         options: [
-                            'Pause',
                             'Ignore',
+                            'Pause',
                             'Standard Re-zero',
                             'Flexible Re-zero',
                             'Fixed Tool Sensor',

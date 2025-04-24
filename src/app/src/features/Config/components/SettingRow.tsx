@@ -9,14 +9,13 @@ import { NumberSettingInput } from 'app/features/Config/components/SettingInputs
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import {isSettingDefault, useSettings} from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
-import get from 'lodash/get';
 import cn from 'classnames';
 
 interface SettingRowProps {
@@ -114,6 +113,7 @@ export function SettingRow({
     const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
         useSettings();
 
+    const displaySetting = { ...setting }
     // Default function to not hidden
     let isHidden = false;
     if (setting && setting.hidden) {
@@ -136,6 +136,7 @@ export function SettingRow({
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};
+
     // if EEPROM or Hybrid and not connected, show nothing
     if (
         (setting.type === 'eeprom' || setting.type === 'hybrid') &&
@@ -155,17 +156,22 @@ export function SettingRow({
             />
         );
     }
+
+    const isDefault = isSettingDefault(populatedValue);
+
     //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
         <div
-            className={cn('p-2 flex flex-row items-center text-gray-700', {
+            className={cn('p-2 flex flex-row items-center text-gray-700 border-b border-gray-200', {
                 hidden: isHidden,
+                'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                    !isDefault,
             })}
         >
             <span className="w-1/5 dark:text-gray-400">{setting.label}</span>
             <span className="w-1/5 text-xs px-4 dark:text-gray-200">
                 {returnSettingControl(
-                    setting,
+                    displaySetting,
                     populatedValue.value,
                     setting.globalIndex,
                     changeHandler(populatedValue.globalIndex),

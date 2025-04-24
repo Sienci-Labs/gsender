@@ -76,8 +76,8 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
-                <IconButton icon={<FaPaperPlane />} disabled={false} />
+            <PopoverTrigger disabled={disabled} className="disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-300 text-xl bg-robin-500 text-white border-robin-500 gap-1 border rounded hover:opacity-90 px-3 shadow">
+                <FaPaperPlane />
             </PopoverTrigger>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
@@ -111,7 +111,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         <Switch onClick={onToggleSwap} />
                         <span>INC</span>
                     </div>
-                    <Button color="primary" onClick={goToLocation}>
+                    <Button variant="primary" onClick={goToLocation}>
                         Go!
                     </Button>
                 </div>

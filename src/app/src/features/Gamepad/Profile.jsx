@@ -117,7 +117,7 @@ const Profile = ({ data }) => {
                 </Button>
             </div>
 
-            <div className="flex gap-4 mt-4 ">
+            <div className="flex gap-4 mt-4 xl:mt-0 ">
                 <div className="w-3/5 flex flex-col gap-2">
                     <h3 className="text-2xl font-bold dark:text-white">
                         Button Actions

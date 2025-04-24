@@ -12,7 +12,7 @@ import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import store from 'app/store';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
-import {GRBL} from "app/constants";
+import { GRBL } from 'app/constants';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -125,7 +125,7 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
+            <div className="h-12 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top min-w-[250px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}
@@ -162,9 +162,13 @@ function Connection(props: ConnectionProps) {
 
 export default connect((store) => {
     const connection = get(store, 'connection', {});
-    const ports = get(connection, 'ports', []);
-    const unrecognizedPorts = get(connection, 'unrecognizedPorts', []);
-    const reportedFirmware = get(store, 'controller.type', 'Grbl');
+    const ports: Port[] = get(connection, 'ports', []);
+    const unrecognizedPorts: Port[] = get(connection, 'unrecognizedPorts', []);
+    const reportedFirmware: FirmwareFlavour = get(
+        store,
+        'controller.type',
+        'Grbl',
+    );
 
     return {
         ports,

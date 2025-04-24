@@ -92,7 +92,7 @@ export function MaintenanceList() {
                                 textAlign: 'center',
                             }}
                         >
-                            {info.renderValue() + ' Hours'}
+                            {info.renderValue() + ' Hrs'}
                         </div>
                     );
                 } else if (info.renderValue() === 'Due') {

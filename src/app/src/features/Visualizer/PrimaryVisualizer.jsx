@@ -65,7 +65,7 @@ const PrimaryVisualizer = ({
         <Widget className="w-full p-1">
             <Widget.Content id={containerID} className="w-full">
                 {showLoading && (
-                    <div className="z-10 relative bg-gray-100 w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="z-10 relative bg-gray-100 dark:bg-dark w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Loading />
                         <LoadingAnimation />
                     </div>

@@ -25,15 +25,13 @@ import cx from 'classnames';
 import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
-import { FileData } from '..';
 import isElectron from 'is-electron';
-import get from 'lodash/get';
 
 interface Props {
-    handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
+    handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
 }
 
-const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
+const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
     const { name, size, total, path, fileLoaded, fileProcessing } =
         useTypedSelector((state) => state.file);
 
@@ -56,7 +54,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             pubsub.subscribe(
                 'recent-files-updated',
                 (_: string, files: RecentFile[]) => {
-                    setRecentFiles(files);
+                    setRecentFiles(files.slice());
                 },
             ),
             pubsub.subscribe('lastJob', (_: string, job: Job) => {
@@ -121,12 +119,16 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                                         <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
                                             <RiFolderUploadLine
                                                 onClick={() =>
-                                                    handleElectronFileUpload(
+                                                    handleRecentFileUpload(
                                                         {
-                                                            name: file.fileName,
-                                                            data: file.fileData,
-                                                            size: file.fileSize,
-                                                            path: file.filePath,
+                                                            fileName:
+                                                                file.fileName,
+                                                            fileSize:
+                                                                file.fileSize,
+                                                            filePath:
+                                                                file.filePath,
+                                                            timeUploaded:
+                                                                file.timeUploaded,
                                                         },
                                                         true,
                                                     )
@@ -228,7 +230,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
     }
 
     return (
-        <div className="flex flex-col gap-1 justify-center p-2 items-center h-full self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col mt-2 justify-center items-start self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -252,13 +254,15 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             </div>
 
             {path && (
-                <div className="text-gray-500 text-xs">
+                <div className="text-gray-500 text-xs max-w-full flex flex-row">
                     <span>Path: </span>
-                    <span>{path}</span>
+                    <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
+                        {path}
+                    </span>
                 </div>
             )}
 
-            <div className="flex gap-2 min-w-64 self-center justify-center items-center">
+            <div className="flex gap-2 min-w-64 self-center justify-center items-start">
                 <div className="flex flex-col items-center mr-1">
                     <span className="text-gray-500">Info</span>
                     <Switch
@@ -269,7 +273,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                     <span className="text-gray-500">Size</span>
                 </div>
 
-                <div className="w-full h-[115px] overflow-auto">
+                <div className="w-full overflow-auto">
                     <ToggleOutput />
                 </div>
             </div>

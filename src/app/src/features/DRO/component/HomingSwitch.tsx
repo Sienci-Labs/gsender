@@ -24,7 +24,7 @@ export function HomingSwitch({
                 disabled={disabled}
                 className={cn({ hidden: !singleAxisHoming })}
             />
-            <Button color="alt" onClick={homeMachine} disabled={disabled}>
+            <Button size="sm" variant="primary" onClick={homeMachine} disabled={disabled}>
                 Home
             </Button>
         </>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Select from 'react-select';
-import { LuArrowRight } from 'react-icons/lu';
+import { LuArrowRight, LuRefreshCw } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
 import { Button } from 'app/components/Button';
@@ -29,6 +29,8 @@ import { Jogging } from '../../Jogging';
 import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
+import { jogAxis } from 'app/features/Jogging/utils/Jogging';
+import { toast } from 'app/lib/toaster';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -55,8 +57,21 @@ const Steps = () => {
         setMeasuredDistance(100);
     };
 
-    const eepromKey = getEEPROMSettingKey(selectedAxis);
+    const handleUpdateEEPROM = () => {
+        const currentStepsPerMM = Number(settings[eepromKey as EEPROM]);
 
+        const newStepsPerMM = calculateNewStepsPerMM({
+            originalStepsPerMM: currentStepsPerMM,
+            givenDistanceMoved: moveDistance,
+            actualDistanceMoved: measuredDistance,
+        });
+
+        controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`]);
+
+        toast.info('Updated steps-per-mm value');
+    };
+
+    const eepromKey = getEEPROMSettingKey(selectedAxis);
     const currentStepsPerMM = Number(settings[eepromKey as EEPROM]);
 
     const isCompleted =
@@ -83,9 +98,9 @@ const Steps = () => {
         }[selectedAxis];
 
         return (
-            <div className="flex flex-col gap-4">
-                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
-                    <div className="space-y-6">
+            <div className="flex flex-col gap-4 xl:gap-0">
+                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
+                    <div className="space-y-1 text-xs xl:text-sm">
                         <p className="dark:text-white">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
@@ -144,7 +159,7 @@ const Steps = () => {
                         </div>
 
                         {!isConnected && (
-                            <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
+                            <div className="text-yellow-800 bg-yellow-100 text-sm p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
                                     Please connect to a device before starting
                                     the movement tuning wizard.
@@ -156,7 +171,7 @@ const Steps = () => {
                         <img
                             src={starterImage}
                             alt="Movement Tuning Example"
-                            className="w-full h-auto border border-gray-200 rounded-lg"
+                            className="w-[440px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-white">
@@ -244,10 +259,13 @@ const Steps = () => {
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>
+                                    <AlertDialogCancel className="border-none">
                                         No, Cancel
                                     </AlertDialogCancel>
-                                    <AlertDialogAction className="bg-blue-500 hover:bg-blue-800 text-white">
+                                    <AlertDialogAction
+                                        className="border border-blue-500"
+                                        onClick={handleUpdateEEPROM}
+                                    >
                                         Yes, Update Steps-Per-MM
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -255,9 +273,12 @@ const Steps = () => {
                         </AlertDialog>
                     </div>
                     <div className="flex gap-4 shrink-0">
-                        <Button onClick={reset} variant="outline">
-                            Restart Wizard
-                        </Button>
+                        <Button
+                            onClick={reset}
+                            variant="outline"
+                            icon={<LuRefreshCw className="w-4 h-4" />}
+                            text="Restart Wizard"
+                        />
                     </div>
                 </div>
             );
@@ -274,9 +295,12 @@ const Steps = () => {
                 </div>
 
                 <div className="flex gap-4 shrink-0">
-                    <Button onClick={reset} variant="outline">
-                        Restart Wizard
-                    </Button>
+                    <Button
+                        onClick={reset}
+                        variant="outline"
+                        icon={<LuRefreshCw className="w-4 h-4" />}
+                        text="Restart Wizard"
+                    />
                 </div>
             </div>
         );
@@ -322,13 +346,7 @@ const Steps = () => {
                                             setMarkLocationCompleted(true);
                                             setCurrentStep(1);
                                         }}
-                                        className={`${
-                                            currentStep === 0
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : markLocationCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300'
-                                        } text-white`}
+                                        variant="secondary"
                                     >
                                         Mark First Location
                                     </Button>
@@ -362,19 +380,17 @@ const Steps = () => {
                                             moveAxisCompleted
                                         }
                                         onClick={() => {
-                                            controller.command('gcode', [
-                                                `$J=G91 ${selectedAxis}${moveDistance} F1000`,
-                                            ]);
+                                            jogAxis(
+                                                {
+                                                    [selectedAxis.toUpperCase()]:
+                                                        moveDistance,
+                                                },
+                                                1000,
+                                            );
                                             setMoveAxisCompleted(true);
                                             setCurrentStep(2);
                                         }}
-                                        className={`${
-                                            currentStep === 1
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : moveAxisCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                        } text-white`}
+                                        variant="alt"
                                     >
                                         Move {selectedAxis.toUpperCase()}-axis
                                     </Button>
@@ -389,11 +405,9 @@ const Steps = () => {
                                                 )
                                             }
                                             disabled={currentStep !== 1}
-                                            className="w-24"
+                                            className="w-28"
+                                            suffix="mm"
                                         />
-                                        <span className="text-gray-500">
-                                            mm
-                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -428,13 +442,6 @@ const Steps = () => {
                                             setSetTravelCompleted(true);
                                             setCurrentStep(3);
                                         }}
-                                        className={`${
-                                            currentStep === 2
-                                                ? 'bg-green-500 hover:bg-green-600'
-                                                : setTravelCompleted
-                                                  ? 'bg-blue-500'
-                                                  : 'bg-gray-300'
-                                        } text-white`}
                                     >
                                         Set Distance Travelled
                                     </Button>
@@ -449,11 +456,9 @@ const Steps = () => {
                                                 )
                                             }
                                             disabled={currentStep !== 2}
-                                            className="w-24"
+                                            className="w-28"
+                                            suffix="mm"
                                         />
-                                        <span className="text-gray-500">
-                                            mm
-                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -477,15 +482,18 @@ const Steps = () => {
                     <img
                         src={stepImage}
                         alt="Movement Tuning Step"
-                        className="w-full h-auto border border-gray-200 rounded-lg"
+                        className="w-[450px] h-auto border border-gray-200 rounded-lg"
                     />
                 </div>
             </div>
 
             <div className="flex gap-4 shrink-0">
-                <Button onClick={reset} variant="outline">
-                    Restart Wizard
-                </Button>
+                <Button
+                    onClick={reset}
+                    variant="outline"
+                    icon={<LuRefreshCw className="w-4 h-4" />}
+                    text="Restart Wizard"
+                />
             </div>
         </div>
     );

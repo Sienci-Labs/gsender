@@ -1,6 +1,6 @@
 import { LuArrowRight } from 'react-icons/lu';
 import Button from 'app/components/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from 'app/components/Input';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';
@@ -75,7 +75,7 @@ const MeasurementStep = () => {
                         return (
                             <div
                                 key={step.buttonLabel}
-                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
                                         ? 'bg-green-50 border border-green-200'
                                         : isPastStep
@@ -117,11 +117,8 @@ const MeasurementStep = () => {
                                                             }),
                                                         );
                                                     }}
-                                                    className="w-32"
+                                                    suffix="mm"
                                                 />
-                                                <span className="text-gray-500">
-                                                    mm
-                                                </span>
                                                 <Button
                                                     disabled={
                                                         !measurementInputs[
@@ -138,11 +135,6 @@ const MeasurementStep = () => {
                                                             step.buttonLabel,
                                                         )
                                                     }
-                                                    className={`${
-                                                        step.completed
-                                                            ? 'bg-blue-500'
-                                                            : 'bg-green-500 hover:bg-green-600'
-                                                    } text-white min-w-[100px]`}
                                                 >
                                                     {step.completed
                                                         ? 'Update'

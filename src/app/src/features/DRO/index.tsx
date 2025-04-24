@@ -9,10 +9,8 @@ import {
     gotoZero,
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
-import { IconButton } from 'app/components/IconButton';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from 'app/components/Button';
-import { LuSquareParking } from 'react-icons/lu';
 import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
@@ -51,13 +49,21 @@ import { Parking } from 'app/features/DRO/component/Parking.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import controller from 'app/lib/controller';
+import {
+    BACK_RIGHT,
+    BACK_LEFT,
+    FRONT_RIGHT,
+    FRONT_LEFT,
+    getMovementGCode,
+} from './utils/RapidPosition';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 interface DROProps {
     axes: AxesArray;
     mposController: DROPosition;
     wposController: DROPosition;
     unitLabel: string;
     homingEnabled: boolean;
-    canClick: boolean;
     workflowState: string;
     isConnected: boolean;
     activeState: string;
@@ -80,6 +86,13 @@ function DRO({
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
     const { shouldWarnZero } = useWorkspaceState();
+    const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
+    const homingDirection = useTypedSelector((state) =>
+        get(state, 'controller.settings.settings.$23', '0'),
+    );
+    const pullOff = useTypedSelector((state) =>
+        get(state, 'controller.settings.settings.$27', 1),
+    );
 
     useEffect(() => {
         const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
@@ -89,6 +102,16 @@ function DRO({
             setIsRotaryMode(workspaceMode === 'ROTARY');
         });
     }, []);
+
+    function jogToCorner(corner: string) {
+        const gcode = getMovementGCode(
+            corner,
+            homingDirection,
+            homingFlag,
+            Number(pullOff),
+        );
+        controller.command('gcode', gcode);
+    }
 
     const shuttleControlEvents = {
         ZERO_X_AXIS: {
@@ -193,6 +216,46 @@ function DRO({
             category: LOCATION_CATEGORY,
             callback: () => goXYAxes(),
         },
+        HOMING_GO_TO_BACK_LEFT_CORNER: {
+            title: 'Rapid Position - Back Left Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => jogToCorner(BACK_LEFT),
+        },
+        HOMING_GO_TO_BACK_RIGHT_CORNER: {
+            title: 'Rapid Position - Back Right Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => jogToCorner(BACK_RIGHT),
+        },
+        HOMING_GO_TO_FRONT_LEFT_CORNER: {
+            title: 'Rapid Position - Front Left Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => jogToCorner(FRONT_LEFT),
+        },
+        HOMING_GO_TO_FRONT_RIGHT_CORNER: {
+            title: 'Rapid Position - Front Right Corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => jogToCorner(FRONT_RIGHT),
+        },
     };
 
     useShuttleEvents(shuttleControlEvents);
@@ -226,7 +289,7 @@ function DRO({
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (
-                    <Parking />
+                    <Parking disabled={!canClick} />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
                 )}
             </div>
@@ -317,7 +380,7 @@ function DRO({
                     />
                 )}
 
-                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button variant="alt" onClick={goXYAxes} disabled={!canClick} size="sm">
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>
@@ -336,7 +399,11 @@ export default connect((reduxStore) => {
         'controller.wpos',
         defaultDROPosition,
     );
-    const axes = get(reduxStore, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
+    const axes: AxesArray = get(reduxStore, 'controller.state.axes.axes', [
+        'X',
+        'Y',
+        'Z',
+    ]);
     const settings = get(reduxStore, 'controller.settings.settings', {});
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;

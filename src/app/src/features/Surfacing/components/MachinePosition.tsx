@@ -117,7 +117,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                                 <SpiralIcon
                                     checked={surfacing.type === SPIRAL_MOVEMENT}
                                     className={cx(
-                                        'fill-black p-4 w-20 h-20 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white ',
+                                        'fill-black p-4 w-20 h-20 xl:w-16 xl:h-16 xl:p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white ',
                                         {
                                             // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
                                             'bg-blue-50 fill-black border-blue-500':
@@ -146,7 +146,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                                         surfacing.type === ZIG_ZAG_MOVEMENT
                                     }
                                     className={cx(
-                                        'fill-black p-4 w-20 h-20 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white',
+                                        'fill-black p-4 w-20 h-20 xl:w-16 xl:h-16 xl:p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white',
                                         {
                                             // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
                                             'bg-blue-50 fill-black border-blue-500':
@@ -165,7 +165,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                     </TooltipProvider>
                 </div>
 
-                <div className="flex my-4 justify-between items-center">
+                <div className="flex mt-4 justify-between items-center">
                     <span className="font-light text-sm max-w-20 dark:text-white">
                         Flip Cut Direction
                     </span>

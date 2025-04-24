@@ -13,9 +13,6 @@ import {
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
 import get from 'lodash/get';
-import { LOCATION_CATEGORY } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
 export function RapidPositionButtons() {
     const homingFlag = useSelector(
@@ -37,52 +34,6 @@ export function RapidPositionButtons() {
         );
         controller.command('gcode', gcode);
     }
-
-    const shuttleControlEvents = {
-        HOMING_GO_TO_BACK_LEFT_CORNER: {
-            title: 'Rapid Position - Back Left Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_LEFT),
-        },
-        HOMING_GO_TO_BACK_RIGHT_CORNER: {
-            title: 'Rapid Position - Back Right Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_RIGHT),
-        },
-        HOMING_GO_TO_FRONT_LEFT_CORNER: {
-            title: 'Rapid Position - Front Left Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_LEFT),
-        },
-        HOMING_GO_TO_FRONT_RIGHT_CORNER: {
-            title: 'Rapid Position - Front Right Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_RIGHT),
-        },
-    };
-
-    useKeybinding(shuttleControlEvents);
-    useShuttleEvents(shuttleControlEvents);
 
     return (
         <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform">

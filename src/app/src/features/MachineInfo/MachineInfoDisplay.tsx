@@ -3,7 +3,6 @@ import {
     CardContent,
     CardDescription,
 } from 'app/components/shadcn/Card.tsx';
-import cx from 'classnames';
 import { TiPin, TiPinOutline } from 'react-icons/ti';
 import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
@@ -14,14 +13,11 @@ import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 
 interface MachineInfoDisplayProps {
-    open: boolean;
     pinned: boolean;
-    onClose: () => void;
     setPinned: (pinned: boolean) => void;
 }
 
 export function MachineInfoDisplay({
-    open,
     pinned,
     setPinned,
 }: MachineInfoDisplayProps) {
@@ -36,7 +32,7 @@ export function MachineInfoDisplay({
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');
 
-    const handleStepperMotorToggle = (value) => {
+    const handleStepperMotorToggle = (value: boolean) => {
         if (!controller.settings?.settings) {
             return;
         }
@@ -60,11 +56,7 @@ export function MachineInfoDisplay({
     };
 
     return (
-        <Card
-            className={cx({
-                hidden: !open,
-            })}
-        >
+        <Card>
             <CardContent className="max-sm:block -mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center bg-gray-50 w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:bg-dark dark:text-white dark:border-dark-lighter">
                 <div className="flex flex-row w-full justify-between">
                     <span className="float-left font-bold text-2xl pb-2">

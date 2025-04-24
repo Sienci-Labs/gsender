@@ -70,7 +70,7 @@ function MaintenanceTask({ task }: { task: Task }) {
         >
             <div className={'flex flex-col'}>
                 <span className={reminderStyles({ color: reminderString })}>
-                    {time} hours
+                    {time} hrs
                 </span>
                 <span className="text-gray-700 dark:text-gray-400">
                     {task.name}

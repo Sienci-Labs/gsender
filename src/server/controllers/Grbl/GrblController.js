@@ -394,10 +394,10 @@ class GrblController {
                 return;
             }
 
-            // this.emit('serialport:write', line + '\n', {
-            //     ...context,
-            //     source: WRITE_SOURCE_FEEDER
-            // });
+            this.emit('serialport:write', line + '\n', {
+                ...context,
+                source: WRITE_SOURCE_FEEDER
+            });
 
             this.connection.write(line + '\n', {
                 ...context,
@@ -561,7 +561,7 @@ class GrblController {
 
             this.emit('serialport:read', line);
 
-            this.connection.write(line + '\n');
+            this.write(line + '\n');
             log.silly(`> ${line}`);
         });
         this.sender.on('hold', noop);
@@ -1647,6 +1647,9 @@ class GrblController {
             'unlock': () => {
                 this.writeln('$X');
             },
+            'populateConfig': () => {
+                this.writeln('$$');
+            },
             'reset': () => {
                 this.workflow.stop();
 
@@ -1981,6 +1984,7 @@ class GrblController {
             },
             'toolchange:context': () => {
                 const [context] = args;
+                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {

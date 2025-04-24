@@ -32,7 +32,7 @@ function StatMenuLink({ label, href, end = false }: StatMenuProps) {
 export function StatMenu() {
     return (
         <div className="w-fit mx-auto">
-            <ul className="rounded-md flex text-sm font-medium text-center text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 dark:ring-gray-800 p-1 dark:bg-dark-lighter dark:border-gray-800 dark:text-white">
+            <ul className="fixed bottom-0 left-[55%] -translate-x-[55%] rounded-md flex text-sm font-medium text-center bg-white text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 dark:ring-gray-800 p-1 dark:bg-dark-lighter dark:border-gray-800 dark:text-white">
                 <StatMenuLink label="Overview" href={'/stats'} end />
                 <StatMenuLink label="Jobs" href={'/stats/jobs'} />
                 <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />

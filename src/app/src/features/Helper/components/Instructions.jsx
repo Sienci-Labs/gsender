@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import { useWizardContext } from 'app/features/Helper/context';
 import Substep from 'app/features/Helper/components/Substep';
 import Introduction from 'app/features/Helper/components/Introduction';

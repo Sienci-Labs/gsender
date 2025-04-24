@@ -3,21 +3,49 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 const Size = () => {
     const bbox = useTypedSelector((state) => state.file.bbox);
 
+    // if it is a whole number when rounded, don't show decimals
     const formattedBBox = {
         delta: {
-            x: bbox.delta.x.toFixed(2),
-            y: bbox.delta.y.toFixed(2),
-            z: bbox.delta.z.toFixed(2),
+            x:
+                Number(bbox.delta.x.toFixed(2)) % 1 === 0
+                    ? bbox.delta.x
+                    : bbox.delta.x.toFixed(2),
+            y:
+                Number(bbox.delta.y.toFixed(2)) % 1 === 0
+                    ? bbox.delta.y
+                    : bbox.delta.y.toFixed(2),
+            z:
+                Number(bbox.delta.z.toFixed(2)) % 1 === 0
+                    ? bbox.delta.z
+                    : bbox.delta.z.toFixed(2),
         },
         min: {
-            x: bbox.min.x.toFixed(2),
-            y: bbox.min.y.toFixed(2),
-            z: bbox.min.z.toFixed(2),
+            x:
+                Number(bbox.min.x.toFixed(2)) % 1 === 0
+                    ? bbox.min.x
+                    : bbox.min.x.toFixed(2),
+            y:
+                Number(bbox.min.y.toFixed(2)) % 1 === 0
+                    ? bbox.min.y
+                    : bbox.min.y.toFixed(2),
+            z:
+                Number(bbox.min.z.toFixed(2)) % 1 === 0
+                    ? bbox.min.z
+                    : bbox.min.z.toFixed(2),
         },
         max: {
-            x: bbox.max.x.toFixed(2),
-            y: bbox.max.y.toFixed(2),
-            z: bbox.max.z.toFixed(2),
+            x:
+                Number(bbox.max.x.toFixed(2)) % 1 === 0
+                    ? bbox.max.x
+                    : bbox.max.x.toFixed(2),
+            y:
+                Number(bbox.max.y.toFixed(2)) % 1 === 0
+                    ? bbox.max.y
+                    : bbox.max.y.toFixed(2),
+            z:
+                Number(bbox.max.z.toFixed(2)) % 1 === 0
+                    ? bbox.max.z
+                    : bbox.max.z.toFixed(2),
         },
     };
     return (
@@ -35,13 +63,13 @@ const Size = () => {
                     <td className="border border-gray-300 px-1 py-0.5 font-bold">
                         X
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.delta.x}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.min.x}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.max.x}
                     </td>
                 </tr>
@@ -49,13 +77,13 @@ const Size = () => {
                     <td className="border border-gray-300 px-1 py-0.5 font-bold">
                         Y
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.delta.y}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.min.y}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.max.y}
                     </td>
                 </tr>
@@ -63,13 +91,13 @@ const Size = () => {
                     <td className="border border-gray-300 px-1 py-0.5 font-bold">
                         Z
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.delta.z}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.min.z}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5">
+                    <td className="border border-gray-300 px-1 py-0.5 text-center">
                         {formattedBBox.max.z}
                     </td>
                 </tr>

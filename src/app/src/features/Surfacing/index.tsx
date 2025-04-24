@@ -1,21 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
-import { FaCode, FaPlay } from 'react-icons/fa';
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import store from 'app/store';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
+    METRIC_UNITS,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import { convertToMetric } from 'app/lib/units';
-import MultiInputBlock from 'app/components/MultiInputBlock';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
 import cx from 'classnames';
 import { Checkbox } from 'app/components/shadcn/Checkbox';
-import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/Input';
 import defaultState from 'app/store/defaultState';
@@ -23,23 +21,32 @@ import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';
-import Visualizer from '../Visualizer';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import Generator from './utils/surfacingGcodeGenerator';
 import { GcodeViewer } from './components/GcodeViewer';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import InputArea from 'app/components/InputArea';
+import { Button } from 'app/components/Button';
+import VisualizerPreview from './components/VisualizerPreview';
 
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const SurfacingTool = () => {
+    const navigate = useNavigate();
     const surfacingConfig = new WidgetConfig('surfacing');
     const [tabSwitch, setTabSwitch] = useState(false);
+    const [units, setUnits] = useState('mm');
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+
+    useEffect(() => {
+        const storeUnits = store.get('workspace.units', METRIC_UNITS);
+        setUnits(storeUnits);
+    }, []);
 
     const [surfacing, setSurfacing]: [
         Surfacing,
@@ -47,7 +54,21 @@ const SurfacingTool = () => {
     ] = useState(surfacingConfig.get('', defaultSurfacingState));
     const [gcode, setGcode] = useState('');
 
-    const units = store.get('workspace.units');
+    useEffect(() => {
+        if (units == IMPERIAL_UNITS) {
+            const convertedSurfacing = {
+                ...surfacing,
+                bitDiameter: convertToImperial(surfacing.bitDiameter),
+                feedrate: convertToImperial(surfacing.feedrate),
+                length: convertToImperial(surfacing.length),
+                width: convertToImperial(surfacing.width),
+                skimDepth: convertToImperial(surfacing.skimDepth),
+                maxDepth: convertToImperial(surfacing.maxDepth),
+            };
+            setSurfacing(convertedSurfacing);
+        }
+    }, [units]);
+
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
@@ -79,7 +100,6 @@ const SurfacingTool = () => {
             surfacingConfig.set('', {
                 ...surfacing,
                 bitDiameter: convertToMetric(surfacing.bitDiameter),
-                stepover: convertToMetric(surfacing.stepover),
                 feedrate: convertToMetric(surfacing.feedrate),
                 length: convertToMetric(surfacing.length),
                 width: convertToMetric(surfacing.width),
@@ -92,18 +112,20 @@ const SurfacingTool = () => {
     };
 
     const loadGcode = () => {
-        const name = 'gSender_Surfacing';
+        const name = 'gSender_Surfacing.gcode';
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
+
+        navigate('/');
     };
 
     return (
         <>
-            <div className="grid grid-rows-[5fr_1fr] h-full gap-y-4">
-                <div className="grid grid-cols-[3fr_4fr] gap-8">
-                    <div>
-                        <p className="text-base font-normal mb-4 text-gray-500 dark:text-gray-300">
+            <div className="bg-white w-full flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-4 xl:gap-2">
+                        <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit
                             switches and other add-ons, get nicer and faster
@@ -111,99 +133,88 @@ const SurfacingTool = () => {
                             turning off hard and soft limits so you don&apos;t
                             encounter alarms or errors.
                         </p>
-                        <div className="flex justify-between">
-                            <MultiInputBlock
-                                label="X & Y"
-                                divider="&"
-                                firstComponent={
-                                    <Input
-                                        type="number"
-                                        id="width"
-                                        min={1}
-                                        max={50000}
-                                        className={inputStyle}
-                                        value={surfacing.width}
-                                        onChange={(e) =>
-                                            onChange(
-                                                'width',
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                    />
-                                }
-                                secondComponent={
-                                    <Input
-                                        type="number"
-                                        id="length"
-                                        units={units}
-                                        min={1}
-                                        max={50000}
-                                        className={inputStyle}
-                                        value={surfacing.length}
-                                        onChange={(e) =>
-                                            onChange(
-                                                'length',
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                    />
-                                }
-                            />
-                        </div>
-                        <div className="flex items-center">
-                            <MultiInputBlock
-                                label="Cut Depth & Max"
-                                divider="&"
-                                firstComponent={
-                                    <Input
-                                        type="number"
-                                        id="skimDepth"
-                                        min={0.00001}
-                                        max={10000}
-                                        className={cx('rounded', inputStyle)}
-                                        value={surfacing.skimDepth}
-                                        onChange={(e) =>
-                                            onChange(
-                                                'skimDepth',
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        // tooltip={{
-                                        //     content: `Default Value: ${defaultValues.skimDepth}`,
-                                        // }}
-                                    />
-                                }
-                                secondComponent={
-                                    <Input
-                                        type="number"
-                                        id="maxDepth"
-                                        units={units}
-                                        min={0.00001}
-                                        max={10000}
-                                        className={inputStyle}
-                                        // style={{ ...inputStyles }}
-                                        value={surfacing.maxDepth}
-                                        onChange={(e) =>
-                                            onChange(
-                                                'maxDepth',
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        // tooltip={{
-                                        //     content: `Default Value: ${defaultValues.maxDepth}`,
-                                        // }}
-                                    />
-                                }
-                            />
-                        </div>
+                        <InputArea label="X & Y">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                                <Input
+                                    type="number"
+                                    id="width"
+                                    suffix={units}
+                                    min={1}
+                                    max={50000}
+                                    className={inputStyle}
+                                    value={surfacing.width}
+                                    onChange={(e) =>
+                                        onChange(
+                                            'width',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
+                                <Input
+                                    type="number"
+                                    id="length"
+                                    suffix={units}
+                                    min={1}
+                                    max={50000}
+                                    className={inputStyle}
+                                    value={surfacing.length}
+                                    onChange={(e) =>
+                                        onChange(
+                                            'length',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                            </div>
+                        </InputArea>
+                        <InputArea label="Cut Depth & Max">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                                <Input
+                                    type="number"
+                                    id="skimDepth"
+                                    suffix={units}
+                                    min={0.00001}
+                                    max={10000}
+                                    className={cx('rounded', inputStyle)}
+                                    value={surfacing.skimDepth}
+                                    onChange={(e) =>
+                                        onChange(
+                                            'skimDepth',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
+                                <Input
+                                    type="number"
+                                    id="maxDepth"
+                                    suffix={units}
+                                    min={0.00001}
+                                    max={10000}
+                                    className={inputStyle}
+                                    value={surfacing.maxDepth}
+                                    onChange={(e) =>
+                                        onChange(
+                                            'maxDepth',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                            </div>
+                        </InputArea>
 
-                        <div className="flex items-center font-light mb-4">
+                        <InputArea label="Bit Diameter">
                             <Input
-                                label="Bit Diameter"
                                 type="number"
                                 suffix={units}
                                 className={inputStyle}
                                 value={surfacing.bitDiameter}
+                                wrapperClassName="col-span-3"
                                 onChange={(e) =>
                                     onChange(
                                         'bitDiameter',
@@ -211,146 +222,131 @@ const SurfacingTool = () => {
                                     )
                                 }
                             />
-                        </div>
-                        <div className="flex items-center">
-                            <MultiInputBlock
-                                label="Cut Depth & Max"
-                                divider=""
-                                firstComponent={
-                                    <Input
-                                        type="number"
-                                        className={inputStyle}
-                                        value={surfacing.spindleRPM}
-                                        onChange={(e) =>
-                                            onChange(
-                                                'spindleRPM',
-                                                Number(e.target.value),
-                                            )
-                                        }
+                        </InputArea>
+                        <InputArea label="Spindle RPM">
+                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                                <Input
+                                    type="number"
+                                    className={inputStyle}
+                                    value={surfacing.spindleRPM}
+                                    suffix={'RPM'}
+                                    onChange={(e) =>
+                                        onChange(
+                                            'spindleRPM',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                                <div className="flex items-center gap-2 justify-center">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                        Delay
+                                    </label>
+                                    <Checkbox
+                                        checked={surfacing.shouldDwell}
+                                        onCheckedChange={(checked) => {
+                                            setSurfacing({
+                                                ...surfacing,
+                                                shouldDwell: checked as boolean,
+                                            });
+                                        }}
+                                        className="bg-white border-gray-400 rounded-sm min-h-5 min-w-5"
                                     />
-                                }
-                                secondComponent={
-                                    <div className="flex items-center gap-2 justify-center">
-                                        <span className="text-lg font-light dark:text-white">
-                                            Delay
-                                        </span>
-                                        <Checkbox
-                                            checked={surfacing.shouldDwell}
-                                            onCheckedChange={(checked) => {
-                                                setSurfacing({
-                                                    ...surfacing,
-                                                    shouldDwell:
-                                                        checked as boolean,
-                                                });
-                                            }}
-                                            className="bg-white border-gray-400 rounded-sm min-h-5 min-w-5"
-                                        />
-                                    </div>
-                                }
-                            />
-                        </div>
-                        <div className="flex items-center font-light mb-4">
+                                </div>
+                            </div>
+                        </InputArea>
+                        <InputArea label="Feedrate">
                             <Input
-                                label="Feedrate"
                                 type="number"
-                                units={`${units}/min`}
+                                suffix={`${units}/min`}
                                 className={inputStyle}
                                 value={surfacing.feedrate}
+                                wrapperClassName="col-span-3"
                                 onChange={(e) =>
                                     onChange('feedrate', Number(e.target.value))
                                 }
                             />
-                        </div>
-                        <div className="flex items-center font-light mb-4">
+                        </InputArea>
+                        <InputArea label="Stepover">
                             <Input
-                                label="Stepover"
                                 type="number"
-                                units="%"
+                                suffix="%"
                                 className={inputStyle}
                                 value={surfacing.stepover}
+                                wrapperClassName="col-span-3"
                                 onChange={(e) =>
                                     onChange('stepover', Number(e.target.value))
                                 }
                             />
-                        </div>
+                        </InputArea>
 
-                        <div className="flex items-center justify-between">
-                            <span className="text-lg font-light dark:text-white">
+                        <div className="flex flex-row items-center justify-between">
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                 Start Position
-                            </span>
-
-                            <MachinePosition
-                                surfacing={surfacing}
-                                setSurfacing={setSurfacing}
-                            />
+                            </label>
+                            <div className="flex items-center col-span-3">
+                                <MachinePosition
+                                    surfacing={surfacing}
+                                    setSurfacing={setSurfacing}
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-2">
                         <Tabs defaultValue="visualizer-preview">
-                            <TabsList>
+                            <TabsList className="bg-gray-100 w-full">
                                 <TabsTrigger
                                     value="visualizer-preview"
-                                    className="text-blue-500"
+                                    className="w-full"
                                     onClick={() => setTabSwitch(false)}
                                 >
                                     Visualizer Preview
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="gcode-viewer"
-                                    className="text-blue-500"
+                                    className="w-full"
                                     onClick={() => setTabSwitch(true)}
                                 >
-                                    G-code Viewer
+                                    G-Code{' '}
+                                    {gcode.length !== 0 ? (
+                                        <span className="text-xs text-gray-500">
+                                            ({gcode.split('\n').length} lines)
+                                        </span>
+                                    ) : null}
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-
-                        <div
-                            className={cx(
-                                'h-[600px] border border-gray-500 rounded',
-                                {
-                                    hidden: tabSwitch,
-                                },
-                            )}
-                        >
-                            <Visualizer
-                                gcode={gcode}
-                                surfacing={surfacing}
-                                isSecondary
-                            />
-                        </div>
-                        <div
-                            className={cx(
-                                'p-4 h-[600px] border border-gray-500 rounded relative',
-                                {
-                                    hidden: !tabSwitch,
-                                },
-                            )}
-                        >
-                            <GcodeViewer gcode={gcode} />
+                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                            <div
+                                className={cx(
+                                    'absolute w-full h-full top-0 left-0 rounded-md',
+                                    {
+                                        invisible: tabSwitch,
+                                    },
+                                )}
+                            >
+                                <VisualizerPreview gcode={gcode} />
+                            </div>
+                            <div
+                                className={cx('h-full rounded-md relative', {
+                                    invisible: !tabSwitch,
+                                })}
+                            >
+                                <GcodeViewer gcode={gcode} />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-4 w-4/5 m-auto">
-                    <ToolModalButton
-                        Icon={FaCode}
-                        disabled={isDisabled}
-                        className="m-0"
-                        onClick={handleGenerateGcode}
-                    >
+                <div className="flex flex-row gap-4">
+                    <Button onClick={handleGenerateGcode}>
                         Generate G-code
-                    </ToolModalButton>
-                    <Link to={'/'}>
-                        <ToolModalButton
-                            Icon={FaPlay}
-                            disabled={!!!gcode && isDisabled}
-                            className="m-0"
-                            onClick={loadGcode}
-                        >
-                            Run on Main Visualizer
-                        </ToolModalButton>
-                    </Link>
+                    </Button>
+                    <Button
+                        disabled={!!!gcode || isDisabled}
+                        onClick={loadGcode}
+                    >
+                        Load to Main Visualizer
+                    </Button>
                 </div>
             </div>
         </>

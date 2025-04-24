@@ -125,7 +125,7 @@ class DFU {
                 this.device = await WebUSBDevice.createInstance(device);
 
                 await this.device.open();
-                await delay(250);
+                await delay(450);
 
                 this.configurations = get(this.device, 'configurations');
                 this.interfaces = this.configurations[0].interfaces;

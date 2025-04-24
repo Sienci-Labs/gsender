@@ -45,8 +45,10 @@ export const convertMillisecondsToTimeStamp = (
         if (short) {
             if (hours !== 0) {
                 return `${String(hours).padStart(2, '0')}hr ${String(minutes).padStart(2, '0')}m`;
-            } else {
+            } else if (minutes !== 0) {
                 return `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+            } else {
+                return `${String(seconds).padStart(2, '0')}s`;
             }
         }
 

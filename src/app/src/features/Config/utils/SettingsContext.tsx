@@ -9,13 +9,15 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 
 import {
-    GRBL_SETTINGS,
     GRBL_HAL_SETTINGS,
+    GRBL_SETTINGS,
 } from 'app/features/Config/assets/SettingsDescriptions.ts';
 import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import defaultStoreState from 'app/store/defaultState';
+import { boolean } from 'zod';
+import isEqual from "lodash/isEqual";
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -34,6 +36,8 @@ interface iSettingsContext {
     setSearchTerm: (v) => void;
     settingsValues: gSenderSetting[];
     setSettingsValue: (v) => void;
+    settingsFilter: (v) => boolean;
+    setFilterNonDefault: () => void;
 }
 
 interface SettingsProviderProps {
@@ -51,6 +55,9 @@ const defaultState = {
     connected: false,
     settingsAreDirty: false,
     settingsValues: [],
+    settingsFilter: (v) => true,
+    toggleFilterNonDefault: () => {},
+    filterNonDefault: boolean,
 };
 
 export const SettingsContext =
@@ -62,6 +69,13 @@ export function useSettings() {
         console.error('useSettings must be used within SettingsContext');
     }
     return context;
+}
+
+export function isSettingDefault(v) {
+    if ('key' in v) {
+        return isEqual(v.value, v.defaultValue)
+    }
+    return true; // Default to true to non-key settings aren't always highlighted.
 }
 
 function fetchStoreValue(key) {
@@ -88,11 +102,13 @@ function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
         }
         ss.settings.map((s) => {
             s.settings.map((o) => {
-                o.value = fetchStoreValue(o.key);
-                o.globalIndex = index;
-                o.defaultValue = fetchDefaultValue(o.key);
-                globalValueReference.push({ ...o });
-                index++;
+                if (o.key && o.key.length > 0) {
+                    o.value = fetchStoreValue(o.key);
+                    o.globalIndex = index;
+                    o.defaultValue = fetchDefaultValue(o.key);
+                    globalValueReference.push({ ...o });
+                    index++;
+                }
             });
         });
     });
@@ -110,6 +126,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settingsAreDirty, setSettingsAreDirty] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [settingsValues, setSettingsValues] = useState([]);
+    const [filterNonDefault, setFilterNonDefault] = useState(false);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -165,6 +182,73 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         );
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
+    /**
+     * Filter for general settings.
+     * Filter EEPROM if not connected
+     * Filter EEPROM if no Value
+     * Filter remaining by matching search term
+     * @param v - The setting to filter
+     */
+    function settingsFilter(v) {
+        if (v.type === 'eeprom' || v.type === 'hybrid') {
+            // Always exclude eeprom/hybrids when not connected
+            if (!connectionState) {
+                return false;
+            }
+            // If filterNonDefault is enabled, make sure the current value equals the default value
+            if (filterNonDefault) {
+                const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+                if (EEPROMData) {
+                    return !eepromIsDefault(EEPROMData);
+                }
+                return false; // We don't know, default to hide
+            }
+        }
+
+        // Filter non-default gSender settings if they are store values (have a key)
+        if (filterNonDefault && 'key' in v) {
+            if ('defaultValue' in v) {
+                return !isEqual(settingsValues[v.globalIndex].value, v.defaultValue);
+            }
+            return false;
+        }
+
+
+        if (searchTerm.length === 0 || !searchTerm) {
+            return true;
+        }
+
+        // Hide hidden when filtering
+        if ('hidden' in v) {
+            return !v.hidden();
+        }
+
+        if (v)
+            return JSON.stringify(v)
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
+    }
+
+    function eepromIsDefault(settingData) {
+        const profileDefaults =
+            controllerType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : machineProfile.grblHALeepromSettings;
+        const inputDefault = get(profileDefaults, settingData.setting, '-');
+
+        const settingIsNumberValue = !(
+            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
+        );
+
+        return settingIsNumberValue
+            ? `${Number(settingData.value)}` === `${Number(inputDefault)}`
+            : settingData.value === inputDefault;
+    }
+
+    function toggleFilterNonDefault() {
+        setFilterNonDefault(!filterNonDefault);
+    }
+
     // Populate eeprom descriptions as needed
     useEffect(() => {
         if (!settings.length) {
@@ -211,6 +295,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSearchTerm,
         settingsValues,
         setSettingsValues,
+        settingsFilter,
+        toggleFilterNonDefault,
+        filterNonDefault,
+        eepromIsDefault,
     };
 
     return (

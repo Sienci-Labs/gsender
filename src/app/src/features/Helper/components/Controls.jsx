@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI } from 'app/features/Helper/context';

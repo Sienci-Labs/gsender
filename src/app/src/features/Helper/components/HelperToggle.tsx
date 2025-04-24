@@ -80,7 +80,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
             )}
         >
             <RiSpeakLine
-                className={`text-2xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
+                className={`w-3/5 h-3/5 text-2xl ${helperEnabled ? 'text-orange-600' : 'text-gray-400'}`}
             />
             <span className={cn('text-xs', { 'opacity-0': minimized })}>
                 {helperTitle}

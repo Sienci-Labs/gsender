@@ -45,13 +45,8 @@ const MachineInfo = () => {
                     <img src={icon} className="w-[24px]" />
                 </button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 w-auto" align="start">
-                <MachineInfoDisplay
-                    open={open}
-                    pinned={pinned}
-                    onClose={() => setOpen(false)}
-                    setPinned={setPinned}
-                />
+            <PopoverContent className="w-full" align="start">
+                <MachineInfoDisplay pinned={pinned} setPinned={setPinned} />
             </PopoverContent>
         </Popover>
     );
