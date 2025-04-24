@@ -274,6 +274,13 @@ store.on(
     }, 100),
 );
 
+store.on(
+    'replace',
+    debounce((state: any) => {
+        persist({ version: settings.version, state: state });
+    }, 100),
+);
+
 //
 // Migration
 //
