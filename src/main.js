@@ -224,8 +224,13 @@ const main = () => {
       });
 
       ipcMain.on("load-recent-file", async (msg, recentFile) => {
-        const fileMetadata = await parseAndReturnGCode(recentFile);
-        window.webContents.send("loaded-recent-file", fileMetadata);
+        try {
+          const fileMetadata = await parseAndReturnGCode(recentFile);
+          window.webContents.send("loaded-recent-file", fileMetadata);
+        } catch(err) {
+          log.error(err);
+          window.webContents.send("remove-recent-file", { err: err.message, path: recentFile.filePath });
+        }
       });
 
       ipcMain.on("logError:electron", (channel, error) => {

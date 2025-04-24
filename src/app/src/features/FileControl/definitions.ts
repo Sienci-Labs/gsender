@@ -9,7 +9,6 @@ export interface JobStatus {
 }
 
 export interface RecentFile {
-    fileData: string;
     fileSize: number;
     filePath: string,
     fileName: string,
