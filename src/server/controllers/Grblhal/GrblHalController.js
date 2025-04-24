@@ -343,6 +343,7 @@ class GrblHalController {
                 if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     console.log(this.toolChangeContext);
+                    console.log(passthroughM6);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
@@ -469,11 +470,9 @@ class GrblHalController {
                     this.updateSpindleModal(spindleCommand);
                 }
 
-                /* Emit event to UI for toolchange handler */
-                const { toolChangeOption } = this.toolChangeContext;
-                if (_.includes(words, 'M6') && toolChangeOption !== 'Passthrough') {
+                if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-
+                    const { toolChangeOption } = this.toolChangeContext;
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
@@ -512,8 +511,10 @@ class GrblHalController {
                         }
                     }
 
-
-                    line = line.replace('M6', '(M6)');
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    if (!passthroughM6 || toolChangeOption === 'Code') {
+                        line = line.replace('M6', '(M6)');
+                    }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
                 }
 
