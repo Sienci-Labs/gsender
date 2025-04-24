@@ -341,8 +341,9 @@ class GrblHalController {
 
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
-                    const { toolChangeOption } = this.toolChangeContext;
-                    if (toolChangeOption !== 'Passthrough') {
+                    const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
+                    console.log(this.toolChangeContext);
+                    if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
                             data: 'M6',
