@@ -568,7 +568,6 @@ class Visualizer extends Component {
             // instead of calling loadGCode right away,
             // use this pubsub to invoke a refresh of the visualizer wrapper.
             // this removes visual glitches that would otherwise appear.
-            console.log('called toggle');
             pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
@@ -1426,7 +1425,6 @@ class Visualizer extends Component {
                 this.setState({ layoutIsReversed });
             }),
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name }) => {
-                console.log(name);
                 const file = new File([gcode], name);
                 await uploadGcodeFileToServer(
                     file,

@@ -36,6 +36,7 @@ interface ConfirmOptions {
     onConfirm?: () => void;
     confirmLabel?: string;
     cancelLabel?: string;
+    hideClose?: boolean;
     show?: boolean;
 }
 
@@ -49,6 +50,7 @@ export const Confirm = (options: ConfirmOptions = {}): void => {
         confirmLabel = 'Confirm',
         cancelLabel = 'Cancel',
         show = true,
+        hideClose = false,
     } = options;
 
     pubsub.publish('dialog:new', {
@@ -59,6 +61,7 @@ export const Confirm = (options: ConfirmOptions = {}): void => {
         onConfirm,
         confirmLabel,
         cancelLabel,
+        hideClose,
         show,
     });
 };

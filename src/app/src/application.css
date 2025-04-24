@@ -3098,6 +3098,11 @@ video {
   background-color: rgb(168 85 247 / var(--tw-bg-opacity, 1)) !important;
 }
 
+.bg-purple-600 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(147 51 234 / var(--tw-bg-opacity, 1)) !important;
+}
+
 .bg-red-100 {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(234 125 125 / var(--tw-bg-opacity, 1)) !important;

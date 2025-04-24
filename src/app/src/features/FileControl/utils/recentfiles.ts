@@ -81,6 +81,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
         return;
     }
     const recentFiles = getRecentFiles();
+
     let sortedFiles;
 
     if (recentFileExists(fileMetaData.filePath, recentFiles)) {
@@ -91,6 +92,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
         sortedFiles = sortRecentFiles(recentFiles);
         sortedFiles = trimRecentFilesToLimit(sortedFiles);
     }
+
     updateStoredRecentFiles(sortedFiles);
     pubsub.publish('recent-files-updated', sortedFiles);
 };
@@ -140,4 +142,4 @@ export const deleteRecentFile = (filePath: string) => {
     } else {
         console.error('Recent file to be deleted cannot be found in storage');
     }
-}
+};

@@ -63,9 +63,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
             window.ipcRenderer.on(
                 'recieve-data-console',
                 (_: string, data: { port: string }) => {
-                    console.log('receiving data');
                     const { port } = data;
-                    console.log('receiving port: ' + port);
                     // set port
                     controller.port = port;
                     // add client
@@ -110,13 +108,13 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
     useEffect(() => {
         if (isElectron()) {
             registerIPCListeners();
-            addControllerEvents();
             if (isChildWindow) {
-                console.log('requesting data');
                 // ask main window for data for component we are about to render
                 window.ipcRenderer.send('get-data', 'console');
             }
         }
+
+        addControllerEvents();
 
         return () => {
             removeControllerEvents();

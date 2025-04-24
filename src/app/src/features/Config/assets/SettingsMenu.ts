@@ -39,6 +39,7 @@ import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
 import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
+import { AutoSpinSetup } from 'app/features/Config/components/wizards/AutoSpinSetup.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -722,6 +723,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$523',
                     },
+                    {
+                        type: 'wizard',
+                        label: 'AutoSpin Setup',
+                        wizard: AutoSpinSetup,
+                        description:
+                            'Configure your EEPROM for the AutoSpin T1.  Remember to power cycle your board after running the wizard.',
+                    },
                 ],
             },
             {
@@ -982,6 +990,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChange.passthrough',
                         description:
                             'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands',
+                    },
+                    {
+                        label: 'Skip Dialog',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.skipDialog',
+                        description:
+                            'Skips dialog for non-wizard options.  This will combine code blocks if using that strategy, and not send a popup for pause.',
                     },
                     {
                         type: 'select',
