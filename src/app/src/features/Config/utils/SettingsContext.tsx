@@ -17,6 +17,7 @@ import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import defaultStoreState from 'app/store/defaultState';
 import { boolean } from 'zod';
+import isEqual from "lodash/isEqual";
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -70,6 +71,13 @@ export function useSettings() {
     return context;
 }
 
+export function isSettingDefault(v) {
+    if ('key' in v) {
+        return isEqual(v.value, v.defaultValue)
+    }
+    return true; // Default to true to non-key settings aren't always highlighted.
+}
+
 function fetchStoreValue(key) {
     return store.get(key);
 }
@@ -81,8 +89,6 @@ function fetchDefaultValue(key) {
 export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
-
-export function getPopulatedMenus(settings: SettingsMenuSection[]) {}
 
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
     const globalValueReference = [];
@@ -198,6 +204,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 return false; // We don't know, default to hide
             }
         }
+
+        // Filter non-default gSender settings if they are store values (have a key)
+        if (filterNonDefault && 'key' in v) {
+            if ('defaultValue' in v) {
+                return !isEqual(settingsValues[v.globalIndex].value, v.defaultValue);
+            }
+            return false;
+        }
+
 
         if (searchTerm.length === 0 || !searchTerm) {
             return true;
