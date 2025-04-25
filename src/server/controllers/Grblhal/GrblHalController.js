@@ -1731,6 +1731,11 @@ class GrblHalController {
 
                 this.write('\x18'); // ^x
             },
+            'reset:soft': () => {
+                this.workflow.stop();
+                this.feeder.reset();
+                this.write('\x19'); // HAL soft stop command
+            },
             'reset:limit': () => {
                 this.workflow.stop();
                 this.feeder.reset();

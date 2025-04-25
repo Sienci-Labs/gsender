@@ -899,7 +899,7 @@ export function Jogging() {
                         src={stopSign}
                         className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"
                         alt="E-Stop button"
-                        onClick={cancelJog}
+                        onClick={() => cancelJog(activeState, firmware)}
                     />
                 </div>
                 <div className="flex justify-center gap-4">
