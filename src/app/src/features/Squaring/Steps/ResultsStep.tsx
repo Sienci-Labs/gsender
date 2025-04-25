@@ -5,7 +5,6 @@ import Button from 'app/components/Button';
 import controller from 'app/lib/controller';
 
 import { useSquaring } from '../context/SquaringContext';
-import TriangleDiagram from '../components/TriangleDiagram';
 import {
     calculateHypotenuse,
     calculateAngle,
@@ -36,8 +35,8 @@ const ResultsStep = () => {
     const handleUpdateEEPROM = async () => {
         setIsUpdating(true);
         try {
-            const $100 = eepromAdjustment.x.amount;
-            const $101 = eepromAdjustment.y.amount;
+            const $100 = eepromAdjustment.x.amount.toFixed(3);
+            const $101 = eepromAdjustment.y.amount.toFixed(3);
 
             controller.command('gcode', [`$100=${$100}`, `$101=${$101}`]);
 
