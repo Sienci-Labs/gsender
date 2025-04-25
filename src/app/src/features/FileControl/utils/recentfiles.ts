@@ -103,7 +103,7 @@ export const getRecentFiles = (): RecentFile[] => {
 };
 
 export const updateStoredRecentFiles = (recentFiles: RecentFile[]) => {
-    store.replace('workspace.recentFiles', recentFiles.slice());
+    store.replace('workspace.recentFiles', recentFiles);
 };
 
 export const trimRecentFilesToLimit = (
@@ -133,17 +133,12 @@ export const loadRecentFile = (filePath: string) => {
 
 export const deleteRecentFile = (filePath: string) => {
     let savedFiles: RecentFile[] = store.get('workspace.recentFiles', []);
-    const indexToDelete = savedFiles.findIndex(
-        (file, _index) => file.filePath === filePath,
-    );
-    if (indexToDelete > -1) {
-        // sanity check
-        savedFiles.splice(indexToDelete, 1);
-        updateStoredRecentFiles(savedFiles);
-        pubsub.publish(
-            'recent-files-updated',
-            trimRecentFilesToLimit(savedFiles),
-        );
+    let updatedFiles = savedFiles.slice();
+    const indexToDelete = updatedFiles.findIndex((file, _index) => file.filePath === filePath);
+    if (indexToDelete > -1) { // sanity check
+        updatedFiles.splice(indexToDelete, 1);
+        updateStoredRecentFiles(updatedFiles);
+        pubsub.publish('recent-files-updated', updatedFiles);
     } else {
         console.error('Recent file to be deleted cannot be found in storage');
     }

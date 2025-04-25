@@ -992,6 +992,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands',
                     },
                     {
+                        label: 'Skip Dialog',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.skipDialog',
+                        description:
+                            'Skips dialog for non-wizard options.  This will combine code blocks if using that strategy, and not send a popup for pause.',
+                    },
+                    {
                         type: 'select',
                         label: 'Strategy',
                         description:

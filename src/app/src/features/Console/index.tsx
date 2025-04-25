@@ -108,12 +108,13 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
     useEffect(() => {
         if (isElectron()) {
             registerIPCListeners();
-            addControllerEvents();
             if (isChildWindow) {
                 // ask main window for data for component we are about to render
                 window.ipcRenderer.send('get-data', 'console');
             }
         }
+
+        addControllerEvents();
 
         return () => {
             removeControllerEvents();

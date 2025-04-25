@@ -554,24 +554,27 @@ export function* initialize(): Generator<any, void, any> {
             context,
             comment,
         };
+        const skipDialog = store.get('workspace.toolChange.skipDialog', false);
 
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
-            toast.info(msg);
+            if (!skipDialog) {
+                toast.info(msg);
+            }
         } else {
             let title, instructions;
 
             if (option === 'Standard Re-zero') {
                 title = 'Standard Re-zero Tool Change';
                 instructions = manualToolChange;
-            } else if (option === '') {
+            } else if (option === 'Flexible Re-zero') {
                 title = 'Flexible Re-zero Tool Change';
                 instructions =
                     count > 1
                         ? semiautoToolchangeSecondRun
                         : semiautoToolChange;
-            } else if (option === '') {
+            } else if (option === 'Fixed Tool Sensor') {
                 title = 'Fixed Tool Sensor Tool Change';
                 instructions =
                     count > 1
