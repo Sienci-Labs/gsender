@@ -3337,6 +3337,14 @@ video {
   fill: #689AC9 !important;
 }
 
+.fill-gray-200 {
+  fill: #e5e7eb !important;
+}
+
+.fill-gray-300 {
+  fill: #d1d5db !important;
+}
+
 .stroke-black {
   stroke: #000 !important;
 }
@@ -4795,6 +4803,22 @@ html,
   fill: #fff !important;
 }
 
+.hover\:fill-red-200:hover {
+  fill: #e76767 !important;
+}
+
+.hover\:fill-blue-200:hover {
+  fill: #79aad8 !important;
+}
+
+.hover\:fill-red-600:hover {
+  fill: #c62222 !important;
+}
+
+.hover\:fill-gray-500:hover {
+  fill: #6b7280 !important;
+}
+
 .hover\:text-blue-500:hover {
   --tw-text-opacity: 1 !important;
   color: rgb(63 133 199 / var(--tw-text-opacity, 1)) !important;
@@ -4963,6 +4987,14 @@ html,
   fill: #3c74a9 !important;
 }
 
+.active\:fill-red-700:active {
+  fill: #b01e1e !important;
+}
+
+.active\:fill-gray-500:active {
+  fill: #6b7280 !important;
+}
+
 .active\:shadow-\[inset_7px_4px_6px_0px_rgba\(59\2c _130\2c _246\2c _0\.1\)\]:active {
   --tw-shadow: inset 7px 4px 6px 0px rgba(59, 130, 246, 0.1) !important;
   --tw-shadow-colored: inset 7px 4px 6px 0px var(--tw-shadow-color) !important;
@@ -5003,6 +5035,10 @@ html,
 
 .disabled\:bg-opacity-15:disabled {
   --tw-bg-opacity: 0.15 !important;
+}
+
+.disabled\:fill-gray-500:disabled {
+  fill: #6b7280 !important;
 }
 
 .disabled\:text-black:disabled {

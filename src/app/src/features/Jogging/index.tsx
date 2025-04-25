@@ -40,6 +40,7 @@ import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import { inRange, throttle } from 'lodash';
 import { GamepadProfile } from 'app/lib/gamepad/definitions';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { StopButton } from 'app/features/Jogging/components/StopButton.tsx';
 
 // Define a type that represents what gamepad.getInstance() actually returns
 interface GamepadInstance {
@@ -92,11 +93,13 @@ export function Jogging() {
         return get(state, 'controller.state.status.activeState', 'Idle');
     });
 
-    const firmwareType = useSelector((state: RootState) => state.controller.type);
+    const firmwareType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
 
     useEffect(() => {
-        setFirmware(firmwareType)
-    }, [firmwareType])
+        setFirmware(firmwareType);
+    }, [firmwareType]);
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -895,12 +898,17 @@ export function Jogging() {
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
                     />
-                    <img
-                        src={stopSign}
-                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"
-                        alt="E-Stop button"
+                    <StopButton
+                        disabled={!isConnected}
                         onClick={() => cancelJog(activeState, firmware)}
                     />
+                    {/*<img
+                        src={stopSign}
+                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 hover:fill-red-200"
+                        alt="E-Stop button"
+
+                        onClick={() => cancelJog(activeState, firmware)}
+                    />*/}
                 </div>
                 <div className="flex justify-center gap-4">
                     <ZJog
