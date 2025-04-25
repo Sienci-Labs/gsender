@@ -92,6 +92,12 @@ export function Jogging() {
         return get(state, 'controller.state.status.activeState', 'Idle');
     });
 
+    const firmwareType = useSelector((state: RootState) => state.controller.type);
+
+    useEffect(() => {
+        setFirmware(firmwareType)
+    }, [firmwareType])
+
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
