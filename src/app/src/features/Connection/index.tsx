@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
-import { ConnectionStateIndicator } from './components/ConnectionStateIndicator';
-import { ConnectionInfo } from './components/ConnectionInfo';
-//import styles from './assets/animations.module.css';
+import ip from 'ip';
 import cn from 'classnames';
-import { refreshPorts, refreshPortsOnParentEntry } from './utils/connection';
-import { PortListings } from './components/PortListings';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+
 import controller from 'app/lib/controller';
+import store from 'app/store';
+import { GRBL } from 'app/constants';
+
+import { ConnectionStateIndicator } from './components/ConnectionStateIndicator';
+import { ConnectionInfo } from './components/ConnectionInfo';
+import { refreshPorts, refreshPortsOnParentEntry } from './utils/connection';
+import { PortListings } from './components/PortListings';
 import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
-import store from 'app/store';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
-import { GRBL } from 'app/constants';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -58,9 +60,11 @@ function Connection(props: ConnectionProps) {
         setFirmware(preferredFirmware);
 
         refreshPorts();
+
+        setTimeout(() => attemptAutoConnect(), 500);
     }, []);
 
-    function onConnectClick(port: string, type: ConnectionType) {
+    function handleConnect(port: string, type: ConnectionType) {
         if (!port) {
             console.assert('Connect called with empty port');
         }
@@ -109,6 +113,19 @@ function Connection(props: ConnectionProps) {
         });
     }
 
+    function attemptAutoConnect() {
+        const autoReconnect = connectionConfig.get('autoReconnect', false);
+        const port = connectionConfig.get('port', null);
+
+        if (connectionState !== ConnectionState.DISCONNECTED || !autoReconnect)
+            return;
+
+        // TODO: Add autoconnect for ethernet
+        if (ip.isV4Format(port)) return;
+
+        handleConnect(port, ConnectionType.USB);
+    }
+
     useEffect(() => {
         setFirmware(props.reportedFirmware);
     }, [props.reportedFirmware]);
@@ -147,7 +164,7 @@ function Connection(props: ConnectionProps) {
                 {(connectionState == ConnectionState.DISCONNECTED ||
                     connectionState === ConnectionState.ERROR) && (
                     <PortListings
-                        connectHandler={onConnectClick}
+                        connectHandler={handleConnect}
                         unrecognizedPorts={props.unrecognizedPorts}
                         ports={props.ports}
                     />
