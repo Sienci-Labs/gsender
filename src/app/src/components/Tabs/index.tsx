@@ -13,7 +13,7 @@ interface TabbedProps {
 }
 
 export const Tabs = ({ items = [] }: TabbedProps) => {
-    const [activeTab, setActiveTab] = useState('');
+    const [activeTab, setActiveTab] = useState(items[0]?.label);
     const tabsRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
