@@ -26,7 +26,6 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 
-import stopSign from './assets/stop.svg';
 import jogWheeelLabels from './assets/labels.svg';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toast } from 'app/lib/toaster';
@@ -541,6 +540,8 @@ export function Jogging() {
         axis: { [key: string]: number } | null;
     }) => {
         const currentJogSpeed = jogSpeedRef.current;
+        console.log('current', currentJogSpeed);
+        console.log(currentJogSpeed);
 
         if (!axis || !canJog()) {
             return;
