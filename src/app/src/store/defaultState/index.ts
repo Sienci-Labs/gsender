@@ -336,6 +336,7 @@ const defaultState: State = {
             theme: 'Dark',
             SVGEnabled: false,
             jobEndModal: true,
+            maintenanceTaskNotifications: true,
             gcode: {
                 displayName: true,
             },
