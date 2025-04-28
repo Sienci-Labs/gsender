@@ -5573,6 +5573,14 @@ html,
   background-color: rgb(66 32 6 / var(--tw-bg-opacity, 1)) !important;
 }
 
+.dark\:bg-transparent:is(.dark *) {
+  background-color: transparent !important;
+}
+
+.dark\:bg-none:is(.dark *) {
+  background-image: none !important;
+}
+
 .dark\:fill-gray-700:is(.dark *) {
   fill: #374151 !important;
 }
