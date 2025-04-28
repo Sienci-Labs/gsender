@@ -23,6 +23,7 @@
 
 import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
+import { FaBan, FaRedoAlt } from 'react-icons/fa';
 
 type Props = {
     actions: {
@@ -47,26 +48,23 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     onClick={actions.sendM3}
                     disabled={!canClick}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt" />
-                    For (M3)
-                </Button>
+                    icon={<FaRedoAlt />}
+                    text="For M3"
+                />
                 <Button
                     onClick={actions.sendM4}
                     disabled={!canClick}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt fa-flip-horizontal" />
-                    Rev (M4)
-                </Button>
+                    icon={<FaRedoAlt className="fa-flip-horizontal" />}
+                    text="Rev M4"
+                />
                 <Button
                     onClick={actions.sendM5}
                     disabled={!canClick}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-ban" />
-                    Stop (M5)
-                </Button>
+                    icon={<FaBan />}
+                    text="Stop M5 "
+                />
             </div>
             <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
                 <span>Speed</span>
