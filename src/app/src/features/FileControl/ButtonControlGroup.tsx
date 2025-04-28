@@ -47,6 +47,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
+import {toast} from "app/lib/toaster";
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -178,6 +179,7 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
+        toast('G-code File Closed');
 
         fileInputRef.current.value = '';
     }, 100);
