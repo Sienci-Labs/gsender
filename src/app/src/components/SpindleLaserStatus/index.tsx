@@ -1,15 +1,17 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import { SpindleLaserStatusVariant } from './SpindleLaserStatusVariant';
+import store from 'app/store';
 
 const SpindleLaserStatus = () => {
     const { isConnected } = useTypedSelector((state) => state.connection);
     const { settings } = useTypedSelector((state) => state.controller.settings);
     const { spindle } = useTypedSelector((state) => state.controller.modal);
+    const spindleFunctions = store.get('workspace.spindleFunctions', false);
 
     if (!isConnected) return null;
 
-    const spindleOn = spindle !== 'M5';
+    const spindleOn = spindleFunctions && spindle !== 'M5';
 
     const label = {
         '0': (
