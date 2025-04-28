@@ -40,6 +40,8 @@ import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import { inRange, throttle } from 'lodash';
 import { GamepadProfile } from 'app/lib/gamepad/definitions';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 // Define a type that represents what gamepad.getInstance() actually returns
 interface GamepadInstance {
@@ -57,7 +59,8 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
-    const { mode, units } = useWorkspaceState();
+    const { mode } = useWorkspaceState();
+    const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
@@ -92,11 +95,11 @@ export function Jogging() {
         return get(state, 'controller.state.status.activeState', 'Idle');
     });
 
-    const firmwareType = useSelector((state: RootState) => state.controller.type);
+    const firmwareType = useTypedSelector((state) => state.controller.type);
 
     useEffect(() => {
-        setFirmware(firmwareType)
-    }, [firmwareType])
+        setFirmware(firmwareType as FirmwareFlavour);
+    }, [firmwareType]);
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -937,13 +940,14 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmware === 'grblHAL' || isRotaryMode) && (
-                            <JogInput
-                                label="A°"
-                                currentValue={jogSpeed.aStep}
-                                onChange={updateAStep}
-                            />
-                        )}
+                        {(firmware === 'grblHAL' || isRotaryMode) &&
+                            rotaryWidgetState.tab.show && (
+                                <JogInput
+                                    label="A°"
+                                    currentValue={jogSpeed.aStep}
+                                    onChange={updateAStep}
+                                />
+                            )}
                         <JogInput
                             label="at"
                             currentValue={jogSpeed.feedrate}
