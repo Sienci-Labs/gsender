@@ -3337,14 +3337,6 @@ video {
   fill: #689AC9 !important;
 }
 
-.fill-gray-200 {
-  fill: #e5e7eb !important;
-}
-
-.fill-gray-300 {
-  fill: #d1d5db !important;
-}
-
 .stroke-black {
   stroke: #000 !important;
 }
@@ -4799,24 +4791,20 @@ html,
   fill: #9ca3af !important;
 }
 
-.hover\:fill-white:hover {
-  fill: #fff !important;
+.hover\:fill-gray-500:hover {
+  fill: #6b7280 !important;
 }
 
 .hover\:fill-red-200:hover {
   fill: #e76767 !important;
 }
 
-.hover\:fill-blue-200:hover {
-  fill: #79aad8 !important;
-}
-
 .hover\:fill-red-600:hover {
   fill: #c62222 !important;
 }
 
-.hover\:fill-gray-500:hover {
-  fill: #6b7280 !important;
+.hover\:fill-white:hover {
+  fill: #fff !important;
 }
 
 .hover\:text-blue-500:hover {
@@ -4983,16 +4971,16 @@ html,
   fill: #2c5d8b !important;
 }
 
-.active\:fill-robin-700:active {
-  fill: #3c74a9 !important;
+.active\:fill-gray-500:active {
+  fill: #6b7280 !important;
 }
 
 .active\:fill-red-700:active {
   fill: #b01e1e !important;
 }
 
-.active\:fill-gray-500:active {
-  fill: #6b7280 !important;
+.active\:fill-robin-700:active {
+  fill: #3c74a9 !important;
 }
 
 .active\:shadow-\[inset_7px_4px_6px_0px_rgba\(59\2c _130\2c _246\2c _0\.1\)\]:active {

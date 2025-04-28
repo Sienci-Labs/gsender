@@ -34,7 +34,7 @@ const Overrides: React.FC<OverridesProps> = ({
     isConnected,
 }) => {
     const [showSpindleOverride, setShowSpindleOverride] = useState(
-        store.get('workspace.machineProfile.spindle'),
+        store.get('workspace.spindleFunctions'),
     );
     const [spindleOverrideLabel, setSpindleOverrideLabel] = useState(
         store.get('widgets.spindle.mode') === SPINDLE_MODE
@@ -51,7 +51,7 @@ const Overrides: React.FC<OverridesProps> = ({
     }
 
     const handleStoreChange = () => {
-        setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
+        setShowSpindleOverride(store.get('workspace.spindleFunctions'));
         setSpindleOverrideLabel(
             store.get('widgets.spindle.mode', SPINDLE_MODE) === SPINDLE_MODE
                 ? 'Spindle'
