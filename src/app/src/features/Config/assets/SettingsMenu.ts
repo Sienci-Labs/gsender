@@ -199,14 +199,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Enable Notification on Job End',
+                        label: 'Job End Notifications',
                         key: 'widgets.visualizer.jobEndModal',
                         description:
                             'Show a pop up with job details after a job finishes.',
                         type: 'boolean',
                     },
                     {
-                        label: 'Enable Maintenance Task Notifications',
+                        label: 'Maintenance Task Notifications',
                         key: 'widgets.visualizer.maintenanceTaskNotifications',
                         description:
                             'Alert with upcoming maintenance tasks on application start.',
