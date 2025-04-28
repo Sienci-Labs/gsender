@@ -26,6 +26,7 @@ import React from 'react';
 import Button from 'app/components/Button';
 import Slider from './Slider';
 import { Input } from 'app/components/Input';
+import { FaLightbulb, FaSatelliteDish } from 'react-icons/fa';
 
 type Props = {
     actions: LaserActions;
@@ -61,24 +62,21 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                 <Button
                     onClick={actions.sendLaserM3}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-lightbulb" />
-                    Laser On
-                </Button>
+                    icon={<FaLightbulb />}
+                    text="Laser On"
+                />
                 <Button
                     onClick={actions.runLaserTest}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-satellite-dish" />
-                    Laser Test
-                </Button>
+                    icon={<FaSatelliteDish />}
+                    text="Laser Test"
+                />
                 <Button
                     onClick={actions.sendM5}
                     color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="far fa-lightbulb" />
-                    Laser Off
-                </Button>
+                    icon={<FaLightbulb />}
+                    text="Laser Off"
+                />
             </div>
             <Slider
                 label="Power"

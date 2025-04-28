@@ -654,9 +654,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable Spindle functionalities',
+                        label: 'Enable Spindle/Laser functionalities',
                         description:
-                            'Enable Spindle tab and related functionalities on main user interface.',
+                            'Enable Spindle/Laser tab and related functionalities on main user interface.',
                         key: 'workspace.spindleFunctions',
                     },
                     {
