@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+
 import { Axis } from 'app/features/DRO/utils/DRO.ts';
 
 export interface WCSInputProps {
@@ -14,7 +15,7 @@ export function WCSInput({
     movementHandler,
     axis,
 }: WCSInputProps) {
-    const inputRef = useRef<HTMLInputElement>();
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {

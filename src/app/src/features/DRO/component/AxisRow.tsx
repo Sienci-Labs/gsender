@@ -20,20 +20,23 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 
 interface AxisRowProps {
+    label: string;
     axis: Axis;
     mpos: string;
     wpos: string;
     disabled: boolean;
-    key: string;
     homingMode: boolean;
+    disablePositionUpdate?: boolean;
 }
 
 export function AxisRow({
+    label,
     axis,
     mpos,
     wpos,
     disabled,
     homingMode,
+    disablePositionUpdate,
 }: AxisRowProps) {
     const { shouldWarnZero } = useWorkspaceState();
 
@@ -53,7 +56,7 @@ export function AxisRow({
                     size="sm"
                 >
                     <span className="font-bold font-mono text-xl transition-all transition-duration-300">
-                        {`${homingMode ? 'H' : ''}${axis}${homingMode ? '' : '0'}`}
+                        {`${homingMode ? 'H' : ''}${label}${homingMode ? '' : '0'}`}
                     </span>
                 </Button>
             ) : (
@@ -65,22 +68,24 @@ export function AxisRow({
                             size="sm"
                         >
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
-                                {`${axis}0`}
+                                {`${label}0`}
                             </span>
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
                             <AlertDialogTitle>
-                                Zero {axis} Axis
+                                Zero {label} Axis
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to zero the {axis} axis?
+                                Are you sure you want to zero the {label} axis?
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => zeroWCS(axis, 0)}>
+                            <AlertDialogAction
+                                onClick={() => zeroWCS(label, 0)}
+                            >
                                 Continue
                             </AlertDialogAction>
                         </AlertDialogFooter>
@@ -90,13 +95,13 @@ export function AxisRow({
 
             <WCSInput
                 disabled={disabled}
-                value={wpos}
+                value={disablePositionUpdate ? undefined : wpos}
                 axis={axis}
                 movementHandler={handleManualOffset}
             />
 
             <span className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center">
-                {mpos}
+                {disablePositionUpdate ? '0.00' : mpos}
             </span>
 
             <Button
@@ -105,7 +110,7 @@ export function AxisRow({
                 variant="alt"
                 size="sm"
             >
-                <span className="text-lg font-mono">{axis}</span>
+                <span className="text-lg font-mono">{label}</span>
             </Button>
         </div>
     );
