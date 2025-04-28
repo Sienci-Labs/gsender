@@ -20,9 +20,6 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const [canScrollRight, setCanScrollRight] = useState(false);
 
     useEffect(() => {
-        if (items.length > 0) {
-            setActiveTab(items[0].label);
-        }
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
 
