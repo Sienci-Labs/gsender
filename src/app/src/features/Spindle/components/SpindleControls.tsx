@@ -23,7 +23,8 @@
 
 import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
-import { FaBan, FaRedoAlt } from 'react-icons/fa';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 
 type Props = {
     actions: {
@@ -41,29 +42,36 @@ type Props = {
 };
 
 const SpindleControls = ({ actions, state, canClick }: Props) => {
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const spindleForward = spindle === 'M3';
+    const spindleReverse = spindle === 'M4';
+
     return (
         <>
             <div className="flex flex-row gap-2 justify-center my-2">
                 <Button
                     onClick={actions.sendM3}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
                     icon={<FaRedoAlt />}
-                    text="For M3"
+                    text="Forward"
+                    className="w-full"
+                    active={spindleForward}
                 />
                 <Button
                     onClick={actions.sendM4}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                    icon={<FaRedoAlt className="fa-flip-horizontal" />}
-                    text="Rev M4"
+                    icon={<FaUndoAlt />}
+                    text="Reverse"
+                    className="w-full"
+                    active={spindleReverse}
                 />
                 <Button
                     onClick={actions.sendM5}
-                    disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
+                    disabled={!canClick || spindle === 'M5'}
                     icon={<FaBan />}
-                    text="Stop M5 "
+                    text="Stop"
+                    className="w-full"
                 />
             </div>
             <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">

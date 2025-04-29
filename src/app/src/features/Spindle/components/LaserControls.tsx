@@ -26,7 +26,8 @@ import React from 'react';
 import Button from 'app/components/Button';
 import Slider from './Slider';
 import { Input } from 'app/components/Input';
-import { FaLightbulb, FaSatelliteDish } from 'react-icons/fa';
+import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 type Props = {
     actions: LaserActions;
@@ -55,27 +56,31 @@ interface LaserActions {
 
 const LaserControls = ({ actions, state, canClick }: Props) => {
     const { laser } = state;
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const laserIsOn = spindle !== 'M5';
 
     return (
         <div>
             <div className="flex gap-2 justify-center my-2">
                 <Button
                     onClick={actions.sendLaserM3}
-                    color={canClick ? 'primary' : 'disabled'}
                     icon={<FaLightbulb />}
                     text="Laser On"
+                    active={laserIsOn}
+                    disabled={!canClick}
                 />
                 <Button
                     onClick={actions.runLaserTest}
-                    color={canClick ? 'primary' : 'disabled'}
                     icon={<FaSatelliteDish />}
                     text="Laser Test"
+                    disabled={!canClick}
                 />
                 <Button
                     onClick={actions.sendM5}
-                    color={canClick ? 'primary' : 'disabled'}
-                    icon={<FaLightbulb />}
+                    icon={<FaRegLightbulb />}
                     text="Laser Off"
+                    disabled={!canClick || spindle === 'M5'}
                 />
             </div>
             <Slider

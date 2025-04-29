@@ -23,10 +23,14 @@ export const buttonStyle = tv({
         disabled: {
             true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark',
         },
+        active: {
+            true: 'bg-gray-200 shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
+        },
     },
     defaultVariants: {
         variant: 'secondary',
         size: 'md',
+        active: false,
     },
 });
 
@@ -39,6 +43,7 @@ export type ButtonProps = ButtonVariants &
         disabled?: boolean;
         className?: string;
         text?: string;
+        active?: boolean;
     };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -51,12 +56,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             children,
             icon,
             text,
+            active,
             ...rest
         } = props;
 
         return (
             <ShadcnButton
-                className={buttonStyle({ variant, size, disabled, className })}
+                className={buttonStyle({
+                    variant,
+                    size,
+                    disabled,
+                    active,
+                    className,
+                })}
                 disabled={disabled}
                 ref={ref}
                 {...rest}
