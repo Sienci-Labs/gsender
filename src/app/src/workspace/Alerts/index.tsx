@@ -10,6 +10,12 @@ export const Alerts = () => {
     const [modalEnabled, setModalEnabled] = useState(
         store.get('widgets.visualizer.jobEndModal'),
     );
+    const [maintenanceAlertsEnabled, setMaintenanceAlertsEnabled] = useState(
+        store.get('widgets.visualizer.maintenanceTaskNotifications', true),
+    );
+    const [jobEndAlertEnabled, setJobEndAlertEnabled] = useState(
+        store.get('widgets.visualizer.jobEndModal', true),
+    );
     const [showMaintenanceAlert, setShowMaintenanceAlert] = useState(false);
     const [showJobEndModal, setShowJobEndModal] = useState(false);
     const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
@@ -19,7 +25,11 @@ export const Alerts = () => {
     const handleStoreChange = () => {
         setShowJobEndModal(false);
         setShowMaintenanceAlert(false);
-        setModalEnabled(store.get('widgets.visualizer.jobEndModal'));
+        //setModalEnabled(store.get('widgets.visualizer.jobEndModal'));
+        setJobEndAlertEnabled(store.get('widgets.visualizerJobEndModal'));
+        setMaintenanceAlertsEnabled(
+            store.get('widgets.visualizer.maintenanceTaskNotifications'),
+        );
     };
 
     useEffect(() => {
@@ -60,26 +70,22 @@ export const Alerts = () => {
 
     return (
         <>
-            {modalEnabled && (
-                <>
-                    {showJobEndModal && (
-                        <JobEndModal
-                            job={job}
-                            errors={errors}
-                            showModal={showJobEndModal}
-                            setShowModal={setShowJobEndModal}
-                            onClose={() => setShowJobEndModal(false)}
-                        />
-                    )}
-                    {showMaintenanceAlert && (
-                        <MaintenanceAlert
-                            tasks={tasks}
-                            showModal={showMaintenanceAlert}
-                            setShowModal={setShowMaintenanceAlert}
-                            onClose={() => setShowMaintenanceAlert(false)}
-                        />
-                    )}
-                </>
+            {jobEndAlertEnabled && showJobEndModal && (
+                <JobEndModal
+                    job={job}
+                    errors={errors}
+                    showModal={showJobEndModal}
+                    setShowModal={setShowJobEndModal}
+                    onClose={() => setShowJobEndModal(false)}
+                />
+            )}
+            {maintenanceAlertsEnabled && showMaintenanceAlert && (
+                <MaintenanceAlert
+                    tasks={tasks}
+                    showModal={showMaintenanceAlert}
+                    setShowModal={setShowMaintenanceAlert}
+                    onClose={() => setShowMaintenanceAlert(false)}
+                />
             )}
         </>
     );

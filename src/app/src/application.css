@@ -706,10 +706,6 @@ video {
   left: -0.5rem !important;
 }
 
-.-left-40 {
-  left: -10rem !important;
-}
-
 .-left-5 {
   left: -1.25rem !important;
 }
@@ -752,6 +748,10 @@ video {
 
 .bottom-8 {
   bottom: 2rem !important;
+}
+
+.bottom-\[30\%\] {
+  bottom: 30% !important;
 }
 
 .left-0 {
@@ -908,10 +908,6 @@ video {
 
 .top-\[60\%\] {
   top: 60% !important;
-}
-
-.top-\[calc\(50\%\+60px\)\] {
-  top: calc(50% + 60px) !important;
 }
 
 .top-full {
@@ -1071,16 +1067,16 @@ video {
   margin-left: -1.25rem !important;
 }
 
+.-ml-56 {
+  margin-left: -14rem !important;
+}
+
 .-ml-\[1px\] {
   margin-left: -1px !important;
 }
 
 .-ml-\[2px\] {
   margin-left: -2px !important;
-}
-
-.-ml-\[calc\(128px-50px\)\] {
-  margin-left: calc(calc(128px - 50px) * -1) !important;
 }
 
 .-mt-4 {
@@ -5887,10 +5883,6 @@ html,
 }
 
 @media (min-width: 1280px) {
-  .xl\:-left-44 {
-    left: -11rem !important;
-  }
-
   .xl\:mt-0 {
     margin-top: 0px !important;
   }
@@ -5957,8 +5949,8 @@ html,
 }
 
 @media (orientation: portrait) {
-  .portrait\:top-\[calc\(50\%-200px\)\] {
-    top: calc(50% - 200px) !important;
+  .portrait\:bottom-\[calc\(50\%\+85px\)\] {
+    bottom: calc(50% + 85px) !important;
   }
 
   .portrait\:order-1 {
