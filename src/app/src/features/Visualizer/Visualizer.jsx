@@ -99,11 +99,11 @@ const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
 const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
 const PERSPECTIVE_FOV = 70;
 const PERSPECTIVE_NEAR = 0.001;
-const PERSPECTIVE_FAR = 2000;
-const ORTHOGRAPHIC_FOV = 35;
+const PERSPECTIVE_FAR = 3000;
+const ORTHOGRAPHIC_FOV = 30;
 const ORTHOGRAPHIC_NEAR = 0.001;
-const ORTHOGRAPHIC_FAR = 2000;
-const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0, 0)
+const ORTHOGRAPHIC_FAR = 3000;
+const CAMERA_DISTANCE = 600; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 import { outlineResponse } from '../../workers/Outline.response';
@@ -336,10 +336,12 @@ class Visualizer extends Component {
         // Projection
         if (prevState.projection !== state.projection) {
             if (state.projection === 'orthographic') {
+                console.log('is ortho');
                 this.camera.toOrthographic();
                 this.camera.setZoom(1.3);
                 this.camera.setFov(ORTHOGRAPHIC_FOV);
             } else {
+                console.log('is perspect');
                 this.camera.toPerspective();
                 this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
@@ -1374,10 +1376,12 @@ class Visualizer extends Component {
 
         // Projection
         if (state.projection === 'orthographic') {
+            console.log('is ortho');
             this.camera.toOrthographic();
             this.camera.setZoom(1);
             this.camera.setFov(ORTHOGRAPHIC_FOV);
         } else {
+            console.log('is persp');
             this.camera.toPerspective();
             this.camera.setZoom(1);
             this.camera.setFov(PERSPECTIVE_FOV);
