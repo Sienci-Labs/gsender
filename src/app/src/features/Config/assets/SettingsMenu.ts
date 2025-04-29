@@ -968,6 +968,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        key: 'workspace.coolantFunctions',
+                        description:
+                            'Show coolant functionality on the main Carve page.',
+                        label: 'Enable Coolant Tab',
+                    },
                     { type: 'eeprom', eID: '$456' },
                     { type: 'eeprom', eID: '$457' },
                     { type: 'eeprom', eID: '$458' },

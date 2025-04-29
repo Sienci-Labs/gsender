@@ -1946,6 +1946,10 @@ video {
   max-width: 28rem !important;
 }
 
+.max-w-24 {
+  max-width: 6rem !important;
+}
+
 .flex-1 {
   flex: 1 1 0% !important;
 }
@@ -4063,6 +4067,12 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
+.shadow-\[inset_7px_4px_6px_0px_rgba\(59\2c _130\2c _246\2c _0\.1\)\] {
+  --tw-shadow: inset 7px 4px 6px 0px rgba(59, 130, 246, 0.1) !important;
+  --tw-shadow-colored: inset 7px 4px 6px 0px var(--tw-shadow-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
 .shadow-blue-200 {
   --tw-shadow-color: #79aad8 !important;
   --tw-shadow: var(--tw-shadow-colored) !important;
@@ -5675,6 +5685,12 @@ html,
   background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
 }
 
+@media not all and (min-width: 768px) {
+  .max-md\:hidden {
+    display: none !important;
+  }
+}
+
 @media not all and (min-width: 640px) {
   .max-sm\:static {
     position: static !important;
@@ -5706,6 +5722,11 @@ html,
 
   .max-sm\:min-w-full {
     min-width: 100% !important;
+  }
+
+  .max-sm\:min-w-max {
+    min-width: -moz-max-content !important;
+    min-width: max-content !important;
   }
 
   .max-sm\:-translate-x-1\/2 {
@@ -6013,6 +6034,23 @@ html,
     min-width: 400px !important;
   }
 
+  .portrait\:min-w-\[200px\] {
+    min-width: 200px !important;
+  }
+
+  .portrait\:min-w-\[180px\] {
+    min-width: 180px !important;
+  }
+
+  .portrait\:min-w-\[170px\] {
+    min-width: 170px !important;
+  }
+
+  .portrait\:min-w-max {
+    min-width: -moz-max-content !important;
+    min-width: max-content !important;
+  }
+
   .portrait\:grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
   }
@@ -6027,6 +6065,19 @@ html,
 
   .portrait\:pb-0 {
     padding-bottom: 0px !important;
+  }
+
+  @media not all and (min-width: 640px) {
+    .portrait\:max-sm\:min-w-max {
+      min-width: -moz-max-content !important;
+      min-width: max-content !important;
+    }
+  }
+}
+
+@media (orientation: landscape) {
+  .landscape\:hidden {
+    display: none !important;
   }
 }
 
