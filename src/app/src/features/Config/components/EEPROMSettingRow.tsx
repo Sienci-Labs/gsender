@@ -5,7 +5,6 @@ import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 

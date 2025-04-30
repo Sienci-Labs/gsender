@@ -164,7 +164,6 @@ export function SettingRow({
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};
-    console.log(firmwareType);
 
     // if EEPROM or Hybrid and not connected, show nothing
     if (
@@ -187,6 +186,7 @@ export function SettingRow({
     }
 
     const isDefault = isSettingDefault(populatedValue);
+    console.log(populatedValue);
 
     //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
