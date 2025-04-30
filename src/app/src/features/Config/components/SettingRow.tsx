@@ -186,7 +186,6 @@ export function SettingRow({
     }
 
     const isDefault = isSettingDefault(populatedValue);
-    console.log(populatedValue);
 
     //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (

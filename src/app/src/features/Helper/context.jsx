@@ -322,6 +322,7 @@ export const WizardProvider = ({ children }) => {
                 completedSubStep,
                 title,
                 visible,
+                load: api.load,
                 stepCount,
                 minimized,
                 isLoading,

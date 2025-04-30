@@ -80,7 +80,6 @@ class JogHelper {
         this.startTime = startTime.getTime();
         this.currentCoordinates = coordinates;
         this.didPress = true;
-        console.log(feedrate);
 
         this.feedrate = feedrate;
 

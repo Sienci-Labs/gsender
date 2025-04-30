@@ -81,7 +81,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const { touchplate, toolDiameter } = state;
     const { touchplateType } = touchplate;
     let { availableTools, units } = state;
-    console.log(availableTools);
+    //console.log(availableTools);
 
     // Add refs to track current state
     const valueRef = useRef<string>(

@@ -31,6 +31,7 @@ import controller from 'app/lib/controller';
 import ToolModalButton from 'app/components/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import styles from '../index.module.styl';
+import { FaCode } from 'react-icons/fa';
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const {
@@ -108,7 +109,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                                     <ToolModalButton
                                         disabled={isNotIdle()}
                                         onClick={cbWithCompletion}
-                                        icon="fas fa-code"
+                                        icon={<FaCode />}
                                         id="button-action"
                                     >
                                         {action.label}

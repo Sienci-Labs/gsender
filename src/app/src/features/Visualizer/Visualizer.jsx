@@ -336,12 +336,10 @@ class Visualizer extends Component {
         // Projection
         if (prevState.projection !== state.projection) {
             if (state.projection === 'orthographic') {
-                console.log('is ortho');
                 this.camera.toOrthographic();
                 this.camera.setZoom(1.3);
                 this.camera.setFov(ORTHOGRAPHIC_FOV);
             } else {
-                console.log('is perspect');
                 this.camera.toPerspective();
                 this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
@@ -1376,12 +1374,10 @@ class Visualizer extends Component {
 
         // Projection
         if (state.projection === 'orthographic') {
-            console.log('is ortho');
             this.camera.toOrthographic();
             this.camera.setZoom(1);
             this.camera.setFov(ORTHOGRAPHIC_FOV);
         } else {
-            console.log('is persp');
             this.camera.toPerspective();
             this.camera.setZoom(1);
             this.camera.setFov(PERSPECTIVE_FOV);
