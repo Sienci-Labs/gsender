@@ -23,6 +23,15 @@
 
 import _ from 'lodash';
 
+type JogHelperProps = {
+    jogCB: (coordinates: Record<string, number>) => void;
+    startContinuousJogCB: (
+        coordinates: Record<string, number>,
+        feedrate: number,
+    ) => void;
+    stopContinuousJogCB: () => void;
+};
+
 class JogHelper {
     timeoutFunction: NodeJS.Timeout | null = null;
 
@@ -47,14 +56,7 @@ class JogHelper {
         jogCB,
         startContinuousJogCB,
         stopContinuousJogCB,
-    }: {
-        jogCB: (coordinates: Record<string, number>) => void;
-        startContinuousJogCB: (
-            coordinates: Record<string, number>,
-            feedrate: number,
-        ) => void;
-        stopContinuousJogCB: () => void;
-    }) {
+    }: JogHelperProps) {
         this.jog = _.throttle(jogCB, 150, { trailing: false });
         this.continuousJog = _.throttle(startContinuousJogCB, 150, {
             trailing: false,

@@ -43,7 +43,7 @@ const tabs = [
 
 const Tools = () => {
     const rotary = useWidgetState('rotary');
-    const { spindleFunctions } = useWorkspaceState();
+    const { spindleFunctions, coolantFunctions } = useWorkspaceState();
 
     const filteredTabs = tabs.filter((tab) => {
         if (tab.label === 'Rotary' && !rotary.tab.show) {
@@ -51,6 +51,10 @@ const Tools = () => {
         }
 
         if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+            return false;
+        }
+
+        if (tab.label === 'Coolant' && !coolantFunctions) {
             return false;
         }
 

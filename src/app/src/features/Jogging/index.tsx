@@ -2,18 +2,21 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import includes from 'lodash/includes';
 import get from 'lodash/get';
+import inRange from 'lodash/inRange';
+import throttle from 'lodash/throttle';
+import cx from 'classnames';
 
-import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
-import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
-import { AJog } from 'app/features/Jogging/components/AJog.tsx';
+import { JogInput } from 'app/features/Jogging/components/JogInput';
+import { JogWheel } from 'app/features/Jogging/components/JogWheel';
+import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
+import { ZJog } from 'app/features/Jogging/components/ZJog';
+import { AJog } from 'app/features/Jogging/components/AJog';
 import store from 'app/store';
 import {
     cancelJog,
     jogAxis,
     startJogCommand,
-} from 'app/features/Jogging/utils/Jogging.ts';
+} from 'app/features/Jogging/utils/Jogging';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from 'app/store/redux';
 import {
@@ -25,25 +28,21 @@ import {
     WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
-
-import jogWheeelLabels from './assets/labels.svg';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toast } from 'app/lib/toaster';
-import cx from 'classnames';
 import controller from 'app/lib/controller';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import gamepad, { checkButtonHold } from 'app/lib/gamepad';
+import { GamepadProfile } from 'app/lib/gamepad/definitions';
+import { StopButton } from 'app/features/Jogging/components/StopButton';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+
+import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
-import gamepad, { checkButtonHold } from 'app/lib/gamepad';
-import { inRange, throttle } from 'lodash';
-import { GamepadProfile } from 'app/lib/gamepad/definitions';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
-import { StopButton } from 'app/features/Jogging/components/StopButton.tsx';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
-// Define a type that represents what gamepad.getInstance() actually returns
 interface GamepadInstance {
     isHolding?: boolean;
     start: () => void;
@@ -100,7 +99,7 @@ export function Jogging() {
     );
 
     useEffect(() => {
-        setFirmware(firmwareType);
+        setFirmware(firmwareType as FirmwareFlavour);
     }, [firmwareType]);
 
     const canClick = useCallback((): boolean => {
@@ -560,7 +559,18 @@ export function Jogging() {
         };
 
         const startContinuousJogCB = (coordinates: Record<string, number>) => {
-            startJogCommand(coordinates, currentJogSpeed.feedrate, true);
+            const normalizedCoordinates: Record<string, number> = {};
+
+            // Convert each coordinate value to either 1 or -1 based on its sign
+            Object.keys(coordinates).forEach((key) => {
+                normalizedCoordinates[key] = coordinates[key] > 0 ? 1 : -1;
+            });
+
+            startJogCommand(
+                normalizedCoordinates,
+                currentJogSpeed.feedrate,
+                true,
+            );
         };
 
         const stopContinuousJogCB = () => {

@@ -25,13 +25,13 @@ export interface Workspace {
     units: UNITS_EN;
     reverseWidgets: boolean;
     spindleFunctions: boolean;
+    coolantFunctions: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;
     jobsFinished: number;
     jobsCancelled: number;
     timeSpentRunning: number;
     longestTimeRun: number;
-    spindleFunctions: boolean;
     defaultFirmware: string;
     park: object;
     jobTimes: number[];

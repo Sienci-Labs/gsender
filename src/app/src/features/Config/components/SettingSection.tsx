@@ -6,7 +6,6 @@ import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
-import { EmptySectionWarning } from 'app/features/Config/components/EmptySectionWarning.tsx';
 import React from 'react';
 
 interface SettingSectionProps {
@@ -21,7 +20,7 @@ export function SettingSection({
     connected = false,
     wizard,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, settingsFilter } =
+    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
         useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
