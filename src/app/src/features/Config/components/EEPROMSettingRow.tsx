@@ -31,14 +31,8 @@ export function EEPROMSettingRow({
     link = null,
     linkLabel = null,
 }: EEPROMSettingRowProps) {
-    const {
-        EEPROM,
-        machineProfile,
-        firmwareType,
-        searchTerm,
-        setSettingsAreDirty,
-        eepromIsDefault,
-    } = useSettings();
+    const { EEPROM, machineProfile, firmwareType, eepromIsDefault } =
+        useSettings();
     if (!EEPROM) {
         return;
     }

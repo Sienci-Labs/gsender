@@ -35,7 +35,7 @@ import {
     GRBLHAL,
 } from '../../constants';
 
-import machineProfiles from './machineProfiles';
+import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { profiles } from './gamepad';
 import { State } from '../definitions';
 import { MachineProfile } from 'app/definitions/firmware';
@@ -84,7 +84,7 @@ const defaultState: State = {
                 widgets: ['visualizer', 'job_status'],
             },
         },
-        machineProfile: machineProfiles[4] as MachineProfile,
+        machineProfile: machineProfiles[3] as MachineProfile,
         probeProfile: {
             xyThickness: 10,
             zThickness: 15,
