@@ -20,7 +20,7 @@ export function SettingSection({
     connected = false,
     wizard,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, settingsFilter } =
+    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
         useSettings();
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
@@ -33,12 +33,16 @@ export function SettingSection({
         });
     };
 
+    const filteredSettings = settings.filter((o) =>
+        matchesSearchTerm(o, searchTerm),
+    );
+
     return (
         <fieldset
             className={cn(
                 '[&:not(:first-child)]:border [&:not(:first-child)]:border-solid [&:not(:first-child)]:border-gray-300 rounded',
                 {
-                    'hidden text-gray-600': settings.length === 0,
+                    'hidden text-gray-600': filteredSettings.length === 0,
                 },
             )}
         >
@@ -48,7 +52,7 @@ export function SettingSection({
                     {connected && wizard && wizard()}
                 </legend>
             )}
-            {settings.map((setting) => {
+            {filteredSettings.map((setting) => {
                 return (
                     <SettingRow
                         setting={setting}

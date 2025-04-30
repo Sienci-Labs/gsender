@@ -240,19 +240,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
         }
 
-        if (searchTerm.length === 0 || !searchTerm) {
-            return true;
-        }
-
         // Hide hidden when filtering
         if ('hidden' in v) {
             return !v.hidden();
         }
 
-        if (v)
-            return JSON.stringify(v)
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase());
+        return true; // you made it this far, congrats, you're in
     }
 
     function eepromIsDefault(settingData) {
