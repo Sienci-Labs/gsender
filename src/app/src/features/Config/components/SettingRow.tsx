@@ -23,6 +23,8 @@ import cn from 'classnames';
 import { BiReset } from 'react-icons/bi';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import store from 'app/store';
+import { FaMicrochip } from 'react-icons/fa6';
+import { GRBLHAL } from 'app/constants';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -121,6 +123,7 @@ export function SettingRow({
         setSettingsAreDirty,
         setEEPROM,
         setSettingsValues,
+        firmwareType,
         connected,
     } = useSettings();
 
@@ -161,6 +164,7 @@ export function SettingRow({
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};
+    console.log(firmwareType);
 
     // if EEPROM or Hybrid and not connected, show nothing
     if (
@@ -224,6 +228,11 @@ export function SettingRow({
                     >
                         <BiReset />
                     </button>
+                )}
+                {setting.type === 'hybrid' && firmwareType === GRBLHAL && (
+                    <span className="text-robin-500 text-4xl">
+                        <FaMicrochip />
+                    </span>
                 )}
             </span>
             <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">

@@ -158,8 +158,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const latest = machineProfiles.find(
             (o) => o.id === storeMachineProfile.id,
         );
-        console.log(latest);
-        console.log(storeMachineProfile);
+
         if (!latest) {
             console.error(
                 'No machine profile with this ID found, using previous value.',
@@ -208,9 +207,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
+            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+
+            // can't find a relevant value, we hide it
+            if (!EEPROMData) {
+                return false;
+            }
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (filterNonDefault) {
-                const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
                 if (EEPROMData) {
                     return !eepromIsDefault(EEPROMData);
                 }
