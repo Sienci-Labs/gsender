@@ -24,7 +24,7 @@
 import _ from 'lodash';
 
 type JogHelperProps = {
-    jogCB: (coordinates: Record<string, number>) => void;
+    jogCB: (coordinates: Record<string, number>, feedrate: number) => void;
     startContinuousJogCB: (
         coordinates: Record<string, number>,
         feedrate: number,
@@ -43,7 +43,9 @@ class JogHelper {
 
     currentCoordinates: Record<string, number> | null = null;
 
-    jog: (coordinates: Record<string, number>) => void = null;
+    feedrate = 3000;
+
+    jog: (coordinates: Record<string, number>, feedrate: number) => void = null;
 
     continuousJog: (
         coordinates: Record<string, number>,
@@ -80,6 +82,8 @@ class JogHelper {
         this.didPress = true;
         console.log(feedrate);
 
+        this.feedrate = feedrate;
+
         this.timeoutFunction = setTimeout(() => {
             this.continuousJog(coordinates, feedrate);
         }, this.timeout);
@@ -96,7 +100,7 @@ class JogHelper {
         this.timeoutFunction = null;
 
         if (timer < this.timeout && this.didPress) {
-            this.jog({ ...this.currentCoordinates });
+            this.jog({ ...this.currentCoordinates }, this.feedrate);
             this.startTime = new Date().getTime();
             this.didPress = false;
             this.currentCoordinates = null;

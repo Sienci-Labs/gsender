@@ -554,11 +554,14 @@ export function Jogging() {
             A: currentJogSpeed.aStep,
         };
 
-        const jogCB = (given: Record<string, number>) => {
-            startJogCommand(given, currentJogSpeed.feedrate, false);
+        const jogCB = (given: Record<string, number>, feedrate: number) => {
+            startJogCommand(given, feedrate, false);
         };
 
-        const startContinuousJogCB = (coordinates: Record<string, number>) => {
+        const startContinuousJogCB = (
+            coordinates: Record<string, number>,
+            feedrate: number,
+        ) => {
             const normalizedCoordinates: Record<string, number> = {};
 
             // Convert each coordinate value to either 1 or -1 based on its sign
@@ -566,11 +569,7 @@ export function Jogging() {
                 normalizedCoordinates[key] = coordinates[key] > 0 ? 1 : -1;
             });
 
-            startJogCommand(
-                normalizedCoordinates,
-                currentJogSpeed.feedrate,
-                true,
-            );
+            startJogCommand(normalizedCoordinates, feedrate, true);
         };
 
         const stopContinuousJogCB = () => {

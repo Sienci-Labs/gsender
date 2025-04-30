@@ -1,10 +1,12 @@
-import controller from 'app/lib/controller';
 import map from 'lodash/map';
+
+import controller from 'app/lib/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     GRBLHAL,
 } from 'app/constants';
+import store from 'app/store';
 
 export interface JogSpeeds {
     aStep: number;
@@ -26,7 +28,7 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
-    const units = 'mm';
+    const units = store.get('units', 'mm');
     controller.command('jog:start', axes, feedrate, units);
 }
 
