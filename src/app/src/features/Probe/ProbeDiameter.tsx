@@ -81,6 +81,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const { touchplate, toolDiameter } = state;
     const { touchplateType } = touchplate;
     let { availableTools, units } = state;
+    console.log(availableTools);
 
     // Add refs to track current state
     const valueRef = useRef<string>(
@@ -148,7 +149,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
     }, [customValues]);
 
-    const tools = [...availableTools].sort((a, b) => a.metricDiameter - b.metricDiameter);
+    const tools = [...availableTools].sort(
+        (a, b) => a.metricDiameter - b.metricDiameter,
+    );
 
     // Create stable callback that doesn't change on each render
     const handleChange = useCallback((value: string): void => {
@@ -358,9 +361,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     function getUnitString(option) {
         if (option === 'Tip' || option === 'Auto') {
-            return ''
+            return '';
         }
-        return units
+        return units;
     }
 
     options.push(...toolsObjects, ...customValues);
@@ -392,7 +395,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                     >
                                         <div className="flex items-center justify-between w-full">
                                             <span>
-                                                {option.label} {getUnitString(option.value)}
+                                                {option.label}{' '}
+                                                {getUnitString(option.value)}
                                             </span>
                                             {option.isCustom && (
                                                 <div
