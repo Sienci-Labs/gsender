@@ -70,7 +70,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         const { state } = workflow;
 
         return (
-            includes([WORKFLOW_STATE_RUNNING], state) &&
+            includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state) &&
             (activeState === GRBL_ACTIVE_STATE_RUN ||
                 activeState === GRBL_ACTIVE_STATE_HOLD)
         );
