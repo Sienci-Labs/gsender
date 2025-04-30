@@ -33,16 +33,12 @@ export function SettingSection({
         });
     };
 
-    const filteredSettings = settings.filter((o) =>
-        matchesSearchTerm(o, searchTerm),
-    );
-
     return (
         <fieldset
             className={cn(
                 '[&:not(:first-child)]:border [&:not(:first-child)]:border-solid [&:not(:first-child)]:border-gray-300 rounded',
                 {
-                    'hidden text-gray-600': filteredSettings.length === 0,
+                    'hidden text-gray-600': settings.length === 0,
                 },
             )}
         >
@@ -52,7 +48,7 @@ export function SettingSection({
                     {connected && wizard && wizard()}
                 </legend>
             )}
-            {filteredSettings.map((setting) => {
+            {settings.map((setting) => {
                 return (
                     <SettingRow
                         setting={setting}
