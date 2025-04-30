@@ -1,6 +1,10 @@
 import controller from 'app/lib/controller';
 import map from 'lodash/map';
-import {GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG, GRBLHAL} from "app/constants";
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    GRBLHAL,
+} from 'app/constants';
 
 export interface JogSpeeds {
     aStep: number;
@@ -22,7 +26,7 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
-    const units = 'G21';
+    const units = 'mm';
     controller.command('jog:start', axes, feedrate, units);
 }
 
@@ -54,7 +58,7 @@ export function cancelJog(state, firmwareType) {
             return;
         }
         if (firmwareType === GRBLHAL) {
-            return controller.command('reset:soft')
+            return controller.command('reset:soft');
         }
         controller.command('reset');
     }

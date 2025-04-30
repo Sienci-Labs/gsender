@@ -80,7 +80,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     onClick={actions.sendM5}
                     icon={<FaRegLightbulb />}
                     text="Laser Off"
-                    disabled={!canClick || spindle === 'M5'}
+                    disabled={!canClick}
                 />
             </div>
             <Slider
