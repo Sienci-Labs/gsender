@@ -2044,7 +2044,7 @@ class GrblController {
         log.silly(`> ${data}`);
     }
 
-    writeln(data, context) {
+    writeln(data, context, emit = false) {
         if (_.includes(GRBL_REALTIME_COMMANDS, data)) {
             this.write(data, context);
         } else {
