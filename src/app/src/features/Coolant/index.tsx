@@ -13,6 +13,9 @@ import Button from 'app/components/Button';
 import { COOLANT_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import ensureArray from 'ensure-array';
+import includes from 'lodash/includes';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -56,7 +59,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
     return (
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-around w-full gap-4">
-                <Button
+                <ActiveStateButton
                     text="Mist"
                     icon={<FaShower />}
                     onClick={startMist}
@@ -64,7 +67,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={mistActive}
                 />
-                <Button
+                <ActiveStateButton
                     text="Flood"
                     icon={<FaWater />}
                     onClick={startFlood}
@@ -72,7 +75,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={floodActive}
                 />
-                <Button
+                <ActiveStateButton
                     text="Off"
                     icon={<FaBan />}
                     onClick={stopCoolant}
@@ -86,9 +89,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 
 export default connect((state) => {
     const coolantModal: string = get(state, 'controller.modal.coolant', 'M9');
-    const mistActive = coolantModal === 'M7';
-    const floodActive = coolantModal === 'M8';
+    const coolantArray = ensureArray(coolantModal);
 
+    const mistActive = includes(coolantArray, 'M7');
+    const floodActive = includes(coolantArray, 'M8');
     return {
         mistActive,
         floodActive,

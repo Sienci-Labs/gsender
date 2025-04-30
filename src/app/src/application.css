@@ -718,6 +718,10 @@ video {
   right: -3rem !important;
 }
 
+.-right-2 {
+  right: -0.5rem !important;
+}
+
 .-right-5 {
   right: -1.25rem !important;
 }
@@ -732,6 +736,10 @@ video {
 
 .-top-2 {
   top: -0.5rem !important;
+}
+
+.-top-3 {
+  top: -0.75rem !important;
 }
 
 .-top-5 {
@@ -2132,6 +2140,20 @@ video {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
 }
 
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) scale(10);
+  }
+
+  100% {
+    transform: rotate(-360deg) scale(10);
+  }
+}
+
+.animate-rotate {
+  animation: rotate 3s linear infinite !important;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -3244,6 +3266,10 @@ video {
 
 .bg-opacity-70 {
   --tw-bg-opacity: 0.7 !important;
+}
+
+.bg-\[conic-gradient\(theme\(colors\.robin\.500\)_20deg\2c transparent_120deg\)\] {
+  background-image: conic-gradient(#689AC9 20deg,transparent 120deg) !important;
 }
 
 .bg-\[repeating-linear-gradient\(-45deg\2c transparent\2c transparent_20px\2c lightgrey_20px\2c lightgrey_40px\)\] {
