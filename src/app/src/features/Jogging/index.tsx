@@ -26,7 +26,6 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 
-import stopSign from './assets/stop.svg';
 import jogWheeelLabels from './assets/labels.svg';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toast } from 'app/lib/toaster';
@@ -40,6 +39,9 @@ import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import { inRange, throttle } from 'lodash';
 import { GamepadProfile } from 'app/lib/gamepad/definitions';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { StopButton } from 'app/features/Jogging/components/StopButton.tsx';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 // Define a type that represents what gamepad.getInstance() actually returns
 interface GamepadInstance {
@@ -57,7 +59,8 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
-    const { mode, units } = useWorkspaceState();
+    const { mode } = useWorkspaceState();
+    const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
@@ -92,11 +95,13 @@ export function Jogging() {
         return get(state, 'controller.state.status.activeState', 'Idle');
     });
 
-    const firmwareType = useSelector((state: RootState) => state.controller.type);
+    const firmwareType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
 
     useEffect(() => {
-        setFirmware(firmwareType)
-    }, [firmwareType])
+        setFirmware(firmwareType);
+    }, [firmwareType]);
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -895,12 +900,17 @@ export function Jogging() {
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
                     />
-                    <img
-                        src={stopSign}
-                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"
-                        alt="E-Stop button"
-                        onClick={cancelJog}
+                    <StopButton
+                        disabled={!isConnected}
+                        onClick={() => cancelJog(activeState, firmware)}
                     />
+                    {/*<img
+                        src={stopSign}
+                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 hover:fill-red-200"
+                        alt="E-Stop button"
+
+                        onClick={() => cancelJog(activeState, firmware)}
+                    />*/}
                 </div>
                 <div className="flex justify-center gap-4">
                     <ZJog
@@ -937,13 +947,14 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmware === 'grblHAL' || isRotaryMode) && (
-                            <JogInput
-                                label="A°"
-                                currentValue={jogSpeed.aStep}
-                                onChange={updateAStep}
-                            />
-                        )}
+                        {(firmware === 'grblHAL' || isRotaryMode) &&
+                            rotaryWidgetState.tab.show && (
+                                <JogInput
+                                    label="A°"
+                                    currentValue={jogSpeed.aStep}
+                                    onChange={updateAStep}
+                                />
+                            )}
                         <JogInput
                             label="at"
                             currentValue={jogSpeed.feedrate}

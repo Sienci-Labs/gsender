@@ -1,0 +1,2 @@
+# Ignore server for prettier, different code styling
+src/server

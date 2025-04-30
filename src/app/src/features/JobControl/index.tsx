@@ -83,7 +83,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     return (
         <>
-            <div className="z-10 absolute top-[calc(50%+60px)] portrait:top-[calc(50%-200px)] left-1/2 -ml-[calc(128px-50px)] w-64 justify-center items-center flex">
+            <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea senderStatus={senderStatus}></ProgressArea>
                 )}

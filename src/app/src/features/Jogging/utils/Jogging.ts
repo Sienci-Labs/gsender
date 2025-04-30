@@ -1,5 +1,6 @@
 import controller from 'app/lib/controller';
 import map from 'lodash/map';
+import {GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG, GRBLHAL} from "app/constants";
 
 export interface JogSpeeds {
     aStep: number;
@@ -44,8 +45,19 @@ export interface JoggerProps {
     canClick?: boolean;
 }
 
-export function cancelJog() {
-    controller.command('jog:cancel');
+export function cancelJog(state, firmwareType) {
+    if (state) {
+        if (state === GRBL_ACTIVE_STATE_JOG) {
+            return controller.command('jog:cancel');
+        }
+        if (state === GRBL_ACTIVE_STATE_IDLE) {
+            return;
+        }
+        if (firmwareType === GRBLHAL) {
+            return controller.command('reset:soft')
+        }
+        controller.command('reset');
+    }
 }
 
 export function startJogCommand(

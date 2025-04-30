@@ -39,7 +39,6 @@ import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
 import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
-import { AutoSpinSetup } from 'app/features/Config/components/wizards/AutoSpinSetup.tsx';
 
 export interface SettingsMenuSection {
     label: string;
@@ -200,10 +199,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Enable popup for Job End & Maintenance Alerts',
+                        label: 'Job End Notifications',
                         key: 'widgets.visualizer.jobEndModal',
                         description:
-                            'Show a pop up with job details after a job finishes, and another popup to alert you of maintenance tasks that are due.',
+                            'Show a pop up with job details after a job finishes.',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Maintenance Task Notifications',
+                        key: 'widgets.visualizer.maintenanceTaskNotifications',
+                        description:
+                            'Alert with upcoming maintenance tasks on application start.',
                         type: 'boolean',
                     },
                     {
@@ -655,9 +661,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable Spindle functionalities',
+                        label: 'Enable Spindle/Laser functionalities',
                         description:
-                            'Enable Spindle tab and related functionalities on main user interface.',
+                            'Enable Spindle/Laser tab and related functionalities on main user interface.',
                         key: 'workspace.spindleFunctions',
                     },
                     {
@@ -722,13 +728,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$523',
-                    },
-                    {
-                        type: 'wizard',
-                        label: 'AutoSpin Setup',
-                        wizard: AutoSpinSetup,
-                        description:
-                            'Configure your EEPROM for the AutoSpin T1.  Remember to power cycle your board after running the wizard.',
                     },
                 ],
             },

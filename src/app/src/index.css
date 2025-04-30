@@ -25,6 +25,12 @@ html,
     }
     input {
     }
+    textarea:focus, input:focus{
+        outline: none;
+    }
+    *:focus {
+        outline: none !important;
+    }
 }
 
 @layer utilities {

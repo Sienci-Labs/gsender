@@ -17,6 +17,9 @@ import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
 import cn from 'classnames';
+import {BiReset} from "react-icons/bi";
+import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import store from "app/store";
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -110,7 +113,7 @@ export function SettingRow({
     index,
     changeHandler,
 }: SettingRowProps): JSX.Element {
-    const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
+    const { settingsValues, setSettingsAreDirty, setEEPROM, setSettingsValues, connected } =
         useSettings();
 
     const displaySetting = { ...setting }
@@ -133,6 +136,21 @@ export function SettingRow({
     function handleSingleSettingReset(setting, value) {
         controller.command('gcode', [`${setting}=${value}`, '$$']);
         toast.success(`Restored ${setting} to default value of ${value}`);
+    }
+
+    function handleProgramSettingReset(setting) {
+        console.log(setting)
+        if ('key' in setting) {
+            if (setting.defaultValue) {
+                store.set(setting.key, setting.defaultValue);
+                setSettingsValues((prev) => {
+                    const updated = [...prev];
+                    updated[setting.globalIndex].value = setting.defaultValue;
+                    updated[setting.globalIndex].dirty = false;
+                    return updated;
+                });
+            }
+        }
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};
@@ -177,7 +195,29 @@ export function SettingRow({
                     changeHandler(populatedValue.globalIndex),
                 )}
             </span>
-            <span className="w-1/5 text-xs px-4"></span>
+            <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+                {
+                    !isDefault && (
+                        <button
+                            className="text-3xl"
+                            title="Reset Setting"
+                            onClick={() => {
+                                Confirm({
+                                    title: 'Reset setting',
+                                    content:
+                                        'Are you sure you want to reset this value to default?',
+                                    confirmLabel: 'Yes',
+                                    onConfirm: () => {
+                                        handleProgramSettingReset(populatedValue)
+                                    },
+                                });
+                            }}
+                        >
+                            <BiReset />
+                        </button>
+                    )
+                }
+            </span>
             <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
                 {setting.description.split('\n').map((line, index) => (
                     <p>{line}</p>

@@ -23,6 +23,8 @@
 
 import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 
 type Props = {
     actions: {
@@ -40,33 +42,37 @@ type Props = {
 };
 
 const SpindleControls = ({ actions, state, canClick }: Props) => {
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const spindleForward = spindle === 'M3';
+    const spindleReverse = spindle === 'M4';
+
     return (
         <>
             <div className="flex flex-row gap-2 justify-center my-2">
                 <Button
                     onClick={actions.sendM3}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt" />
-                    For (M3)
-                </Button>
+                    icon={<FaRedoAlt />}
+                    text="Forward"
+                    className="w-full"
+                    active={spindleForward}
+                />
                 <Button
                     onClick={actions.sendM4}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt fa-flip-horizontal" />
-                    Rev (M4)
-                </Button>
+                    icon={<FaUndoAlt />}
+                    text="Reverse"
+                    className="w-full"
+                    active={spindleReverse}
+                />
                 <Button
                     onClick={actions.sendM5}
-                    disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-ban" />
-                    Stop (M5)
-                </Button>
+                    disabled={!canClick || spindle === 'M5'}
+                    icon={<FaBan />}
+                    text="Stop"
+                    className="w-full"
+                />
             </div>
             <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
                 <span>Speed</span>

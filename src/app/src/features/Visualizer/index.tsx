@@ -610,7 +610,6 @@ class Visualizer extends Component {
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
-            toast('G-code File Closed');
         },
         getHull: () => {
             return this.visualizer.getToolpathHull();

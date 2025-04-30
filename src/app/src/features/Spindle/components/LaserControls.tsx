@@ -26,6 +26,8 @@ import React from 'react';
 import Button from 'app/components/Button';
 import Slider from './Slider';
 import { Input } from 'app/components/Input';
+import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 type Props = {
     actions: LaserActions;
@@ -54,31 +56,32 @@ interface LaserActions {
 
 const LaserControls = ({ actions, state, canClick }: Props) => {
     const { laser } = state;
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const laserIsOn = spindle !== 'M5';
 
     return (
         <div>
             <div className="flex gap-2 justify-center my-2">
                 <Button
                     onClick={actions.sendLaserM3}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-lightbulb" />
-                    Laser On
-                </Button>
+                    icon={<FaLightbulb />}
+                    text="Laser On"
+                    active={laserIsOn}
+                    disabled={!canClick}
+                />
                 <Button
                     onClick={actions.runLaserTest}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-satellite-dish" />
-                    Laser Test
-                </Button>
+                    icon={<FaSatelliteDish />}
+                    text="Laser Test"
+                    disabled={!canClick}
+                />
                 <Button
                     onClick={actions.sendM5}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="far fa-lightbulb" />
-                    Laser Off
-                </Button>
+                    icon={<FaRegLightbulb />}
+                    text="Laser Off"
+                    disabled={!canClick || spindle === 'M5'}
+                />
             </div>
             <Slider
                 label="Power"

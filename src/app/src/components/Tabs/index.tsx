@@ -13,16 +13,13 @@ interface TabbedProps {
 }
 
 export const Tabs = ({ items = [] }: TabbedProps) => {
-    const [activeTab, setActiveTab] = useState('');
+    const [activeTab, setActiveTab] = useState(items[0]?.label);
     const tabsRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
 
     useEffect(() => {
-        if (items.length > 0) {
-            setActiveTab(items[0].label);
-        }
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
 

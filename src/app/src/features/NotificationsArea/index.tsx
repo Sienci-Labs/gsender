@@ -14,8 +14,10 @@ import { GENERAL_CATEGORY } from 'app/constants';
 
 const NotificationsArea = () => {
     const [open, setOpen] = useState(false);
-    const notifications = useTypedSelector(
-        (state) => state.preferences.notifications,
+    const notifications = useTypedSelector((state) =>
+        state.preferences.notifications?.filter(
+            (notification) => notification.type === 'error',
+        ),
     );
 
     const shuttleControlEvents = {
