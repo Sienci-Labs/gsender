@@ -151,7 +151,7 @@ export function SettingRow({
 
     function handleProgramSettingReset(setting) {
         if ('key' in setting) {
-            if (setting.defaultValue) {
+            if (setting.defaultValue !== null) {
                 store.set(setting.key, setting.defaultValue);
                 setSettingsValues((prev) => {
                     const updated = [...prev];
