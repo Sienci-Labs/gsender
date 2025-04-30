@@ -927,7 +927,7 @@ export function Jogging() {
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
                     />
-                    {axes && (isRotaryMode || axes.includes('A')) && (
+                    {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
                         <AJog
                             distance={jogSpeed.aStep}
                             feedrate={jogSpeed.feedrate}
@@ -941,9 +941,11 @@ export function Jogging() {
                     <div
                         className={cx('grid gap-x-1 items-center', {
                             'grid-cols-2 gap-y-3':
-                                firmware === 'grblHAL' || isRotaryMode,
+                                (rotaryWidgetState.tab.show &&
+                                    firmwareType === 'grblHAL') ||
+                                isRotaryMode,
                             'grid-cols-1 gap-y-1':
-                                firmware !== 'grblHAL' && !isRotaryMode,
+                                !rotaryWidgetState.tab.show && !isRotaryMode,
                         })}
                     >
                         <JogInput
@@ -956,7 +958,7 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmware === 'grblHAL' || isRotaryMode) &&
+                        {(firmwareType === 'grblHAL' || isRotaryMode) &&
                             rotaryWidgetState.tab.show && (
                                 <JogInput
                                     label="A°"
