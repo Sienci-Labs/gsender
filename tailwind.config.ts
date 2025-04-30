@@ -27,9 +27,9 @@ export default {
       },
       colors: {
         dark: {
-          DEFAULT: '#0f172a',
-          darker: '#020617',
-          lighter: '#334155',
+          DEFAULT: "#0f172a",
+          darker: "#020617",
+          lighter: "#334155",
         },
         robin: {
           50: "#f6f9fc",
@@ -105,14 +105,15 @@ export default {
           "75%": { transform: "translate(-5px, 5px) rotate(-5deg)" },
           "100%": { transform: "translate(0, 0) rotate(0deg)" },
         },
-        "gradient-shift": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
+        rotate: {
+          "0%": { transform: "rotate(0deg) scale(10)" },
+          "100%": { transform: "rotate(-360deg) scale(10)" },
         },
       },
       animation: {
         attention: "attention 1s ease-in-out infinite",
         gradient: "gradient-shift 15s ease infinite",
+        rotate: "rotate 1s linear infinite",
       },
     },
   },

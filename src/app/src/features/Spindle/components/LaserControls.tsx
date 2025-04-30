@@ -26,8 +26,14 @@ import React from 'react';
 import Button from 'app/components/Button';
 import Slider from './Slider';
 import { Input } from 'app/components/Input';
-import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
+import {
+    FaLightbulb,
+    FaRedoAlt,
+    FaRegLightbulb,
+    FaSatelliteDish,
+} from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
 
 type Props = {
     actions: LaserActions;
@@ -63,23 +69,26 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
     return (
         <div>
             <div className="flex gap-2 justify-center my-2">
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
                     text="Laser On"
                     active={laserIsOn}
+                    size={'sm'}
                     disabled={!canClick}
                 />
-                <Button
+                <ActiveStateButton
                     onClick={actions.runLaserTest}
                     icon={<FaSatelliteDish />}
                     text="Laser Test"
+                    size={'sm'}
                     disabled={!canClick}
                 />
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendM5}
                     icon={<FaRegLightbulb />}
                     text="Laser Off"
+                    size={'sm'}
                     disabled={!canClick}
                 />
             </div>
