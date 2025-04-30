@@ -15,7 +15,7 @@ export function ActiveStateButton({
     active = false,
     text = '',
     onClick = (e) => {},
-    size = 'lg',
+    size = 'md',
     className = '',
     ...rest
 }: ActiveStateButtonProps): JSX.Element {
