@@ -2151,7 +2151,7 @@ video {
 }
 
 .animate-rotate {
-  animation: rotate 2s linear infinite !important;
+  animation: rotate 1s linear infinite !important;
 }
 
 @keyframes spin {

@@ -25,6 +25,8 @@ import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import { stopCoolant } from 'app/features/Coolant/utils/actions.ts';
 
 type Props = {
     actions: {
@@ -50,27 +52,30 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
     return (
         <>
             <div className="flex flex-row gap-2 justify-center my-2">
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendM3}
                     disabled={!canClick}
                     icon={<FaRedoAlt />}
                     text="Forward"
+                    size="sm"
                     className="w-full"
                     active={spindleForward}
                 />
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendM4}
                     disabled={!canClick}
                     icon={<FaUndoAlt />}
                     text="Reverse"
+                    size="sm"
                     className="w-full"
                     active={spindleReverse}
                 />
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendM5}
                     disabled={!canClick}
                     icon={<FaBan />}
                     text="Stop"
+                    size="sm"
                     className="w-full"
                 />
             </div>
