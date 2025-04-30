@@ -113,7 +113,7 @@ export default {
       animation: {
         attention: "attention 1s ease-in-out infinite",
         gradient: "gradient-shift 15s ease infinite",
-        rotate: "rotate 3s linear infinite",
+        rotate: "rotate 2s linear infinite",
       },
     },
   },

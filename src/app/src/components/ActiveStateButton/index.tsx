@@ -30,7 +30,7 @@ export function ActiveStateButton({
                         },
                     )}
                 ></div>
-                <div className="relative z-20 flex w-full rounded bg-transparent p-[1px]">
+                <div className="relative z-20 flex w-full rounded-2xl bg-transparent p-[1px]">
                     <Button
                         text={text}
                         icon={icon}
@@ -38,7 +38,7 @@ export function ActiveStateButton({
                         onClick={onClick}
                         size={size}
                         className={cn(className, {
-                            'shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]':
+                            'shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)] text-robin-500 dark:text-robin-500':
                                 active,
                         })}
                         {...rest}

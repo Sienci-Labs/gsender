@@ -2151,7 +2151,7 @@ video {
 }
 
 .animate-rotate {
-  animation: rotate 3s linear infinite !important;
+  animation: rotate 2s linear infinite !important;
 }
 
 @keyframes spin {
@@ -5661,6 +5661,11 @@ html,
 .dark\:text-gray-500:is(.dark *) {
   --tw-text-opacity: 1 !important;
   color: rgb(107 114 128 / var(--tw-text-opacity, 1)) !important;
+}
+
+.dark\:text-robin-500:is(.dark *) {
+  --tw-text-opacity: 1 !important;
+  color: rgb(104 154 201 / var(--tw-text-opacity, 1)) !important;
 }
 
 .dark\:text-white:is(.dark *) {
