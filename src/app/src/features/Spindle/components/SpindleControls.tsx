@@ -68,7 +68,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                 />
                 <Button
                     onClick={actions.sendM5}
-                    disabled={!canClick || spindle === 'M5'}
+                    disabled={!canClick}
                     icon={<FaBan />}
                     text="Stop"
                     className="w-full"
