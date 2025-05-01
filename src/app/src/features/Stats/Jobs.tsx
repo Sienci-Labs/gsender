@@ -103,12 +103,12 @@ export function Jobs() {
             </div>
             <div className="col-span-2 row-span-6 col-start-5 px-8 flex flex-col gap-4">
                 <StatCard>
-                    <CardHeader>Jobs per Port</CardHeader>
+                    <CardHeader>Jobs per CNC</CardHeader>
                     <JobsPerComPort />
                 </StatCard>
                 <StatCard>
                     {' '}
-                    <CardHeader>Run Time per Port</CardHeader>
+                    <CardHeader>Run Time per CNC</CardHeader>
                     <RunTimePerComPort />
                 </StatCard>
             </div>
