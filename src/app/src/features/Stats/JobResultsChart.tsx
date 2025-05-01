@@ -2,11 +2,23 @@ import { useContext } from 'react';
 import { Job, StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-
+import { FaChartPie } from 'react-icons/fa';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+export function EmptyDataPlaceholder() {
+    return (
+        <div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-white">
+            <span className="text-6xl">
+                <FaChartPie />
+            </span>
+            <span>No data to display</span>
+        </div>
+    );
+}
+
 export function JobResultsChart() {
-    const { jobStats } = useContext(StatContext);
+    const { jobStats, isConnected } = useContext(StatContext);
+
     const labels = ['Complete', 'Incomplete'];
 
     const data = {
@@ -22,7 +34,8 @@ export function JobResultsChart() {
 
     return (
         <div className={'w-full h-52 flex items-center justify-center'}>
-            <Pie data={data} />
+            {!isConnected && <EmptyDataPlaceholder />}
+            {isConnected && <Pie data={data} />}
         </div>
     );
 }
@@ -61,7 +74,6 @@ export function JobResultsChart() {
     };
 
     return (
-        <div className={'w-full h-52 flex items-center justify-center'}>
             <Bar data={data} options={options} className="dark:text-white" />
         </div>
     );
