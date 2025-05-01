@@ -33,7 +33,7 @@ export function JobsPerComPort() {
         labels,
         datasets: [
             {
-                label: 'Jobs per Com Port',
+                label: 'Jobs',
                 data: jobData,
                 backgroundColor: [
                     '#7ca7d0',

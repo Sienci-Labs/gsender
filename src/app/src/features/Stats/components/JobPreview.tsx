@@ -14,7 +14,7 @@ const statusBadge = tv({
     },
 });
 
-function formatDuration(seconds: number) {
+export function formatDuration(seconds: number) {
     return new Date(seconds).toISOString().slice(11, 19);
 }
 
