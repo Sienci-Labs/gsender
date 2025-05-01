@@ -22,7 +22,7 @@
  */
 
 import React, { PointerEventHandler } from 'react';
-import * as Slider from '@radix-ui/react-slider';
+import { Slider } from '../shadcn/Slider';
 import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
 
 import Button from 'app/components/Button';
@@ -82,8 +82,11 @@ const RangeSlider = ({
                     size="sm"
                     icon={<FaUndo />}
                 />
-                <Slider.Root
+                <Slider
                     className="flex relative items-center w-full h-6"
+                    trackClassName="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
+                    rangeClassName={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
+                    thumbClassName="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none"
                     defaultValue={defaultPercentage}
                     value={percentage}
                     step={step}
@@ -93,14 +96,7 @@ const RangeSlider = ({
                     onPointerUp={onPointerUp}
                     disabled={disabled}
                     {...props}
-                >
-                    <Slider.Track className="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]">
-                        <Slider.Range
-                            className={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
-                        />
-                    </Slider.Track>
-                    <Slider.Thumb className="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none" />
-                </Slider.Root>
+                ></Slider>
                 <Button
                     type="button"
                     onClick={() => {
