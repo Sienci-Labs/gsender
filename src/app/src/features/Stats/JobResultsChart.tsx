@@ -52,6 +52,13 @@ export function JobResultsChart() {
     const finishedJobData = Object.values(finished);
     const incompleteJobData = Object.values(unfinished);
 
+    const disconnectedData = {
+        labels,
+        datasets: [
+            { label: 'Disconnected', data: 1, backgroundColor: '#659dd2' },
+        ],
+    };
+
     const data = {
         labels,
         datasets: [
@@ -79,5 +86,11 @@ export function JobResultsChart() {
         },
     };
 
-    return <Bar data={data} options={options} className="dark:text-white" />;
+    return (
+        <Bar
+            data={disconnectedData}
+            options={options}
+            className="dark:text-white"
+        />
+    );
 }
