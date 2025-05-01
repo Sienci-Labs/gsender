@@ -10,6 +10,7 @@ import { JobPreviewList } from 'app/features/Stats/components/JobPreviewList.tsx
 import { MaintenancePreview } from 'app/features/Stats/components/MaintenancePreview.tsx';
 import { Configuration } from 'app/features/Stats/components/Configuration.tsx';
 import { JobResultsChart } from 'app/features/Stats/JobResultsChart.tsx';
+import { StatTable } from 'app/features/Stats/components/StatTable.tsx';
 
 export function Stats() {
     return (
@@ -21,9 +22,10 @@ export function Stats() {
                 <h1 className="text-5xl dark:text-white">Your Machine</h1>
                 <StatCard>
                     <div className="grid grid-cols-2">
-                        <div className="p-4">
+                        <div className="p-4 flex flex-col gap-2">
                             <CardHeader>Stats</CardHeader>
                             <JobResultsChart />
+                            <StatTable />
                         </div>
                         <div className="px-4">
                             <CardHeader link={'/stats/jobs'} linkLabel={'More'}>

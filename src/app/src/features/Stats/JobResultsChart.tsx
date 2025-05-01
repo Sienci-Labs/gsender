@@ -1,51 +1,32 @@
 import { useContext } from 'react';
 import { Job, StatContext } from 'app/features/Stats/utils/StatContext.tsx';
-import { Bar } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-);
-
-interface StatusAggregate {
-    [key: string]: number;
-}
-
-function aggregateJobsByStatus(jobs: Job[]) {
-    const finishedJobs: StatusAggregate = {};
-    const incompleteJobs: StatusAggregate = {};
-    jobs.forEach((job) => {
-        if (job.jobStatus === 'COMPLETE') {
-            if (!finishedJobs.hasOwnProperty(job.port)) {
-                finishedJobs[job.port] = 0;
-            }
-            finishedJobs[job.port] += 1;
-        } else {
-            if (!incompleteJobs.hasOwnProperty(job.port)) {
-                incompleteJobs[job.port] = 0;
-            }
-            incompleteJobs[job.port] += 1;
-        }
-    });
-    return [finishedJobs, incompleteJobs];
-}
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function JobResultsChart() {
-    const { jobs } = useContext(StatContext);
+    const { jobStats } = useContext(StatContext);
+    const labels = ['Complete', 'Incomplete'];
+
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Jobs',
+                data: [jobStats.completeJobs, jobStats.incompleteJobs],
+                backgroundColor: ['#659dd2', '#C7813F'],
+            },
+        ],
+    };
+
+    return (
+        <div className={'w-full h-52 flex items-center justify-center'}>
+            <Pie data={data} />
+        </div>
+    );
+}
+/*const { jobs } = useContext(StatContext);
     const [finished, unfinished] = aggregateJobsByStatus(jobs);
     const ports = Object.keys(finished);
     const labels = ports.map((p) => truncatePort(p));
@@ -79,5 +60,10 @@ export function JobResultsChart() {
         },
     };
 
-    return <Bar data={data} options={options} className="dark:text-white" />;
+    return (
+        <div className={'w-full h-52 flex items-center justify-center'}>
+            <Bar data={data} options={options} className="dark:text-white" />
+        </div>
+    );
 }
+*/
