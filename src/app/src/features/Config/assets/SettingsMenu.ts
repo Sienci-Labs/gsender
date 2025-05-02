@@ -278,7 +278,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$100',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -306,7 +306,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$101',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -330,7 +330,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$102',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',

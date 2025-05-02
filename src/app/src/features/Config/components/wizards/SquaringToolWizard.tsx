@@ -15,5 +15,5 @@ export function ToolLink({ link, label }) {
 }
 
 export function SquaringToolWizard() {
-    return <ToolLink link="/squaring" label="Square XY" />;
+    return <ToolLink link="/tools/squaring" label="Square XY" />;
 }

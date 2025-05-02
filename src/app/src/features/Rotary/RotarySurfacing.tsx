@@ -187,6 +187,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix={units}
+                                type="number"
                             />
                         </InputArea>
                         <InputArea label="Start & Final Diameter">
@@ -197,6 +198,7 @@ const RotarySurfacing = () => {
                                     onChange={handleChange}
                                     className={inputStyle}
                                     suffix={units}
+                                    type="number"
                                 />
                                 <span className="flex justify-center items-center">
                                     &
@@ -207,6 +209,7 @@ const RotarySurfacing = () => {
                                     onChange={handleChange}
                                     className={inputStyle}
                                     suffix={units}
+                                    type="number"
                                 />
                             </div>
                         </InputArea>
@@ -218,6 +221,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix={units}
+                                type="number"
                             />
                         </InputArea>
                         <InputArea label="Bit Diameter">
@@ -228,6 +232,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix={units}
+                                type="number"
                             />
                         </InputArea>
                         <InputArea label="Stepover">
@@ -238,6 +243,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix="%"
+                                type="number"
                             />
                         </InputArea>
                         <InputArea label="Spindle RPM">
@@ -248,6 +254,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix="RPM"
+                                type="number"
                             />
                         </InputArea>
                         <InputArea label="Feedrate">
@@ -258,6 +265,7 @@ const RotarySurfacing = () => {
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
                                 suffix={`${units}/min`}
+                                type="number"
                             />
                         </InputArea>
 
