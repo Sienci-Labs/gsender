@@ -5,8 +5,8 @@ import { MaintenanceList } from 'app/features/Stats/components/MaintenanceList.t
 
 export function Maintenance() {
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full h-full">
-            <div className="col-span-4 row-span-6 px-8 mb-2">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 max-xl:gap-2 w-full h-full">
+            <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
                 <StatCard>
                     <CardHeader>Maintenance</CardHeader>
                     <div className="w-full flex flex-col">
@@ -14,7 +14,7 @@ export function Maintenance() {
                     </div>
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 px-8 flex flex-col gap-4">
+            <div className="col-span-2 row-span-6 col-start-5 px-8 max-xl:px-0 flex flex-col gap-4">
                 <StatCard>
                     <CardHeader>Upcoming Maintenance</CardHeader>
                     <MaintenancePreview limit={6} />
