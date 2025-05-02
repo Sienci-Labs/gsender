@@ -5785,6 +5785,14 @@ html,
     width: 50% !important;
   }
 
+  .max-xl\:w-1\/5 {
+    width: 20% !important;
+  }
+
+  .max-xl\:w-2\/5 {
+    width: 40% !important;
+  }
+
   .max-xl\:min-w-\[180px\] {
     min-width: 180px !important;
   }
@@ -5795,6 +5803,14 @@ html,
 
   .max-xl\:gap-1 {
     gap: 0.25rem !important;
+  }
+
+  .max-xl\:p-2 {
+    padding: 0.5rem !important;
+  }
+
+  .max-xl\:p-3 {
+    padding: 0.75rem !important;
   }
 
   .max-xl\:px-2 {

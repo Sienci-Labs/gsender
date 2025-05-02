@@ -73,11 +73,11 @@ export function EEPROMSettingRow({
                     },
                 )}
             >
-                <div className="w-1/5 max-xl:w-full text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
+                <div className="w-1/5 max-xl:w-full max-xl:mb-1 text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
                     {EEPROMData.description}
                 </div>
                 <div
-                    className="w-1/5 max-xl:w-1/4 text-xs px-4 gap-2 flex flex-col"
+                    className="w-1/5 max-xl:w-2/5 text-xs px-4 gap-2 flex flex-col"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -91,7 +91,7 @@ export function EEPROMSettingRow({
                         </div>
                     )}
                 </div>
-                <span className="w-1/5 max-xl:w-1/4 text-xs px-4 flex flex-row gap-2 justify-end">
+                <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (
                         <button
                             className="text-3xl"
@@ -118,7 +118,7 @@ export function EEPROMSettingRow({
                         <FaMicrochip />
                     </span>
                 </span>
-                <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/4">
+                <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5">
                     {detailString}
                 </span>
             </div>
