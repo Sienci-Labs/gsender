@@ -17,7 +17,7 @@ function timeRemainingSortComparison(a: Task, b: Task) {
 }
 
 const reminderStyles = tv({
-    base: 'text-3xl flex flex-row gap-8 items-center font-bolt',
+    base: 'text-3xl max-xl:text-xl flex flex-row gap-8 items-center font-bolt',
     variants: {
         color: {
             'Urgent!': 'text-red-500',
@@ -72,7 +72,7 @@ function MaintenanceTask({ task }: { task: Task }) {
                 <span className={reminderStyles({ color: reminderString })}>
                     {time} hrs
                 </span>
-                <span className="text-gray-700 dark:text-gray-400">
+                <span className="text-gray-700 max-xl:text-sm dark:text-gray-400">
                     {task.name}
                 </span>
             </div>

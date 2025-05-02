@@ -26,7 +26,7 @@ export function Alarms() {
     }
 
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 no-scrollbar">
             <div className="col-span-4 max-xl:col-span-6 row-span-6 px-8 mb-2">
                 <StatCard>
                     <CardHeader>Alarms & Errors</CardHeader>

@@ -1515,12 +1515,12 @@ video {
   max-height: 75% !important;
 }
 
-.max-h-screen {
-  max-height: 100vh !important;
-}
-
 .max-h-full {
   max-height: 100% !important;
+}
+
+.max-h-screen {
+  max-height: 100vh !important;
 }
 
 .min-h-0 {
@@ -5813,12 +5813,13 @@ html,
     gap: 0.5rem !important;
   }
 
-  .max-xl\:gap-0 {
-    gap: 0px !important;
-  }
-
   .max-xl\:p-3 {
     padding: 0.75rem !important;
+  }
+
+  .max-xl\:px-0 {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
   }
 
   .max-xl\:px-1 {
@@ -5829,11 +5830,6 @@ html,
   .max-xl\:px-2 {
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
-  }
-
-  .max-xl\:px-0 {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
   }
 
   .max-xl\:pl-5 {
@@ -5848,6 +5844,11 @@ html,
   .max-xl\:text-xs {
     font-size: 0.75rem !important;
     line-height: 1rem !important;
+  }
+
+  .max-xl\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
   }
 }
 
