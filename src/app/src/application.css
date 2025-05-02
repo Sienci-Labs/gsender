@@ -1542,6 +1542,10 @@ video {
   max-height: 75% !important;
 }
 
+.max-h-full {
+  max-height: 100% !important;
+}
+
 .max-h-screen {
   max-height: 100vh !important;
 }
@@ -3788,6 +3792,11 @@ video {
   line-height: 1 !important;
 }
 
+.text-6xl {
+  font-size: 3.75rem !important;
+  line-height: 1 !important;
+}
+
 .text-9xl {
   font-size: 8rem !important;
   line-height: 1 !important;
@@ -3826,11 +3835,6 @@ video {
 .text-xs {
   font-size: 0.75rem !important;
   line-height: 1rem !important;
-}
-
-.text-6xl {
-  font-size: 3.75rem !important;
-  line-height: 1 !important;
 }
 
 .font-bold {
@@ -5851,6 +5855,114 @@ html,
 .dark\:data-\[state\=active\]\:bg-dark[data-state="active"]:is(.dark *) {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+}
+
+@media not all and (min-width: 1280px) {
+  .max-xl\:bottom-4 {
+    bottom: 1rem !important;
+  }
+
+  .max-xl\:right-0 {
+    right: 0px !important;
+  }
+
+  .max-xl\:-order-1 {
+    order: -1 !important;
+  }
+
+  .max-xl\:col-span-6 {
+    grid-column: span 6 / span 6 !important;
+  }
+
+  .max-xl\:mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .max-xl\:mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .max-xl\:block {
+    display: block !important;
+  }
+
+  .max-xl\:grid {
+    display: grid !important;
+  }
+
+  .max-xl\:hidden {
+    display: none !important;
+  }
+
+  .max-xl\:w-1\/5 {
+    width: 20% !important;
+  }
+
+  .max-xl\:w-2\/5 {
+    width: 40% !important;
+  }
+
+  .max-xl\:w-full {
+    width: 100% !important;
+  }
+
+  .max-xl\:min-w-\[180px\] {
+    min-width: 180px !important;
+  }
+
+  .max-xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .max-xl\:flex-row {
+    flex-direction: row !important;
+  }
+
+  .max-xl\:gap-1 {
+    gap: 0.25rem !important;
+  }
+
+  .max-xl\:gap-2 {
+    gap: 0.5rem !important;
+  }
+
+  .max-xl\:p-3 {
+    padding: 0.75rem !important;
+  }
+
+  .max-xl\:px-0 {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  .max-xl\:px-1 {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+
+  .max-xl\:px-2 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .max-xl\:pl-5 {
+    padding-left: 1.25rem !important;
+  }
+
+  .max-xl\:text-xl {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  .max-xl\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+
+  .max-xl\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
 }
 
 @media not all and (min-width: 640px) {
