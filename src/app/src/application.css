@@ -1519,6 +1519,10 @@ video {
   max-height: 100vh !important;
 }
 
+.max-h-full {
+  max-height: 100% !important;
+}
+
 .min-h-0 {
   min-height: 0px !important;
 }
@@ -5741,20 +5745,16 @@ html,
 }
 
 @media not all and (min-width: 1280px) {
-  .max-xl\:right-12 {
-    right: 3rem !important;
-  }
-
-  .max-xl\:right-10 {
-    right: 2.5rem !important;
+  .max-xl\:bottom-4 {
+    bottom: 1rem !important;
   }
 
   .max-xl\:right-0 {
     right: 0px !important;
   }
 
-  .max-xl\:bottom-4 {
-    bottom: 1rem !important;
+  .max-xl\:col-span-6 {
+    grid-column: span 6 / span 6 !important;
   }
 
   .max-xl\:mb-1 {
@@ -5769,20 +5769,12 @@ html,
     display: block !important;
   }
 
+  .max-xl\:grid {
+    display: grid !important;
+  }
+
   .max-xl\:hidden {
     display: none !important;
-  }
-
-  .max-xl\:w-full {
-    width: 100% !important;
-  }
-
-  .max-xl\:w-1\/4 {
-    width: 25% !important;
-  }
-
-  .max-xl\:w-2\/4 {
-    width: 50% !important;
   }
 
   .max-xl\:w-1\/5 {
@@ -5793,29 +5785,28 @@ html,
     width: 40% !important;
   }
 
+  .max-xl\:w-full {
+    width: 100% !important;
+  }
+
   .max-xl\:min-w-\[180px\] {
     min-width: 180px !important;
   }
 
-  .max-xl\:gap-2 {
-    gap: 0.5rem !important;
+  .max-xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .max-xl\:flex-row {
+    flex-direction: row !important;
   }
 
   .max-xl\:gap-1 {
     gap: 0.25rem !important;
   }
 
-  .max-xl\:p-2 {
-    padding: 0.5rem !important;
-  }
-
   .max-xl\:p-3 {
     padding: 0.75rem !important;
-  }
-
-  .max-xl\:px-2 {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
   }
 
   .max-xl\:px-1 {
@@ -5823,34 +5814,13 @@ html,
     padding-right: 0.25rem !important;
   }
 
-  .max-xl\:pl-20 {
-    padding-left: 5rem !important;
-  }
-
-  .max-xl\:pl-14 {
-    padding-left: 3.5rem !important;
-  }
-
-  .max-xl\:pl-10 {
-    padding-left: 2.5rem !important;
-  }
-
-  .max-xl\:pl-8 {
-    padding-left: 2rem !important;
+  .max-xl\:px-2 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
   }
 
   .max-xl\:pl-5 {
     padding-left: 1.25rem !important;
-  }
-
-  .max-xl\:text-sm {
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
-  }
-
-  .max-xl\:text-xs {
-    font-size: 0.75rem !important;
-    line-height: 1rem !important;
   }
 
   .max-xl\:text-xl {
@@ -5858,22 +5828,9 @@ html,
     line-height: 1.75rem !important;
   }
 
-  .max-xl\:font-bold {
-    font-weight: 700 !important;
-  }
-}
-
-@media not all and (min-width: 1024px) {
-  .max-lg\:px-2 {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-  }
-}
-
-@media not all and (min-width: 768px) {
-  .max-md\:px-2 {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+  .max-xl\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
   }
 }
 
@@ -6057,11 +6014,6 @@ html,
 
   .md\:max-w-\[420px\] {
     max-width: 420px !important;
-  }
-
-  .md\:px-2 {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
   }
 
   .md\:text-lg {
