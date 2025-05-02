@@ -257,11 +257,10 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                     style={{
                         maxHeight: height,
                         minHeight: height,
-                        maxWidth: width,
-                        minWidth: width,
                         marginBottom: '5px',
                         overflowY: 'scroll',
                     }}
+                    className={'w-full'}
                 >
                     <BTable
                         striped

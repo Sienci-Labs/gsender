@@ -142,7 +142,7 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="h-12 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
+            <div className="h-12 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}

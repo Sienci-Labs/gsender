@@ -191,7 +191,7 @@ export function SettingRow({
     return (
         <div
             className={cn(
-                'p-2 flex flex-row items-center text-gray-700 border-b border-gray-200',
+                'p-2 flex flex-row flex-wrap items-center text-gray-700 border-b border-gray-200',
                 {
                     hidden: isHidden,
                     'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
@@ -199,8 +199,10 @@ export function SettingRow({
                 },
             )}
         >
-            <span className="w-1/5 dark:text-gray-400">{setting.label}</span>
-            <span className="w-1/5 text-xs px-4 dark:text-gray-200">
+            <span className="w-1/5 font-xl max-xl:w-full max-xl:mb-2 dark:text-gray-400">
+                {setting.label}
+            </span>
+            <span className="w-1/5 max-xl:w-2/5 text-xs px-4 dark:text-gray-200">
                 {returnSettingControl(
                     displaySetting,
                     populatedValue.value,
@@ -208,7 +210,7 @@ export function SettingRow({
                     changeHandler(populatedValue.globalIndex),
                 )}
             </span>
-            <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+            <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                 {!isDefault && (
                     <button
                         className="text-3xl"
@@ -234,7 +236,7 @@ export function SettingRow({
                     </span>
                 )}
             </span>
-            <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
+            <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5 flex flex-col gap-2">
                 {setting.description.split('\n').map((line, index) => (
                     <p>{line}</p>
                 ))}

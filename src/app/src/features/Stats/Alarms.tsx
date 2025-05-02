@@ -26,14 +26,14 @@ export function Alarms() {
     }
 
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4">
-            <div className="col-span-4 row-span-6 px-8 mb-2">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 no-scrollbar">
+            <div className="col-span-4 max-xl:col-span-6 row-span-6 px-8 mb-2">
                 <StatCard>
                     <CardHeader>Alarms & Errors</CardHeader>
                     <AlarmListing />
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 px-8 flex flex-col gap-4">
+            <div className="col-span-2 row-span-6 col-start-5 px-8 flex flex-col max-xl:flex-row max-xl:col-span-6 max-xl:-order-1 gap-4">
                 <StatCard>
                     <CardHeader>Diagnostic File</CardHeader>
                     <Diagnostic />
