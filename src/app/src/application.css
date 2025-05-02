@@ -5757,12 +5757,36 @@ html,
     bottom: 1rem !important;
   }
 
+  .max-xl\:mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .max-xl\:mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+
   .max-xl\:block {
     display: block !important;
   }
 
   .max-xl\:hidden {
     display: none !important;
+  }
+
+  .max-xl\:w-full {
+    width: 100% !important;
+  }
+
+  .max-xl\:w-1\/4 {
+    width: 25% !important;
+  }
+
+  .max-xl\:w-2\/4 {
+    width: 50% !important;
+  }
+
+  .max-xl\:min-w-\[180px\] {
+    min-width: 180px !important;
   }
 
   .max-xl\:gap-2 {
@@ -5816,6 +5840,10 @@ html,
   .max-xl\:text-xl {
     font-size: 1.25rem !important;
     line-height: 1.75rem !important;
+  }
+
+  .max-xl\:font-bold {
+    font-weight: 700 !important;
   }
 }
 
