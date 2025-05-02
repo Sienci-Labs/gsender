@@ -108,6 +108,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                         onChange={actions.handleLaserDurationChange}
                         className="z-0 text-center text-blue-500 text-xl"
                         suffix="sec"
+                        type="number"
                     />
                 </div>
             </div>
