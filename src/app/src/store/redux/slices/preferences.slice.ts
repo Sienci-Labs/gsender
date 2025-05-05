@@ -42,7 +42,6 @@ const preferencesSlice = createSlice({
         readAllNotifications(state) {
             const notifications = [...state.notifications];
             notifications.map((n) => (n.status = 'Read'));
-            console.log(notifications);
             state.notifications = notifications;
         },
         clearNotifications(state) {

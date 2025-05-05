@@ -139,7 +139,6 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         if (!connectedPort || connectedPort.length === 0) return;
 
         const jobsOnConnectedPort = filterJobsByPort(jobs, connectedPort);
-        console.log(jobsOnConnectedPort);
         const portStats = calculateJobStats(jobsOnConnectedPort);
 
         setJobStats(portStats);
