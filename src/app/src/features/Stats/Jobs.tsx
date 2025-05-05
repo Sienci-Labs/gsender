@@ -91,7 +91,7 @@ const columnData: CustomColumnDef<Job, any>[] = [
 export function Jobs() {
     const { jobs } = useContext(StatContext);
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-scroll no-scrollbar">
+        <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto no-scrollbar">
             <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
                 <StatCard>
                     <SortableTable
@@ -107,7 +107,6 @@ export function Jobs() {
                     <JobsPerComPort />
                 </StatCard>
                 <StatCard>
-                    {' '}
                     <CardHeader>Run Time per CNC</CardHeader>
                     <RunTimePerComPort />
                 </StatCard>
