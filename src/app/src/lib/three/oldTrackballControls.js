@@ -297,12 +297,11 @@ const TrackballControls = function (object, domElement) {
     this.zoomCamera = function () {
         var factor;
 
-        // if (_state === STATE.TOUCH_ZOOM_PAN) {
-        //     factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
-        //     _touchZoomDistanceStart = _touchZoomDistanceEnd;
-        //     _eye.multiplyScalar(factor);
-        // } else {
-        factor = 1.0 + (_zoomEnd.y - _zoomStart.y) * _this.zoomSpeed;
+        if (_state === STATE.TOUCH_ZOOM_PAN) {
+            factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
+        } else {
+            factor = 1.0 + (_zoomEnd.y - _zoomStart.y) * _this.zoomSpeed;
+        }
 
         if (factor !== 1.0 && factor > 0.0) {
             if (_this.object.inOrthographicMode) {
@@ -316,11 +315,11 @@ const TrackballControls = function (object, domElement) {
 
         if (_this.staticMoving) {
             _zoomStart.copy(_zoomEnd);
+            _touchZoomDistanceStart = _touchZoomDistanceEnd;
         } else {
             _zoomStart.y +=
                 (_zoomEnd.y - _zoomStart.y) * this.dynamicDampingFactor;
         }
-        // }
     };
 
     this.panCamera = (function () {
@@ -555,23 +554,18 @@ const TrackballControls = function (object, domElement) {
                 break;
 
             default: // 2 or more
-                // _state = STATE.TOUCH_ZOOM_PAN;
-                // var dx = event.touches[0].pageX - event.touches[1].pageX;
-                // var dy = event.touches[0].pageY - event.touches[1].pageY;
-                // _touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt(
-                //     dx * dx + dy * dy,
-                // );
-
-                // var x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-                // var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
-                // _panStart.copy(getMouseOnScreen(x, y));
-                // _panEnd.copy(_panStart);
-                _zoomStart.copy(
-                    getMouseOnScreen(
-                        event.touches[0].pageX,
-                        event.touches[0].pageY,
-                    ),
+                _state = STATE.TOUCH_ZOOM_PAN;
+                var dx = event.touches[0].pageX - event.touches[1].pageX;
+                var dy = event.touches[0].pageY - event.touches[1].pageY;
+                _touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt(
+                    dx * dx + dy * dy,
                 );
+
+                var x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+                var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+                _panStart.copy(getMouseOnScreen(x, y));
+                _panEnd.copy(_panStart);
+                _zoomStart.copy(getMouseOnScreen(x, y));
                 break;
         }
 
@@ -596,19 +590,14 @@ const TrackballControls = function (object, domElement) {
                 break;
 
             default: // 2 or more
-                // var dx = event.touches[0].pageX - event.touches[1].pageX;
-                // var dy = event.touches[0].pageY - event.touches[1].pageY;
-                // _touchZoomDistanceEnd = Math.sqrt(dx * dx + dy * dy);
+                var dx = event.touches[0].pageX - event.touches[1].pageX;
+                var dy = event.touches[0].pageY - event.touches[1].pageY;
+                _touchZoomDistanceEnd = Math.sqrt(dx * dx + dy * dy);
 
-                // var x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-                // var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
-                // _panEnd.copy(getMouseOnScreen(x, y));
-                _zoomEnd.copy(
-                    getMouseOnCircle(
-                        event.touches[0].pageX,
-                        event.touches[0].pageY,
-                    ),
-                );
+                var x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+                var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+                _panEnd.copy(getMouseOnScreen(x, y));
+                _zoomEnd.copy(getMouseOnCircle(x, y));
                 break;
         }
     }
@@ -622,20 +611,14 @@ const TrackballControls = function (object, domElement) {
                 break;
 
             case 1:
-                // _state = STATE.TOUCH_ROTATE;
-                // _moveCurr.copy(
-                //     getMouseOnCircle(
-                //         event.touches[0].pageX,
-                //         event.touches[0].pageY,
-                //     ),
-                // );
-                // _movePrev.copy(_moveCurr);
-                _zoomEnd.copy(
+                _state = STATE.TOUCH_ROTATE;
+                _moveCurr.copy(
                     getMouseOnCircle(
                         event.touches[0].pageX,
                         event.touches[0].pageY,
                     ),
                 );
+                _movePrev.copy(_moveCurr);
                 break;
         }
 

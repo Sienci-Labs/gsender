@@ -13,7 +13,7 @@ import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 
 type ConsoleProps = {
     isActive: boolean;
-    isChildWindow: boolean;
+    isChildWindow?: boolean;
 };
 
 const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
