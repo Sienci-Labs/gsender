@@ -68,7 +68,7 @@ export const ReactRoutes = () => {
                                     Choose a tool to get started...
                                 </p>
 
-                                <div className="grid lg:grid-cols-3 grid-cols-2 p-1 gap-4 fixed-select-tool-area overflow-y-scroll overflow-x-hidden">
+                                <div className="grid lg:grid-cols-3 grid-cols-2 p-1 gap-4 fixed-select-tool-area overflow-y-auto overflow-x-hidden">
                                     <ToolCard
                                         title="Surfacing"
                                         description="Generate toolpaths to surface and level your material"

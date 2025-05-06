@@ -23,12 +23,23 @@
 import { useState, useEffect, ReactNode } from 'react';
 import pubsub from 'pubsub-js';
 import cx from 'classnames';
-import { FaExclamationTriangle } from 'react-icons/fa';
-
+import { FaExclamationTriangle, FaRedo } from 'react-icons/fa';
+import { Button } from 'app/components/Button';
 import ConfirmationDialogButton from './ConfirmationDialogButton';
 import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 
 import styles from './index.module.styl';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from 'app/components/shadcn/AlertDialog.tsx';
 
 interface DialogOptions {
     title: string;
@@ -37,6 +48,7 @@ interface DialogOptions {
     onConfirm?: () => void;
     confirmLabel?: string;
     cancelLabel?: string;
+    hideClose?: boolean;
     show: boolean;
 }
 
@@ -48,6 +60,7 @@ const ConfirmationDialog = () => {
     const [onConfirm, setOnConfirm] = useState<(() => void) | null>(null);
     const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
     const [cancelLabel, setCancelLabel] = useState<string | null>(null);
+    const [hideClose, setHideClose] = useState(false);
 
     let hideModal = !show;
 
@@ -65,6 +78,7 @@ const ConfirmationDialog = () => {
                 setOnConfirm(() => options.onConfirm);
                 setConfirmLabel(options.confirmLabel || null);
                 setCancelLabel(options.cancelLabel || null);
+                setHideClose(options.hideClose || false);
                 setShow(options.show);
             },
         );
@@ -75,6 +89,41 @@ const ConfirmationDialog = () => {
     }, []);
 
     return (
+        <AlertDialog open={show}>
+            <AlertDialogContent className="bg-white">
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogDescription>{content}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    {!hideClose && (
+                        <AlertDialogCancel
+                            onClick={() => {
+                                if (onClose !== null) {
+                                    onClose();
+                                }
+                                setShow(false);
+                            }}
+                        >
+                            {cancelLabel}
+                        </AlertDialogCancel>
+                    )}
+
+                    <AlertDialogAction
+                        onClick={() => {
+                            if (onConfirm !== null) {
+                                onConfirm();
+                            }
+                            setShow(false);
+                        }}
+                    >
+                        {confirmLabel}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+    /*return (
         <div
             className={cx(styles.confirmationDialogWrapper, {
                 [styles.hidden]: hideModal,
@@ -120,7 +169,7 @@ const ConfirmationDialog = () => {
                 </div>
             </div>
         </div>
-    );
+    );*/
 };
 
 export default ConfirmationDialog;

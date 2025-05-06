@@ -137,10 +137,10 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                     },
                 )}
             >
-                <DialogHeader className="text-robin-700 flex items-start justify-center h-10 border-b-[1px] border-gray-400 mb-1">
+                <DialogHeader className="text-robin-700 flex items-start justify-center">
                     <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-[1.5fr_1fr] gap-3 w-[600px] min-h-[200px]">
+                <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
                     <div className="flex flex-col justify-between pb-4">
                         <div className="text-black leading-snug dark:text-white">
                             <p className="mb-3">
@@ -158,7 +158,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 measurement.
                             </p>
                         </div>
-                        <Button disabled={!connectionMade} onClick={startProbe}>
+                        <Button variant="primary" disabled={!connectionMade} onClick={startProbe}>
                             {connectionMade
                                 ? 'Start Probe'
                                 : 'Waiting for probe circuit check...'}

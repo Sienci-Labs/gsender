@@ -1,4 +1,4 @@
-import aLabels from 'app/features/Jogging/assets/aLabelsReversed.svg';
+import aLabels from 'app/features/Jogging/assets/aLabels.svg';
 import TabJog from 'app/features/Jogging/components/TabJog.tsx';
 import {
     aMinusJog,

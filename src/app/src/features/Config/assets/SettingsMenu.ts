@@ -199,10 +199,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Enable popup for Job End & Maintenance Alerts',
+                        label: 'Job End Notifications',
                         key: 'widgets.visualizer.jobEndModal',
                         description:
-                            'Show a pop up with job details after a job finishes, and another popup to alert you of maintenance tasks that are due.',
+                            'Show a pop up with job details after a job finishes.',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Maintenance Task Notifications',
+                        key: 'widgets.visualizer.maintenanceTaskNotifications',
+                        description:
+                            'Alert with upcoming maintenance tasks on application start.',
                         type: 'boolean',
                     },
                     {
@@ -271,7 +278,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$100',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -299,7 +306,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$101',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -323,7 +330,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$102',
                         toolLink: 'Tune Correction',
-                        toolLinkLabel: '/movement-tuning',
+                        toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
                         type: 'eeprom',
@@ -654,9 +661,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable Spindle functionalities',
+                        label: 'Enable Spindle/Laser functionalities',
                         description:
-                            'Enable Spindle tab and related functionalities on main user interface.',
+                            'Enable Spindle/Laser tab and related functionalities on main user interface.',
                         key: 'workspace.spindleFunctions',
                     },
                     {
@@ -961,6 +968,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        key: 'workspace.coolantFunctions',
+                        description:
+                            'Show coolant functionality on the main Carve page.',
+                        label: 'Enable Coolant Tab',
+                    },
                     { type: 'eeprom', eID: '$456' },
                     { type: 'eeprom', eID: '$457' },
                     { type: 'eeprom', eID: '$458' },
@@ -984,13 +998,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands',
                     },
                     {
+                        label: 'Skip Dialog',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.skipDialog',
+                        description:
+                            'Skips dialog for non-wizard options.  This will combine code blocks if using that strategy, and not send a popup for pause.',
+                    },
+                    {
                         type: 'select',
                         label: 'Strategy',
                         description:
                             'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length.  Limit switches required.\n\nCode runs blocks before and after the toolchange',
                         options: [
-                            'Pause',
                             'Ignore',
+                            'Pause',
                             'Standard Re-zero',
                             'Flexible Re-zero',
                             'Fixed Tool Sensor',

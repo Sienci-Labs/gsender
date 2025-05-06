@@ -6,6 +6,8 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 interface TabItem {
     label: string;
@@ -22,7 +24,7 @@ const tabs = [
         content: Macros,
     },
     {
-        label: 'Spindle',
+        label: 'Spindle/Laser',
         content: Spindle,
     },
     {
@@ -40,10 +42,29 @@ const tabs = [
 ];
 
 const Tools = () => {
+    const rotary = useWidgetState('rotary');
+    const { spindleFunctions, coolantFunctions } = useWorkspaceState();
+
+    const filteredTabs = tabs.filter((tab) => {
+        if (tab.label === 'Rotary' && !rotary.tab.show) {
+            return false;
+        }
+
+        if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+            return false;
+        }
+
+        if (tab.label === 'Coolant' && !coolantFunctions) {
+            return false;
+        }
+
+        return true;
+    });
+
     return (
         <Widget>
             <Widget.Content>
-                <Tabs items={tabs as TabItem[]} />
+                <Tabs items={filteredTabs as TabItem[]} />
             </Widget.Content>
         </Widget>
     );

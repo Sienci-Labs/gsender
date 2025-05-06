@@ -67,13 +67,13 @@ export function Config() {
                     activeSection={visibleSection}
                 />
                 <div className="flex flex-col fixed-content-area w-4/5">
-                    <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 dark:bg-dark dark:border-gray-700">
+                    <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
                         <Search />
                         <FilterDefaultToggle />
                         <ApplicationPreferences />
                     </div>
                     <div
-                        className="px-10 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
+                        className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
                         ref={inViewRef}
                     >
                         <EEPROMNotConnectedWarning connected={connected} />
@@ -94,6 +94,7 @@ export function Config() {
                                                 settings={item.settings}
                                                 eeprom={item.eeprom}
                                                 ref={ref}
+                                                connected={connected}
                                                 wizard={item.wizard}
                                             />
                                         );

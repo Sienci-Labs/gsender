@@ -289,7 +289,7 @@ function DRO({
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (
-                    <Parking />
+                    <Parking disabled={!canClick} />
                     // Leaving this commented out for the time being since parking is not implemented as a feature yet
                 )}
             </div>
@@ -299,26 +299,25 @@ function DRO({
             </div>
             <div className="flex flex-col w-full gap-1 space-between">
                 <AxisRow
+                    label={'X'}
                     axis={'X'}
-                    key={'X'}
                     mpos={mpos.x}
                     wpos={wpos.x}
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                {!isRotaryMode && (
-                    <AxisRow
-                        axis={'Y'}
-                        key={'Y'}
-                        mpos={mpos.y}
-                        wpos={wpos.y}
-                        disabled={!canClick}
-                        homingMode={homingMode}
-                    />
-                )}
                 <AxisRow
+                    label={'Y'}
+                    axis={'Y'}
+                    mpos={mpos.y}
+                    wpos={wpos.y}
+                    disabled={!canClick || isRotaryMode}
+                    homingMode={homingMode}
+                    disablePositionUpdate={isRotaryMode}
+                />
+                <AxisRow
+                    label={'Z'}
                     axis={'Z'}
-                    key={'Z'}
                     mpos={mpos.z}
                     wpos={wpos.z}
                     disabled={!canClick}
@@ -326,12 +325,13 @@ function DRO({
                 />
                 {(isRotaryMode || axes.includes('A')) && (
                     <AxisRow
-                        axis={'A'}
-                        key={'a'}
-                        mpos={mpos.a}
-                        wpos={wpos.a}
+                        label={'A'}
+                        axis={isRotaryMode ? 'Y' : 'A'}
+                        mpos={isRotaryMode ? mpos.y : mpos.a}
+                        wpos={isRotaryMode ? wpos.y : wpos.a}
                         disabled={!canClick}
                         homingMode={homingMode}
+                        disablePositionUpdate={isRotaryMode}
                     />
                 )}
             </div>
@@ -380,7 +380,12 @@ function DRO({
                     />
                 )}
 
-                <Button variant="alt" onClick={goXYAxes} disabled={!canClick}>
+                <Button
+                    variant="alt"
+                    onClick={goXYAxes}
+                    disabled={!canClick}
+                    size="sm"
+                >
                     <span className="font-mono text-lg">XY</span>
                 </Button>
             </div>

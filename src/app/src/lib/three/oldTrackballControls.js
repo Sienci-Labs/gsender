@@ -299,27 +299,26 @@ const TrackballControls = function (object, domElement) {
 
         if (_state === STATE.TOUCH_ZOOM_PAN) {
             factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
-            _touchZoomDistanceStart = _touchZoomDistanceEnd;
-            _eye.multiplyScalar(factor);
         } else {
             factor = 1.0 + (_zoomEnd.y - _zoomStart.y) * _this.zoomSpeed;
+        }
 
-            if (factor !== 1.0 && factor > 0.0) {
-                if (_this.object.inOrthographicMode) {
-                    // See https://github.com/mrdoob/three.js/issues/1521
-                    var zoom = _this.object.zoom * (2 - factor);
-                    _this.object.setZoom(zoom);
-                } else {
-                    _eye.multiplyScalar(factor);
-                }
-            }
-
-            if (_this.staticMoving) {
-                _zoomStart.copy(_zoomEnd);
+        if (factor !== 1.0 && factor > 0.0) {
+            if (_this.object.inOrthographicMode) {
+                // See https://github.com/mrdoob/three.js/issues/1521
+                var zoom = _this.object.zoom * (2 - factor);
+                _this.object.setZoom(zoom);
             } else {
-                _zoomStart.y +=
-                    (_zoomEnd.y - _zoomStart.y) * this.dynamicDampingFactor;
+                _eye.multiplyScalar(factor);
             }
+        }
+
+        if (_this.staticMoving) {
+            _zoomStart.copy(_zoomEnd);
+            _touchZoomDistanceStart = _touchZoomDistanceEnd;
+        } else {
+            _zoomStart.y +=
+                (_zoomEnd.y - _zoomStart.y) * this.dynamicDampingFactor;
         }
     };
 
@@ -566,6 +565,7 @@ const TrackballControls = function (object, domElement) {
                 var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
                 _panStart.copy(getMouseOnScreen(x, y));
                 _panEnd.copy(_panStart);
+                _zoomStart.copy(getMouseOnScreen(x, y));
                 break;
         }
 
@@ -597,6 +597,7 @@ const TrackballControls = function (object, domElement) {
                 var x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
                 var y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
                 _panEnd.copy(getMouseOnScreen(x, y));
+                _zoomEnd.copy(getMouseOnCircle(x, y));
                 break;
         }
     }

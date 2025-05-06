@@ -32,7 +32,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
             <div className="flex flex-col gap-1 text-right">
                 <span>{truncatePortName(port.port)}</span>
                 <span className="text-sm text-gray-600 font-normal">
-                    USB at {baud} baud
+                    USB ({baud})
                 </span>
             </div>
         </button>
@@ -63,7 +63,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
     }
 
     return (
-        <div className="absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
+        <div className="absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full min-w[250px] rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found
@@ -89,7 +89,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 <div className="flex flex-col gap-1 text-right">
                     <span>{ip}</span>
                     <span className="text-sm text-gray-600 font-normal">
-                        Ethernet on port 23
+                        Ethernet (port 23)
                     </span>
                 </div>
             </button>

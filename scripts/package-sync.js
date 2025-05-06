@@ -27,6 +27,7 @@ const deps = _uniq([
   "@serialport/parser-readline",
   "@sienci/avrgirl-arduino",
   "@sentry/electron",
+  "electron-updater",
   "@sentry/react",
   "@sentry/node",
   "regenerator-runtime",

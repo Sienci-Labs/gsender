@@ -15,6 +15,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
             </Label>
             <Input
                 sizing="xs"
+                type="number"
                 value={currentValue}
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="flex-1"

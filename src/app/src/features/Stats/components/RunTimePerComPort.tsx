@@ -50,7 +50,7 @@ export function RunTimePerComPort() {
     };
 
     return (
-        <div>
+        <div className="w-52 h-52">
             <Doughnut
                 data={data}
                 width={280}

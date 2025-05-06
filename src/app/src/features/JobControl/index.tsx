@@ -82,64 +82,66 @@ const JobControl: React.FC<JobControlProps> = ({
     };
 
     return (
-        <div className="relative h-full">
-            <div className="z-10 absolute top-[-160px] flex flex-col justify-center items-center w-full">
+        <>
+            <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea senderStatus={senderStatus}></ProgressArea>
                 )}
             </div>
-            <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
-                    <div className="flex flex-row gap-2 justify-center mb-3 w-full">
-                        <OutlineButton disabled={disabled} />
-                        <StartFromLine
-                            disabled={disabled}
-                            lastLine={lastLine}
-                        />
-                    </div>
-                )}
-            </div>
+            <div className="relative h-full">
+                <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
+                    {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
+                        <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                            <OutlineButton disabled={disabled} />
+                            <StartFromLine
+                                disabled={disabled}
+                                lastLine={lastLine}
+                            />
+                        </div>
+                    )}
+                </div>
 
-            <div className="z-10 absolute top-[-30px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
-                <ControlButton
-                    type={START}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                    onStop={onStop}
-                />
-                <ControlButton
-                    type={PAUSE}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                    onStop={onStop}
-                />
-                <ControlButton
-                    type={STOP}
-                    workflow={workflow}
-                    activeState={activeState}
-                    isConnected={isConnected}
-                    fileLoaded={fileLoaded}
-                    onStop={onStop}
-                />
+                <div className="z-10 absolute top-[-30px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
+                    <ControlButton
+                        type={START}
+                        workflow={workflow}
+                        activeState={activeState}
+                        isConnected={isConnected}
+                        fileLoaded={fileLoaded}
+                        onStop={onStop}
+                    />
+                    <ControlButton
+                        type={PAUSE}
+                        workflow={workflow}
+                        activeState={activeState}
+                        isConnected={isConnected}
+                        fileLoaded={fileLoaded}
+                        onStop={onStop}
+                    />
+                    <ControlButton
+                        type={STOP}
+                        workflow={workflow}
+                        activeState={activeState}
+                        isConnected={isConnected}
+                        fileLoaded={fileLoaded}
+                        onStop={onStop}
+                    />
+                </div>
+                <Widget>
+                    <Widget.Content className="flex justify-center items-center flex-col">
+                        <div className="mt-4">
+                            <Overrides
+                                ovF={ovF}
+                                ovS={ovS}
+                                feedrate={feedrate}
+                                spindle={spindle}
+                                isConnected={isConnected}
+                            />
+                        </div>
+                    </Widget.Content>
+                </Widget>
             </div>
-            <Widget>
-                <Widget.Content className="flex justify-center items-center flex-col">
-                    <div className="mt-4">
-                        <Overrides
-                            ovF={ovF}
-                            ovS={ovS}
-                            feedrate={feedrate}
-                            spindle={spindle}
-                            isConnected={isConnected}
-                        />
-                    </div>
-                </Widget.Content>
-            </Widget>
-        </div>
+        </>
     );
 };
 

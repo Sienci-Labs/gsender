@@ -610,7 +610,6 @@ class Visualizer extends Component {
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
-            toast('G-code File Closed');
         },
         getHull: () => {
             return this.visualizer.getToolpathHull();
@@ -1425,7 +1424,6 @@ class Visualizer extends Component {
                 this.setState({ layoutIsReversed });
             }),
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name }) => {
-                console.log(name);
                 const file = new File([gcode], name);
                 await uploadGcodeFileToServer(
                     file,

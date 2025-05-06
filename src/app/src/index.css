@@ -25,6 +25,12 @@ html,
     }
     input {
     }
+    textarea:focus, input:focus{
+        outline: none;
+    }
+    *:focus {
+        outline: none !important;
+    }
 }
 
 @layer utilities {
@@ -44,6 +50,7 @@ html,
     initial-value: 0deg;
     syntax: '<angle>';
 }
+
 
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */

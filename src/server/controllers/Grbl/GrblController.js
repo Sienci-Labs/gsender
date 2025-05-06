@@ -1499,7 +1499,7 @@ class GrblController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
-                        modalGCode.push(`${modal.spindle} F${feedRate} S${spindleRate}`);
+                        modalGCode.push(`${modal.units} ${modal.spindle} F${feedRate} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
@@ -2044,7 +2044,7 @@ class GrblController {
         log.silly(`> ${data}`);
     }
 
-    writeln(data, context) {
+    writeln(data, context, emit = false) {
         if (_.includes(GRBL_REALTIME_COMMANDS, data)) {
             this.write(data, context);
         } else {

@@ -25,14 +25,13 @@ import cx from 'classnames';
 import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
-import { FileData } from '..';
 import isElectron from 'is-electron';
 
 interface Props {
-    handleElectronFileUpload: (file: FileData, isRecentFile?: boolean) => void;
+    handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
 }
 
-const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
+const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
     const { name, size, total, path, fileLoaded, fileProcessing } =
         useTypedSelector((state) => state.file);
 
@@ -55,7 +54,7 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             pubsub.subscribe(
                 'recent-files-updated',
                 (_: string, files: RecentFile[]) => {
-                    setRecentFiles(files);
+                    setRecentFiles(files.slice());
                 },
             ),
             pubsub.subscribe('lastJob', (_: string, job: Job) => {
@@ -120,12 +119,16 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
                                         <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
                                             <RiFolderUploadLine
                                                 onClick={() =>
-                                                    handleElectronFileUpload(
+                                                    handleRecentFileUpload(
                                                         {
-                                                            name: file.fileName,
-                                                            data: file.fileData,
-                                                            size: file.fileSize,
-                                                            path: file.filePath,
+                                                            fileName:
+                                                                file.fileName,
+                                                            fileSize:
+                                                                file.fileSize,
+                                                            filePath:
+                                                                file.filePath,
+                                                            timeUploaded:
+                                                                file.timeUploaded,
                                                         },
                                                         true,
                                                     )
@@ -251,9 +254,11 @@ const FileInformation: React.FC<Props> = ({ handleElectronFileUpload }) => {
             </div>
 
             {path && (
-                <div className="text-gray-500 text-xs">
+                <div className="text-gray-500 text-xs max-w-full flex flex-row">
                     <span>Path: </span>
-                    <span>{path}</span>
+                    <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
+                        {path}
+                    </span>
                 </div>
             )}
 

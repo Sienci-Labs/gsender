@@ -39,6 +39,11 @@ const preferencesSlice = createSlice({
                 (notification) => notification.id !== action.payload,
             );
         },
+        readAllNotifications(state) {
+            const notifications = [...state.notifications];
+            notifications.map((n) => (n.status = 'Read'));
+            state.notifications = notifications;
+        },
         clearNotifications(state) {
             state.notifications = [];
         },
@@ -53,6 +58,7 @@ export const {
     holdShortcuts,
     unholdShortcuts,
     setIpList,
+    readAllNotifications,
     addNotification,
     removeNotification,
     clearNotifications,

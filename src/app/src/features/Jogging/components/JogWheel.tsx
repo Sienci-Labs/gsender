@@ -79,8 +79,8 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
         },
     )();
 
-    const standardColourClass = 'fill-blue-500 hover:fill-blue-600';
-    const altColourClass = 'fill-robin-500 hover:fill-blue-400';
+    const standardColourClass = 'fill-blue-500 hover:fill-blue-600 active:fill-blue-700';
+    const altColourClass = 'fill-robin-500 hover:fill-blue-400 active:fill-robin-700';
     const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
 
     return (

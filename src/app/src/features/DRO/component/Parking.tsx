@@ -19,7 +19,7 @@ function goToParkLocation() {
     controller.command('gcode', code);
 }
 
-export function Parking() {
+export function Parking({disabled = false}) {
     const shuttleControlEvents = {
         HOMING_PARK: {
             title: 'Park ',
@@ -37,6 +37,7 @@ export function Parking() {
 
     return (
         <IconButton
+            disabled={disabled}
             icon={<RiParkingFill />}
             variant="primary"
             onClick={goToParkLocation}
