@@ -23,6 +23,10 @@
 
 import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import { stopCoolant } from 'app/features/Coolant/utils/actions.ts';
 
 type Props = {
     actions: {
@@ -40,33 +44,40 @@ type Props = {
 };
 
 const SpindleControls = ({ actions, state, canClick }: Props) => {
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const spindleForward = spindle === 'M3';
+    const spindleReverse = spindle === 'M4';
+
     return (
         <>
             <div className="flex flex-row gap-2 justify-center my-2">
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendM3}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt" />
-                    For (M3)
-                </Button>
-                <Button
+                    icon={<FaRedoAlt />}
+                    text="Forward"
+                    size="md"
+                    className="w-full"
+                    active={spindleForward}
+                />
+                <ActiveStateButton
                     onClick={actions.sendM4}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-redo-alt fa-flip-horizontal" />
-                    Rev (M4)
-                </Button>
-                <Button
+                    icon={<FaUndoAlt />}
+                    text="Reverse"
+                    size="md"
+                    className="w-full"
+                    active={spindleReverse}
+                />
+                <ActiveStateButton
                     onClick={actions.sendM5}
                     disabled={!canClick}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-ban" />
-                    Stop (M5)
-                </Button>
+                    icon={<FaBan />}
+                    text="Stop"
+                    size="md"
+                    className="w-full"
+                />
             </div>
             <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
                 <span>Speed</span>

@@ -51,7 +51,7 @@ const Overrides: React.FC<OverridesProps> = ({
     }
 
     const handleStoreChange = () => {
-        setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
+        setShowSpindleOverride(store.get('workspace.spindleFunctions'));
         setSpindleOverrideLabel(
             store.get('widgets.spindle.mode', SPINDLE_MODE) === SPINDLE_MODE
                 ? 'Spindle'

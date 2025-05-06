@@ -38,23 +38,22 @@ export const recentFileExists = (
     return !!file;
 };
 
-// export const createRecentFile = ({
-//     name,
-//     dir,
-// }: {
-//     name: string;
-//     dir: string;
-// }): RecentFile => {
-//     return {
-//         fileName: name,
-//         filePath: `${dir}\\${name}`,
-//         timeUploaded: Date.now(),
-//     };
-// };
+export const createRecentFile = ({
+    name,
+    dir,
+}: {
+    name: string;
+    dir: string;
+}) => {
+    return {
+        fileName: name,
+        filePath: `${dir}\\${name}`,
+        timeUploaded: Date.now(),
+    };
+};
 
 export const createRecentFileFromRawPath = (file: FileData): RecentFile => {
     return {
-        fileData: file.data,
         fileName: file.name,
         filePath: file.path,
         fileSize: file.size,
@@ -82,6 +81,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
         return;
     }
     const recentFiles = getRecentFiles();
+
     let sortedFiles;
 
     if (recentFileExists(fileMetaData.filePath, recentFiles)) {
@@ -92,6 +92,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
         sortedFiles = sortRecentFiles(recentFiles);
         sortedFiles = trimRecentFilesToLimit(sortedFiles);
     }
+
     updateStoredRecentFiles(sortedFiles);
     pubsub.publish('recent-files-updated', sortedFiles);
 };
@@ -128,4 +129,17 @@ export const loadRecentFile = (filePath: string) => {
         filePath: filePath,
     });
     return true;
+};
+
+export const deleteRecentFile = (filePath: string) => {
+    let savedFiles: RecentFile[] = store.get('workspace.recentFiles', []);
+    let updatedFiles = savedFiles.slice();
+    const indexToDelete = updatedFiles.findIndex((file, _index) => file.filePath === filePath);
+    if (indexToDelete > -1) { // sanity check
+        updatedFiles.splice(indexToDelete, 1);
+        updateStoredRecentFiles(updatedFiles);
+        pubsub.publish('recent-files-updated', updatedFiles);
+    } else {
+        console.error('Recent file to be deleted cannot be found in storage');
+    }
 };

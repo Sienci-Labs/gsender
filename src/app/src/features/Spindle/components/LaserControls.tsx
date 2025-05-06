@@ -26,6 +26,14 @@ import React from 'react';
 import Button from 'app/components/Button';
 import Slider from './Slider';
 import { Input } from 'app/components/Input';
+import {
+    FaLightbulb,
+    FaRedoAlt,
+    FaRegLightbulb,
+    FaSatelliteDish,
+} from 'react-icons/fa';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
 
 type Props = {
     actions: LaserActions;
@@ -54,31 +62,35 @@ interface LaserActions {
 
 const LaserControls = ({ actions, state, canClick }: Props) => {
     const { laser } = state;
+    const { spindle } = useTypedSelector((state) => state.controller.modal);
+
+    const laserIsOn = spindle !== 'M5';
 
     return (
         <div>
             <div className="flex gap-2 justify-center my-2">
-                <Button
+                <ActiveStateButton
                     onClick={actions.sendLaserM3}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-lightbulb" />
-                    Laser On
-                </Button>
-                <Button
+                    icon={<FaLightbulb />}
+                    text="Laser On"
+                    active={laserIsOn}
+                    size={'sm'}
+                    disabled={!canClick}
+                />
+                <ActiveStateButton
                     onClick={actions.runLaserTest}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="fas fa-satellite-dish" />
-                    Laser Test
-                </Button>
-                <Button
+                    icon={<FaSatelliteDish />}
+                    text="Laser Test"
+                    size={'sm'}
+                    disabled={!canClick}
+                />
+                <ActiveStateButton
                     onClick={actions.sendM5}
-                    color={canClick ? 'primary' : 'disabled'}
-                >
-                    <i className="far fa-lightbulb" />
-                    Laser Off
-                </Button>
+                    icon={<FaRegLightbulb />}
+                    text="Laser Off"
+                    size={'sm'}
+                    disabled={!canClick}
+                />
             </div>
             <Slider
                 label="Power"
@@ -96,6 +108,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                         onChange={actions.handleLaserDurationChange}
                         className="z-0 text-center text-blue-500 text-xl"
                         suffix="sec"
+                        type="number"
                     />
                 </div>
             </div>

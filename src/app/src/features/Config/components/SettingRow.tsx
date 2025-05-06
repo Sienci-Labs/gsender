@@ -9,15 +9,22 @@ import { NumberSettingInput } from 'app/features/Config/components/SettingInputs
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import {
+    isSettingDefault,
+    useSettings,
+} from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
-import get from 'lodash/get';
 import cn from 'classnames';
+import { BiReset } from 'react-icons/bi';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import store from 'app/store';
+import { FaMicrochip } from 'react-icons/fa6';
+import { GRBLHAL } from 'app/constants';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -111,9 +118,16 @@ export function SettingRow({
     index,
     changeHandler,
 }: SettingRowProps): JSX.Element {
-    const { settingsValues, setSettingsAreDirty, setEEPROM, connected } =
-        useSettings();
+    const {
+        settingsValues,
+        setSettingsAreDirty,
+        setEEPROM,
+        setSettingsValues,
+        firmwareType,
+        connected,
+    } = useSettings();
 
+    const displaySetting = { ...setting };
     // Default function to not hidden
     let isHidden = false;
     if (setting && setting.hidden) {
@@ -135,7 +149,22 @@ export function SettingRow({
         toast.success(`Restored ${setting} to default value of ${value}`);
     }
 
+    function handleProgramSettingReset(setting) {
+        if ('key' in setting) {
+            if (setting.defaultValue !== null) {
+                store.set(setting.key, setting.defaultValue);
+                setSettingsValues((prev) => {
+                    const updated = [...prev];
+                    updated[setting.globalIndex].value = setting.defaultValue;
+                    updated[setting.globalIndex].dirty = false;
+                    return updated;
+                });
+            }
+        }
+    }
+
     const populatedValue = settingsValues[setting.globalIndex] || {};
+
     // if EEPROM or Hybrid and not connected, show nothing
     if (
         (setting.type === 'eeprom' || setting.type === 'hybrid') &&
@@ -155,24 +184,59 @@ export function SettingRow({
             />
         );
     }
+
+    const isDefault = isSettingDefault(populatedValue);
+
     //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
         <div
-            className={cn('p-2 flex flex-row items-center text-gray-700 border-b border-gray-200', {
-                hidden: isHidden,
-            })}
+            className={cn(
+                'p-2 flex flex-row flex-wrap items-center text-gray-700 border-b border-gray-200',
+                {
+                    hidden: isHidden,
+                    'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                        !isDefault,
+                },
+            )}
         >
-            <span className="w-1/5 dark:text-gray-400">{setting.label}</span>
-            <span className="w-1/5 text-xs px-4 dark:text-gray-200">
+            <span className="w-1/5 font-xl max-xl:w-full max-xl:mb-2 dark:text-gray-400">
+                {setting.label}
+            </span>
+            <span className="w-1/5 max-xl:w-2/5 text-xs px-4 dark:text-gray-200">
                 {returnSettingControl(
-                    setting,
+                    displaySetting,
                     populatedValue.value,
                     setting.globalIndex,
                     changeHandler(populatedValue.globalIndex),
                 )}
             </span>
-            <span className="w-1/5 text-xs px-4"></span>
-            <span className="text-gray-500 text-sm w-2/5 flex flex-col gap-2">
+            <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+                {!isDefault && (
+                    <button
+                        className="text-3xl"
+                        title="Reset Setting"
+                        onClick={() => {
+                            Confirm({
+                                title: 'Reset setting',
+                                content:
+                                    'Are you sure you want to reset this value to default?',
+                                confirmLabel: 'Yes',
+                                onConfirm: () => {
+                                    handleProgramSettingReset(populatedValue);
+                                },
+                            });
+                        }}
+                    >
+                        <BiReset />
+                    </button>
+                )}
+                {setting.type === 'hybrid' && firmwareType === GRBLHAL && (
+                    <span className="text-robin-500 text-4xl">
+                        <FaMicrochip />
+                    </span>
+                )}
+            </span>
+            <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5 flex flex-col gap-2">
                 {setting.description.split('\n').map((line, index) => (
                     <p>{line}</p>
                 ))}

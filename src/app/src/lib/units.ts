@@ -174,7 +174,6 @@ export const convertToMetric = (val: number): number => {
 // assume starting imperial,
 export function convertIfImperial(num: string | number, units = METRIC_UNITS) {
     if (units === IMPERIAL_UNITS) {
-        console.log('converting');
         return convertValueToImperialUnits(num);
     }
     return Number(num);

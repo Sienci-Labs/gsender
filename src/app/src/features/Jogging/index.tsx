@@ -2,18 +2,21 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import includes from 'lodash/includes';
 import get from 'lodash/get';
+import inRange from 'lodash/inRange';
+import throttle from 'lodash/throttle';
+import cx from 'classnames';
 
-import { JogInput } from 'app/features/Jogging/components/JogInput.tsx';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel.tsx';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector.tsx';
-import { ZJog } from 'app/features/Jogging/components/ZJog.tsx';
-import { AJog } from 'app/features/Jogging/components/AJog.tsx';
+import { JogInput } from 'app/features/Jogging/components/JogInput';
+import { JogWheel } from 'app/features/Jogging/components/JogWheel';
+import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
+import { ZJog } from 'app/features/Jogging/components/ZJog';
+import { AJog } from 'app/features/Jogging/components/AJog';
 import store from 'app/store';
 import {
     cancelJog,
     jogAxis,
     startJogCommand,
-} from 'app/features/Jogging/utils/Jogging.ts';
+} from 'app/features/Jogging/utils/Jogging';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from 'app/store/redux';
 import {
@@ -25,23 +28,21 @@ import {
     WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
-
-import stopSign from './assets/stop.svg';
-import jogWheeelLabels from './assets/labels.svg';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toast } from 'app/lib/toaster';
-import cx from 'classnames';
 import controller from 'app/lib/controller';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import gamepad, { checkButtonHold } from 'app/lib/gamepad';
+import { GamepadProfile } from 'app/lib/gamepad/definitions';
+import { StopButton } from 'app/features/Jogging/components/StopButton';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+
+import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
-import gamepad, { checkButtonHold } from 'app/lib/gamepad';
-import { inRange, throttle } from 'lodash';
-import { GamepadProfile } from 'app/lib/gamepad/definitions';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 
-// Define a type that represents what gamepad.getInstance() actually returns
 interface GamepadInstance {
     isHolding?: boolean;
     start: () => void;
@@ -57,7 +58,8 @@ export interface JogValueObject {
 }
 
 export function Jogging() {
-    const { mode, units } = useWorkspaceState();
+    const { mode } = useWorkspaceState();
+    const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
@@ -91,6 +93,14 @@ export function Jogging() {
     const activeState = useSelector((state: RootState) => {
         return get(state, 'controller.state.status.activeState', 'Idle');
     });
+
+    const firmwareType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
+
+    useEffect(() => {
+        setFirmware(firmwareType as FirmwareFlavour);
+    }, [firmwareType]);
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -544,12 +554,22 @@ export function Jogging() {
             A: currentJogSpeed.aStep,
         };
 
-        const jogCB = (given: Record<string, number>) => {
-            startJogCommand(given, currentJogSpeed.feedrate, false);
+        const jogCB = (given: Record<string, number>, feedrate: number) => {
+            startJogCommand(given, feedrate, false);
         };
 
-        const startContinuousJogCB = (coordinates: Record<string, number>) => {
-            startJogCommand(coordinates, currentJogSpeed.feedrate, true);
+        const startContinuousJogCB = (
+            coordinates: Record<string, number>,
+            feedrate: number,
+        ) => {
+            const normalizedCoordinates: Record<string, number> = {};
+
+            // Convert each coordinate value to either 1 or -1 based on its sign
+            Object.keys(coordinates).forEach((key) => {
+                normalizedCoordinates[key] = coordinates[key] > 0 ? 1 : -1;
+            });
+
+            startJogCommand(normalizedCoordinates, feedrate, true);
         };
 
         const stopContinuousJogCB = () => {
@@ -889,12 +909,17 @@ export function Jogging() {
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
                     />
-                    <img
-                        src={stopSign}
-                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"
-                        alt="E-Stop button"
-                        onClick={cancelJog}
+                    <StopButton
+                        disabled={!isConnected}
+                        onClick={() => cancelJog(activeState, firmware)}
                     />
+                    {/*<img
+                        src={stopSign}
+                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 hover:fill-red-200"
+                        alt="E-Stop button"
+
+                        onClick={() => cancelJog(activeState, firmware)}
+                    />*/}
                 </div>
                 <div className="flex justify-center gap-4">
                     <ZJog
@@ -902,7 +927,7 @@ export function Jogging() {
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
                     />
-                    {axes && (isRotaryMode || axes.includes('A')) && (
+                    {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
                         <AJog
                             distance={jogSpeed.aStep}
                             feedrate={jogSpeed.feedrate}
@@ -916,9 +941,11 @@ export function Jogging() {
                     <div
                         className={cx('grid gap-x-1 items-center', {
                             'grid-cols-2 gap-y-3':
-                                firmware === 'grblHAL' || isRotaryMode,
+                                (rotaryWidgetState.tab.show &&
+                                    firmwareType === 'grblHAL') ||
+                                isRotaryMode,
                             'grid-cols-1 gap-y-1':
-                                firmware !== 'grblHAL' && !isRotaryMode,
+                                !rotaryWidgetState.tab.show && !isRotaryMode,
                         })}
                     >
                         <JogInput
@@ -931,13 +958,14 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmware === 'grblHAL' || isRotaryMode) && (
-                            <JogInput
-                                label="A°"
-                                currentValue={jogSpeed.aStep}
-                                onChange={updateAStep}
-                            />
-                        )}
+                        {(firmwareType === 'grblHAL' || isRotaryMode) &&
+                            rotaryWidgetState.tab.show && (
+                                <JogInput
+                                    label="A°"
+                                    currentValue={jogSpeed.aStep}
+                                    onChange={updateAStep}
+                                />
+                            )}
                         <JogInput
                             label="at"
                             currentValue={jogSpeed.feedrate}

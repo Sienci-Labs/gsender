@@ -33,22 +33,22 @@ export function JobsPerComPort() {
         labels,
         datasets: [
             {
-                label: 'Jobs per Com Port',
+                label: 'Jobs',
                 data: jobData,
                 backgroundColor: [
                     '#7ca7d0',
+                    '#22415e',
                     '#dc2626',
                     '#bb6a0c',
                     '#3F85C7',
                     '#059669',
-                    '#22415e',
                 ],
             },
         ],
     };
 
     return (
-        <div>
+        <div className="w-40">
             <Pie
                 data={data}
                 width={280}

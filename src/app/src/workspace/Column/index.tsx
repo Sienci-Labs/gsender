@@ -3,7 +3,7 @@ import { Location } from 'app/features/Location';
 
 export const Column = () => {
     return (
-        <div className="p-1 flex-1 box-border">
+        <div className="p-1 flex-1 box-border portrait:h-full">
             <Widget>
                 <Widget.Content
                     className="justify-between"

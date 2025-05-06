@@ -7,7 +7,7 @@ import { FaPaperPlane } from 'react-icons/fa6';
 import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
-import { Switch } from 'app/components/shadcn/Switch.tsx';
+import Switch from 'app/components/Switch';
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
 
@@ -50,7 +50,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     }, [relativeMovement]);
 
     const onToggleSwap = () => {
-        setRelativeMovement(!relativeMovement);
+        setRelativeMovement((prev) => !prev);
     };
 
     function goToLocation() {
@@ -75,8 +75,12 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover>
-            <PopoverTrigger disabled={disabled} className="disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-300 text-xl bg-robin-500 text-white border-robin-500 gap-1 border rounded hover:opacity-90 px-3 shadow">
-                <FaPaperPlane />
+            <PopoverTrigger asChild>
+                <Button
+                    disabled={disabled}
+                    icon={<FaPaperPlane />}
+                    variant="secondary"
+                />
             </PopoverTrigger>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
@@ -107,7 +111,10 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                     />
                     <div className="flex flex-row text-sm text-gray-400 justify-between">
                         <span>ABS</span>
-                        <Switch onClick={onToggleSwap} />
+                        <Switch
+                            checked={relativeMovement}
+                            onChange={onToggleSwap}
+                        />
                         <span>INC</span>
                     </div>
                     <Button variant="primary" onClick={goToLocation}>

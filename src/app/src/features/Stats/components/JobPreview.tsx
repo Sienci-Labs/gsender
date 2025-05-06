@@ -9,12 +9,12 @@ const statusBadge = tv({
     variants: {
         color: {
             Finished: 'text-green-500 border-green-500 bg-green-500',
-            Incomplete: 'text-red-500 border-red-500 bg-red-500',
+            Stopped: 'text-red-500 border-red-500 bg-red-500',
         },
     },
 });
 
-function formatDuration(seconds: number) {
+export function formatDuration(seconds: number) {
     return new Date(seconds).toISOString().slice(11, 19);
 }
 
@@ -28,7 +28,7 @@ export function JobPreview({
     duration: number;
 }) {
     const jobComplete = jobStatus === 'COMPLETE';
-    const statusMessage = jobComplete ? 'Finished' : 'Incomplete';
+    const statusMessage = jobComplete ? 'Finished' : 'Stopped';
     return (
         <div className="grid grid-cols-8 grid-rows-1 gap-4 items-center dark:text-white">
             <span

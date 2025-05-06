@@ -17,6 +17,8 @@ import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import defaultStoreState from 'app/store/defaultState';
 import { boolean } from 'zod';
+import isEqual from 'lodash/isEqual';
+import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -70,6 +72,13 @@ export function useSettings() {
     return context;
 }
 
+export function isSettingDefault(v) {
+    if ('key' in v) {
+        return isEqual(v.value, v.defaultValue);
+    }
+    return true; // Default to true to non-key settings aren't always highlighted.
+}
+
 function fetchStoreValue(key) {
     return store.get(key);
 }
@@ -81,8 +90,6 @@ function fetchDefaultValue(key) {
 export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
-
-export function getPopulatedMenus(settings: SettingsMenuSection[]) {}
 
 function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
     const globalValueReference = [];
@@ -146,8 +153,19 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
 
     useEffect(() => {
-        const machineProfile = store.get('workspace.machineProfile', {});
-        setMachineProfile(machineProfile);
+        const storeMachineProfile = store.get('workspace.machineProfile', {});
+        // lookup latest values as set for this machine ID
+        const latest = machineProfiles.find(
+            (o) => o.id === storeMachineProfile.id,
+        );
+
+        if (!latest) {
+            console.error(
+                'No machine profile with this ID found, using previous value.',
+            );
+            return setMachineProfile(storeMachineProfile);
+        }
+        setMachineProfile(latest);
     }, []);
 
     useEffect(() => {
@@ -189,13 +207,36 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
+            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+
+            // can't find a relevant value, we hide it
+            if (!EEPROMData) {
+                return false;
+            }
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (filterNonDefault) {
-                const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
                 if (EEPROMData) {
                     return !eepromIsDefault(EEPROMData);
                 }
                 return false; // We don't know, default to hide
+            }
+        }
+
+        // Filter non-default gSender settings if they are store values (have a key)
+        if (filterNonDefault && 'key' in v) {
+            if ('defaultValue' in v) {
+                return !isEqual(
+                    settingsValues[v.globalIndex].value,
+                    v.defaultValue,
+                );
+            }
+            return false;
+        }
+
+        if (filterNonDefault) {
+            if (v.type === 'wizard' || v.type === 'event') {
+                // we don't have defaults for these
+                return false;
             }
         }
 
@@ -220,6 +261,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 ? machineProfile.eepromSettings
                 : machineProfile.grblHALeepromSettings;
         const inputDefault = get(profileDefaults, settingData.setting, '-');
+
+        if (inputDefault === '-') {
+            return true; // default in cases where we don't know the default
+        }
 
         const settingIsNumberValue = !(
             Number.isNaN(inputDefault) || Number.isNaN(inputDefault)

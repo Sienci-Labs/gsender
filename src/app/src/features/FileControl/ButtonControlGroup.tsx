@@ -9,10 +9,14 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
 import { Button } from 'app/components/Button';
-import { store as reduxStore } from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import { CARVING_CATEGORY, VISUALIZER_PRIMARY } from 'app/constants';
+import {
+    CARVING_CATEGORY,
+    VISUALIZER_PRIMARY,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     DropdownMenu,
@@ -42,6 +46,8 @@ import Divider from './components/Divider';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import { useSelector } from 'react-redux';
+import {toast} from "app/lib/toaster";
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,6 +60,14 @@ const ButtonControlGroup = () => {
     }, [fileLoaded]);
 
     const usingElectron = isElectron();
+    const connected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const workflowState = useSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
+    const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
+    const canClick = !isRunning;
 
     useEffect(() => {
         setRecentFiles(getRecentFiles());
@@ -165,6 +179,7 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
+        toast('G-code File Closed');
 
         fileInputRef.current.value = '';
     }, 100);
@@ -177,6 +192,7 @@ const ButtonControlGroup = () => {
                     icon={<FaFolderOpen className="w-5 h-5" />}
                     text="Load File"
                     variant="ghost"
+                    disabled={!canClick}
                     className="h-10 px-4 rounded-none"
                 />
 
@@ -187,6 +203,7 @@ const ButtonControlGroup = () => {
                         <Button
                             icon={<MdKeyboardArrowDown className="w-10 h-8" />}
                             variant="ghost"
+                            disabled={!canClick}
                             className="h-10 w-12 rounded-none"
                         />
                     </DropdownMenuTrigger>
@@ -216,7 +233,7 @@ const ButtonControlGroup = () => {
                 <Divider />
 
                 <ReloadFileAlert
-                    fileLoaded={fileLoaded && usingElectron}
+                    fileLoaded={!canClick && fileLoaded && usingElectron}
                     handleFileReload={handleFileReload}
                 />
 
@@ -228,7 +245,7 @@ const ButtonControlGroup = () => {
                             icon={<MdClose className="w-6 h-6" />}
                             variant="ghost"
                             className="h-10 w-12 rounded-none"
-                            disabled={!fileLoaded}
+                            disabled={isRunning || !fileLoaded}
                         />
                     </AlertDialogTrigger>
                     <AlertDialogContent className="bg-white">

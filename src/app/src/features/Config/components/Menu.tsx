@@ -37,7 +37,7 @@ function MenuItem({
     return (
         <button
             className={cn(
-                'flex min-h-8 max-h-14 items-center justify-start gap-2 px-4 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500',
+                'flex min-h-8 max-h-14 items-center justify-start gap-2 px-4 max-xl:px-1 max-xl:font-sm max-xl:gap-1 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500',
                 {
                     'text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
                         active,
@@ -51,7 +51,7 @@ function MenuItem({
         >
             <span
                 className={cn(
-                    'text-gray-600 text-2xl group-hover:text-blue-500',
+                    'text-gray-600 text-2xl max-xl:text-xl group-hover:text-blue-500',
                     {
                         'text-blue-500 fill-blue-500': active,
                     },

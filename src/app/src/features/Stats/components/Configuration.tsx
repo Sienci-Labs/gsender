@@ -7,7 +7,7 @@ import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import store from 'app/store';
 import { MachineProfile } from 'app/definitions/firmware';
 
-function ConfigRow({
+export function ConfigRow({
     label,
     children,
     connected = false,

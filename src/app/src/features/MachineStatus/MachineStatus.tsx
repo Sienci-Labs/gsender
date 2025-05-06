@@ -36,6 +36,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_TOOL,
 } from '../../constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
@@ -95,6 +96,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             Sleep: 'Sleep',
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
+            Tool: 'Tool Change',
         };
 
         return (
@@ -122,6 +124,9 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 isConnected,
                             'bg-red-500 text-white':
                                 activeState === GRBL_ACTIVE_STATE_ALARM &&
+                                isConnected,
+                            'bg-purple-600 text-white':
+                                activeState === GRBL_ACTIVE_STATE_TOOL &&
                                 isConnected,
                         },
                     )}
@@ -172,7 +177,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 
     return (
         // calc = half of width + sidebar width
-        <div className="absolute top-0 left-1/2 -ml-[calc(128px-50px)] max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
+        <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
             {machineStateRender()}
         </div>
     );

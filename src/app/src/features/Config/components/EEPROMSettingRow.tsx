@@ -5,7 +5,6 @@ import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 
@@ -31,14 +30,8 @@ export function EEPROMSettingRow({
     link = null,
     linkLabel = null,
 }: EEPROMSettingRowProps) {
-    const {
-        EEPROM,
-        machineProfile,
-        firmwareType,
-        searchTerm,
-        setSettingsAreDirty,
-        eepromIsDefault,
-    } = useSettings();
+    const { EEPROM, machineProfile, firmwareType, eepromIsDefault } =
+        useSettings();
     if (!EEPROM) {
         return;
     }
@@ -73,18 +66,18 @@ export function EEPROMSettingRow({
             <div
                 key={`eSetting-${EEPROMData.key}`}
                 className={cn(
-                    'p-2 flex flex-row items-center border-b border-gray-200',
+                    'p-2 flex flex-row flex-wrap items-center border-b border-gray-200',
                     {
                         'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
                             !isDefault,
                     },
                 )}
             >
-                <div className="w-1/5 text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
+                <div className="w-1/5 max-xl:w-full max-xl:mb-1 text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
                     {EEPROMData.description}
                 </div>
                 <div
-                    className="w-1/5 text-xs px-4 gap-2 flex flex-col"
+                    className="w-1/5 max-xl:w-2/5 text-xs px-4 gap-2 flex flex-col"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -98,7 +91,7 @@ export function EEPROMSettingRow({
                         </div>
                     )}
                 </div>
-                <span className="w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+                <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (
                         <button
                             className="text-3xl"
@@ -125,7 +118,7 @@ export function EEPROMSettingRow({
                         <FaMicrochip />
                     </span>
                 </span>
-                <span className="text-gray-500 text-sm w-2/5">
+                <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5">
                     {detailString}
                 </span>
             </div>

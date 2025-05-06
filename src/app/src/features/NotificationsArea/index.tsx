@@ -11,12 +11,23 @@ import { NotificationDisplay } from 'app/features/NotificationsArea/Notification
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { GENERAL_CATEGORY } from 'app/constants';
+import reduxStore from 'app/store/redux';
+import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
 
 const NotificationsArea = () => {
     const [open, setOpen] = useState(false);
-    const notifications = useTypedSelector(
-        (state) => state.preferences.notifications,
+    const notifications = useTypedSelector((state) =>
+        state.preferences.notifications?.filter(
+            (notification) =>
+                notification.type === 'error' &&
+                notification.status === 'unread',
+        ),
     );
+
+    function markNotificationsRead() {
+        setOpen(!open);
+        reduxStore.dispatch(readAllNotifications());
+    }
 
     const shuttleControlEvents = {
         DISPLAY_NOTIFICATIONS: {
@@ -34,7 +45,7 @@ const NotificationsArea = () => {
     useShuttleEvents(shuttleControlEvents);
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={markNotificationsRead}>
             <PopoverTrigger asChild>
                 <button className="relative max-sm:hidden">
                     <LuBell className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />

@@ -130,6 +130,7 @@ export const GRBL_ACTIVE_STATE_ALARM = 'Alarm';
 export const GRBL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBL_ACTIVE_STATE_JOG = 'Jog';
 export const GRBL_ACTIVE_STATE_TESTING = 'Testing File';
+export const GRBL_ACTIVE_STATE_TOOL = 'Tool';
 export const GRBL_ACTIVE_STATES = {
     GRBL_ACTIVE_STATE_IDLE: 'Idle',
     GRBL_ACTIVE_STATE_RUN: 'Run',
@@ -141,6 +142,7 @@ export const GRBL_ACTIVE_STATES = {
     GRBL_ACTIVE_STATE_CHECK: 'Check',
     GRBL_ACTIVE_STATE_JOG: 'Jog',
     GRBL_ACTIVE_STATE_TESTING: 'Testing File',
+    GRBL_ACTIVE_STATE_TOOL: 'Tool'
 };
 
 // grblHal Active State
@@ -154,6 +156,7 @@ export const GRBL_HAL_ACTIVE_STATE_ALARM = 'Alarm';
 export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBL_HAL_ACTIVE_STATE_JOG = 'Jog';
 export const GRBL_HAL_ACTIVE_STATE_TESTING = 'Testing File';
+export const GRBL_HAL_ACTIVE_STATE_TOOL = 'Tool';
 export const GRBL_HAL_ACTIVE_STATES = {
     GRBL_HAL_ACTIVE_STATE_IDLE: 'Idle',
     GRBL_HAL_ACTIVE_STATE_RUN: 'Run',
@@ -164,6 +167,7 @@ export const GRBL_HAL_ACTIVE_STATES = {
     GRBL_HAL_ACTIVE_STATE_ALARM: 'Alarm',
     GRBL_HAL_ACTIVE_STATE_CHECK: 'Check',
     GRBL_HAL_ACTIVE_STATE_JOG: 'Jog',
+    GRBL_HAL_ACTIVE_STATE_TOOL: 'Tool',
     GRBL_HAL_ACTIVE_STATE_TESTING: 'Testing File',
 };
 

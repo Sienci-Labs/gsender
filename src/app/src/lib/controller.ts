@@ -409,7 +409,6 @@ class Controller {
         //     options = {};
         //     callback = options;
         // }
-        console.log(options);
         if (typeof callback !== 'function') {
             callback = noop;
         }

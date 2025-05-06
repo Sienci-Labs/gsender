@@ -3,6 +3,12 @@ import api from 'app/api';
 import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { JOB_STATUS, JOB_TYPES } from 'app/constants';
 import { AxiosResponse } from 'axios';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
+import {
+    calculateJobStats,
+    filterJobsByPort,
+} from 'app/features/Stats/utils/statUtils.ts';
 
 type EventType = 'ALARM' | 'ERROR';
 export type JOB_TYPES_T = (typeof JOB_TYPES)[keyof typeof JOB_TYPES];
@@ -36,6 +42,14 @@ export interface Job {
     subRow?: string;
 }
 
+export interface JobStats {
+    completeJobs: number;
+    incompleteJobs: number;
+    totalCutTime: number;
+    averageCutTime: number;
+    longestCutTime: number;
+}
+
 export interface MaintenanceTask {
     id?: number;
     description: string;
@@ -53,6 +67,7 @@ export interface JobAggregate {
 const initialState: {
     jobs: Job[];
     alarms: FirmwareEvent[];
+    isConnected: false;
     maintenanceTasks: MaintenanceTask[];
     jobAggregate: JobAggregate;
     maintenanceActions?: {
@@ -67,6 +82,7 @@ const initialState: {
     alarms: [],
     maintenanceTasks: [],
     jobAggregate: {},
+    isConnected: false,
 };
 
 export const StatContext = createContext(initialState);
@@ -76,6 +92,22 @@ export function StatsProvider({ children }: { children: ReactNode }) {
     const [alarms, setAlarms] = useState<FirmwareEvent[]>([]);
     const [maintenanceTasks, setMaintenanceTasks] = useState([]);
     const [jobAggregate, setJobAggregate] = useState({});
+    const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+
+    const [jobStats, setJobStats] = useState<JobStats>({
+        averageCutTime: 0,
+        completeJobs: 0,
+        incompleteJobs: 0,
+        longestCutTime: 0,
+        totalCutTime: 0,
+    });
+
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const connectedPort = useTypedSelector(
+        (state: RootState) => state.connection.port,
+    );
 
     // File stats, Alarms and Maintenance
     useEffect(() => {
@@ -102,6 +134,16 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         fetchMaintenance().catch((e) => console.error(e));
     }, []);
 
+    useEffect(() => {
+        if (!isConnected) return;
+        if (!connectedPort || connectedPort.length === 0) return;
+
+        const jobsOnConnectedPort = filterJobsByPort(jobs, connectedPort);
+        const portStats = calculateJobStats(jobsOnConnectedPort);
+
+        setJobStats(portStats);
+    }, [jobs, isConnected, connectedPort]);
+
     const maintenanceActions = {
         update: async (newTasks: MaintenanceTask[]) => {
             try {
@@ -120,8 +162,10 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         alarms,
         maintenanceTasks,
         maintenanceActions,
+        isConnected,
         setAlarms,
         setMaintenanceTasks,
+        jobStats,
     };
 
     return (

@@ -22,6 +22,7 @@ export interface Visualizer {
     theme: THEMES_T;
     SVGEnabled: boolean;
     jobEndModal: boolean;
+    maintenanceTaskNotifications: boolean;
     gcode: {
         displayName: boolean;
     };

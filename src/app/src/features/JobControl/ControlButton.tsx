@@ -24,6 +24,7 @@ import {
     STOP,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
+    WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 
 type MACHINE_CONTROL_BUTTONS_T =
@@ -58,20 +59,35 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     fileLoaded,
     onStop,
 }) => {
+    function canRun() {
+        return (
+            activeState === GRBL_ACTIVE_STATE_IDLE ||
+            activeState === GRBL_ACTIVE_STATE_HOLD
+        );
+    }
+
+    function canPause() {
+        const { state } = workflow;
+
+        return (
+            includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state) &&
+            (activeState === GRBL_ACTIVE_STATE_RUN ||
+                activeState === GRBL_ACTIVE_STATE_HOLD)
+        );
+    }
+
+    function canStop() {
+        const { state } = workflow;
+        return includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state);
+    }
+
     const isDisabled = (): boolean => {
         if (!isConnected || !fileLoaded) {
             return true;
         } else if (
-            (type === START &&
-                (activeState === GRBL_ACTIVE_STATE_IDLE ||
-                    activeState === GRBL_ACTIVE_STATE_HOLD)) ||
-            (type === PAUSE &&
-                (activeState === GRBL_ACTIVE_STATE_RUN ||
-                    activeState === GRBL_ACTIVE_STATE_HOLD)) ||
-            (type === STOP &&
-                (activeState === GRBL_ACTIVE_STATE_RUN ||
-                    activeState === GRBL_ACTIVE_STATE_HOLD ||
-                    activeState === GRBL_ACTIVE_STATE_ALARM))
+            (type === START && canRun()) ||
+            (type === PAUSE && canPause()) ||
+            (type === STOP && canStop())
         ) {
             return false;
         }
