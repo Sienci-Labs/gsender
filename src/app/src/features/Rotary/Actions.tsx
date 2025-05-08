@@ -13,6 +13,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';
 import { useNavigate } from 'react-router';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 const Actions = () => {
     const navigate = useNavigate();
@@ -21,11 +22,17 @@ const Actions = () => {
     );
 
     const runProbing = (name = 'rotary', commands: string) => {
-        toast.info(`Running ${name} probing commands`);
+        Confirm({
+            title: `${name} probing`,
+            content: `Click 'Run' to start the ${name} probing cycle`,
+            confirmLabel: `Run`,
+            onConfirm: () => {
+                toast.info(`Running ${name} probing commands`);
+                const unitModal = getUnitModal();
 
-        const unitModal = getUnitModal();
-
-        controller.command('gcode:safe', commands, unitModal);
+                controller.command('gcode:safe', commands, unitModal);
+            },
+        });
     };
 
     const shuttleControlEvents = {
@@ -63,6 +70,7 @@ const Actions = () => {
             </Button>
             <Button
                 size="sm"
+                variant="primary"
                 onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}
                 disabled={!isConnected}
             >
@@ -70,6 +78,7 @@ const Actions = () => {
             </Button>
             <Button
                 size="sm"
+                variant="primary"
                 onClick={() =>
                     runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
                 }
