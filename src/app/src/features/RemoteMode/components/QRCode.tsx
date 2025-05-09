@@ -3,6 +3,11 @@ import React from 'react';
 import { FaCopy } from 'react-icons/fa';
 import Button from 'app/components/Button';
 
+function copyToClipboard(text: string) {
+    console.log(text);
+    navigator.clipboard.writeText(text);
+}
+
 export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
     const safeAddress = `http://${address}/#/remote`;
     return (
@@ -18,7 +23,9 @@ export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
                 <Button
                     size="sm"
                     variant="outline"
+                    type="button"
                     className="flex flex-row items-center justify-center gap-1"
+                    onClick={() => copyToClipboard(safeAddress)}
                 >
                     <span>Copy</span> <FaCopy />
                 </Button>
