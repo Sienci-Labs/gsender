@@ -47,7 +47,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
-import {toast} from "app/lib/toaster";
+import { toast } from 'app/lib/toaster';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -233,7 +233,7 @@ const ButtonControlGroup = () => {
                 <Divider />
 
                 <ReloadFileAlert
-                    fileLoaded={!canClick && fileLoaded && usingElectron}
+                    fileLoaded={canClick && fileLoaded && usingElectron}
                     handleFileReload={handleFileReload}
                 />
 
