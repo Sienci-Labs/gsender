@@ -7,7 +7,7 @@ import { FaPaperPlane } from 'react-icons/fa6';
 import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
 

@@ -22,7 +22,7 @@ import {
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import ToggleSwitch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import Button from 'app/components/Button';
 import {
     Table,
@@ -286,7 +286,7 @@ const SetShortcut = () => {
                         <div className="text-base">
                             <div className="my-8">
                                 <p>Use As Lockout Button</p>
-                                <ToggleSwitch
+                                <Switch
                                     checked={isLockoutButton}
                                     onChange={(checked) =>
                                         handleSetToggle(

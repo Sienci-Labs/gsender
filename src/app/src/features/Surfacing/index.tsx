@@ -13,7 +13,7 @@ import {
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import cx from 'classnames';
-import { Checkbox } from 'app/components/shadcn/Checkbox';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/Input';
 import defaultState from 'app/store/defaultState';
@@ -241,15 +241,14 @@ const SurfacingTool = () => {
                                     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                         Delay
                                     </label>
-                                    <Checkbox
+                                    <Switch
                                         checked={surfacing.shouldDwell}
-                                        onCheckedChange={(checked) => {
+                                        onChange={(checked) => {
                                             setSurfacing({
                                                 ...surfacing,
                                                 shouldDwell: checked as boolean,
                                             });
                                         }}
-                                        className="bg-white border-gray-400 rounded-sm min-h-5 min-w-5"
                                     />
                                 </div>
                             </div>

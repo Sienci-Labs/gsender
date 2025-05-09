@@ -21,7 +21,7 @@
  *
  */
 
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { LASER_MODE } from 'app/constants';
 
 type Props = {

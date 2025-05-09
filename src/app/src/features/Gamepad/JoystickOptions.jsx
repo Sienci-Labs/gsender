@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Select from 'react-select';
 import { cloneDeep, set, get } from 'lodash';
 
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
 import { Input } from 'app/components/Input';
 import { GamepadContext } from './utils/context';

@@ -1,4 +1,4 @@
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';

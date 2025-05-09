@@ -8,7 +8,7 @@ import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import store from 'app/store';
-import Toggle from 'app/components/Switch/Toggle.tsx';
+import { Switch } from 'app/components/shadcn/Switch';
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 
@@ -129,7 +129,7 @@ export function MachineInfoDisplay({
                     <span className="text-gray-500 dark:text-white">
                         Lock Stepper Motors
                     </span>
-                    <Toggle
+                    <Switch
                         onChange={handleStepperMotorToggle}
                         checked={stepperState === '255'}
                         disabled={!isConnected}

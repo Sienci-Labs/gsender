@@ -7,25 +7,43 @@ import * as SwitchPrimitives from '@radix-ui/react-switch';
 
 import cx from 'classnames';
 
+interface Props
+    extends Omit<
+        React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
+        'onChange'
+    > {
+    position?: 'horizontal' | 'vertical';
+    onChange: (checked: boolean, id: string) => void;
+}
+
 const Switch = React.forwardRef<
     React.ElementRef<typeof SwitchPrimitives.Root>,
-    React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-    <SwitchPrimitives.Root
-        className={cx(
-            'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-200 data-[state=unchecked]:bg-gray-50',
-            className,
-        )}
-        {...props}
-        ref={ref}
-    >
-        <SwitchPrimitives.Thumb
+    Props
+>(({ className, position = 'horizontal', onChange, id, ...props }, ref) => {
+    const isVertical = position === 'vertical';
+    return (
+        <SwitchPrimitives.Root
             className={cx(
-                'pointer-events-none block h-5 w-5 rounded-full bg-blue-500 shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0',
+                'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200',
+                className,
+                isVertical ? 'flex-col h-11 w-6 ' : 'items-center h-6 w-11 ',
             )}
-        />
-    </SwitchPrimitives.Root>
-));
+            {...props}
+            ref={ref}
+            id={id}
+            onCheckedChange={(checked) => onChange(checked, id)}
+        >
+            <SwitchPrimitives.Thumb
+                className={cx(
+                    'pointer-events-none block h-5 w-5 rounded-full border data-[state=checked]:border-blue-500 data-[state=unchecked]:border-gray-300 bg-white shadow-lg ring-0 transition-transform ',
+                    isVertical
+                        ? 'data-[state=checked]:translate-y-[1px] data-[state=unchecked]:translate-y-[21px]'
+                        : 'data-[state=checked]:translate-x-[21px] data-[state=unchecked]:translate-x-0',
+                )}
+            />
+        </SwitchPrimitives.Root>
+    );
+});
 Switch.displayName = SwitchPrimitives.Root.displayName;
 
 export { Switch };

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';

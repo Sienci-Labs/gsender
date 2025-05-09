@@ -1,4 +1,4 @@
-import Toggle from 'app/components/Switch/Toggle.tsx';
+import { Switch } from 'app/components/shadcn/Switch';
 
 interface BooleanSettingInputProps {
     value: boolean;
@@ -13,5 +13,5 @@ export function BooleanSettingInput({
     disabled = () => false,
 }: BooleanSettingInputProps) {
     const isDisabled = disabled();
-    return <Toggle checked={value} onChange={onChange} disabled={isDisabled} />;
+    return <Switch checked={value} onChange={onChange} disabled={isDisabled} />;
 }

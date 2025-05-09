@@ -171,7 +171,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                     </span>
                     <Switch
                         // size="small"
-                        onCheckedChange={(value) =>
+                        onChange={(value) =>
                             setSurfacing({
                                 ...surfacing,
                                 cutDirectionFlipped: value,
