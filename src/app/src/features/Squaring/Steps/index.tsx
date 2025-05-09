@@ -47,14 +47,14 @@ const Steps = () => {
         return (
             <div className="flex flex-col gap-2 xl:gap-0 dark:text-white w-full">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
-                    <div className="space-y-1 text-sm">
-                        <p>
+                    <div className="space-y-1 text-sm xl:text-base font-normal">
+                        <p className="text-gray-500 dark:text-gray-300">
                             If your CNC is making skewed cuts (pictured),
                             it&apos;s because the X and Y axes aren&apos;t
                             squared to each other. This can be fixed.
                         </p>
 
-                        <div>
+                        <div className="text-gray-500 dark:text-gray-300">
                             To know how much adjustment is needed, follow the
                             steps below. Prepare:
                             <ul className="list-disc list-inside">
@@ -71,7 +71,7 @@ const Steps = () => {
                             </ul>
                         </div>
 
-                        <p>
+                        <p className="text-gray-500 dark:text-gray-300">
                             Use the jog buttons to position your CNC near its
                             front, left corner with the pointed tip almost
                             touching the wasteboard, then continue below.

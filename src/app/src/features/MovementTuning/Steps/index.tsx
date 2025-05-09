@@ -99,16 +99,16 @@ const Steps = () => {
 
         return (
             <div className="flex flex-col gap-4 xl:gap-0">
-                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[2fr_1fr]">
-                    <div className="space-y-1 text-xs xl:text-sm">
-                        <p className="dark:text-white">
+                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
+                    <div className="space-y-1 text-sm xl:text-base font-normal">
+                        <p className="text-gray-500 dark:text-gray-300">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
                             small amount - say 102mm instead of 100 - then use
                             this tool.
                         </p>
 
-                        <p className="dark:text-white">
+                        <p className="text-gray-500 dark:text-gray-300">
                             Since CNC firmware needs to understand its hardware
                             to make exact movements, small manufacturing
                             variations in the motors, lead screws, pulleys, or
@@ -116,7 +116,7 @@ const Steps = () => {
                             longer distances.
                         </p>
 
-                        <p className="dark:text-white">
+                        <p className="text-gray-500 dark:text-gray-300">
                             By testing for this difference using a marker or
                             tape and a measuring tape, this tool will better
                             tune the firmware to your machine.
