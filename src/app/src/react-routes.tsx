@@ -38,6 +38,7 @@ import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import { BiSolidCylinder } from 'react-icons/bi';
 
 export const ReactRoutes = () => {
     return (
@@ -78,8 +79,8 @@ export const ReactRoutes = () => {
 
                                     <ToolCard
                                         title="Rotary Surfacing"
-                                        description="Generate toolpaths to surface and level your material"
-                                        icon={GiFlatPlatform}
+                                        description="Turn square material into round stock for rotary cutting"
+                                        icon={BiSolidCylinder}
                                         link="/tools/rotary-surfacing"
                                     />
 
