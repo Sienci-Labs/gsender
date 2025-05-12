@@ -4,7 +4,13 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import ControlButton from './ControlButton';
-import { GRBL_ACTIVE_STATE_IDLE, PAUSE, START, STOP } from '../../constants';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    PAUSE,
+    START,
+    STOP,
+    WORKFLOW_STATE_IDLE,
+} from '../../constants';
 import Overrides from './FeedOverride';
 import OutlineButton from './OutlineButton';
 import StartFromLine from './StartFromLine';
@@ -41,6 +47,7 @@ const JobControl: React.FC<JobControlProps> = ({
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
     const disabled = !isConnected || !fileLoaded;
+    const { state: workflowState } = workflow;
 
     useEffect(() => {
         subscribe();
@@ -90,15 +97,17 @@ const JobControl: React.FC<JobControlProps> = ({
             </div>
             <div className="relative h-full">
                 <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                    {fileLoaded && activeState === GRBL_ACTIVE_STATE_IDLE && (
-                        <div className="flex flex-row gap-2 justify-center mb-3 w-full">
-                            <OutlineButton disabled={disabled} />
-                            <StartFromLine
-                                disabled={disabled}
-                                lastLine={lastLine}
-                            />
-                        </div>
-                    )}
+                    {fileLoaded &&
+                        workflowState === WORKFLOW_STATE_IDLE &&
+                        activeState === GRBL_ACTIVE_STATE_IDLE && (
+                            <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                                <OutlineButton disabled={disabled} />
+                                <StartFromLine
+                                    disabled={disabled}
+                                    lastLine={lastLine}
+                                />
+                            </div>
+                        )}
                 </div>
 
                 <div className="z-10 absolute top-[-30px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">

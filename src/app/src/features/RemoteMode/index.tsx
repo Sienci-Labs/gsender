@@ -21,6 +21,7 @@ import { actions } from './apiActions.ts';
 import controller from 'app/lib/controller.ts';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 export function RemoteModeDialog({
     showRemote,
@@ -66,15 +67,23 @@ export function RemoteModeDialog({
     function saveRemotePreferences(e) {
         e.preventDefault();
 
-        const payload = {
-            ip,
-            port,
-            headlessStatus: remoteEnabled,
-        };
-        onClose(false);
-        actions.saveSettings(payload);
-        setHeadlessSettings(payload);
-        toast.success('Updated Wireless Control Settings');
+        Confirm({
+            onConfirm: () => {
+                const payload = {
+                    ip,
+                    port,
+                    headlessStatus: remoteEnabled,
+                };
+                onClose(false);
+                actions.saveSettings(payload);
+                setHeadlessSettings(payload);
+                toast.success('Updated Wireless Control Settings');
+            },
+            confirmLabel: 'Save Settings',
+            title: 'Save Wireless CNC Settings',
+            content:
+                'Are you sure you want to save these settings?  This will restart the application.',
+        });
     }
 
     return (

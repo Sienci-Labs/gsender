@@ -9,6 +9,7 @@ const Toggle = () => {
     const { type: controllerType } = useTypedSelector(
         (state) => state.controller,
     );
+    const connected = useTypedSelector((state) => state.connection.isConnected);
 
     const handleToggle = (checked: boolean) => {
         updateWorkspaceMode(
@@ -22,6 +23,7 @@ const Toggle = () => {
             <Switch
                 checked={mode === WORKSPACE_MODE.ROTARY}
                 onChange={handleToggle}
+                disabled={!connected}
             />
             <span>Rotary</span>
         </div>

@@ -223,10 +223,15 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
     const ToggleOutput = toggleInfo ? Info : Size;
 
     let cutName = '';
-    let extension;
+    let extension = '';
     if (name && name.length > 0) {
-        cutName = name.substring(0, name.indexOf('.') - 3);
-        extension = name.slice(name.indexOf('.') - 3);
+        if (name.indexOf('.') > 0) {
+            cutName = name.substring(0, name.indexOf('.') - 3);
+            extension = name.slice(name.indexOf('.') - 3);
+        } else {
+            cutName = name;
+            extension = '';
+        }
     }
 
     return (
