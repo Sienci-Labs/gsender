@@ -290,9 +290,9 @@ const SurfacingTool = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                         <Tabs defaultValue="visualizer-preview">
-                            <TabsList className="bg-gray-100 w-full">
+                            <TabsList className="w-full">
                                 <TabsTrigger
                                     value="visualizer-preview"
                                     className="w-full"
@@ -326,9 +326,12 @@ const SurfacingTool = () => {
                                 <VisualizerPreview gcode={gcode} />
                             </div>
                             <div
-                                className={cx('h-full rounded-md relative', {
-                                    invisible: !tabSwitch,
-                                })}
+                                className={cx(
+                                    'h-full rounded-md relative border p-2',
+                                    {
+                                        invisible: !tabSwitch,
+                                    },
+                                )}
                             >
                                 <GcodeViewer gcode={gcode} />
                             </div>
