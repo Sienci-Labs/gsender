@@ -121,7 +121,7 @@ const ButtonActionsTable = () => {
                 return (
                     <Input
                         defaultValue={row.label}
-                        className="bg-green-500 border-green-500 text-white p-1 w-full rounded dark:bg-dark dark:text-white"
+                        className="bg-green-500 border-green-500 text-white p-1 w-full rounded dark:bg-green-500 dark:border-green-500"
                         onBlur={(e) =>
                             handleButtonLabelChange(row.value, e.target.value)
                         }
@@ -262,7 +262,7 @@ const ButtonActionsTable = () => {
         if (button.value === modifierButton) {
             return (
                 <td
-                    className={`p-2 ${buttonIsPressed ? activeStyles : inactiveStyles} dark:text-white dark:bg-dark`}
+                    className={`p-2 dark:text-white dark:bg-dark ${buttonIsPressed ? activeStyles : inactiveStyles}`}
                     colSpan={2}
                 >
                     {render.modifier(null, button)}
