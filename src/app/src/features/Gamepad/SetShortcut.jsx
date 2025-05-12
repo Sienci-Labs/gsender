@@ -55,8 +55,9 @@ const SetShortcut = () => {
 
     const macros = getMacros();
     const profile = getGamepadProfile(currentProfile);
-    const currentShortcut =
-        profile.buttons?.[currentButtonValue][currentButtonType];
+    const [currentShortcut, setCurrentShortcut] = useState(
+        profile.buttons?.[currentButtonValue][currentButtonType],
+    );
 
     const closeModal = () => {
         dispatch(setCurrentModal(null));
@@ -68,14 +69,17 @@ const SetShortcut = () => {
         }
     };
 
-    const handleSetAction = (shortcut) => {
+    const handleSetAction = () => {
         const updatedProfiles = profiles.map((profile) =>
             arrayComparator(profile.id, currentProfile)
                 ? {
                       ...profile,
                       buttons: profile.buttons.map((button) =>
                           button.value === currentButtonValue
-                              ? { ...button, [currentButtonType]: shortcut }
+                              ? {
+                                    ...button,
+                                    [currentButtonType]: currentShortcut,
+                                }
                               : button,
                       ),
                   }
@@ -84,6 +88,19 @@ const SetShortcut = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
+        closeModal();
+
+        Toaster.pop({
+            msg: 'Button Shortcut Set',
+            type: TOASTER_INFO,
+            duration: 3000,
+        });
+    };
+
+    const handleActionPress = (action) => {
+        if (currentShortcut === action) return;
+
+        setCurrentShortcut(action);
         setIsChanged(true);
     };
 
@@ -124,16 +141,6 @@ const SetShortcut = () => {
         dispatch(setGamepadProfileList(updatedProfiles));
 
         setIsChanged(true);
-    };
-
-    const onSetClick = () => {
-        closeModal();
-
-        Toaster.pop({
-            msg: 'Button Shortcut Set',
-            type: TOASTER_INFO,
-            duration: 3000,
-        });
     };
 
     const getData = () => {
@@ -201,7 +208,7 @@ const SetShortcut = () => {
                                     ? 'bg-blue-500 text-white px-3 py-1 rounded'
                                     : 'bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded dark:bg-dark-lighter'
                             }
-                            onClick={() => handleSetAction(action.cmd)}
+                            onClick={() => handleActionPress(action.cmd)}
                             disabled={action.cmd === currentShortcut}
                         >
                             {action.title}
@@ -330,7 +337,7 @@ const SetShortcut = () => {
                             </div>
                         </div>
 
-                        <Button onClick={onSetClick} disabled={!isChanged}>
+                        <Button onClick={handleSetAction} disabled={!isChanged}>
                             Set Shortcut
                         </Button>
                     </DialogFooter>
