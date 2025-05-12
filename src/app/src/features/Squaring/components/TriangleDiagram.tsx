@@ -45,7 +45,8 @@ const TriangleDiagram = () => {
     const shouldPointPulse = (index: number) => {
         if (
             currentMainStep === 0 &&
-            currentSubStepData?.buttonLabel.includes('Mark Point')
+            currentSubStepData?.buttonLabel.includes('Mark Point') &&
+            !currentSubStepData.completed
         ) {
             const pointNumber = currentSubStepData.buttonLabel.slice(-1);
             return index === Number(pointNumber) - 1;
@@ -60,7 +61,10 @@ const TriangleDiagram = () => {
                 return lineIndex === 0;
             if (currentSubStepData?.buttonLabel.includes('2-3'))
                 return lineIndex === 1;
-            if (currentSubStepData?.buttonLabel.includes('1-3'))
+            if (
+                currentSubStepData?.buttonLabel.includes('1-3') &&
+                !currentSubStepData?.completed
+            )
                 return lineIndex === 2;
         }
         return false;
@@ -79,19 +83,19 @@ const TriangleDiagram = () => {
     // Calculate if each line should be solid (measured) or dashed (not measured yet)
     const lineStyles = [
         triangle.a
-            ? 'stroke-blue-500'
+            ? 'stroke-green-500'
             : shouldLinePulse(0)
-              ? 'stroke-green-500 animate-pulse'
+              ? 'stroke-blue-500 animate-pulse'
               : 'stroke-gray-300 stroke-dashed',
         triangle.b
-            ? 'stroke-blue-500'
+            ? 'stroke-green-500'
             : shouldLinePulse(1)
-              ? 'stroke-green-500 animate-pulse'
+              ? 'stroke-blue-500 animate-pulse'
               : 'stroke-gray-300 stroke-dashed',
         triangle.c
-            ? 'stroke-blue-500'
+            ? 'stroke-green-500'
             : shouldLinePulse(2)
-              ? 'stroke-green-500 animate-pulse'
+              ? 'stroke-blue-500 animate-pulse'
               : 'stroke-gray-300 stroke-dashed',
     ];
 
@@ -152,11 +156,11 @@ const TriangleDiagram = () => {
                                 }
                                 className={`${
                                     shouldLinePulse(i)
-                                        ? 'fill-green-700'
+                                        ? 'fill-blue-700'
                                         : (i === 0 && triangle.a) ||
                                             (i === 1 && triangle.b) ||
                                             (i === 2 && triangle.c)
-                                          ? 'fill-blue-700'
+                                          ? 'fill-green-700'
                                           : 'fill-gray-500'
                                 }`}
                                 textAnchor="middle"
@@ -189,13 +193,13 @@ const TriangleDiagram = () => {
                             y1={baseSize - padding + 15}
                             x2={baseSize - padding - 15}
                             y2={baseSize - padding + 15}
-                            className="stroke-2 stroke-green-500"
+                            className="stroke-2 stroke-blue-500"
                             markerEnd="url(#arrowhead)"
                         />
                         <text
                             x={baseSize / 2}
                             y={baseSize - padding + 30}
-                            className="text-xs fill-green-700 text-center"
+                            className="text-xs fill-blue-700 text-center"
                             textAnchor="middle"
                             style={{
                                 fontSize: '10px',
@@ -212,13 +216,13 @@ const TriangleDiagram = () => {
                             y1={baseSize - padding - 15}
                             x2={baseSize - padding + 15}
                             y2={padding + 15}
-                            className="stroke-2 stroke-green-500"
+                            className="stroke-2 stroke-blue-500"
                             markerEnd="url(#arrowhead)"
                         />
                         <text
                             x={baseSize - padding + 30}
                             y={baseSize / 2}
-                            className="fill-green-700"
+                            className="fill-blue-700"
                             textAnchor="middle"
                             transform={`rotate(-90 ${baseSize - padding + 35} ${baseSize / 2})`}
                             style={{
@@ -242,7 +246,7 @@ const TriangleDiagram = () => {
                     >
                         <polygon
                             points="0 0, 10 3.5, 0 7"
-                            className="fill-green-500"
+                            className="fill-blue-500"
                         />
                     </marker>
                 </defs>
@@ -257,11 +261,11 @@ const TriangleDiagram = () => {
                                 key={key}
                                 className={`absolute text-lg w-10 h-10 -ml-5 -mt-5 [transform:rotate(45deg)] [-ms-transform:rotate(45deg)] [-webkit-transform:rotate(45deg)] before:absolute before:-z-1 before:left-1/2 before:w-1/3 before:-ml-[15%] before:h-full after:absolute after:-z-1 after:top-1/2 after:h-1/3 after:-mt-[15%] after:w-full flex items-center justify-center font-bold text-white transition-colors ${
                                     shouldPointPulse(index)
-                                        ? 'before:bg-green-500 after:bg-green-500 animate-pulse'
+                                        ? 'before:bg-blue-500 after:bg-blue-500 animate-pulse'
                                         : currentMainStep === 0 &&
                                             index === currentSubStep
-                                          ? 'before:bg-green-500 after:bg-green-500'
-                                          : 'before:bg-blue-500 after:bg-blue-500'
+                                          ? 'before:bg-blue-500 after:bg-blue-500'
+                                          : 'before:bg-green-500 after:bg-green-500'
                                 }`}
                                 style={{
                                     left: `${(pos.x / containerWidth) * 100}%`,

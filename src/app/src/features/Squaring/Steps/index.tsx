@@ -44,6 +44,7 @@ const Steps = () => {
     };
 
     if (!started) {
+        resetSquaring();
         return (
             <div className="flex flex-col gap-2 xl:gap-0 dark:text-white w-full">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
