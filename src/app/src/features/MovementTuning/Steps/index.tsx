@@ -154,8 +154,10 @@ const Steps = () => {
                             />
                         </div>
 
-                        <div className="w-full max-w-96">
-                            <Jogging />
+                        <div className="flex justify-center items-center">
+                            <div className="w-full max-w-96">
+                                <Jogging />
+                            </div>
                         </div>
 
                         {!isConnected && (

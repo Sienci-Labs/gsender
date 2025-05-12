@@ -77,8 +77,10 @@ const Steps = () => {
                             touching the wasteboard, then continue below.
                         </p>
 
-                        <div className="w-full max-w-96 -mt-4">
-                            <Jogging />
+                        <div className="flex justify-center items-center">
+                            <div className="w-full max-w-96 -mt-4">
+                                <Jogging />
+                            </div>
                         </div>
                         {!isConnected && (
                             <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
@@ -93,7 +95,7 @@ const Steps = () => {
                         <img
                             src={xySquaringImage}
                             alt="XY Squaring Example"
-                            className="w-[450px] h-auto"
+                            className="w-[450px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-white">
