@@ -2062,7 +2062,23 @@ class Visualizer extends Component {
         if (shouldZoom) {
             // if secondary, force top view
             if (this.props.isSecondary) {
-                this.toTopView();
+                // no longer force top view
+                // this.toTopView();
+                if (this.props.cameraPosition === 'Top') {
+                    this.toTopView();
+                }
+                if (this.props.cameraPosition === '3D') {
+                    this.to3DView();
+                }
+                if (this.props.cameraPosition === 'Front') {
+                    this.toFrontView();
+                }
+                if (this.props.cameraPosition === 'Left') {
+                    this.toLeftSideView();
+                }
+                if (this.props.cameraPosition === 'Right') {
+                    this.toRightSideView();
+                }
             } else {
                 // if primary, force 3d view
                 this.props.actions.camera.to3DView();
