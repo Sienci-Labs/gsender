@@ -252,7 +252,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 </Tooltip>
             </TooltipProvider>
 
-            <div className="text-gray-500 flex gap-1 text-sm">
+            <div className="text-gray-500 flex gap-1 text-xs">
                 <span>{fileSize}</span>
 
                 <span>({total} lines)</span>
@@ -260,7 +260,6 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
             {path && (
                 <div className="text-gray-500 text-xs max-w-full flex flex-row">
-                    <span>Path: </span>
                     <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
                         {path}
                     </span>

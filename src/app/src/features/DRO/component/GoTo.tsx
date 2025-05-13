@@ -80,6 +80,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                     disabled={disabled}
                     icon={<FaPaperPlane />}
                     variant="secondary"
+                    size="sm"
                 />
             </PopoverTrigger>
             <PopoverContent className="bg-white">

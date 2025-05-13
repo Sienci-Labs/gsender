@@ -618,15 +618,14 @@ const SpindleWidget = () => {
                         onChange={actions.handleModeToggle}
                         disabled={!canClick()}
                     />
-                    <ActiveIndicator active={active} />
+                    {controllerType === GRBLHAL && (
+                        <SpindleSelector
+                            spindles={availableSpindles}
+                            onChange={actions.handleHALSpindleSelect}
+                            spindle={state.spindle}
+                        />
+                    )}
                 </div>
-                {controllerType === GRBLHAL && (
-                    <SpindleSelector
-                        spindles={availableSpindles}
-                        onChange={actions.handleHALSpindleSelect}
-                        spindle={state.spindle}
-                    />
-                )}
             </div>
             <div>
                 {!laserAsSpindle ? (

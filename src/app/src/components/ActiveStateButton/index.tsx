@@ -20,7 +20,7 @@ export function ActiveStateButton({
     ...rest
 }: ActiveStateButtonProps): JSX.Element {
     return (
-        <div className="mx-auto flex w-full max-w-lg items-center justify-center">
+        <div className="mx-auto flex w-full max-w-lg items-center">
             <div className="relative z-10 flex w-full cursor-pointer items-center overflow-hidden rounded-xl border border-transparent p-[1px]">
                 <div
                     className={cn(

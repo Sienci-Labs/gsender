@@ -285,7 +285,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (
@@ -297,7 +297,7 @@ function DRO({
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go</Label>
             </div>
-            <div className="flex flex-col w-full gap-1 space-between">
+            <div className="flex flex-col w-full gap-1 max-xl:gap-0 space-between">
                 <AxisRow
                     label={'X'}
                     axis={'X'}
@@ -335,7 +335,7 @@ function DRO({
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full mt-2">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
                 {!shouldWarnZero ? (
                     <Button
                         text="Zero"

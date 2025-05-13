@@ -9,7 +9,7 @@ export interface IconButtonProps extends ButtonProps {
 export function IconButton(props: IconButtonProps): JSX.Element {
     return (
         <button
-            className={buttonStyle({ variant: 'alt' })}
+            className={buttonStyle({ variant: 'alt', size: 'sm' })}
             onClick={props.onClick}
             disabled={props.disabled}
             variant="alt"

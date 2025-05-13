@@ -20,7 +20,7 @@ export const Carve = () => {
                     'flex',
                     isPortrait
                         ? 'h-[45%] max-h-[45%] pb-0 block portrait:h-[45%] portrait:max-h-[45%] portrait:pb-0 portrait:block'
-                        : 'h-[75%] max-h-[75%] pb-10',
+                        : 'h-[75%] max-h-[75%] pb-10 max-xl:pb-7',
                 )}
             >
                 <div className={isPortrait ? 'h-full w-full' : 'flex-grow'}>

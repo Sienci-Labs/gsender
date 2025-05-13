@@ -57,7 +57,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                     icon={<FaRedoAlt />}
                     text="Forward"
-                    size="md"
+                    size="sm"
                     className="w-full"
                     active={spindleForward}
                 />
@@ -66,7 +66,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                     icon={<FaUndoAlt />}
                     text="Reverse"
-                    size="md"
+                    size="sm"
                     className="w-full"
                     active={spindleReverse}
                 />
@@ -75,7 +75,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                     icon={<FaBan />}
                     text="Stop"
-                    size="md"
+                    size="sm"
                     className="w-full"
                 />
             </div>
