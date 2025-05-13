@@ -114,6 +114,8 @@ function Connection(props: ConnectionProps) {
     }
 
     function attemptAutoConnect() {
+        if (props.ports.length === 0) return;
+
         const autoReconnect = connectionConfig.get('autoReconnect', false);
         const port = connectionConfig.get('port', null);
 
