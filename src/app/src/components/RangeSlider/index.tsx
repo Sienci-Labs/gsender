@@ -72,7 +72,7 @@ const RangeSlider = ({
         <div></div>
     );
     return (
-        <div className="flex flex-col items-center gap-2 justify-center w-full text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
             {textComponent}
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 dark:bg-dark shadow-inner">
                 <Button
