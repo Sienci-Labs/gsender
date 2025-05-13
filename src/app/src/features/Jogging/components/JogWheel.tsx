@@ -13,6 +13,9 @@ import {
     xMinusYMinus,
     xMinusYPlus,
 } from 'app/features/Jogging/utils/Jogging.ts';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { WORKSPACE_MODE } from 'app/constants';
+
 export interface JogWheelProps {
     canClick?: boolean;
     feedrate: number;
@@ -20,6 +23,10 @@ export interface JogWheelProps {
 }
 
 export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
+    const { mode } = useWorkspaceState();
+
+    const isRotaryMode = mode === WORKSPACE_MODE.ROTARY;
+
     const xPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ X: 1 }, feedrate),
         {
@@ -79,8 +86,10 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
         },
     )();
 
-    const standardColourClass = 'fill-blue-500 hover:fill-blue-600 active:fill-blue-700';
-    const altColourClass = 'fill-robin-500 hover:fill-blue-400 active:fill-robin-700';
+    const standardColourClass =
+        'fill-blue-500 hover:fill-blue-600 active:fill-blue-700';
+    const altColourClass =
+        'fill-robin-500 hover:fill-blue-400 active:fill-robin-700';
     const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
 
     return (
@@ -95,25 +104,41 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
             <path
                 id="xPlusYMinus"
                 d="M180.191 140.859C171.562 157.794 157.794 171.562 140.859 180.191L100 100L180.191 140.859Z"
-                className={cn(canClick ? altColourClass : disabledColorClass)}
+                className={cn(
+                    canClick && !isRotaryMode
+                        ? altColourClass
+                        : disabledColorClass,
+                )}
                 {...xPlusYMinusHandlers}
             />
             <path
                 id="xMinusYMinus"
                 d="M59.1408 180.191C42.2063 171.562 28.438 157.794 19.8094 140.859L100 100L59.1408 180.191Z"
-                className={cn(canClick ? altColourClass : disabledColorClass)}
+                className={cn(
+                    canClick && !isRotaryMode
+                        ? altColourClass
+                        : disabledColorClass,
+                )}
                 {...xMinusYMinusHandlers}
             />
             <path
                 id="xMinusYPlus"
                 d="M19.8094 59.1409C28.438 42.2063 42.2063 28.438 59.1408 19.8094L100 100L19.8094 59.1409Z"
-                className={cn(canClick ? altColourClass : disabledColorClass)}
+                className={cn(
+                    canClick && !isRotaryMode
+                        ? altColourClass
+                        : disabledColorClass,
+                )}
                 {...xMinusYPlusHandlers}
             />
             <path
                 id="xPlusYPlus"
                 d="M140.859 19.8094C157.794 28.438 171.562 42.2063 180.191 59.1409L100 100L140.859 19.8094Z"
-                className={cn(canClick ? altColourClass : disabledColorClass)}
+                className={cn(
+                    canClick && !isRotaryMode
+                        ? altColourClass
+                        : disabledColorClass,
+                )}
                 {...xPlusYPlusHandlers}
             />
             <path
@@ -121,7 +146,9 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
                 d="M138.268 192.388C126.136 197.413 113.132 200 100 200C86.8678 200 73.8642 197.413 61.7316 192.388L100 100L138.268 192.388Z"
                 fill="#3F85C7"
                 className={cn(
-                    canClick ? standardColourClass : disabledColorClass,
+                    canClick && !isRotaryMode
+                        ? standardColourClass
+                        : disabledColorClass,
                 )}
                 {...yMinusJogHandlers}
             />
@@ -139,7 +166,9 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
                 d="M61.7316 7.61205C73.8642 2.58658 86.8678 -1.566e-07 100 0C113.132 1.566e-07 126.136 2.58658 138.268 7.61205L100 100L61.7316 7.61205Z"
                 fill="#3F85C7"
                 className={cn(
-                    canClick ? standardColourClass : disabledColorClass,
+                    canClick && !isRotaryMode
+                        ? standardColourClass
+                        : disabledColorClass,
                 )}
                 {...yPlusJogHandlers}
             />
