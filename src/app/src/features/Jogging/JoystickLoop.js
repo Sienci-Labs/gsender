@@ -130,7 +130,7 @@ export class JoystickLoop {
 
         const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
 
-        const multiplier = controllerType === GRBLHAL ? 14 : 1;
+        const multiplier = 1;
         const incrementalDistance =
             feedrateInMMPerSec *
             COMMAND_EXECUTION_TIME_IN_SECONDS *
@@ -359,7 +359,7 @@ export class JoystickLoop {
             (acc, curr) => {
                 const [axis, value] = curr;
 
-                const multiplier = controllerType === GRBLHAL ? 14 : 1;
+                const multiplier = 1;
 
                 acc[axis] = +(
                     value *

@@ -128,6 +128,8 @@ class Gamepad extends GamepadListener {
     };
 }
 
+export type GamepadType = Gamepad;
+
 export const shortcutComboBuilder = (list: Array<string> = []): string => {
     const JOIN_KEY = '+';
 
@@ -327,9 +329,7 @@ class GamepadManager {
         }
     }
 
-    static getInstance():
-        | Gamepad
-        | { start: () => void; on: () => void; off: () => void } {
+    static getInstance(): Gamepad | GamepadInstance {
         return GamepadManager.instance || this.initialize();
     }
 }

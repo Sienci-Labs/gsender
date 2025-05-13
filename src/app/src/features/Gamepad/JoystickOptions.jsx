@@ -90,8 +90,8 @@ const JoystickOptions = () => {
     const activeStyle = {
         control: (provided) => ({
             ...provided,
-            backgroundColor: 'rgb(75, 181, 67)',
-            borderColor: 'rgb(75, 181, 67)',
+            backgroundColor: '#059669',
+            borderColor: '#059669',
         }),
         singleValue: (provided) => ({ ...provided, color: 'white' }),
         dropdownIndicator: (provided) => ({
@@ -499,15 +499,19 @@ const JoystickOptions = () => {
                 <Input
                     type="number"
                     value={movementDistanceOverride}
-                    min={10}
-                    max={99999}
-                    step={1}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                        if (
+                            e.target.valueAsNumber > 99999 ||
+                            e.target.valueAsNumber < 0.001
+                        ) {
+                            return;
+                        }
+
                         handleChange(
                             'movementDistanceOverride',
                             Number(e.target.value),
-                        )
-                    }
+                        );
+                    }}
                     className="p-1 w-full"
                     suffix="%"
                 />
