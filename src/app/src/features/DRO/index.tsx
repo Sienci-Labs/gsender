@@ -84,8 +84,7 @@ function DRO({
     singleAxisHoming,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
-    const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
-    const { shouldWarnZero } = useWorkspaceState();
+    const { shouldWarnZero, mode } = useWorkspaceState();
     const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
     const homingDirection = useTypedSelector((state) =>
         get(state, 'controller.settings.settings.$23', '0'),
@@ -94,14 +93,7 @@ function DRO({
         get(state, 'controller.settings.settings.$27', 1),
     );
 
-    useEffect(() => {
-        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
-        setIsRotaryMode(mode);
-        store.on('change', () => {
-            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
-            setIsRotaryMode(workspaceMode === 'ROTARY');
-        });
-    }, []);
+    const isRotaryMode = mode === 'ROTARY';
 
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
@@ -331,7 +323,6 @@ function DRO({
                         wpos={isRotaryMode ? wpos.y : wpos.a}
                         disabled={!canClick}
                         homingMode={homingMode}
-                        disablePositionUpdate={isRotaryMode}
                     />
                 )}
             </div>

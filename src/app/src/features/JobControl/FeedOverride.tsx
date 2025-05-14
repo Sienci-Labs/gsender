@@ -85,7 +85,7 @@ const Overrides: React.FC<OverridesProps> = ({
         <div
             className={
                 (showSpindleOverride
-                    ? 'grid grid-cols-1 grid-rows-2 gap-4'
+                    ? 'grid grid-cols-1 grid-rows-2 gap-4 max-xl:gap-1'
                     : 'flex justify-center items-center') + ' w-full'
             }
         >

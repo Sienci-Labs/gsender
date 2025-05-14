@@ -138,7 +138,7 @@ const JobControl: React.FC<JobControlProps> = ({
                 </div>
                 <Widget>
                     <Widget.Content className="flex justify-center items-center flex-col">
-                        <div className="mt-4">
+                        <div className="mt-4 max-xl:mt-0">
                             <Overrides
                                 ovF={ovF}
                                 ovS={ovS}
