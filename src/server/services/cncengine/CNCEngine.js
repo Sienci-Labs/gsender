@@ -484,6 +484,7 @@ class CNCEngine {
                 this.connection.open((err = null) => {
                     if (err) {
                         callback(err);
+                        this.connection = null;
                         return;
                     }
 
