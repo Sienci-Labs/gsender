@@ -64,6 +64,7 @@ const RotarySurfacing = () => {
     const { units } = useWorkspaceState();
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
+        status &&
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
 

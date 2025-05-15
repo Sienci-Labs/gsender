@@ -40,8 +40,9 @@ const SurfacingTool = () => {
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
-        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+        status &&
+        status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     useEffect(() => {
         const storeUnits = store.get('workspace.units', METRIC_UNITS);
