@@ -341,7 +341,7 @@ const SurfacingTool = () => {
                 </div>
 
                 <div className="flex flex-row gap-4">
-                    <Button onClick={handleGenerateGcode}>
+                    <Button onClick={handleGenerateGcode} disabled={isDisabled}>
                         Generate G-code
                     </Button>
                     <Button

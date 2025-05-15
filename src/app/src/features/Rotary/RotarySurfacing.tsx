@@ -358,7 +358,11 @@ const RotarySurfacing = () => {
                     </div>
                 </div>
                 <div className="flex flex-row gap-4">
-                    <Button type="submit" onClick={handleGenerateGcode}>
+                    <Button
+                        type="submit"
+                        onClick={handleGenerateGcode}
+                        disabled={isDisabled}
+                    >
                         Generate G-Code
                     </Button>
                     <Button

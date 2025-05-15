@@ -12,12 +12,18 @@ import xySquaringImage from '../assets/XY_squaring_example.jpg';
 import { Jogging } from 'app/features/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { cx } from 'class-variance-authority';
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 
 const Steps = () => {
     const [started, setStarted] = useState(false);
     const { currentMainStep, mainSteps, goToNextMainStep, resetSquaring } =
         useSquaring();
     const { isConnected } = useTypedSelector((state) => state.connection);
+    const status = useTypedSelector((state) => state?.controller.state?.status);
+    const isDisabled =
+        !isConnected ||
+        (status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+            status.activeState !== GRBL_ACTIVE_STATE_JOG);
 
     useEffect(() => {
         resetSquaring();
@@ -108,7 +114,7 @@ const Steps = () => {
                 <div className="flex gap-4 shrink-0">
                     <Button
                         onClick={() => setStarted(true)}
-                        disabled={!isConnected}
+                        disabled={isDisabled}
                     >
                         Start XY Squaring
                     </Button>

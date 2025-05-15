@@ -32,6 +32,7 @@ import { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -46,6 +47,13 @@ const Steps = () => {
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
     );
+    const controllerStatus = useTypedSelector(
+        (state) => state?.controller.state?.status,
+    );
+    const isDisabled =
+        !isConnected ||
+        (controllerStatus.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+            controllerStatus.activeState !== GRBL_ACTIVE_STATE_JOG);
 
     const reset = () => {
         setStatus('initial');
@@ -190,7 +198,7 @@ const Steps = () => {
                     <Button
                         onClick={() => setStatus('started')}
                         variant="outline"
-                        disabled={!isConnected}
+                        disabled={isDisabled}
                     >
                         Start Movement Tuning
                     </Button>
