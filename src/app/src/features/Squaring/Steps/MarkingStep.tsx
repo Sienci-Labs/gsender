@@ -33,7 +33,7 @@ const MarkingStep = () => {
                     <h3 className="text-lg font-semibold dark:text-white">
                         Instructions
                     </h3>
-                    <p className="text-gray-600 dark:text-white">
+                    <p className="text-gray-600 dark:text-white h-20">
                         {currentSubStepData.description}
                     </p>
                 </div>
@@ -136,7 +136,7 @@ const MarkingStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Visualization</h3>
+                <h3 className="text-lg font-semibold">Diagram</h3>
                 <TriangleDiagram />
             </div>
         </div>

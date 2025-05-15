@@ -155,7 +155,7 @@ const MeasurementStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Visualization</h3>
+                <h3 className="text-lg font-semibold">Diagram</h3>
                 <TriangleDiagram />
             </div>
         </div>

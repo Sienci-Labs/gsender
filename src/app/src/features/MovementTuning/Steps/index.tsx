@@ -310,182 +310,184 @@ const Steps = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
-                <div className="flex flex-col gap-4">
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold dark:text-white">
-                            Mark Reference Points
-                        </h3>
-                    </div>
+            <div className="flex justify-center">
+                <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
+                    <div className="flex flex-col gap-4">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-semibold dark:text-white">
+                                Mark Reference Points
+                            </h3>
+                            <p className="h-20 text-gray-600 dark:text-white">
+                                {currentStep === 0 &&
+                                    'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'}
+                                {currentStep === 1 &&
+                                    "Now move any distance you wish. A larger value will better tune your movement, just make sure you don't hit your machine limits. Once you are ready, clicked the Move Axis Button."}
+                                {currentStep === 2 &&
+                                    'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results'}
+                            </p>
+                        </div>
 
-                    <div className="space-y-6">
-                        <div
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                                currentStep === 0
-                                    ? 'bg-green-50 border border-green-200'
-                                    : markLocationCompleted
-                                      ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
-                            }`}
-                        >
-                            <LuArrowRight
-                                className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
+                        <div className="space-y-6">
+                            <div
+                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 0
-                                        ? 'bg-green-500 animate-pulse'
+                                        ? 'bg-green-50 border border-green-200'
                                         : markLocationCompleted
-                                          ? 'bg-blue-500'
-                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
+                                          ? 'bg-blue-50 border border-blue-200'
+                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
-                            />
-                            <div className="flex flex-col gap-2 flex-1">
-                                <div className="flex items-center gap-4">
-                                    <Button
-                                        disabled={
-                                            currentStep !== 0 ||
-                                            markLocationCompleted
-                                        }
-                                        onClick={() => {
-                                            setMarkLocationCompleted(true);
-                                            setCurrentStep(1);
-                                        }}
-                                        variant="secondary"
-                                    >
-                                        Mark First Location
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
-                                currentStep === 1
-                                    ? 'bg-green-50 border border-green-200'
-                                    : moveAxisCompleted
-                                      ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
-                            }`}
-                        >
-                            <LuArrowRight
-                                className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                    currentStep === 1
-                                        ? 'bg-green-500 animate-pulse'
-                                        : moveAxisCompleted
-                                          ? 'bg-blue-500'
-                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                }`}
-                            />
-                            <div className="flex flex-col gap-2 flex-1">
-                                <div className="flex items-center gap-4">
-                                    <Button
-                                        disabled={
-                                            currentStep !== 1 ||
-                                            moveAxisCompleted
-                                        }
-                                        onClick={() => {
-                                            jogAxis(
-                                                {
-                                                    [selectedAxis.toUpperCase()]:
-                                                        moveDistance,
-                                                },
-                                                1000,
-                                            );
-                                            setMoveAxisCompleted(true);
-                                            setCurrentStep(2);
-                                        }}
-                                        variant="alt"
-                                    >
-                                        Move {selectedAxis.toUpperCase()}-axis
-                                    </Button>
-
-                                    <div className="flex items-center gap-2">
-                                        <Input
-                                            type="number"
-                                            value={moveDistance}
-                                            onChange={(e) =>
-                                                setMoveDistance(
-                                                    Number(e.target.value),
-                                                )
+                            >
+                                <LuArrowRight
+                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
+                                        currentStep === 0
+                                            ? 'bg-green-500 animate-pulse'
+                                            : markLocationCompleted
+                                              ? 'bg-blue-500'
+                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
+                                    }`}
+                                />
+                                <div className="flex flex-col gap-2 flex-1">
+                                    <div className="flex items-center gap-4">
+                                        <Button
+                                            disabled={
+                                                currentStep !== 0 ||
+                                                markLocationCompleted
                                             }
-                                            disabled={currentStep !== 1}
-                                            className="w-28"
-                                            suffix="mm"
-                                        />
+                                            onClick={() => {
+                                                setMarkLocationCompleted(true);
+                                                setCurrentStep(1);
+                                            }}
+                                            variant="secondary"
+                                        >
+                                            Mark First Location
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                                currentStep === 2
-                                    ? 'bg-green-50 border border-green-200'
-                                    : setTravelCompleted
-                                      ? 'bg-blue-50 border border-blue-200'
-                                      : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
-                            }`}
-                        >
-                            <LuArrowRight
-                                className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                    currentStep === 2
-                                        ? 'bg-green-500 animate-pulse'
-                                        : setTravelCompleted
-                                          ? 'bg-blue-500'
-                                          : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
+                            <div
+                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
+                                    currentStep === 1
+                                        ? 'bg-green-50 border border-green-200'
+                                        : moveAxisCompleted
+                                          ? 'bg-blue-50 border border-blue-200'
+                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
-                            />
-                            <div className="flex flex-col gap-2 flex-1">
-                                <div className="flex items-center gap-4">
-                                    <Button
-                                        disabled={
-                                            currentStep !== 2 ||
-                                            setTravelCompleted
-                                        }
-                                        onClick={() => {
-                                            setSetTravelCompleted(true);
-                                            setCurrentStep(3);
-                                        }}
-                                    >
-                                        Set Distance Travelled
-                                    </Button>
-
-                                    <div className="flex items-center gap-2">
-                                        <Input
-                                            type="number"
-                                            value={measuredDistance}
-                                            onChange={(e) =>
-                                                setMeasuredDistance(
-                                                    Number(e.target.value),
-                                                )
+                            >
+                                <LuArrowRight
+                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
+                                        currentStep === 1
+                                            ? 'bg-green-500 animate-pulse'
+                                            : moveAxisCompleted
+                                              ? 'bg-blue-500'
+                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
+                                    }`}
+                                />
+                                <div className="flex flex-col gap-2 flex-1">
+                                    <div className="flex items-center gap-4">
+                                        <Button
+                                            disabled={
+                                                currentStep !== 1 ||
+                                                moveAxisCompleted
                                             }
-                                            disabled={currentStep !== 2}
-                                            className="w-28"
-                                            suffix="mm"
-                                        />
+                                            onClick={() => {
+                                                jogAxis(
+                                                    {
+                                                        [selectedAxis.toUpperCase()]:
+                                                            moveDistance,
+                                                    },
+                                                    1000,
+                                                );
+                                                setMoveAxisCompleted(true);
+                                                setCurrentStep(2);
+                                            }}
+                                            variant="alt"
+                                        >
+                                            Move {selectedAxis.toUpperCase()}
+                                            -axis
+                                        </Button>
+
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="number"
+                                                value={moveDistance}
+                                                onChange={(e) =>
+                                                    setMoveDistance(
+                                                        Number(e.target.value),
+                                                    )
+                                                }
+                                                disabled={currentStep !== 1}
+                                                className="w-28"
+                                                suffix="mm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                                    currentStep === 2
+                                        ? 'bg-green-50 border border-green-200'
+                                        : setTravelCompleted
+                                          ? 'bg-blue-50 border border-blue-200'
+                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                }`}
+                            >
+                                <LuArrowRight
+                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
+                                        currentStep === 2
+                                            ? 'bg-green-500 animate-pulse'
+                                            : setTravelCompleted
+                                              ? 'bg-blue-500'
+                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
+                                    }`}
+                                />
+                                <div className="flex flex-col gap-2 flex-1">
+                                    <div className="flex items-center gap-4">
+                                        <Button
+                                            disabled={
+                                                currentStep !== 2 ||
+                                                setTravelCompleted
+                                            }
+                                            onClick={() => {
+                                                setSetTravelCompleted(true);
+                                                setCurrentStep(3);
+                                            }}
+                                        >
+                                            Set Distance Travelled
+                                        </Button>
+
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="number"
+                                                value={measuredDistance}
+                                                onChange={(e) =>
+                                                    setMeasuredDistance(
+                                                        Number(e.target.value),
+                                                    )
+                                                }
+                                                disabled={currentStep !== 2}
+                                                className="w-28"
+                                                suffix="mm"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <p className="text-gray-600 dark:text-white">
-                        {currentStep === 0 &&
-                            'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'}
-                        {currentStep === 1 &&
-                            "Now move any distance you wish. A larger value will better tune your movement, just make sure you don't hit your machine limits. Once you are ready, clicked the Move Axis Button."}
-                        {currentStep === 2 &&
-                            'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results'}
-                    </p>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                    <h3 className="text-lg font-semibold dark:text-white">
-                        Diagram
-                    </h3>
-                    <img
-                        src={stepImage}
-                        alt="Movement Tuning Step"
-                        className="w-[450px] h-auto border border-gray-200 rounded-lg"
-                    />
+                    <div className="flex flex-col items-center gap-4">
+                        <h3 className="text-lg font-semibold dark:text-white">
+                            Diagram
+                        </h3>
+                        <img
+                            src={stepImage}
+                            alt="Movement Tuning Step"
+                            className="w-[450px] h-auto border border-gray-200 rounded-lg"
+                        />
+                    </div>
                 </div>
             </div>
 
