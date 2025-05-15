@@ -278,11 +278,11 @@ const SurfacingTool = () => {
                             />
                         </InputArea>
 
-                        <div className="flex flex-row items-center justify-between">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                        <div className="grid grid-cols-5 items-center gap-4">
+                            <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                 Start Position
-                            </label>
-                            <div className="flex items-center col-span-3">
+                            </span>
+                            <div className="flex items-center col-span-3 justify-center">
                                 <MachinePosition
                                     surfacing={surfacing}
                                     setSurfacing={setSurfacing}
