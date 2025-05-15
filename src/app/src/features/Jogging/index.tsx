@@ -42,6 +42,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { convertValue } from './utils/units';
 
 interface GamepadInstance {
     isHolding?: boolean;
@@ -181,7 +182,19 @@ export function Jogging() {
                 'widgets.connection.controller.type',
                 'Grbl',
             );
+            const units = store.get('workspace.units', 'mm');
             setFirmware(firmwareType);
+
+            if (units === 'in') {
+                jogValues.xyStep = convertValue(jogValues.xyStep, 'mm', 'in');
+                jogValues.zStep = convertValue(jogValues.zStep, 'mm', 'in');
+                jogValues.feedrate = convertValue(
+                    jogValues.feedrate,
+                    'mm',
+                    'in',
+                );
+            }
+
             setJogSpeed({ ...jogValues });
             setInitialized(true);
         }
