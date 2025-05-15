@@ -19,7 +19,6 @@ const ProfileList = () => {
     const ActionArea = () => (
         <div className="flex gap-4">
             <Button
-                variant="primary"
                 onClick={() =>
                     dispatch(setCurrentModal(GAMEPAD_MODAL.ADD_NEW_PROFILE))
                 }
@@ -31,6 +30,7 @@ const ProfileList = () => {
 
             <Button
                 onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))}
+                className="bg-orange-400 dark:bg-orange-700 border-orange-700 dark:border-orange-400 text-white hover:bg-orange-50"
             >
                 <span>Help</span>
             </Button>

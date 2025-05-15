@@ -96,7 +96,7 @@ const Profile = ({ data }) => {
                     onBlur={handleEditName}
                 />
                 <span
-                    className={`p-2 rounded text-white ${isConnected ? 'bg-green-500' : 'bg-blue-400'} text-center`}
+                    className={`p-2 rounded text-white ${isConnected ? 'bg-green-500' : 'bg-gray-500'} text-center`}
                 >
                     {isConnected ? 'Connected' : 'Disconnected'}
                 </span>
@@ -104,7 +104,7 @@ const Profile = ({ data }) => {
                     onClick={() =>
                         dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))
                     }
-                    className="w-full"
+                    className="w-full bg-orange-400 dark:bg-orange-700 border-orange-700 dark:border-orange-400 text-white hover:bg-orange-50"
                 >
                     Help
                 </Button>

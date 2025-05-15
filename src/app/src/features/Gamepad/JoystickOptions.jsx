@@ -106,7 +106,7 @@ const JoystickOptions = () => {
     };
 
     return (
-        <div className="text-base">
+        <div className="text-base border p-2 rounded">
             <div className="grid grid-cols-4 items-center gap-2">
                 <div />
                 <div className="dark:text-white">Action</div>
