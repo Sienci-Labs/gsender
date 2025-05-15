@@ -31,6 +31,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -331,21 +332,24 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 0
-                                        ? 'bg-green-50 border border-green-200'
+                                        ? 'bg-blue-50 border border-blue-200'
                                         : markLocationCompleted
-                                          ? 'bg-blue-50 border border-blue-200'
+                                          ? 'bg-green-50 border border-green-200'
                                           : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
-                                <LuArrowRight
-                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                        currentStep === 0
-                                            ? 'bg-green-500 animate-pulse'
-                                            : markLocationCompleted
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                    }`}
-                                />
+                                <div className={`min-w-8 min-h-8 text-white`}>
+                                    {markLocationCompleted && (
+                                        <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
+                                    )}
+                                    {currentStep !== 0 &&
+                                        !markLocationCompleted && (
+                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                        )}
+                                    {currentStep === 0 && (
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                    )}
+                                </div>
                                 <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex items-center gap-4">
                                         <Button
@@ -368,21 +372,24 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                                     currentStep === 1
-                                        ? 'bg-green-50 border border-green-200'
+                                        ? 'bg-blue-50 border border-blue-200'
                                         : moveAxisCompleted
-                                          ? 'bg-blue-50 border border-blue-200'
+                                          ? 'bg-green-50 border border-green-200'
                                           : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
-                                <LuArrowRight
-                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                        currentStep === 1
-                                            ? 'bg-green-500 animate-pulse'
-                                            : moveAxisCompleted
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                    }`}
-                                />
+                                <div className={`min-w-8 min-h-8 text-white`}>
+                                    {moveAxisCompleted && (
+                                        <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
+                                    )}
+                                    {currentStep !== 1 &&
+                                        !moveAxisCompleted && (
+                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                        )}
+                                    {currentStep === 1 && (
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                    )}
+                                </div>
                                 <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex items-center gap-4">
                                         <Button
@@ -428,21 +435,24 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 2
-                                        ? 'bg-green-50 border border-green-200'
+                                        ? 'bg-blue-50 border border-blue-200'
                                         : setTravelCompleted
-                                          ? 'bg-blue-50 border border-blue-200'
+                                          ? 'bg-green-50 border border-green-200'
                                           : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
-                                <LuArrowRight
-                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                        currentStep === 2
-                                            ? 'bg-green-500 animate-pulse'
-                                            : setTravelCompleted
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                    }`}
-                                />
+                                <div className={`min-w-8 min-h-8 text-white`}>
+                                    {setTravelCompleted && (
+                                        <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
+                                    )}
+                                    {currentStep !== 2 &&
+                                        !setTravelCompleted && (
+                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                        )}
+                                    {currentStep === 2 && (
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                    )}
+                                </div>
                                 <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex items-center gap-4">
                                         <Button
