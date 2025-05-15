@@ -18,7 +18,8 @@ export interface JogSpeeds {
 export type JoggingSpeedOptions = 'Rapid' | 'Normal' | 'Precise';
 
 export function jogAxis(params: JogDistances, feedrate: number) {
-    const modal = 'G21';
+    const units = store.get('workspace.units', 'mm');
+    const modal = units === 'mm' ? 'G21' : 'G20';
     const s = map(
         params,
         (value, letter) => '' + letter.toUpperCase() + value,
@@ -28,7 +29,7 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
-    const units = store.get('units', 'mm');
+    const units = store.get('workspace.units', 'mm');
     controller.command('jog:start', axes, feedrate, units);
 }
 

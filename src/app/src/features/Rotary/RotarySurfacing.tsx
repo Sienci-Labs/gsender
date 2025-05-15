@@ -24,6 +24,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import { useNavigate } from 'react-router';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import cx from 'classnames';
+import store from 'app/store';
 
 const InputArea = ({
     children,
@@ -104,6 +105,22 @@ const RotarySurfacing = () => {
     useEffect(() => {
         setSurfacingState(getInitialState());
     }, [units]);
+
+    useEffect(() => {
+        return () => {
+            store.replace('rotary.stockTurning.options', {
+                stockLength: surfacingState.length,
+                stepdown: surfacingState.stepdown,
+                bitDiameter: surfacingState.bitDiameter,
+                spindleRPM: surfacingState.spindleRPM,
+                feedrate: surfacingState.feedrate,
+                stepover: surfacingState.stepover,
+                startHeight: surfacingState.startDiameter,
+                finalHeight: surfacingState.finalDiameter,
+                enableRehoming: surfacingState.enableRehoming,
+            });
+        };
+    }, []);
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';

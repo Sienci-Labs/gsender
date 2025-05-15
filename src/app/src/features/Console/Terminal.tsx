@@ -17,8 +17,14 @@ import controller, {
     addControllerEvents,
     removeControllerEvents,
 } from 'app/lib/controller';
-import { TERMINAL_GREY, TERMINAL_RED, TERMINAL_ALARM_RED } from 'app/constants';
+import {
+    TERMINAL_GREY,
+    TERMINAL_RED,
+    TERMINAL_ALARM_RED,
+    WORKSPACE_MODE,
+} from 'app/constants';
 import { addToHistory } from 'app/store/redux/slices/console.slice';
+import store from 'app/store';
 
 import '@xterm/xterm/css/xterm.css';
 
@@ -147,6 +153,13 @@ const Terminal = (
                     `Connected to ${port} with a baud rate of ${baudrate}`,
                 ),
             );
+            const { DEFAULT, ROTARY } = WORKSPACE_MODE;
+
+            if (controller.type === 'grblHAL') {
+                const isRotaryMode =
+                    store.get('workspace.mode', DEFAULT) === ROTARY;
+                controller.command('updateRotaryMode', isRotaryMode);
+            }
         },
         'serialport:close': () => {
             terminalInstance.current?.clear();
