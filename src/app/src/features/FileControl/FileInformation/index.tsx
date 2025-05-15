@@ -81,7 +81,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 })}
             >
                 {isElectron() && (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 max-xl:gap-1">
                         <span className="ml-4 dark:text-white">
                             Recent Files
                         </span>
