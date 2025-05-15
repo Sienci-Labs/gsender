@@ -61,30 +61,30 @@ const Wizard = () => {
             <div
                 className={cx({
                     hidden: !visible,
-                    'absolute top-1/2 left-4 w4/5 [transform:translate(0,-50%)] z-[9999] flex flex-col justify-between [transition:all_300ms_ease]':
+                    'absolute top-1/2 left-4 w-4/5 max-h-[500px] border-2 border-gray-500 rounded-lg shadow [transform:translate(0,-50%)] z-40 flex flex-col justify-between [transition:all_300ms_ease]':
                         !minimized,
                 })}
             >
                 <div
                     className={cx({
                         hidden: !visible || !overlay,
-                        'px-1 py-4 flex flex-col justify-center items-center z-[9999] bg-amber-100 rounded content-start':
+                        'px-1 py-4 flex flex-col justify-center items-center z-40 bg-amber-100 rounded content-start':
                             !minimized && overlay,
                     })}
                 >
-                    <div className="text-black text-center text-xl/relaxed font-bold z-[9999]">
+                    <div className="text-black text-center text-xl/relaxed font-bold z-40">
                         Widgets are disabled
                     </div>
-                    <div className="text-black text-center text-sm/relaxed z-[9999]">
+                    <div className="text-black text-center text-sm/relaxed z-40">
                         Please use the button(s) in the wizard instead.
                     </div>
                 </div>
                 <div
                     className={cx({
                         hidden: !visible,
-                        'absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-[9999]':
+                        'absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-40':
                             minimized,
-                        'bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-[9999] duration-300 ease-linear transition-all':
+                        'bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-40 duration-300 ease-linear transition-all':
                             !minimized,
                     })}
                 >

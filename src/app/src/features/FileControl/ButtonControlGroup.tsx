@@ -186,7 +186,7 @@ const ButtonControlGroup = () => {
 
     return (
         <div className="relative w-full flex justify-center">
-            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-50 border-blue-500 border-2 overflow-hidden">
+            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden">
                 <Button
                     onClick={handleClickLoadFile}
                     icon={<FaFolderOpen className="w-5 h-5" />}

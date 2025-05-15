@@ -175,7 +175,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 
     return (
         // calc = half of width + sidebar width
-        <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
+        <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-50 overflow-visible">
             {machineStateRender()}
         </div>
     );
