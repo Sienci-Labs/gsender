@@ -129,7 +129,7 @@ const Steps = () => {
                             setStarted(false);
                         }}
                         icon={<LuRefreshCw className="w-4 h-4" />}
-                        text="Restart Wizard"
+                        text="Start Over"
                     />
                 </div>
                 <div
