@@ -316,7 +316,7 @@ const Steps = () => {
                     <div className="flex flex-col gap-4">
                         <div className="space-y-1">
                             <h3 className="text-lg font-semibold dark:text-white">
-                                Mark Reference Points
+                                Instructions
                             </h3>
                             <p className="h-20 text-gray-600 dark:text-white">
                                 {currentStep === 0 &&
