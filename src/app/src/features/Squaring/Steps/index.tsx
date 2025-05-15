@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuRefreshCw } from 'react-icons/lu';
 
 import Button from 'app/components/Button';
@@ -18,6 +18,10 @@ const Steps = () => {
     const { currentMainStep, mainSteps, goToNextMainStep, resetSquaring } =
         useSquaring();
     const { isConnected } = useTypedSelector((state) => state.connection);
+
+    useEffect(() => {
+        resetSquaring();
+    }, []);
 
     const renderStep = () => {
         switch (currentMainStep) {
@@ -39,7 +43,6 @@ const Steps = () => {
     };
 
     if (!started) {
-        resetSquaring();
         return (
             <div className="flex flex-col gap-2 xl:gap-0 dark:text-white w-full">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
@@ -122,6 +125,7 @@ const Steps = () => {
                 <div className="flex gap-2">
                     <Button
                         onClick={() => {
+                            resetSquaring();
                             setStarted(false);
                         }}
                         icon={<LuRefreshCw className="w-4 h-4" />}

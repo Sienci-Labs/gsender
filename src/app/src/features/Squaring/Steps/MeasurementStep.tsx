@@ -53,13 +53,13 @@ const MeasurementStep = () => {
     };
 
     return (
-        <div className="max-w-7xl w-full grid grid-cols-2 gap-8">
-            <div className="flex flex-col gap-8">
-                <div className="space-y-4">
+        <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
+            <div className="flex flex-col gap-4">
+                <div className="space-y-1">
                     <h3 className="text-lg font-semibold dark:text-white">
                         Instructions
                     </h3>
-                    <p className="text-gray-600 dark:text-white">
+                    <p className="text-gray-600 dark:text-white h-20">
                         {currentSubStepData.description}
                     </p>
                 </div>
