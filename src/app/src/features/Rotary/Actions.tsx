@@ -68,6 +68,7 @@ const Actions = () => {
             >
                 Rotary Surfacing
             </Button>
+            <MountingSetup />
             <Button
                 size="sm"
                 variant="primary"
@@ -86,7 +87,6 @@ const Actions = () => {
             >
                 Y-Axis Alignment
             </Button>
-            <MountingSetup />
         </div>
     );
 };

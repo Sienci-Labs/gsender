@@ -1,51 +1,56 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Size = () => {
     const bbox = useTypedSelector((state) => state.file.bbox);
+    const { units } = useWorkspaceState();
+
+    // Convert to inches if needed
+    const conversionFactor = units === 'in' ? 1 / 25.4 : 1;
 
     // if it is a whole number when rounded, don't show decimals
     const formattedBBox = {
         delta: {
             x:
-                Number(bbox.delta.x.toFixed(2)) % 1 === 0
-                    ? bbox.delta.x
-                    : bbox.delta.x.toFixed(2),
+                Number((bbox.delta.x * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.delta.x * conversionFactor
+                    : (bbox.delta.x * conversionFactor).toFixed(2),
             y:
-                Number(bbox.delta.y.toFixed(2)) % 1 === 0
-                    ? bbox.delta.y
-                    : bbox.delta.y.toFixed(2),
+                Number((bbox.delta.y * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.delta.y * conversionFactor
+                    : (bbox.delta.y * conversionFactor).toFixed(2),
             z:
-                Number(bbox.delta.z.toFixed(2)) % 1 === 0
-                    ? bbox.delta.z
-                    : bbox.delta.z.toFixed(2),
+                Number((bbox.delta.z * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.delta.z * conversionFactor
+                    : (bbox.delta.z * conversionFactor).toFixed(2),
         },
         min: {
             x:
-                Number(bbox.min.x.toFixed(2)) % 1 === 0
-                    ? bbox.min.x
-                    : bbox.min.x.toFixed(2),
+                Number((bbox.min.x * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.min.x * conversionFactor
+                    : (bbox.min.x * conversionFactor).toFixed(2),
             y:
-                Number(bbox.min.y.toFixed(2)) % 1 === 0
-                    ? bbox.min.y
-                    : bbox.min.y.toFixed(2),
+                Number((bbox.min.y * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.min.y * conversionFactor
+                    : (bbox.min.y * conversionFactor).toFixed(2),
             z:
-                Number(bbox.min.z.toFixed(2)) % 1 === 0
-                    ? bbox.min.z
-                    : bbox.min.z.toFixed(2),
+                Number((bbox.min.z * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.min.z * conversionFactor
+                    : (bbox.min.z * conversionFactor).toFixed(2),
         },
         max: {
             x:
-                Number(bbox.max.x.toFixed(2)) % 1 === 0
-                    ? bbox.max.x
-                    : bbox.max.x.toFixed(2),
+                Number((bbox.max.x * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.max.x * conversionFactor
+                    : (bbox.max.x * conversionFactor).toFixed(2),
             y:
-                Number(bbox.max.y.toFixed(2)) % 1 === 0
-                    ? bbox.max.y
-                    : bbox.max.y.toFixed(2),
+                Number((bbox.max.y * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.max.y * conversionFactor
+                    : (bbox.max.y * conversionFactor).toFixed(2),
             z:
-                Number(bbox.max.z.toFixed(2)) % 1 === 0
-                    ? bbox.max.z
-                    : bbox.max.z.toFixed(2),
+                Number((bbox.max.z * conversionFactor).toFixed(2)) % 1 === 0
+                    ? bbox.max.z * conversionFactor
+                    : (bbox.max.z * conversionFactor).toFixed(2),
         },
     };
     return (
