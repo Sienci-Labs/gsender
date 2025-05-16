@@ -288,7 +288,7 @@ const Steps = () => {
                             onClick={reset}
                             variant="outline"
                             icon={<LuRefreshCw className="w-4 h-4" />}
-                            text="Start Over"
+                            text="Restart Wizard"
                         />
                     </div>
                 </div>
@@ -310,7 +310,7 @@ const Steps = () => {
                         onClick={reset}
                         variant="outline"
                         icon={<LuRefreshCw className="w-4 h-4" />}
-                        text="Start Over"
+                        text="Restart Wizard"
                     />
                 </div>
             </div>
@@ -514,7 +514,7 @@ const Steps = () => {
                     onClick={reset}
                     variant="outline"
                     icon={<LuRefreshCw className="w-4 h-4" />}
-                    text="Start Over"
+                    text="Restart Wizard"
                 />
             </div>
         </div>
