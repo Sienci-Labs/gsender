@@ -99,7 +99,7 @@ const MacroForm = ({
 
     return (
         <Dialog open onOpenChange={onCancel}>
-            <DialogContent className="bg-white w-1/3">
+            <DialogContent className="bg-white w-1/3 max-xl:w-[450px]">
                 <form
                     onSubmit={(event: FormEvent) => {
                         event.preventDefault();

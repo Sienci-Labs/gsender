@@ -5925,6 +5925,10 @@ html,
     width: 100% !important;
   }
 
+  .max-xl\:w-\[450px\] {
+    width: 450px !important;
+  }
+
   .max-xl\:min-w-\[180px\] {
     min-width: 180px !important;
   }
