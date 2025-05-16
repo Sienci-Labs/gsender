@@ -153,7 +153,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             <span className="text-base text-gray-900 dark:text-gray-300">
                                 Last Job
                             </span>
-                            <div className="grid grid-rows-3 gap-4 -ml-[2px] text-gray-500 font-bold">
+                            <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>

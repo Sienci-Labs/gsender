@@ -21,11 +21,12 @@ const buttonVariants = cva(
                     'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
-                confirm: 'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10',
-                cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500'
+                confirm:
+                    'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10',
+                cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500',
             },
             size: {
-                default: 'h-10 px-4 py-2',
+                default: 'h-10 px-4 max-xl:px-3 py-2 max-xl:py-1',
                 sm: 'h-9 rounded-md px-3',
                 lg: 'h-11 rounded-md px-8',
                 icon: 'h-10 w-10',

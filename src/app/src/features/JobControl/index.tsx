@@ -110,7 +110,7 @@ const JobControl: React.FC<JobControlProps> = ({
                         )}
                 </div>
 
-                <div className="z-10 absolute top-[-30px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
+                <div className="z-10 absolute top-[-30px] max-xl:top-[-28px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
                     <ControlButton
                         type={START}
                         workflow={workflow}
