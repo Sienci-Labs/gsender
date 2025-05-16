@@ -53,6 +53,12 @@ function Connection(props: ConnectionProps) {
     const [activePort, setActivePort] = useState('');
 
     useEffect(() => {
+        controller.addListener('serialport:close', () => {
+            onControllerDisconnect();
+        });
+    }, []);
+
+    useEffect(() => {
         const preferredFirmware = store.get(
             'widgets.connection.controller.type',
             'grbl',
@@ -99,6 +105,12 @@ function Connection(props: ConnectionProps) {
 
         connectionConfig.set('port', port);
         connectionConfig.set('baudrate', baud);
+    }
+
+    function onControllerDisconnect() {
+        setConnectionState(ConnectionState.DISCONNECTED);
+        setConnectionType(ConnectionType.DISCONNECTED);
+        setActivePort('');
     }
 
     function onDisconnectClick() {
