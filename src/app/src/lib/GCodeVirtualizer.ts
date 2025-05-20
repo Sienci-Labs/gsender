@@ -146,9 +146,9 @@ class GCodeVirtualizer extends EventEmitter {
 
     re3: RegExp = new RegExp(/\s+/g);
 
-    minBounds: [number, number, number] = [0, 0, 0];
+    minBounds: [number, number, number, number] = [0, 0, 0, 0];
 
-    maxBounds: [number, number, number] = [0, 0, 0];
+    maxBounds: [number, number, number, number] = [0, 0, 0, 0];
 
     modal: Modal = {
         // Motion Mode
@@ -1344,7 +1344,7 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     updateBounds(position: BasicPosition): void {
-        const { x, y, z } = position;
+        const { x, y, z, a } = position;
 
         if (x > this.maxBounds[0]) {
             this.maxBounds[0] = x;
@@ -1366,27 +1366,39 @@ class GCodeVirtualizer extends EventEmitter {
         if (z < this.minBounds[2]) {
             this.minBounds[2] = z;
         }
+
+        if (a !== undefined) {
+            if (a > this.maxBounds[3]) {
+                this.maxBounds[3] = a;
+            }
+            if (a < this.minBounds[3]) {
+                this.minBounds[3] = a;
+            }
+        }
     }
 
     getBBox() {
-        const [minX, minY, minZ] = this.minBounds;
-        const [maxX, maxY, maxZ] = this.maxBounds;
+        const [minX, minY, minZ, minA] = this.minBounds;
+        const [maxX, maxY, maxZ, maxA] = this.maxBounds;
 
         return {
             min: {
                 x: minX,
                 y: minY,
                 z: minZ,
+                a: minA,
             },
             max: {
                 x: maxX,
                 y: maxY,
                 z: maxZ,
+                a: maxA,
             },
             delta: {
                 x: maxX - minX,
                 y: maxY - minY,
                 z: maxZ - minZ,
+                a: maxA - minA,
             },
         };
     }
