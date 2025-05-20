@@ -93,8 +93,6 @@ function DRO({
         get(state, 'controller.settings.settings.$27', 1),
     );
 
-    const isRotaryMode = mode === 'ROTARY';
-
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
             corner,
@@ -103,6 +101,10 @@ function DRO({
             Number(pullOff),
         );
         controller.command('gcode', gcode);
+    }
+
+    function toggleHoming() {
+        setHomingMode((prev) => !prev);
     }
 
     const shuttleControlEvents = {
@@ -253,10 +255,6 @@ function DRO({
     useShuttleEvents(shuttleControlEvents);
     useKeybinding(shuttleControlEvents);
 
-    function toggleHoming() {
-        setHomingMode(!homingMode);
-    }
-
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
@@ -273,6 +271,8 @@ function DRO({
     const mpos = mapValues(mposController, (pos) => {
         return String(mapPositionToUnits(pos, preferredUnits));
     });
+
+    const isRotaryMode = mode === 'ROTARY';
 
     return (
         <div className="relative">
@@ -377,7 +377,9 @@ function DRO({
                     disabled={!canClick}
                     size="sm"
                 >
-                    <span className="font-mono text-lg">XY</span>
+                    <span className="font-mono text-lg">
+                        {isRotaryMode ? 'XA' : 'XY'}
+                    </span>
                 </Button>
             </div>
         </div>
