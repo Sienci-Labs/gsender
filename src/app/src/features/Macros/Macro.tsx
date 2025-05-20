@@ -21,22 +21,36 @@
  *
  */
 
-import includes from 'lodash/includes';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-
-import DroppableColumn from './DroppableColumn';
+import includes from 'lodash/includes';
+import {
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    MouseSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+    DragOverEvent,
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    arrayMove,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from '../../constants';
+import DroppableColumn, { Actions } from './DroppableColumn';
 
-interface ContainerProps {
+type ContainerProps = {
     columns: number;
     children: React.ReactNode;
-}
+};
 
-const Container: React.FC<ContainerProps> = ({ columns, children }) => {
+const Container = ({ columns, children }: ContainerProps) => {
     const arr = new Array(columns).fill(columns);
     const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
 
@@ -50,47 +64,64 @@ const Container: React.FC<ContainerProps> = ({ columns, children }) => {
     );
 };
 
-interface MacroItem {
+type MacroItem = {
     id: string;
     name: string;
     description: string;
     column: string;
     rowIndex: number;
-}
+};
 
-interface MacroState {
+type MacroState = {
     macros: MacroItem[];
     canClick: boolean;
-}
+};
 
-interface MacroActions {
+type MacroActions = {
     updateMacros: (macros: MacroItem[]) => void;
-}
+    runMacro: (id: string, options: { name: string }) => void;
+    openEditMacroModal: (id: string) => void;
+    deleteMacro: (id: string) => void;
+};
 
-interface MacroProps {
+type MacroProps = {
     state: MacroState;
     actions: MacroActions;
     workflow: {
         state: string;
     };
-}
+};
 
-interface ColumnState {
+type ColumnState = {
     items: MacroItem[];
-}
+};
 
-interface ColumnsState {
+type ColumnsState = {
     column1: ColumnState;
     column2: ColumnState;
-}
+};
 
-const Macro: React.FC<MacroProps> = ({ state, actions, workflow }) => {
+const Macro = ({ state, actions, workflow }: MacroProps) => {
     const { macros = [] } = state;
-
+    const [activeId, setActiveId] = useState<string | null>(null);
     const [columns, setColumns] = useState<ColumnsState>({
         column1: { items: [] },
         column2: { items: [] },
     });
+
+    const sensors = useSensors(
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 250,
+                tolerance: 5,
+            },
+        }),
+    );
 
     const setRowIndices = (macros: MacroItem[]): MacroItem[] => {
         return macros.map((macro, index) => ({
@@ -128,60 +159,81 @@ const Macro: React.FC<MacroProps> = ({ state, actions, workflow }) => {
         );
     };
 
-    // https://codesandbox.io/s/i0ex5?file=/src/App.js
-    const onDragEnd = (
-        result: DropResult,
-        columns: ColumnsState,
-        setColumns: React.Dispatch<React.SetStateAction<ColumnsState>>,
-    ): void => {
-        const { source, destination } = result;
-        if (!destination) {
-            return;
-        }
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(event.active.id as string);
+    };
 
-        //Check if we are trying to move the macro into a different column
-        if (source.droppableId !== destination.droppableId) {
-            const sourceColumn =
-                columns[source.droppableId as keyof ColumnsState];
-            const destColumn =
-                columns[destination.droppableId as keyof ColumnsState];
+    const handleDragOver = (event: DragOverEvent) => {
+        const { active, over } = event;
+        if (!over) return;
+
+        const activeColumn = active.data.current?.column;
+        const overColumn = over.data.current?.column;
+
+        if (activeColumn !== overColumn) {
+            // Moving between columns
+            const sourceColumn = columns[activeColumn as keyof ColumnsState];
+            const destColumn = columns[overColumn as keyof ColumnsState];
             const sourceItems = [...sourceColumn.items];
             const destItems = [...destColumn.items];
-            const [popped] = sourceItems.splice(source.index, 1);
+            const [movedItem] = sourceItems.splice(
+                sourceItems.findIndex((item) => item.id === active.id),
+                1,
+            );
 
-            // Update the macro column and row index properties so they can be saved
-            // within the API call and can be sorted properly when the user closes and opens the program again
-            popped.column = destination.droppableId;
-
-            destItems.splice(destination.index, 0, popped);
+            movedItem.column = overColumn as string;
+            destItems.splice(
+                destItems.findIndex((item) => item.id === over.id),
+                0,
+                movedItem,
+            );
 
             setColumns({
                 ...columns,
-                [source.droppableId]: {
+                [activeColumn]: {
                     ...sourceColumn,
                     items: setRowIndices(sourceItems),
                 },
-                [destination.droppableId]: {
+                [overColumn]: {
                     ...destColumn,
                     items: setRowIndices(destItems),
-                },
-            });
-        } else {
-            const column = columns[source.droppableId as keyof ColumnsState];
-            const copiedItems = [...column.items];
-            const [removed] = copiedItems.splice(source.index, 1);
-            copiedItems.splice(destination.index, 0, removed);
-            setColumns({
-                ...columns,
-                [source.droppableId]: {
-                    ...column,
-                    items: setRowIndices(copiedItems),
                 },
             });
         }
     };
 
-    // Set rowIndices after sorting to correct any invalid saved data, normally it should be a no-op
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (!over) return;
+
+        const activeColumn = active.data.current?.column;
+        const overColumn = over.data.current?.column;
+
+        if (activeColumn === overColumn) {
+            // Moving within the same column
+            const column = columns[activeColumn as keyof ColumnsState];
+            const oldIndex = column.items.findIndex(
+                (item) => item.id === active.id,
+            );
+            const newIndex = column.items.findIndex(
+                (item) => item.id === over.id,
+            );
+
+            setColumns({
+                ...columns,
+                [activeColumn]: {
+                    ...column,
+                    items: setRowIndices(
+                        arrayMove(column.items, oldIndex, newIndex),
+                    ),
+                },
+            });
+        }
+
+        setActiveId(null);
+    };
+
     const computeColumn = (columnName: string): MacroItem[] =>
         setRowIndices(
             macros
@@ -201,26 +253,48 @@ const Macro: React.FC<MacroProps> = ({ state, actions, workflow }) => {
                     </div>
                 </div>
             ) : (
-                <DragDropContext
-                    onDragEnd={(result) =>
-                        onDragEnd(result, columns, setColumns)
-                    }
+                <DndContext
+                    sensors={sensors}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDragEnd={handleDragEnd}
                 >
                     <Container columns={2}>
-                        <DroppableColumn
-                            droppableId="column1"
-                            macros={column1.items}
-                            actions={actions as any}
-                            disabled={disabled}
-                        />
-                        <DroppableColumn
-                            droppableId="column2"
-                            macros={column2.items}
-                            actions={actions as any}
-                            disabled={disabled}
-                        />
+                        <SortableContext
+                            items={column1.items.map((item) => item.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <DroppableColumn
+                                droppableId="column1"
+                                macros={column1.items}
+                                actions={actions as unknown as Actions}
+                                disabled={disabled}
+                            />
+                        </SortableContext>
+                        <SortableContext
+                            items={column2.items.map((item) => item.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <DroppableColumn
+                                droppableId="column2"
+                                macros={column2.items}
+                                actions={actions as unknown as Actions}
+                                disabled={disabled}
+                            />
+                        </SortableContext>
                     </Container>
-                </DragDropContext>
+                    <DragOverlay>
+                        {activeId ? (
+                            <div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
+                                {
+                                    [...column1.items, ...column2.items].find(
+                                        (item) => item.id === activeId,
+                                    )?.name
+                                }
+                            </div>
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
             )}
         </>
     );
