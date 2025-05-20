@@ -264,15 +264,17 @@ function DRO({
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
 
-    const wpos = mapValues(wposController, (pos) => {
-        return String(mapPositionToUnits(pos, preferredUnits));
-    });
-
-    const mpos = mapValues(mposController, (pos) => {
-        return String(mapPositionToUnits(pos, preferredUnits));
-    });
-
     const isRotaryMode = mode === 'ROTARY';
+
+    const wpos = mapValues(wposController, (pos, axis) => {
+        if (axis === 'a') return pos;
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
+
+    const mpos = mapValues(mposController, (pos, axis) => {
+        if (axis === 'a') return pos;
+        return String(mapPositionToUnits(pos, preferredUnits));
+    });
 
     return (
         <div className="relative">
