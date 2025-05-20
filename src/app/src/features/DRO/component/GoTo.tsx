@@ -1,15 +1,18 @@
+import { useEffect, useState } from 'react';
+import { FaPaperPlane } from 'react-icons/fa6';
+
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover.tsx';
-import { FaPaperPlane } from 'react-icons/fa6';
+} from 'app/components/shadcn/Popover';
 import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
-import { DROPosition } from 'app/features/DRO/utils/DRO.ts';
+import { DROPosition } from 'app/features/DRO/utils/DRO';
 import Switch from 'app/components/Switch';
-import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 interface GotoProps {
     units: string;
@@ -18,6 +21,8 @@ interface GotoProps {
 }
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
+    const { mode } = useWorkspaceState();
+    const controllerType = useTypedSelector((state) => state.controller.type);
     const [relativeMovement, setRelativeMovement] = useState(false);
     const [movementPos, setMovementPos] = useState({
         x: 0,
@@ -49,6 +54,10 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         }
     }, [relativeMovement]);
 
+    const isInRotaryMode = mode === 'ROTARY';
+    const aAxisIsAvailble = isInRotaryMode || controllerType === 'grblHAL';
+    const yAxisIsAvailble = !isInRotaryMode;
+
     const onToggleSwap = () => {
         setRelativeMovement((prev) => !prev);
     };
@@ -57,10 +66,26 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         const code = [];
         const unitModal = 'G90';
         const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
-        code.push(
-            movementModal,
-            `G0 X${movementPos.x} Y${movementPos.y} Z${movementPos.z}`,
-        );
+
+        // Build axis commands based on non-zero values
+        const axes = [];
+        axes.push(`X${movementPos.x}`);
+
+        if (yAxisIsAvailble) {
+            axes.push(`Y${movementPos.y}`);
+        }
+
+        axes.push(`Z${movementPos.z}`);
+
+        if (aAxisIsAvailble) {
+            axes.push(`A${movementPos.a}`);
+        }
+
+        // Only add movement command if there are axes to move
+        if (axes.length > 0) {
+            code.push(movementModal, `G0 ${axes.join(' ')}`);
+        }
+
         controller.command('gcode:safe', code, unitModal);
     }
 
@@ -97,6 +122,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         label="Y"
                         value={movementPos.y}
                         onChange={(v) => onValueEdit(v, 'y')}
+                        disabled={!yAxisIsAvailble}
                     />
                     <UnitInput
                         units={units}
@@ -109,6 +135,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         label="A"
                         value={movementPos.a}
                         onChange={(v) => onValueEdit(v, 'a')}
+                        disabled={!aAxisIsAvailble}
                     />
                     <div className="flex flex-row text-sm text-gray-400 justify-between">
                         <span>ABS</span>
