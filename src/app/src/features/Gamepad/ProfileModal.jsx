@@ -44,7 +44,10 @@ const ProfileModal = () => {
                 setAvailabilityType(isAvailable);
                 setGamepadInfo(gamepad);
 
-                if (isAvailable === AVAILABLE) {
+                if (
+                    isAvailable === AVAILABLE &&
+                    inputRef.current.value === ''
+                ) {
                     inputRef.current.value = gamepad.id;
                     inputRef.current.focus();
                 }
