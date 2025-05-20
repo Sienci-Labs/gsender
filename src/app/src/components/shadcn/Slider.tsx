@@ -39,6 +39,7 @@ const Slider = React.forwardRef<
                 'relative flex w-full touch-none select-none items-center',
                 className,
             )}
+            disabled={disabled}
             {...props}
         >
             <SliderPrimitive.Track
@@ -57,9 +58,10 @@ const Slider = React.forwardRef<
             </SliderPrimitive.Track>
             <SliderPrimitive.Thumb
                 className={cx(thumbClassName, {
-                    ' bg-white border-gray-500 block h-5 w-5 rounded-full border-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50':
+                    'border-gray-500 block h-5 w-5 rounded-full border-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2':
                         !thumbClassName,
-                    'bg-gray-500': disabled,
+                    'bg-white cursor-pointer': !disabled,
+                    'bg-gray-300 cursor-not-allowed': disabled,
                 })}
             />
         </SliderPrimitive.Root>

@@ -5,9 +5,10 @@ interface ActiveStateButtonProps {
     icon: JSX.Element;
     active?: boolean;
     onClick?: (event: React.MouseEvent) => void;
-    size?: string;
+    size?: 'sm' | 'md' | 'lg';
     className?: string;
     text?: string;
+    disabled?: boolean;
 }
 
 export function ActiveStateButton({

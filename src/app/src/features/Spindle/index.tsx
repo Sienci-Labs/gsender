@@ -381,8 +381,7 @@ const SpindleWidget = () => {
             }
             setState((prevState) => ({ ...prevState, spindleSpeed: value }));
         },
-        handleLaserPowerChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = Number(e.target.value);
+        handleLaserPowerChange: (value: number) => {
             if (isLaserOn) {
                 debounceLaserPower(
                     value,

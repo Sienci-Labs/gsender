@@ -24,7 +24,7 @@ export const buttonStyle = tv({
             lg: 'h-12 text-lg',
         },
         disabled: {
-            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark',
+            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark cursor-not-allowed',
         },
         active: {
             true: 'bg-gray-200 shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
