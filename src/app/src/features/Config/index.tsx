@@ -52,10 +52,10 @@ export function Config() {
         e: MouseEventHandler<HTMLButtonElement>,
         index: number,
     ) {
-        setActiveSection(index);
         document
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
+        setActiveSection(index);
     }
 
     return (
