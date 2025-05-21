@@ -49,6 +49,7 @@ interface DialogOptions {
     confirmLabel?: string;
     cancelLabel?: string;
     hideClose?: boolean;
+    hideConfirm?: boolean;
     show: boolean;
 }
 
@@ -61,6 +62,7 @@ const ConfirmationDialog = () => {
     const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
     const [cancelLabel, setCancelLabel] = useState<string | null>(null);
     const [hideClose, setHideClose] = useState(false);
+    const [hideConfirm, setHideConfirm] = useState(false);
 
     let hideModal = !show;
 
@@ -79,6 +81,7 @@ const ConfirmationDialog = () => {
                 setConfirmLabel(options.confirmLabel || null);
                 setCancelLabel(options.cancelLabel || null);
                 setHideClose(options.hideClose || false);
+                setHideConfirm(options.hideConfirm || false);
                 setShow(options.show);
             },
         );
@@ -108,17 +111,18 @@ const ConfirmationDialog = () => {
                             {cancelLabel}
                         </AlertDialogCancel>
                     )}
-
-                    <AlertDialogAction
-                        onClick={() => {
-                            if (onConfirm !== null) {
-                                onConfirm();
-                            }
-                            setShow(false);
-                        }}
-                    >
-                        {confirmLabel}
-                    </AlertDialogAction>
+                    {!hideConfirm && (
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (onConfirm !== null) {
+                                    onConfirm();
+                                }
+                                setShow(false);
+                            }}
+                        >
+                            {confirmLabel}
+                        </AlertDialogAction>
+                    )}
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

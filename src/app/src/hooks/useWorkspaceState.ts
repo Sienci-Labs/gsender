@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import store from 'app/store';

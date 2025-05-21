@@ -31,16 +31,19 @@ export interface BBox {
         x: number;
         y: number;
         z: number;
+        a?: number;
     };
     max: {
         x: number;
         y: number;
         z: number;
+        a?: number;
     };
     delta?: {
         x: number;
         y: number;
         z: number;
+        a?: number;
     };
 }
 

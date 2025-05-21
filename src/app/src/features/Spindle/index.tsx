@@ -381,8 +381,7 @@ const SpindleWidget = () => {
             }
             setState((prevState) => ({ ...prevState, spindleSpeed: value }));
         },
-        handleLaserPowerChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = Number(e.target.value);
+        handleLaserPowerChange: (value: number) => {
             if (isLaserOn) {
                 debounceLaserPower(
                     value,
@@ -618,15 +617,14 @@ const SpindleWidget = () => {
                         onChange={actions.handleModeToggle}
                         disabled={!canClick()}
                     />
-                    <ActiveIndicator active={active} />
+                    {controllerType === GRBLHAL && (
+                        <SpindleSelector
+                            spindles={availableSpindles}
+                            onChange={actions.handleHALSpindleSelect}
+                            spindle={state.spindle}
+                        />
+                    )}
                 </div>
-                {controllerType === GRBLHAL && (
-                    <SpindleSelector
-                        spindles={availableSpindles}
-                        onChange={actions.handleHALSpindleSelect}
-                        spindle={state.spindle}
-                    />
-                )}
             </div>
             <div>
                 {!laserAsSpindle ? (

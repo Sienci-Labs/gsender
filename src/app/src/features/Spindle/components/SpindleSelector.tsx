@@ -27,8 +27,7 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 const SpindleSelector = ({ spindles, onChange, spindle }: Props) => {
     const formattedSpindles = formatSpindles(spindles);
     return (
-        <div className="flex gap-2 justify-center my-2 w-full items-center">
-            <label className="font-semibold">Spindles</label>
+        <div className="flex gap-1 justify-center my-2 w-full items-center">
             <Select<FormattedSpindle>
                 options={formattedSpindles}
                 placeholder="Default Spindle"

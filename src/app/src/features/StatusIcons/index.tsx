@@ -19,7 +19,6 @@ const StatusIcons = () => {
     });
     const [showRemoteDialog, setShowRemoteDialog] = useState(false);
 
-    console.log(headlessSettings);
     function toggleRemoteModeDialog(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         setShowRemoteDialog(!showRemoteDialog);
@@ -55,7 +54,7 @@ const StatusIcons = () => {
     }, []);
 
     return (
-        <div className="flex flex-row gap-4 absolute top-4 right-4 max-sm:hidden">
+        <div className="flex flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 max-sm:hidden">
             <button
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                 onClick={toggleRemoteModeDialog}

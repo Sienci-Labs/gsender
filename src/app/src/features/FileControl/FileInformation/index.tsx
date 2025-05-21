@@ -81,7 +81,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 })}
             >
                 {isElectron() && (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 max-xl:gap-1">
                         <span className="ml-4 dark:text-white">
                             Recent Files
                         </span>
@@ -153,7 +153,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             <span className="text-base text-gray-900 dark:text-gray-300">
                                 Last Job
                             </span>
-                            <div className="grid grid-rows-3 gap-4 -ml-[2px] text-gray-500 font-bold">
+                            <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -252,7 +252,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 </Tooltip>
             </TooltipProvider>
 
-            <div className="text-gray-500 flex gap-1 text-sm">
+            <div className="text-gray-500 flex gap-1 text-xs">
                 <span>{fileSize}</span>
 
                 <span>({total} lines)</span>
@@ -260,7 +260,6 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
             {path && (
                 <div className="text-gray-500 text-xs max-w-full flex flex-row">
-                    <span>Path: </span>
                     <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
                         {path}
                     </span>

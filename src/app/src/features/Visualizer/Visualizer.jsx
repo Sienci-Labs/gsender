@@ -2441,6 +2441,7 @@ class Visualizer extends Component {
             <div
                 className="overflow-hidden h-full w-full rounded-lg"
                 ref={this.setRef}
+                id="visualizer-wrapper"
             />
         );
     }

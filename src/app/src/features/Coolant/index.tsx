@@ -9,13 +9,20 @@ import {
     startFlood,
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
-import Button from 'app/components/Button';
-import { COOLANT_CATEGORY } from 'app/constants';
+import {
+    COOLANT_CATEGORY,
+    GRBL,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBLHAL,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
+import { useCallback } from 'react';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -23,6 +30,14 @@ export interface CoolantProps {
 }
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
+    const { workflow, isConnected, controllerState, controllerType } =
+        useTypedSelector((state) => ({
+            workflow: state.controller.workflow,
+            isConnected: state.connection.isConnected ?? false,
+            controllerState: state.controller.state ?? {},
+            controllerType: state.controller.type ?? 'grbl',
+        }));
+
     const shuttleControlEvents = {
         MIST_COOLANT: {
             title: 'Mist Coolant',
@@ -56,6 +71,20 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
     useShuttleEvents(shuttleControlEvents);
     useKeybinding(shuttleControlEvents);
 
+    const canClick = useCallback((): boolean => {
+        if (!isConnected) return false;
+        if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
+        if (![GRBL, GRBLHAL].includes(controllerType)) return false;
+
+        const activeState = controllerState?.status?.activeState;
+        return activeState === GRBL_ACTIVE_STATE_IDLE;
+    }, [
+        isConnected,
+        workflow.state,
+        controllerType,
+        controllerState?.status?.activeState,
+    ]);
+
     return (
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-around w-full gap-4">
@@ -66,6 +95,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="lg"
                     className="w-full h-16"
                     active={mistActive}
+                    disabled={!canClick()}
                 />
                 <ActiveStateButton
                     text="Flood"
@@ -74,6 +104,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="lg"
                     className="w-full h-16"
                     active={floodActive}
+                    disabled={!canClick()}
                 />
                 <ActiveStateButton
                     text="Off"
@@ -81,6 +112,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     onClick={stopCoolant}
                     size="lg"
                     className="w-full h-16"
+                    disabled={!canClick()}
                 />
             </div>
         </div>

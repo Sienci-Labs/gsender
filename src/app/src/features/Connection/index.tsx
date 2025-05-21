@@ -53,6 +53,12 @@ function Connection(props: ConnectionProps) {
     const [activePort, setActivePort] = useState('');
 
     useEffect(() => {
+        controller.addListener('serialport:close', () => {
+            onControllerDisconnect();
+        });
+    }, []);
+
+    useEffect(() => {
         const preferredFirmware = store.get(
             'widgets.connection.controller.type',
             'grbl',
@@ -101,6 +107,12 @@ function Connection(props: ConnectionProps) {
         connectionConfig.set('baudrate', baud);
     }
 
+    function onControllerDisconnect() {
+        setConnectionState(ConnectionState.DISCONNECTED);
+        setConnectionType(ConnectionType.DISCONNECTED);
+        setActivePort('');
+    }
+
     function onDisconnectClick() {
         setConnectionState(ConnectionState.DISCONNECTED);
         setConnectionType(ConnectionType.DISCONNECTED);
@@ -142,7 +154,7 @@ function Connection(props: ConnectionProps) {
                     )}
                 />
             )}
-            <div className="h-12 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
+            <div className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
                 <ConnectionStateIndicator
                     state={connectionState}
                     type={connectionType}

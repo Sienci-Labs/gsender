@@ -33,7 +33,7 @@ export function UnlockButton() {
     const activateUnlockButton = isHold || isAlarm;
 
     return (
-        <div className="text-4xl absolute top-3 left-72">
+        <div className="text-4xl absolute top-3 max-xl:top-2 left-72">
             <button
                 className={cx('group text-gray-400', {
                     'text-yellow-600 bg-orange-200 bg-opacity-10 rounded':

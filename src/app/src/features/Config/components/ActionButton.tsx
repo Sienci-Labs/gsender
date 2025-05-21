@@ -15,7 +15,7 @@ export function ActionButton({
         <button
             onClick={onClick}
             disabled={disabled}
-            className="last:border-r-0 inline-flex flex-col disabled:bg-gray-200 disabled:text-gray-300 items-center justify-center px-5 group group-hover:text-blue-500 border-gray-200 border-x hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:bg-dark"
+            className="last:border-r-0 inline-flex flex-col disabled:bg-gray-200 disabled:text-gray-300 disabled:cursor-not-allowed items-center justify-center px-5 group group-hover:text-blue-500 border-gray-200 border-x hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:bg-dark"
         >
             <span className="enabled:group-hover:text-blue-500 text-gray-600 dark:text-white">
                 {icon}

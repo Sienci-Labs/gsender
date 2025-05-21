@@ -25,6 +25,7 @@ const initialState: FileInfoState = {
     },
     content: '',
     fileType: null,
+    usedAxes: [],
 };
 
 const normalizeBBox = (bbox: Partial<BBox>): BBox => {

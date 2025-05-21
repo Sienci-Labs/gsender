@@ -136,6 +136,7 @@ export interface FileInfoState {
     bbox: BBox;
     content: string;
     fileType: FILE_TYPE_T;
+    usedAxes: Array<string>;
 }
 
 export interface PreferencesState {

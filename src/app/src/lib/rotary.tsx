@@ -75,6 +75,8 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
                     '$$',
                     ROTARY_TOGGLE_MACRO,
                 ]);
+
+                controller.command('updateRotaryMode', false);
             }
             return;
         }

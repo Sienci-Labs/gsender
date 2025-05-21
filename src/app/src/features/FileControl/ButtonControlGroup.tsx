@@ -193,7 +193,7 @@ const ButtonControlGroup = () => {
                     text="Load File"
                     variant="ghost"
                     disabled={!canClick}
-                    className="h-10 px-4 rounded-none"
+                    className="h-10 max-xl:h-9 px-4 rounded-none"
                 />
 
                 <Divider />
@@ -204,7 +204,7 @@ const ButtonControlGroup = () => {
                             icon={<MdKeyboardArrowDown className="w-10 h-8" />}
                             variant="ghost"
                             disabled={!canClick}
-                            className="h-10 w-12 rounded-none"
+                            className="h-10 max-xl:h-9 w-12 rounded-none"
                         />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 bg-white">
@@ -244,7 +244,7 @@ const ButtonControlGroup = () => {
                         <Button
                             icon={<MdClose className="w-6 h-6" />}
                             variant="ghost"
-                            className="h-10 w-12 rounded-none"
+                            className="h-10 max-xl:h-9 w-12 rounded-none"
                             disabled={isRunning || !fileLoaded}
                         />
                     </AlertDialogTrigger>
