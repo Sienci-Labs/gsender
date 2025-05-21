@@ -14,7 +14,7 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
 import Button from 'app/components/Button';
-import Toggle from 'app/components/Switch/Toggle.tsx';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { actions } from './apiActions.ts';
@@ -99,7 +99,7 @@ export function RemoteModeDialog({
                                 <span className="font-bold dark:text-white">
                                     Enable Wireless Control
                                 </span>
-                                <Toggle
+                                <Switch
                                     onChange={toggleRemoteMode}
                                     checked={remoteEnabled}
                                 />

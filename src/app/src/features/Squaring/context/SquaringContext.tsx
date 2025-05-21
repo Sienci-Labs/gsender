@@ -122,7 +122,7 @@ const initialMainSteps: MainStep[] = [
                 buttonLabel: 'Mark Point 1',
                 buttonVariant: 'secondary',
                 description:
-                    'Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.',
+                    "First, we'll mark three points on your machine in a triangle. Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.",
                 completed: false,
                 output: null,
                 shapeActions: [
@@ -264,7 +264,8 @@ const initialMainSteps: MainStep[] = [
         subSteps: [
             {
                 buttonLabel: 'Measure Distance 1-2',
-                description: 'Measure the distance between points 1 and 2.',
+                description:
+                    "Now, measure the distances between the points you've marked and enter them below. Measure the distance between points 1 and 2.",
                 completed: false,
                 output: null,
             },

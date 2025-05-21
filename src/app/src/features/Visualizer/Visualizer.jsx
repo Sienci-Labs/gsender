@@ -97,15 +97,15 @@ const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
 const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
-const PERSPECTIVE_FOV = 70;
+const PERSPECTIVE_FOV = 50;
 const PERSPECTIVE_NEAR = 0.001;
-const PERSPECTIVE_FAR = 3000;
-const ORTHOGRAPHIC_FOV = 30;
+const PERSPECTIVE_FAR = 7000;
+const ORTHOGRAPHIC_FOV = 10;
 const ORTHOGRAPHIC_NEAR = 0.001;
-const ORTHOGRAPHIC_FAR = 3000;
-const CAMERA_DISTANCE = 600; // Move the camera out a bit from the origin (0, 0, 0)
+const ORTHOGRAPHIC_FAR = 7000;
+const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
-const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
+const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
 import { outlineResponse } from '../../workers/Outline.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -2000,7 +2000,7 @@ class Visualizer extends Component {
             WORKSPACE_MODE.DEFAULT,
         );
 
-        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
+        const shouldZoom = true; //this.props.isSecondary ? !this.didZoom : true;
 
         if (!this.visualizer) {
             return;
@@ -2062,7 +2062,23 @@ class Visualizer extends Component {
         if (shouldZoom) {
             // if secondary, force top view
             if (this.props.isSecondary) {
-                this.toTopView();
+                // no longer force top view
+                // this.toTopView();
+                if (this.props.cameraPosition === 'Top') {
+                    this.toTopView();
+                }
+                if (this.props.cameraPosition === '3D') {
+                    this.to3DView();
+                }
+                if (this.props.cameraPosition === 'Front') {
+                    this.toFrontView();
+                }
+                if (this.props.cameraPosition === 'Left') {
+                    this.toLeftSideView();
+                }
+                if (this.props.cameraPosition === 'Right') {
+                    this.toRightSideView();
+                }
             } else {
                 // if primary, force 3d view
                 this.props.actions.camera.to3DView();

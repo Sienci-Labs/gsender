@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-import { IoIosWarning } from "react-icons/io";
+import { IoIosWarning } from 'react-icons/io';
 
 import cx from 'classnames';
 import { buttonVariants } from './Button';
@@ -21,7 +21,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AlertDialogPrimitive.Overlay
         className={cx(
-            'fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'fixed inset-0 z-[9999] bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             className,
         )}
         {...props}
@@ -39,7 +39,7 @@ const AlertDialogContent = React.forwardRef<
         <AlertDialogPrimitive.Content
             ref={ref}
             className={cx(
-                'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]  border bg-white dark:bg-dark-darker p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg dark:text-white dark:border-dark-lighter',
+                'fixed left-[50%] top-[50%] z-[9999] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]  border bg-white dark:bg-dark-darker p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg dark:text-white dark:border-dark-lighter',
                 className,
             )}
             {...props}
@@ -60,9 +60,11 @@ const AlertDialogHeader = ({
         )}
         {...props}
     >
-            <div className="text-4xl text-blue-500 flex items-center justify-center border-blue-500 border bg-blue-500 bg-opacity-20 rounded-md p-1 mr-6">
-                <span className="opacity-60"><IoIosWarning/></span>
-            </div>
+        <div className="text-4xl text-blue-500 flex items-center justify-center border-blue-500 border bg-blue-500 bg-opacity-20 rounded-md p-1 mr-6">
+            <span className="opacity-60">
+                <IoIosWarning />
+            </span>
+        </div>
         <div className="flex flex-col gap-2 p-4">{children}</div>
     </div>
 );
@@ -88,7 +90,10 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AlertDialogPrimitive.Title
         ref={ref}
-        className={cx('text-2xl font-semibold text-blue-500 dark:text-white', className)}
+        className={cx(
+            'text-2xl font-semibold text-blue-500 dark:text-white',
+            className,
+        )}
         {...props}
     />
 ));
@@ -100,7 +105,10 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AlertDialogPrimitive.Description
         ref={ref}
-        className={cx('text-sm text-gray-700 dark:text-gray-300 text-muted-foreground', className)}
+        className={cx(
+            'text-sm text-gray-700 dark:text-gray-300 text-muted-foreground',
+            className,
+        )}
         {...props}
     />
 ));
@@ -113,7 +121,7 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AlertDialogPrimitive.Action
         ref={ref}
-        className={cx(buttonVariants({ variant: 'confirm'}), className)}
+        className={cx(buttonVariants({ variant: 'confirm' }), className)}
         {...props}
     />
 ));
@@ -125,10 +133,7 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AlertDialogPrimitive.Cancel
         ref={ref}
-        className={cx(
-            buttonVariants({ variant: 'cancel' }),
-            className,
-        )}
+        className={cx(buttonVariants({ variant: 'cancel' }), className)}
         {...props}
     />
 ));

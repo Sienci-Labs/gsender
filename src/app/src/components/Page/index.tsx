@@ -66,8 +66,7 @@ const Page = ({
             <div
                 className={cx(
                     'w-full h-full',
-                    withFixedArea &&
-                        'overflow-y-scroll overflow-x-hidden no-scrollbar',
+                    withFixedArea && 'overflow-y-auto overflow-x-hidden',
                 )}
             >
                 {children}

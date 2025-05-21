@@ -77,7 +77,7 @@ class VisualizerWrapper extends Component {
             pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
                 if (isFileLoaded) {
                     this.setNeedRefresh(true);
-                    this.forceUpdate()
+                    this.forceUpdate();
                 } else {
                     this.forceUpdate();
                 }

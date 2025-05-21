@@ -27,7 +27,7 @@ import { cn } from 'app/lib/utils';
 
 import { LuTrash, LuPencil, LuPlus } from 'react-icons/lu';
 
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import {
     Table,
