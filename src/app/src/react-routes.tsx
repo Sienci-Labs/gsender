@@ -223,7 +223,10 @@ export const ReactRoutes = () => {
                     <Route path="about" element={<About />} />
                 </Route>
             </Route>
-            <Route path="console" element={<Console isActive={true} />}></Route>
+            <Route
+                path="console"
+                element={<Console isActive={true} isChildWindow={true} />}
+            ></Route>
             <Route
                 path="remote"
                 element={
