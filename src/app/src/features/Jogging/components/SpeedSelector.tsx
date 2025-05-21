@@ -44,8 +44,14 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
     const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
+    const handleClickRef = useRef(handleClick);
     const { units } = useWorkspaceState();
     const previousUnitsRef = useRef(units);
+
+    // Update the ref when handleClick changes
+    useEffect(() => {
+        handleClickRef.current = handleClick;
+    }, [handleClick]);
 
     const rapidActive = selectedSpeed === 'Rapid';
     const normalActive = selectedSpeed === 'Normal';
@@ -82,7 +88,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
             );
         }
 
-        handleClick(newSpeeds);
+        handleClickRef.current(newSpeeds);
         previousUnitsRef.current = units;
     }
 
