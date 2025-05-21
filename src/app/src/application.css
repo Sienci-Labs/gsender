@@ -930,6 +930,10 @@ video {
   top: 2.5rem !important;
 }
 
+.-left-1 {
+  left: -0.25rem !important;
+}
+
 .z-0 {
   z-index: 0 !important;
 }

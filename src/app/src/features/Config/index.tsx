@@ -87,7 +87,7 @@ export function Config() {
                                     key={`IV-section-${index}`}
                                     onChange={setInView}
                                     threshold={0}
-                                    rootMargin="0px 0px -70% 0px"
+                                    rootMargin="0px 0px -75% 0px"
                                     className={'bg-red-500'}
                                 >
                                     {({ ref }) => {

@@ -237,7 +237,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Send Usage Data',
-                        key: '',
+                        key: 'workspace.sendUsageData',
                         description:
                             'Allow gSender to collect your data periodically',
                         type: 'boolean',
