@@ -69,6 +69,7 @@ interface DROProps {
     activeState: string;
     preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
+    rotaryFunctionsEnabled: boolean;
 }
 
 function DRO({
@@ -82,6 +83,7 @@ function DRO({
     preferredUnits,
     homingEnabled,
     singleAxisHoming,
+    rotaryFunctionsEnabled,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { shouldWarnZero, mode } = useWorkspaceState();
@@ -317,7 +319,8 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                {(isRotaryMode || axes.includes('A')) && (
+                {(isRotaryMode ||
+                    (rotaryFunctionsEnabled && axes.includes('A'))) && (
                     <AxisRow
                         label={'A'}
                         axis={isRotaryMode ? 'Y' : 'A'}
@@ -409,6 +412,7 @@ export default connect((reduxStore) => {
     const homingEnabled = homingValue > 0;
     const singleAxisValue = homingValue & 2;
     const singleAxisHoming = singleAxisValue > 0;
+    const rotaryFunctionsEnabled = store.get('widgets.rotary.tab.show', false);
 
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
@@ -432,5 +436,6 @@ export default connect((reduxStore) => {
         activeState,
         preferredUnits,
         singleAxisHoming,
+        rotaryFunctionsEnabled,
     };
 })(DRO);
