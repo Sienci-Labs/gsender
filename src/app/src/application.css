@@ -922,6 +922,14 @@ video {
   top: 100% !important;
 }
 
+.-top-10 {
+  top: -2.5rem !important;
+}
+
+.top-10 {
+  top: 2.5rem !important;
+}
+
 .z-0 {
   z-index: 0 !important;
 }
@@ -1465,6 +1473,18 @@ video {
 
 .h-screen {
   height: 100vh !important;
+}
+
+.h-\[20px\] {
+  height: 20px !important;
+}
+
+.h-\[100px\] {
+  height: 100px !important;
+}
+
+.h-\[180px\] {
+  height: 180px !important;
 }
 
 .max-h-14 {

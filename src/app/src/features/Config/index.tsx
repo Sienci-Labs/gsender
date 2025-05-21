@@ -57,6 +57,9 @@ export function Config() {
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
         setActiveSection(index);
+        setTimeout(() => {
+            setVisibleSection(`h-section-${index}`);
+        }, 50);
     }
 
     return (
@@ -83,7 +86,9 @@ export function Config() {
                                 <InView
                                     key={`IV-section-${index}`}
                                     onChange={setInView}
-                                    threshold={0.2}
+                                    threshold={0}
+                                    rootMargin="0px 0px -70% 0px"
+                                    className={'bg-red-500'}
                                 >
                                     {({ ref }) => {
                                         return (
