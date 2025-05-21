@@ -23,7 +23,10 @@
 
 import React, { Component } from 'react';
 import pubsub from 'pubsub-js';
-import { shouldVisualizeSVG } from '../../workers/Visualize.response';
+import {
+    shouldVisualize,
+    shouldVisualizeSVG,
+} from '../../workers/Visualize.response';
 import SVGVisualizer from './SVGVisualizer';
 import Visualizer from './Visualizer';
 
@@ -107,9 +110,11 @@ class VisualizerWrapper extends Component {
             isSecondary,
         } = this.props;
         let renderSVG = shouldVisualizeSVG();
+        let renderAny = shouldVisualize();
+
         return (
             <>
-                {!renderSVG && (
+                {renderAny && (
                     <Visualizer
                         show={show}
                         cameraPosition={cameraPosition}
