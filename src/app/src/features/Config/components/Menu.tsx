@@ -95,7 +95,7 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
         >
             {filteredSettings.map((item, index) => {
                 const availableSettings = tallySettings(item);
-                let active = `section-${index}` === activeSection;
+                let active = `h-section-${index}` === activeSection;
                 return (
                     <MenuItem
                         key={`menu-item-${index}`}

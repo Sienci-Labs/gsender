@@ -27,10 +27,11 @@ export function Config() {
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
-    const [visibleSection, setVisibleSection] = React.useState('section-0');
+    const [visibleSection, setVisibleSection] = React.useState('h-section-0');
 
     function setInView(inView, entry) {
         if (inView) {
+            console.log(entry);
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }

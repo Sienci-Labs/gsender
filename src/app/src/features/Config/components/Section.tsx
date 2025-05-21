@@ -55,10 +55,13 @@ export const Section = React.forwardRef(
                 className={cn({
                     hidden: settingsAvailable === 0,
                 })}
-                ref={ref}
             >
                 <div className="flex flex-row gap-8 py-2">
-                    <h1 className="mb-2 text-3xl ml-4 font-sans dark:text-white">
+                    <h1
+                        className="mb-2 text-3xl ml-4 font-sans dark:text-white"
+                        id={`h-${id}`}
+                        ref={ref}
+                    >
                         {title}
                     </h1>
                     {connected && wizard && wizard()}
