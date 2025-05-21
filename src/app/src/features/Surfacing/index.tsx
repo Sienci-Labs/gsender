@@ -13,7 +13,7 @@ import {
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import cx from 'classnames';
-import { Checkbox } from 'app/components/shadcn/Checkbox';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { Input } from 'app/components/Input';
 import defaultState from 'app/store/defaultState';
@@ -40,8 +40,9 @@ const SurfacingTool = () => {
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
-        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+        status &&
+        status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     useEffect(() => {
         const storeUnits = store.get('workspace.units', METRIC_UNITS);
@@ -241,15 +242,14 @@ const SurfacingTool = () => {
                                     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                         Delay
                                     </label>
-                                    <Checkbox
+                                    <Switch
                                         checked={surfacing.shouldDwell}
-                                        onCheckedChange={(checked) => {
+                                        onChange={(checked) => {
                                             setSurfacing({
                                                 ...surfacing,
                                                 shouldDwell: checked as boolean,
                                             });
                                         }}
-                                        className="bg-white border-gray-400 rounded-sm min-h-5 min-w-5"
                                     />
                                 </div>
                             </div>
@@ -279,11 +279,11 @@ const SurfacingTool = () => {
                             />
                         </InputArea>
 
-                        <div className="flex flex-row items-center justify-between">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                        <div className="grid grid-cols-5 items-center gap-4">
+                            <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                 Start Position
-                            </label>
-                            <div className="flex items-center col-span-3">
+                            </span>
+                            <div className="flex items-center col-span-3 justify-center">
                                 <MachinePosition
                                     surfacing={surfacing}
                                     setSurfacing={setSurfacing}
@@ -291,9 +291,9 @@ const SurfacingTool = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                         <Tabs defaultValue="visualizer-preview">
-                            <TabsList className="bg-gray-100 w-full">
+                            <TabsList className="w-full">
                                 <TabsTrigger
                                     value="visualizer-preview"
                                     className="w-full"
@@ -327,9 +327,12 @@ const SurfacingTool = () => {
                                 <VisualizerPreview gcode={gcode} />
                             </div>
                             <div
-                                className={cx('h-full rounded-md relative', {
-                                    invisible: !tabSwitch,
-                                })}
+                                className={cx(
+                                    'h-full rounded-md relative border p-2',
+                                    {
+                                        invisible: !tabSwitch,
+                                    },
+                                )}
                             >
                                 <GcodeViewer gcode={gcode} />
                             </div>
@@ -338,7 +341,7 @@ const SurfacingTool = () => {
                 </div>
 
                 <div className="flex flex-row gap-4">
-                    <Button onClick={handleGenerateGcode}>
+                    <Button onClick={handleGenerateGcode} disabled={isDisabled}>
                         Generate G-code
                     </Button>
                     <Button

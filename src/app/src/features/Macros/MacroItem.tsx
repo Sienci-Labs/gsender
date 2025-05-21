@@ -96,7 +96,7 @@ const MacroItem = ({
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">
                     <FaEllipsisH className="text-xl" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white p-2 z-50">
+                <DropdownMenuContent className="bg-white p-2 z-40">
                     <DropdownMenuItem
                         onClick={() => onEdit(macro)}
                         className="cursor-pointer py-3 px-4 text-lg hover:bg-gray-100"

@@ -22,7 +22,7 @@ import {
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import ToggleSwitch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import Button from 'app/components/Button';
 import {
     Table,
@@ -174,21 +174,21 @@ const SetShortcut = () => {
             const baseClass = 'text-white px-2 py-1 rounded text-center';
 
             const categories = {
-                [CARVING_CATEGORY]: 'bg-green-500',
-                [OVERRIDES_CATEGORY]: 'bg-blue-500',
-                [VISUALIZER_CATEGORY]: 'bg-pink-500',
-                [LOCATION_CATEGORY]: 'bg-orange-500',
-                [JOGGING_CATEGORY]: 'bg-red-500',
-                [PROBING_CATEGORY]: 'bg-purple-500',
-                [SPINDLE_LASER_CATEGORY]: 'bg-black',
-                [GENERAL_CATEGORY]: 'bg-gray-500',
-                [TOOLBAR_CATEGORY]: 'bg-indigo-500',
-                [MACRO_CATEGORY]: 'bg-blue-300',
-                [COOLANT_CATEGORY]: 'bg-red-800',
+                [CARVING_CATEGORY]: 'bg-green-100 text-green-800',
+                [OVERRIDES_CATEGORY]: 'bg-blue-100 text-blue-800',
+                [VISUALIZER_CATEGORY]: 'bg-pink-100 text-pink-800',
+                [LOCATION_CATEGORY]: 'bg-orange-100 text-orange-800',
+                [JOGGING_CATEGORY]: 'bg-red-100 text-red-800',
+                [PROBING_CATEGORY]: 'bg-purple-100 text-purple-800',
+                [SPINDLE_LASER_CATEGORY]: 'bg-gray-800 text-gray-300',
+                [GENERAL_CATEGORY]: 'bg-gray-200 text-gray-800',
+                [TOOLBAR_CATEGORY]: 'bg-indigo-100 text-indigo-800',
+                [MACRO_CATEGORY]: 'bg-blue-50 text-blue-600',
+                [COOLANT_CATEGORY]: 'bg-red-200 text-red-900',
             };
 
             const categoryClass =
-                categories[row.category] || 'bg-gray-300 text-gray-800';
+                categories[row.category] || 'bg-gray-100 text-gray-800';
 
             return (
                 <div className={cn(baseClass, categoryClass)}>
@@ -293,7 +293,7 @@ const SetShortcut = () => {
                         <div className="text-base">
                             <div className="my-8">
                                 <p>Use As Lockout Button</p>
-                                <ToggleSwitch
+                                <Switch
                                     checked={isLockoutButton}
                                     onChange={(checked) =>
                                         handleSetToggle(
@@ -307,7 +307,7 @@ const SetShortcut = () => {
 
                             <div>
                                 <p>Use As Enable Second Action Button</p>
-                                <ToggleSwitch
+                                <Switch
                                     checked={isSecondaryActionButton}
                                     onChange={(checked) =>
                                         handleSetToggle(

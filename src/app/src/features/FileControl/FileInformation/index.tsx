@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
 import Size from './Size';
 import Info from './Info';

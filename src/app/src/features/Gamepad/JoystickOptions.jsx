@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Select from 'react-select';
 import { cloneDeep, set, get } from 'lodash';
 
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
 import { Input } from 'app/components/Input';
 import { GamepadContext } from './utils/context';
@@ -106,7 +106,7 @@ const JoystickOptions = () => {
     };
 
     return (
-        <div className="text-base">
+        <div className="text-base border p-2 rounded">
             <div className="grid grid-cols-4 items-center gap-2">
                 <div />
                 <div className="dark:text-white">Action</div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuRefreshCw } from 'react-icons/lu';
 
 import Button from 'app/components/Button';
@@ -10,19 +10,24 @@ import ResultsStep from './ResultsStep';
 
 import xySquaringImage from '../assets/XY_squaring_example.jpg';
 import { Jogging } from 'app/features/Jogging';
-import ShowJogControls from '../components/ShowJogControls';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { cx } from 'class-variance-authority';
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 
 const Steps = () => {
     const [started, setStarted] = useState(false);
-    const {
-        currentMainStep,
-        mainSteps,
-        goToNextMainStep,
-        goToPreviousMainStep,
-        resetSquaring,
-    } = useSquaring();
+    const { currentMainStep, mainSteps, goToNextMainStep, resetSquaring } =
+        useSquaring();
     const { isConnected } = useTypedSelector((state) => state.connection);
+    const status = useTypedSelector((state) => state?.controller.state?.status);
+    const isDisabled =
+        !isConnected ||
+        (status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+            status.activeState !== GRBL_ACTIVE_STATE_JOG);
+
+    useEffect(() => {
+        resetSquaring();
+    }, []);
 
     const renderStep = () => {
         switch (currentMainStep) {
@@ -47,14 +52,14 @@ const Steps = () => {
         return (
             <div className="flex flex-col gap-2 xl:gap-0 dark:text-white w-full">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
-                    <div className="space-y-1 text-sm">
-                        <p>
+                    <div className="space-y-1 text-sm xl:text-base font-normal">
+                        <p className="text-gray-500 dark:text-gray-300">
                             If your CNC is making skewed cuts (pictured),
                             it&apos;s because the X and Y axes aren&apos;t
                             squared to each other. This can be fixed.
                         </p>
 
-                        <div>
+                        <div className="text-gray-500 dark:text-gray-300">
                             To know how much adjustment is needed, follow the
                             steps below. Prepare:
                             <ul className="list-disc list-inside">
@@ -71,14 +76,16 @@ const Steps = () => {
                             </ul>
                         </div>
 
-                        <p>
+                        <p className="text-gray-500 dark:text-gray-300">
                             Use the jog buttons to position your CNC near its
                             front, left corner with the pointed tip almost
                             touching the wasteboard, then continue below.
                         </p>
 
-                        <div className="w-full max-w-96 -mt-4">
-                            <Jogging />
+                        <div className="flex justify-center items-center">
+                            <div className="w-full max-w-96 -mt-4">
+                                <Jogging />
+                            </div>
                         </div>
                         {!isConnected && (
                             <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
@@ -93,7 +100,7 @@ const Steps = () => {
                         <img
                             src={xySquaringImage}
                             alt="XY Squaring Example"
-                            className="w-[450px] h-auto"
+                            className="w-[450px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-white">
@@ -107,7 +114,7 @@ const Steps = () => {
                 <div className="flex gap-4 shrink-0">
                     <Button
                         onClick={() => setStarted(true)}
-                        disabled={!isConnected}
+                        disabled={isDisabled}
                     >
                         Start XY Squaring
                     </Button>
@@ -118,66 +125,27 @@ const Steps = () => {
 
     return (
         <div className="flex flex-col gap-1 xl:gap-3">
-            {/* Progress Bar */}
-            <div className="flex gap-4 shrink-0">
-                {mainSteps.map((step, index) => (
-                    <div
-                        key={step.title}
-                        className="grid grid-cols-[1fr_3fr_1fr] items-center gap-4"
-                    >
-                        <div
-                            className={`flex items-center justify-center w-8 h-8 rounded-full font-bold ${
-                                index === currentMainStep
-                                    ? 'bg-green-500 text-white'
-                                    : index < currentMainStep
-                                      ? 'bg-blue-500 text-white'
-                                      : 'bg-gray-200 text-gray-600'
-                            }`}
-                        >
-                            {index + 1}
-                        </div>
-                        <div className="flex-1">
-                            <div className="font-medium dark:text-white">
-                                {step.title}
-                            </div>
-                            <div className="text-sm text-gray-500 dark:text-white">
-                                {step.description}
-                            </div>
-                        </div>
-                        {index < mainSteps.length - 1 && (
-                            <div
-                                className={`flex-1 h-0.5 ${
-                                    index < currentMainStep
-                                        ? 'bg-blue-500'
-                                        : 'bg-gray-200'
-                                }`}
-                            />
-                        )}
-                    </div>
-                ))}
-            </div>
-
             <div className="flex justify-center">{renderStep()}</div>
 
-            <div className="flex justify-between mt-4 xl:mt-1 shrink-0">
+            <div className="flex justify-start gap-4 mt-4 xl:mt-1 shrink-0">
                 <div className="flex gap-2">
                     <Button
                         onClick={() => {
                             resetSquaring();
+                            setStarted(false);
                         }}
                         icon={<LuRefreshCw className="w-4 h-4" />}
-                        text="Start Over"
-                        variant="ghost"
+                        text="Restart Wizard"
                     />
-                    <ShowJogControls />
                 </div>
-                <div className="flex gap-2">
+                <div
+                    className={cx('flex gap-2', {
+                        hidden: currentMainStep === mainSteps.length - 1,
+                    })}
+                >
                     <Button
                         onClick={goToNextMainStep}
-                        disabled={
-                            currentMainStep === mainSteps.length - 1 ||
-                            !isCurrentStepComplete()
-                        }
+                        disabled={!isCurrentStepComplete()}
                     >
                         Next Step
                     </Button>

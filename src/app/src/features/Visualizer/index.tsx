@@ -1532,7 +1532,7 @@ class Visualizer extends Component {
                     this.visualizer = ref?.visualizer;
                 }}
                 gcode={gcode}
-                cameraPosition="Top"
+                cameraPosition="3D"
             />
         ) : (
             <PrimaryVisualizer
