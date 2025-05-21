@@ -287,17 +287,19 @@ class SVGVisualizer extends Component {
         const { currentTheme } = this.props.state;
         return (
             <div
+                className="h-full overflow-hidden relative object-fit"
                 style={{
                     visibility: this.props.show ? 'visible' : 'hidden',
                 }}
             >
                 <svg
                     id={id}
-                    height="100%"
-                    width="100%"
                     viewBox={viewBox}
+                    className="block margin-auto object-fit absolute top-0 bottom-0 right-0 left-0"
                     style={{
                         backgroundColor: currentTheme.get(BACKGROUND_PART),
+                        height: '100%',
+                        width: '100%',
                     }}
                 />
             </div>
