@@ -2256,6 +2256,10 @@ video {
   grid-template-columns: 1.5fr 1fr !important;
 }
 
+.grid-cols-\[1fr_17fr_1fr_1fr\] {
+  grid-template-columns: 1fr 17fr 1fr 1fr !important;
+}
+
 .grid-cols-\[1fr_2fr\] {
   grid-template-columns: 1fr 2fr !important;
 }
@@ -2282,10 +2286,6 @@ video {
 
 .grid-cols-\[4fr_1fr_5fr\] {
   grid-template-columns: 4fr 1fr 5fr !important;
-}
-
-.grid-cols-\[5fr_1fr_1fr_1fr\] {
-  grid-template-columns: 5fr 1fr 1fr 1fr !important;
 }
 
 .grid-cols-\[5fr_3fr\] {
@@ -3385,6 +3385,10 @@ video {
 
 .fill-none {
   fill: none !important;
+}
+
+.fill-red-600 {
+  fill: #c62222 !important;
 }
 
 .fill-robin-500 {
@@ -5778,10 +5782,6 @@ html,
     top: 0.75rem !important;
   }
 
-  .max-xl\:top-\[-32px\] {
-    top: -32px !important;
-  }
-
   .max-xl\:top-\[-28px\] {
     top: -28px !important;
   }
@@ -5834,79 +5834,25 @@ html,
     height: 2.25rem !important;
   }
 
-  .max-xl\:h-\[22\%\] {
-    height: 22% !important;
-  }
-
-  .max-xl\:h-\[78\%\] {
-    height: 78% !important;
-  }
-
-  .max-xl\:h-max {
-    height: -moz-max-content !important;
-    height: max-content !important;
-  }
-
-  .max-xl\:h-\[79\%\] {
-    height: 79% !important;
-  }
-
-  .max-xl\:h-\[77\%\] {
-    height: 77% !important;
+  .max-xl\:h-\[24\%\] {
+    height: 24% !important;
   }
 
   .max-xl\:h-\[76\%\] {
     height: 76% !important;
   }
 
-  .max-xl\:h-\[75\%\] {
-    height: 75% !important;
-  }
-
-  .max-xl\:h-\[74\%\] {
-    height: 74% !important;
-  }
-
-  .max-xl\:h-\[24\%\] {
-    height: 24% !important;
-  }
-
-  .max-xl\:max-h-\[22\%\] {
-    max-height: 22% !important;
-  }
-
-  .max-xl\:max-h-\[78\%\] {
-    max-height: 78% !important;
-  }
-
-  .max-xl\:max-h-max {
-    max-height: -moz-max-content !important;
-    max-height: max-content !important;
-  }
-
-  .max-xl\:max-h-\[77\%\] {
-    max-height: 77% !important;
+  .max-xl\:max-h-\[24\%\] {
+    max-height: 24% !important;
   }
 
   .max-xl\:max-h-\[76\%\] {
     max-height: 76% !important;
   }
 
-  .max-xl\:max-h-\[75\%\] {
-    max-height: 75% !important;
-  }
-
-  .max-xl\:max-h-\[24\%\] {
-    max-height: 24% !important;
-  }
-
   .max-xl\:min-h-max {
     min-height: -moz-max-content !important;
     min-height: max-content !important;
-  }
-
-  .max-xl\:min-h-\[20\%\] {
-    min-height: 20% !important;
   }
 
   .max-xl\:w-1\/5 {
@@ -5921,12 +5867,12 @@ html,
     width: 7rem !important;
   }
 
-  .max-xl\:w-full {
-    width: 100% !important;
-  }
-
   .max-xl\:w-\[450px\] {
     width: 450px !important;
+  }
+
+  .max-xl\:w-full {
+    width: 100% !important;
   }
 
   .max-xl\:min-w-\[180px\] {
@@ -6004,19 +5950,14 @@ html,
     padding-right: 0.5rem !important;
   }
 
-  .max-xl\:py-1 {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-  }
-
   .max-xl\:px-3 {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
 
-  .max-xl\:px-4 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+  .max-xl\:py-1 {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
   }
 
   .max-xl\:pb-6 {
@@ -6255,10 +6196,6 @@ html,
 }
 
 @media (min-width: 1280px) {
-  .xl\:mt-0 {
-    margin-top: 0px !important;
-  }
-
   .xl\:mt-1 {
     margin-top: 0.25rem !important;
   }

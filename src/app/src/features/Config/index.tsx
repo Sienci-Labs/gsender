@@ -55,7 +55,7 @@ export function Config() {
         setActiveSection(index);
         document
             .getElementById(`section-${index}`)
-            .scrollIntoView({ behavior: 'smooth' });
+            .scrollIntoView({ behavior: 'instant' });
     }
 
     return (
