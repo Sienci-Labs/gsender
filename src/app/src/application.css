@@ -3265,6 +3265,10 @@ video {
   background-image: repeating-linear-gradient(-45deg,transparent,transparent 20px,lightgrey 20px,lightgrey 40px) !important;
 }
 
+.bg-\[url\(\'\/assets\/placeholder\.png\'\)\] {
+  background-image: url('/assets/placeholder.png') !important;
+}
+
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops)) !important;
 }
@@ -3326,6 +3330,10 @@ video {
 
 .bg-center {
   background-position: center !important;
+}
+
+.bg-no-repeat {
+  background-repeat: no-repeat !important;
 }
 
 .bg-repeat-x {
@@ -3398,6 +3406,11 @@ video {
 
 .stroke-2 {
   stroke-width: 2 !important;
+}
+
+.object-scale-down {
+  -o-object-fit: scale-down !important;
+     object-fit: scale-down !important;
 }
 
 .p-0 {

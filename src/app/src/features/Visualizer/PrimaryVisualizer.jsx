@@ -63,7 +63,10 @@ const PrimaryVisualizer = ({
 
     return (
         <Widget className="w-full p-1 max-xl:p-0.5">
-            <Widget.Content id={containerID} className="w-full">
+            <Widget.Content
+                id={containerID}
+                className="w-full bg-[url('/assets/placeholder.png')] bg-no-repeat bg-center"
+            >
                 {showLoading && (
                     <div className="z-10 relative bg-gray-100 dark:bg-dark w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Loading />

@@ -50,7 +50,7 @@ class VisualizerWrapper extends Component {
     componentDidUpdate() {
         // force refresh, changing which visualizer component is being used
         if (this.state.needRefresh) {
-            this.visualizer.reloadGCode();
+            this.visualizer && this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
             // a step further than refresh, reparsing the gcode as well
         } else if (this.state.needReload) {
@@ -110,7 +110,7 @@ class VisualizerWrapper extends Component {
             isSecondary,
         } = this.props;
         let renderSVG = shouldVisualizeSVG();
-        let renderAny = shouldVisualize();
+        let renderAny = shouldVisualize() && !renderSVG;
 
         return (
             <>
