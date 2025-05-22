@@ -108,7 +108,7 @@ const RotarySurfacing = () => {
     }, [units]);
 
     useEffect(() => {
-        return () => {
+        const saveState = () => {
             store.replace('rotary.stockTurning.options', {
                 stockLength: surfacingState.length,
                 stepdown: surfacingState.stepdown,
@@ -121,7 +121,9 @@ const RotarySurfacing = () => {
                 enableRehoming: surfacingState.enableRehoming,
             });
         };
-    }, []);
+
+        return saveState;
+    }, [surfacingState]);
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';

@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-function SpiralIcon(props) {
+type SpiralIconProps = {
+    checked?: boolean;
+    className?: string;
+    onClick?: () => void;
+};
+
+const SpiralIcon = forwardRef<SVGSVGElement, SpiralIconProps>((props, ref) => {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="3 3 25 24" {...props}>
+        <svg
+            ref={ref}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="3 3 25 24"
+            {...props}
+        >
             <rect
                 width="100%"
                 height="100%"
@@ -23,6 +34,8 @@ function SpiralIcon(props) {
             </g>
         </svg>
     );
-}
+});
+
+SpiralIcon.displayName = 'SpiralIcon';
 
 export default SpiralIcon;

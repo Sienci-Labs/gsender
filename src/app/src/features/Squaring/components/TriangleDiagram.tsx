@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useSquaring } from '../context/SquaringContext';
 
 const TriangleDiagram = () => {
@@ -127,13 +129,10 @@ const TriangleDiagram = () => {
 
     return (
         <div className="relative w-[370px] border border-gray-200 rounded-lg">
-            <svg
-                viewBox={`0 0 ${containerWidth} ${containerWidth}`}
-                // className="absolute inset-0 w-full h-full"
-            >
+            <svg viewBox={`0 0 ${containerWidth} ${containerWidth}`}>
                 {/* Draw the lines */}
                 {lines.map((d, i) => (
-                    <g key={i}>
+                    <g key={d}>
                         <path
                             d={d}
                             className={`stroke-2 ${lineStyles[i]} fill-none`}
@@ -256,9 +255,8 @@ const TriangleDiagram = () => {
             {Object.entries(positions).map(
                 ([key, pos], index) =>
                     getPointVisibility(index) && (
-                        <>
+                        <React.Fragment key={key}>
                             <div
-                                key={key}
                                 className={`absolute text-lg w-10 h-10 -ml-5 -mt-5 [transform:rotate(45deg)] [-ms-transform:rotate(45deg)] [-webkit-transform:rotate(45deg)] before:absolute before:-z-1 before:left-1/2 before:w-1/3 before:-ml-[15%] before:h-full after:absolute after:-z-1 after:top-1/2 after:h-1/3 after:-mt-[15%] after:w-full flex items-center justify-center font-bold text-white transition-colors ${
                                     shouldPointPulse(index)
                                         ? 'before:bg-blue-500 after:bg-blue-500 animate-pulse'
@@ -281,7 +279,7 @@ const TriangleDiagram = () => {
                             >
                                 {index + 1}
                             </div>
-                        </>
+                        </React.Fragment>
                     ),
             )}
         </div>
