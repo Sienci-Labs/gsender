@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-9",
+  "version": "1.5.0-Edge-9-internal-1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -43,7 +43,7 @@
     "build-prod": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\" && npm run copy-css",
     "build-prod-server": "cross-env NODE_ENV=production webpack-cli --config webpack.config.server.production.js && npm run build-i18n-server",
     "build-prod-app": "cross-env NODE_ENV=production webpack-cli --config webpack.config.app.production.js && npm run build-i18n-app",
-    "copy-css": "mkdir -p dist/gsender/app/src && cp src/app/src/application.css dist/gsender/app/src/",
+    "copy-css": "cross-env mkdir -p dist/gsender/app/src && cp src/app/src/application.css dist/gsender/app/src/",
     "postbuild-dev-server": "bash -c \"mkdir -p output/server; cp -af src/server/{i18n,views} output/server/\"",
     "postbuild-dev-app": "bash -c \"mkdir -p output/app output/app-server; cp -af src/app_old/{favicon.ico,i18n,images,assets} output/app/\"",
     "postbuild-prod-server": "bash -c \"mkdir -p dist/gsender/server; cp -af src/server/{i18n,views} dist/gsender/server/\"",
