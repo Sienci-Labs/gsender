@@ -84,6 +84,7 @@ export interface gSenderSetting {
     toolLinkLabel?: string;
     disabled?: () => boolean;
     hidden?: () => boolean;
+    onDisable?: () => void;
 }
 
 export interface gSenderSubSection {
@@ -665,6 +666,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Enable Spindle/Laser tab and related functionalities on main user interface.',
                         key: 'workspace.spindleFunctions',
+                        onDisable: () => {
+                            // Disable laser mode if spindle functions turned off.  TBD what to do with EEPROM.
+                            store.set('widgets.spindle.mode', 'spindle');
+                        },
                     },
                     {
                         type: 'eeprom',

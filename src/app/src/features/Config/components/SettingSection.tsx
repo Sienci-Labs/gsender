@@ -22,6 +22,7 @@ export function SettingSection({
 }: SettingSectionProps): JSX.Element {
     const { setSettingsValues, setSettingsAreDirty, searchTerm } =
         useSettings();
+
     const changeHandler = (i) => (v) => {
         setSettingsAreDirty(true);
 
@@ -29,6 +30,17 @@ export function SettingSection({
             const updated = [...prev];
             updated[i].value = v;
             updated[i].dirty = true;
+
+            const curSetting = updated[i];
+            // For just switches for now - if onDisable and false, run onDisable
+            if (
+                curSetting.type === 'boolean' &&
+                !v &&
+                'onDisable' in curSetting
+            ) {
+                curSetting.onDisable();
+            }
+
             return updated;
         });
     };
