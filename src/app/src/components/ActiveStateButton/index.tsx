@@ -21,7 +21,7 @@ export function ActiveStateButton({
     ...rest
 }: ActiveStateButtonProps): JSX.Element {
     return (
-        <div className="mx-auto flex w-full max-w-lg items-center">
+        <div className="mx-auto flex items-center">
             <div className="relative z-10 flex w-full cursor-pointer items-center overflow-hidden rounded-xl border border-transparent p-[1px]">
                 <div
                     className={cn(
@@ -39,7 +39,7 @@ export function ActiveStateButton({
                         onClick={onClick}
                         size={size}
                         className={cn(className, {
-                            'shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)] text-robin-500 dark:text-robin-500':
+                            'shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)] text-robin-500 dark:text-robin-500 w-full flex':
                                 active,
                         })}
                         {...rest}
