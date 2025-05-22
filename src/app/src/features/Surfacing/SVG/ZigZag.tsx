@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-function Icon(props) {
+type ZigZagIconProps = {
+    checked?: boolean;
+    className?: string;
+    onClick?: () => void;
+};
+
+const ZigZagIcon = forwardRef<SVGSVGElement, ZigZagIconProps>((props, ref) => {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="14.27 6.1 57.6 76.83" {...props}>
+        <svg
+            ref={ref}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="14.27 6.1 57.6 76.83"
+            {...props}
+        >
             <rect
                 width="100%"
                 height="100%"
@@ -20,6 +31,8 @@ function Icon(props) {
             </g>
         </svg>
     );
-}
+});
 
-export default Icon;
+ZigZagIcon.displayName = 'ZigZagIcon';
+
+export default ZigZagIcon;
