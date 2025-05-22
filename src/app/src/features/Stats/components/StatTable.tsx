@@ -19,6 +19,9 @@ export function StatRow({
 }
 
 function getTimeString(seconds: number): string {
+    if (seconds === 0 || isNaN(Number(seconds))) {
+        return '-';
+    }
     seconds = seconds / 1000; // milliseconds to seconds
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
