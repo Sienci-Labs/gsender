@@ -14,49 +14,22 @@ const Size = () => {
     // if it is a whole number when rounded, don't show decimals
     const formattedBBox = {
         delta: {
-            x:
-                Number((bbox.delta.x * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.delta.x * conversionFactor
-                    : (bbox.delta.x * conversionFactor).toFixed(2),
-            y:
-                Number((bbox.delta.y * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.delta.y * conversionFactor
-                    : (bbox.delta.y * conversionFactor).toFixed(2),
-            z:
-                Number((bbox.delta.z * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.delta.z * conversionFactor
-                    : (bbox.delta.z * conversionFactor).toFixed(2),
-            a: Number(bbox.delta.a.toFixed(2)),
+            x: (bbox.delta.x * conversionFactor).toFixed(2),
+            y: (bbox.delta.y * conversionFactor).toFixed(2),
+            z: (bbox.delta.z * conversionFactor).toFixed(2),
+            a: bbox.delta.a.toFixed(2),
         },
         min: {
-            x:
-                Number((bbox.min.x * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.min.x * conversionFactor
-                    : (bbox.min.x * conversionFactor).toFixed(2),
-            y:
-                Number((bbox.min.y * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.min.y * conversionFactor
-                    : (bbox.min.y * conversionFactor).toFixed(2),
-            z:
-                Number((bbox.min.z * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.min.z * conversionFactor
-                    : (bbox.min.z * conversionFactor).toFixed(2),
-            a: Number(bbox.min.a.toFixed(2)),
+            x: (bbox.min.x * conversionFactor).toFixed(2),
+            y: (bbox.min.y * conversionFactor).toFixed(2),
+            z: (bbox.min.z * conversionFactor).toFixed(2),
+            a: bbox.min.a.toFixed(2),
         },
         max: {
-            x:
-                Number((bbox.max.x * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.max.x * conversionFactor
-                    : (bbox.max.x * conversionFactor).toFixed(2),
-            y:
-                Number((bbox.max.y * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.max.y * conversionFactor
-                    : (bbox.max.y * conversionFactor).toFixed(2),
-            z:
-                Number((bbox.max.z * conversionFactor).toFixed(2)) % 1 === 0
-                    ? bbox.max.z * conversionFactor
-                    : (bbox.max.z * conversionFactor).toFixed(2),
-            a: Number(bbox.max.a.toFixed(2)),
+            x: (bbox.max.x * conversionFactor).toFixed(2),
+            y: (bbox.max.y * conversionFactor).toFixed(2),
+            z: (bbox.max.z * conversionFactor).toFixed(2),
+            a: bbox.max.a.toFixed(2),
         },
     };
 

@@ -104,7 +104,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                 <Button
                     disabled={disabled}
                     icon={<FaPaperPlane />}
-                    variant="secondary"
+                    variant="alt"
                     size="sm"
                 />
             </PopoverTrigger>

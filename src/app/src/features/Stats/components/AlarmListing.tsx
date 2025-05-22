@@ -7,7 +7,6 @@ import { useContext } from 'react';
 import { IoIosWarning } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
 import cx from 'classnames';
-import { convertISOStringToDateAndTime } from 'app/lib/datetime.ts';
 import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
 // const colorCodes = {
@@ -16,7 +15,8 @@ import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx
 // };
 
 function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
-    const time = convertISOStringToDateAndTime(alarm.time);
+    const [yyyy, mm, dd, hh, mi, _ss] = alarm.time.toString().split(/[:\-T.]+/);
+
     const isAlarm = alarm.type === 'ALARM';
     return (
         <li
@@ -46,7 +46,7 @@ function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
                 {alarm.type} {alarm.CODE} - {alarm.source}
             </h3>
             <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                at {time}
+                {`at ${hh}:${mi} ${dd}/${mm}/${yyyy}`}
             </time>
             <p className="text-base font-normal text-gray-500 dark:text-gray-300">
                 {alarm.MESSAGE || 'No associated message'}

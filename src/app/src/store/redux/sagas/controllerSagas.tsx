@@ -815,7 +815,7 @@ export function* initialize(): Generator<any, void, any> {
                 title: '4 Axis File Loaded',
                 content:
                     'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
-                confirmLabel: null,
+                confirmLabel: 'OK',
                 cancelLabel: 'Close',
             });
         }
