@@ -413,25 +413,25 @@ const MacroWidget = ({
                     <Button
                         onClick={actions.openAddMacroModal}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaPlus />
-                    </Button>
+                        icon={<FaPlus />}
+                        text="Add"
+                    />
 
                     <Button
                         onClick={() => {
                             inputRef.current?.click();
                         }}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaFileImport />
-                    </Button>
+                        icon={<FaFileImport />}
+                        text="Import"
+                    />
 
                     <Button
                         onClick={exportMacros}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaFileExport />
-                    </Button>
+                        icon={<FaFileExport />}
+                        text="Export"
+                    />
                 </div>
             </div>
         </Widget>
