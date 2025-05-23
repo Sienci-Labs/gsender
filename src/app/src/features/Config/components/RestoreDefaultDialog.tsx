@@ -38,12 +38,14 @@ function restoreEEPROMDefaults(type = '') {
         eepromSettings = profile?.eepromSettings;
     }
 
+    console.log(profile);
+
     const hasOrderedSettings = !!profile.orderedSettings;
 
     const values = [];
 
     for (let [key, value] of Object.entries(eepromSettings)) {
-        if (hasOrderedSettings && orderedSettings.has(key)) {
+        if (hasOrderedSettings && profile.orderedSettings.has(key)) {
             continue;
         }
 
@@ -51,6 +53,7 @@ function restoreEEPROMDefaults(type = '') {
     }
 
     if (hasOrderedSettings) {
+        console.log('exists:', profile);
         for (const [k, v] of profile.orderedSettings) {
             values.push(`${k}=${v}`);
         }
