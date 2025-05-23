@@ -46,7 +46,12 @@ export function MachineInfoDisplay({
             50,
         );
 
-        controller.command('gcode', [`$1=${storedValue}`, '$$']);
+        if (storedValue === null) {
+            controller.command('gcode', [`$1=50`, '$$']);
+        } else {
+            controller.command('gcode', [`$1=${storedValue}`, '$$']);
+        }
+
         store.replace('workspace.diagnostics.stepperMotor.storedValue', null);
     };
 
