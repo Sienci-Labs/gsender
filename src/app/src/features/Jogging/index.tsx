@@ -44,13 +44,6 @@ import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { convertValue } from './utils/units';
 
-interface GamepadInstance {
-    isHolding?: boolean;
-    start: () => void;
-    on: (event: string, callback: any) => void;
-    off: (event: string, callback: any) => void;
-}
-
 export interface JogValueObject {
     xyStep: number;
     aStep: number;
@@ -202,14 +195,13 @@ export function Jogging() {
 
     useEffect(() => {
         // Use the type assertion with unknown first to avoid type errors
-        const gamepadInstance =
-            gamepad.getInstance() as unknown as GamepadInstance;
+        const gamepadInstance = gamepad.getInstance();
 
         gamepadInstance.on(
             'gamepad:axis',
             throttle(
                 ({ detail: output }) => {
-                    if (gamepadInstance.isHolding || !isConnected) {
+                    if (gamepadInstance.shouldHold || !isConnected) {
                         return;
                     }
 
