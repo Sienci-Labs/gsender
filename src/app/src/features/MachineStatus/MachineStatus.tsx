@@ -31,6 +31,7 @@ import { UnlockButton as SmallUnlockButton } from 'app/features/UnlockButton';
 import {
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_DOOR,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_HOME,
     GRBL_ACTIVE_STATE_IDLE,
@@ -97,6 +98,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
             Tool: 'Tool Change',
+            Door: 'Door',
         };
 
         return (
@@ -120,7 +122,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 activeState === GRBL_ACTIVE_STATE_HOME &&
                                 isConnected,
                             'bg-yellow-600 text-white':
-                                activeState === GRBL_ACTIVE_STATE_HOLD &&
+                                (activeState === GRBL_ACTIVE_STATE_HOLD ||
+                                    activeState === GRBL_ACTIVE_STATE_DOOR) &&
                                 isConnected,
                             'bg-red-500 text-white':
                                 activeState === GRBL_ACTIVE_STATE_ALARM &&
