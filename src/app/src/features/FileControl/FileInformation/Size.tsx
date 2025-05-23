@@ -10,6 +10,7 @@ const Size = () => {
     const conversionFactor = units === 'in' ? 1 / 25.4 : 1;
 
     const fileContainsA = usedAxes.includes('A');
+    console.log(bbox);
 
     // if it is a whole number when rounded, don't show decimals
     const formattedBBox = {

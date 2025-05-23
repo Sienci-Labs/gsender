@@ -19,9 +19,9 @@ const initialState: FileInfoState = {
     estimatedTime: 0,
     fileModal: METRIC_UNITS,
     bbox: {
-        min: { x: 0, y: 0, z: 0 },
-        max: { x: 0, y: 0, z: 0 },
-        delta: { x: 0, y: 0, z: 0 },
+        min: { x: 0, y: 0, z: 0, a: 0 },
+        max: { x: 0, y: 0, z: 0, a: 0 },
+        delta: { x: 0, y: 0, z: 0, a: 0 },
     },
     content: '',
     fileType: null,
@@ -30,9 +30,9 @@ const initialState: FileInfoState = {
 
 const normalizeBBox = (bbox: Partial<BBox>): BBox => {
     const defaultBBox: BBox = {
-        min: { x: 0, y: 0, z: 0 },
-        max: { x: 0, y: 0, z: 0 },
-        delta: { x: 0, y: 0, z: 0 },
+        min: { x: 0, y: 0, z: 0, a: 0 },
+        max: { x: 0, y: 0, z: 0, a: 0 },
+        delta: { x: 0, y: 0, z: 0, a: 0 },
     };
     return {
         ...defaultBBox,
