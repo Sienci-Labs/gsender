@@ -1645,6 +1645,7 @@ class GrblController {
                 this.writeln('$SLP');
             },
             'unlock': () => {
+                this.feeder.reset();
                 this.writeln('$X');
             },
             'populateConfig': () => {
