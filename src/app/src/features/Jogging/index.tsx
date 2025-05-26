@@ -650,6 +650,7 @@ export function Jogging() {
 
             toast.info(
                 `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`,
+                { position: 'bottom-right' },
             );
         },
     };

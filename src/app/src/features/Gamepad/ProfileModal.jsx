@@ -102,7 +102,7 @@ const ProfileModal = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        toast.info('Created New Gamepad Profile');
+        toast.info('Created New Gamepad Profile', { position: 'bottom-right' });
 
         closeModal();
     };

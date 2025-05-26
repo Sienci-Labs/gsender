@@ -94,7 +94,9 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                     return;
                 }
 
-                toast.info('Probe Confirmed Manually');
+                toast.info('Probe Confirmed Manually', {
+                    position: 'bottom-right',
+                });
 
                 actions.setProbeConnectivity(true);
             },
@@ -109,7 +111,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         // console.log(probeCommands);
 
         actions.runProbeCommands(probeCommands);
-        toast.info('Initiated probing cycle');
+        toast.info('Initiated probing cycle', { position: 'bottom-right' });
         actions.onOpenChange(false);
     };
 
@@ -158,7 +160,11 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 measurement.
                             </p>
                         </div>
-                        <Button variant="primary" disabled={!connectionMade} onClick={startProbe}>
+                        <Button
+                            variant="primary"
+                            disabled={!connectionMade}
+                            onClick={startProbe}
+                        >
                             {connectionMade
                                 ? 'Start Probe'
                                 : 'Waiting for probe circuit check...'}

@@ -19,7 +19,7 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
             window.location.reload();
         }, 250);
     }*/
-    toast.success('Settings restored');
+    toast.success('Settings restored', { position: 'bottom-right' });
 };
 
 export const storeUpdate = async (

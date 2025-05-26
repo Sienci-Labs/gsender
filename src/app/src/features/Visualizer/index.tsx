@@ -628,6 +628,7 @@ class Visualizer extends Component {
             if (this.state.invalidGcode.shouldShow) {
                 toast.info(
                     `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    { position: 'bottom-right' },
                 );
             }
         }
@@ -870,7 +871,9 @@ class Visualizer extends Component {
 
     showToast = _.throttle(
         () => {
-            toast.info('Unable to activate GrblHAL ONLY shortcut');
+            toast.info('Unable to activate GrblHAL ONLY shortcut', {
+                position: 'bottom-right',
+            });
         },
         3000,
         { trailing: false },

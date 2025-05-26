@@ -161,7 +161,9 @@ const MacroWidget = ({
                 const { records: macros } = res.data;
                 setMacros(macros);
                 actions.closeModal();
-                toast.success(`Updated macro '${name}'`);
+                toast.success(`Updated macro '${name}'`, {
+                    position: 'bottom-right',
+                });
             } catch (err) {
                 // Ignore error
             }

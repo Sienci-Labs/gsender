@@ -183,6 +183,7 @@ const Keyboard = () => {
         (msg = 'Shortcut Updated') => {
             toast.info(msg, {
                 duration: 3000,
+                position: 'bottom-right',
             });
         },
         5000,
@@ -536,11 +537,15 @@ const Keyboard = () => {
                     iframe.contentWindow?.print();
                 };
             } else {
-                toast.error('Unable to create print document.');
+                toast.error('Unable to create print document.', {
+                    position: 'bottom-right',
+                });
             }
         } catch (error) {
             console.error('Print error:', error);
-            toast.error('Failed to print shortcuts.');
+            toast.error('Failed to print shortcuts.', {
+                position: 'bottom-right',
+            });
         }
     };
 

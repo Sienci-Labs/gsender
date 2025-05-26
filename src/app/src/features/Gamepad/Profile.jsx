@@ -79,7 +79,7 @@ const Profile = ({ data }) => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        toast.info('Updated Profile Name');
+        toast.info('Updated Profile Name', { position: 'bottom-right' });
     };
 
     return (

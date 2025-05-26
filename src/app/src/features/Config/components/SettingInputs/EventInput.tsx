@@ -63,7 +63,9 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
         };
 
         fetchCall().catch((e) => {
-            toast.error(`Unable to fetch event data ${eventType}`);
+            toast.error(`Unable to fetch event data ${eventType}`, {
+                position: 'bottom-right',
+            });
         });
     }, []);
 

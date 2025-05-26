@@ -178,7 +178,9 @@ const MountingSetup = () => {
             VISUALIZER_PRIMARY,
         );
 
-        toast.info('Loaded rotary mounting setup macro');
+        toast.info('Loaded rotary mounting setup macro', {
+            position: 'bottom-right',
+        });
 
         setOpen(false);
     };

@@ -179,7 +179,7 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
-        toast('G-code File Closed');
+        toast('G-code File Closed', { position: 'bottom-right' });
 
         fileInputRef.current.value = '';
     }, 100);

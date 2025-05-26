@@ -145,7 +145,9 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        toast.info('Rotary Mode Enabled');
+                        toast.info('Rotary Mode Enabled', {
+                            position: 'bottom-right',
+                        });
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
@@ -220,7 +222,9 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
                         controller.command('updateRotaryMode', true);
 
-                        toast.info('Rotary Mode Enabled');
+                        toast.info('Rotary Mode Enabled', {
+                            position: 'bottom-right',
+                        });
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);

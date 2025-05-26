@@ -63,9 +63,13 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                     }),
                 );
             });
-            toast.success('EEPROM Settings imported');
+            toast.success('EEPROM Settings imported', {
+                position: 'bottom-right',
+            });
         } catch (e) {
-            toast.error('Unable to import settings');
+            toast.error('Unable to import settings', {
+                position: 'bottom-right',
+            });
         }
     }
 

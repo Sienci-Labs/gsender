@@ -14,9 +14,13 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(gcode);
-            toast.info('G-code has been copied to your clipboard');
+            toast.info('G-code has been copied to your clipboard', {
+                position: 'bottom-right',
+            });
         } catch (err) {
-            toast.error('Could not copy G-code to clipboard');
+            toast.error('Could not copy G-code to clipboard', {
+                position: 'bottom-right',
+            });
         }
     };
 

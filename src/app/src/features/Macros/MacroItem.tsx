@@ -79,7 +79,9 @@ const MacroItem = ({
         }
 
         onRun(macro);
-        toast.info(`Started running macro '${macro.name}'!`);
+        toast.info(`Started running macro '${macro.name}'!`, {
+            position: 'bottom-right',
+        });
     };
 
     return (

@@ -8,7 +8,7 @@ import store from 'app/store';
 import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import { updateJobOverrides } from 'app/store/redux/slices/visualizer.slice';
 import controller from 'app/lib/controller';
-import {RootState, store as reduxStore} from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 import {
     Dialog,
     DialogContent,
@@ -19,7 +19,7 @@ import Tooltip from 'app/components/Tooltip';
 import { Input } from 'app/components/Input';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
-import {useSelector} from "react-redux";
+import { useSelector } from 'react-redux';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -43,7 +43,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                 : 0.4,
     });
 
-    const lineTotal =useSelector((state: RootState) => state.file.total)
+    const lineTotal = useSelector((state: RootState) => state.file.total);
 
     const handleStartFromLine = () => {
         const { safeHeight, value } = state;
@@ -61,7 +61,9 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
-        toast.info('Running Start From Specific Line Command');
+        toast.info('Running Start From Specific Line Command', {
+            position: 'bottom-right',
+        });
     };
 
     return (
@@ -107,7 +109,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             <p className="mb-0 text-black dark:text-white">
                                 Your job was last stopped around line:{' '}
                                 <b>{state.value}</b> on a g-code file with a
-                                total of <b>{ lineTotal }</b> lines
+                                total of <b>{lineTotal}</b> lines
                             </p>
                             {state.value > 0 && (
                                 <p>

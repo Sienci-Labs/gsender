@@ -560,7 +560,7 @@ export function* initialize(): Generator<any, void, any> {
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             if (!skipDialog) {
-                toast.info(msg);
+                toast.info(msg, { position: 'bottom-right' });
             }
         } else {
             let title, instructions;
@@ -711,6 +711,7 @@ export function* initialize(): Generator<any, void, any> {
         const { data } = opts;
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
+            { position: 'bottom-right' },
         );
     });
 
@@ -743,7 +744,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('outline:start', () => {
-        toast.success('Running file outline');
+        toast.success('Running file outline', { position: 'bottom-right' });
     });
 
     controller.addListener('homing:flag', (flag: boolean) => {
