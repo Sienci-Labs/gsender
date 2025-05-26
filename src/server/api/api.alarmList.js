@@ -2,6 +2,7 @@ import config from '../services/configstore';
 import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
+import { get } from 'lodash';
 // import logger from '../lib/logger';
 
 // const log = logger('api:alarmList');
@@ -23,6 +24,21 @@ const getAlarmList = () => {
 export const fetch = (req, res) => {
     const alarmList = getAlarmList();
     res.send(alarmList);
+};
+
+export const fetchRecent = (req, res) => {
+    const alarmList = getAlarmList();
+    const list = get(alarmList, 'list', []);
+    let cutoff = new Date();
+    cutoff = cutoff.setDate(cutoff.getDate() - 21);
+
+    const recentIssues = list.filter((item) => {
+        const itemDate = new Date(item.time);
+        return itemDate > cutoff;
+    });
+    res.send({
+        list: recentIssues
+    });
 };
 
 export const update = (req, res) => {

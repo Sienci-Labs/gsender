@@ -1099,7 +1099,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Max Speed',
                         key: 'workspace.rotaryAxis.firmwareSettings.$111',
                         description:
-                            'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
+                            'Max axis speed, also used for G0 rapids ($113, default 8000)',
                         type: 'hybrid',
                         eID: '$113',
                         unit: 'rpm',
