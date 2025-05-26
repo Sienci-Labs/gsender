@@ -27,7 +27,9 @@ const Actions = () => {
             content: `Click 'Run' to start the ${name} probing cycle`,
             confirmLabel: `Run`,
             onConfirm: () => {
-                toast.info(`Running ${name} probing commands`);
+                toast.info(`Running ${name} probing commands`, {
+                    position: 'bottom-right',
+                });
                 const unitModal = getUnitModal();
 
                 controller.command('gcode:safe', commands, unitModal);

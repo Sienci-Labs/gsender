@@ -27,7 +27,7 @@ const ProfileItem = ({ title, icon, id }) => {
 
     const deleteProfile = (id) => {
         dispatch(removeGamepadProfileFromList(id));
-        toast.info('Removed Gamepad Profile');
+        toast.info('Removed Gamepad Profile', { position: 'bottom-right' });
     };
 
     const setCurrentProfile = (profileID) => {

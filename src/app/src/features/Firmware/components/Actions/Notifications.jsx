@@ -48,7 +48,9 @@ const Notifications = () => {
 
     const beginFlashing = (port, profile) => {
         if (profile === '' || port === '') {
-            toast.info('Please select a Port and Machine profile');
+            toast.info('Please select a Port and Machine profile', {
+                position: 'bottom-right',
+            });
         } else {
             setPortSelected(port);
             startFlash(port, profile);

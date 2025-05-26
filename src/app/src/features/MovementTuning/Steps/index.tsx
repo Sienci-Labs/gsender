@@ -77,7 +77,7 @@ const Steps = () => {
 
         controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`]);
 
-        toast.info('Updated steps-per-mm value');
+        toast.info('Updated steps-per-mm value', { position: 'bottom-right' });
     };
 
     const eepromKey = getEEPROMSettingKey(selectedAxis);

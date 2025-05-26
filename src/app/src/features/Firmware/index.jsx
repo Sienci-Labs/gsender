@@ -93,6 +93,7 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
                 `Flashing completed successfully on port: ${JSON.stringify(
                     message,
                 )}  Please reconnect your machine`,
+                { position: 'bottom-right' },
             );
         },
         'task:error': (error) => {
@@ -101,6 +102,7 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
                 JSON.stringify(
                     isEmpty(error) ? error : 'Process failed.',
                 ).replaceAll('"', ''),
+                { position: 'bottom-right' },
             );
         },
         'serialport:open': () => {

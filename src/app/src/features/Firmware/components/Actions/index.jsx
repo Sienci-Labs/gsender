@@ -52,7 +52,9 @@ const ActionArea = () => {
             try {
                 const uploadedSettings = JSON.parse(e.target.result);
 
-                toast.info('Settings Imported From File');
+                toast.info('Settings Imported From File', {
+                    position: 'bottom-right',
+                });
 
                 let newSetting = false;
                 setSettings((prev) =>
@@ -67,7 +69,9 @@ const ActionArea = () => {
                 );
                 setSettingsToApply(newSetting);
             } catch (error) {
-                toast.error('Unable to Load Settings From File');
+                toast.error('Unable to Load Settings From File', {
+                    position: 'bottom-right',
+                });
             }
 
             return null;

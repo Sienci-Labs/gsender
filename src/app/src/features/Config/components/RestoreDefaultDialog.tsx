@@ -62,7 +62,9 @@ function restoreEEPROMDefaults(type = '') {
 
     controller.command('gcode', values);
 
-    toast.success('Restored default settings for your machine.');
+    toast.success('Restored default settings for your machine.', {
+        position: 'bottom-right',
+    });
 }
 
 export function RestoreDefaultDialog({ fileLoaded, handleFileReload }) {

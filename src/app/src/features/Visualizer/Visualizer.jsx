@@ -550,7 +550,9 @@ class Visualizer extends Component {
 
     showToast = _.throttle(
         () => {
-            toast.info(this.state.finishedMessage);
+            toast.info(this.state.finishedMessage, {
+                position: 'bottom-right',
+            });
         },
         2000,
         { trailing: false },
@@ -559,7 +561,7 @@ class Visualizer extends Component {
     controllerEvents = {
         gcode_error: _throttle(
             (msg) => {
-                toast.error(msg);
+                toast.error(msg, { position: 'bottom-right' });
             },
             250,
             { trailing: false },

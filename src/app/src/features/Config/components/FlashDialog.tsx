@@ -55,6 +55,7 @@ function startFlash({
     if (!port) {
         toast.error(
             'No port specified - please connect to the device to determine what is being flashed.',
+            { position: 'bottom-right' },
         );
     }
 

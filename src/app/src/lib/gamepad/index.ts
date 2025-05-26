@@ -307,11 +307,11 @@ class GamepadManager {
                 ? `${foundGamepad.name} Connected`
                 : 'New gamepad connected, add it as a profile in your preferences';
 
-            toast.info(toastMessage);
+            toast.info(toastMessage, { position: 'bottom-right' });
         };
 
         this.disconnectedListener = () => {
-            toast.info('Gamepad disconnected');
+            toast.info('Gamepad disconnected', { position: 'bottom-right' });
         };
 
         this.buttonListener = (event: GamepadDetail) => {

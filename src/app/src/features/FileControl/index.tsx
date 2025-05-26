@@ -52,6 +52,7 @@ const FileControl = () => {
                     if (!fileMetaData) {
                         toast.error(
                             'Error loading recent file, it may have been deleted or moved to a different folder.',
+                            { position: 'bottom-right' },
                         );
 
                         return;
@@ -77,7 +78,7 @@ const FileControl = () => {
                         path: string;
                     },
                 ) => {
-                    toast.error(data.err);
+                    toast.error(data.err, { position: 'bottom-right' });
 
                     deleteRecentFile(data.path);
                 },

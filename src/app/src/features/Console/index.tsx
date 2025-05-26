@@ -44,7 +44,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
         if (terminalRef.current) {
             terminalRef.current.clear();
 
-            toast.info('Console cleared', { position: 'bottom-left' });
+            toast.info('Console cleared', { position: 'bottom-right' });
         }
     };
 

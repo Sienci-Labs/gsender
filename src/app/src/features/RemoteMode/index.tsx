@@ -77,7 +77,9 @@ export function RemoteModeDialog({
                 onClose(false);
                 actions.saveSettings(payload);
                 setHeadlessSettings(payload);
-                toast.success('Updated Wireless Control Settings');
+                toast.success('Updated Wireless Control Settings', {
+                    position: 'bottom-right',
+                });
             },
             confirmLabel: 'Save Settings',
             title: 'Save Wireless CNC Settings',
