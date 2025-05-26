@@ -1446,6 +1446,16 @@ class GrblController {
                         return 0;
                     };
 
+                    const wordValueInWords = (token, words) => {
+                        let found = false;
+                        words.forEach(word => {
+                            if (word[0] === token) {
+                                found = true;
+                            }
+                        });
+                        return found;
+                    };
+
                     const toolpath = new GcodeToolpath();
                     toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
                         const { words, line } = data;
@@ -1454,7 +1464,9 @@ class GrblController {
                             feedFound = true;
                         }
                         if (line.includes('S')) {
-                            spindleRate = getWordValue('S', words);
+                            if (wordValueInWords('S', words)) {
+                                spindleRate = getWordValue('S', words);
+                            }
                         }
                     });
 
