@@ -1,12 +1,10 @@
 import React, { JSX } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { FaExclamation } from 'react-icons/fa';
-import { cx } from 'class-variance-authority';
 
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 
 export const buttonStyle = tv({
-    base: 'relative border rounded hover:opacity-90 px-3 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
+    base: 'disabled:cursor-not-allowed relative border rounded hover:opacity-90 px-3 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
     variants: {
         variant: {
             primary: 'border-blue-500 text-white bg-blue-500',
@@ -24,7 +22,7 @@ export const buttonStyle = tv({
             lg: 'h-12 text-lg',
         },
         disabled: {
-            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark cursor-not-allowed',
+            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark disabled:cursor-not-allowed cursor-not-allowed',
         },
         active: {
             true: 'bg-gray-200 shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
@@ -83,18 +81,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                         {icon}
                         {text}
                     </span>
-                )}
-
-                {active && (
-                    <div className="absolute -top-3 -right-2">
-                        <div
-                            className={cx(
-                                'w-5 h-5 rounded-full border flex items-center justify-center bg-red-600 border-red-700 animate-pulse',
-                            )}
-                        >
-                            <FaExclamation className="text-white animate-bounce w-2 h-2" />
-                        </div>
-                    </div>
                 )}
             </ShadcnButton>
         );

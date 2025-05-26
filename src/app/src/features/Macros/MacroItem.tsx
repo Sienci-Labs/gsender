@@ -47,7 +47,7 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 ref={ref}
                 onClick={run}
                 disabled={disabled}
-                className={cn('w-full', {
+                className={cn('w-full block', {
                     'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100':
                         running,
                     'opacity-50 cursor-not-allowed': disabled,

@@ -7,7 +7,7 @@ import { cva, VariantProps } from 'class-variance-authority';
 import cx from 'classnames';
 
 const buttonVariants = cva(
-    'inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
+    'disabled:cursor-not-allowed inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
     {
         variants: {
             variant: {
@@ -27,7 +27,7 @@ const buttonVariants = cva(
                 cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500',
             },
             disabled: {
-                true: 'bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
+                true: 'cursor-not-allowed disabled:cursor-not-allowed bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
             },
             size: {
                 default: 'h-10 px-4 max-xl:px-3 py-2 max-xl:py-1',
@@ -57,18 +57,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ) => {
         const Comp = asChild ? Slot : 'button';
         return (
-            <div className={cx({ 'cursor-not-allowed': disabled })}>
-                <Comp
-                    className={cx(
-                        !disabled && buttonVariants({ variant, size }),
-                        disabled && buttonVariants({ disabled, size }),
-                        className,
-                    )}
-                    ref={ref}
-                    disabled={disabled}
-                    {...props}
-                />
-            </div>
+            <Comp
+                className={cx(
+                    !disabled && buttonVariants({ variant, size }),
+                    disabled && buttonVariants({ disabled, size }),
+                    className,
+                    { 'disabled:cursor-not-allowed': disabled },
+                )}
+                ref={ref}
+                disabled={disabled}
+                {...props}
+            />
         );
     },
 );
