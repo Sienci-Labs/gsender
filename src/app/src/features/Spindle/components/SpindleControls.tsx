@@ -79,19 +79,22 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     className="w-full"
                 />
             </div>
-            <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
-                <span>Speed</span>
+            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center my-2 items-center dark:text-white">
+                <span className="text-right">Speed</span>
                 <Slider
                     value={[state.spindleSpeed]}
                     min={state.spindleMin}
                     max={state.spindleMax}
                     step={10}
+                    className="w-3/5"
                     onValueChange={(value) =>
                         actions.handleSpindleSpeedChange(value[0])
                     }
                     disabled={!canClick}
                 />
-                <span>{state.spindleSpeed} RPM</span>
+                <div className={'w-[10ch] text-left flex flex-row'}>
+                    {state.spindleSpeed} RPM
+                </div>
             </div>
         </>
     );

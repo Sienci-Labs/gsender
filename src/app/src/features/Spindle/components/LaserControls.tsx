@@ -84,8 +84,8 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                 />
             </div>
-            <div className="flex flex-row gap-2 justify-center my-2 items-center dark:text-white">
-                <span>Power</span>
+            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center my-2 items-center dark:text-white">
+                <span className="text-right">Power</span>
                 <Slider
                     value={[laser.power]}
                     max={100}
@@ -95,7 +95,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     }
                     disabled={!canClick}
                 />
-                <span>{laser.power} %</span>
+                <span>{laser.power}%</span>
             </div>
             <div className="flex gap-2 justify-center items-center my-2 dark:text-white">
                 <label>Test Duration:</label>
