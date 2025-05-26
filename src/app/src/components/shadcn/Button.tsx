@@ -62,7 +62,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                     !disabled && buttonVariants({ variant, size }),
                     disabled && buttonVariants({ disabled, size }),
                     className,
-                    { 'disabled:cursor-not-allowed': disabled },
+                    {
+                        'disabled:cursor-not-allowed cursor-not-allowed':
+                            disabled,
+                    },
                 )}
                 ref={ref}
                 disabled={disabled}
