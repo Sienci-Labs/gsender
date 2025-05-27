@@ -267,7 +267,7 @@ class SVGVisualizer extends Component {
         this.handleSceneRender(vizualization);
     }
 
-    unload() {
+    unload(skipVis = false) {
         let svg = document.getElementById(
             !this.isSecondaryVisualizer ? 'svg' : 'svg2',
         );

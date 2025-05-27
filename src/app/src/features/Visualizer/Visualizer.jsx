@@ -220,16 +220,16 @@ class Visualizer extends Component {
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
 
-        this.unload();
+        this.unload(true);
 
         this.updateCuttingToolPosition();
         this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
-        this.updateScene();
         this.redrawGrids();
-        this.rerenderGCode();
+        this.updateScene();
+        //this.rerenderGCode();
     };
 
     hasVisualization() {
@@ -277,7 +277,7 @@ class Visualizer extends Component {
     }
 
     addStoreEvents() {
-        store.on('dimensions', () => {
+        store.on('_dimensions', () => {
             this.changeMachineProfile()
         })
     }
@@ -287,7 +287,7 @@ class Visualizer extends Component {
         this.addControllerEvents();
         this.addStoreEvents()
         this.addResizeEventListener();
-        //store.on('change', this.changeMachineProfile);
+
         if (this.node) {
             this.createScene(this.node);
 
@@ -593,7 +593,6 @@ class Visualizer extends Component {
         this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
-        store.removeListener('change', this.changeMachineProfile);
         this.clearScene();
     }
 
@@ -808,6 +807,13 @@ class Visualizer extends Component {
             unitGroup.add(axisYLabel);
             unitGroup.add(axisZLabel);
         }
+    }
+
+    returnData() {
+        return [
+            this.vertices,
+            this.color
+        ]
     }
 
     recolorGridNumbers(units) {
@@ -2235,7 +2241,7 @@ class Visualizer extends Component {
         }
     }
 
-    unload() {
+    unload(skipClearingVis = false) {
         this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
         const toolPathObject = this.group.getObjectByName('toolpath');
@@ -2249,7 +2255,8 @@ class Visualizer extends Component {
             this.group.remove(toolPathObject);
         }
 
-        if (this.visualizer) {
+        if (this.visualizer && !skipClearingVis) {
+            console.log('clearing vis');
             this.visualizer.unload();
             this.visualizer = null;
         }
