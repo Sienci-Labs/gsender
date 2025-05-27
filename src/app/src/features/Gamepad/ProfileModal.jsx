@@ -44,7 +44,10 @@ const ProfileModal = () => {
                 setAvailabilityType(isAvailable);
                 setGamepadInfo(gamepad);
 
-                if (isAvailable === AVAILABLE) {
+                if (
+                    isAvailable === AVAILABLE &&
+                    inputRef.current.value === ''
+                ) {
                     inputRef.current.value = gamepad.id;
                     inputRef.current.focus();
                 }
@@ -99,7 +102,7 @@ const ProfileModal = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        toast.info('Created New Gamepad Profile');
+        toast.info('Created New Gamepad Profile', { position: 'bottom-right' });
 
         closeModal();
     };

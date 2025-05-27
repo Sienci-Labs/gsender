@@ -60,14 +60,14 @@ const columnData: CustomColumnDef<Job, any>[] = [
         accessorKey: 'startTime',
         header: () => 'Start Time',
         cell: (info: { renderValue: () => Date }) => {
-            const [yyyy, mm, dd, hh, mi, ss] = info
+            const [yyyy, mm, dd, hh, mi, _ss] = info
                 .renderValue()
                 .toString()
                 .split(/[:\-T.]+/);
             return (
                 <>
                     <div>
-                        {hh}:{mi}:{ss} - {mm}/{dd}/{yyyy}
+                        {hh}:{mi} {dd}/{mm}/{yyyy}
                     </div>
                 </>
             );

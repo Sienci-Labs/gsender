@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import store from 'app/store';
 import GamepadManager from 'app/lib/gamepad';
-import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { toast } from 'app/lib/toaster';
 import { Button } from 'app/components/Button';
 
 import { GamepadContext } from './utils/context';
@@ -18,6 +18,7 @@ import ButtonActionsTable from './components/ButtonActionsTable';
 import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
 import { GAMEPAD_MODAL } from './utils/constants';
+import { ArrowLeft } from 'lucide-react';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -72,31 +73,33 @@ const Profile = ({ data }) => {
 
         const updatedProfiles = profiles.map((profile) =>
             arrayComparator(profile.id, data.id)
-                ? { ...profile, profileName: name }
+                ? { ...profile, name }
                 : profile,
         );
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        Toaster.pop({
-            msg: 'Updated Profile Name',
-            type: TOASTER_INFO,
-            duration: 2000,
-        });
+        toast.info('Updated Profile Name', { position: 'bottom-right' });
     };
 
     return (
-        <>
-            <div className="grid grid-cols-[5fr_1fr_1fr_1fr] gap-2 items-center mb-2">
+        <div className="flex flex-col gap-2 mt-4">
+            <div className="grid grid-cols-[1fr_17fr_1fr_1fr] gap-2 items-center">
+                <Button
+                    onClick={() => dispatch(setCurrentGamepadProfile(null))}
+                    className="w-full flex items-center justify-center gap-2"
+                    icon={<ArrowLeft className="w-6 h-6" />}
+                    size="sm"
+                />
                 <input
                     type="text"
                     value={name}
-                    className="rounded text-3xl font-bold hover:border-gray-400 focus:border-gray-400 dark:bg-dark dark:text-white"
+                    className="rounded text-2xl font-bold border border-transparent hover:border-gray-400 focus:border-gray-400 dark:bg-dark dark:text-white transition-all duration-200 ease-in-out"
                     onChange={(e) => setName(e.target.value)}
                     onBlur={handleEditName}
                 />
                 <span
-                    className={`p-2 rounded text-white ${isConnected ? 'bg-green-500' : 'bg-blue-400'} text-center`}
+                    className={`p-2 px-4 rounded-full w-full text-white ${isConnected ? 'bg-green-500 text-green-800' : 'bg-gray-500'} text-center`}
                 >
                     {isConnected ? 'Connected' : 'Disconnected'}
                 </span>
@@ -104,22 +107,15 @@ const Profile = ({ data }) => {
                     onClick={() =>
                         dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))
                     }
-                    className="w-full"
+                    className="w-full bg-orange-400 dark:bg-orange-700 border-orange-700 dark:border-orange-400 text-white hover:bg-orange-50"
                 >
                     Help
                 </Button>
-                <Button
-                    onClick={() => dispatch(setCurrentGamepadProfile(null))}
-                    className="w-full flex items-center justify-center gap-2"
-                >
-                    <i className="fas fa-arrow-left" />
-                    <span>Back to Profiles</span>
-                </Button>
             </div>
 
-            <div className="flex gap-4 mt-4 xl:mt-0 ">
+            <div className="flex gap-4 mt-4">
                 <div className="w-3/5 flex flex-col gap-2">
-                    <h3 className="text-2xl font-bold dark:text-white">
+                    <h3 className="text-xl font-bold dark:text-white">
                         Button Actions
                     </h3>
                     <p className="dark:text-white">
@@ -133,13 +129,13 @@ const Profile = ({ data }) => {
                 </div>
 
                 <div className="w-2/5">
-                    <h3 className="text-2xl font-bold dark:text-white">
+                    <h3 className="text-xl font-bold dark:text-white">
                         Joystick Options
                     </h3>
                     <JoystickOptions />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

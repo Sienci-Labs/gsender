@@ -1,57 +1,58 @@
-import {
-    Droppable,
-    Draggable,
-    DroppableProvided,
-    DroppableStateSnapshot,
-    DraggableProvided,
-    DraggableStateSnapshot,
-} from 'react-beautiful-dnd';
+import { useDroppable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import Tooltip from 'app/components/Tooltip';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 import MacroItem from './MacroItem';
 
-interface Macro {
+type Macro = {
     id: string;
     name: string;
     description: string;
-}
+    column: string;
+};
 
-interface Actions {
+export type Actions = {
     runMacro: (id: string, options: { name: string }) => void;
     openEditMacroModal: (id: string) => void;
     deleteMacro: (id: string) => void;
-}
+};
 
-interface DroppableColumnProps {
+type DroppableColumnProps = {
     droppableId: string;
     macros: Macro[];
     actions: Actions;
     disabled: boolean;
-}
+};
 
-const DroppableColumn = ({
-    droppableId,
-    macros,
+const SortableMacroItem = ({
+    macro,
     actions,
     disabled,
-}: DroppableColumnProps) => {
-    const getListStyle = (_isDraggingOver: boolean) => ({
-        width: '100%',
-        display: 'grid',
-        gridAutoRows: 'min-content',
-        gap: 4,
-    });
+}: {
+    macro: Macro;
+    actions: Actions;
+    disabled: boolean;
+}) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: macro.id, data: { column: macro.column } });
 
-    const getItemStyle = (
-        _isDragging: boolean,
-        draggableStyle: React.CSSProperties,
-    ) => ({
-        ...draggableStyle,
-    });
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        position: 'relative' as const,
+    };
 
-    const handleRunMacro = (macro: Macro) => {
+    const handleRunMacro = () => {
         if (disabled) {
             return;
         }
@@ -60,102 +61,83 @@ const DroppableColumn = ({
         actions.runMacro(id, { name });
     };
 
-    const handleEditMacro = (macro: Macro) => {
+    const handleEditMacro = () => {
         actions.openEditMacroModal(macro.id);
     };
 
-    const handleDeleteMacro = (macroID: string) => {
-        actions.deleteMacro(macroID);
+    const handleDeleteMacro = () => {
+        actions.deleteMacro(macro.id);
     };
 
-    const onDeleteClick = ({ name, id }: { name: string; id: string }) => {
+    const onDeleteClick = () => {
         Confirm({
             title: 'Delete Macro',
             content: (
                 <>
                     <p>Are you sure you want to delete this macro?</p>
                     <p>
-                        <strong>{name}</strong>
+                        <strong>{macro.name}</strong>
                     </p>
                 </>
             ),
             confirmLabel: 'Delete',
-            onConfirm: () => handleDeleteMacro(id),
+            onConfirm: handleDeleteMacro,
         });
     };
 
     return (
-        <Droppable droppableId={droppableId}>
-            {(
-                provided: DroppableProvided,
-                snapshot: DroppableStateSnapshot,
-            ) => (
-                <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}
-                >
-                    {macros.map((macro, index) => (
-                        <Draggable
-                            key={macro.id}
-                            draggableId={macro.id}
-                            index={index}
-                        >
-                            {(
-                                provided: DraggableProvided,
-                                snapshot: DraggableStateSnapshot,
-                            ) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={getItemStyle(
-                                        snapshot.isDragging,
-                                        provided.draggableProps.style || {},
-                                    )}
-                                >
-                                    {macro.description.trim() !== '' ? (
-                                        <Tooltip
-                                            content={macro.description}
-                                            location="default"
-                                        >
-                                            <MacroItem
-                                                key={macro.id}
-                                                macro={macro}
-                                                onRun={handleRunMacro}
-                                                onEdit={handleEditMacro}
-                                                onDelete={() =>
-                                                    onDeleteClick({
-                                                        name: macro.name,
-                                                        id: macro.id,
-                                                    })
-                                                }
-                                                disabled={disabled}
-                                            />
-                                        </Tooltip>
-                                    ) : (
-                                        <MacroItem
-                                            key={macro.id}
-                                            macro={macro}
-                                            onRun={handleRunMacro}
-                                            onEdit={handleEditMacro}
-                                            onDelete={() =>
-                                                onDeleteClick({
-                                                    name: macro.name,
-                                                    id: macro.id,
-                                                })
-                                            }
-                                            disabled={disabled}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </Draggable>
-                    ))}
-                    {provided.placeholder}
-                </div>
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {macro.description.trim() !== '' ? (
+                <Tooltip content={macro.description} location="default">
+                    <MacroItem
+                        key={macro.id}
+                        macro={macro}
+                        onRun={handleRunMacro}
+                        onEdit={handleEditMacro}
+                        onDelete={onDeleteClick}
+                        disabled={disabled}
+                    />
+                </Tooltip>
+            ) : (
+                <MacroItem
+                    key={macro.id}
+                    macro={macro}
+                    onRun={handleRunMacro}
+                    onEdit={handleEditMacro}
+                    onDelete={onDeleteClick}
+                    disabled={disabled}
+                />
             )}
-        </Droppable>
+        </div>
+    );
+};
+
+const DroppableColumn = ({
+    droppableId,
+    macros,
+    actions,
+    disabled,
+}: DroppableColumnProps) => {
+    const { setNodeRef } = useDroppable({
+        id: droppableId,
+        data: { column: droppableId },
+    });
+
+    return (
+        <div
+            ref={setNodeRef}
+            className="w-full grid gap-1"
+            style={{ gridAutoRows: 'min-content' }}
+        >
+            {macros.map((macro) => (
+                <SortableMacroItem
+                    key={macro.id}
+                    macro={macro}
+                    actions={actions}
+                    disabled={disabled}
+                />
+            ))}
+        </div>
     );
 };
 

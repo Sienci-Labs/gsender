@@ -17,7 +17,7 @@ export function EmptyDataPlaceholder() {
 }
 
 export function JobResultsChart() {
-    const { jobStats, isConnected } = useContext(StatContext);
+    const { jobStats, filteredJobs, isConnected } = useContext(StatContext);
 
     const labels = ['Complete', 'Incomplete'];
 
@@ -34,8 +34,10 @@ export function JobResultsChart() {
 
     return (
         <div className={'w-full h-52 flex items-center justify-center'}>
-            {!isConnected && <EmptyDataPlaceholder />}
-            {isConnected && <Pie data={data} />}
+            {(!isConnected || filteredJobs.length === 0) && (
+                <EmptyDataPlaceholder />
+            )}
+            {isConnected && filteredJobs.length > 0 && <Pie data={data} />}
         </div>
     );
 }

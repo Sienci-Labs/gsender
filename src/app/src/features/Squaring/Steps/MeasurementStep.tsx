@@ -1,9 +1,9 @@
-import { LuArrowRight } from 'react-icons/lu';
 import Button from 'app/components/Button';
 import { Input } from 'app/components/Input';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 
 const MeasurementStep = () => {
     const {
@@ -53,21 +53,23 @@ const MeasurementStep = () => {
     };
 
     return (
-        <div className="max-w-7xl w-full grid grid-cols-2 gap-8">
-            <div className="flex flex-col gap-8">
-                <div className="space-y-4">
+        <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
+            <div className="flex flex-col gap-4">
+                <div className="space-y-1">
                     <h3 className="text-lg font-semibold dark:text-white">
                         Instructions
                     </h3>
-                    <p className="text-gray-600 dark:text-white">
+                    <p className="text-gray-600 dark:text-white h-20">
                         {currentSubStepData.description}
                     </p>
                 </div>
 
                 <div className="space-y-6">
                     {currentMainStepData.subSteps.map((step, index) => {
-                        const isCurrentStep = index === currentSubStep;
-                        const isPastStep = index < currentSubStep;
+                        const isCurrentStep =
+                            index === currentSubStep && !step.completed;
+                        const isPastStep =
+                            index < currentSubStep || step.completed;
                         const measurementKey = getMeasurementKey(
                             step.buttonLabel,
                         );
@@ -77,21 +79,23 @@ const MeasurementStep = () => {
                                 key={step.buttonLabel}
                                 className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
-                                        ? 'bg-green-50 border border-green-200'
+                                        ? 'bg-blue-50 border border-blue-200'
                                         : isPastStep
-                                          ? 'bg-blue-50 border border-blue-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200'
+                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700'
                                 }`}
                             >
-                                <LuArrowRight
-                                    className={`min-w-8 min-h-8 p-[4px] text-white rounded-full ${
-                                        isCurrentStep
-                                            ? 'bg-green-500 animate-pulse'
-                                            : isPastStep
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-300 dark:bg-dark-lighter dark:text-white'
-                                    }`}
-                                />
+                                <div className={`min-w-8 min-h-8 text-white`}>
+                                    {isPastStep && (
+                                        <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
+                                    )}
+                                    {!isCurrentStep && !isPastStep && (
+                                        <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                    )}
+                                    {isCurrentStep && (
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                    )}
+                                </div>
                                 <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1">
@@ -151,7 +155,7 @@ const MeasurementStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Visualization</h3>
+                <h3 className="text-lg font-semibold">Diagram</h3>
                 <TriangleDiagram />
             </div>
         </div>

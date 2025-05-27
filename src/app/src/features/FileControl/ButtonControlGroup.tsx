@@ -47,7 +47,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
-import {toast} from "app/lib/toaster";
+import { toast } from 'app/lib/toaster';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -179,21 +179,21 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
-        toast('G-code File Closed');
+        toast('G-code File Closed', { position: 'bottom-right' });
 
         fileInputRef.current.value = '';
     }, 100);
 
     return (
         <div className="relative w-full flex justify-center">
-            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-50 border-blue-500 border-2 overflow-hidden">
+            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden">
                 <Button
                     onClick={handleClickLoadFile}
                     icon={<FaFolderOpen className="w-5 h-5" />}
                     text="Load File"
                     variant="ghost"
                     disabled={!canClick}
-                    className="h-10 px-4 rounded-none"
+                    className="h-10 max-xl:h-9 px-4 rounded-none"
                 />
 
                 <Divider />
@@ -204,7 +204,7 @@ const ButtonControlGroup = () => {
                             icon={<MdKeyboardArrowDown className="w-10 h-8" />}
                             variant="ghost"
                             disabled={!canClick}
-                            className="h-10 w-12 rounded-none"
+                            className="h-10 max-xl:h-9 w-12 rounded-none"
                         />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 bg-white">
@@ -233,7 +233,7 @@ const ButtonControlGroup = () => {
                 <Divider />
 
                 <ReloadFileAlert
-                    fileLoaded={!canClick && fileLoaded && usingElectron}
+                    fileLoaded={canClick && fileLoaded && usingElectron}
                     handleFileReload={handleFileReload}
                 />
 
@@ -244,7 +244,7 @@ const ButtonControlGroup = () => {
                         <Button
                             icon={<MdClose className="w-6 h-6" />}
                             variant="ghost"
-                            className="h-10 w-12 rounded-none"
+                            className="h-10 max-xl:h-9 w-12 rounded-none"
                             disabled={isRunning || !fileLoaded}
                         />
                     </AlertDialogTrigger>

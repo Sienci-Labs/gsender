@@ -1,53 +1,39 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Size = () => {
     const bbox = useTypedSelector((state) => state.file.bbox);
+    const usedAxes = useTypedSelector((state) => state.file.usedAxes);
+    const { units } = useWorkspaceState();
+
+    // Convert to inches if needed
+    const conversionFactor = units === 'in' ? 1 / 25.4 : 1;
+
+    const fileContainsA = usedAxes.includes('A');
+    console.log(bbox);
 
     // if it is a whole number when rounded, don't show decimals
     const formattedBBox = {
         delta: {
-            x:
-                Number(bbox.delta.x.toFixed(2)) % 1 === 0
-                    ? bbox.delta.x
-                    : bbox.delta.x.toFixed(2),
-            y:
-                Number(bbox.delta.y.toFixed(2)) % 1 === 0
-                    ? bbox.delta.y
-                    : bbox.delta.y.toFixed(2),
-            z:
-                Number(bbox.delta.z.toFixed(2)) % 1 === 0
-                    ? bbox.delta.z
-                    : bbox.delta.z.toFixed(2),
+            x: (bbox.delta.x * conversionFactor).toFixed(2),
+            y: (bbox.delta.y * conversionFactor).toFixed(2),
+            z: (bbox.delta.z * conversionFactor).toFixed(2),
+            a: bbox.delta.a.toFixed(2),
         },
         min: {
-            x:
-                Number(bbox.min.x.toFixed(2)) % 1 === 0
-                    ? bbox.min.x
-                    : bbox.min.x.toFixed(2),
-            y:
-                Number(bbox.min.y.toFixed(2)) % 1 === 0
-                    ? bbox.min.y
-                    : bbox.min.y.toFixed(2),
-            z:
-                Number(bbox.min.z.toFixed(2)) % 1 === 0
-                    ? bbox.min.z
-                    : bbox.min.z.toFixed(2),
+            x: (bbox.min.x * conversionFactor).toFixed(2),
+            y: (bbox.min.y * conversionFactor).toFixed(2),
+            z: (bbox.min.z * conversionFactor).toFixed(2),
+            a: bbox.min.a.toFixed(2),
         },
         max: {
-            x:
-                Number(bbox.max.x.toFixed(2)) % 1 === 0
-                    ? bbox.max.x
-                    : bbox.max.x.toFixed(2),
-            y:
-                Number(bbox.max.y.toFixed(2)) % 1 === 0
-                    ? bbox.max.y
-                    : bbox.max.y.toFixed(2),
-            z:
-                Number(bbox.max.z.toFixed(2)) % 1 === 0
-                    ? bbox.max.z
-                    : bbox.max.z.toFixed(2),
+            x: (bbox.max.x * conversionFactor).toFixed(2),
+            y: (bbox.max.y * conversionFactor).toFixed(2),
+            z: (bbox.max.z * conversionFactor).toFixed(2),
+            a: bbox.max.a.toFixed(2),
         },
     };
+
     return (
         <table className="border-collapse border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300">
             <thead>
@@ -101,6 +87,22 @@ const Size = () => {
                         {formattedBBox.max.z}
                     </td>
                 </tr>
+                {fileContainsA && (
+                    <tr>
+                        <td className="border border-gray-300 px-1 py-0.5 font-bold">
+                            A
+                        </td>
+                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                            {formattedBBox.delta.a}
+                        </td>
+                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                            {formattedBBox.min.a}
+                        </td>
+                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                            {formattedBBox.max.a}
+                        </td>
+                    </tr>
+                )}
             </tbody>
         </table>
     );

@@ -69,6 +69,7 @@ interface DROProps {
     activeState: string;
     preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
+    rotaryFunctionsEnabled: boolean;
 }
 
 function DRO({
@@ -82,10 +83,10 @@ function DRO({
     preferredUnits,
     homingEnabled,
     singleAxisHoming,
+    rotaryFunctionsEnabled,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
-    const [isRotaryMode, setIsRotaryMode] = useState<boolean>(false);
-    const { shouldWarnZero } = useWorkspaceState();
+    const { shouldWarnZero, mode } = useWorkspaceState();
     const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
     const homingDirection = useTypedSelector((state) =>
         get(state, 'controller.settings.settings.$23', '0'),
@@ -93,15 +94,6 @@ function DRO({
     const pullOff = useTypedSelector((state) =>
         get(state, 'controller.settings.settings.$27', 1),
     );
-
-    useEffect(() => {
-        const mode = store.get('workspace.mode', 'DEFAULT') === 'ROTARY';
-        setIsRotaryMode(mode);
-        store.on('change', () => {
-            const workspaceMode = store.get('workspace.mode', 'DEFAULT');
-            setIsRotaryMode(workspaceMode === 'ROTARY');
-        });
-    }, []);
 
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
@@ -111,6 +103,10 @@ function DRO({
             Number(pullOff),
         );
         controller.command('gcode', gcode);
+    }
+
+    function toggleHoming() {
+        setHomingMode((prev) => !prev);
     }
 
     const shuttleControlEvents = {
@@ -261,10 +257,6 @@ function DRO({
     useShuttleEvents(shuttleControlEvents);
     useKeybinding(shuttleControlEvents);
 
-    function toggleHoming() {
-        setHomingMode(!homingMode);
-    }
-
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
@@ -274,18 +266,22 @@ function DRO({
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
 
-    const wpos = mapValues(wposController, (pos) => {
+    const isRotaryMode = mode === 'ROTARY';
+
+    const wpos = mapValues(wposController, (pos, axis) => {
+        if (axis === 'a') return pos;
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 
-    const mpos = mapValues(mposController, (pos) => {
+    const mpos = mapValues(mposController, (pos, axis) => {
+        if (axis === 'a') return pos;
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 relative">
+            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
                 {homingEnabled && <RapidPositionButtons />}
                 {homingEnabled && (
@@ -297,7 +293,7 @@ function DRO({
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go</Label>
             </div>
-            <div className="flex flex-col w-full gap-1 space-between">
+            <div className="flex flex-col w-full gap-1 max-xl:gap-0 space-between">
                 <AxisRow
                     label={'X'}
                     axis={'X'}
@@ -323,7 +319,8 @@ function DRO({
                     disabled={!canClick}
                     homingMode={homingMode}
                 />
-                {(isRotaryMode || axes.includes('A')) && (
+                {(isRotaryMode ||
+                    (rotaryFunctionsEnabled && axes.includes('A'))) && (
                     <AxisRow
                         label={'A'}
                         axis={isRotaryMode ? 'Y' : 'A'}
@@ -331,11 +328,10 @@ function DRO({
                         wpos={isRotaryMode ? wpos.y : wpos.a}
                         disabled={!canClick}
                         homingMode={homingMode}
-                        disablePositionUpdate={isRotaryMode}
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full mt-2">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
                 {!shouldWarnZero ? (
                     <Button
                         text="Zero"
@@ -386,7 +382,9 @@ function DRO({
                     disabled={!canClick}
                     size="sm"
                 >
-                    <span className="font-mono text-lg">XY</span>
+                    <span className="font-mono text-lg">
+                        {isRotaryMode ? 'XA' : 'XY'}
+                    </span>
                 </Button>
             </div>
         </div>
@@ -414,6 +412,7 @@ export default connect((reduxStore) => {
     const homingEnabled = homingValue > 0;
     const singleAxisValue = homingValue & 2;
     const singleAxisHoming = singleAxisValue > 0;
+    const rotaryFunctionsEnabled = store.get('widgets.rotary.tab.show', false);
 
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
@@ -437,5 +436,6 @@ export default connect((reduxStore) => {
         activeState,
         preferredUnits,
         singleAxisHoming,
+        rotaryFunctionsEnabled,
     };
 })(DRO);

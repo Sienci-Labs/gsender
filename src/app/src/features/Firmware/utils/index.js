@@ -103,6 +103,7 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
     if (!port) {
         toast.error(
             'No port specified - please connect to the device to determine what is being flashed',
+            { position: 'bottom-right' },
         );
         return;
     }
@@ -177,7 +178,7 @@ export const restoreDefaultSettings = (machineProfile, controllerType) => {
 
     controller.command('gcode', values);
 
-    toast.info('Default Settings Restored');
+    toast.info('Default Settings Restored', { position: 'bottom-right' });
 };
 
 export const restoreSingleDefaultSetting = (
@@ -196,7 +197,9 @@ export const restoreSingleDefaultSetting = (
 
     controller.command('gcode', [`${setting}=${defaultValue}`, '$$']);
 
-    toast.info(`Restored Default Value for ${setting}`);
+    toast.info(`Restored Default Value for ${setting}`, {
+        position: 'bottom-right',
+    });
 };
 
 export const addControllerEvents = (controllerEvents) => {
@@ -271,7 +274,7 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
     }
     controller.command('gcode', changedSettings);
     setSettingsToApply(false);
-    toast.success('Firmware Settings Updated');
+    toast.success('Firmware Settings Updated', { position: 'bottom-right' });
 };
 
 export const importFirmwareSettings = (file, callback) => {

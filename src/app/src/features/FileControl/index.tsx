@@ -52,6 +52,7 @@ const FileControl = () => {
                     if (!fileMetaData) {
                         toast.error(
                             'Error loading recent file, it may have been deleted or moved to a different folder.',
+                            { position: 'bottom-right' },
                         );
 
                         return;
@@ -77,7 +78,7 @@ const FileControl = () => {
                         path: string;
                     },
                 ) => {
-                    toast.error(data.err);
+                    toast.error(data.err, { position: 'bottom-right' });
 
                     deleteRecentFile(data.path);
                 },
@@ -112,7 +113,7 @@ const FileControl = () => {
     return (
         <Widget>
             <Widget.Content>
-                <div className="w-full flex flex-col gap-2">
+                <div className="w-full flex flex-col gap-2 max-xl:gap-1">
                     <ButtonControlGroup />
                     <FileInformation
                         handleRecentFileUpload={handleRecentFileUpload}

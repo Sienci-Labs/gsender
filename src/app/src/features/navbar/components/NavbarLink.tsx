@@ -34,7 +34,7 @@ export function NavbarLink(props: NavbarLinkProps) {
                 >
                     {props.icon && (
                         <props.icon
-                            className={`w-3/5 h-3/5 text-2xl ${isActive ? 'text-blue-600' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`text-2xl ${isActive ? 'text-blue-600' : 'text-gray-600 dark:text-gray-400'}`}
                         />
                     )}
                     {props.svg && <img src={props.svg} />}

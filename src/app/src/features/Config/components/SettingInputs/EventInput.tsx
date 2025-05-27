@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import api from 'app/api';
-import ToggleSwitch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
 interface EventInputProps {
     eventType: string;
@@ -63,7 +63,9 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
         };
 
         fetchCall().catch((e) => {
-            toast.error(`Unable to fetch event data ${eventType}`);
+            toast.error(`Unable to fetch event data ${eventType}`, {
+                position: 'bottom-right',
+            });
         });
     }, []);
 
@@ -71,10 +73,7 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
         <div className="flex flex-col w-full gap-2">
             <div className="flex flex-row justify-between items-center">
                 <span>Enabled:</span>
-                <ToggleSwitch
-                    checked={eventData.enabled}
-                    onChange={toggleEvent}
-                />
+                <Switch checked={eventData.enabled} onChange={toggleEvent} />
             </div>
             <textarea
                 rows={8}

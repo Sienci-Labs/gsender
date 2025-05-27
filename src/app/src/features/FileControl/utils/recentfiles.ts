@@ -77,6 +77,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
     if (fileMetaData === null) {
         toast.error(
             'Unable to load file - file may have been moved or deleted.',
+            { position: 'bottom-right' }
         );
         return;
     }

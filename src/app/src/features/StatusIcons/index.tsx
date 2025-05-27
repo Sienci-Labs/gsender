@@ -3,12 +3,12 @@ import cx from 'classnames';
 import { Link } from 'react-router';
 import { LuGamepad2 } from 'react-icons/lu';
 import { FaRegKeyboard } from 'react-icons/fa6';
-import phone from 'app/workspace/TopBar/assets/phone-hand.svg';
 
 import { RemoteModeDialog } from 'app/features/RemoteMode';
 import actions, {
     HeadlessSettings,
 } from 'app/features/RemoteMode/apiActions.ts';
+import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.tsx';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
@@ -54,16 +54,15 @@ const StatusIcons = () => {
     }, []);
 
     return (
-        <div className="flex flex-row gap-4 absolute top-4 right-4 max-sm:hidden">
+        <div className="flex flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 max-sm:hidden">
             <button
                 className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                 onClick={toggleRemoteModeDialog}
             >
-                <img
-                    src={phone}
+                <RemoteIndicator
                     className={cx('w-6 h-7', {
-                        'text-gray-400': !headlessSettings.headlessStatus,
-                        'text-green-500': headlessSettings.headlessStatus,
+                        'fill-gray-400': !headlessSettings.headlessStatus,
+                        'fill-green-500': headlessSettings.headlessStatus,
                     })}
                 />
             </button>

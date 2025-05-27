@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import get from 'lodash/get';
 import { connect } from 'react-redux';
+import get from 'lodash/get';
 import includes from 'lodash/includes';
-import _ from 'lodash';
+import throttle from 'lodash/throttle';
+import cloneDeep from 'lodash/cloneDeep';
 import { FaPlus, FaFileImport, FaFileExport } from 'react-icons/fa';
 
 import api from 'app/api';
@@ -12,6 +13,8 @@ import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import log from 'app/lib/log';
 import Button from 'app/components/Button';
+import { toast } from 'app/lib/toaster';
+
 import Macro from './Macro';
 import MacroForm from './MacroForm';
 import {
@@ -37,7 +40,6 @@ import {
     ModalType,
 } from './constants';
 import { deleteGamepadMacro } from '../../lib/gamepad';
-import { toast } from 'app/lib/toaster';
 
 type MacroWidgetProps = {
     type: string;
@@ -61,7 +63,7 @@ const MacroWidget = ({
     });
     const [editMacro, setEditMacro] = useState<any>(null);
 
-    const showToast = _.throttle(
+    const showToast = throttle(
         ({
             msg,
             type,
@@ -126,7 +128,7 @@ const MacroWidget = ({
                 setMacros(macros);
 
                 const commandKeys = store.get('commandKeys', {});
-                const filteredCommandKeys = _.cloneDeep(commandKeys);
+                const filteredCommandKeys = cloneDeep(commandKeys);
                 delete filteredCommandKeys[id];
 
                 store.replace('commandKeys', filteredCommandKeys);
@@ -159,7 +161,9 @@ const MacroWidget = ({
                 const { records: macros } = res.data;
                 setMacros(macros);
                 actions.closeModal();
-                toast.success(`Updated macro '${name}'`);
+                toast.success(`Updated macro '${name}'`, {
+                    position: 'bottom-right',
+                });
             } catch (err) {
                 // Ignore error
             }
@@ -411,25 +415,25 @@ const MacroWidget = ({
                     <Button
                         onClick={actions.openAddMacroModal}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaPlus />
-                    </Button>
+                        icon={<FaPlus />}
+                        text="Add"
+                    />
 
                     <Button
                         onClick={() => {
                             inputRef.current?.click();
                         }}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaFileImport />
-                    </Button>
+                        icon={<FaFileImport />}
+                        text="Import"
+                    />
 
                     <Button
                         onClick={exportMacros}
                         className="flex flex-1 justify-center items-center"
-                    >
-                        <FaFileExport />
-                    </Button>
+                        icon={<FaFileExport />}
+                        text="Export"
+                    />
                 </div>
             </div>
         </Widget>

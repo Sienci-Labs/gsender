@@ -68,6 +68,7 @@ const getPositionMovements = (
     if (!xLimit || !yLimit) {
         toast.error(
             "Unable to find machine limits - make sure they're set in preferences",
+            { position: 'bottom-right' }
         );
         return [null, null];
     }
@@ -155,6 +156,7 @@ export const getMovementGCode = (
     if (xMovement === null || yMovement === null) {
         toast.error(
             'Unable to calculate position movements based on inputs - check arguments passed',
+            { position: 'bottom-right' }
         );
         return [];
     }

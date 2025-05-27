@@ -23,15 +23,9 @@
 
 import React from 'react';
 
-import Button from 'app/components/Button';
-import Slider from './Slider';
+import { Slider } from 'app/components/shadcn/Slider';
 import { Input } from 'app/components/Input';
-import {
-    FaLightbulb,
-    FaRedoAlt,
-    FaRegLightbulb,
-    FaSatelliteDish,
-} from 'react-icons/fa';
+import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
 
@@ -52,9 +46,7 @@ interface LaserActions {
     sendLaserM3: () => void;
     runLaserTest: () => void;
     sendM5: () => void;
-    handleLaserPowerChange: (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => void;
+    handleLaserPowerChange: (value: number) => void;
     handleLaserDurationChange: (
         event: React.ChangeEvent<HTMLInputElement>,
     ) => void;
@@ -92,14 +84,19 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                 />
             </div>
-            <Slider
-                label="Power"
-                unitString="%"
-                value={laser.power}
-                max={100}
-                step={1}
-                onChange={actions.handleLaserPowerChange}
-            />
+            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center my-2 items-center dark:text-white">
+                <span className="text-right">Power</span>
+                <Slider
+                    value={[laser.power]}
+                    max={100}
+                    step={1}
+                    onValueChange={(value) =>
+                        actions.handleLaserPowerChange(value[0])
+                    }
+                    disabled={!canClick}
+                />
+                <span>{laser.power}%</span>
+            </div>
             <div className="flex gap-2 justify-center items-center my-2 dark:text-white">
                 <label>Test Duration:</label>
                 <div className="flex gap-2">

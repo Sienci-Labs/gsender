@@ -121,7 +121,7 @@ const ButtonActionsTable = () => {
                 return (
                     <Input
                         defaultValue={row.label}
-                        className="bg-green-500 border-green-500 text-white p-1 w-full rounded dark:bg-dark dark:text-white"
+                        className="bg-green-500 border-green-500 text-white text-center p-1 w-full rounded dark:bg-green-500 dark:border-green-500"
                         onBlur={(e) =>
                             handleButtonLabelChange(row.value, e.target.value)
                         }
@@ -132,7 +132,7 @@ const ButtonActionsTable = () => {
             return (
                 <Input
                     defaultValue={row.label}
-                    className="bg-white border border-gray-300 p-1 w-full rounded"
+                    className="bg-white border border-gray-300 text-center p-1 w-full rounded"
                     onBlur={(e) =>
                         handleButtonLabelChange(row.value, e.target.value)
                     }
@@ -163,10 +163,10 @@ const ButtonActionsTable = () => {
                 macros.find((el) => el.cmd === action);
 
             return (
-                <div className="flex justify-between items-center p-2 border border-gray-300 rounded dark:border-gray-700">
-                    <div className="w-full truncate dark:text-white">
+                <div className="grid grid-cols-[2fr_auto] justify-between items-center p-2 border border-gray-300 rounded dark:border-gray-700 gap-3">
+                    <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap dark:text-white">
                         {event?.title ?? action}
-                    </div>
+                    </span>
 
                     <div className="flex space-x-2">
                         <FaEdit
@@ -262,7 +262,7 @@ const ButtonActionsTable = () => {
         if (button.value === modifierButton) {
             return (
                 <td
-                    className={`p-2 ${buttonIsPressed ? activeStyles : inactiveStyles} dark:text-white dark:bg-dark`}
+                    className={`p-2 dark:text-white dark:bg-dark ${buttonIsPressed ? activeStyles : inactiveStyles}`}
                     colSpan={2}
                 >
                     {render.modifier(null, button)}

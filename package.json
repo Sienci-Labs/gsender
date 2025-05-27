@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.0-Edge-9",
+  "version": "1.5.0-Edge-9-internal-2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -40,9 +40,10 @@
     "build-dev-server": "cross-env NODE_ENV=development webpack-cli --progress --config webpack.config.server.development.js && npm run build-i18n-server",
     "build-dev-app": "npm run build-i18n-app",
     "build-dev-css": "postcss src/app/src/index.css -o src/app/src/application.css",
-    "build-prod": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\"",
+    "build-prod": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\" && npm run copy-css",
     "build-prod-server": "cross-env NODE_ENV=production webpack-cli --config webpack.config.server.production.js && npm run build-i18n-server",
     "build-prod-app": "cross-env NODE_ENV=production webpack-cli --config webpack.config.app.production.js && npm run build-i18n-app",
+    "copy-css": "cross-env mkdir -p dist/gsender/app/src && cp src/app/src/application.css dist/gsender/app/src/",
     "postbuild-dev-server": "bash -c \"mkdir -p output/server; cp -af src/server/{i18n,views} output/server/\"",
     "postbuild-dev-app": "bash -c \"mkdir -p output/app output/app-server; cp -af src/app_old/{favicon.ico,i18n,images,assets} output/app/\"",
     "postbuild-prod-server": "bash -c \"mkdir -p dist/gsender/server; cp -af src/server/{i18n,views} dist/gsender/server/\"",
@@ -173,6 +174,9 @@
   "dependencies": {
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@electron/rebuild": "^3.2.13",
     "@electron/remote": "^2.0.8",
     "@emotion/styled": "^11.10.5",

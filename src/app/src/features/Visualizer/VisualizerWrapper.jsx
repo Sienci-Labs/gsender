@@ -23,7 +23,10 @@
 
 import React, { Component } from 'react';
 import pubsub from 'pubsub-js';
-import { shouldVisualizeSVG } from '../../workers/Visualize.response';
+import {
+    shouldVisualize,
+    shouldVisualizeSVG,
+} from '../../workers/Visualize.response';
 import SVGVisualizer from './SVGVisualizer';
 import Visualizer from './Visualizer';
 
@@ -47,7 +50,7 @@ class VisualizerWrapper extends Component {
     componentDidUpdate() {
         // force refresh, changing which visualizer component is being used
         if (this.state.needRefresh) {
-            this.visualizer.reloadGCode();
+            this.visualizer && this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
             // a step further than refresh, reparsing the gcode as well
         } else if (this.state.needReload) {
@@ -77,7 +80,7 @@ class VisualizerWrapper extends Component {
             pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
                 if (isFileLoaded) {
                     this.setNeedRefresh(true);
-                    this.forceUpdate()
+                    this.forceUpdate();
                 } else {
                     this.forceUpdate();
                 }
@@ -107,9 +110,11 @@ class VisualizerWrapper extends Component {
             isSecondary,
         } = this.props;
         let renderSVG = shouldVisualizeSVG();
+        let renderAny = shouldVisualize() && !renderSVG;
+
         return (
             <>
-                {!renderSVG && (
+                {renderAny && (
                     <Visualizer
                         show={show}
                         cameraPosition={cameraPosition}

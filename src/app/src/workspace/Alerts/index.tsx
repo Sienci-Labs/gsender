@@ -7,9 +7,6 @@ import JobEndModal from './JobEndModal';
 import store from 'app/store';
 
 export const Alerts = () => {
-    const [modalEnabled, setModalEnabled] = useState(
-        store.get('widgets.visualizer.jobEndModal'),
-    );
     const [maintenanceAlertsEnabled, setMaintenanceAlertsEnabled] = useState(
         store.get('widgets.visualizer.maintenanceTaskNotifications', true),
     );
@@ -26,9 +23,11 @@ export const Alerts = () => {
         setShowJobEndModal(false);
         setShowMaintenanceAlert(false);
         //setModalEnabled(store.get('widgets.visualizer.jobEndModal'));
-        setJobEndAlertEnabled(store.get('widgets.visualizerJobEndModal'));
+        setJobEndAlertEnabled(
+            store.get('widgets.visualizer.JobEndModal', true),
+        );
         setMaintenanceAlertsEnabled(
-            store.get('widgets.visualizer.maintenanceTaskNotifications'),
+            store.get('widgets.visualizer.maintenanceTaskNotifications', true),
         );
     };
 

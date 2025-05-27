@@ -1,13 +1,13 @@
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
-import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
 import store from 'app/store';
+import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
 import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
 
 import shuttleEvents from '../shuttleEvents';
-import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 import { toast } from '../toaster';
+import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
 
 const macroCallbackDebounce = debounce(
     (action: string) =>
@@ -15,44 +15,66 @@ const macroCallbackDebounce = debounce(
     500,
 );
 
+type GamepadOptions = {
+    axis: {
+        precision: number;
+    };
+    button: {
+        analog: boolean;
+    };
+    deadZone?: number;
+    precision?: number;
+};
+
 class Gamepad extends GamepadListener {
-    shouldHold = false;
+    shouldHold: boolean;
+    declare options: GamepadOptions;
 
     constructor() {
         super({ axis: { precision: 2 }, button: { analog: false } });
         this.shouldHold = false;
+        this.options = { axis: { precision: 2 }, button: { analog: false } };
         this.start();
     }
 
-    update = ({ deadZone, precision }: GamepadConfig): void => {
-        if (deadZone) {
-            this.options.deadZone = deadZone;
+    override update(): void {
+        super.update();
+    }
+
+    updateConfig(config: GamepadConfig): void {
+        if (config.deadZone) {
+            this.options.deadZone = config.deadZone;
         }
 
-        if (precision) {
-            this.options.precision = precision;
+        if (config.precision) {
+            this.options.precision = config.precision;
         }
-    };
+    }
 
-    holdListener = (): void => {
+    holdListener(): void {
         this.shouldHold = true;
-    };
+    }
 
-    unholdListener = (): void => {
+    unholdListener(): void {
         this.shouldHold = false;
-    };
+    }
 
-    onAxis = ({ detail }: GamepadDetail): void => {
+    override onAxis(event: Event): void {
+        const gamepadEvent = event as unknown as {
+            detail: GamepadDetail['detail'];
+        };
         const profiles: Array<GamepadProfile> = store.get(
             'workspace.gamepad.profiles',
             [],
         );
         const currentProfile = profiles.find((profile) =>
-            profile.id.includes(detail.gamepad.id),
+            profile.id.includes(gamepadEvent.detail.gamepad.id),
         );
 
         const lockoutButton =
-            detail.gamepad.buttons[currentProfile?.lockout?.button];
+            gamepadEvent.detail.gamepad.buttons[
+                currentProfile?.lockout?.button
+            ];
 
         if (lockoutButton && !lockoutButton?.pressed) {
             return;
@@ -63,7 +85,7 @@ class Gamepad extends GamepadListener {
             currentProfile?.joystickOptions?.zeroThreshold / 100;
 
         const [leftStickX, leftStickY, rightStickX, rightStickY] =
-            detail.gamepad.axes;
+            gamepadEvent.detail.gamepad.axes;
 
         const cartesian2Polar = (x: number, y: number): number => {
             const radians = Math.atan2(y, x);
@@ -73,7 +95,6 @@ class Gamepad extends GamepadListener {
 
         const cartesian2PolarDistance = (x: number, y: number): number => {
             const distance = Math.sqrt(x * x + y * y);
-
             return +distance.toFixed(2);
         };
 
@@ -90,7 +111,7 @@ class Gamepad extends GamepadListener {
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
         const dataOutput = {
-            detail: detail,
+            detail: gamepadEvent.detail,
             degrees: {
                 leftStick,
                 rightStick,
@@ -103,7 +124,11 @@ class Gamepad extends GamepadListener {
 
         const { index } = dataOutput.detail;
 
-        if (deadZone && detail.value < deadZone && detail.value > -deadZone) {
+        if (
+            deadZone &&
+            gamepadEvent.detail.value < deadZone &&
+            gamepadEvent.detail.value > -deadZone
+        ) {
             const payload = {
                 ...dataOutput,
                 value: 0,
@@ -125,7 +150,7 @@ class Gamepad extends GamepadListener {
             `gamepad:${index}:axis:${dataOutput.detail.axis}`,
             dataOutput.detail,
         );
-    };
+    }
 }
 
 export const shortcutComboBuilder = (list: Array<string> = []): string => {
@@ -250,9 +275,7 @@ export const deleteGamepadMacro = (macroID: string): void => {
     });
 };
 
-export type GamepadInstance =
-    | Gamepad
-    | { start: () => void; on: () => void; off: () => void };
+type GamepadInstance = Gamepad;
 
 class GamepadManager {
     private static instance: GamepadInstance | null = null;
@@ -284,11 +307,11 @@ class GamepadManager {
                 ? `${foundGamepad.name} Connected`
                 : 'New gamepad connected, add it as a profile in your preferences';
 
-            toast.info(toastMessage);
+            toast.info(toastMessage, { position: 'bottom-right' });
         };
 
         this.disconnectedListener = () => {
-            toast.info('Gamepad disconnected');
+            toast.info('Gamepad disconnected', { position: 'bottom-right' });
         };
 
         this.buttonListener = (event: GamepadDetail) => {
@@ -327,9 +350,7 @@ class GamepadManager {
         }
     }
 
-    static getInstance():
-        | Gamepad
-        | { start: () => void; on: () => void; off: () => void } {
+    static getInstance() {
         return GamepadManager.instance || this.initialize();
     }
 }

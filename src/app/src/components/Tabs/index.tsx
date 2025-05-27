@@ -78,7 +78,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
             <div className="relative">
                 <div className="flex items-center absolute top-[-41px] left-0 right-0 z-10">
                     <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
+                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
                             canScrollLeft
                                 ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
                                 : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
@@ -102,7 +102,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                 <button
                                     key={item.label}
                                     ref={(el) => (tabRefs.current[index] = el)}
-                                    className={`flex-grow pt-1 px-4 text-lg font-medium ${
+                                    className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
                                             : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
@@ -116,7 +116,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                             ))}
                     </div>
                     <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 ${
+                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
                             canScrollRight
                                 ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
                                 : 'text-gray-200 cursor-not-allowed dark:text-gray-500'

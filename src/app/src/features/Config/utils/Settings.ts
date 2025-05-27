@@ -126,7 +126,7 @@ export function updateAllSettings(settings, eeprom) {
         );
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);
-        toast.success(`Updated ${eepromNumber} EEPROM values.`);
+        toast.success(`Updated ${eepromNumber} EEPROM values.`, { position: 'bottom-right' });
     }
 
     const settingsToUpdate = generateSenderSettings(settings);
@@ -135,7 +135,7 @@ export function updateAllSettings(settings, eeprom) {
         Object.keys(settingsToUpdate).map((k) => {
             store.set(k, settingsToUpdate[k]);
         });
-        toast.success(`Updated ${updateableSettingsNumber} settings.`);
+        toast.success(`Updated ${updateableSettingsNumber} settings.`, { position: 'bottom-right' });
     }
 
     pubsub.publish('config:saved');

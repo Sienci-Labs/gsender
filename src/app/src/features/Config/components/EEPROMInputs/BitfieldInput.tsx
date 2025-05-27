@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import ToggleSwitch from 'app/components/Switch';
+import { useEffect, useState } from 'react';
+import { Switch } from 'app/components/shadcn/Switch';
 import ensureArray from 'ensure-array';
 import styles from './index.module.styl';
 import { convertBitfieldToValue, getBitfieldArr } from './utils.ts';
@@ -26,7 +26,7 @@ const BitfieldInput = ({
         setBitMap(map);
     }, [setting]);
 
-    const onToggleOpt = (checked, e, id) => {
+    const onToggleOpt = (_checked: boolean, id: string) => {
         const index = document.getElementById(id).value;
 
         let curValue = bitMap[index];
@@ -53,7 +53,7 @@ const BitfieldInput = ({
                         <div className={styles.row} key={key}>
                             <div>{opt}: </div>
                             <div>
-                                <ToggleSwitch
+                                <Switch
                                     id={id}
                                     onChange={onToggleOpt}
                                     checked={checked}

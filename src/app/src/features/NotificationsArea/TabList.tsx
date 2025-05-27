@@ -11,18 +11,8 @@ const TabList = () => {
     return (
         <Tabs defaultValue="all">
             <TabsList className="grid w-full grid-cols-4 bg-gray-200">
-                <TabsTrigger
-                    className="data-[state=active]:bg-white"
-                    value="all"
-                >
-                    All
-                </TabsTrigger>
-                <TabsTrigger
-                    className="data-[state=active]:bg-white"
-                    value="error"
-                >
-                    Errors
-                </TabsTrigger>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="error">Errors</TabsTrigger>
                 <TabsTrigger value="info">Info</TabsTrigger>
                 <TabsTrigger value="success">Success</TabsTrigger>
             </TabsList>

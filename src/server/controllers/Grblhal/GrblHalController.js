@@ -1479,7 +1479,6 @@ class GrblHalController {
                 const [lineToStartFrom, zMax, safeHeight = 10] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
-                // log.info(startEventEnabled);
                 this.emit('job:start');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
@@ -1499,6 +1498,16 @@ class GrblHalController {
                         return 0;
                     };
 
+                    const wordValueInWords = (token, words) => {
+                        let found = false;
+                        words.forEach(word => {
+                            if (word[0] === token) {
+                                found = true;
+                            }
+                        });
+                        return found;
+                    };
+
                     const toolpath = new GcodeToolpath();
                     toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
                         const { words, line } = data;
@@ -1507,7 +1516,9 @@ class GrblHalController {
                             feedFound = true;
                         }
                         if (line.includes('S')) {
-                            spindleRate = getWordValue('S', words);
+                            if (wordValueInWords('S', words)) {
+                                spindleRate = getWordValue('S', words);
+                            }
                         }
                     });
 
@@ -1572,7 +1583,6 @@ class GrblHalController {
 
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
-                    console.log('start event enabled');
                     this.feederCB = () => {
                         // Feeder
                         this.feeder.reset();
@@ -1719,6 +1729,8 @@ class GrblHalController {
                 this.writeln('$SLP');
             },
             'unlock': () => {
+                this.feeder.reset();
+                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
                 this.writeln('$X');
             },
             'populateConfig': () => {

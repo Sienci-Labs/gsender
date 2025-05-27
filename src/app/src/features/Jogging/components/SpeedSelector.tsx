@@ -1,13 +1,17 @@
 import cn from 'classnames';
 import { useEffect, useState, useRef } from 'react';
-import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging.ts';
-import store from 'app/store';
-import get from 'lodash/get';
-import { JogValueObject } from 'app/features/Jogging';
 import pubsub from 'pubsub-js';
-import { JOGGING_CATEGORY } from 'app/constants';
+import get from 'lodash/get';
+
+import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
+import store from 'app/store';
+import { JogValueObject } from 'app/features/Jogging';
+import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+
+import { convertValue } from '../utils/units';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;
@@ -22,7 +26,7 @@ export function SpeedSelectButton({
 }: SpeedSelectButtonProps) {
     return (
         <button
-            className={cn('text-sm px-2 py-2 rounded', {
+            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded', {
                 'bg-blue-400 bg-opacity-30': active,
             })}
             onClick={onClick}
@@ -40,6 +44,14 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
     const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
+    const handleClickRef = useRef(handleClick);
+    const { units } = useWorkspaceState();
+    const previousUnitsRef = useRef(units);
+
+    // Update the ref when handleClick changes
+    useEffect(() => {
+        handleClickRef.current = handleClick;
+    }, [handleClick]);
 
     const rapidActive = selectedSpeed === 'Rapid';
     const normalActive = selectedSpeed === 'Normal';
@@ -54,15 +66,31 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     function updateCurrentJogValues() {
         const jogValues = store.get('widgets.axes.jog', {});
         const key = selectedSpeed.toLowerCase();
-        const newSpeeds = get(jogValues, key, {});
-        handleClick(newSpeeds);
-    }
+        const newSpeeds = { ...get(jogValues, key, {}) };
 
-    useEffect(() => {
-        store.on('change', () => {
-            updateCurrentJogValues();
-        });
-    }, []);
+        // Only convert if the units have changed or we've selected a different speed
+        if (units === IMPERIAL_UNITS && !jogValues.storedInMetric) {
+            // Convert metric values to imperial for display
+            newSpeeds.xyStep = convertValue(
+                newSpeeds.xyStep,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+            newSpeeds.zStep = convertValue(
+                newSpeeds.zStep,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+            newSpeeds.feedrate = convertValue(
+                newSpeeds.feedrate,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+        }
+
+        handleClickRef.current(newSpeeds);
+        previousUnitsRef.current = units;
+    }
 
     // Any time the value swaps, fetch and update the parent
     useEffect(() => {
@@ -74,7 +102,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         return () => {
             pubsub.unsubscribe(token);
         };
-    }, [selectedSpeed]);
+    }, [selectedSpeed, units]);
 
     const shuttleControlEvents = {
         SET_R_JOG_PRESET: {
@@ -133,7 +161,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     useShuttleEvents(shuttleControlEvents);
 
     return (
-        <div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32">
+        <div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32 max-xl:w-28">
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedChange('Rapid')}

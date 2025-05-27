@@ -174,8 +174,8 @@ const main = () => {
       // * `width` Number - The width of the rectangle.
       // * `height` Number - The height of the rectangle.
       const bounds = {
-        minWidth: 1024,
-        minHeight: 768,
+        minWidth: 1200,
+        minHeight: 900,
         ...store.get("bounds"),
       };
       const options = {
@@ -227,9 +227,12 @@ const main = () => {
         try {
           const fileMetadata = await parseAndReturnGCode(recentFile);
           window.webContents.send("loaded-recent-file", fileMetadata);
-        } catch(err) {
+        } catch (err) {
           log.error(err);
-          window.webContents.send("remove-recent-file", { err: err.message, path: recentFile.filePath });
+          window.webContents.send("remove-recent-file", {
+            err: err.message,
+            path: recentFile.filePath,
+          });
         }
       });
 

@@ -266,6 +266,7 @@ const HalFlashModal = ({ onClose }) => {
                                         if (!fileContent || !file) {
                                             toast.info(
                                                 'Please select a hex file',
+                                                { position: 'bottom-right' },
                                             );
                                             return;
                                         }

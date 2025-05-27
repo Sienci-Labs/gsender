@@ -14,13 +14,14 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
 import Button from 'app/components/Button';
-import Toggle from 'app/components/Switch/Toggle.tsx';
+import { Switch } from 'app/components/shadcn/Switch';
 import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
 import { actions } from './apiActions.ts';
 import controller from 'app/lib/controller.ts';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 export function RemoteModeDialog({
     showRemote,
@@ -53,28 +54,38 @@ export function RemoteModeDialog({
     }
 
     function updatePort(e) {
-        setDirty(true)
+        setDirty(true);
         e.preventDefault();
         setPort(e.target.value);
     }
 
     function onIPSelect(v) {
-        setDirty(true)
+        setDirty(true);
         setIp(v);
     }
 
     function saveRemotePreferences(e) {
         e.preventDefault();
 
-        const payload = {
-            ip,
-            port,
-            headlessStatus: remoteEnabled,
-        };
-        onClose(false);
-        actions.saveSettings(payload);
-        setHeadlessSettings(payload);
-        toast.success('Updated Wireless Control Settings');
+        Confirm({
+            onConfirm: () => {
+                const payload = {
+                    ip,
+                    port,
+                    headlessStatus: remoteEnabled,
+                };
+                onClose(false);
+                actions.saveSettings(payload);
+                setHeadlessSettings(payload);
+                toast.success('Updated Wireless Control Settings', {
+                    position: 'bottom-right',
+                });
+            },
+            confirmLabel: 'Save Settings',
+            title: 'Save Wireless CNC Settings',
+            content:
+                'Are you sure you want to save these settings?  This will restart the application.',
+        });
     }
 
     return (
@@ -90,7 +101,7 @@ export function RemoteModeDialog({
                                 <span className="font-bold dark:text-white">
                                     Enable Wireless Control
                                 </span>
-                                <Toggle
+                                <Switch
                                     onChange={toggleRemoteMode}
                                     checked={remoteEnabled}
                                 />

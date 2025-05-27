@@ -40,7 +40,7 @@ const ResultsStep = () => {
 
             controller.command('gcode', [`$100=${$100}`, `$101=${$101}`]);
 
-            toast.info('Updated EEPROM values');
+            toast.info('Updated EEPROM values', { position: 'bottom-right' });
         } catch (error) {
             console.error('Failed to update EEPROM:', error);
         } finally {

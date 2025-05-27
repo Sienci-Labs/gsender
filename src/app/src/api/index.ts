@@ -417,6 +417,9 @@ const alarmList = {
     fetch: (options?: FetchOptions): Promise<AxiosResponse> => {
         return authrequest.get('/api/alarmList', { params: options });
     },
+    recent: (options?: FetchOptions): Promise<AxiosResponse> => {
+        return authrequest.get('/api/alarmList/recent', { params: options });
+    },
     update: (options: Record<string, any>): Promise<AxiosResponse> => {
         return authrequest.put('/api/alarmList/', options);
     },

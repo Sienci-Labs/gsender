@@ -142,7 +142,7 @@ export const GRBL_ACTIVE_STATES = {
     GRBL_ACTIVE_STATE_CHECK: 'Check',
     GRBL_ACTIVE_STATE_JOG: 'Jog',
     GRBL_ACTIVE_STATE_TESTING: 'Testing File',
-    GRBL_ACTIVE_STATE_TOOL: 'Tool'
+    GRBL_ACTIVE_STATE_TOOL: 'Tool',
 };
 
 // grblHal Active State
@@ -441,7 +441,7 @@ export const LIGHT = 'Light';
 export const EVERYTHING = 'Everything';
 export const LIGHTWEIGHT_OPTIONS = {
     LIGHT: LIGHT,
-    EVERYTHING: EVERYTHING
+    EVERYTHING: EVERYTHING,
 };
 
 // const SPINDLE_LABELS = {

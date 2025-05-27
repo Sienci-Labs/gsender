@@ -1,4 +1,4 @@
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import Button from 'app/components/Button';
 import { homeMachine } from 'app/features/DRO/utils/DRO.ts';
 import cn from 'classnames';
@@ -24,7 +24,12 @@ export function HomingSwitch({
                 disabled={disabled}
                 className={cn({ hidden: !singleAxisHoming })}
             />
-            <Button size="sm" variant="primary" onClick={homeMachine} disabled={disabled}>
+            <Button
+                size="sm"
+                variant="primary"
+                onClick={homeMachine}
+                disabled={disabled}
+            >
                 Home
             </Button>
         </>

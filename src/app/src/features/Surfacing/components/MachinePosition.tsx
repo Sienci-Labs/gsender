@@ -67,7 +67,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
 
     return (
         <div className="flex items-center gap-8 justify-between">
-            <div className="w-20 h-20 border-4 border-black dark:border-gray-500 relative">
+            <div className="w-20 h-20 border-4 border-black relative">
                 <RadioGroup
                     name="positions"
                     value={startPosition}
@@ -117,10 +117,10 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                                 <SpiralIcon
                                     checked={surfacing.type === SPIRAL_MOVEMENT}
                                     className={cx(
-                                        'fill-black p-4 w-20 h-20 xl:w-16 xl:h-16 xl:p-3 border-2 border-black dark:border-gray-500 rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white ',
+                                        'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white ',
                                         {
                                             // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
-                                            'bg-blue-50 dark:bg-dark-darker fill-black dark:fill-white border-blue-500':
+                                            'bg-blue-50 fill-black border-blue-500':
                                                 type === SPIRAL_MOVEMENT,
                                         },
                                     )}
@@ -146,10 +146,10 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                                         surfacing.type === ZIG_ZAG_MOVEMENT
                                     }
                                     className={cx(
-                                        'fill-black p-4 w-20 h-20 xl:w-16 xl:h-16 xl:p-3 border-2 border-black dark:border-white rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white',
+                                        'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white',
                                         {
                                             // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
-                                            'bg-blue-50 dark:bg-dark-darker fill-black dark:fill-white border-blue-500':
+                                            'bg-blue-50 fill-black border-blue-500':
                                                 type === ZIG_ZAG_MOVEMENT,
                                         },
                                     )}
@@ -171,7 +171,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                     </span>
                     <Switch
                         // size="small"
-                        onCheckedChange={(value) =>
+                        onChange={(value) =>
                             setSurfacing({
                                 ...surfacing,
                                 cutDirectionFlipped: value,

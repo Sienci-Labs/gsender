@@ -60,6 +60,7 @@ const defaultState: State = {
         timeSpentRunning: 0,
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
+        sendUsageData: false,
         jobTimes: [],
         toolChange: {
             passthrough: false,

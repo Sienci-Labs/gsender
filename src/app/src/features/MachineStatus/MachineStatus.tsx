@@ -31,6 +31,7 @@ import { UnlockButton as SmallUnlockButton } from 'app/features/UnlockButton';
 import {
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_DOOR,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_HOME,
     GRBL_ACTIVE_STATE_IDLE,
@@ -97,6 +98,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
             Tool: 'Tool Change',
+            Door: 'Door',
         };
 
         return (
@@ -120,7 +122,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 activeState === GRBL_ACTIVE_STATE_HOME &&
                                 isConnected,
                             'bg-yellow-600 text-white':
-                                activeState === GRBL_ACTIVE_STATE_HOLD &&
+                                (activeState === GRBL_ACTIVE_STATE_HOLD ||
+                                    activeState === GRBL_ACTIVE_STATE_DOOR) &&
                                 isConnected,
                             'bg-red-500 text-white':
                                 activeState === GRBL_ACTIVE_STATE_ALARM &&
@@ -161,15 +164,13 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     )}
                 </div>
                 <div className="mt-4 z-50">
-                    {isConnected &&
-                        (activeState === GRBL_ACTIVE_STATE_ALARM ||
-                            activeState === GRBL_ACTIVE_STATE_HOLD) && (
-                            <UnlockButton
-                                onClick={unlock}
-                                alarmCode={alarmCode}
-                                activeState={activeState}
-                            />
-                        )}
+                    {isConnected && activeState === GRBL_ACTIVE_STATE_ALARM && (
+                        <UnlockButton
+                            onClick={unlock}
+                            alarmCode={alarmCode}
+                            activeState={activeState}
+                        />
+                    )}
                 </div>
             </div>
         );
@@ -177,7 +178,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 
     return (
         // calc = half of width + sidebar width
-        <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-10 overflow-visible">
+        <div className="absolute top-0 left-1/2 right-1/2 -translate-x-1/2 max-sm:ml-0 max-sm:-translate-x-1/2 w-64 z-50 overflow-visible">
             {machineStateRender()}
         </div>
     );

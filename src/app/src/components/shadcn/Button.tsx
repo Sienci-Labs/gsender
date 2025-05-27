@@ -7,12 +7,13 @@ import { cva, VariantProps } from 'class-variance-authority';
 import cx from 'classnames';
 
 const buttonVariants = cva(
-    'inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
+    'disabled:cursor-not-allowed inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
     {
         variants: {
             variant: {
                 default:
                     'bg-primary text-primary-foreground hover:bg-primary/90',
+                alt: 'bg-robin-500 text-white border-robin-500',
                 destructive:
                     'bg-destructive text-destructive-foreground hover:bg-destructive/90',
                 outline:
@@ -21,11 +22,16 @@ const buttonVariants = cva(
                     'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
-                confirm: 'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10',
-                cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500'
+                confirm:
+                    'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10',
+                cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500',
+            },
+            disabled: {
+                true: 'cursor-not-allowed disabled:cursor-not-allowed bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
             },
             size: {
-                default: 'h-10 px-4 py-2',
+                default: 'h-10 px-4 max-xl:px-3 py-2 max-xl:py-1',
+                xs: 'h-8 rounded-md px-3',
                 sm: 'h-9 rounded-md px-3',
                 lg: 'h-11 rounded-md px-8',
                 icon: 'h-10 w-10',
@@ -45,12 +51,24 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, asChild = false, ...props }, ref) => {
+    (
+        { className, variant, size, disabled, asChild = false, ...props },
+        ref,
+    ) => {
         const Comp = asChild ? Slot : 'button';
         return (
             <Comp
-                className={cx(buttonVariants({ variant, size }), className)}
+                className={cx(
+                    !disabled && buttonVariants({ variant, size }),
+                    disabled && buttonVariants({ disabled, size }),
+                    className,
+                    {
+                        'disabled:cursor-not-allowed cursor-not-allowed':
+                            disabled,
+                    },
+                )}
                 ref={ref}
+                disabled={disabled}
                 {...props}
             />
         );

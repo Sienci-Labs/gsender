@@ -42,13 +42,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
-
-interface GamepadInstance {
-    isHolding?: boolean;
-    start: () => void;
-    on: (event: string, callback: any) => void;
-    off: (event: string, callback: any) => void;
-}
+import { convertValue } from './utils/units';
 
 export interface JogValueObject {
     xyStep: number;
@@ -181,7 +175,19 @@ export function Jogging() {
                 'widgets.connection.controller.type',
                 'Grbl',
             );
+            const units = store.get('workspace.units', 'mm');
             setFirmware(firmwareType);
+
+            if (units === 'in') {
+                jogValues.xyStep = convertValue(jogValues.xyStep, 'mm', 'in');
+                jogValues.zStep = convertValue(jogValues.zStep, 'mm', 'in');
+                jogValues.feedrate = convertValue(
+                    jogValues.feedrate,
+                    'mm',
+                    'in',
+                );
+            }
+
             setJogSpeed({ ...jogValues });
             setInitialized(true);
         }
@@ -189,14 +195,13 @@ export function Jogging() {
 
     useEffect(() => {
         // Use the type assertion with unknown first to avoid type errors
-        const gamepadInstance =
-            gamepad.getInstance() as unknown as GamepadInstance;
+        const gamepadInstance = gamepad.getInstance();
 
         gamepadInstance.on(
             'gamepad:axis',
             throttle(
                 ({ detail: output }) => {
-                    if (gamepadInstance.isHolding || !isConnected) {
+                    if (gamepadInstance.shouldHold || !isConnected) {
                         return;
                     }
 
@@ -645,6 +650,7 @@ export function Jogging() {
 
             toast.info(
                 `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`,
+                { position: 'bottom-right' },
             );
         },
     };
@@ -897,7 +903,7 @@ export function Jogging() {
 
     return (
         <>
-            <div className="flex flex-row w-full gap-2 justify-around items-center select-none xl:mt-4">
+            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 max-xl:scale-90">
                 <div className="min-w-[180px] relative">
                     <JogWheel
                         distance={jogSpeed.xyStep}
@@ -936,7 +942,7 @@ export function Jogging() {
                     )}
                 </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 max-xl:gap-2 max-xl:scale-90">
                 <div className="flex w-full items-center justify-center">
                     <div
                         className={cx('grid gap-x-1 items-center', {
@@ -973,7 +979,7 @@ export function Jogging() {
                         />
                     </div>
                 </div>
-                <div className="flex float-right">
+                <div className="flex float-right max-xl:scale-90">
                     <SpeedSelector handleClick={updateJogValues} />
                 </div>
             </div>

@@ -313,17 +313,4 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
     );
 };
 
-EditArea.propTypes = {
-    shortcut: PropTypes.shape({
-        cmd: PropTypes.string.isRequired,
-        keys: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        isActive: PropTypes.bool.isRequired,
-    }).isRequired,
-    shortcuts: PropTypes.object.isRequired,
-    switchPages: PropTypes.func.isRequired,
-    edit: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-};
-
 export default EditArea;

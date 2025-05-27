@@ -16,7 +16,9 @@ const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
         async () => {
             await navigator.clipboard?.writeText(gcode);
 
-            toast.info('Copied G-code to Clipboard');
+            toast.info('Copied G-code to Clipboard', {
+                position: 'bottom-right',
+            });
         },
         2000,
         { trailing: false },

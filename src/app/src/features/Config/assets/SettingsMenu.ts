@@ -84,6 +84,7 @@ export interface gSenderSetting {
     toolLinkLabel?: string;
     disabled?: () => boolean;
     hidden?: () => boolean;
+    onDisable?: () => void;
 }
 
 export interface gSenderSubSection {
@@ -237,7 +238,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Send Usage Data',
-                        key: '',
+                        key: 'workspace.sendUsageData',
                         description:
                             'Allow gSender to collect your data periodically',
                         type: 'boolean',
@@ -665,6 +666,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Enable Spindle/Laser tab and related functionalities on main user interface.',
                         key: 'workspace.spindleFunctions',
+                        onDisable: () => {
+                            // Disable laser mode if spindle functions turned off.  TBD what to do with EEPROM.
+                            store.set('widgets.spindle.mode', 'spindle');
+                        },
                     },
                     {
                         type: 'eeprom',
@@ -1094,7 +1099,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Max Speed',
                         key: 'workspace.rotaryAxis.firmwareSettings.$111',
                         description:
-                            'Used for motion planning to not exceed motor torque and lose steps ($123, default 1000)',
+                            'Max axis speed, also used for G0 rapids ($113, default 8000)',
                         type: 'hybrid',
                         eID: '$113',
                         unit: 'rpm',

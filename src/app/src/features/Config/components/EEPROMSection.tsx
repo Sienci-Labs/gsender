@@ -48,7 +48,9 @@ export function EEPROMSection({
 
     function handleSingleSettingReset(setting, value) {
         controller.command('gcode', [`${setting}=${value}`, '$$']);
-        toast.success(`Restored ${setting} to default value of ${value}`);
+        toast.success(`Restored ${setting} to default value of ${value}`, {
+            position: 'bottom-right',
+        });
     }
 
     return (

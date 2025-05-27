@@ -101,11 +101,14 @@ const MaintenanceAlert: React.FC<Props> = ({
                                     .update(updatedTasks)
                                     .then((res) => {
                                         if (res.status === 200) {
-                                            toast('Reset Timers successfully');
+                                            toast('Reset Timers successfully', {
+                                                position: 'bottom-right',
+                                            });
                                         } else {
                                             toast('Failed to Reset Timers.', {
                                                 description:
                                                     'Please go to the Stats Page to reset them manually.',
+                                                position: 'bottom-right',
                                             });
                                         }
                                     });

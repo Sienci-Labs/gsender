@@ -14,10 +14,11 @@ export function StopButton({ disabled = false, onClick }) {
                 fill="#DC2626"
                 stroke="#000"
                 className={cn(
-                    'hover:fill-red-600 cursor-pointer active:fill-red-700 disabled:fill-gray-500',
+                    'cursor-pointer active:fill-red-700 disabled:fill-gray-500',
                     {
                         'fill-gray-500 hover:fill-gray-500 active:fill-gray-500':
                             disabled,
+                        'hover:fill-red-600': !disabled,
                     },
                 )}
                 d="m28.766 11.998 22.438.328 15.634 16.098-.328 22.439-16.098 15.634-22.438-.328L12.34 50.071l.328-22.438 16.098-15.635Z"

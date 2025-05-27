@@ -27,10 +27,11 @@ export function Config() {
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
-    const [visibleSection, setVisibleSection] = React.useState('section-0');
+    const [visibleSection, setVisibleSection] = React.useState('h-section-0');
 
     function setInView(inView, entry) {
         if (inView) {
+            console.log(entry);
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }
@@ -52,10 +53,13 @@ export function Config() {
         e: MouseEventHandler<HTMLButtonElement>,
         index: number,
     ) {
-        setActiveSection(index);
         document
             .getElementById(`section-${index}`)
-            .scrollIntoView({ behavior: 'smooth' });
+            .scrollIntoView({ behavior: 'instant' });
+        setActiveSection(index);
+        setTimeout(() => {
+            setVisibleSection(`h-section-${index}`);
+        }, 50);
     }
 
     return (
@@ -82,7 +86,9 @@ export function Config() {
                                 <InView
                                     key={`IV-section-${index}`}
                                     onChange={setInView}
-                                    threshold={0.2}
+                                    threshold={0}
+                                    rootMargin="0px 0px -75% 0px"
+                                    className={'bg-red-500'}
                                 >
                                     {({ ref }) => {
                                         return (

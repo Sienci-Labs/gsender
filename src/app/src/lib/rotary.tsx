@@ -1,6 +1,12 @@
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 
+import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
+import {
+    FIRMWARE_TYPES_T,
+    RotaryModeFirmwareSettings,
+} from 'app/definitions/firmware';
+
 import store from '../store';
 import controller from './controller';
 import { store as reduxStore } from '../store/redux';
@@ -13,17 +19,9 @@ import {
     GRBLHAL,
 } from '../constants';
 import { Confirm } from '../components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO } from './toaster/ToasterLib';
-import {
-    FIRMWARE_TYPES_T,
-    RotaryModeFirmwareSettings,
-} from 'definitions/firmware';
-import { WORKSPACE_MODE_T } from 'workspace/definitions';
 import { toast } from './toaster';
 
-export const updateWorkspaceMode = (
-    mode: WORKSPACE_MODE_T = WORKSPACE_MODE.DEFAULT,
-): void => {
+export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;
     const firmwareType: FIRMWARE_TYPES_T = get(
         reduxStore.getState(),
@@ -77,6 +75,8 @@ export const updateWorkspaceMode = (
                     '$$',
                     ROTARY_TOGGLE_MACRO,
                 ]);
+
+                controller.command('updateRotaryMode', false);
             }
             return;
         }
@@ -145,7 +145,9 @@ export const updateWorkspaceMode = (
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        toast.info('Rotary Mode Enabled');
+                        toast.info('Rotary Mode Enabled', {
+                            position: 'bottom-right',
+                        });
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
@@ -218,10 +220,15 @@ export const updateWorkspaceMode = (
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        toast.info('Rotary Mode Enabled');
+                        controller.command('updateRotaryMode', true);
+
+                        toast.info('Rotary Mode Enabled', {
+                            position: 'bottom-right',
+                        });
                     },
                     onClose: () => {
                         store.replace('workspace.mode', WORKSPACE_MODE.DEFAULT);
+                        controller.command('updateRotaryMode', false);
                     },
                 });
             }

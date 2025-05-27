@@ -142,6 +142,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         const portStats = calculateJobStats(jobsOnConnectedPort);
 
         setJobStats(portStats);
+        setFilteredJobs(jobsOnConnectedPort);
     }, [jobs, isConnected, connectedPort]);
 
     const maintenanceActions = {
@@ -166,6 +167,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         setAlarms,
         setMaintenanceTasks,
         jobStats,
+        filteredJobs,
     };
 
     return (

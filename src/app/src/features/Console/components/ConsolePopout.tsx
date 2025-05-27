@@ -8,7 +8,9 @@ export function ConsolePopout({ id = 'console' }) {
         if (isElectron()) {
             window.ipcRenderer.send('open-new-window', route);
         } else {
-            toast.info('This functionality is not available on web view.');
+            toast.info('This functionality is not available on web view.', {
+                position: 'bottom-right',
+            });
         }
     }
 

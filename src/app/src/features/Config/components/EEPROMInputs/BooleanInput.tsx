@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import ToggleSwitch from 'app/components/Switch';
+import { useState, useEffect } from 'react';
+import { Switch } from 'app/components/shadcn/Switch';
 import styles from './index.module.styl';
 
 const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
@@ -11,7 +11,7 @@ const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
         setBool(value);
     }, []);
 
-    const booleanOnChange = (checked) => {
+    const booleanOnChange = (checked: boolean) => {
         const value = checked ? 1 : 0;
         setBool(checked);
         onChange(value);
@@ -19,7 +19,7 @@ const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
 
     return (
         <div className={styles.row}>
-            <ToggleSwitch
+            <Switch
                 checked={bool}
                 onChange={booleanOnChange}
                 disabled={disabled}

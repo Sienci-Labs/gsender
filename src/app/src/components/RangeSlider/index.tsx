@@ -24,6 +24,7 @@
 import React, { PointerEventHandler } from 'react';
 import { Slider } from '../shadcn/Slider';
 import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
+import cx from 'classnames';
 
 import Button from 'app/components/Button';
 
@@ -72,7 +73,7 @@ const RangeSlider = ({
         <div></div>
     );
     return (
-        <div className="flex flex-col items-center gap-2 justify-center w-full text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
             {textComponent}
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 dark:bg-dark shadow-inner">
                 <Button
@@ -86,7 +87,13 @@ const RangeSlider = ({
                     className="flex relative items-center w-full h-6"
                     trackClassName="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
                     rangeClassName={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
-                    thumbClassName="block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 cursor-pointer relative bg-white outline-none"
+                    thumbClassName={cx(
+                        'block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 relative outline-none',
+                        {
+                            'bg-white': !disabled,
+                            'bg-gray-300 ': disabled,
+                        },
+                    )}
                     defaultValue={defaultPercentage}
                     value={percentage}
                     step={step}

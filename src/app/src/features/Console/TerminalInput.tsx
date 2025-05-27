@@ -81,13 +81,13 @@ const TerminalInput = ({ onClear }: Props) => {
                 `Copied last ${lastCommands.length} commands to clipboard`,
                 {
                     duration: 3000,
-                    position: 'bottom-left',
+                    position: 'bottom-right',
                 },
             );
         } catch (error) {
             toast.error('Failed to copy commands to clipboard', {
                 duration: 3000,
-                position: 'bottom-left',
+                position: 'bottom-right',
             });
             console.error('Failed to copy commands to clipboard:', error);
         }

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/Input';
 import { Label } from 'app/components/shadcn/Label';
-import Switch from 'app/components/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
@@ -24,6 +24,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import { useNavigate } from 'react-router';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import cx from 'classnames';
+import store from 'app/store';
 
 const InputArea = ({
     children,
@@ -63,6 +64,7 @@ const RotarySurfacing = () => {
     const { units } = useWorkspaceState();
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
+        status &&
         status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status?.activeState !== GRBL_ACTIVE_STATE_JOG;
 
@@ -104,6 +106,24 @@ const RotarySurfacing = () => {
     useEffect(() => {
         setSurfacingState(getInitialState());
     }, [units]);
+
+    useEffect(() => {
+        const saveState = () => {
+            store.replace('rotary.stockTurning.options', {
+                stockLength: surfacingState.length,
+                stepdown: surfacingState.stepdown,
+                bitDiameter: surfacingState.bitDiameter,
+                spindleRPM: surfacingState.spindleRPM,
+                feedrate: surfacingState.feedrate,
+                stepover: surfacingState.stepover,
+                startHeight: surfacingState.startDiameter,
+                finalHeight: surfacingState.finalDiameter,
+                enableRehoming: surfacingState.enableRehoming,
+            });
+        };
+
+        return saveState;
+    }, [surfacingState]);
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
@@ -173,7 +193,7 @@ const RotarySurfacing = () => {
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-4 xl:gap-2">
-                        <p className="text-sm xl:text-base">
+                        <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             Make sure that your tool clears the surface of your
                             material without running into the limits of your
                             Z-axis. You should also use the probing feature to
@@ -291,9 +311,9 @@ const RotarySurfacing = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                         <Tabs defaultValue="visualizer">
-                            <TabsList className="bg-gray-100 w-full">
+                            <TabsList className="w-full">
                                 <TabsTrigger
                                     value="visualizer"
                                     className="w-full"
@@ -327,9 +347,12 @@ const RotarySurfacing = () => {
                                 <VisualizerPreview gcode={gcode} />
                             </div>
                             <div
-                                className={cx('h-full rounded-md relative', {
-                                    invisible: !tabSwitch,
-                                })}
+                                className={cx(
+                                    'h-full rounded-md relative border p-2',
+                                    {
+                                        invisible: !tabSwitch,
+                                    },
+                                )}
                             >
                                 <GcodeViewer gcode={gcode} />
                             </div>
@@ -337,7 +360,11 @@ const RotarySurfacing = () => {
                     </div>
                 </div>
                 <div className="flex flex-row gap-4">
-                    <Button type="submit" onClick={handleGenerateGcode}>
+                    <Button
+                        type="submit"
+                        onClick={handleGenerateGcode}
+                        disabled={isDisabled}
+                    >
                         Generate G-Code
                     </Button>
                     <Button

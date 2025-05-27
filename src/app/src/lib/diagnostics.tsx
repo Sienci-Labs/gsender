@@ -305,7 +305,7 @@ function generateSupportFile() {
     let alarms: Array<AlarmsErrors>,
         errors: Array<AlarmsErrors> = [];
 
-    api.alarmList.fetch().then((value) => {
+    api.alarmList.recent().then((value) => {
         const grblAlarmsAndErrors = get(value, 'data.list', []);
         [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
     });
