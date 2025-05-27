@@ -88,8 +88,6 @@ class GCodeVisualizer {
             new THREE.BufferAttribute(colorArray, 4),
         );
 
-        //this.geometry.computeBoundingBox();
-        //console.log(this.geometry.boundingBox);
 
         const workpiece = new THREE.Line(
             this.geometry,
@@ -100,8 +98,9 @@ class GCodeVisualizer {
                 opacity: 0.9,
             }),
         );
-
+        workpiece.name = 'workpiece';
         this.group.add(workpiece);
+        console.log(this.group);
 
         return this.group;
     }

@@ -137,6 +137,12 @@ const updateMachineLimitsFromEEPROM = ({
     const xmax = Number($130);
     const ymax = Number($131);
     const zmax = Number($132);
+    console.log(ymax);
+
+    if (ymax === NaN || xmax === NaN || zmax === NaN) {
+        console.log('missing val, returning');
+        return;
+    }
     const machineProfile = store.get('workspace.machineProfile');
     machineProfile.limits = {
         ...machineProfile.limits,
@@ -154,7 +160,7 @@ const updateMachineLimitsFromEEPROM = ({
         height: Number(mm2in(zmax).toFixed(2)),
         width: Number(mm2in(xmax).toFixed(2)),
     };
-    store.replace('workspace.machineProfile', machineProfile);
+    store.set('workspace.machineProfile', machineProfile);
     store.emit('dimensions');
 };
 

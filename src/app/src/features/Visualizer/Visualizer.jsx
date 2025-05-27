@@ -276,9 +276,16 @@ class Visualizer extends Component {
         this.visualizer = null;
     }
 
+    addStoreEvents() {
+        store.on('dimensions', () => {
+            this.changeMachineProfile()
+        })
+    }
+
     componentDidMount() {
         this.subscribe();
         this.addControllerEvents();
+        this.addStoreEvents()
         this.addResizeEventListener();
         //store.on('change', this.changeMachineProfile);
         if (this.node) {
@@ -610,6 +617,7 @@ class Visualizer extends Component {
 
     rerenderGCode() {
         const content = reduxStore.getState().file.content;
+        console.log('content', content)
 
         if (!content) {
             return;
@@ -2013,7 +2021,7 @@ class Visualizer extends Component {
             colorArray,
             savedColors,
         );
-        obj.name = '';
+        obj.name = 'toolpath';
         this.group.add(obj);
 
         const bbox = getBoundingBox(obj);
@@ -2230,10 +2238,15 @@ class Visualizer extends Component {
     unload() {
         this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
+        const toolPathObject = this.group.getObjectByName('toolpath');
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
 
         if (visualizerObject) {
             this.group.remove(visualizerObject);
+        }
+
+        if (toolPathObject) {
+            this.group.remove(toolPathObject);
         }
 
         if (this.visualizer) {
