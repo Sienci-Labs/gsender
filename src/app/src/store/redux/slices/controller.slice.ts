@@ -133,6 +133,7 @@ const updateMachineLimitsFromEEPROM = ({
     settings: EEPROMSettings;
 }) => {
     const { $130, $131, $132 } = settings;
+    console.log(settings);
     const xmax = Number($130);
     const ymax = Number($131);
     const zmax = Number($132);
@@ -153,7 +154,8 @@ const updateMachineLimitsFromEEPROM = ({
         height: Number(mm2in(zmax).toFixed(2)),
         width: Number(mm2in(xmax).toFixed(2)),
     };
-    store.set('workspace.machineProfile', machineProfile);
+    store.replace('workspace.machineProfile', machineProfile);
+    store.emit('dimensions');
 };
 
 const controllerSlice = createSlice({
