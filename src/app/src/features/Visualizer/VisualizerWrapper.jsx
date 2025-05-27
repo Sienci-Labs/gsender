@@ -29,6 +29,7 @@ import {
 } from '../../workers/Visualize.response';
 import SVGVisualizer from './SVGVisualizer';
 import Visualizer from './Visualizer';
+import { VisualizerPlaceholder } from 'app/features/Visualizer/Placeholder.jsx';
 
 class VisualizerWrapper extends Component {
     constructor(props) {
@@ -139,6 +140,10 @@ class VisualizerWrapper extends Component {
                         isSecondary={isSecondary}
                     />
                 )}
+
+                {
+                    !renderSVG && !renderAny && <VisualizerPlaceholder />
+                }
             </>
         );
     }
