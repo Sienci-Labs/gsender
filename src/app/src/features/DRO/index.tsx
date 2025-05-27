@@ -69,7 +69,6 @@ interface DROProps {
     activeState: string;
     preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
-    rotaryFunctionsEnabled: boolean;
 }
 
 function DRO({
@@ -83,9 +82,9 @@ function DRO({
     preferredUnits,
     homingEnabled,
     singleAxisHoming,
-    rotaryFunctionsEnabled,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
+    const [rotaryFunctionsEnabled, setRotaryFunctionsEnabled] = useState(false);
     const { shouldWarnZero, mode } = useWorkspaceState();
     const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
     const homingDirection = useTypedSelector((state) =>
@@ -94,6 +93,15 @@ function DRO({
     const pullOff = useTypedSelector((state) =>
         get(state, 'controller.settings.settings.$27', 1),
     );
+
+
+    useEffect(() => {
+        setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
+        store.on('change', () => {
+            setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
+        })
+    }, [])
+
 
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
@@ -412,7 +420,6 @@ export default connect((reduxStore) => {
     const homingEnabled = homingValue > 0;
     const singleAxisValue = homingValue & 2;
     const singleAxisHoming = singleAxisValue > 0;
-    const rotaryFunctionsEnabled = store.get('widgets.rotary.tab.show', false);
 
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
@@ -436,6 +443,5 @@ export default connect((reduxStore) => {
         activeState,
         preferredUnits,
         singleAxisHoming,
-        rotaryFunctionsEnabled,
     };
 })(DRO);
