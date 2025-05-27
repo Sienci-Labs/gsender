@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Select from 'react-select';
-import { LuArrowRight, LuRefreshCw } from 'react-icons/lu';
+import { LuRefreshCw } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -423,7 +423,7 @@ const Steps = () => {
                                         </Button>
 
                                         <div className="flex items-center gap-2">
-                                            <Input
+                                            <ControlledInput
                                                 type="number"
                                                 value={moveDistance}
                                                 onChange={(e) =>
@@ -477,7 +477,7 @@ const Steps = () => {
                                         </Button>
 
                                         <div className="flex items-center gap-2">
-                                            <Input
+                                            <ControlledInput
                                                 type="number"
                                                 value={measuredDistance}
                                                 onChange={(e) =>

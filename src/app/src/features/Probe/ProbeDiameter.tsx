@@ -41,11 +41,17 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select';
 
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 import { Button } from 'app/components/Button';
 
 import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
-import { Actions, AvailableTool, ProbeCommand, State } from './definitions';
+import {
+    Actions,
+    AvailableTool,
+    PROBE_TYPES_T,
+    ProbeCommand,
+    State,
+} from './definitions';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 
@@ -164,6 +170,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             currentActions._setToolDiameter({ value: Number(value) });
         }
         setValue(value);
+        setInputValue('');
     }, []);
 
     const handleCreateOption = useCallback(
@@ -359,7 +366,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         );
     }
 
-    function getUnitString(option) {
+    function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {
             return '';
         }
@@ -434,18 +441,21 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                         e: KeyboardEvent<HTMLInputElement>,
                                     ) => {
                                         if (e.key === 'Enter') {
-                                            handleCreateOption(inputValue);
+                                            handleCreateOption(
+                                                inputRef.current.value,
+                                            );
                                             setInputValue('');
                                         }
                                     }}
                                     sizing="sm"
+                                    clearOnEnter
+                                    ref={inputRef}
                                 />
                                 <Button
                                     variant="ghost"
                                     onClick={() => {
                                         if (inputValue) {
                                             handleCreateOption(inputValue);
-                                            setInputValue('');
                                         }
                                     }}
                                     size="sm"

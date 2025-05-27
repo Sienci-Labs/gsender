@@ -1,5 +1,5 @@
 import { Label } from 'app/components/Label';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 
 interface JogInputProps {
     label: string;
@@ -13,7 +13,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
             <Label className="w-[3ch] text-right whitespace-nowrap">
                 {label}
             </Label>
-            <Input
+            <ControlledInput
                 sizing="xs"
                 type="number"
                 value={currentValue}

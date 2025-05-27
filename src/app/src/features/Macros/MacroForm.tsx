@@ -13,7 +13,7 @@ import {
 
 import { MACRO_VARIABLES } from './constants';
 import insertAtCaret from './insertAtCaret';
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 
 const MAX_CHARACTERS = 128;
 

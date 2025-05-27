@@ -24,7 +24,7 @@
 import React from 'react';
 
 import { Slider } from 'app/components/shadcn/Slider';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
@@ -100,7 +100,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
             <div className="flex gap-2 justify-center items-center my-2 dark:text-white">
                 <label>Test Duration:</label>
                 <div className="flex gap-2">
-                    <Input
+                    <ControlledInput
                         value={laser.duration}
                         onChange={actions.handleLaserDurationChange}
                         className="z-0 text-center text-blue-500 text-xl"

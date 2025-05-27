@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
+
+interface InputProps extends React.ComponentProps<'input'> {
+    className: string;
+    value: any;
+    externalOnChange: (value: string) => void;
+}
 
 const ControlledInput = ({
     className,
@@ -8,7 +14,7 @@ const ControlledInput = ({
     type = 'decimal',
     externalOnChange = null,
     ...rest
-}) => {
+}: InputProps) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);

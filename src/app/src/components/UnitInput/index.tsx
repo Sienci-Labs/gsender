@@ -1,7 +1,7 @@
 import cx from 'classnames';
 
 import { Label } from 'app/components/Label';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 
 export interface UnitInputProps {
     units: string;
@@ -28,7 +28,7 @@ export function UnitInput({
             )}
         >
             {label && <Label className="flex items-center">{label}</Label>}
-            <Input
+            <ControlledInput
                 type="number"
                 className="w-[7ch] border-none margin-none p-0 focus:border-none focus:outline-none text-center"
                 value={disabled ? '0' : value}

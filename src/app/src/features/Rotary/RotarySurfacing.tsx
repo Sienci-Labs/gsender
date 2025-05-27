@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { Label } from 'app/components/shadcn/Label';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
@@ -200,7 +200,7 @@ const RotarySurfacing = () => {
                             zero your Z-axis to the centerline before surfacing.
                         </p>
                         <InputArea label="Length">
-                            <Input
+                            <ControlledInput
                                 id="length"
                                 value={surfacingState.length}
                                 onChange={handleChange}
@@ -212,7 +212,7 @@ const RotarySurfacing = () => {
                         </InputArea>
                         <InputArea label="Start & Final Diameter">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <Input
+                                <ControlledInput
                                     id="startDiameter"
                                     value={surfacingState.startDiameter}
                                     onChange={handleChange}
@@ -223,7 +223,7 @@ const RotarySurfacing = () => {
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <Input
+                                <ControlledInput
                                     id="finalDiameter"
                                     value={surfacingState.finalDiameter}
                                     onChange={handleChange}
@@ -234,7 +234,7 @@ const RotarySurfacing = () => {
                             </div>
                         </InputArea>
                         <InputArea label="Stepdown">
-                            <Input
+                            <ControlledInput
                                 id="stepdown"
                                 value={surfacingState.stepdown}
                                 onChange={handleChange}
@@ -245,7 +245,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Bit Diameter">
-                            <Input
+                            <ControlledInput
                                 id="bitDiameter"
                                 value={surfacingState.bitDiameter}
                                 onChange={handleChange}
@@ -256,7 +256,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Stepover">
-                            <Input
+                            <ControlledInput
                                 id="stepover"
                                 value={surfacingState.stepover}
                                 onChange={handleChange}
@@ -267,7 +267,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Spindle RPM">
-                            <Input
+                            <ControlledInput
                                 id="spindleRPM"
                                 value={surfacingState.spindleRPM}
                                 onChange={handleChange}
@@ -278,7 +278,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Feedrate">
-                            <Input
+                            <ControlledInput
                                 id="feedrate"
                                 value={surfacingState.feedrate}
                                 onChange={handleChange}

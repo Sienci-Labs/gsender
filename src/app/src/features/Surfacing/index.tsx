@@ -15,7 +15,7 @@ import { convertToImperial, convertToMetric } from 'app/lib/units';
 import cx from 'classnames';
 import { Switch } from 'app/components/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import defaultState from 'app/store/defaultState';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
@@ -136,7 +136,7 @@ const SurfacingTool = () => {
                         </p>
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <Input
+                                <ControlledInput
                                     type="number"
                                     id="width"
                                     suffix={units}
@@ -154,7 +154,7 @@ const SurfacingTool = () => {
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <Input
+                                <ControlledInput
                                     type="number"
                                     id="length"
                                     suffix={units}
@@ -173,7 +173,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <Input
+                                <ControlledInput
                                     type="number"
                                     id="skimDepth"
                                     suffix={units}
@@ -191,7 +191,7 @@ const SurfacingTool = () => {
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <Input
+                                <ControlledInput
                                     type="number"
                                     id="maxDepth"
                                     suffix={units}
@@ -210,7 +210,7 @@ const SurfacingTool = () => {
                         </InputArea>
 
                         <InputArea label="Bit Diameter">
-                            <Input
+                            <ControlledInput
                                 type="number"
                                 suffix={units}
                                 className={inputStyle}
@@ -226,7 +226,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Spindle RPM">
                             <div className="grid grid-cols-2 gap-2 col-span-3">
-                                <Input
+                                <ControlledInput
                                     type="number"
                                     className={inputStyle}
                                     value={surfacing.spindleRPM}
@@ -255,7 +255,7 @@ const SurfacingTool = () => {
                             </div>
                         </InputArea>
                         <InputArea label="Feedrate">
-                            <Input
+                            <ControlledInput
                                 type="number"
                                 suffix={`${units}/min`}
                                 className={inputStyle}
@@ -267,7 +267,7 @@ const SurfacingTool = () => {
                             />
                         </InputArea>
                         <InputArea label="Stepover">
-                            <Input
+                            <ControlledInput
                                 type="number"
                                 suffix="%"
                                 className={inputStyle}
