@@ -30,7 +30,7 @@ export default [
     {
         id: 0,
         company: 'Sienci Labs',
-        name: 'Altmill 48x48',
+        name: 'AltMill 4X4',
         type: '',
         version: '',
         mm: {
@@ -56,7 +56,7 @@ export default [
     {
         id: 1,
         company: 'Sienci Labs',
-        name: 'Altmill 48x48 + Spindle',
+        name: 'AltMill 4x4 + Spindle',
         type: '',
         version: '',
         mm: {
@@ -78,6 +78,58 @@ export default [
         grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
         orderedSettings: altmillSettings.SPINDLE_ORDERED,
         isHal: true,
+    },
+    {
+        id: 2,
+        company: 'Sienci Labs',
+        name: 'AltMill 2x4',
+        type: '',
+        version: '',
+        mm: {
+            width: 1260,
+            depth: 1248,
+            height: 170
+        },
+        in: {
+            width: 31.18,
+            depth: 33.27,
+            height: 4.5
+        },
+        endstops: true,
+        spindle: false,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.DEFAULT_2X4,
+        grblHALeepromSettings: altmillSettings.DEFAULT_2X4,
+        orderedSettings: altmillSettings.ALTMILL_ORDERED,
+        isHal: true
+    },
+    {
+        id: 3,
+        company: 'Sienci Labs',
+        name: 'AltMill 2x4 + Spindle',
+        type: '',
+        version: '',
+        mm: {
+            width: 24,
+            depth: 49.1,
+            height: 6.6
+        },
+        in: {
+            width: 24,
+            depth: 49.1,
+            height: 6.6
+        },
+        endstops: true,
+        spindle: true,
+        coolant: false,
+        laser: false,
+        laserOnOutline: false,
+        eepromSettings: altmillSettings.DEFAULT_2X4_SPINDLE_KIT,
+        grblHALeepromSettings: altmillSettings.DEFAULT_2X4_SPINDLE_KIT,
+        orderedSettings: altmillSettings.SPINDLE_ORDERED,
+        isHal: true
     },
     {
         id: 5,

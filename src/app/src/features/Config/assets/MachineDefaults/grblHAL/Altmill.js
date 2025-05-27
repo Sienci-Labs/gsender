@@ -173,6 +173,16 @@ export const SPINDLE_KIT = {
     '$476': '2'
 };
 
+export const DEFAULT_2X4 = {
+    ...ALTMILL_DEFAULT,
+    '$131': '648'
+};
+
+export const DEFAULT_2X4_SPINDLE_KIT = {
+    ...ALTMILL_DEFAULT,
+    '$131': '648'
+};
+
 
 export const ALTMILL_ORDERED = new Map();
 ALTMILL_ORDERED.set('$462', '8192');
