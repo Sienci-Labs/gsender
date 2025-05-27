@@ -52,8 +52,8 @@ const Steps = () => {
     );
     const isDisabled =
         !isConnected ||
-        (controllerStatus.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-            controllerStatus.activeState !== GRBL_ACTIVE_STATE_JOG);
+        (controllerStatus?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+            controllerStatus?.activeState !== GRBL_ACTIVE_STATE_JOG);
 
     const reset = () => {
         setStatus('initial');
