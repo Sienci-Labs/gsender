@@ -34,8 +34,8 @@ class Connection extends EventEmitter {
                     return;
                 }
 
-                const grblR = data.match(/.*Grbl.*/);
-                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/);
+                const grblR = data.match(/.*Grbl.*/i);
+                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/i);
 
                 if (grblHalR) {
                     this.controllerType = GRBLHAL;
@@ -143,7 +143,7 @@ class Connection extends EventEmitter {
     }
 
     open = (callback = noop) => {
-        const { port, network } = this.options;
+        const { port, network = false } = this.options;
 
         // Assertion check
         if (this.isOpen()) {

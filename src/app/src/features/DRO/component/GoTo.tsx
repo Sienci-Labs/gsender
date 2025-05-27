@@ -145,7 +145,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         />
                         <span>INC</span>
                     </div>
-                    <Button variant="primary" onClick={goToLocation}>
+                    <Button variant="alt" onClick={goToLocation}>
                         Go!
                     </Button>
                 </div>
