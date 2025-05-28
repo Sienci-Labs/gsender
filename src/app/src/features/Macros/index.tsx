@@ -140,17 +140,20 @@ const MacroWidget = ({
                 // Ignore error
             }
         },
-        updateMacro: async ({
-            id,
-            name,
-            content,
-            description,
-        }: {
-            id: string;
-            name: string;
-            content: string;
-            description: string;
-        }) => {
+        updateMacro: async (
+            {
+                id,
+                name,
+                content,
+                description,
+            }: {
+                id: string;
+                name: string;
+                content: string;
+                description: string;
+            },
+            skipToast = false,
+        ) => {
             try {
                 await api.macros.update(id, {
                     name,
@@ -161,9 +164,11 @@ const MacroWidget = ({
                 const { records: macros } = res.data;
                 setMacros(macros);
                 actions.closeModal();
-                toast.success(`Updated macro '${name}'`, {
-                    position: 'bottom-right',
-                });
+                if (!skipToast) {
+                    toast.success(`Updated macro '${name}'`, {
+                        position: 'bottom-right',
+                    });
+                }
             } catch (err) {
                 // Ignore error
             }
@@ -305,7 +310,7 @@ const MacroWidget = ({
                     event.target?.result as string,
                 );
                 let importedCount = 0;
-                let skippedCount = 0;
+                let updatedCount = 0;
 
                 for (const {
                     id,
@@ -327,20 +332,29 @@ const MacroWidget = ({
                             });
                             importedCount++;
                         } else {
-                            skippedCount++;
+                            actions.updateMacro(
+                                {
+                                    name,
+                                    id,
+                                    content,
+                                    description,
+                                },
+                                true,
+                            );
+                            updatedCount++;
                         }
                     }
                 }
 
                 if (importedCount > 0) {
                     showToast({
-                        msg: `Successfully imported ${importedCount} macro(s)${skippedCount > 0 ? `, skipped ${skippedCount} duplicate(s)` : ''}`,
+                        msg: `Successfully imported ${importedCount} macro(s)${updatedCount > 0 ? `, updated ${updatedCount} existing macro(s)` : ''}`,
                         type: 'success',
                     });
-                } else if (skippedCount > 0) {
+                } else if (updatedCount > 0) {
                     showToast({
-                        msg: `All ${skippedCount} macro(s) were duplicates and were skipped`,
-                        type: 'info',
+                        msg: `Updated ${updatedCount} existing macro(s)`,
+                        type: 'success',
                     });
                 }
             };
