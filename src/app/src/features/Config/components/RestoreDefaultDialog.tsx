@@ -53,7 +53,6 @@ function restoreEEPROMDefaults(type = '') {
     }
 
     if (hasOrderedSettings) {
-        console.log('exists:', profile);
         for (const [k, v] of profile.orderedSettings) {
             values.push(`${k}=${v}`);
         }

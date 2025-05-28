@@ -31,7 +31,6 @@ export function Config() {
 
     function setInView(inView, entry) {
         if (inView) {
-            console.log(entry);
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }
