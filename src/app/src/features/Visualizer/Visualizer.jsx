@@ -278,14 +278,14 @@ class Visualizer extends Component {
 
     addStoreEvents() {
         store.on('_dimensions', () => {
-            this.changeMachineProfile()
-        })
+            this.changeMachineProfile();
+        });
     }
 
     componentDidMount() {
         this.subscribe();
         this.addControllerEvents();
-        this.addStoreEvents()
+        this.addStoreEvents();
         this.addResizeEventListener();
 
         if (this.node) {
@@ -616,7 +616,7 @@ class Visualizer extends Component {
 
     rerenderGCode() {
         const content = reduxStore.getState().file.content;
-        console.log('content', content)
+        console.log('content', content);
 
         if (!content) {
             return;
@@ -810,10 +810,7 @@ class Visualizer extends Component {
     }
 
     returnData() {
-        return [
-            this.vertices,
-            this.color
-        ]
+        return [this.vertices, this.color];
     }
 
     recolorGridNumbers(units) {
