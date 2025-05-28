@@ -38,10 +38,8 @@ export function RemoteModeDialog({
     const [dirty, setDirty] = useState(false);
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
-    console.log(ipList);
 
     useEffect(() => {
-        console.log('remote listener');
         setIp(remoteIp);
         setPort(remotePort);
         setRemoteEnabled(remoteOn);
