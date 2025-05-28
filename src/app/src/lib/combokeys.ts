@@ -23,13 +23,14 @@
 
 import events from 'events';
 import Mousetrap from 'mousetrap';
-import _ from 'lodash';
+import { get, cloneDeep } from 'lodash';
+
+import reduxStore from '../store/redux';
 import api from '../api';
 import { MACRO_CATEGORY } from '../constants';
 import log from './log';
 import { preventDefault } from './dom-events';
 import { modifierKeys } from './constants';
-
 import store from '../store';
 import shuttleEvents from '../lib/shuttleEvents';
 import {
@@ -82,6 +83,12 @@ class Combokeys extends events.EventEmitter {
         }
         const commandKeys: CommandKeys = await this.getCommandKeys();
 
+        const shouldHold = get(
+            reduxStore.getState(),
+            'preferences.shortcuts.shouldHold',
+            false,
+        );
+
         Object.entries(commandKeys).forEach(([key, o]) => {
             const { keys, isActive } = o as CommandKey;
             const {
@@ -93,7 +100,7 @@ class Combokeys extends events.EventEmitter {
             (o as CommandKey); // if macro, won't have shuttleEvents to pull defaults from
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
-            if (!isActive || !keys) {
+            if (!isActive || !keys || shouldHold) {
                 return;
             }
 
@@ -185,7 +192,7 @@ class Combokeys extends events.EventEmitter {
         const res = await api.macros.fetch();
         const macros = res.data.records;
 
-        const newCommandKeysList: CommandKeys = _.cloneDeep(setCommandKeys);
+        const newCommandKeysList: CommandKeys = cloneDeep(setCommandKeys);
 
         // get callback for macros
         const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
