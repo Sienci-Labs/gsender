@@ -271,10 +271,14 @@ const MacroWidget = ({
             return;
         }
 
-        const macrosClean = macros.map(({ name, content }) => ({
-            name,
-            content,
-        }));
+        const macrosClean = macros.map(
+            ({ name, content, description, id }) => ({
+                name,
+                content,
+                description: description.trim(),
+                id,
+            }),
+        );
         const macrosJson = JSON.stringify(macrosClean, null, 1);
         const data = new Blob([macrosJson], {
             type: 'application/json',
@@ -297,22 +301,48 @@ const MacroWidget = ({
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = (event: ProgressEvent<FileReader>) => {
-                const macros = JSON.parse(event.target?.result as string);
+                const importedMacros = JSON.parse(
+                    event.target?.result as string,
+                );
+                let importedCount = 0;
+                let skippedCount = 0;
 
-                for (const { name, content } of macros) {
+                for (const {
+                    id,
+                    name,
+                    content,
+                    description,
+                } of importedMacros) {
                     if (name && content) {
-                        actions.addMacro({
-                            name,
-                            content,
-                            details: '',
-                        });
+                        // Check if macro with same ID already exists
+                        const isDuplicate = macros.some(
+                            (existingMacro) => existingMacro.id === id,
+                        );
+
+                        if (!isDuplicate) {
+                            actions.addMacro({
+                                name,
+                                content,
+                                description,
+                            });
+                            importedCount++;
+                        } else {
+                            skippedCount++;
+                        }
                     }
                 }
 
-                showToast({
-                    msg: 'Macros Imported Successfully',
-                    type: 'success',
-                });
+                if (importedCount > 0) {
+                    showToast({
+                        msg: `Successfully imported ${importedCount} macro(s)${skippedCount > 0 ? `, skipped ${skippedCount} duplicate(s)` : ''}`,
+                        type: 'success',
+                    });
+                } else if (skippedCount > 0) {
+                    showToast({
+                        msg: `All ${skippedCount} macro(s) were duplicates and were skipped`,
+                        type: 'info',
+                    });
+                }
             };
             reader.onerror = () => {
                 showToast({
