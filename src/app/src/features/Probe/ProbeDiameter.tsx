@@ -149,7 +149,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 ? 'Auto'
                 : String(toolDiameter),
         );
-    }, [toolDiameter, touchplateType]);
+    }, [touchplateType]);
 
     useEffect(() => {
         localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
@@ -418,7 +418,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                                 {option.label}{' '}
                                                 {getUnitString(option.value)}
                                             </span>
-                                            {option.isCustom && (
+                                            {/^\d+.?\d*$/.test(
+                                                option.value,
+                                            ) && (
                                                 <div
                                                     className="ml-2"
                                                     onMouseDown={(e) => {
