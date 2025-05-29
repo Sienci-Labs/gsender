@@ -80,10 +80,13 @@ const ProbeWidget = () => {
 
     const { actions: config } = getWidgetConfigContext();
 
-    const calcToolDiamater = (): number => {
+    const calcToolDiamater = (
+        newTouchplateType?: TOUCHPLATE_TYPES_T,
+    ): number => {
         const defaultToolDiameter = units === METRIC_UNITS ? 6.35 : 0.25;
+        const currentPlateType = newTouchplateType || touchplateType;
         let toolDiameter: number;
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        if (currentPlateType === TOUCHPLATE_TYPE_AUTOZERO) {
             toolDiameter = null;
         } else {
             toolDiameter =
@@ -463,7 +466,9 @@ const ProbeWidget = () => {
         setZProbeDistance(config.get('zProbeDistance') || {});
         setConnectivityTest(config.get('connectivityTest'));
 
-        setToolDiameter(calcToolDiamater());
+        setToolDiameter(
+            calcToolDiamater(store.get('workspace.probeProfile', {})),
+        );
 
         let newZProbeDistance = config.get('zProbeDistance');
         if (newZProbeDistance) {

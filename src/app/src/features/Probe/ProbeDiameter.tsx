@@ -92,7 +92,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     // Add refs to track current state
     const valueRef = useRef<string>(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? 'Auto'
+            ? PROBE_TYPE_AUTO
             : String(toolDiameter),
     );
     const customValuesRef = useRef<CustomValue[]>([]);
@@ -104,7 +104,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     const [value, setValue] = useState(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? 'Auto'
+            ? PROBE_TYPE_AUTO
             : String(toolDiameter),
     );
     const [customValues, setCustomValues] = useState<CustomValue[]>(() => {
@@ -144,7 +144,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         // Keep local state in sync with prop changes
         setValue(
             touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-                ? 'Auto'
+                ? PROBE_TYPE_AUTO
                 : String(toolDiameter),
         );
     }, [touchplateType]);
