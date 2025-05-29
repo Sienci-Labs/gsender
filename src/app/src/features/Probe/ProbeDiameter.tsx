@@ -101,8 +101,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const actionsRef = useRef(actions);
     // Add ref for the input element
     const inputRef = useRef<HTMLInputElement>(null);
-    // Add state for input value
-    const [inputValue, setInputValue] = useState<string>('');
 
     const [value, setValue] = useState(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
@@ -170,7 +168,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             currentActions._setToolDiameter({ value: Number(value) });
         }
         setValue(value);
-        setInputValue('');
+        inputRef.current.value = '';
     }, []);
 
     const handleCreateOption = useCallback(
@@ -448,10 +446,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                 <Input
                                     type="decimal"
                                     placeholder={`Custom diameter (${units})`}
-                                    value={inputValue}
-                                    onChange={(e) =>
-                                        setInputValue(e.target.value)
-                                    }
                                     onKeyDown={(
                                         e: KeyboardEvent<HTMLInputElement>,
                                     ) => {
@@ -459,18 +453,18 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                             handleCreateOption(
                                                 inputRef.current.value,
                                             );
-                                            setInputValue('');
                                         }
                                     }}
                                     sizing="sm"
-                                    clearOnEnter
                                     ref={inputRef}
                                 />
                                 <Button
                                     variant="ghost"
                                     onClick={() => {
-                                        if (inputValue) {
-                                            handleCreateOption(inputValue);
+                                        if (inputRef.current.value) {
+                                            handleCreateOption(
+                                                inputRef.current.value,
+                                            );
                                         }
                                     }}
                                     size="sm"

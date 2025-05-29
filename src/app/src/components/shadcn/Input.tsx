@@ -6,7 +6,6 @@ type InputProps = React.ComponentProps<'input'> & {
     label?: string | React.ReactNode;
     sizing?: 'xs' | 'sm' | 'md' | 'lg';
     wrapperClassName?: string;
-    clearOnEnter?: boolean;
 };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
