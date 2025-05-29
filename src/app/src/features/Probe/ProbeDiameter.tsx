@@ -374,6 +374,19 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     }
 
     options.push(...toolsObjects, ...customValues);
+    options.sort((a, b) => {
+        const isNumR = /^\d+.?\d*$/;
+        const isANum = isNumR.test(a.value);
+        const isBNum = isNumR.test(b.value);
+        // check if number
+        if (isANum && isBNum) {
+            return Number(a.value) - Number(b.value);
+        } else if (!isANum && !isBNum) {
+            return a.value.localeCompare(b.value); // we want letters first
+        } else {
+            return isANum ? 1 : -1; // we want words at the top
+        }
+    });
 
     return (
         <div className={cx('w-full', { hidden: !probeCommand.tool })}>
