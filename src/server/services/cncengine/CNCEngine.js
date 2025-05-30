@@ -789,7 +789,7 @@ class CNCEngine {
     hasFileLoaded() {
         // this function is for checking whether we need to reload a file to the main vis,
         // so if the file we loaded was in secondary vis, return false
-        if (this.meta.visualizer === VISUALIZER_SECONDARY) {
+        if (this.meta?.visualizer === VISUALIZER_SECONDARY) {
             return false;
         }
         return this.gcode !== null;
