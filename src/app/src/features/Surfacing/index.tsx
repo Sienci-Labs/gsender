@@ -254,7 +254,7 @@ const SurfacingTool = () => {
                                 </div>
                             </div>
                         </InputArea>
-                        <InputArea label="Feedrate">
+                        <InputArea label="Feed Rate">
                             <ControlledInput
                                 type="number"
                                 suffix={`${units}/min`}

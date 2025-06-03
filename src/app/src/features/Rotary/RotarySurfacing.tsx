@@ -277,7 +277,7 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-                        <InputArea label="Feedrate">
+                        <InputArea label="Feed Rate">
                             <ControlledInput
                                 id="feedrate"
                                 value={surfacingState.feedrate}
