@@ -188,11 +188,12 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                         <div className="flex justify-center">
                             <Button
                                 onClick={handleStartFromLine}
+                                variant={'primary'}
                                 // disabled={!isConnected}
-                                className="flex flex-row p-3 items-center"
+                                className="flex flex-row p-3 items-center gap-2"
                             >
-                                <span>Start from Line</span>
                                 <FaPlay className="ml-2" />
+                                <span>Start from Line</span>
                             </Button>
                         </div>
                     </div>
