@@ -186,7 +186,7 @@ class Visualizer extends Component {
 
     throttledResize = _throttle(() => {
         this.resizeRenderer();
-    }, 32); // 60hz
+    }, 16);
 
     changeMachineProfile = () => {
         const machineProfile = store.get('workspace.machineProfile');
