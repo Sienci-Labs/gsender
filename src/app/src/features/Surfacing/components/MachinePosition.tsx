@@ -26,7 +26,7 @@ import { cx } from 'class-variance-authority';
 
 interface Props {
     surfacing: Surfacing;
-    setSurfacing: React.Dispatch<Partial<Surfacing>>;
+    setSurfacing: React.Dispatch<Surfacing>;
 }
 
 const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {

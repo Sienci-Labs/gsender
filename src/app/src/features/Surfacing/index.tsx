@@ -36,7 +36,7 @@ const SurfacingTool = () => {
     const navigate = useNavigate();
     const surfacingConfig = new WidgetConfig('surfacing');
     const [tabSwitch, setTabSwitch] = useState(false);
-    const [units, setUnits] = useState('mm');
+    const units = store.get('workspace.units', METRIC_UNITS);
 
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
@@ -44,20 +44,12 @@ const SurfacingTool = () => {
         status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
         status.activeState !== GRBL_ACTIVE_STATE_JOG;
 
-    useEffect(() => {
-        const storeUnits = store.get('workspace.units', METRIC_UNITS);
-        setUnits(storeUnits);
-    }, []);
+    // Initialize state with appropriate units
+    const getInitialState = (): Surfacing => {
+        const surfacing = surfacingConfig.get('', defaultSurfacingState);
 
-    const [surfacing, setSurfacing]: [
-        Surfacing,
-        React.Dispatch<Partial<Surfacing>>,
-    ] = useState(surfacingConfig.get('', defaultSurfacingState));
-    const [gcode, setGcode] = useState('');
-
-    useEffect(() => {
-        if (units == IMPERIAL_UNITS) {
-            const convertedSurfacing = {
+        if (units === IMPERIAL_UNITS) {
+            return {
                 ...surfacing,
                 bitDiameter: convertToImperial(surfacing.bitDiameter),
                 feedrate: convertToImperial(surfacing.feedrate),
@@ -66,15 +58,37 @@ const SurfacingTool = () => {
                 skimDepth: convertToImperial(surfacing.skimDepth),
                 maxDepth: convertToImperial(surfacing.maxDepth),
             };
-            setSurfacing(convertedSurfacing);
         }
-    }, [units]);
+        return surfacing;
+    };
+
+    const [surfacing, setSurfacing] = useState<Surfacing>(getInitialState());
+    const [gcode, setGcode] = useState('');
+
+    useEffect(() => {
+        const saveState = () => {
+            if (units === IMPERIAL_UNITS) {
+                surfacingConfig.set('', {
+                    ...surfacing,
+                    bitDiameter: convertToMetric(surfacing.bitDiameter),
+                    feedrate: convertToMetric(surfacing.feedrate),
+                    length: convertToMetric(surfacing.length),
+                    width: convertToMetric(surfacing.width),
+                    skimDepth: convertToMetric(surfacing.skimDepth),
+                    maxDepth: convertToMetric(surfacing.maxDepth),
+                });
+            } else {
+                surfacingConfig.set('', surfacing);
+            }
+        };
+
+        return saveState();
+    }, [surfacing]);
 
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
     const handleGenerateGcode = async () => {
-        saveSurfacing(surfacing, units === IMPERIAL_UNITS);
         const generator = new Generator({
             surfacing: surfacing,
             units: units,
@@ -94,22 +108,6 @@ const SurfacingTool = () => {
             ...surfacing,
             [property]: value,
         });
-    };
-
-    const saveSurfacing = (surfacing: Surfacing, needsConvert = false) => {
-        if (needsConvert) {
-            surfacingConfig.set('', {
-                ...surfacing,
-                bitDiameter: convertToMetric(surfacing.bitDiameter),
-                feedrate: convertToMetric(surfacing.feedrate),
-                length: convertToMetric(surfacing.length),
-                width: convertToMetric(surfacing.width),
-                skimDepth: convertToMetric(surfacing.skimDepth),
-                maxDepth: convertToMetric(surfacing.maxDepth),
-            });
-        } else {
-            surfacingConfig.set('', surfacing);
-        }
     };
 
     const loadGcode = () => {
