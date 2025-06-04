@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import WoodBlockBefore from './assets/loading-wood-block-lines.png';
 import SpinningDrill from './assets/loading-spinning-bit-test2.gif';
 import WoodBlockAfter from './assets/loading-wood-dust-pile.gif';
+import Gifplayer from 'react-gif-player';
 
 type WoodcuttingProgressProps = {
     percentage: number;
@@ -32,16 +33,24 @@ const WoodcuttingProgress = ({ percentage }: WoodcuttingProgressProps) => {
             />
 
             {/* Drill that moves across */}
-            <img
+            <Gifplayer
+                gif={SpinningDrill}
+                className="absolute top-1/2 w-8 h-auto transition-all duration-100 -translate-y-1/2 z-10"
+                autoplay={true}
+                style={{
+                    left: `calc(${percentage}% - ${drillImageRef.current?.offsetWidth}px + 6px)`,
+                }}
+                ref={drillImageRef}
+            />
+            {/*<img
                 src={SpinningDrill}
                 alt="Spinning Drill"
                 className="absolute top-1/2 w-8 h-auto transition-all duration-100 -translate-y-1/2 z-10"
                 style={{
                     left: `calc(${percentage}% - ${drillImageRef.current?.offsetWidth}px + 6px)`,
-                    animationPlayState: 'paused',
                 }}
                 ref={drillImageRef}
-            />
+            />*/}
         </div>
     );
 };
