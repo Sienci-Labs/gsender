@@ -67,7 +67,7 @@ const PrimaryVisualizer = ({
                 id={containerID}
                 className="w-full bg-no-repeat bg-center"
             >
-                {!showLoading && (
+                {showLoading && (
                     <div className=" z-10 relative  w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Loading />
                     </div>

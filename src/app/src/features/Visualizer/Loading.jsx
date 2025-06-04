@@ -27,7 +27,7 @@ import { useSelector } from 'react-redux';
 import cn from 'classnames';
 
 const Loading = () => {
-    const [progress, setProgress] = useState(70);
+    const [progress, setProgress] = useState(0);
     const renderState = useSelector((state) => state.file.renderState);
 
     const subscribe = () => {
