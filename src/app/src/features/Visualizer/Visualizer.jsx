@@ -1486,10 +1486,10 @@ class Visualizer extends Component {
 
                 let material = new THREE.MeshLambertMaterial({
                     map: texture,
-                    opacity: 0.6,
+                    opacity: 0.9,
                     transparent: false,
-                    emissive: 0xffffff,
-                    emissiveIntensity: 0.4,
+                    emissive: 0xcccccc,
+                    emissiveIntensity: 0.5,
                     color: '#caf0f8',
                 });
 
