@@ -22,8 +22,6 @@ export function Config() {
         threshold: 0.2,
     });
 
-    const { settingsFilter } = useSettings();
-
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
