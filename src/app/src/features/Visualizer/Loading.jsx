@@ -27,7 +27,7 @@ import { useSelector } from 'react-redux';
 import cn from 'classnames';
 
 const Loading = () => {
-    const [progress, setProgress] = useState(0);
+    const [progress, setProgress] = useState(70);
     const renderState = useSelector((state) => state.file.renderState);
 
     const subscribe = () => {
@@ -61,11 +61,11 @@ const Loading = () => {
                 </div>
             </div>
 
-            <div className="flex relative rounded-full h-6 bg-gray-200 animate-glowPulse">
+            <div className="flex relative rounded-full h-6 bg-gray-200">
                 <div className="absolute rounded-full inset-0 h-full flex shadow-[0px_0px_10px_0px_rgba(104,_154,_201,_1)] p-[2px] bg-red w-full ">
                     <div
                         style={{ width: `${progress}%` }}
-                        className="rounded-full bg-gradient-to-r from-robin-400 to-blue-500"
+                        className="rounded-full stripes bg-blue-500"
                     />
                 </div>
             </div>
