@@ -88,7 +88,6 @@ class GCodeVisualizer {
             new THREE.BufferAttribute(colorArray, 4),
         );
 
-
         const workpiece = new THREE.Line(
             this.geometry,
             new THREE.LineBasicMaterial({
@@ -100,7 +99,6 @@ class GCodeVisualizer {
         );
         workpiece.name = 'workpiece';
         this.group.add(workpiece);
-        console.log(this.group);
 
         return this.group;
     }

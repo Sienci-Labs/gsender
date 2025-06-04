@@ -38,8 +38,6 @@ function restoreEEPROMDefaults(type = '') {
         eepromSettings = profile?.eepromSettings;
     }
 
-    console.log(profile);
-
     const hasOrderedSettings = !!profile.orderedSettings;
 
     const values = [];

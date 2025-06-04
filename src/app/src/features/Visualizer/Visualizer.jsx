@@ -616,7 +616,6 @@ class Visualizer extends Component {
 
     rerenderGCode() {
         const content = reduxStore.getState().file.content;
-        console.log('content', content);
 
         if (!content) {
             return;
@@ -2253,7 +2252,6 @@ class Visualizer extends Component {
         }
 
         if (this.visualizer && !skipClearingVis) {
-            console.log('clearing vis');
             this.visualizer.unload();
             this.visualizer = null;
         }
