@@ -31,7 +31,7 @@ const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
         ref={ref}
         className={cx(
-            'items-center justify-center whitespace-nowrap px-3 py-1.5 text-sm font-medium focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:text-blue-500 data-[state=active]:text-foreground data-[state=active]:shadow-sm dark:data-[state=active]:border-blue-400 dark:data-[state=active]:text-blue-400',
+            'items-center justify-center whitespace-nowrap px-3 py-1.5 text-sm font-medium focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-b-2 data-[state=active]:border-robin-500 data-[state=active]:text-robin-500 data-[state=active]:text-foreground data-[state=active]:shadow-sm dark:data-[state=active]:border-robin-400 dark:data-[state=active]:text-robin-400',
             className,
         )}
         {...props}

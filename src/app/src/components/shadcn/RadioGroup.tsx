@@ -46,7 +46,7 @@ const RadioGroupItem = React.forwardRef<
                 {/* <Circle className="h-4 w-4 border-blue-500 border-4 rounded-full" /> */}
                 <div
                     className={cx(
-                        'absolute h-4 w-4 border-blue-500 border-8 rounded-full',
+                        'absolute h-4 w-4 border-robin-500 border-8 rounded-full',
                         size,
                     )}
                 ></div>

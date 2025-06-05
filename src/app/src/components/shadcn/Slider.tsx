@@ -50,7 +50,7 @@ const Slider = React.forwardRef<
             >
                 <SliderPrimitive.Range
                     className={cx(rangeClassName, {
-                        ' bg-blue-400 absolute h-full bg-primary':
+                        ' bg-robin-400 absolute h-full bg-primary':
                             !rangeClassName,
                         'bg-gray-500': disabled,
                     })}
