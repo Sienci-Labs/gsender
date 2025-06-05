@@ -201,6 +201,7 @@ const ProbeWidget = () => {
         },
         onOpenChange: (isOpen: boolean): void => {
             if (isOpen) {
+                setConnectionMade(false)
                 actions.startConnectivityTest();
             } else {
                 if (testInterval) {
