@@ -48,14 +48,16 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 onClick={run}
                 disabled={disabled}
                 className={cn('w-full block', {
-                    'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100':
+                    'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100 ':
                         running,
                     'opacity-50 cursor-not-allowed': disabled,
                 })}
                 active={running}
                 variant="ghost"
             >
-                {running ? 'Running...' : macro.name}
+                <span className="whitespace-nowrap text-overflow-ellipsis max-w-[10ch]">
+                    {running ? 'Running...' : macro.name}
+                </span>
             </Button>
         );
     },

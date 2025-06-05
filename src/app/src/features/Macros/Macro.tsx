@@ -55,10 +55,7 @@ const Container = ({ columns, children }: ContainerProps) => {
     const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
 
     return (
-        <div
-            className="grid overflow-y-auto absolute h-full w-full gap-1"
-            style={{ gridTemplateColumns }}
-        >
+        <div className="grid grid-cols-2 absolute h-full w-full gap-1">
             {children}
         </div>
     );
@@ -247,7 +244,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
     return (
         <>
             {macros.length === 0 ? (
-                <div className="grid gap-1 p-1 h-full">
+                <div className="grid grid-cols-2 gap-1 p-1 h-full">
                     <div className="w-full flex justify-center items-center">
                         No Macros...
                     </div>
