@@ -415,7 +415,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         label: 'Customize UI',
         icon: MdSettingsApplications,
         settings: [
-            ]
+        ]
     },
     {
         label: 'Motors',
@@ -833,6 +833,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Park Location',
                         key: 'workspace.park',
                         type: 'location',
+                        unit: 'mm',
                         description:
                             'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
                     },
@@ -1252,6 +1253,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'location',
                         label: 'Fixed Sensor Location',
                         key: 'workspace.toolChangePosition',
+                        unit: 'mm',
                         description:
                             'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
                         hidden: () => {
