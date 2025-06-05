@@ -371,6 +371,7 @@ export default [
         company: '',
         name: 'Generic CNC',
         type: '',
+        version: '',
         mm: {
             width: 530,
             depth: 450,
@@ -392,6 +393,7 @@ export default [
         company: '',
         name: 'Shapeoko',
         type: '',
+        version: '',
         mm: {
             width: 304,
             depth: 304.8,
@@ -412,6 +414,7 @@ export default [
         company: '',
         name: 'X-Carve',
         type: '',
+        version: '',
         mm: {
             width: 1219.2,
             depth: 609.6,
@@ -433,6 +436,7 @@ export default [
         company: '',
         name: 'Nomad',
         type: '',
+        version: '',
         mm: {
             width: 1219.2,
             depth: 609.6,
@@ -454,6 +458,7 @@ export default [
         company: '',
         name: 'Onefinity',
         type: '',
+        version: '',
         mm: {
             width: 819.15,
             depth: 819.15,
@@ -475,6 +480,7 @@ export default [
         company: '',
         name: 'OpenBuilds',
         type: '',
+        version: '',
         mm: {
             width: 270,
             depth: 270,
@@ -496,6 +502,7 @@ export default [
         company: '',
         name: 'Ooznest',
         type: '',
+        version: '',
         mm: {
             width: 300,
             depth: 270,
@@ -517,6 +524,7 @@ export default [
         company: '',
         name: 'MillRight',
         type: '',
+        version: '',
         mm: {
             width: 260,
             depth: 260,
@@ -538,6 +546,7 @@ export default [
         company: '',
         name: 'CNC4newbie',
         type: '',
+        version: '',
         mm: {
             width: 400.05,
             depth: 368.3,
@@ -559,6 +568,7 @@ export default [
         company: '',
         name: 'BobsCNC',
         type: '',
+        version: '',
         mm: {
             width: 457.2,
             depth: 406.4,
@@ -580,6 +590,7 @@ export default [
         company: '',
         name: 'YoraHome',
         type: '',
+        version: '',
         mm: {
             width: 609.6,
             depth: 609.6,
@@ -601,6 +612,7 @@ export default [
         company: '',
         name: 'SainSmart',
         type: '',
+        version: '',
         mm: {
             width: 180,
             depth: 100,
@@ -622,6 +634,7 @@ export default [
         company: '',
         name: 'WhittleCNC',
         type: '',
+        version: '',
         mm: {
             width: 228,
             depth: 356,
@@ -643,6 +656,7 @@ export default [
         company: '',
         name: 'Evo-One',
         type: '',
+        version: '',
         mm: {
             width: 530,
             depth: 450,

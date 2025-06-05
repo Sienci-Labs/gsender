@@ -4,7 +4,7 @@ import {
     RENDER_STATE,
     TOGGLE_STATUS,
 } from '../constants';
-import { EEPROMSettings, EEPROMDescriptions } from 'app/definitions/firmware';
+import { EEPROMSettings, EEPROMDescriptions, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { BasicObject, BasicPosition, BBox } from 'app/definitions/general';
 import { Axes } from 'app/features/Axes/definitions';
 import { Connection } from 'app/features/Connection/definitions';
@@ -73,7 +73,7 @@ export interface gSenderInfo {
 }
 
 export interface ControllerState {
-    type: string;
+    type: FIRMWARE_TYPES_T;
     settings: ControllerSettings;
     state: any;
     modal: Modal;

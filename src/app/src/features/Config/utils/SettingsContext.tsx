@@ -16,9 +16,13 @@ import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import defaultStoreState from 'app/store/defaultState';
-import { boolean } from 'zod';
 import isEqual from 'lodash/isEqual';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import {
+    EEPROMSettings,
+    FIRMWARE_TYPES_T,
+    MachineProfile,
+} from 'app/definitions/firmware';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -27,25 +31,28 @@ interface iSettingsContext {
     EEPROMToUpdate?: object;
     machineProfile: object;
     rawEEPROM: object;
-    firmwareType: 'Grbl' | 'GrblHAL';
-    setMachineProfile: (v) => void;
-    setEEPROM: (v) => void;
+    firmwareType: FIRMWARE_TYPES_T;
+    setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
+    setEEPROM?: React.Dispatch<React.SetStateAction<EEPROMSettings>>;
     connected: boolean;
     settingsAreDirty: boolean;
-    setSettingsAreDirty: (v) => void;
+    setSettingsAreDirty?: React.Dispatch<React.SetStateAction<boolean>>;
     searchTerm: string;
-    setSearchTerm: (v) => void;
+    setSearchTerm?: (v: string) => void;
     settingsValues: gSenderSetting[];
-    setSettingsValue: (v) => void;
-    settingsFilter: (v) => boolean;
-    setFilterNonDefault: () => void;
+    setSettingsValues?: React.Dispatch<React.SetStateAction<gSenderSetting[]>>;
+    settingsFilter: (v: gSenderSetting) => boolean;
+    toggleFilterNonDefault: () => void;
+    filterNonDefault: boolean;
+    setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
+    eepromIsDefault: (v: object) => boolean;
 }
 
 interface SettingsProviderProps {
     children: React.ReactNode;
 }
 
-const defaultState = {
+const defaultState: iSettingsContext = {
     settings: SettingsMenu,
     settingsToUpdate: {},
     EEPROMToUpdate: {},
@@ -55,10 +62,16 @@ const defaultState = {
     firmwareType: 'Grbl',
     connected: false,
     settingsAreDirty: false,
-    settingsValues: [],
-    settingsFilter: (v) => true,
+    searchTerm: '',
+    settingsValues: [
+        {
+            type: 'number',
+        },
+    ],
+    settingsFilter: () => true,
     toggleFilterNonDefault: () => {},
-    filterNonDefault: boolean,
+    filterNonDefault: false,
+    eepromIsDefault: (_v) => false,
 };
 
 export const SettingsContext =
@@ -72,18 +85,18 @@ export function useSettings() {
     return context;
 }
 
-export function isSettingDefault(v) {
+export function isSettingDefault(v: gSenderSetting) {
     if ('key' in v) {
         return isEqual(v.value, v.defaultValue);
     }
     return true; // Default to true to non-key settings aren't always highlighted.
 }
 
-function fetchStoreValue(key) {
+function fetchStoreValue(key: string) {
     return store.get(key);
 }
 
-function fetchDefaultValue(key) {
+function fetchDefaultValue(key: string) {
     return get(defaultStoreState, key, null);
 }
 
@@ -91,8 +104,10 @@ export function hasSettingsToApply(settings: object, eeprom: object) {
     return Object.keys(settings).length > 0 || Object.keys(eeprom).length > 0;
 }
 
-function populateSettingsValues(settingsSections: SettingsMenuSection[] = []) {
-    const globalValueReference = [];
+function populateSettingsValues(
+    settingsSections: SettingsMenuSection[] = [],
+): [SettingsMenuSection[], gSenderSetting[]] {
+    const globalValueReference: gSenderSetting[] = [];
     let index = 0;
     if (!settingsSections.length) {
         return;
@@ -122,11 +137,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         useState<SettingsMenuSection[]>(SettingsMenu);
     const [EEPROM, setEEPROM] = useState<object>([]);
     const [rawEEPROM, setRawEEPROM] = useState<object>({});
-    const [machineProfile, setMachineProfile] = useState({});
+    const [machineProfile, setMachineProfile] = useState<MachineProfile>(
+        {} as MachineProfile,
+    );
     const [connected, setConnected] = useState(false);
     const [settingsAreDirty, setSettingsAreDirty] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [settingsValues, setSettingsValues] = useState([]);
+    const [settingsValues, setSettingsValues] = useState<gSenderSetting[]>([]);
     const [filterNonDefault, setFilterNonDefault] = useState(false);
 
     const detectedEEPROM = useSelector(
@@ -153,9 +170,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
 
     useEffect(() => {
-        const storeMachineProfile = store.get('workspace.machineProfile', {});
+        const storeMachineProfile: MachineProfile = store.get(
+            'workspace.machineProfile',
+            {},
+        );
         // lookup latest values as set for this machine ID
-        const latest = machineProfiles.find(
+        const latest: MachineProfile = machineProfiles.find(
             (o) => o.id === storeMachineProfile.id,
         );
 
@@ -201,7 +221,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * Filter remaining by matching search term
      * @param v - The setting to filter
      */
-    function settingsFilter(v) {
+    function settingsFilter(v: gSenderSetting) {
         if (v.type === 'eeprom' || v.type === 'hybrid') {
             // Always exclude eeprom/hybrids when not connected
             if (!connectionState) {
