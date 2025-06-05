@@ -291,10 +291,9 @@ function DRO({
             <UnitBadge />
             <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
-                {homingEnabled && <RapidPositionButtons />}
-                {homingEnabled && (
+                {isConnected && homingEnabled && <RapidPositionButtons />}
+                {isConnected && homingEnabled && (
                     <Parking disabled={!canClick} />
-                    // Leaving this commented out for the time being since parking is not implemented as a feature yet
                 )}
             </div>
             <div className="w-full flex flex-row justify-between px-3">
