@@ -9,6 +9,7 @@ import controller from 'app/lib/controller.ts';
 export interface LocationInputProps {
     value: object;
     onChange: (value: object) => void;
+    unit: string;
 }
 
 export function LocationInput({
@@ -18,6 +19,7 @@ export function LocationInput({
         z: 0,
     },
     onChange,
+    unit,
 }: LocationInputProps) {
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const isConnected = useSelector(
@@ -62,6 +64,7 @@ export function LocationInput({
                     value={value.x}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'x')}
+                    suffix={unit}
                 />
             </div>
             <div className="flex flex-row gap-2 items-center">
@@ -70,6 +73,7 @@ export function LocationInput({
                     value={value.y}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'y')}
+                    suffix={unit}
                 />
             </div>
             <div className="flex flex-row gap-2 items-center">
@@ -78,6 +82,7 @@ export function LocationInput({
                     value={value.z}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'z')}
+                    suffix={unit}
                 />
             </div>
             <div className="flex flex-row justify-between">

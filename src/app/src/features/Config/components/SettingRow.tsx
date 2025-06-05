@@ -92,12 +92,19 @@ function returnSettingControl(
                     index={index}
                     eepromKey={setting.eID}
                     onChange={handler}
+                    unit={setting.unit}
                 />
             );
         case 'event':
             return <EventInput eventType={setting.eventType} />;
         case 'location':
-            return <LocationInput value={value as object} onChange={handler} />;
+            return (
+                <LocationInput
+                    value={value as object}
+                    onChange={handler}
+                    unit={setting.unit}
+                />
+            );
         case 'textarea':
             return (
                 <TextAreaInput
