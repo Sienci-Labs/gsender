@@ -121,19 +121,37 @@ export const SettingsMenu: SettingsMenuSection[] = [
         label: 'Basics',
         icon: FaCog,
         settings: [
+
+
+
             {
                 label: '',
                 settings: [
                     {
-                        label: 'Preferred Units',
+                        label: 'Carve Screen Units',
                         key: 'workspace.units',
                         type: 'radio',
                         description:
-                            'What units would you like gSender to show you?',
+                            'What units would you prefer to see on the carve screen? Config will always be metric since all common CNC firmware requires metric values as input.',
                         options: ['mm', 'in'],
                     },
                     {
-                        label: 'Baudrate',
+                        label: 'Reconnect Automatically',
+                        key: 'widgets.connection.autoReconnect',
+                        type: 'boolean',
+                        description:
+                            'Reconnect to the last machine you used automatically',
+                    },
+                    {
+                        label: 'Firmware Fallback',
+                        type: 'select',
+                        key: 'workspace.defaultFirmware',
+                        description:
+                            'If automatic detection of firmware fails on connection, this lets you decide which firmware flavour should gSender use as a fallback.',
+                        options: [GRBL, GRBLHAL],
+                    },
+                    {
+                        label: 'Baud Rate',
                         key: 'widgets.connection.baudrate',
                         type: 'select',
                         description:
@@ -151,13 +169,170 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             return controller.portOpen;
                         },
                     },
+
+
                     {
-                        label: 'Reconnect Automatically',
-                        key: 'widgets.connection.autoReconnect',
-                        type: 'boolean',
+                        label: 'Safe Height',
+                        key: 'workspace.safeRetractHeight',
+                        type: 'number',
+                        unit: 'mm',
                         description:
-                            'Reconnect to the last machine you used automatically',
+                            "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
                     },
+
+
+
+                    {
+                        label: 'Send Usage Data',
+                        key: 'workspace.sendUsageData',
+                        description:
+                            'Allow gSender to collect your data periodically',
+                        type: 'boolean',
+                    },
+                ],
+            },
+            {
+                label: 'UI Options',
+                settings: [
+                    {
+                        label: 'Enable Dark Mode',
+                        key: 'workspace.enableDarkMode',
+                        description: 'Enable dark mode for the UI',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Visualizer Theme',
+                        key: 'widgets.visualizer.theme',
+                        description: '',
+                        type: 'select',
+                        options: ['Light', 'Dark'],
+                    },
+                    {
+                        label: 'Lightweight options',
+                        key: 'widgets.visualizer.liteOption',
+                        description:
+                            'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
+                        type: 'select',
+                        options: [
+                            LIGHTWEIGHT_OPTIONS.LIGHT,
+                            LIGHTWEIGHT_OPTIONS.EVERYTHING,
+                        ],
+                    },
+                    {
+                        label: 'DRO Zeros',
+                        key: 'workspace.customDecimalPlaces',
+                        description:
+                            'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
+                        type: 'number',
+                    },
+                ],
+            },
+            {
+                label: 'Rapid Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.rapid.xyStep',
+                        type: 'number',
+                        description: 'Rapid jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.rapid.zStep',
+                        description: 'Rapid jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.rapid.aStep',
+                        description: 'Rapid jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feed Rate',
+                        key: 'widgets.axes.jog.rapid.feedrate',
+                        description:
+                            'Feed rate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Normal Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.normal.xyStep',
+                        type: 'number',
+                        description: 'Normal jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.normal.zStep',
+                        description: 'Normal jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.normal.aStep',
+                        description: 'Normal jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feed Rate',
+                        key: 'widgets.axes.jog.normal.feedrate',
+                        description:
+                            'Feed rate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Precise Jogging',
+                settings: [
+                    {
+                        label: 'XY',
+                        key: 'widgets.axes.jog.precise.xyStep',
+                        type: 'number',
+                        description: 'Precise jogging amount in the XY axes.',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'Z',
+                        key: 'widgets.axes.jog.precise.zStep',
+                        description: 'Precise jogging amount in the Z axis.',
+                        type: 'number',
+                        unit: 'mm',
+                    },
+                    {
+                        label: 'A',
+                        key: 'widgets.axes.jog.precise.aStep',
+                        description: 'Precise jogging amount in the A axis.',
+                        type: 'number',
+                        unit: 'deg',
+                    },
+                    {
+                        label: 'Feed Rate',
+                        key: 'widgets.axes.jog.precise.feedrate',
+                        description:
+                            'Feed rate to use when jogging in this preset.',
+                        type: 'number',
+                        unit: 'mm/min',
+                    },
+                ],
+            },
+            {
+                label: 'Notifications',
+                settings: [
+
                     {
                         label: 'Warn if bad file',
                         key: 'widgets.visualizer.showWarning',
@@ -212,40 +387,35 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Alert with upcoming maintenance tasks on application start.',
                         type: 'boolean',
+                    },]
+            },
+            {
+                label: 'Shortcuts',
+                settings: [
+                    {
+                        label: 'Keyboard',
+                        type: 'wizard',
+                        wizard: KeyboardLinkWizard,
+                        description:
+                            'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
                     },
                     {
-                        label: 'Safe Height',
-                        key: 'workspace.safeRetractHeight',
-                        type: 'number',
-                        unit: 'mm',
+                        label: 'Gamepad',
+                        type: 'wizard',
+                        wizard: GamepadLinkWizard,
                         description:
-                            "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
-                    },
-                    {
-                        label: 'Park Location',
-                        key: 'workspace.park',
-                        type: 'location',
-                        description:
-                            'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
-                    },
-                    {
-                        label: 'Default Firmware',
-                        type: 'select',
-                        key: 'workspace.defaultFirmware',
-                        description:
-                            'If automatic detection of firmware fails on connection, this lets you decide which firmware flavour should gSender use as a default.',
-                        options: [GRBL, GRBLHAL],
-                    },
-                    {
-                        label: 'Send Usage Data',
-                        key: 'workspace.sendUsageData',
-                        description:
-                            'Allow gSender to collect your data periodically',
-                        type: 'boolean',
+                            'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
                     },
                 ],
             },
+
         ],
+    },
+    {
+        label: 'Customize UI',
+        icon: MdSettingsApplications,
+        settings: [
+            ]
     },
     {
         label: 'Motors',
@@ -485,20 +655,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Status Lights',
-        icon: CiLight,
+        label: 'Action Buttons',
+        icon: RxButton,
         settings: [
             {
                 label: '',
                 settings: [
-                    {
-                        type: 'eeprom',
-                        eID: '$664',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$665',
-                    },
+                    { type: 'eeprom', eID: '$450' },
+                    { type: 'eeprom', eID: '$451' },
+                    { type: 'eeprom', eID: '$452' },
+                    { type: 'eeprom', eID: '$453' },
+                    { type: 'eeprom', eID: '$454' },
+                    { type: 'eeprom', eID: '$455' },
                 ],
             },
         ],
@@ -658,6 +826,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                 ],
             },
+            {
+                label: 'Parking',
+                settings: [
+                    {
+                        label: 'Park Location',
+                        key: 'workspace.park',
+                        type: 'location',
+                        description:
+                            'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
+                    },
+                ]
+            }
         ],
     },
     {
@@ -918,6 +1098,82 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
+        label: 'Accessory Outputs',
+        icon: CiMapPin,
+        wizard: AccessoryOutputWizard,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        type: 'boolean',
+                        key: 'workspace.coolantFunctions',
+                        description:
+                            'Show coolant functionality on the main Carve page.',
+                        label: 'Enable Coolant Tab',
+                    },
+                    { type: 'eeprom', eID: '$456' },
+                    { type: 'eeprom', eID: '$457' },
+                    { type: 'eeprom', eID: '$458' },
+                    { type: 'eeprom', eID: '$459' },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Rotary',
+        icon: FaArrowsSpin,
+        wizard: AJogWizard,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable Rotary Functionalities',
+                        description:
+                            'Enable Rotary tab and related functionalities on main user interface.',
+                        key: 'widgets.rotary.tab.show',
+                    },
+                    { type: 'eeprom', eID: '$376' },
+                    {
+                        label: 'Resolution',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$101',
+                        description:
+                            'Travel resolution in steps per degree ($103, default 19.75308642)',
+                        type: 'hybrid',
+                        eID: '$103',
+                        unit: 'rpm',
+                    },
+                    {
+                        label: 'Max Speed',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$111',
+                        description:
+                            'Max axis speed, also used for G0 rapids ($113, default 8000)',
+                        type: 'hybrid',
+                        eID: '$113',
+                        unit: 'rpm',
+                    },
+                    { type: 'eeprom', eID: '$123' },
+                    {
+                        label: 'Force Hard Limits',
+                        key: '',
+                        description:
+                            'Updates hard limits when toggling into rotary mode',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Force Soft Limits',
+                        key: '',
+                        description:
+                            'Updates soft limits when toggling into rotary mode',
+                        type: 'boolean',
+                    },
+                ],
+            },
+        ],
+    },
+    {
         label: 'Automations',
         icon: FaRobot,
         settings: [
@@ -952,46 +1208,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'A catch-all to ensure that stopped or ended jobs always safely turn everything off',
                     },
-                ],
-            },
-        ],
-    },
-    {
-        label: 'Action Buttons',
-        icon: RxButton,
-        settings: [
-            {
-                label: '',
-                settings: [
-                    { type: 'eeprom', eID: '$450' },
-                    { type: 'eeprom', eID: '$451' },
-                    { type: 'eeprom', eID: '$452' },
-                    { type: 'eeprom', eID: '$453' },
-                    { type: 'eeprom', eID: '$454' },
-                    { type: 'eeprom', eID: '$455' },
-                ],
-            },
-        ],
-    },
-    {
-        label: 'Accessory Outputs',
-        icon: CiMapPin,
-        wizard: AccessoryOutputWizard,
-        settings: [
-            {
-                label: '',
-                settings: [
-                    {
-                        type: 'boolean',
-                        key: 'workspace.coolantFunctions',
-                        description:
-                            'Show coolant functionality on the main Carve page.',
-                        label: 'Enable Coolant Tab',
-                    },
-                    { type: 'eeprom', eID: '$456' },
-                    { type: 'eeprom', eID: '$457' },
-                    { type: 'eeprom', eID: '$458' },
-                    { type: 'eeprom', eID: '$459' },
                 ],
             },
         ],
@@ -1079,227 +1295,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Rotary',
-        icon: FaArrowsSpin,
-        wizard: AJogWizard,
-        settings: [
-            {
-                label: '',
-                settings: [
-                    {
-                        type: 'boolean',
-                        label: 'Enable Rotary Functionalities',
-                        description:
-                            'Enable Rotary tab and related functionalities on main user interface.',
-                        key: 'widgets.rotary.tab.show',
-                    },
-                    { type: 'eeprom', eID: '$376' },
-                    {
-                        label: 'Resolution',
-                        key: 'workspace.rotaryAxis.firmwareSettings.$101',
-                        description:
-                            'Travel resolution in steps per degree ($103, default 19.75308642)',
-                        type: 'hybrid',
-                        eID: '$103',
-                        unit: 'rpm',
-                    },
-                    {
-                        label: 'Max Speed',
-                        key: 'workspace.rotaryAxis.firmwareSettings.$111',
-                        description:
-                            'Max axis speed, also used for G0 rapids ($113, default 8000)',
-                        type: 'hybrid',
-                        eID: '$113',
-                        unit: 'rpm',
-                    },
-                    { type: 'eeprom', eID: '$123' },
-                    {
-                        label: 'Force Hard Limits',
-                        key: '',
-                        description:
-                            'Updates hard limits when toggling into rotary mode',
-                        type: 'boolean',
-                    },
-                    {
-                        label: 'Force Soft Limits',
-                        key: '',
-                        description:
-                            'Updates soft limits when toggling into rotary mode',
-                        type: 'boolean',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        label: 'Customize UI',
-        icon: MdSettingsApplications,
-        settings: [
-            {
-                label: '',
-                settings: [
-                    {
-                        label: 'DRO Zeros',
-                        key: 'workspace.customDecimalPlaces',
-                        description:
-                            'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
-                        type: 'number',
-                    },
-                    {
-                        label: 'Enable Dark Mode',
-                        key: 'workspace.enableDarkMode',
-                        description: 'Enable dark mode for the UI',
-                        type: 'boolean',
-                    },
-                ],
-            },
-            {
-                label: 'Rapid Jogging',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.rapid.xyStep',
-                        type: 'number',
-                        description: 'Rapid jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.rapid.zStep',
-                        description: 'Rapid jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.rapid.aStep',
-                        description: 'Rapid jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'deg',
-                    },
-                    {
-                        label: 'Feedrate',
-                        key: 'widgets.axes.jog.rapid.feedrate',
-                        description:
-                            'Feedrate to use when jogging in this preset.',
-                        type: 'number',
-                        unit: 'mm/min',
-                    },
-                ],
-            },
-            {
-                label: 'Normal Jogging',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.normal.xyStep',
-                        type: 'number',
-                        description: 'Normal jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.normal.zStep',
-                        description: 'Normal jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.normal.aStep',
-                        description: 'Normal jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'deg',
-                    },
-                    {
-                        label: 'Feedrate',
-                        key: 'widgets.axes.jog.normal.feedrate',
-                        description:
-                            'Feedrate to use when jogging in this preset.',
-                        type: 'number',
-                        unit: 'mm/min',
-                    },
-                ],
-            },
-            {
-                label: 'Precise Jogging',
-                settings: [
-                    {
-                        label: 'XY',
-                        key: 'widgets.axes.jog.precise.xyStep',
-                        type: 'number',
-                        description: 'Precise jogging amount in the XY axes.',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'Z',
-                        key: 'widgets.axes.jog.precise.zStep',
-                        description: 'Precise jogging amount in the Z axis.',
-                        type: 'number',
-                        unit: 'mm',
-                    },
-                    {
-                        label: 'A',
-                        key: 'widgets.axes.jog.precise.aStep',
-                        description: 'Precise jogging amount in the A axis.',
-                        type: 'number',
-                        unit: 'deg',
-                    },
-                    {
-                        label: 'Feedrate',
-                        key: 'widgets.axes.jog.precise.feedrate',
-                        description:
-                            'Feedrate to use when jogging in this preset.',
-                        type: 'number',
-                        unit: 'mm/min',
-                    },
-                ],
-            },
-            {
-                label: 'Shortcuts',
-                settings: [
-                    {
-                        label: 'Keyboard',
-                        type: 'wizard',
-                        wizard: KeyboardLinkWizard,
-                        description:
-                            'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
-                    },
-                    {
-                        label: 'Gamepad',
-                        type: 'wizard',
-                        wizard: GamepadLinkWizard,
-                        description:
-                            'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
-                    },
-                ],
-            },
-            {
-                label: 'Visualizer',
-                settings: [
-                    {
-                        label: 'Theme',
-                        key: 'widgets.visualizer.theme',
-                        description: '',
-                        type: 'select',
-                        options: ['Light', 'Dark'],
-                    },
-                    {
-                        label: 'Lightweight options',
-                        key: 'widgets.visualizer.liteOption',
-                        description:
-                            'The Light option shows an SVG visualizer, while Everything disables the visualizer entirely.',
-                        type: 'select',
-                        options: [
-                            LIGHTWEIGHT_OPTIONS.LIGHT,
-                            LIGHTWEIGHT_OPTIONS.EVERYTHING,
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
-    {
         label: 'Ethernet',
         icon: BsEthernet,
         settings: [
@@ -1322,6 +1317,25 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$305' },
                     { type: 'eeprom', eID: '$307' },
                     { type: 'eeprom', eID: '$308' },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Status Lights',
+        icon: CiLight,
+        settings: [
+            {
+                label: '',
+                settings: [
+                    {
+                        type: 'eeprom',
+                        eID: '$664',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$665',
+                    },
                 ],
             },
         ],
@@ -1427,4 +1441,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
+
+
+
 ];
