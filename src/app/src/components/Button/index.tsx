@@ -4,7 +4,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 
 export const buttonStyle = tv({
-    base: 'cursor-pointer disabled:cursor-not-allowed relative border rounded hover:opacity-90 px-3 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
+    base: 'cursor-pointer max-xl:font-sm disabled:cursor-not-allowed relative border rounded hover:opacity-90 px-3 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
     variants: {
         variant: {
             primary: 'border-blue-500 text-white bg-blue-500',

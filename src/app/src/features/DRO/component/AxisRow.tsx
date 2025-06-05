@@ -22,8 +22,8 @@ import {
 interface AxisRowProps {
     label: string;
     axis: Axis;
-    mpos: string;
-    wpos: string;
+    mpos: string | number;
+    wpos: string | number;
     disabled: boolean;
     homingMode: boolean;
     disablePositionUpdate?: boolean;

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { UNITS_EN } from 'app/definitions/general';
 import { mapPositionToUnits } from 'app/lib/units';
+import {useWorkspaceState} from "app/hooks/useWorkspaceState.ts";
 
 interface OverridesProps {
     ovF: number;
@@ -33,6 +34,8 @@ const Overrides: React.FC<OverridesProps> = ({
     spindle,
     isConnected,
 }) => {
+    const { units } = useWorkspaceState();
+
     const [showSpindleOverride, setShowSpindleOverride] = useState(
         store.get('workspace.spindleFunctions'),
     );
@@ -43,7 +46,7 @@ const Overrides: React.FC<OverridesProps> = ({
     );
     const [localOvF, setLocalOvF] = useState(ovF);
     const [localOvS, setLocalOvS] = useState(ovS);
-    const units: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
+    //const units: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
 
     const unitString = `${units}/min`;
     if (units !== METRIC_UNITS) {

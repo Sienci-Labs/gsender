@@ -32,11 +32,12 @@ export function RemoteModeDialog({
     remoteOn,
 }) {
     const [port, setPort] = useState(8000);
-    const [ip, setIp] = useState('192.168.0.10');
+    const [ip, setIp] = useState('');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
     const [dirty, setDirty] = useState(false);
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
+    console.log(ipList);
 
     useEffect(() => {
         setIp(remoteIp);
@@ -44,9 +45,9 @@ export function RemoteModeDialog({
         setRemoteEnabled(remoteOn);
     }, [remoteIp, remotePort, remoteOn]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         controller.listAllIps();
-    }, [showRemote]);
+    }, [showRemote]);*/
 
     function toggleRemoteMode() {
         setDirty(true);
@@ -114,15 +115,14 @@ export function RemoteModeDialog({
                                 <span className="dark:text-white">Addr:</span>
                                 <Select onValueChange={onIPSelect}>
                                     <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
-                                        <SelectValue placeholder={ip} />
+                                        <SelectValue placeholder={'0.0.0.0'}/>
                                     </SelectTrigger>
                                     <SelectContent
-                                        contentEditable={true}
                                         className="bg-white"
                                     >
                                         {ipList.map((o) => (
                                             <SelectItem
-                                                key={`${o}`}
+                                                key={`option-${o}`}
                                                 value={`${o}`}
                                             >
                                                 {o}
@@ -157,7 +157,6 @@ export function RemoteModeDialog({
 
                         <QRCodeDisplay address={`${ip}:${port}`} />
                     </div>
-                    <DialogFooter></DialogFooter>
                 </form>
             </DialogContent>
         </Dialog>
