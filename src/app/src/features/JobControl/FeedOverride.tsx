@@ -8,7 +8,6 @@ import controller from 'app/lib/controller';
 import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
 import store from 'app/store';
-import { UNITS_EN } from 'app/definitions/general';
 import { mapPositionToUnits } from 'app/lib/units';
 import {useWorkspaceState} from "app/hooks/useWorkspaceState.ts";
 

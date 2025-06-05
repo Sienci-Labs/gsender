@@ -1,4 +1,3 @@
-import { StatLink } from 'app/features/Stats/components/StatLink.tsx';
 import { Link } from 'react-router';
 import { FaHatWizard } from 'react-icons/fa';
 
@@ -13,7 +12,7 @@ export function ToolLink({ link, label }) {
         </Link>
     );
 }
-
+xx
 export function SquaringToolWizard() {
     return <ToolLink link="/tools/squaring" label="Square XY" />;
 }
