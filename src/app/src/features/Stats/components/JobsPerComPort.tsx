@@ -53,7 +53,9 @@ export function JobsPerComPort() {
                 data={data}
                 width={280}
                 height={280}
-                options={{ maintainAspectRatio: false }}
+                options={{
+                    maintainAspectRatio: false,
+                }}
             />
         </div>
     );

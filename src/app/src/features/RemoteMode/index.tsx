@@ -5,7 +5,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
-import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import {
     Select,
     SelectContent,
@@ -13,7 +12,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
+import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import Button from 'app/components/Button';
+//import Select from 'react-select';
 import { Switch } from 'app/components/shadcn/Switch';
 import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
@@ -32,12 +33,11 @@ export function RemoteModeDialog({
     remoteOn,
 }) {
     const [port, setPort] = useState(8000);
-    const [ip, setIp] = useState('');
+    const [ip, setIp] = useState('127.0.0.1');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
     const [dirty, setDirty] = useState(false);
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
-    console.log(ipList);
 
     useEffect(() => {
         setIp(remoteIp);
@@ -45,9 +45,9 @@ export function RemoteModeDialog({
         setRemoteEnabled(remoteOn);
     }, [remoteIp, remotePort, remoteOn]);
 
-    /*useEffect(() => {
+    useEffect(() => {
         controller.listAllIps();
-    }, [showRemote]);*/
+    }, [showRemote]);
 
     function toggleRemoteMode() {
         setDirty(true);
@@ -113,16 +113,14 @@ export function RemoteModeDialog({
                             </p>
                             <div className="flex flex-row w-full justify-between items-center gap-4">
                                 <span className="dark:text-white">Addr:</span>
-                                <Select onValueChange={onIPSelect}>
-                                    <SelectTrigger className="w-2/3 bg-white bg-opacity-100">
-                                        <SelectValue placeholder={'0.0.0.0'}/>
+                                <Select onValueChange={onIPSelect} value={ip}>
+                                    <SelectTrigger className="">
+                                        <SelectValue placeholder={ip} />
                                     </SelectTrigger>
-                                    <SelectContent
-                                        className="bg-white"
-                                    >
+                                    <SelectContent className="bg-white z-[10000]">
                                         {ipList.map((o) => (
                                             <SelectItem
-                                                key={`option-${o}`}
+                                                key={`${o}`}
                                                 value={`${o}`}
                                             >
                                                 {o}

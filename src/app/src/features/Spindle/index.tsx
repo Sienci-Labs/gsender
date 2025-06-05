@@ -622,6 +622,7 @@ const SpindleWidget = () => {
                             spindles={availableSpindles}
                             onChange={actions.handleHALSpindleSelect}
                             spindle={state.spindle}
+                            disabled={!canClick()}
                         />
                     )}
                 </div>

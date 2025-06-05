@@ -109,11 +109,29 @@ export default {
           "0%": { transform: "rotate(0deg) scale(10)" },
           "100%": { transform: "rotate(-360deg) scale(10)" },
         },
+        glowPulse: {
+          "0%, 100%": {
+            boxShadow: "0 0 5px rgba(104, 154, 201, 0.5)",
+          },
+          "50%": {
+            boxShadow: "0 0 10px rgba(104, 154, 201, 1)",
+          },
+        },
+        glowPacity: {
+          "0%, 100%": {
+            opacity: "0.5",
+          },
+          "50%": {
+            opacity: "1",
+          },
+        },
       },
       animation: {
         attention: "attention 1s ease-in-out infinite",
         gradient: "gradient-shift 15s ease infinite",
         rotate: "rotate 1s linear infinite",
+        glowPulse: "glowPulse 1.5s ease-in-out infinite",
+        glowPacity: "glowPacity 1.5s ease-in-out infinite",
       },
     },
   },

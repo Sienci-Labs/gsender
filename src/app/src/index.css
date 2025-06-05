@@ -83,3 +83,41 @@ html,
             rotateX(55deg);
     }
 }
+
+@layer components {
+    .stripes {
+        position: relative;
+        overflow: hidden
+    }
+
+    .stripes:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: calc(100% + 22px);
+        content: "";
+        background-image: linear-gradient(
+                -45deg,
+                #689AC9 5%,
+                transparent 5% 45%,
+                #689AC9 45% 55%,
+                transparent 55% 95%,
+                #689AC9 95%
+        );
+        background-size: 22px 22px;
+        animation: slide 1s infinite linear;
+    }
+}
+
+
+@layer base {
+    @keyframes slide {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(20px);
+        }
+    }
+}

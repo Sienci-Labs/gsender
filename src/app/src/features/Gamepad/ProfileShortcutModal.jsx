@@ -14,7 +14,7 @@ import {
 } from 'app/components/shadcn/Dialog';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 
 import { AVAILABILITY_TYPES } from '../utils';
 import Availability from './Availability';

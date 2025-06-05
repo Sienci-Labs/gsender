@@ -1,5 +1,5 @@
 import Button from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';
@@ -103,7 +103,7 @@ const MeasurementStep = () => {
                                                 {step.buttonLabel}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
-                                                <Input
+                                                <ControlledInput
                                                     type="number"
                                                     placeholder="Enter measurement"
                                                     value={

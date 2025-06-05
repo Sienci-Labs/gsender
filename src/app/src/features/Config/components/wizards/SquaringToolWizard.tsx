@@ -1,18 +1,23 @@
 import { Link } from 'react-router';
 import { FaHatWizard } from 'react-icons/fa';
 
-export function ToolLink({ link, label }) {
+interface ToolLinkProps {
+    link: string;
+    label: string;
+}
+
+export function ToolLink({ link, label }: ToolLinkProps) {
     return (
         <Link
             to={link}
-            className="text-lg max-xl:text-sm border border-blue-500 shadow hover:bg-gray-100 text-gray-700 p-2 justify-center rounded flex flex-row gap-2 items-center dark:text-white dark:hover:bg-dark-lighter"
+            className="text-sm border border-blue-500 bg-white dark:bg-dark shadow hover:bg-gray-100 text-gray-700 p-2 justify-center rounded flex flex-row gap-2 items-center dark:text-white dark:hover:bg-dark-lighter"
         >
+            <FaHatWizard className="text-lg" />
             {label}
-            <FaHatWizard />
         </Link>
     );
 }
-xx
+
 export function SquaringToolWizard() {
     return <ToolLink link="/tools/squaring" label="Square XY" />;
 }

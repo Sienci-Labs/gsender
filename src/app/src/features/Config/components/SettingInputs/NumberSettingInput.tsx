@@ -1,4 +1,4 @@
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 export interface NumberSettingInputProps {
     unit?: string;
     value: number;
@@ -14,7 +14,7 @@ export function NumberSettingInput({
 }: NumberSettingInputProps) {
     return (
         <div className="ring-1 ring-gray-300 flex flex-row flex-1 rounded">
-            <Input
+            <ControlledInput
                 type="number"
                 value={value}
                 className="flex-1 p-2 focus:outline-none"

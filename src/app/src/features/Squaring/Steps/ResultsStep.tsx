@@ -154,7 +154,7 @@ const ResultsStep = () => {
                     </div>
                 </div>
 
-                {!isSquare && isWithinEEPROMThreshold && (
+                {!isSquare && (
                     <div className="flex flex-col justify-center items-start space-y-1 dark:text-white">
                         <h3 className="text-lg font-semibold">
                             EEPROM Adjustment Recommendations

@@ -1,5 +1,5 @@
 import Button from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
@@ -105,7 +105,7 @@ const MarkingStep = () => {
                                         <div className="flex items-center gap-2">
                                             {step.value !== undefined ? (
                                                 <div className="flex items-center gap-2">
-                                                    <Input
+                                                    <ControlledInput
                                                         type="number"
                                                         value={step.value}
                                                         onChange={(e) =>

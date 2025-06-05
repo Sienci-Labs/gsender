@@ -140,17 +140,20 @@ const MacroWidget = ({
                 // Ignore error
             }
         },
-        updateMacro: async ({
-            id,
-            name,
-            content,
-            description,
-        }: {
-            id: string;
-            name: string;
-            content: string;
-            description: string;
-        }) => {
+        updateMacro: async (
+            {
+                id,
+                name,
+                content,
+                description,
+            }: {
+                id: string;
+                name: string;
+                content: string;
+                description: string;
+            },
+            skipToast = false,
+        ) => {
             try {
                 await api.macros.update(id, {
                     name,
@@ -161,9 +164,11 @@ const MacroWidget = ({
                 const { records: macros } = res.data;
                 setMacros(macros);
                 actions.closeModal();
-                toast.success(`Updated macro '${name}'`, {
-                    position: 'bottom-right',
-                });
+                if (!skipToast) {
+                    toast.success(`Updated macro '${name}'`, {
+                        position: 'bottom-right',
+                    });
+                }
             } catch (err) {
                 // Ignore error
             }
@@ -271,10 +276,14 @@ const MacroWidget = ({
             return;
         }
 
-        const macrosClean = macros.map(({ name, content }) => ({
-            name,
-            content,
-        }));
+        const macrosClean = macros.map(
+            ({ name, content, description, id }) => ({
+                name,
+                content,
+                description: description.trim(),
+                id,
+            }),
+        );
         const macrosJson = JSON.stringify(macrosClean, null, 1);
         const data = new Blob([macrosJson], {
             type: 'application/json',
@@ -297,22 +306,57 @@ const MacroWidget = ({
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = (event: ProgressEvent<FileReader>) => {
-                const macros = JSON.parse(event.target?.result as string);
+                const importedMacros = JSON.parse(
+                    event.target?.result as string,
+                );
+                let importedCount = 0;
+                let updatedCount = 0;
 
-                for (const { name, content } of macros) {
+                for (const {
+                    id,
+                    name,
+                    content,
+                    description,
+                } of importedMacros) {
                     if (name && content) {
-                        actions.addMacro({
-                            name,
-                            content,
-                            details: '',
-                        });
+                        // Check if macro with same ID already exists
+                        const isDuplicate = macros.some(
+                            (existingMacro) => existingMacro.id === id,
+                        );
+
+                        if (!isDuplicate) {
+                            actions.addMacro({
+                                name,
+                                content,
+                                description,
+                            });
+                            importedCount++;
+                        } else {
+                            actions.updateMacro(
+                                {
+                                    name,
+                                    id,
+                                    content,
+                                    description,
+                                },
+                                true,
+                            );
+                            updatedCount++;
+                        }
                     }
                 }
 
-                showToast({
-                    msg: 'Macros Imported Successfully',
-                    type: 'success',
-                });
+                if (importedCount > 0) {
+                    showToast({
+                        msg: `Successfully imported ${importedCount} macro(s)${updatedCount > 0 ? `, updated ${updatedCount} existing macro(s)` : ''}`,
+                        type: 'success',
+                    });
+                } else if (updatedCount > 0) {
+                    showToast({
+                        msg: `Updated ${updatedCount} existing macro(s)`,
+                        type: 'success',
+                    });
+                }
             };
             reader.onerror = () => {
                 showToast({

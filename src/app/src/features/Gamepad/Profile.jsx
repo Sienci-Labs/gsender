@@ -31,6 +31,7 @@ const Profile = ({ data }) => {
         gamepadInstance.on('gamepad:connected', checkGamepadConnection);
         gamepadInstance.on('gamepad:disconnected', checkGamepadConnection);
         gamepadInstance.on('gamepad:button', checkGamepadConnection);
+        gamepadInstance.holdListener();
 
         checkGamepadConnection();
 
@@ -51,6 +52,7 @@ const Profile = ({ data }) => {
                 'gamepad:button',
                 checkGamepadConnection,
             );
+            gamepadInstance.unholdListener();
         };
     }, []);
 

@@ -41,11 +41,17 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select';
 
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 import { Button } from 'app/components/Button';
 
 import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
-import { Actions, AvailableTool, ProbeCommand, State } from './definitions';
+import {
+    Actions,
+    AvailableTool,
+    PROBE_TYPES_T,
+    ProbeCommand,
+    State,
+} from './definitions';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 
@@ -86,7 +92,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     // Add refs to track current state
     const valueRef = useRef<string>(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? 'Auto'
+            ? PROBE_TYPE_AUTO
             : String(toolDiameter),
     );
     const customValuesRef = useRef<CustomValue[]>([]);
@@ -95,12 +101,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const actionsRef = useRef(actions);
     // Add ref for the input element
     const inputRef = useRef<HTMLInputElement>(null);
-    // Add state for input value
-    const [inputValue, setInputValue] = useState<string>('');
 
     const [value, setValue] = useState(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? 'Auto'
+            ? PROBE_TYPE_AUTO
             : String(toolDiameter),
     );
     const [customValues, setCustomValues] = useState<CustomValue[]>(() => {
@@ -140,10 +144,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         // Keep local state in sync with prop changes
         setValue(
             touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-                ? 'Auto'
+                ? PROBE_TYPE_AUTO
                 : String(toolDiameter),
         );
-    }, [toolDiameter, touchplateType]);
+    }, [touchplateType]);
 
     useEffect(() => {
         localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
@@ -164,6 +168,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             currentActions._setToolDiameter({ value: Number(value) });
         }
         setValue(value);
+        inputRef.current.value = '';
     }, []);
 
     const handleCreateOption = useCallback(
@@ -359,7 +364,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         );
     }
 
-    function getUnitString(option) {
+    function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {
             return '';
         }
@@ -367,6 +372,19 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     }
 
     options.push(...toolsObjects, ...customValues);
+    options.sort((a, b) => {
+        const isNumR = /^\d+.?\d*$/;
+        const isANum = isNumR.test(a.value);
+        const isBNum = isNumR.test(b.value);
+        // check if number
+        if (isANum && isBNum) {
+            return Number(a.value) - Number(b.value);
+        } else if (!isANum && !isBNum) {
+            return a.value.localeCompare(b.value); // we want letters first
+        } else {
+            return isANum ? 1 : -1; // we want words at the top
+        }
+    });
 
     return (
         <div className={cx('w-full', { hidden: !probeCommand.tool })}>
@@ -398,7 +416,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                                 {option.label}{' '}
                                                 {getUnitString(option.value)}
                                             </span>
-                                            {option.isCustom && (
+                                            {/^\d+.?\d*$/.test(
+                                                option.value,
+                                            ) && (
                                                 <div
                                                     className="ml-2"
                                                     onMouseDown={(e) => {
@@ -426,26 +446,25 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                 <Input
                                     type="decimal"
                                     placeholder={`Custom diameter (${units})`}
-                                    value={inputValue}
-                                    onChange={(e) =>
-                                        setInputValue(e.target.value)
-                                    }
                                     onKeyDown={(
                                         e: KeyboardEvent<HTMLInputElement>,
                                     ) => {
                                         if (e.key === 'Enter') {
-                                            handleCreateOption(inputValue);
-                                            setInputValue('');
+                                            handleCreateOption(
+                                                inputRef.current.value,
+                                            );
                                         }
                                     }}
                                     sizing="sm"
+                                    ref={inputRef}
                                 />
                                 <Button
                                     variant="ghost"
                                     onClick={() => {
-                                        if (inputValue) {
-                                            handleCreateOption(inputValue);
-                                            setInputValue('');
+                                        if (inputRef.current.value) {
+                                            handleCreateOption(
+                                                inputRef.current.value,
+                                            );
                                         }
                                     }}
                                     size="sm"

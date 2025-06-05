@@ -52,6 +52,7 @@ import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
 import SerialConnection from 'server/lib/SerialConnection';
 import Connection from '../../lib/Connection';
+import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
 
 const log = logger('service:cncengine');
 
@@ -786,6 +787,11 @@ class CNCEngine {
     }
 
     hasFileLoaded() {
+        // this function is for checking whether we need to reload a file to the main vis,
+        // so if the file we loaded was in secondary vis, return false
+        if (this.meta?.visualizer === VISUALIZER_SECONDARY) {
+            return false;
+        }
         return this.gcode !== null;
     }
 }

@@ -12,7 +12,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 import { defaultOptions } from 'app/store/gamepad';
 
 import { AVAILABILITY_TYPES } from './utils';

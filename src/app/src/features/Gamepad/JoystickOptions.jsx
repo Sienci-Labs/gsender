@@ -4,7 +4,7 @@ import { cloneDeep, set, get } from 'lodash';
 
 import { Switch } from 'app/components/shadcn/Switch';
 
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { GamepadContext } from './utils/context';
 import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';
@@ -478,7 +478,7 @@ const JoystickOptions = () => {
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
                 <div className="dark:text-white">Zero Threshold</div>
-                <Input
+                <ControlledInput
                     value={zeroThreshold}
                     type="number"
                     min={0}
@@ -496,7 +496,7 @@ const JoystickOptions = () => {
                 <div className="dark:text-white">
                     Movement Distance Override
                 </div>
-                <Input
+                <ControlledInput
                     type="number"
                     value={movementDistanceOverride}
                     onChange={(e) => {

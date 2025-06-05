@@ -22,8 +22,8 @@ const Steps = () => {
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
         !isConnected ||
-        (status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-            status.activeState !== GRBL_ACTIVE_STATE_JOG);
+        (status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+            status?.activeState !== GRBL_ACTIVE_STATE_JOG);
 
     useEffect(() => {
         resetSquaring();

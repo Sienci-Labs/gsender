@@ -55,7 +55,18 @@ export function RunTimePerComPort() {
                 data={data}
                 width={280}
                 height={280}
-                options={{ maintainAspectRatio: false }}
+                options={{
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (d) => {
+                                    return `${d.raw} hours`;
+                                },
+                            },
+                        },
+                    },
+                }}
             />
         </div>
     );

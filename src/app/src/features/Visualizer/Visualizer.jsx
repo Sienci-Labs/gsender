@@ -186,7 +186,7 @@ class Visualizer extends Component {
 
     throttledResize = _throttle(() => {
         this.resizeRenderer();
-    }, 32); // 60hz
+    }, 16);
 
     changeMachineProfile = () => {
         const machineProfile = store.get('workspace.machineProfile');
@@ -278,14 +278,14 @@ class Visualizer extends Component {
 
     addStoreEvents() {
         store.on('_dimensions', () => {
-            this.changeMachineProfile()
-        })
+            this.changeMachineProfile();
+        });
     }
 
     componentDidMount() {
         this.subscribe();
         this.addControllerEvents();
-        this.addStoreEvents()
+        this.addStoreEvents();
         this.addResizeEventListener();
 
         if (this.node) {
@@ -616,7 +616,6 @@ class Visualizer extends Component {
 
     rerenderGCode() {
         const content = reduxStore.getState().file.content;
-        console.log('content', content)
 
         if (!content) {
             return;
@@ -810,10 +809,7 @@ class Visualizer extends Component {
     }
 
     returnData() {
-        return [
-            this.vertices,
-            this.color
-        ]
+        return [this.vertices, this.color];
     }
 
     recolorGridNumbers(units) {
@@ -1490,10 +1486,10 @@ class Visualizer extends Component {
 
                 let material = new THREE.MeshLambertMaterial({
                     map: texture,
-                    opacity: 0.6,
+                    opacity: 0.9,
                     transparent: false,
-                    emissive: 0xffffff,
-                    emissiveIntensity: 0.4,
+                    emissive: 0xcccccc,
+                    emissiveIntensity: 0.5,
                     color: '#caf0f8',
                 });
 
@@ -2256,7 +2252,6 @@ class Visualizer extends Component {
         }
 
         if (this.visualizer && !skipClearingVis) {
-            console.log('clearing vis');
             this.visualizer.unload();
             this.visualizer = null;
         }

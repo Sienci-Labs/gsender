@@ -16,7 +16,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import Tooltip from 'app/components/Tooltip';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
@@ -128,7 +128,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 <label htmlFor="resumeJobLine">
                                     Resume job at line:
                                 </label>
-                                <Input
+                                <ControlledInput
                                     id="resumeJobLine"
                                     type="number"
                                     value={state.value}
@@ -158,7 +158,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 <Tooltip
                                     content={`Default Value: ${state.defaultSafeHeight}`}
                                 >
-                                    <Input
+                                    <ControlledInput
                                         id="safeHeight"
                                         type="number"
                                         value={state.safeHeight}
@@ -188,11 +188,12 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                         <div className="flex justify-center">
                             <Button
                                 onClick={handleStartFromLine}
+                                variant={'primary'}
                                 // disabled={!isConnected}
-                                className="flex flex-row p-3 items-center"
+                                className="flex flex-row p-3 items-center gap-2"
                             >
-                                <span>Start from Line</span>
                                 <FaPlay className="ml-2" />
+                                <span>Start from Line</span>
                             </Button>
                         </div>
                     </div>

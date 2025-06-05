@@ -4,7 +4,6 @@ import { FaCopy } from 'react-icons/fa';
 import Button from 'app/components/Button';
 
 function copyToClipboard(text: string) {
-    console.log(text);
     navigator.clipboard.writeText(text);
 }
 

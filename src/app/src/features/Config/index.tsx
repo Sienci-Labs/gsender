@@ -22,8 +22,6 @@ export function Config() {
         threshold: 0.2,
     });
 
-    const { settingsFilter } = useSettings();
-
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -31,7 +29,6 @@ export function Config() {
 
     function setInView(inView, entry) {
         if (inView) {
-            console.log(entry);
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }

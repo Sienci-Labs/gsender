@@ -5,7 +5,7 @@ import { LuPaintbrush } from 'react-icons/lu';
 import { FaEllipsisH } from 'react-icons/fa';
 
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { Input } from 'app/components/shadcn/Input';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';

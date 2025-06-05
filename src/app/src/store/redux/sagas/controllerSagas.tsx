@@ -239,7 +239,10 @@ export function* initialize(): Generator<any, void, any> {
                 updateFileRenderState({ renderState: RENDER_NO_FILE }),
             );
             setTimeout(() => {
-                const renderState = _get(reduxState, 'file.renderState');
+                const renderState = _get(
+                    reduxStore.getState(), // pull from redux again so we have the current render state
+                    'file.renderState',
+                );
                 if (renderState === RENDER_NO_FILE) {
                     reduxStore.dispatch(
                         updateFileRenderState({ renderState: RENDER_LOADING }),

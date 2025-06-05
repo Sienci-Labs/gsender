@@ -26,6 +26,7 @@ import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import Mousetrap from 'mousetrap';
+import { useDispatch } from 'react-redux';
 
 import {
     ALL_CATEGORY,
@@ -43,8 +44,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { formatShortcut } from '../helpers';
+import combokeys from 'app/lib/combokeys';
+import {
+    holdShortcuts,
+    unholdShortcuts,
+} from 'app/store/redux/slices/preferences.slice';
 
+import { formatShortcut } from '../helpers';
 import CategoryFilter from '../CategoryFilter';
 import ShortcutsTable from '../ShortcutsTable';
 import EditArea from './EditArea';
@@ -60,7 +66,12 @@ const Keyboard = () => {
     );
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
+    const dispatch = useDispatch();
+    const [currentShortcut, setCurrentShortcut] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+    const stopCallbackFunc = Mousetrap.prototype.stopCallback;
 
     const formatShortcutForPrint = (shortcut) => {
         if (!shortcut) return '';
@@ -146,18 +157,13 @@ const Keyboard = () => {
         setDataSet(filteredData);
         setFilterCategory(category);
     };
-    // const dispatch = useDispatch();
-
-    const [currentShortcut, setCurrentShortcut] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-
-    const stopCallbackFunc = Mousetrap.prototype.stopCallback;
 
     useEffect(() => {
         // Trigger pubsub for use in Location widget where keybindings are injected
         // When modifing keybindings, we remove the key listener in location widget to prevent
         // it from being fired during the edit
-        // dispatch(holdShortcutsListener());
+        dispatch(holdShortcuts());
+        combokeys.reload();
         // pubsub.publish('removeshortcutsListener');
 
         const token = pubsub.subscribe(
@@ -174,8 +180,9 @@ const Keyboard = () => {
         // within the location widget again
         return () => {
             pubsub.unsubscribe(token);
-            // pubsub.publish('addshortcutsListener');
-            // dispatch(unholdShortcutsListener());
+            pubsub.publish('addshortcutsListener');
+            dispatch(unholdShortcuts());
+            combokeys.reload();
         };
     }, []);
 

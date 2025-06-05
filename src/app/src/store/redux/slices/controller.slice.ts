@@ -133,14 +133,12 @@ const updateMachineLimitsFromEEPROM = ({
     settings: EEPROMSettings;
 }) => {
     const { $130, $131, $132 } = settings;
-    console.log(settings);
+
     const xmax = Number($130);
     const ymax = Number($131);
     const zmax = Number($132);
-    console.log(ymax);
 
-    if (ymax === NaN || xmax === NaN || zmax === NaN) {
-        console.log('missing val, returning');
+    if (isNaN(ymax) || isNaN(xmax) || isNaN(zmax)) {
         return;
     }
     const machineProfile = store.get('workspace.machineProfile');

@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { Label } from 'app/components/shadcn/Label';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    IMPERIAL_UNITS,
+    METRIC_UNITS,
     TOOLBAR_CATEGORY,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
@@ -25,6 +26,8 @@ import { useNavigate } from 'react-router';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import cx from 'classnames';
 import store from 'app/store';
+import { Rotary } from './definitions';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
 
 const InputArea = ({
     children,
@@ -45,9 +48,9 @@ const InputArea = ({
 
 // Default values in mm
 const DEFAULT_VALUES_MM = {
-    length: 100,
-    startDiameter: 50,
-    finalDiameter: 40,
+    stockLength: 100,
+    startHeight: 50,
+    finalHeight: 40,
     stepdown: 20,
     bitDiameter: 6.35,
     stepover: 15,
@@ -56,12 +59,9 @@ const DEFAULT_VALUES_MM = {
     enableRehoming: false,
 };
 
-// Conversion factor from mm to inches
-const MM_TO_INCH = 0.0393701;
-
 const RotarySurfacing = () => {
     const navigate = useNavigate();
-    const { units } = useWorkspaceState();
+    const units = store.get('workspace.units', METRIC_UNITS);
     const status = useTypedSelector((state) => state?.controller.state?.status);
     const isDisabled =
         status &&
@@ -70,56 +70,45 @@ const RotarySurfacing = () => {
 
     // Initialize state with appropriate units
     const getInitialState = () => {
-        if (units === 'in') {
+        const options = store.get(
+            'rotary.stockTurning.options',
+            DEFAULT_VALUES_MM,
+        );
+
+        if (units === IMPERIAL_UNITS) {
             return {
-                length: Number(
-                    (DEFAULT_VALUES_MM.length * MM_TO_INCH).toFixed(4),
-                ),
-                startDiameter: Number(
-                    (DEFAULT_VALUES_MM.startDiameter * MM_TO_INCH).toFixed(4),
-                ),
-                finalDiameter: Number(
-                    (DEFAULT_VALUES_MM.finalDiameter * MM_TO_INCH).toFixed(4),
-                ),
-                stepdown: Number(
-                    (DEFAULT_VALUES_MM.stepdown * MM_TO_INCH).toFixed(4),
-                ),
-                bitDiameter: Number(
-                    (DEFAULT_VALUES_MM.bitDiameter * MM_TO_INCH).toFixed(4),
-                ),
-                feedrate: Number(
-                    (DEFAULT_VALUES_MM.feedrate * MM_TO_INCH).toFixed(4),
-                ),
-                stepover: DEFAULT_VALUES_MM.stepover,
-                spindleRPM: DEFAULT_VALUES_MM.spindleRPM,
-                enableRehoming: DEFAULT_VALUES_MM.enableRehoming,
+                ...options,
+                stockLength: convertToImperial(options.stockLength),
+                startHeight: convertToImperial(options.startHeight),
+                finalHeight: convertToImperial(options.finalHeight),
+                stepdown: convertToImperial(options.stepdown),
+                bitDiameter: convertToImperial(options.bitDiameter),
+                feedrate: convertToImperial(options.feedrate),
             };
         }
-        return { ...DEFAULT_VALUES_MM };
+        return options;
     };
 
-    const [surfacingState, setSurfacingState] = useState(getInitialState());
+    const [surfacingState, setSurfacingState] =
+        useState<Rotary['stockTurning']['options']>(getInitialState());
     const [gcode, setGcode] = useState('');
     const [tabSwitch, setTabSwitch] = useState(false);
 
-    // Update state when units change
-    useEffect(() => {
-        setSurfacingState(getInitialState());
-    }, [units]);
-
     useEffect(() => {
         const saveState = () => {
-            store.replace('rotary.stockTurning.options', {
-                stockLength: surfacingState.length,
-                stepdown: surfacingState.stepdown,
-                bitDiameter: surfacingState.bitDiameter,
-                spindleRPM: surfacingState.spindleRPM,
-                feedrate: surfacingState.feedrate,
-                stepover: surfacingState.stepover,
-                startHeight: surfacingState.startDiameter,
-                finalHeight: surfacingState.finalDiameter,
-                enableRehoming: surfacingState.enableRehoming,
-            });
+            if (units === IMPERIAL_UNITS) {
+                store.replace('rotary.stockTurning.options', {
+                    ...surfacingState,
+                    stockLength: convertToMetric(surfacingState.stockLength),
+                    startHeight: convertToMetric(surfacingState.startHeight),
+                    finalHeight: convertToMetric(surfacingState.finalHeight),
+                    stepdown: convertToMetric(surfacingState.stepdown),
+                    bitDiameter: convertToMetric(surfacingState.bitDiameter),
+                    feedrate: convertToMetric(surfacingState.feedrate),
+                });
+            } else {
+                store.replace('rotary.stockTurning.options', surfacingState);
+            }
         };
 
         return saveState;
@@ -130,14 +119,14 @@ const RotarySurfacing = () => {
 
     const handleGenerateGcode = () => {
         const generator = new StockTurningGenerator({
-            stockLength: +surfacingState.length,
+            stockLength: +surfacingState.stockLength,
+            startHeight: +surfacingState.startHeight,
+            finalHeight: +surfacingState.finalHeight,
             stepdown: +surfacingState.stepdown,
             bitDiameter: +surfacingState.bitDiameter,
-            spindleRPM: +surfacingState.spindleRPM,
             feedrate: +surfacingState.feedrate,
             stepover: +surfacingState.stepover,
-            startHeight: +surfacingState.startDiameter,
-            finalHeight: +surfacingState.finalDiameter,
+            spindleRPM: +surfacingState.spindleRPM,
             enableRehoming: surfacingState.enableRehoming,
         });
 
@@ -200,9 +189,9 @@ const RotarySurfacing = () => {
                             zero your Z-axis to the centerline before surfacing.
                         </p>
                         <InputArea label="Length">
-                            <Input
-                                id="length"
-                                value={surfacingState.length}
+                            <ControlledInput
+                                id="stockLength"
+                                value={surfacingState.stockLength}
                                 onChange={handleChange}
                                 wrapperClassName="col-span-3"
                                 className={inputStyle}
@@ -212,9 +201,9 @@ const RotarySurfacing = () => {
                         </InputArea>
                         <InputArea label="Start & Final Diameter">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <Input
-                                    id="startDiameter"
-                                    value={surfacingState.startDiameter}
+                                <ControlledInput
+                                    id="startHeight"
+                                    value={surfacingState.startHeight}
                                     onChange={handleChange}
                                     className={inputStyle}
                                     suffix={units}
@@ -223,9 +212,9 @@ const RotarySurfacing = () => {
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <Input
-                                    id="finalDiameter"
-                                    value={surfacingState.finalDiameter}
+                                <ControlledInput
+                                    id="finalHeight"
+                                    value={surfacingState.finalHeight}
                                     onChange={handleChange}
                                     className={inputStyle}
                                     suffix={units}
@@ -234,7 +223,7 @@ const RotarySurfacing = () => {
                             </div>
                         </InputArea>
                         <InputArea label="Stepdown">
-                            <Input
+                            <ControlledInput
                                 id="stepdown"
                                 value={surfacingState.stepdown}
                                 onChange={handleChange}
@@ -245,7 +234,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Bit Diameter">
-                            <Input
+                            <ControlledInput
                                 id="bitDiameter"
                                 value={surfacingState.bitDiameter}
                                 onChange={handleChange}
@@ -256,7 +245,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Stepover">
-                            <Input
+                            <ControlledInput
                                 id="stepover"
                                 value={surfacingState.stepover}
                                 onChange={handleChange}
@@ -267,7 +256,7 @@ const RotarySurfacing = () => {
                             />
                         </InputArea>
                         <InputArea label="Spindle RPM">
-                            <Input
+                            <ControlledInput
                                 id="spindleRPM"
                                 value={surfacingState.spindleRPM}
                                 onChange={handleChange}
@@ -277,8 +266,8 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-                        <InputArea label="Feedrate">
-                            <Input
+                        <InputArea label="Feed Rate">
+                            <ControlledInput
                                 id="feedrate"
                                 value={surfacingState.feedrate}
                                 onChange={handleChange}

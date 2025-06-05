@@ -1,10 +1,10 @@
 import Button from 'app/components/Button';
 import { FiTarget } from 'react-icons/fi';
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
-import { FaChartLine } from "react-icons/fa";
-import controller from "app/lib/controller.ts";
+import { FaChartLine } from 'react-icons/fa';
+import controller from 'app/lib/controller.ts';
 
 export interface LocationInputProps {
     value: object;
@@ -20,7 +20,9 @@ export function LocationInput({
     onChange,
 }: LocationInputProps) {
     const mpos = useSelector((state: RootState) => state.controller.mpos);
-    const isConnected = useSelector((state: RootState) => state.connection.isConnected);
+    const isConnected = useSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
 
     function grabLocation() {
         const location = {
@@ -32,13 +34,13 @@ export function LocationInput({
     }
 
     function gotoLocation() {
-        const code = []
-        const location = value
+        const code = [];
+        const location = value;
         code.push(
             `G53 G0 Z-1`,
             `G53 G0 X${location.x} Y${location.y}`,
-            `G53 G0 Z${location.z}`
-        )
+            `G53 G0 Z${location.z}`,
+        );
         controller.command('gcode', code);
     }
 
@@ -56,7 +58,7 @@ export function LocationInput({
         <div className="flex flex-col gap-2">
             <div className="flex flex-row gap-2 items-center">
                 <span className="text-lg">X:</span>
-                <Input
+                <ControlledInput
                     value={value.x}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'x')}
@@ -64,7 +66,7 @@ export function LocationInput({
             </div>
             <div className="flex flex-row gap-2 items-center">
                 <span className="text-lg">Y:</span>
-                <Input
+                <ControlledInput
                     value={value.y}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'y')}
@@ -72,7 +74,7 @@ export function LocationInput({
             </div>
             <div className="flex flex-row gap-2 items-center">
                 <span className="text-lg">Z:</span>
-                <Input
+                <ControlledInput
                     value={value.z}
                     type="number"
                     onChange={(e) => updateSpecificAxes(e, 'z')}
@@ -87,9 +89,17 @@ export function LocationInput({
                     <FiTarget />
                     Grab
                 </Button>
-                <Button disabled={!isConnected} variant="primary" className="flex flex-row gap-2 items-center" onClick={gotoLocation}> <FaChartLine />Go To</Button>
+                <Button
+                    disabled={!isConnected}
+                    variant="primary"
+                    className="flex flex-row gap-2 items-center"
+                    onClick={gotoLocation}
+                >
+                    {' '}
+                    <FaChartLine />
+                    Go To
+                </Button>
             </div>
-
         </div>
     );
 }

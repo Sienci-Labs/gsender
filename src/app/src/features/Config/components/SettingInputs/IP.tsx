@@ -1,4 +1,4 @@
-import { Input } from 'app/components/Input';
+import { ControlledInput } from 'app/components/ControlledInput';
 
 interface IPSettingInputsProps {
     ip: number[];
@@ -15,7 +15,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
     }
     return (
         <div className="flex flex-row gap-2 items-end">
-            <Input
+            <ControlledInput
                 type="number"
                 className="w-[6ch] p-2 text-center"
                 value={ip[0]}
@@ -24,7 +24,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
                 }
             />
             .
-            <Input
+            <ControlledInput
                 type="number"
                 className="w-[6ch] p-2 text-center"
                 value={ip[1]}
@@ -33,7 +33,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
                 }
             />
             .
-            <Input
+            <ControlledInput
                 type="number"
                 className="w-[6ch] p-2 text-center"
                 value={ip[2]}
@@ -42,7 +42,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
                 }
             />
             .
-            <Input
+            <ControlledInput
                 type="number"
                 className="w-[6ch] p-2 text-center"
                 value={ip[3]}
