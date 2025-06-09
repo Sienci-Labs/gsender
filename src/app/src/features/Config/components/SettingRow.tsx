@@ -66,6 +66,8 @@ function returnSettingControl(
                     value={value as number}
                     index={index}
                     onChange={handler}
+                    max={setting.max}
+                    min={setting.min}
                 />
             );
         case 'radio':

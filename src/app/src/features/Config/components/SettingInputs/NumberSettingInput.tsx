@@ -3,6 +3,8 @@ export interface NumberSettingInputProps {
     unit?: string;
     value: number;
     index: number;
+    min: number;
+    max: number;
     subIndex: number;
     onChange: (value: number) => void;
 }
@@ -10,6 +12,8 @@ export interface NumberSettingInputProps {
 export function NumberSettingInput({
     unit = null,
     value = 0,
+    min = null,
+    max = null,
     onChange,
 }: NumberSettingInputProps) {
     return (
@@ -22,6 +26,8 @@ export function NumberSettingInput({
                     onChange(e.target.valueAsNumber)
                 }
                 suffix={unit}
+                min={min}
+                max={max}
             />
         </div>
     );

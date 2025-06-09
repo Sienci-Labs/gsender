@@ -38,7 +38,6 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
-import { TOOLCHANGE_OPTIONS } from 'app/features/Preferences/ToolChange/ToolChange';
 
 export interface SettingsMenuSection {
     label: string;
@@ -85,6 +84,8 @@ export interface gSenderSetting {
     disabled?: () => boolean;
     hidden?: () => boolean;
     onDisable?: () => void;
+    min?: number;
+    max?: number;
 }
 
 export interface gSenderSubSection {
@@ -121,9 +122,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
         label: 'Basics',
         icon: FaCog,
         settings: [
-
-
-
             {
                 label: '',
                 settings: [
@@ -170,7 +168,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
 
-
                     {
                         label: 'Safe Height',
                         key: 'workspace.safeRetractHeight',
@@ -179,8 +176,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             "Amount Z-axis will move up from its current position before making an X/Y/A movement (only for gotos and quick-movements in gSender, doesn't apply to files, if homing is enabled this value becomes the offset from the top of the Z-axis, default 0)",
                     },
-
-
 
                     {
                         label: 'Send Usage Data',
@@ -222,8 +217,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'DRO Zeros',
                         key: 'workspace.customDecimalPlaces',
                         description:
-                            'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-5 to change the number of decimal places shown',
+                            'Default 0 (shows 2 decimal places for mm and 3 for inches) - Set between 1-4 to change the number of decimal places shown',
                         type: 'number',
+                        min: 0,
+                        max: 4,
                     },
                 ],
             },
@@ -332,7 +329,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Notifications',
                 settings: [
-
                     {
                         label: 'Warn if bad file',
                         key: 'widgets.visualizer.showWarning',
@@ -387,7 +383,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Alert with upcoming maintenance tasks on application start.',
                         type: 'boolean',
-                    },]
+                    },
+                ],
             },
             {
                 label: 'Shortcuts',
@@ -408,14 +405,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                 ],
             },
-
         ],
     },
     {
         label: 'Customize UI',
         icon: MdSettingsApplications,
-        settings: [
-        ]
+        settings: [],
     },
     {
         label: 'Motors',
@@ -837,8 +832,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
                     },
-                ]
-            }
+                ],
+            },
         ],
     },
     {
@@ -1443,7 +1438,4 @@ export const SettingsMenu: SettingsMenuSection[] = [
             },
         ],
     },
-
-
-
 ];
