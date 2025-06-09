@@ -97,9 +97,20 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         };
         setMovementPos(payload);
     }
+    function onPopoverOpen(open) {
+        if (open) {
+            setMovementPos({
+                ...movementPos,
+                x: Number(wpos.x),
+                y: Number(wpos.y),
+                z: Number(wpos.y),
+                a: Number(wpos.a),
+            });
+        }
+    }
 
     return (
-        <Popover>
+        <Popover onOpenChange={onPopoverOpen}>
             <PopoverTrigger asChild>
                 <Button
                     disabled={disabled}
