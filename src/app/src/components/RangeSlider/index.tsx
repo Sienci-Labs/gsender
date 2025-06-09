@@ -67,7 +67,7 @@ const RangeSlider = ({
             {!disabled && (
                 <span className="min-w-4 text-right text-blue-500">{`${value} ${unitString}`}</span>
             )}
-            <span className="min-w-4 text-right">{`${percentage[0]}%`}</span>
+            <span className="w-12 text-right">{`${percentage[0]}%`}</span>
         </div>
     ) : (
         <div></div>
