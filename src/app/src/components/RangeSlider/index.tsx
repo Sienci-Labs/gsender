@@ -63,9 +63,9 @@ const RangeSlider = ({
 }: RangeSliderProps): React.JSX.Element => {
     const textComponent = showText ? (
         <div className="flex flex-row items-center justify-between w-full px-4">
-            <span className="min-w-4 text-right">{title}</span>
+            <span className="w-16 text-left">{title}</span>
             {!disabled && (
-                <span className="min-w-4 text-right text-blue-500">{`${value} ${unitString}`}</span>
+                <span className="min-w-4 text-center text-blue-500">{`${value} ${unitString}`}</span>
             )}
             <span className="w-12 text-right">{`${percentage[0]}%`}</span>
         </div>
