@@ -106,6 +106,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                         className="z-0 text-center text-blue-500 text-xl"
                         suffix="sec"
                         type="number"
+                        sizing="xs"
                     />
                 </div>
             </div>
