@@ -9,9 +9,16 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function AJog({ feedrate, distance, canClick }: JoggerProps) {
+export function AJog({
+    feedrate,
+    distance,
+    canClick,
+    isRotaryMode,
+}: JoggerProps) {
+    const axis = isRotaryMode ? 'Y' : 'A';
+
     const aPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ A: 1 }, feedrate),
+        () => continuousJogAxis({ [axis]: 1 }, feedrate),
         {
             threshold: 200,
             onCancel: () => aPlusJog(distance, feedrate, false),
@@ -19,7 +26,7 @@ export function AJog({ feedrate, distance, canClick }: JoggerProps) {
         },
     )();
     const aMinusJogHandlers = useLongPress(
-        () => continuousJogAxis({ A: -1 }, feedrate),
+        () => continuousJogAxis({ [axis]: -1 }, feedrate),
         {
             threshold: 200,
             onCancel: () => aMinusJog(distance, feedrate, false),

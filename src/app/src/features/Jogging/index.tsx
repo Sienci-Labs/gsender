@@ -938,6 +938,7 @@ export function Jogging() {
                             distance={jogSpeed.aStep}
                             feedrate={jogSpeed.feedrate}
                             canClick={canClick}
+                            isRotaryMode={isRotaryMode}
                         />
                     )}
                 </div>

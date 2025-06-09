@@ -27,15 +27,8 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
         const saveChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
             const current = e.target.value;
-            if (props.min !== null) {
-                console.log(props.min);
-            }
-            if (props.max) {
-                console.log(props.max);
-            }
             if (localValue && localValue !== originalValue) {
                 if (type === 'number') {
-                    console.log('number');
                     if (props.min !== null && current < props.min) {
                         e.target.value = props.min;
                         setLocalValue(props.min);

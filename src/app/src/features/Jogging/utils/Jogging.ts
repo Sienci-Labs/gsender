@@ -50,6 +50,7 @@ export interface JoggerProps {
     distance: number;
     feedrate: number;
     canClick?: boolean;
+    isRotaryMode?: boolean;
 }
 
 export function cancelJog(state, firmwareType) {
@@ -131,16 +132,26 @@ export function aPlusJog(
     distance: number,
     feed: number,
     continuous: boolean = false,
+    isRotaryMode = false,
 ) {
-    startJogCommand({ A: distance }, feed, continuous);
+    if (isRotaryMode) {
+        startJogCommand({ Y: distance }, feed, continuous);
+    } else {
+        startJogCommand({ A: distance }, feed, continuous);
+    }
 }
 
 export function aMinusJog(
     distance: number,
     feed: number,
     continuous: boolean = false,
+    isRotaryMode = false,
 ) {
-    startJogCommand({ A: distance * -1 }, feed, continuous);
+    if (isRotaryMode) {
+        startJogCommand({ Y: distance * -1 }, feed, continuous);
+    } else {
+        startJogCommand({ A: distance * -1 }, feed, continuous);
+    }
 }
 
 export function xPlusYPlus(
