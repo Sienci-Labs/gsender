@@ -63,7 +63,7 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
-            'G53 G0 Z-5; Safely retract the spindle first before moving',
+            `G0 Z${z}`,
             'G0 X0 Y0',
             ...m7,
             ...m8,
