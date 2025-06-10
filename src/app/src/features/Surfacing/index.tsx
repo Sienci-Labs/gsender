@@ -30,8 +30,6 @@ import InputArea from 'app/components/InputArea';
 import { Button } from 'app/components/Button';
 import VisualizerPreview from './components/VisualizerPreview';
 
-import { Switch } from 'app/components/shadcn/Switch';
-
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const SurfacingTool = () => {
@@ -296,7 +294,7 @@ const SurfacingTool = () => {
                                     Mist (M7)
                                 </span>
                                 <Switch
-                                    onCheckedChange={(value) =>
+                                    onChange={(value) =>
                                         setSurfacing({
                                             ...surfacing,
                                             mist: value,
@@ -309,7 +307,7 @@ const SurfacingTool = () => {
                                     Flood (M8)
                                 </span>
                                 <Switch
-                                    onCheckedChange={(value) =>
+                                    onChange={(value) =>
                                         setSurfacing({
                                             ...surfacing,
                                             flood: value,
@@ -320,8 +318,6 @@ const SurfacingTool = () => {
                                 />
                             </div>
                         </InputArea>
-
-
                     </div>
                     <div className="flex flex-col gap-1">
                         <Tabs defaultValue="visualizer-preview">
