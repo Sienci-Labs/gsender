@@ -110,12 +110,13 @@ class VisualizerWrapper extends Component {
             containerID,
             isSecondary,
         } = this.props;
+
         let renderSVG = shouldVisualizeSVG();
         let renderAny = shouldVisualize() && !renderSVG;
 
         return (
             <>
-                {renderAny && (
+                {(isSecondary || renderAny) && (
                     <Visualizer
                         show={show}
                         cameraPosition={cameraPosition}
@@ -128,7 +129,7 @@ class VisualizerWrapper extends Component {
                         isSecondary={isSecondary}
                     />
                 )}
-                {renderSVG && (
+                {!isSecondary && renderSVG && (
                     <SVGVisualizer
                         show={show}
                         ref={(visualizerRef) => {
@@ -140,10 +141,9 @@ class VisualizerWrapper extends Component {
                         isSecondary={isSecondary}
                     />
                 )}
-
-                {
-                    !renderSVG && !renderAny && <VisualizerPlaceholder />
-                }
+                {!isSecondary && !renderSVG && !renderAny && (
+                    <VisualizerPlaceholder />
+                )}
             </>
         );
     }
