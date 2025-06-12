@@ -53,7 +53,7 @@ const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const { fileLoaded, path } = useTypedSelector((state) => state.file);
+    const { fileLoaded, path, name } = useTypedSelector((state) => state.file);
 
     useEffect(() => {
         fileLoadedRef.current = fileLoaded;
@@ -163,6 +163,13 @@ const ButtonControlGroup = () => {
 
     const handleFileReload = debounce(() => {
         if (!fileLoaded) {
+            return;
+        }
+
+        if (
+            name === 'gSender_Surfacing.gcode' ||
+            name === 'gSender_Rotary_Surfacing'
+        ) {
             return;
         }
 
