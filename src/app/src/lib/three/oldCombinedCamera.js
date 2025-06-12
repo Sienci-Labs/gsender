@@ -213,7 +213,7 @@ class CombinedCamera extends THREE.Camera {
             (0.5 * filmGauge) /
             (focalLength * Math.max(this.cameraP.aspect, 1));
 
-        const fov = THREE.Math.RAD2DEG * 2 * Math.atan(vExtentSlope);
+        const fov = THREE.MathUtils.RAD2DEG * 2 * Math.atan(vExtentSlope);
 
         this.setFov(fov);
 
