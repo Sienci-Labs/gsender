@@ -51,25 +51,20 @@ module.exports = {
             ),
         ].filter(Boolean)
     },
-    plugins: [
-        new webpack.DefinePlugin({
-            'global.NODE_ENV': JSON.stringify('production'),
-            'global.PUBLIC_PATH': JSON.stringify(publicPath),
-            'global.BUILD_VERSION': JSON.stringify(buildVersion),
-            'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT),
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: path.resolve(__dirname, 'index.html'),
-            chunksSortMode: 'dependency' // Sort chunks by dependency
-        }),
-        sentryWebpackPlugin({
-            org: process.env.SENTRY_ORG,
-            project: process.env.SENTRY_PROJECT,
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            telemetry: false
-        }),
-    ],
+    plugins: [new webpack.DefinePlugin({
+        'global.NODE_ENV': JSON.stringify('production'),
+        'global.PUBLIC_PATH': JSON.stringify(publicPath),
+        'global.BUILD_VERSION': JSON.stringify(buildVersion),
+        'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT),
+    }), new HtmlWebpackPlugin({
+        filename: 'index.html',
+        template: path.resolve(__dirname, 'index.html'),
+        chunksSortMode: 'dependency' // Sort chunks by dependency
+    }), sentryWebpackPlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+    })],
     module: {
         rules: [
             USE_ESLINT_LOADER && {
