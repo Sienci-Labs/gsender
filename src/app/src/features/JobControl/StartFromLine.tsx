@@ -87,9 +87,9 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
             </ShadButton>
             <Dialog
                 open={state.showModal}
-                onOpenChange={() =>
-                    setState((prev) => ({ ...prev, showModal: false }))
-                }
+                onOpenChange={(open) => {
+                    setState((prev) => ({ ...prev, showModal: false }));
+                }}
             >
                 <DialogContent className="bg-white">
                     <DialogHeader>
@@ -108,18 +108,16 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             </p>
                             <p className="mb-0 text-black dark:text-white">
                                 Your job was last stopped around line:{' '}
-                                <b>{state.value}</b> on a g-code file with a
-                                total of <b>{lineTotal}</b> lines
+                                <b>{lastLine}</b> on a g-code file with a total
+                                of <b>{lineTotal}</b> lines
                             </p>
                             {state.value > 0 && (
                                 <p>
                                     Recommended starting lines:{' '}
                                     <strong>
-                                        {state.value - 10 >= 0
-                                            ? state.value - 10
-                                            : 0}
+                                        {lastLine - 10 >= 0 ? lastLine - 10 : 0}
                                     </strong>{' '}
-                                    - <strong>{state.value}</strong>
+                                    - <strong>{lastLine}</strong>
                                 </p>
                             )}
                         </div>
