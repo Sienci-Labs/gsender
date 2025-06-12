@@ -144,8 +144,8 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                             }));
                                         }
                                     }}
-                                    // max={lineTotal}
-                                    min={0}
+                                    min={1}
+                                    max={lineTotal}
                                     className="w-20"
                                 />
                             </div>

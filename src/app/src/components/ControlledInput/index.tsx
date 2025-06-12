@@ -33,6 +33,7 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
                         e.target.value = props.min;
                         setLocalValue(props.min);
                     } else if (props.max !== null && current > props.max) {
+                        console.log('max');
                         e.target.value = props.max;
                         setLocalValue(props.max);
                     } else {
