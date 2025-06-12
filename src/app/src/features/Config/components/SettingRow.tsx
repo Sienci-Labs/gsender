@@ -25,6 +25,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import store from 'app/store';
 import { FaMicrochip } from 'react-icons/fa6';
 import { GRBLHAL } from 'app/constants';
+import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -117,6 +118,8 @@ function returnSettingControl(
             );
         case 'wizard':
             return setting.wizard();
+        case 'jog':
+            return <JogInput value={value} index={index} onChange={handler} />;
         default:
             return setting.type;
     }

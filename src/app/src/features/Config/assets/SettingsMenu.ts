@@ -60,6 +60,7 @@ export type gSenderSettingType =
     | 'event'
     | 'textarea'
     | 'api'
+    | 'jog'
     | 'location'
     | 'wizard';
 
@@ -221,6 +222,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'number',
                         min: 0,
                         max: 4,
+                    },
+                ],
+            },
+            {
+                label: 'Jogging',
+                settings: [
+                    {
+                        label: 'Rapid Preset',
+                        type: 'jog',
+                        description:
+                            'Rapid Jogging preset speeds and distances',
+                        key: 'widgets.axes.jog.rapid',
+                    },
+                    {
+                        label: 'Normal Preset',
+                        type: 'jog',
+                        description:
+                            'Normal Jogging preset speeds and distances',
+                        key: 'widgets.axes.jog.normal',
+                    },
+                    {
+                        label: 'Precise Preset',
+                        type: 'jog',
+                        description:
+                            'Precise Jogging preset speeds and distances',
+                        key: 'widgets.axes.jog.precise',
                     },
                 ],
             },

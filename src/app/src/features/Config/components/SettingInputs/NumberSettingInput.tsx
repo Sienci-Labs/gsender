@@ -3,9 +3,8 @@ export interface NumberSettingInputProps {
     unit?: string;
     value: number;
     index: number;
-    min: number;
-    max: number;
-    subIndex: number;
+    min?: number;
+    max?: number;
     onChange: (value: number) => void;
 }
 
