@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
+import { HashRouter } from 'react-router';
 
 import { store as reduxStore } from 'app/store/redux';
 import rootSaga from 'app/store/redux/sagas';
@@ -8,9 +9,9 @@ import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
+
 import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
-import { BrowserRouter, HashRouter } from 'react-router';
 
 function App() {
     useEffect(() => {
