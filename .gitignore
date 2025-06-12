@@ -26,3 +26,4 @@ cypress.env.json
 
 src/app/src/routeTree.gen.ts
 src/app/src/application.css
+.env

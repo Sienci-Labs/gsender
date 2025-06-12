@@ -85,7 +85,6 @@ export const viteServer = async (app) => {
         } catch (e) {
             // eslint-disable-next-line no-unused-expressions
             vite?.ssrFixStacktrace(e);
-            console.log(e.stack);
             res.status(500).end(e.stack);
         }
     });
