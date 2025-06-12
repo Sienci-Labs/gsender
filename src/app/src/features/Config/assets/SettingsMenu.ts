@@ -227,24 +227,24 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: 'Jogging Presets',
                 settings: [
                     {
-                        label: 'Rapid Preset',
+                        label: 'Rapid',
                         type: 'jog',
                         description:
-                            'Rapid Jogging preset speeds and distances',
+                            '',
                         key: 'widgets.axes.jog.rapid',
                     },
                     {
-                        label: 'Normal Preset',
+                        label: 'Normal',
                         type: 'jog',
                         description:
-                            'Normal Jogging preset speeds and distances',
+                            'Set the movement distances and speeds used for each jogging preset',
                         key: 'widgets.axes.jog.normal',
                     },
                     {
-                        label: 'Precise Preset',
+                        label: 'Precise',
                         type: 'jog',
                         description:
-                            'Precise Jogging preset speeds and distances',
+                            '',
                         key: 'widgets.axes.jog.precise',
                     },
                 ],
@@ -263,7 +263,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Warn on bad line',
                         key: 'widgets.visualizer.showLineWarnings',
                         description:
-                            'Warns when running a job if any invalid commands are found',
+                            'Warns if any invalid commands are found when running a job',
                         type: 'boolean',
                     },
                     {
@@ -277,7 +277,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Warn if beyond soft limits',
                         key: 'widgets.visualizer.showSoftLimitWarning',
                         description:
-                            'Be told if your file exceeds your machine limits based on the current zero point (homing and soft limits must be enabled)',
+                            'Warns if your file exceeds your machine limits based on the current zero point (homing and soft limits must be enabled)',
                         type: 'boolean',
                         disabled: () => {
                             const connected = controller.portOpen;
@@ -297,14 +297,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Job end notifications',
                         key: 'widgets.visualizer.jobEndModal',
                         description:
-                            'Show a pop up with job details after a job finishes.',
+                            'Show a carving summary at the end of each job',
                         type: 'boolean',
                     },
                     {
                         label: 'Maintenance task notifications',
                         key: 'widgets.visualizer.maintenanceTaskNotifications',
                         description:
-                            'Alert with upcoming maintenance tasks on application start.',
+                            'Show upcoming maintenance tasks at the end of each job',
                         type: 'boolean',
                     },
                 ],
