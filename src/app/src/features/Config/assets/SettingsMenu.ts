@@ -146,7 +146,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'select',
                         key: 'workspace.defaultFirmware',
                         description:
-                            'If automatic detection fails, this will be the firmware gSender falls back to using',
+                            'The firmware gSender will resort to using if automatic detection fails',
                         options: [GRBL, GRBLHAL],
                     },
                     {
@@ -180,7 +180,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:
-                            'This info appears to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it',
+                            'This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it',
                         type: 'boolean',
                     },
                 ],
@@ -191,7 +191,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Dark mode',
                         key: 'workspace.enableDarkMode',
-                        description: 'Change gSenders colours for reduced eye strain, better contrast, or just for fun!',
+                        description: 'Change the app colours for reduced eye strain, better contrast, or just for fun!',
                         type: 'boolean',
                     },
                     {
@@ -205,7 +205,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
-                            'Enable with the feather when big files are slowing down your computer. Light turns off 3D file viewing, Everything disables the visualizer.',
+                            'Enable with the feather when big files are slowing down your computer (Light turns off 3D file viewing, Everything disables the visualizer)',
                         type: 'select',
                         options: [
                             LIGHTWEIGHT_OPTIONS.LIGHT,
@@ -317,14 +317,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'wizard',
                         wizard: KeyboardLinkWizard,
                         description:
-                            'Set up movements and macros with keys or key combinations on your keyboard (manipulate most of gSender, with many shortcuts already set, and also support for Numpads, macro pads, and wireless keyboards)',
+                            'Control your CNC and navigate through gSender using custom key combinations on any keyboard, numpad, or macro pad',
                     },
                     {
                         label: 'Gamepad',
                         type: 'wizard',
                         wizard: GamepadLinkWizard,
                         description:
-                            'Easily jog, set zeros, start jobs, and more using many common gamepads (set up your own profile or use a pre-tested gamepad profile)',
+                            'Easily jog, set zeros, start jobs, and more using most common gamepads (create your own profile or use a pre-made one)',
                     },
                 ],
             },
@@ -347,7 +347,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         wizard: SquaringToolWizard,
                         label: 'Square up CNC rails',
                         description:
-                            'Misaligned rails can cause 90 degree cuts to come out skewed, use the wizard to fix this.',
+                            'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this',
                     },
                     {
                         type: 'eeprom',
@@ -469,7 +469,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Z thickness',
                         key: 'workspace.probeProfile.zThickness',
                         description:
-                            'Measure the plate thickness where the cutting tool will touch off when probing the Z-axis (default 15)',
+                            'Plate thickness where the bit touches when Z-axis probing (default 15)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -477,7 +477,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero touchplate
                             return probeType === TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
@@ -485,7 +485,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY thickness',
                         key: 'workspace.probeProfile.xyThickness',
                         description:
-                            'Measure the plate thickness where the cutting tool will touch off when probing the X and Y axes (default 10)',
+                            'Plate thickness where the bit touches when X/Y-axis probing (default 10)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -493,7 +493,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero or Z-only touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
                         },
                     },
@@ -501,7 +501,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Z probe distance',
                         key: 'widgets.probe.zProbeDistance',
                         description:
-                            'How far to travel in Z until it gives up on probing, if you get an alarm 2 for soft limits when probing then reduce this value (default 30)',
+                            'Movement in Z before it gives up on probing (reduce this value if you get a soft limit alarm 2 when probing, default 30)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -509,7 +509,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero touchplate
                             return probeType === TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
@@ -525,7 +525,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero touchplate
                             return probeType === TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
@@ -533,7 +533,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Slow find',
                         key: 'widgets.probe.probeFeedrate',
                         description:
-                            'Slower speed for more accuracy on second touch-off (default 75)',
+                            'Speed for the more accurate second touch-off (default 75)',
                         type: 'number',
                         unit: 'mm/min',
                         hidden: () => {
@@ -541,7 +541,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero touchplate
                             return probeType === TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
@@ -549,7 +549,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Retraction',
                         key: 'widgets.probe.retractionDistance',
                         description:
-                            'How far the probe moves away after a successful touch (default 4)',
+                            'How far the bit moves away after a successful touch (default 4)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -557,15 +557,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using auto touchplate
+                            // Hidden if we are using AutoZero touchplate
                             return probeType === TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
                     {
-                        label: 'Probe connection test',
+                        label: 'Connection test',
                         key: 'widgets.probe.connectivityTest',
                         description:
-                            'A safe check to make sure your probe is connected correctly',
+                            'Safety check to make sure your probe is connected correctly',
                         type: 'boolean',
                     },
                 ],
@@ -636,7 +636,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Homing Plan',
+                label: 'Homing Behaviour',
                 settings: [
                     {
                         type: 'eeprom',
@@ -655,8 +655,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$45',
                     },
                     {
-                        eID: '$46',
                         type: 'eeprom',
+                        eID: '$46',
                     },
                     {
                         type: 'eeprom',
@@ -665,22 +665,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$25',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$170',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$171',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$172',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$173',
                     },
                     {
                         type: 'eeprom',
@@ -728,6 +712,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         type: 'eeprom',
+                        eID: '$170',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$171',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$172',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$173',
+                    },
+                    {
+                        type: 'eeprom',
                         eID: '$347',
                     },
                     {
@@ -737,10 +737,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$349',
-                    },
-                    {
-                        type: 'eeprom',
-                        eID: '$350',
                     },
                 ],
             },
@@ -753,7 +749,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'location',
                         unit: 'mm',
                         description:
-                            'Set a Park location, which lets you move the router to a pre-determined place when homing is enabled.  Use Grab Location to use the current router position.',
+                            'The P on the main Carve page will always take you to this convenient parking spot (homing must be enabled)',
                     },
                 ],
             },
@@ -771,10 +767,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                         label: 'Enable spindle/laser controls',
                         description:
-                            'Enable Spindle/Laser tab and related functions on the main Carve page.',
+                            'Enable Spindle/Laser tab and related functions on the main Carve page',
                         key: 'workspace.spindleFunctions',
                         onDisable: () => {
-                            // Disable laser mode if spindle functions turned off.  TBD what to do with EEPROM.
+                            // Disable laser mode if spindle functions turned off. TBD what to do with EEPROM.
                             store.set('widgets.spindle.mode', 'spindle');
                         },
                     },
@@ -976,7 +972,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.spindle.laser.laserOnOutline',
                         type: 'boolean',
                         description:
-                            'See the job position better by turning on the laser at its lowest power while outlining.',
+                            'See the job position better by turning on the laser at its lowest power while outlining',
                     },
                     {
                         label: 'Laser X offset',
@@ -1028,7 +1024,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Enable coolant controls',
                         key: 'workspace.coolantFunctions',
                         description:
-                            'Show coolant functions on the main Carve page.',
+                            'Show coolant functions on the main Carve page.,
                         type: 'boolean',
                     },
                     { type: 'eeprom', eID: '$456' },
@@ -1051,7 +1047,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Enable rotary controls',
                         key: 'widgets.rotary.tab.show',
                         description:
-                            'Enable Rotary tab and related functions on the main Carve page.',
+                            'Enable Rotary tab and related functions on the main Carve page',
                         type: 'boolean',
                     },
                     { type: 'eeprom', eID: '$376' },
@@ -1150,13 +1146,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                         key: 'workspace.toolChange.skipDialog',
                         description:
-                            'Skips dialog for non-wizard options.  This will combine code blocks if using that strategy, and not send a popup for pause.',
+                            'Skips dialog for non-wizard options. This will combine code blocks if using that strategy, and not send a popup for pause.',
                     },
                     {
                         label: 'Strategy',
-                        type: 'select',                        
+                        type: 'select',
                         description:
-                            'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length.  Limit switches required.\n\nCode runs blocks before and after the toolchange',
+                            'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length. Limit switches required.\n\nCode runs blocks before and after the toolchange',
                         options: [
                             'Ignore',
                             'Pause',
@@ -1173,7 +1169,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangePosition',
                         unit: 'mm',
                         description:
-                            'Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.',
+                            'Set fixed tool sensor position at current machine position - this will be the start location for probing. Your Z value should be negative.',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
@@ -1187,7 +1183,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',
                         description:
-                            'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
+                            'When using the Code strategy, this code is run as soon as an M6 command is encountered',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
@@ -1201,7 +1197,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.postHook',
                         description:
-                            'When using the Code strategy, this code is run after a tool change is completed.',
+                            'When using the Code strategy, this code is run after a tool change is completed',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
