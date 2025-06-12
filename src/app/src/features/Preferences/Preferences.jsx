@@ -422,14 +422,14 @@ class PreferencesPage extends PureComponent {
                 });
             },
             changeXYThickness: (e) => {
-                const value = Math.abs(Number(e.target.value));
+                const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
                 const metricValue =
                     units === METRIC_UNITS
                         ? value
-                        : Math.abs(convertToMetric(value));
+                        : convertToMetric(value);
 
                 this.setState({
                     probe: {
@@ -440,7 +440,7 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('probe:updated');
             },
             changeZThickness: (e) => {
-                const value = Math.abs(Number(e.target.value));
+                const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
