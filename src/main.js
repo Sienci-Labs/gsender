@@ -39,7 +39,7 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
