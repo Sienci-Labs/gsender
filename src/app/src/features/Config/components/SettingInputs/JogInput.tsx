@@ -4,14 +4,15 @@ export interface JogInputProps {
     unit?: string;
     value?: object;
     index: number;
-    onChange: (value: number) => void;
+    onChange: (value: object) => void;
 }
 
 export function JogInput({ unit, value, index, onChange }: JogInputProps) {
-    console.log(value);
     // xyStep, aStep, zStep, feedrate = key
     function customJogUpdater(e, key) {
-        console.log(value);
+        const updatedValue = Number(e.target.value);
+        const o = { ...value, [key]: updatedValue };
+        onChange(o);
     }
 
     return (
