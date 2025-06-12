@@ -95,7 +95,7 @@
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender Edge",
+    "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "extraResources": [
@@ -385,7 +385,7 @@
     "rimraf": "~2.6.3",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "semver": "~6.0.0",
-    "serialport": "^10",
+    "serialport": "^13.0.0",
     "serve-favicon": "~2.5.0",
     "serve-static": "~1.13.2",
     "session-file-store": "~1.2.0",
