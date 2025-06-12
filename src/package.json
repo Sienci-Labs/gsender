@@ -9,7 +9,7 @@
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
-    "@sentry/electron": "^4.14.0",
+    "@sentry/electron": "^6.7.0",
     "@sentry/react": "^9.28.0",
     "@serialport/parser-readline": "^11.0.0",
     "@sienci/avrgirl-arduino": "^5.0.3",
