@@ -110,6 +110,20 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.5.0 (June 18th, 2025)
+- All new user experience - we've streamlined and modernized the UI, with a focus on touch device and usability.  It should seem familiar to previous gSender users with a number of new improvements.
+- Firmware now detected on connection - no more firmware selector, gSender can just use the correct controller type.
+- All new Stats tool which collates your job run statistics, alarms and errors, maintenance tasks, and diagnostics
+- Firmware settings and gSender settings have been combined into a new streamlined Config tool, allowing you to easily configure your machine setup and application behaviour.
+- All settings (both EEPROM and application) can be filtered by non-default and restored to default values at a single click.
+- Rotary now a first-class citizen - enabling rotary functionality adds all DRO and jogging controls you could need to the main UI.
+- Some new perspectives - gSender now comes with a configurable dark mode, selectable in config.  As well, portrait mode is available by rotating your device.
+- Updated remote mode - more functionality at your finger tips
+- What'd I miss - all new notifications center to keep you informed about what's happened when running your job.
+- Helper - Alarm explanations and toolchanging are now helpers, which will pop up as required.  
+- Visualizer - Lightweight mode has had some behaviour changes, and better supports touch movements like pinch and zoom.
+- Tools - All tools and widgets are collated on the new Tools interace, allowing you to easily 
+
 ### 1.4.12 (March 10th, 2025)
 - Added new machine profiles for Altmill 2X4
 - Added support for new rotary track options
