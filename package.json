@@ -81,7 +81,7 @@
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
     "cypress:open": "cypress open",
-    "vite:build": "yarn --cwd ./src/app build",
+    "vite:build": "NODE_OPTIONS='--max-old-space-size=8192' yarn --cwd ./src/app build",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app_old/{favicon.ico,i18n,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /src/app",
     "check-types": "tsc --noEmit -p ./src/app/src"
