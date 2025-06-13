@@ -301,29 +301,6 @@ const RotarySurfacing = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-1">
-                        <Tabs defaultValue="visualizer">
-                            <TabsList className="w-full">
-                                <TabsTrigger
-                                    value="visualizer"
-                                    className="w-full"
-                                    onClick={() => setTabSwitch(false)}
-                                >
-                                    Visualizer Preview
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="gcode"
-                                    className="w-full"
-                                    onClick={() => setTabSwitch(true)}
-                                >
-                                    G-Code{' '}
-                                    {gcode.length !== 0 ? (
-                                        <span className="text-xs text-gray-500">
-                                            ({gcode.split('\n').length} lines)
-                                        </span>
-                                    ) : null}
-                                </TabsTrigger>
-                            </TabsList>
-                        </Tabs>
                         <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
                             <div
                                 className={cx(
@@ -345,6 +322,32 @@ const RotarySurfacing = () => {
                             >
                                 <GcodeViewer gcode={gcode} />
                             </div>
+                        </div>
+                        <div className="w-full border border-gray-200 rounded-md">
+                            <Tabs defaultValue="visualizer">
+                                <TabsList className="w-full">
+                                    <TabsTrigger
+                                        value="visualizer"
+                                        className="w-full"
+                                        onClick={() => setTabSwitch(false)}
+                                    >
+                                        Visualizer Preview
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="gcode"
+                                        className="w-full"
+                                        onClick={() => setTabSwitch(true)}
+                                    >
+                                        G-Code{' '}
+                                        {gcode.length !== 0 ? (
+                                            <span className="text-xs text-gray-500">
+                                                ({gcode.split('\n').length}{' '}
+                                                lines)
+                                            </span>
+                                        ) : null}
+                                    </TabsTrigger>
+                                </TabsList>
+                            </Tabs>
                         </div>
                     </div>
                 </div>
