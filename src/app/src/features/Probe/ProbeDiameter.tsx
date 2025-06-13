@@ -23,7 +23,7 @@
 
 import { useState, useEffect, KeyboardEvent, useCallback, useRef } from 'react';
 import cx from 'classnames';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, ChevronDown } from 'lucide-react';
 
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
@@ -33,13 +33,10 @@ import {
 } from 'app/lib/constants';
 import { UNITS_EN } from 'app/definitions/general';
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from 'app/components/shadcn/Select';
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover';
 
 import { Input } from 'app/components/shadcn/Input';
 import { Button } from 'app/components/Button';
@@ -59,6 +56,7 @@ type CustomValue = {
     value: string;
     label: string;
     isCustom: boolean;
+    isDeleted?: boolean;
 };
 
 interface Props {
@@ -218,12 +216,33 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     const handleDeleteOption = useCallback(
         (valueToDelete: string) => {
-            const updatedCustomValues = customValuesRef.current.filter(
-                (v) => v.value !== valueToDelete,
+            // Check if it's a custom value
+            const isCustomValue = customValuesRef.current.some(
+                (v) => v.value === valueToDelete,
             );
 
-            setCustomValues(updatedCustomValues);
-            customValuesRef.current = updatedCustomValues;
+            if (isCustomValue) {
+                // Handle custom value deletion
+                const updatedCustomValues = customValuesRef.current.filter(
+                    (v) => v.value !== valueToDelete,
+                );
+                setCustomValues(updatedCustomValues);
+                customValuesRef.current = updatedCustomValues;
+            } else {
+                // Handle default tool deletion by adding it to custom values with a deleted flag
+                const newCustomValue: CustomValue = {
+                    value: valueToDelete,
+                    label: valueToDelete,
+                    isCustom: true,
+                    isDeleted: true,
+                };
+                const updatedCustomValues = [
+                    ...customValuesRef.current,
+                    newCustomValue,
+                ];
+                setCustomValues(updatedCustomValues);
+                customValuesRef.current = updatedCustomValues;
+            }
 
             if (valueRef.current === valueToDelete) {
                 const firstTool = availableToolsRef.current[0];
@@ -364,6 +383,20 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         );
     }
 
+    // Filter out deleted tools
+    const deletedValues = customValues
+        .filter((cv) => cv.isDeleted)
+        .map((cv) => cv.value);
+
+    const filteredToolsObjects = toolsObjects.filter(
+        (tool) => !deletedValues.includes(tool.value),
+    );
+
+    options.push(
+        ...filteredToolsObjects,
+        ...customValues.filter((cv) => !cv.isDeleted),
+    );
+
     function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {
             return '';
@@ -371,7 +404,11 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         return units;
     }
 
-    options.push(...toolsObjects, ...customValues);
+    function checkIsDeletable(value: string) {
+        // Allow deletion of all tools except 'Auto' and 'Tip'
+        return value !== PROBE_TYPE_AUTO && value !== PROBE_TYPE_TIP;
+    }
+
     options.sort((a, b) => {
         const isNumR = /^\d+.?\d*$/;
         const isANum = isNumR.test(a.value);
@@ -389,62 +426,78 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     return (
         <div className={cx('w-full', { hidden: !probeCommand.tool })}>
             <div className="flex flex-col space-y-2">
-                <Select
-                    value={value}
-                    onValueChange={handleChange}
-                    disabled={!probeCommand.tool}
-                >
-                    <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select diameter" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                        <SelectGroup>
-                            {options.map((option) => (
-                                <div
-                                    key={option.value}
-                                    className="flex items-center justify-between"
-                                >
-                                    <SelectItem
-                                        value={option.value}
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            role="combobox"
+                            className="w-full justify-between bg-white dark:bg-gray-800"
+                            disabled={!probeCommand.tool}
+                        >
+                            {value ? (
+                                <span>
+                                    {value}{' '}
+                                    {getUnitString(value as PROBE_TYPES_T)}
+                                </span>
+                            ) : (
+                                'Select diameter'
+                            )}
+                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 bg-white">
+                        <div className="max-h-[300px] overflow-y-auto">
+                            {options.length > 0 ? (
+                                options.map((option) => (
+                                    <div
+                                        key={option.value}
                                         className={cx(
-                                            option.isCustom &&
-                                                'flex items-center justify-between pr-8',
+                                            'flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 cursor-pointer rounded min-h-10',
+                                            {
+                                                'bg-blue-50 dark:bg-gray-800 hover:bg-blue-50':
+                                                    option.value === value,
+                                            },
                                         )}
+                                        onClick={() =>
+                                            handleChange(option.value)
+                                        }
                                     >
                                         <div className="flex items-center justify-between w-full">
                                             <span>
                                                 {option.label}{' '}
-                                                {getUnitString(option.value)}
+                                                {getUnitString(
+                                                    option.value as PROBE_TYPES_T,
+                                                )}
                                             </span>
-                                            {/^\d+.?\d*$/.test(
-                                                option.value,
-                                            ) && (
-                                                <div
-                                                    className="ml-2"
-                                                    onMouseDown={(e) => {
-                                                        // This prevents the dropdown from closing
+                                            {checkIsDeletable(option.value) && (
+                                                <Button
+                                                    className="ml-2 hover:text-red-500 rounded p-0"
+                                                    variant="ghost"
+                                                    onClick={(e) => {
                                                         e.stopPropagation();
-                                                        e.preventDefault();
-                                                        // Add a small delay to ensure the event doesn't bubble
-                                                        setTimeout(() => {
-                                                            handleDeleteOption(
-                                                                option.value,
-                                                            );
-                                                        }, 0);
+                                                        handleDeleteOption(
+                                                            option.value,
+                                                        );
                                                     }}
+                                                    size="sm"
                                                 >
-                                                    <X className="h-4 w-4 cursor-pointer hover:text-red-500" />
-                                                </div>
+                                                    <X className="h-6 w-6 cursor-pointer" />
+                                                </Button>
                                             )}
                                         </div>
-                                    </SelectItem>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="flex items-center justify-center h-full min-h-10">
+                                    <p className="text-gray-500">
+                                        No tools available, add one below.
+                                    </p>
                                 </div>
-                            ))}
-                        </SelectGroup>
-                        <div className="p-2 border-t">
+                            )}
+                        </div>
+                        <div className="pt-2 border-t">
                             <div className="flex items-center space-x-2">
                                 <Input
-                                    type="decimal"
                                     placeholder={`Custom diameter (${units})`}
                                     onKeyDown={(
                                         e: KeyboardEvent<HTMLInputElement>,
@@ -459,7 +512,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                     ref={inputRef}
                                 />
                                 <Button
-                                    variant="ghost"
                                     onClick={() => {
                                         if (inputRef.current.value) {
                                             handleCreateOption(
@@ -468,13 +520,13 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                         }
                                     }}
                                     size="sm"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </Button>
+                                    text="Add"
+                                    icon={<Plus className="h-4 w-4" />}
+                                />
                             </div>
                         </div>
-                    </SelectContent>
-                </Select>
+                    </PopoverContent>
+                </Popover>
             </div>
         </div>
     );
