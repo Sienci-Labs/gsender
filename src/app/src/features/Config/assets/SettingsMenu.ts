@@ -139,14 +139,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.connection.autoReconnect',
                         type: 'boolean',
                         description:
-                            'Reconnect to the last machine you used automatically when you open gSender',
+                            'Reconnect to the last machine you used automatically when you open gSender.',
                     },
                     {
                         label: 'Firmware fallback',
                         type: 'select',
                         key: 'workspace.defaultFirmware',
                         description:
-                            'The firmware gSender will resort to using if automatic detection fails',
+                            'The firmware gSender will resort to using if automatic detection fails.',
                         options: [GRBL, GRBLHAL],
                     },
                     {
@@ -154,7 +154,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.connection.baudrate',
                         type: 'select',
                         description:
-                            'Needs to match up with the value your CNC uses (serial transmission speed, default 115200)',
+                            'Needs to match up with the value your CNC uses. (Serial transmission speed, Default 115200)',
                         options: [
                             '250000',
                             '115200',
@@ -174,13 +174,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'number',
                         unit: 'mm',
                         description:
-                            "Amount Z-axis will move up before moving in X/Y/A using go tos, corner-movements, or parking (doesn't apply to files, if homing is enabled this value becomes an offset from the top of the Z-axis, default 0)",
+                            "Amount Z-axis will move up before moving in X/Y/A using go tos, corner-movements, or parking. (Doesn't apply to files, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:
-                            'This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it',
+                            'This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it.',
                         type: 'boolean',
                     },
                 ],
@@ -197,7 +197,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Visualizer theme',
                         key: 'widgets.visualizer.theme',
-                        description: 'Independant colour control for the visualizer',
+                        description: 'Independant colour control for the visualizer.',
                         type: 'select',
                         options: ['Light', 'Dark'],
                     },
@@ -205,7 +205,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
-                            'Enable with the feather when big files are slowing down your computer (Light turns off 3D file viewing, Everything disables the visualizer)',
+                            'Enable with the feather when big files are slowing down your computer. (Light turns off 3D file view, Everything disables the visualizer)',
                         type: 'select',
                         options: [
                             LIGHTWEIGHT_OPTIONS.LIGHT,
@@ -216,7 +216,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'DRO zeros',
                         key: 'workspace.customDecimalPlaces',
                         description:
-                            'Set the number of decimal places shown between 1-4 (default 0 shows 2 for mm and 3 for inches)',
+                            'Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)',
                         type: 'number',
                         min: 0,
                         max: 4,
@@ -237,7 +237,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Normal',
                         type: 'jog',
                         description:
-                            'Set the movement distances and speeds used for each jogging preset',
+                            'Set the movement distances and speeds used for each jogging preset.',
                         key: 'widgets.axes.jog.normal',
                     },
                     {
@@ -256,28 +256,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Warn if bad file',
                         key: 'widgets.visualizer.showWarning',
                         description:
-                            'Warns if any invalid commands are found when a file is opened',
+                            'Warns if any invalid commands are found when a file is opened.',
                         type: 'boolean',
                     },
                     {
                         label: 'Warn on bad line',
                         key: 'widgets.visualizer.showLineWarnings',
                         description:
-                            'Warns if any invalid commands are found when running a job',
+                            'Warns if any invalid commands are found when running a job.',
                         type: 'boolean',
                     },
                     {
                         label: 'Warn when setting zero',
                         key: 'workspace.shouldWarnZero',
                         description:
-                            'Useful if you tend to set zero accidentally',
+                            'Useful if you tend to set zero accidentally.',
                         type: 'boolean',
                     },
                     {
                         label: 'Warn if beyond soft limits',
                         key: 'widgets.visualizer.showSoftLimitWarning',
                         description:
-                            'Warns if your file exceeds your machine limits based on the current zero point (homing and soft limits must be enabled)',
+                            'Warns if your file exceeds your machine limits based on the current zero point. (Homing and soft limits must be enabled)',
                         type: 'boolean',
                         disabled: () => {
                             const connected = controller.portOpen;
@@ -297,14 +297,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Job end notifications',
                         key: 'widgets.visualizer.jobEndModal',
                         description:
-                            'Show a carving summary at the end of each job',
+                            'Show a carving summary at the end of each job.',
                         type: 'boolean',
                     },
                     {
-                        label: 'Maintenance task notifications',
+                        label: 'Maintenance notifications',
                         key: 'widgets.visualizer.maintenanceTaskNotifications',
                         description:
-                            'Show upcoming maintenance tasks at the end of each job',
+                            'Show upcoming maintenance tasks at the end of each job.',
                         type: 'boolean',
                     },
                 ],
@@ -317,14 +317,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'wizard',
                         wizard: KeyboardLinkWizard,
                         description:
-                            'Control your CNC and navigate through gSender using custom key combinations on any keyboard, numpad, or macro pad',
+                            'Control your CNC and navigate through gSender using custom key combinations on any keyboard, numpad, or macro pad.',
                     },
                     {
                         label: 'Gamepad',
                         type: 'wizard',
                         wizard: GamepadLinkWizard,
                         description:
-                            'Easily jog, set zeros, start jobs, and more using most common gamepads (create your own profile or use a pre-made one)',
+                            'Easily jog, set zeros, start jobs, and more using most common gamepads. Create your own profile or use a pre-made one.',
                     },
                 ],
             },
@@ -347,7 +347,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         wizard: SquaringToolWizard,
                         label: 'Square up CNC rails',
                         description:
-                            'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this',
+                            'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
                     },
                     {
                         type: 'eeprom',
@@ -458,7 +458,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.probeProfile.touchplateType',
                         type: 'select',
                         description:
-                            "Select the touch plate you're using with your machine (default Standard block)",
+                            "Select the touch plate you're using with your machine. (Default Standard block)",
                         options: [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
@@ -469,7 +469,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Z thickness',
                         key: 'workspace.probeProfile.zThickness',
                         description:
-                            'Plate thickness where the bit touches when Z-axis probing (default 15)',
+                            'Plate thickness where the bit touches when Z-axis probing. (Default 15)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -485,7 +485,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY thickness',
                         key: 'workspace.probeProfile.xyThickness',
                         description:
-                            'Plate thickness where the bit touches when X/Y-axis probing (default 10)',
+                            'Plate thickness where the bit touches when X/Y-axis probing. (Default 10)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -501,7 +501,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Z probe distance',
                         key: 'widgets.probe.zProbeDistance',
                         description:
-                            'Movement in Z before it gives up on probing (reduce this value if you get a soft limit alarm 2 when probing, default 30)',
+                            'Movement in Z before it gives up on probing. (Reduce this value if you get a soft limit alarm 2 when probing, Default 30)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -517,7 +517,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Fast find',
                         key: 'widgets.probe.probeFastFeedrate',
                         description:
-                            'Probe speed before the first touch-off (default 150)',
+                            'Probe speed before the first touch-off. (Default 150)',
                         type: 'number',
                         unit: 'mm/min',
                         hidden: () => {
@@ -533,7 +533,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Slow find',
                         key: 'widgets.probe.probeFeedrate',
                         description:
-                            'Speed for the more accurate second touch-off (default 75)',
+                            'Speed for the more accurate second touch-off. (Default 75)',
                         type: 'number',
                         unit: 'mm/min',
                         hidden: () => {
@@ -549,7 +549,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Retraction',
                         key: 'widgets.probe.retractionDistance',
                         description:
-                            'How far the bit moves away after a successful touch (default 4)',
+                            'How far the bit moves away after a successful touch. (Default 4)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -565,7 +565,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Connection test',
                         key: 'widgets.probe.connectivityTest',
                         description:
-                            'Safety check to make sure your probe is connected correctly',
+                            'Safety check to make sure your probe is connected correctly.',
                         type: 'boolean',
                     },
                 ],
@@ -749,7 +749,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'location',
                         unit: 'mm',
                         description:
-                            'The P on the main Carve page will always take you to this convenient parking spot (homing must be enabled)',
+                            'The P on the main Carve page will always take you to this convenient parking spot. (Homing must be enabled)',
                     },
                 ],
             },
@@ -765,9 +765,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable spindle/laser controls',
+                        label: 'Spindle/laser controls',
                         description:
-                            'Enable Spindle/Laser tab and related functions on the main Carve page',
+                            'Show the Spindle/Laser tab and related functions on the main Carve page.',
                         key: 'workspace.spindleFunctions',
                         onDisable: () => {
                             // Disable laser mode if spindle functions turned off. TBD what to do with EEPROM.
@@ -779,10 +779,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$32',
                     },
                     {
-                        label: 'Delay after start',
+                        label: 'Spindle on delay',
                         key: 'workspace.spindleDelay',
                         description:
-                            'Delays all jobs at the start to give time for the spindle to spin up ($392)',
+                            'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',
                         eID: '$392',
                         unit: 's',
@@ -791,7 +791,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Minimum spindle speed',
                         key: 'widgets.spindle.spindleMin',
                         description:
-                            'Match this to the minimum speed your spindle is able to spin at ($31, default 7200)',
+                            'Match this to the minimum speed of your spindle. ($31)',
                         type: 'hybrid',
                         eID: '$31',
                         unit: 'rpm',
@@ -800,7 +800,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Maximum spindle speed',
                         key: 'widgets.spindle.spindleMax',
                         description:
-                            'Match this to the maximum speed your spindle is able to spin at ($30, default 24000)',
+                            'Match this to the maximum speed of your spindle. ($30)',
                         type: 'hybrid',
                         eID: '$30',
                         unit: 'rpm',
@@ -953,7 +953,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Minimum laser power',
                         key: 'widgets.spindle.laser.minPower',
                         description:
-                            'Match this to the settings in your laser CAM software for the minimum S word laser power ($731, default 0)',
+                            'Match this to the minimum S word setting in your laser CAM software. ($731)',
                         type: 'hybrid',
                         eID: '$731',
                         unit: '',
@@ -962,7 +962,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Maximum laser power',
                         key: 'widgets.spindle.laser.maxPower',
                         description:
-                            'Match this to the settings in your laser CAM software for the maximum S word laser power ($730, default 255)',
+                            'Match this to the maximum S word setting in your laser CAM software. ($730)',
                         type: 'hybrid',
                         eID: '$730',
                         unit: '',
@@ -972,13 +972,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'widgets.spindle.laser.laserOnOutline',
                         type: 'boolean',
                         description:
-                            'See the job position better by turning on the laser at its lowest power while outlining',
+                            "Turn on the laser at it's lowest power to see the job position better.",
                     },
                     {
                         label: 'Laser X offset',
                         key: 'widgets.spindle.laser.xOffset',
                         description:
-                            'Offset from the spindle in the X-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $741, default 0)',
+                            'X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741)',
                         type: 'hybrid',
                         eID: '$741',
                         unit: 'mm',
@@ -987,7 +987,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Laser Y offset',
                         key: 'widgets.spindle.laser.yOffset',
                         description:
-                            'Offset from the spindle in the Y-axis (measure this by making a mark with a sharp v-bit then moving the laser to point to the same spot, $742, default 0)',
+                            'Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742)',
                         type: 'hybrid',
                         eID: '$742',
                         unit: 'rpm',
@@ -1021,10 +1021,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'Enable coolant controls',
+                        label: 'Coolant controls',
                         key: 'workspace.coolantFunctions',
                         description:
-                            'Show coolant functions on the main Carve page.,
+                            'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
                     { type: 'eeprom', eID: '$456' },
@@ -1044,10 +1044,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'Enable rotary controls',
+                        label: 'Rotary controls',
                         key: 'widgets.rotary.tab.show',
                         description:
-                            'Enable Rotary tab and related functions on the main Carve page',
+                            'Show the Rotary tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
                     { type: 'eeprom', eID: '$376' },
@@ -1055,7 +1055,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Resolution',
                         key: 'workspace.rotaryAxis.firmwareSettings.$101',
                         description:
-                            'Travel resolution in steps per degree ($103, default 19.75308642)',
+                            'Travel resolution in steps per degree. ($103)',
                         type: 'hybrid',
                         eID: '$103',
                         unit: 'rpm',
@@ -1064,7 +1064,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Max speed',
                         key: 'workspace.rotaryAxis.firmwareSettings.$111',
                         description:
-                            'Max axis speed, also used for G0 rapids ($113, default 8000)',
+                            'Max axis speed, also used for G0 rapids. ($113)',
                         type: 'hybrid',
                         eID: '$113',
                         unit: 'rpm',
@@ -1074,14 +1074,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Force hard limits',
                         key: '',
                         description:
-                            'Updates hard limits when toggling into rotary mode',
+                            'Updates hard limits when toggling into rotary mode.',
                         type: 'boolean',
                     },
                     {
                         label: 'Force soft limits',
                         key: '',
                         description:
-                            'Updates soft limits when toggling into rotary mode',
+                            'Updates soft limits when toggling into rotary mode.',
                         type: 'boolean',
                     },
                 ],
@@ -1096,32 +1096,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'Job start',
+                        label: 'File start',
                         type: 'event',
                         eventType: 'gcode:start',
                         description:
-                            'Runs when you start a job, before the file itself runs',
+                            'Runs when you start a job, before the file itself runs.',
                     },
                     {
-                        label: 'Job pause',
+                        label: 'File pause',
                         type: 'event',
                         eventType: 'gcode:pause',
                         description:
-                            "If you'd like to stop accessories or move out of the way when you pause during a job",
+                            "If you'd like to stop accessories or move out of the way when you pause during a job.",
                     },
                     {
-                        label: 'Job resume',
+                        label: 'File resume',
                         type: 'event',
                         eventType: 'gcode:resume',
                         description:
-                            'Ensure that anything you set up for File pause is undone when you resume',
+                            'Ensure that anything you set up for File pause is undone when you resume.',
                     },
                     {
-                        label: 'Job stop/end',
+                        label: 'File stop/end',
                         type: 'event',
                         eventType: 'gcode:stop',
                         description:
-                            'A catch-all to ensure that stopped or ended jobs always safely turn everything off',
+                            'A catch-all to ensure that stopped or ended jobs always safely turn everything off.',
                     },
                 ],
             },
@@ -1139,20 +1139,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                         key: 'workspace.toolChange.passthrough',
                         description:
-                            'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands',
+                            'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands.',
                     },
                     {
-                        label: 'Skip dialog',
-                        type: 'boolean',
-                        key: 'workspace.toolChange.skipDialog',
-                        description:
-                            'Skips dialog for non-wizard options. This will combine code blocks if using that strategy, and not send a popup for pause.',
-                    },
-                    {
-                        label: 'Strategy',
+                        label: 'gSender strategy',
                         type: 'select',
                         description:
-                            'Strategy that gSender will use to handle tool change commands\n\nStandard will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.\n\nFlexible is similar, using a saved tool offset.\n\nFixed is an almost fully automated process in which a preconfigured bitsetter or probe block is used to set new tool length. Limit switches required.\n\nCode runs blocks before and after the toolchange',
+                            'Standard wizard will guide you through the steps to manually set up a new tool and resume cutting.\n\nFlexible is similar but uses a touch plate like a tool length sensor.\n\nFixed is also guided but fully automated, moving around and measuring tools for you. Homing and TLS required.\n\nCode is for fully custom setups.',
                         options: [
                             'Ignore',
                             'Pause',
@@ -1164,12 +1157,19 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangeOption',
                     },
                     {
+                        label: 'Skip dialog',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.skipDialog',
+                        description:
+                            "Won't prompt on Pause, and won't pause between Code blocks.",
+                    },
+                    {
                         label: 'Fixed sensor location',
                         type: 'location',
                         key: 'workspace.toolChangePosition',
                         unit: 'mm',
                         description:
-                            'Set fixed tool sensor position at current machine position - this will be the start location for probing. Your Z value should be negative.',
+                            "The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)",
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
@@ -1183,7 +1183,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',
                         description:
-                            'When using the Code strategy, this code is run as soon as an M6 command is encountered',
+                            'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
@@ -1197,7 +1197,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.postHook',
                         description:
-                            'When using the Code strategy, this code is run after a tool change is completed',
+                            'When using the Code strategy, this code is run after a tool change is completed.',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
@@ -1221,7 +1221,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'IP address',
                         key: 'widgets.connection.ip',
                         description:
-                            'Set the IP address for network scanning (default 192.168.5.1)',
+                            'Set the IP address for network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
                     { type: 'eeprom', eID: '$301' },
