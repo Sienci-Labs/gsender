@@ -3,6 +3,16 @@ import { useState } from 'react';
 import { store as reduxStore } from 'app/store/redux';
 import Button from 'app/components/Button';
 import controller from 'app/lib/controller';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogFooter,
+    AlertDialogTitle,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogTrigger,
+} from 'app/components/shadcn/AlertDialog';
 
 import { useSquaring } from '../context/SquaringContext';
 import {
@@ -194,14 +204,58 @@ const ResultsStep = () => {
                             </div>
                             <div className="flex flex-row gap-4">
                                 <div className="mt-1 xl:mt-4">
-                                    <Button
-                                        onClick={handleUpdateEEPROM}
-                                        disabled={isUpdating}
-                                    >
-                                        {isUpdating
-                                            ? 'Updating...'
-                                            : 'Update EEPROM Settings'}
-                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button disabled={isUpdating}>
+                                                {isUpdating
+                                                    ? 'Updating...'
+                                                    : 'Update EEPROM Settings'}
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent className="bg-white">
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Update EEPROM Values
+                                                </AlertDialogTitle>
+                                                <div className="space-y-4">
+                                                    <p>
+                                                        This action cannot be
+                                                        undone. This will update
+                                                        the steps-per-mm values
+                                                        for both X and Y axes in
+                                                        the EEPROM settings.
+                                                    </p>
+                                                    <p>
+                                                        X-Axis ($100):{' '}
+                                                        <strong>
+                                                            {eepromAdjustment.x.amount.toFixed(
+                                                                3,
+                                                            )}
+                                                        </strong>
+                                                    </p>
+                                                    <p>
+                                                        Y-Axis ($101):{' '}
+                                                        <strong>
+                                                            {eepromAdjustment.y.amount.toFixed(
+                                                                3,
+                                                            )}
+                                                        </strong>
+                                                    </p>
+                                                </div>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className="border-none">
+                                                    No, Cancel
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    className="border border-blue-500"
+                                                    onClick={handleUpdateEEPROM}
+                                                >
+                                                    Yes, Update EEPROM Settings
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
 
                                 <div className="mt-1 xl:mt-4 text-sm text-yellow-600 dark:text-yellow-400">
