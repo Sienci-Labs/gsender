@@ -342,8 +342,6 @@ class GrblHalController {
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    console.log(this.toolChangeContext);
-                    console.log(passthroughM6);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
@@ -2010,7 +2008,6 @@ class GrblHalController {
                     axes.F *= 0.8;
                     axes.F = axes.F.toFixed(3);
                 }
-                console.log(axes);
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.writeln(jogCommand, {}, true);
@@ -2092,7 +2089,6 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {
