@@ -662,6 +662,15 @@ class Visualizer extends Component {
 
     componentDidMount() {
         this.subscribe();
+
+        store.on('change', () => {
+            const { theme } = this.state;
+            const { theme: storeTheme } = store.get('widgets.visualizer');
+            if (theme !== storeTheme) {
+                console.log('theme changed', storeTheme);
+                pubsub.publish('theme:change')
+            }
+        })
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
