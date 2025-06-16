@@ -84,7 +84,7 @@ const defaultMaintenance = [
     },
     {
         id: 3,
-        name: 'Replace Wear Components',
+        name: 'Replace Worn Components',
         description: 'Some CNC parts wear out over time and eventually need replacing - like lead screw nuts and v-wheels. ' +
         'Unlike the smooth gliding of a bearing, these parts experience continuous rubbing so they’re considered consumables. ' +
         'Your manufacturer should stock replacements and tell you how to change them out. ',
