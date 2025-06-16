@@ -667,8 +667,7 @@ class Visualizer extends Component {
             const { theme } = this.state;
             const { theme: storeTheme } = store.get('widgets.visualizer');
             if (theme !== storeTheme) {
-                console.log('theme changed', storeTheme);
-                pubsub.publish('theme:change')
+                pubsub.publish('theme:change', storeTheme);
             }
         })
         this.addShuttleControlEvents();
