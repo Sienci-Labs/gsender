@@ -80,7 +80,6 @@ class WorkflowControl extends PureComponent {
             controller.command('gcode:stop', { force: true });
         },
         handleUnitSwap: (value) => {
-            console.log(value);
 
             this.setState({
                 units: value

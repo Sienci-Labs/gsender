@@ -207,7 +207,6 @@ class CNCEngine {
                 },
                 'firmwareFound': (controllerType = GRBL, options, callback = noop, refresh = false) => {
                     let { port, baudrate, rtscts, network } = { ...options };
-                    console.log(`Final controller type: ${controllerType}`);
 
                     if (typeof callback !== 'function') {
                         callback = noop;
@@ -454,7 +453,6 @@ class CNCEngine {
             // Open serial port
             socket.on('open', (port, options, callback) => {
                 const engine = this;
-                console.log(options);
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
