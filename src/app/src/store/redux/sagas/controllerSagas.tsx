@@ -63,7 +63,7 @@ import {
 import {
     closeConnection,
     openConnection,
-    scanNetwork,
+    scanNetwork, setConnectionState,
 } from '../slices/connection.slice';
 import { listPorts } from '../slices/connection.slice';
 import {
@@ -437,7 +437,7 @@ export function* initialize(): Generator<any, void, any> {
                 openConnection({
                     port: options.port,
                     baudrate: options.baudrate,
-                    isConnected: true,
+                    isConnected: false,
                 }),
             );
             reduxStore.dispatch(
@@ -450,7 +450,6 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:openController',
         (controllerType: FIRMWARE_TYPES_T) => {
-            console.log('this is never called');
             const machineProfile: MachineProfile = store.get(
                 'workspace.machineProfile',
             );
@@ -478,6 +477,17 @@ export function* initialize(): Generator<any, void, any> {
             store.set('widgets.connection.controller.type', controllerType);
             reduxStore.dispatch(updateControllerType({ type: controllerType }));
             console.log('controller open');
+            // Don't show as connected until controller open
+            setTimeout(
+                () => {
+                    reduxStore.dispatch(
+                        setConnectionState({
+                            isConnected: true,
+                        }),
+                    );
+                }, 500
+            )
+
             pubsub.publish('machine:connected');
         },
     );
