@@ -88,6 +88,7 @@ export interface ControllerListeners {
     realtime_report: Array<Function>;
     error_clear: Array<Function>;
     'toolchange:acknowledge': Array<Function>;
+    'serialport:openController': Array<Function>;
     cyclestart_alt: Array<Function>;
     feedhold_alt: Array<Function>;
     virtual_stop_toggle: Array<Function>;
@@ -161,6 +162,7 @@ class Controller {
         'serialport:open': [],
         'serialport:close': [],
         'serialport:closeController': [],
+        'serialport:openController': [],
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],

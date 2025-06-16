@@ -443,6 +443,7 @@ export function* initialize(): Generator<any, void, any> {
             reduxStore.dispatch(
                 updateControllerType({ type: options.controllerType }),
             );
+            console.log('connection open');
         },
     );
 
@@ -476,7 +477,7 @@ export function* initialize(): Generator<any, void, any> {
 
             store.set('widgets.connection.controller.type', controllerType);
             reduxStore.dispatch(updateControllerType({ type: controllerType }));
-
+            console.log('controller open');
             pubsub.publish('machine:connected');
         },
     );
