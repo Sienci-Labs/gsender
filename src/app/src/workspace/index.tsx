@@ -12,6 +12,8 @@ import {
     LOCATION_CATEGORY,
 } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useDarkMode } from 'app/hooks/useDarkMode';
 
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -19,8 +21,7 @@ import { TopBar } from './TopBar';
 import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useDarkMode } from 'app/hooks/useDarkMode';
+import pkg from '../../package.json';
 
 const Workspace = () => {
     const location = useLocation();
@@ -30,6 +31,8 @@ const Workspace = () => {
         if (pathname === '/') {
             window.dispatchEvent(new Event('resize')); // Manual resize dispatch for visualizer on navigating to carve
         }
+
+        document.title = `gSender ${pkg.version}`;
     }, [location]);
 
     useDarkMode();
