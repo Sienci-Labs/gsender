@@ -485,7 +485,7 @@ export function* initialize(): Generator<any, void, any> {
                             isConnected: true,
                         }),
                     );
-                }, 500
+                }, 250
             )
 
             pubsub.publish('machine:connected');

@@ -42,12 +42,12 @@ const defaultMaintenance = [
     {
         id: 0,
         name: 'Clean around your CNC',
-        description: "A clean CNC is a working CNC. "
-        + "Any buildup of dust or chips can block moving components and wear them out faster, making your machine less accurate and less reliable. "
-        + "Generally a shop towel for surfaces and an old toothbrush for crevices should be able to take care of most CNCs. "
-        + "Be thorough since it’s easy to miss areas you don’t normally think about or ones covered in thin layers of dust.\n\n"
-        + "Key areas to check: cutting tool collet, v-wheel inner V, v-wheel rail V, belt teeth, lead/ball screw threads, lead/ball screw nut ends, "
-        + "entire linear rail and block ends, any rotating bearings. Check your manufacturer’s maintenance page for more details.",
+        description: 'A clean CNC is a working CNC. ' +
+        'Any buildup of dust or chips can block moving components and wear them out faster, making your machine less accurate and less reliable. ' +
+        'Generally a shop towel for surfaces and an old toothbrush for crevices should be able to take care of most CNCs. ' +
+        'Be thorough since it’s easy to miss areas you don’t normally think about or ones covered in thin layers of dust.\n\n' +
+        'Key areas to check: cutting tool collet, v-wheel inner V, v-wheel rail V, belt teeth, lead/ball screw threads, lead/ball screw nut ends, ' +
+        'entire linear rail and block ends, any rotating bearings. Check your manufacturer’s maintenance page for more details.',
         rangeStart: 15,
         rangeEnd: 20,
         currentTime: 0
@@ -55,14 +55,14 @@ const defaultMaintenance = [
     {
         id: 1,
         name: 'Check for Loose Hardware',
-        description: "Cutting causes vibrations which means things can come loose over time. "
-        + "Some CNCs also use components that wear out and so should be tightened to keep the machine running as accurately as possible. "
-        + "Collect all the tools you used for assembly and maintenance of your CNC then, similar to cleaning, "
-        + "closely check over all areas of your machine down to the smallest screw and re-tighten anything you find to be loose.\n\n"
-        + "Key areas to check: set screws on couplers and locking nuts, attaching hardware for router/spindle, bolts attaching lead/ball "
-        + "screw nuts and linear rails and blocks, loose v-wheels, loose anti-backlash nuts, mounted electronics like motors and limit "
-        + "switches, loose electrical connectors, and structural hardware holding your machine frame together. "
-        + "Check your manufacturer’s maintenance page for more details.",
+        description: 'Cutting causes vibrations which means things can come loose over time. ' +
+        'Some CNCs also use components that wear out and so should be tightened to keep the machine running as accurately as possible. ' +
+        'Collect all the tools you used for assembly and maintenance of your CNC then, similar to cleaning, ' +
+        'closely check over all areas of your machine down to the smallest screw and re-tighten anything you find to be loose.\n\n' +
+        'Key areas to check: set screws on couplers and locking nuts, attaching hardware for router/spindle, bolts attaching lead/ball ' +
+        'screw nuts and linear rails and blocks, loose v-wheels, loose anti-backlash nuts, mounted electronics like motors and limit ' +
+        'switches, loose electrical connectors, and structural hardware holding your machine frame together. ' +
+        'Check your manufacturer’s maintenance page for more details.',
         rangeStart: 25,
         rangeEnd: 30,
         currentTime: 0
@@ -70,16 +70,16 @@ const defaultMaintenance = [
     {
         id: 2,
         name: 'Lubricate Bearing Components',
-        description: "Any components that use bearings need occasional upkeep and lubrication to keep them running smoothly and to help prevent dust "
-        + "buildup which can cause them to seize. This applies to round bearings, ball screws, ball screw nuts, linear rails, and linear bearing blocks. "
-        + "Most times a slide oil or 3-in-1 oil can be used, or for ball screws a lithium grease, "
-        + "but please check your manufacturer’s maintenance page for their specific recommendations.\n\n"
-        + "General steps for each component:\n"
-        + "1. Fully wipe down the component with a shop towel to remove old lubricant and debris, and use an old toothbrush to get into the crevices. "
-        + "Jog the machine around to access all surfaces and use a Scotch Brite if you spot rust.\n"
-        + "2. Either inject the oil/grease directly into the bearing, linear block, or ball nut, or use a shop towel to coat the rail or ball screw, "
-        + "ensuring you don’t overdo it since these components usually just need a modest top-up.\n"
-        + "3. Jog all axes to their extents several times to make sure the lubricant gets fully distributed and clean up any excess if you see an accumulation.",
+        description: 'Any components that use bearings need occasional upkeep and lubrication to keep them running smoothly and to help prevent dust ' +
+        'buildup which can cause them to seize. This applies to round bearings, ball screws, ball screw nuts, linear rails, and linear bearing blocks. ' +
+        'Most times a slide oil or 3-in-1 oil can be used, or for ball screws a lithium grease, ' +
+        'but please check your manufacturer’s maintenance page for their specific recommendations.\n\n' +
+        'General steps for each component:\n' +
+        '1. Fully wipe down the component with a shop towel to remove old lubricant and debris, and use an old toothbrush to get into the crevices. ' +
+        'Jog the machine around to access all surfaces and use a Scotch Brite if you spot rust.\n' +
+        '2. Either inject the oil/grease directly into the bearing, linear block, or ball nut, or use a shop towel to coat the rail or ball screw, ' +
+        'ensuring you don’t overdo it since these components usually just need a modest top-up.\n' +
+        '3. Jog all axes to their extents several times to make sure the lubricant gets fully distributed and clean up any excess if you see an accumulation.',
         rangeStart: 250,
         rangeEnd: 300,
         currentTime: 0
@@ -87,10 +87,10 @@ const defaultMaintenance = [
     {
         id: 3,
         name: 'Replace Wear Components',
-        description: "Some CNC parts wear out over time and eventually need replacing. "
-        + "These are typically parts that experience a rubbing action as opposed to using bearings, such as lead screw nuts and v-wheels. "
-        + "Since these parts are considered consumable, you should be able to find them for sale from your manufacturer as well as find "
-        + "guides on how to go through the process of replacing them.",
+        description: 'Some CNC parts wear out over time and eventually need replacing. ' +
+        'These are typically parts that experience a rubbing action as opposed to using bearings, such as lead screw nuts and v-wheels. ' +
+        'Since these parts are considered consumable, you should be able to find them for sale from your manufacturer as well as find ' +
+        'guides on how to go through the process of replacing them.',
         rangeStart: 1500,
         rangeEnd: 2000,
         currentTime: 0
