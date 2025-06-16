@@ -21,7 +21,14 @@
  *
  */
 
-import { useState, useEffect, KeyboardEvent, useCallback, useRef } from 'react';
+import {
+    useState,
+    useEffect,
+    KeyboardEvent,
+    useCallback,
+    useRef,
+    useMemo,
+} from 'react';
 import cx from 'classnames';
 import { X, Plus, ChevronDown } from 'lucide-react';
 
@@ -51,21 +58,23 @@ import {
 } from './definitions';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
 
-type CustomValue = {
-    value: string;
-    label: string;
-    isCustom: boolean;
-    isDeleted?: boolean;
-};
-
-interface Props {
+type Props = {
     actions: Actions;
     state: State;
     probeCommand: ProbeCommand;
-}
+};
 
-const convertAvailableTools = (tools: AvailableTool[], units: UNITS_EN) => {
+type Option = {
+    value: string;
+    label: string;
+};
+
+const convertAvailableTools = (
+    tools: AvailableTool[],
+    units: UNITS_EN,
+): Option[] => {
     return tools.map((tool) => ({
         value: String(
             tool[
@@ -77,7 +86,6 @@ const convertAvailableTools = (tools: AvailableTool[], units: UNITS_EN) => {
                 units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'
             ],
         ),
-        isCustom: false,
     }));
 };
 
@@ -85,89 +93,84 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const { touchplate, toolDiameter } = state;
     const { touchplateType } = touchplate;
     let { availableTools, units } = state;
-    //console.log(availableTools);
-
-    // Add refs to track current state
-    const valueRef = useRef<string>(
-        touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? PROBE_TYPE_AUTO
-            : String(toolDiameter),
-    );
-    const customValuesRef = useRef<CustomValue[]>([]);
-    const unitsRef = useRef<UNITS_EN>(units);
-    const availableToolsRef = useRef<AvailableTool[]>(availableTools);
-    const actionsRef = useRef(actions);
-    // Add ref for the input element
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const [value, setValue] = useState(
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO
             ? PROBE_TYPE_AUTO
             : String(toolDiameter),
     );
-    const [customValues, setCustomValues] = useState<CustomValue[]>(() => {
-        const saved = localStorage.getItem('probeCustomValues');
-        const loadedValues = saved ? JSON.parse(saved) : [];
-        return loadedValues;
-    });
 
-    // Initialize the customValuesRef with initial values
-    useEffect(() => {
-        // Set initial custom values to the ref
-        customValuesRef.current = customValues;
-    }, []);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    // Update refs when state changes
+    // Subscribe to store changes
     useEffect(() => {
-        valueRef.current = value;
-    }, [value]);
+        const handleStoreChange = () => {
+            const updatedTools = store.get('workspace.tools', []);
+            if (
+                JSON.stringify(updatedTools) !== JSON.stringify(availableTools)
+            ) {
+                availableTools = updatedTools;
+            }
+        };
 
-    useEffect(() => {
-        customValuesRef.current = customValues;
-    }, [customValues]);
-
-    useEffect(() => {
-        unitsRef.current = units;
-    }, [units]);
-
-    useEffect(() => {
-        availableToolsRef.current = availableTools;
+        store.on('change', handleStoreChange);
+        return () => {
+            store.removeListener('change', handleStoreChange);
+        };
     }, [availableTools]);
 
-    useEffect(() => {
-        actionsRef.current = actions;
-    }, [actions]);
+    // Memoize the options to prevent unnecessary recalculations
+    const options = useMemo(() => {
+        const baseOptions: Option[] = [];
+        const toolsObjects = convertAvailableTools(availableTools, units);
+
+        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+            baseOptions.push(
+                { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
+                { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
+            );
+        }
+
+        baseOptions.push(...toolsObjects);
+
+        return baseOptions.sort((a, b) => {
+            const isNumR = /^\d+.?\d*$/;
+            const isANum = isNumR.test(a.value);
+            const isBNum = isNumR.test(b.value);
+            if (isANum && isBNum) {
+                return Number(a.value) - Number(b.value);
+            } else if (!isANum && !isBNum) {
+                return a.value.localeCompare(b.value);
+            } else {
+                return isANum ? 1 : -1;
+            }
+        });
+    }, [availableTools, units, touchplateType]);
 
     useEffect(() => {
-        // Keep local state in sync with prop changes
         setValue(
             touchplateType === TOUCHPLATE_TYPE_AUTOZERO
                 ? PROBE_TYPE_AUTO
                 : String(toolDiameter),
         );
-    }, [touchplateType]);
+    }, [touchplateType, toolDiameter]);
 
-    useEffect(() => {
-        localStorage.setItem('probeCustomValues', JSON.stringify(customValues));
-    }, [customValues]);
-
-    const tools = [...availableTools].sort(
-        (a, b) => a.metricDiameter - b.metricDiameter,
+    const handleChange = useCallback(
+        (value: string): void => {
+            if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
+                actions._setProbeType(value);
+                actions._setToolDiameter({ value: null });
+            } else {
+                actions._setProbeType(PROBE_TYPE_DIAMETER);
+                actions._setToolDiameter({ value: Number(value) });
+            }
+            setValue(value);
+            if (inputRef.current) {
+                inputRef.current.value = '';
+            }
+        },
+        [actions],
     );
-
-    // Create stable callback that doesn't change on each render
-    const handleChange = useCallback((value: string): void => {
-        const currentActions = actionsRef.current;
-        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-            currentActions._setProbeType(value);
-            currentActions._setToolDiameter({ value: null });
-        } else {
-            currentActions._setProbeType(PROBE_TYPE_DIAMETER);
-            currentActions._setToolDiameter({ value: Number(value) });
-        }
-        setValue(value);
-        inputRef.current.value = '';
-    }, []);
 
     const handleCreateOption = useCallback(
         (inputValue: string) => {
@@ -175,178 +178,97 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             if (isNaN(newValue) || newValue <= 0) {
                 return;
             }
+
             const formattedValue = String(newValue);
             const toolUnits =
-                unitsRef.current === METRIC_UNITS
-                    ? 'metricDiameter'
-                    : 'imperialDiameter';
-            const existingToolValues = availableToolsRef.current.map((tool) =>
+                units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter';
+            const existingToolValues = availableTools.map((tool) =>
                 String(tool[toolUnits]),
             );
-            const existingCustomValues = customValuesRef.current.map(
-                (cv) => cv.value,
-            );
 
-            if (
-                existingToolValues.includes(formattedValue) ||
-                existingCustomValues.includes(formattedValue)
-            ) {
+            if (existingToolValues.includes(formattedValue)) {
                 handleChange(formattedValue);
                 return;
             }
 
-            const newCustomValue: CustomValue = {
-                value: formattedValue,
-                label: formattedValue,
-                isCustom: true,
+            // Create new tool and add to store
+            const newTool: AvailableTool = {
+                metricDiameter:
+                    units === METRIC_UNITS
+                        ? newValue
+                        : Number((newValue * 25.4).toFixed(2)),
+                imperialDiameter:
+                    units === METRIC_UNITS
+                        ? Number((newValue / 25.4).toFixed(2))
+                        : newValue,
+                type: 'End Mill',
             };
 
-            const updatedCustomValues = [
-                ...customValuesRef.current,
-                newCustomValue,
-            ];
-
-            setCustomValues(updatedCustomValues);
-            customValuesRef.current = updatedCustomValues;
-
+            const updatedTools = [...availableTools, newTool];
+            store.set('workspace.tools', updatedTools);
             handleChange(formattedValue);
         },
-        [handleChange],
+        [handleChange, availableTools, units],
     );
 
     const handleDeleteOption = useCallback(
         (valueToDelete: string) => {
-            // Check if it's a custom value
-            const isCustomValue = customValuesRef.current.some(
-                (v) => v.value === valueToDelete,
+            const toolUnits =
+                units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter';
+            const updatedTools = availableTools.filter(
+                (tool) => String(tool[toolUnits]) !== valueToDelete,
             );
 
-            if (isCustomValue) {
-                // Handle custom value deletion
-                const updatedCustomValues = customValuesRef.current.filter(
-                    (v) => v.value !== valueToDelete,
-                );
-                setCustomValues(updatedCustomValues);
-                customValuesRef.current = updatedCustomValues;
-            } else {
-                // Handle default tool deletion by adding it to custom values with a deleted flag
-                const newCustomValue: CustomValue = {
-                    value: valueToDelete,
-                    label: valueToDelete,
-                    isCustom: true,
-                    isDeleted: true,
-                };
-                const updatedCustomValues = [
-                    ...customValuesRef.current,
-                    newCustomValue,
-                ];
-                setCustomValues(updatedCustomValues);
-                customValuesRef.current = updatedCustomValues;
-            }
+            // Update store first
+            store.replace('workspace.tools', updatedTools);
 
-            if (valueRef.current === valueToDelete) {
-                const firstTool = availableToolsRef.current[0];
+            // Then handle selection if needed
+            if (value === valueToDelete) {
+                const firstTool = updatedTools[0];
                 if (firstTool) {
-                    const toolUnits =
-                        unitsRef.current === METRIC_UNITS
-                            ? 'metricDiameter'
-                            : 'imperialDiameter';
                     const diameter = String(firstTool[toolUnits]);
                     handleChange(diameter);
                 }
             }
         },
-        [handleChange],
+        [handleChange, availableTools, units, value],
     );
 
-    // Create stable callback functions for shuttle events
     const probeDiameterScrollUp = useCallback(() => {
-        const currentValue = valueRef.current;
-        const currentUnits = unitsRef.current;
-        const currentTools = availableToolsRef.current;
-        const currentCustomValues = customValuesRef.current;
-
-        if (
-            currentValue === PROBE_TYPE_AUTO ||
-            currentValue === PROBE_TYPE_TIP
-        ) {
+        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
             return;
         }
 
-        const toolUnits =
-            currentUnits === METRIC_UNITS
-                ? 'metricDiameter'
-                : 'imperialDiameter';
-
-        const standardOptions = currentTools.map((tool) =>
-            String(tool[toolUnits]),
-        );
-        const allOptions = [
-            ...new Set([
-                ...standardOptions,
-                ...currentCustomValues.map((cv) => cv.value),
-            ]),
-        ];
-
-        allOptions.sort((a, b) => Number(a) - Number(b));
-
-        const currentIndex = allOptions.indexOf(currentValue);
-
+        const currentIndex = options.findIndex((opt) => opt.value === value);
         if (currentIndex === -1) {
             return;
         }
 
         let newIndex = currentIndex - 1;
         if (newIndex < 0) {
-            newIndex = allOptions.length - 1;
+            newIndex = options.length - 1;
         }
 
-        handleChange(allOptions[newIndex]);
-    }, [handleChange]);
+        handleChange(options[newIndex].value);
+    }, [handleChange, options, value]);
 
     const probeDiameterScrollDown = useCallback(() => {
-        const currentValue = valueRef.current;
-        const currentUnits = unitsRef.current;
-        const currentTools = availableToolsRef.current;
-        const currentCustomValues = customValuesRef.current;
-
-        if (
-            currentValue === PROBE_TYPE_AUTO ||
-            currentValue === PROBE_TYPE_TIP
-        ) {
+        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
             return;
         }
 
-        const toolUnits =
-            currentUnits === METRIC_UNITS
-                ? 'metricDiameter'
-                : 'imperialDiameter';
-
-        const standardOptions = currentTools.map((tool) =>
-            String(tool[toolUnits]),
-        );
-        const allOptions = [
-            ...new Set([
-                ...standardOptions,
-                ...currentCustomValues.map((cv) => cv.value),
-            ]),
-        ];
-
-        allOptions.sort((a, b) => Number(a) - Number(b));
-
-        const currentIndex = allOptions.indexOf(currentValue);
-
+        const currentIndex = options.findIndex((opt) => opt.value === value);
         if (currentIndex === -1) {
             return;
         }
 
         let newIndex = currentIndex + 1;
-        if (newIndex >= allOptions.length) {
+        if (newIndex >= options.length) {
             newIndex = 0;
         }
 
-        handleChange(allOptions[newIndex]);
-    }, [handleChange]);
+        handleChange(options[newIndex].value);
+    }, [handleChange, options, value]);
 
     const shuttleControlEvents = useRef({
         PROBE_DIAMETER_SCROLL_UP: {
@@ -372,31 +294,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
 
-    const options = [];
-
-    const toolsObjects = convertAvailableTools(tools, units);
-
-    if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
-        options.push(
-            { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, isCustom: false },
-            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, isCustom: false },
-        );
-    }
-
-    // Filter out deleted tools
-    const deletedValues = customValues
-        .filter((cv) => cv.isDeleted)
-        .map((cv) => cv.value);
-
-    const filteredToolsObjects = toolsObjects.filter(
-        (tool) => !deletedValues.includes(tool.value),
-    );
-
-    options.push(
-        ...filteredToolsObjects,
-        ...customValues.filter((cv) => !cv.isDeleted),
-    );
-
     function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {
             return '';
@@ -404,24 +301,52 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         return units;
     }
 
-    function checkIsDeletable(value: string) {
-        // Allow deletion of all tools except 'Auto' and 'Tip'
-        return value !== PROBE_TYPE_AUTO && value !== PROBE_TYPE_TIP;
-    }
-
-    options.sort((a, b) => {
-        const isNumR = /^\d+.?\d*$/;
-        const isANum = isNumR.test(a.value);
-        const isBNum = isNumR.test(b.value);
-        // check if number
-        if (isANum && isBNum) {
-            return Number(a.value) - Number(b.value);
-        } else if (!isANum && !isBNum) {
-            return a.value.localeCompare(b.value); // we want letters first
-        } else {
-            return isANum ? 1 : -1; // we want words at the top
+    const renderOptions = () => {
+        if (options.length === 0) {
+            return (
+                <div className="flex items-center justify-center h-full min-h-10">
+                    <p className="text-gray-500">
+                        No tools available, add one below.
+                    </p>
+                </div>
+            );
         }
-    });
+
+        return options.map((option) => (
+            <div
+                key={option.value}
+                className={cx(
+                    'flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 cursor-pointer rounded min-h-10',
+                    {
+                        'bg-blue-50 dark:bg-gray-800 hover:bg-blue-50':
+                            option.value === value,
+                    },
+                )}
+                onClick={() => handleChange(option.value)}
+            >
+                <div className="flex items-center justify-between w-full">
+                    <span>
+                        {option.label}{' '}
+                        {getUnitString(option.value as PROBE_TYPES_T)}
+                    </span>
+
+                    {options.length > 1 && (
+                        <Button
+                            className="ml-2 hover:text-red-500 rounded p-0"
+                            variant="ghost"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteOption(option.value);
+                            }}
+                            size="sm"
+                        >
+                            <X className="h-6 w-6 cursor-pointer" />
+                        </Button>
+                    )}
+                </div>
+            </div>
+        ));
+    };
 
     return (
         <div className={cx('w-full', { hidden: !probeCommand.tool })}>
@@ -447,53 +372,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0 bg-white">
                         <div className="max-h-[300px] overflow-y-auto">
-                            {options.length > 0 ? (
-                                options.map((option) => (
-                                    <div
-                                        key={option.value}
-                                        className={cx(
-                                            'flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 cursor-pointer rounded min-h-10',
-                                            {
-                                                'bg-blue-50 dark:bg-gray-800 hover:bg-blue-50':
-                                                    option.value === value,
-                                            },
-                                        )}
-                                        onClick={() =>
-                                            handleChange(option.value)
-                                        }
-                                    >
-                                        <div className="flex items-center justify-between w-full">
-                                            <span>
-                                                {option.label}{' '}
-                                                {getUnitString(
-                                                    option.value as PROBE_TYPES_T,
-                                                )}
-                                            </span>
-                                            {checkIsDeletable(option.value) && (
-                                                <Button
-                                                    className="ml-2 hover:text-red-500 rounded p-0"
-                                                    variant="ghost"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteOption(
-                                                            option.value,
-                                                        );
-                                                    }}
-                                                    size="sm"
-                                                >
-                                                    <X className="h-6 w-6 cursor-pointer" />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="flex items-center justify-center h-full min-h-10">
-                                    <p className="text-gray-500">
-                                        No tools available, add one below.
-                                    </p>
-                                </div>
-                            )}
+                            {renderOptions()}
                         </div>
                         <div className="pt-2 border-t">
                             <div className="flex items-center space-x-2">
