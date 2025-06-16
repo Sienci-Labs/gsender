@@ -48,7 +48,11 @@ import {
 import { Input } from 'app/components/shadcn/Input';
 import { Button } from 'app/components/Button';
 
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
+import {
+    IMPERIAL_UNITS,
+    METRIC_UNITS,
+    PROBING_CATEGORY,
+} from '../../constants';
 import {
     Actions,
     AvailableTool,
@@ -154,6 +158,36 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 : String(toolDiameter),
         );
     }, [touchplateType, toolDiameter]);
+
+    useEffect(() => {
+        if (units === METRIC_UNITS) {
+            const metricValue = availableTools.find(
+                (tool) =>
+                    tool.metricDiameter === toolDiameter ||
+                    tool.imperialDiameter === toolDiameter,
+            );
+
+            if (metricValue) {
+                setValue(String(metricValue.metricDiameter));
+            }
+
+            return;
+        }
+
+        if (units === IMPERIAL_UNITS) {
+            const imperialValue = availableTools.find(
+                (tool) =>
+                    tool.imperialDiameter === toolDiameter ||
+                    tool.metricDiameter === toolDiameter,
+            );
+
+            if (imperialValue) {
+                setValue(String(imperialValue.imperialDiameter));
+            }
+
+            return;
+        }
+    }, [units]);
 
     const handleChange = useCallback(
         (value: string): void => {
@@ -298,6 +332,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         if (option === 'Tip' || option === 'Auto') {
             return '';
         }
+
         return units;
     }
 
