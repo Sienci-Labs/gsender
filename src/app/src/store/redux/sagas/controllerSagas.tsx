@@ -63,7 +63,8 @@ import {
 import {
     closeConnection,
     openConnection,
-    scanNetwork, setConnectionState,
+    scanNetwork,
+    setConnectionState,
 } from '../slices/connection.slice';
 import { listPorts } from '../slices/connection.slice';
 import {
@@ -476,15 +477,13 @@ export function* initialize(): Generator<any, void, any> {
             store.set('widgets.connection.controller.type', controllerType);
             reduxStore.dispatch(updateControllerType({ type: controllerType }));
             // Don't show as connected until controller open
-            setTimeout(
-                () => {
-                    reduxStore.dispatch(
-                        setConnectionState({
-                            isConnected: true,
-                        }),
-                    );
-                }, 250
-            )
+            setTimeout(() => {
+                reduxStore.dispatch(
+                    setConnectionState({
+                        isConnected: true,
+                    }),
+                );
+            }, 300);
 
             pubsub.publish('machine:connected');
         },
