@@ -83,7 +83,6 @@ export type CustomColumnDef<
 interface SortableTableProps<TData extends { subRow?: string }, TValue> {
     defaultData?: TData[];
     height?: string;
-    width?: string;
     columns?: CustomColumnDef<TData, TValue>[];
     data: TData[];
     enableSortingRemoval?: boolean;
@@ -97,6 +96,7 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
     pagination?: boolean;
     searchPlaceholder?: string;
     columnVisibility?: VisibilityState;
+    pageSize?: number;
 }
 const SortableTable = <TData extends { subRow?: string }, TValue>(
     props: SortableTableProps<TData, TValue>,
@@ -105,8 +105,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
     const data = props.data || []; // array of data objects
     const columns = props.columns; // format above
     const defaultData = props.defaultData || []; // same as data
-    const height = props.height || '520px';
-    const width = props.width || '760px';
+    const height = props.height || 'h-[520px]';
     const enableSortingRemoval =
         props.enableSortingRemoval !== undefined
             ? props.enableSortingRemoval
@@ -129,6 +128,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
         props.pagination !== null && props.pagination !== undefined
             ? props.pagination
             : true; // boolean for having pagination. default is true
+    const pageSize = props.pageSize ? props.pageSize : 15;
 
     // stop col span from first col that has it disabled
     let stopIndex = 0;
@@ -177,7 +177,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             columnVisibility: columnVisibility,
             pagination: pagination
                 ? {
-                      pageSize: 15,
+                      pageSize: pageSize,
                       pageIndex: 0,
                   }
                 : null,
@@ -200,7 +200,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 
     /***** RENDERING *****/
     return (
-        <div className="w-full flex flex-grow flex-col items-center justify-center gap-3">
+        <div className="w-full h-full flex flex-grow flex-col items-center gap-3">
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
             <div
@@ -247,21 +247,14 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             {/*** TABLE ***/}
             <div
                 className={cx(
-                    'w-full flex flex-grow flex-col items-center justify-center gap-3',
+                    'w-full flex flex-col items-center justify-center gap-3',
                     {
                         hidden: table.getRowModel().rows.length <= 0, // hide table if no search results
+                        [height]: height,
                     },
                 )}
             >
-                <div
-                    style={{
-                        maxHeight: height,
-                        minHeight: height,
-                        marginBottom: '5px',
-                        overflowY: 'scroll',
-                    }}
-                    className={'w-full'}
-                >
+                <div className="w-full h-full mb-1 overflow-y-scroll">
                     <BTable
                         striped
                         bordered
