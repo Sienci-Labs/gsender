@@ -52,6 +52,9 @@ const connectionSlice = createSlice({
             state.baudrate = baudrate;
             state.isConnected = isConnected;
         },
+        setConnectionState: (state, action: PayloadAction<{ isConnected: boolean }>) => {
+          state.isConnected = action.payload.isConnected;
+        },
         closeConnection: (state, action: PayloadAction<{ port: string }>) => {
             state.port = action.payload.port;
             state.isConnected = false;
@@ -78,7 +81,7 @@ const connectionSlice = createSlice({
     },
 });
 
-export const { openConnection, closeConnection, listPorts, scanNetwork } =
+export const { openConnection, setConnectionState, closeConnection, listPorts, scanNetwork } =
     connectionSlice.actions;
 
 export default connectionSlice.reducer;

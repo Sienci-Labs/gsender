@@ -196,7 +196,6 @@ class SerialConnection extends EventEmitter {
         }
 
         if (network || looksLikeIP) {
-            console.log('telnet');
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {
                 this.port.destroy();

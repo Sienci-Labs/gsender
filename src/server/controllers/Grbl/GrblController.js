@@ -1997,7 +1997,6 @@ class GrblController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                console.log(context);
                 this.toolChangeContext = context;
             },
             'toolchange:pre': () => {
@@ -2096,8 +2095,6 @@ class GrblController {
         if (!skipDialog) {
             block.push(`${PREHOOK_COMPLETE} ;${comment}`);
         }
-
-        console.log(block);
 
 
         this.command('gcode', block);

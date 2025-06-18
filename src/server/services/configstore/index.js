@@ -41,78 +41,53 @@ const defaultState = { // default state
 const defaultMaintenance = [
     {
         id: 0,
-        name: 'Cleaning Rails & Wheels',
-        description: 'The gunk on both the wheels and rails is easy to get off with a small brush, plastic scraper, wood scrap, or even your fingernails. ' +
-        'Remember to clean the rails on both the top and bottom edges and try your best to get into the crevices of all the wheels.',
-        rangeStart: 10,
+        name: 'Clean around your CNC',
+        description: 'Any buildup of dust or chips can block moving components and wear them out faster, making your machine less accurate and ' +
+        'less reliable. We recommend a shop towel for surfaces and an old toothbrush for crevices. ' +
+        'Be thorough since dust can settle on thin or in places you don’t expect.\n\n' +
+        'Key areas to check: cutting tool collet, v-wheel groove, rail groove, belt teeth, lead/ball screw threads, lead/ball screw nut ends, ' +
+        'entire linear rail and block ends, any rotating bearings. Check your manufacturer’s maintenance page for more details.',
+        rangeStart: 15,
         rangeEnd: 20,
         currentTime: 0
     },
     {
         id: 1,
-        name: 'Tightening Eccentric Nuts / V-Wheels',
-        description: '1. Get your LongMill wrench and an M5 Allen key and start by loosening the wheel bolt far enough that you can rotate the eccentric nut with the wrench.\n' +
-        '2. Turn the nut so the eccentric hole gets closer to the rail which will bring the wheel closer to the rail as well. ' +
-        'The ‘sweet spot’ is where you’re able to barely turn each wheel with your fingers.\n' +
-        '3. Once you’re satisfied with the nut placement, re-tighten the M5 bolt with the Allen key to confirm the new location.\n' +
-        '4. Check both the wheel you just tightened as well as its static ‘partner’ wheel on the opposite side of the rail for the right ‘sweet spot’. ' +
-        'Whichever wheel is on top will always be harder to spin.',
-        rangeStart: 10,
-        rangeEnd: 20,
+        name: 'Check for Loose Hardware',
+        description: 'Vibrations and wear during cutting can cause components to loosen over time. ' +
+        'Closely check over all areas of your machine and use your CNCs maintenance tools to re-tighten any loose hardware. ' +
+        'Some worn parts might also need adjustment to keep your CNC running accurately.\n\n' +
+        'Key areas to check: set screws on couplers and locking nuts, router/spindle attaching hardware, bolts attaching lead/ball ' +
+        'screw nuts and linear rails and blocks, loose v-wheels or anti-backlash nuts, mounted electronics like motors and limit ' +
+        'switches, loose electrical connectors, and structural machine frame hardware. ' +
+        'Check your manufacturer’s maintenance page for more details.',
+        rangeStart: 25,
+        rangeEnd: 30,
         currentTime: 0
     },
     {
         id: 2,
-        name: 'Tension Delrin Nuts',
-        description: '1. If you have the dust shield add-on for your machine, remove it so you can access the mechanics underneath.\n' +
-        '2. Check X, Z, and both Y plates by moving each of them back and forth. ' +
-        'If you can feel them wiggle a little bit even though the lead screws are stationary you may need to tension your anti-backlash nut.\n' +
-        '3. Every anti-backlash nut has a tensioning screw that you can reach with an M5 Allen key. ' +
-        'Adjusting each screw should only happen a very very tiny rotation at a time before checking again for looseness in the plate. ' +
-        'These screws normally require very little rotation and if you overtighten them it can put added stress on your machine and also cause premature wear.',
-        rangeStart: 10,
-        rangeEnd: 20,
+        name: 'Lubricate Bearing Components',
+        description: 'Any components with bearings need occasional cleaning and lubrication to keep them running smoothly and prevent seizing from ' +
+        'dust buildup. This includes round bearings, ball screws, ball screw nuts, linear rails, and linear bearing blocks. ' +
+        'You can often use a slide oil or 3-in-1 oil, or a lithium grease for ball screws, ' +
+        'but please check your manufacturer’s specific recommendations.\n\n' +
+        'Steps for each component:\n' +
+        '1. Fully wipe down the component with a shop towel to remove old lubricant and debris, and use an old toothbrush to get into the crevices. ' +
+        'Jog the machine around to access all surfaces and use a Scotch Brite if you spot rust.\n' +
+        '2. Inject the oil/grease directly into the bearing, linear block, or ball nut, or use a shop towel to coat the rail or ball screw. ' +
+        'It shouldn’t take too much.\n' +
+        '3. Jog all axes to their extents several times to make sure the lubricant is fully distributed, then clean up any excess.',
+        rangeStart: 250,
+        rangeEnd: 300,
         currentTime: 0
     },
     {
         id: 3,
-        name: 'Lubricate Linear Rails',
-        description: '1. Wipe your linear guides with a clean cloth, paper towel, rag, or shop towel to remove any dust that may have accumulated on your linear guides. ' +
-        'Move your Z-axis up and down if needed.\n' +
-        '2. Most general-purpose lubrication options such as the 3-in-1 oil should suffice. ' +
-        'It is not recommended to use dry lubricants or anything with particulates such as graphite in the lubricant.\n' +
-        '3. Apply a liberal of machine oil or grease to your linear guides. ' +
-        'Move your Z-axis up and down to ensure that the bearings inside have a chance to get coated.',
-        rangeStart: 20,
-        rangeEnd: 30,
-        currentTime: 0
-    },
-    {
-        id: 4,
-        name: 'Check For Loose Hardware',
-        description: 'Some key areas to check:\n' +
-        '1. Set screws on all couplers and ACME locking nuts\n' +
-        '2. M5 screws holding the feet onto the Y-rails and Y-axis plates onto the X-rail\n' +
-        '3. M5 screws mounting the stepper motors to their steel plates\n' +
-        '4. M5 screws on the router mount from in front and where it’s held in from behind\n' +
-        '5. M3 screws holding the Z-axis steel plate on and the linear rails to the X-axis plate\n' +
-        '6. Any assorted fasteners on any add-ons you may have received with your MK2',
-        rangeStart: 20,
-        rangeEnd: 30,
-        currentTime: 0
-    },
-    {
-        id: 5,
-        name: 'Replace Delrin Nuts',
-        description: 'These wear out over time. They need replacing every 1500-2000 hours.',
-        rangeStart: 1500,
-        rangeEnd: 2000,
-        currentTime: 0
-    },
-    {
-        id: 6,
-        name: 'Replace V-Wheels',
-        description: 'These wear out over time. They need replacing every 1500-2000 hours.',
+        name: 'Replace Worn Components',
+        description: 'Some CNC parts wear out over time and eventually need replacing - like lead screw nuts and v-wheels. ' +
+        'Unlike the smooth gliding of a bearing, these parts experience continuous rubbing so they’re considered consumables. ' +
+        'Your manufacturer should stock replacements and tell you how to change them out. ',
         rangeStart: 1500,
         rangeEnd: 2000,
         currentTime: 0

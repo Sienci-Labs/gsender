@@ -468,7 +468,6 @@ class SpindleWidget extends PureComponent {
         });
         let { xOffset, yOffset } = laser;
 
-        console.log('laser');
 
         // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
         if (controllerType === GRBLHAL && SLBLaser) {

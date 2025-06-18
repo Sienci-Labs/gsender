@@ -54,11 +54,8 @@ export function EEPROMSettingRow({
 
         const detailString = (
             <span>
-                <b>{EEPROMData.setting}</b>
-                <span> - </span>
                 {filterNewlines(EEPROMData.details)}
-                <br />
-                <i>Default {inputDefault}</i>
+                <span> ({EEPROMData.setting}, Default {inputDefault})</span>
             </span>
         );
 

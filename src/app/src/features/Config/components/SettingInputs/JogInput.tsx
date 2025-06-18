@@ -45,7 +45,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">Feed</span>
+                <span className="min-w-[7ch]">Speed</span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'feedrate')}

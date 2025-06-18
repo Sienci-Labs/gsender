@@ -34,7 +34,7 @@ gSender is available for the following systems and does not yet support headless
 
 * [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported
 * Smart machine connection
-* 3-axis digital readout (DRO) with manual value entry
+* 4-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
 * Zero-setting and gotos (independent and combined)
 * Probing in any direction plus safe continuity detection ensures no broken cutting toolsk
@@ -122,7 +122,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - What'd I miss - all new notifications center to keep you informed about what's happened when running your job.
 - Helper - Alarm explanations and toolchanging are now helpers, which will pop up as required.  
 - Visualizer - Lightweight mode has had some behaviour changes, and better supports touch movements like pinch and zoom.
-- Tools - All tools and widgets are collated on the new Tools interace, allowing you to easily 
+- Tools - All tools and widgets are collated on the new Tools interface, allowing you to easily access tools and widgets
 
 ### 1.4.12 (March 10th, 2025)
 - Added new machine profiles for Altmill 2X4

@@ -226,7 +226,7 @@ export function MaintenanceList() {
     }
 
     return (
-        <div>
+        <>
             <SortableTable
                 data={formattedData}
                 columns={columns}
@@ -236,6 +236,7 @@ export function MaintenanceList() {
                 pagination={false}
                 searchPlaceholder="Search Tasks..."
                 columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on
+                height="h-[calc(100vh-42px-224px)]"
             />
             <MaintenanceAddTaskDialog
                 show={showAddForm}
@@ -290,6 +291,6 @@ export function MaintenanceList() {
                     </AlertDialogContent>
                 </AlertDialog>
             )}
-        </div>
+        </>
     );
 }

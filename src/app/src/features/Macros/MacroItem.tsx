@@ -55,7 +55,7 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 active={running}
                 variant="ghost"
             >
-                <span className="truncate max-w-[12ch] w-[12ch] text-left">
+                <span className="w-[12ch] text-left truncate whitespace-nowrap text-overflow-ellipsis max-w-[12ch]">
                     {running ? 'Running...' : macro.name}
                 </span>
             </Button>
@@ -88,13 +88,21 @@ const MacroItem = ({
 
     return (
         <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
-            <Tooltip content={macro.description.trim()}>
+            {macro.description.trim() ? (
+                <Tooltip content={macro.description.trim()}>
+                    <MacroButton
+                        onMacroRun={onMacroRun}
+                        disabled={disabled}
+                        macro={macro}
+                    />
+                </Tooltip>
+            ) : (
                 <MacroButton
                     onMacroRun={onMacroRun}
                     disabled={disabled}
                     macro={macro}
                 />
-            </Tooltip>
+            )}
 
             <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">

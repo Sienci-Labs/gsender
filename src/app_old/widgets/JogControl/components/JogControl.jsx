@@ -28,12 +28,10 @@ import styles from '../index.styl';
 
 const JogControl = ({ timeout = 600, disabled = false, jog, continuousJog, stopContinuousJog, className, children }) => {
     const bind = useLongPress((e) => {
-        console.log('long');
         continuousJog();
     }, {
         threshold: timeout,
         onCancel: (e) => {
-            console.log('test');
             jog();
         },
         onFinish: stopContinuousJog,

@@ -300,9 +300,9 @@ const RotarySurfacing = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col border border-gray-200 rounded-md">
                         <Tabs defaultValue="visualizer">
-                            <TabsList className="w-full">
+                            <TabsList className="w-full pb-0 border-b rounded-b-none">
                                 <TabsTrigger
                                     value="visualizer"
                                     className="w-full"
@@ -337,7 +337,7 @@ const RotarySurfacing = () => {
                             </div>
                             <div
                                 className={cx(
-                                    'h-full rounded-md relative border p-2',
+                                    'h-full rounded-md relative p-2',
                                     {
                                         invisible: !tabSwitch,
                                     },
