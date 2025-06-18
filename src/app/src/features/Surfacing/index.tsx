@@ -319,37 +319,34 @@ const SurfacingTool = () => {
                             </div>
                         </InputArea>
                     </div>
-                    <div className="flex flex-col gap-0">
-                        <div className="w-full border border-gray-200 rounded-md border-b-0 rounded-b-none">
-                            <Tabs defaultValue="visualizer-preview">
-                                <TabsList className="w-full">
-                                    <TabsTrigger
-                                        value="visualizer-preview"
-                                        className="w-full"
-                                        onClick={() => setTabSwitch(false)}
-                                    >
-                                        Visualizer Preview
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="gcode-viewer"
-                                        className="w-full"
-                                        onClick={() => setTabSwitch(true)}
-                                    >
-                                        G-Code{' '}
-                                        {gcode.length !== 0 ? (
-                                            <span className="text-xs text-gray-500">
-                                                ({gcode.split('\n').length}{' '}
-                                                lines)
-                                            </span>
-                                        ) : null}
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
-                        </div>
+                    <div className="flex flex-col border border-gray-200 rounded-md">
+                        <Tabs defaultValue="visualizer-preview">
+                            <TabsList className="w-full pb-0 border-b rounded-b-none">
+                                <TabsTrigger
+                                    value="visualizer-preview"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(false)}
+                                >
+                                    Visualizer Preview
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="gcode-viewer"
+                                    className="w-full"
+                                    onClick={() => setTabSwitch(true)}
+                                >
+                                    G-Code{' '}
+                                    {gcode.length !== 0 ? (
+                                        <span className="text-xs text-gray-500">
+                                            ({gcode.split('\n').length} lines)
+                                        </span>
+                                    ) : null}
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
                         <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
                             <div
                                 className={cx(
-                                    'absolute w-full h-full top-0 left-0 rounded-md rounded-t-none',
+                                    'absolute w-full h-full top-0 left-0 rounded-md',
                                     {
                                         invisible: tabSwitch,
                                     },
@@ -358,12 +355,9 @@ const SurfacingTool = () => {
                                 <VisualizerPreview gcode={gcode} />
                             </div>
                             <div
-                                className={cx(
-                                    'h-full rounded-md relative border p-2 rounded-t-none',
-                                    {
-                                        invisible: !tabSwitch,
-                                    },
-                                )}
+                                className={cx('h-full relative p-2', {
+                                    invisible: !tabSwitch,
+                                })}
                             >
                                 <GcodeViewer gcode={gcode} />
                             </div>
