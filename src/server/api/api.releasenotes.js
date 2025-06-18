@@ -25,6 +25,25 @@
 // import path from 'path';
 
 const releases = [
+  {
+    'version': '1.5.0',
+    'date': 'June 18th, 2025',
+    'notes': [
+      'All new user experience - we\'ve streamlined and modernized the UI, with a focus on touch device and usability.  It should seem familiar to previous gSender users with a number of new improvements.',
+      'Firmware now detected on connection - no more firmware selector, gSender can just use the correct controller type.',
+      'All new Stats tool which collates your job run statistics, alarms and errors, maintenance tasks, and diagnostics.',
+      'Firmware settings and gSender settings have been combined into a new streamlined Config tool, allowing you to easily configure your machine setup and application behaviour.',
+      'All settings (both EEPROM and application) can be filtered by non-default and restored to default values at a single click.',
+      'Rotary now a first-class citizen - enabling rotary functionality adds all DRO and jogging controls you could need to the main UI.',
+      'Some new perspectives - gSender now comes with a configurable dark mode, selectable in config.  As well, portrait mode is available by rotating your device.',
+      'Updated remote mode - more functionality at your finger tips',
+      'What\'d I miss - all new notifications center to keep you informed about what\'s happened when running your job.',
+      'Helper - Alarm explanations and toolchanging are now helpers, which will pop up as required.  ',
+      'Visualizer - Lightweight mode has had some behaviour changes, and better supports touch movements like pinch and zoom.',
+      'Tweak to 30X30 machine profile for missing acceleration change for $111.',
+      'Tools - All tools and widgets are collated on the new Tools interface, allowing you to easily access tools and widgets'
+    ]
+  },
     {
         'version': '1.4.11',
         'date': 'December 16th, 2024',
@@ -60,19 +79,6 @@ const releases = [
             'Altmill profile now at top of profiles with other Sienci Machines'
         ]
     },
-    {
-        'version': '1.4.9',
-        'date': 'August 5, 2024',
-        'notes': [
-            'Fix for time remaining converting timestamps incorrectly',
-            'Firmware groups now always emitted to UI on connection',
-            'Reduced situations where error 1 should appear on connection or homing',
-            'Alterations to Altmill default profile for Z acceleration',
-            'Enabling rotary mode for grblHAL now disables homing, and disabling rotary mode restores your previous homing value',
-            'Updated Longmill HAL A axis travel resolution for compiled microstepping value',
-            'Main window should no longer be focused on load file dialog'
-        ]
-    }
 ];
 
 export const fetchReleaseNotes = (req, res) => {
