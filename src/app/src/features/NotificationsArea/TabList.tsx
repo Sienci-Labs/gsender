@@ -10,7 +10,7 @@ import NotificationList from './NotificationList';
 const TabList = () => {
     return (
         <Tabs defaultValue="all">
-            <TabsList className="grid w-full grid-cols-4 bg-gray-200">
+            <TabsList className="grid w-full grid-cols-4 bg-gray-200 dark:bg-gray-800">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="error">Errors</TabsTrigger>
                 <TabsTrigger value="info">Info</TabsTrigger>
