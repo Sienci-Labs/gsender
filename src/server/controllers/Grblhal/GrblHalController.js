@@ -848,11 +848,11 @@ class GrblHalController {
                 if (isRunning) {
                     this.workflow.stop();
                 }
-                this.emit('serialport:read', `ALARM:${code} (${alarm?.description})`);
+                this.emit('serialport:read', `ALARM:${code} (${alarm.description})`);
                 this.emit('error', {
                     type: ALARM,
                     code: code,
-                    description: alarm?.description || '',
+                    description: alarm.description || '',
                     line: line,
                     lineNumber: isFileError ? received + 1 : '',
                     origin: errorOrigin,
