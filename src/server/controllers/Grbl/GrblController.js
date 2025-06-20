@@ -850,7 +850,30 @@ class GrblController {
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
+                this.emit('controller:state', GRBL, this.state);
+            } else {
+                // Grbl v0.9
+                this.emit('serialport:read', res.raw);
+            }
+        });
 
+        this.runner.on('startupAlarm', (res) => {
+            const alarm = _.find(GRBL_ALARMS, { code: 'Homing' });
+
+            if (alarm) {
+                // Grbl v1.1
+                this.emit('serialport:read', `ALARM:Homing (${alarm.message})`);
+                this.emit('error', {
+                    type: ALARM,
+                    code: 'Homing',
+                    description: alarm.description,
+                    line: 'N/A',
+                    lineNumber: '',
+                    origin: 'Startup',
+                    controller: GRBL
+                });
+                // Force propogation of current state on alarm
+                this.state = this.runner.state;
                 this.emit('controller:state', GRBL, this.state);
             } else {
                 // Grbl v0.9
