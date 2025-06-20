@@ -17,6 +17,7 @@ export function unlockFirmware(
         if (code === 11 || code === 'Homing') {
             controller.command('populateConfig');
         }
+        return;
     }
     controller.command('cyclestart');
 }

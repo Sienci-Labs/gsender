@@ -1728,8 +1728,8 @@ class GrblHalController {
             },
             'unlock': () => {
                 this.feeder.reset();
-                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
                 this.writeln('$X');
+                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
             },
             'populateConfig': () => {
                 this.writeln('$$');
