@@ -13,6 +13,7 @@ import Switch from 'app/components/Switch';
 import controller from 'app/lib/controller';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import {METRIC_UNITS} from "app/constants";
 
 interface GotoProps {
     units: string;
@@ -22,6 +23,7 @@ interface GotoProps {
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
     const { mode } = useWorkspaceState();
+    console.log(units);
     const controllerType = useTypedSelector((state) => state.controller.type);
     const [relativeMovement, setRelativeMovement] = useState(false);
     const [movementPos, setMovementPos] = useState({
@@ -64,7 +66,8 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     function goToLocation() {
         const code = [];
-        const unitModal = 'G90';
+        const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+        console.log(unitModal);
         const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
 
         // Build axis commands based on non-zero values
