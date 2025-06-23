@@ -23,6 +23,7 @@ import {
     FIRMWARE_TYPES_T,
     MachineProfile,
 } from 'app/definitions/firmware';
+import pubsub from "pubsub-js";
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -188,11 +189,23 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setMachineProfile(latest);
     }, []);
 
-    useEffect(() => {
+    function repopulateSettings() {
         const [populatedSettings, globalValues] =
             populateSettingsValues(settings);
         setSettings([...populatedSettings]);
         setSettingsValues([...globalValues]);
+    }
+
+    useEffect(() => {
+        repopulateSettings()
+        /*const [populatedSettings, globalValues] =
+            populateSettingsValues(settings);
+        setSettings([...populatedSettings]);
+        setSettingsValues([...globalValues]);*/
+        pubsub.subscribe('repopulate', () => {
+            console.log('repopulate called')
+            return repopulateSettings()
+        })
     }, []);
 
     useEffect(() => {
