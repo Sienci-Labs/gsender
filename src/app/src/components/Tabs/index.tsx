@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
+import { useLocation } from 'react-router';
 
 interface TabItem {
     label: string;
@@ -18,12 +19,25 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
+    const location = useLocation();
+
+    useEffect(() => {
+        const { pathname } = location;
+        if (pathname === '/') {
+            scrollToTab(items.findIndex((value) => value.label === activeTab)); // scroll to correct tab on navigating to carve
+        }
+    }, [location]);
 
     useEffect(() => {
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
 
         window.addEventListener('resize', checkScrollability);
+
+        // if the active tab doesnt exist in the tabs list anymore, default to first tab
+        if (!items.find((value) => value.label === activeTab)) {
+            setActiveTab(items[0].label);
+        }
     }, [items]);
 
     const checkScrollability = () => {
