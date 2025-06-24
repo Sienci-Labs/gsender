@@ -134,6 +134,14 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
                     <h1>Go To Location</h1>
+                    <div className="flex flex-row text-sm text-gray-400 justify-between">
+                        <span>ABS</span>
+                        <Switch
+                            checked={relativeMovement}
+                            onChange={onToggleSwap}
+                        />
+                        <span>INC</span>
+                    </div>
                     <UnitInput
                         units={units}
                         label="X"
@@ -160,14 +168,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         onChange={(v) => onValueEdit(v, 'a')}
                         disabled={!aAxisIsAvailble}
                     />
-                    <div className="flex flex-row text-sm text-gray-400 justify-between">
-                        <span>ABS</span>
-                        <Switch
-                            checked={relativeMovement}
-                            onChange={onToggleSwap}
-                        />
-                        <span>INC</span>
-                    </div>
+
                     <Button variant="alt" onClick={goToLocation}>
                         Go!
                     </Button>

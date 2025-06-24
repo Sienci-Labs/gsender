@@ -48,7 +48,7 @@ const ResultsStep = () => {
             const $100 = eepromAdjustment.x.amount.toFixed(3);
             const $101 = eepromAdjustment.y.amount.toFixed(3);
 
-            controller.command('gcode', [`$100=${$100}`, `$101=${$101}`]);
+            controller.command('gcode', [`$100=${$100}`, `$101=${$101}`, '$$']);
 
             toast.info('Updated EEPROM values', { position: 'bottom-right' });
         } catch (error) {

@@ -75,7 +75,7 @@ const Steps = () => {
             actualDistanceMoved: measuredDistance,
         });
 
-        controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`]);
+        controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`, '$$']);
 
         toast.info('Updated steps-per-mm value', { position: 'bottom-right' });
     };
