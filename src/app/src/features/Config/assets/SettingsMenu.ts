@@ -1063,7 +1063,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Travel resolution in steps per degree. ($103)',
                         type: 'hybrid',
                         eID: '$103',
-                        unit: 'rpm',
+                        unit: 'step/deg',
                     },
                     {
                         label: 'Max speed',
@@ -1072,7 +1072,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Max axis speed, also used for G0 rapids. ($113)',
                         type: 'hybrid',
                         eID: '$113',
-                        unit: 'rpm',
+                        unit: 'deg/min',
                     },
                     { type: 'eeprom', eID: '$123' },
                     {
