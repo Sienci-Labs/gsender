@@ -6,7 +6,7 @@ import {
 const CONFIG_KEY = 'jobStats';
 
 const getJobStats = () => {
-    const jobStats = config.get(CONFIG_KEY, { totalRuntime: 0, totalJobs: 0, jobsCompleted: 0, jobsCancelled: 0, jobs: [] })
+    const jobStats = config.get(CONFIG_KEY, { totalRuntime: 0, totalJobs: 0, jobsCompleted: 0, jobsCancelled: 0, jobs: [] });
 
     if (!jobStats.jobs) {
         jobStats.jobs = [];
