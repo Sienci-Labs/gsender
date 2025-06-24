@@ -101,13 +101,23 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     }
     function onPopoverOpen(open) {
         if (open) {
-            setMovementPos({
-                ...movementPos,
-                x: Number(wpos.x),
-                y: Number(wpos.y),
-                z: Number(wpos.y),
-                a: Number(wpos.a),
-            });
+            if (relativeMovement) {
+                setMovementPos({
+                    ...movementPos,
+                    x: Number(0),
+                    y: Number(0),
+                    z: Number(0),
+                    a: Number(0),
+                });
+            } else {
+                setMovementPos({
+                    ...movementPos,
+                    x: Number(wpos.x),
+                    y: Number(wpos.y),
+                    z: Number(wpos.y),
+                    a: Number(wpos.a),
+                });
+            }
         }
     }
 

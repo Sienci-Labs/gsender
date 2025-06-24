@@ -290,7 +290,7 @@ function DRO({
         <div className="relative">
             <UnitBadge />
             <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
-                <GoTo wpos={wpos} units={unitLabel} disabled={!canClick} />
+                <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && <RapidPositionButtons />}
                 {isConnected && homingEnabled && (
                     <Parking disabled={!canClick} />
