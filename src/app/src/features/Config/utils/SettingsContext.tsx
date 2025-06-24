@@ -299,13 +299,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return true; // default in cases where we don't know the default
         }
 
-        const settingIsNumberValue = !(
-            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
-        );
-
-        return settingIsNumberValue
-            ? `${Number(settingData.value)}` === `${Number(inputDefault)}`
-            : settingData.value === inputDefault;
+        return isEqual(settingData.value, inputDefault);
     }
 
     function toggleFilterNonDefault() {
