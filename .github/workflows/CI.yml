@@ -276,6 +276,11 @@ jobs:
             releases/windows/*
           prerelease: true
           draft: true
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: releases/windows/*.exe
 
   build-pi:
     name: Build Raspberry PI packages
