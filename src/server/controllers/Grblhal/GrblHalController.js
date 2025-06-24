@@ -326,10 +326,14 @@ class GrblHalController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0' && !looksLikeEEPROM) {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
+                        const payload = { data: 'M0', comment: commentString };
+                        this.feeder.hold(payload);
+                        this.emit('feeder:pause', payload);
                     } else if (programMode === 'M1' && !looksLikeEEPROM) {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
+                        const payload = { data: 'M1', comment: commentString };
+                        this.feeder.hold(payload);// Hold reason
+                        this.emit('feeder:pause', payload);
                     }
                 }
 
