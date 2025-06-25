@@ -195,11 +195,13 @@ jobs:
             releases/macos/*
           prerelease: true
           draft: true
-      - name: Upload
+      - name: Upload Mac Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mac_artifact
           path: releases/macos/*.dmg
+          compression-level: 0 # no compression
+          retention-days: 2
   build-windows:
     name: Build Windows packages
     runs-on: windows-latest
@@ -281,11 +283,13 @@ jobs:
             releases/windows/*
           prerelease: true
           draft: true
-      - name: Upload
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows_artifact
           path: releases/windows/*.exe
+          compression-level: 0 # no compression
+          retention-days: 2
 
   build-pi:
     name: Build Raspberry PI packages
