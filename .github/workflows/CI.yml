@@ -6,7 +6,6 @@ on:
     branches:
       - master
       - dev
-      - CI_update
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
@@ -148,7 +147,7 @@ jobs:
           yarn lint
       - name: Run "build" script
         if: github.ref_type == 'tag'
-        run: yarn run build
+        run: yarn run build-latest
       - name: Run "build-latest" script
         if: github.ref_type == 'branch'
         run: yarn run build-latest
@@ -241,7 +240,7 @@ jobs:
       - name: Install necessary dependencies and perform initial checks
         run: |
           yarn install
-      - name: Run "build" script
+      - name: Run "build-latest" script
         if: github.ref_type == 'tag'
         run: yarn run build
       - name: Run "build-latest" script
