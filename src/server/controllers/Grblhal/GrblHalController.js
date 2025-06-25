@@ -1567,7 +1567,7 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
-                        modalGCode.push(`${modal.units} ${modal.spindle} F${feedRate} S${spindleRate}`);
+                        modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
@@ -1576,6 +1576,7 @@ class GrblHalController {
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
+                    modalGCode.push(`F${feedRate}`);
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
