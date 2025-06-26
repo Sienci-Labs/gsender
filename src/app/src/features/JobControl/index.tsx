@@ -26,6 +26,7 @@ interface JobControlProps {
     fileLoaded: boolean;
     ovF: number;
     ovS: number;
+    ovTimestamp: number;
     feedrate: string;
     spindle: string;
     senderStatus: SenderStatus;
@@ -39,6 +40,7 @@ const JobControl: React.FC<JobControlProps> = ({
     fileLoaded,
     ovF,
     ovS,
+    ovTimestamp,
     feedrate,
     spindle,
     senderStatus,
@@ -142,6 +144,7 @@ const JobControl: React.FC<JobControlProps> = ({
                             <Overrides
                                 ovF={ovF}
                                 ovS={ovS}
+                                ovTimestamp={ovTimestamp}
                                 feedrate={feedrate}
                                 spindle={spindle}
                                 isConnected={isConnected}
@@ -162,6 +165,7 @@ export default connect((store) => {
     const ov = get(store, 'controller.state.status.ov', [100, 100, 100]);
     const ovF = ov[0];
     const ovS = ov[2];
+    const ovTimestamp = get(store, 'controller.state.status.ovTimestamp', 0);
     const feedrate = get(store, 'controller.state.status.feedrate');
     const spindle = get(store, 'controller.state.status.spindle');
     const senderStatus = get(store, 'controller.sender.status');
@@ -174,6 +178,7 @@ export default connect((store) => {
         isConnected,
         ovF,
         ovS,
+        ovTimestamp,
         feedrate,
         spindle,
         senderStatus,

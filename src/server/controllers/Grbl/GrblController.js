@@ -1717,8 +1717,7 @@ class GrblController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
 
@@ -1745,8 +1744,7 @@ class GrblController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
             },
