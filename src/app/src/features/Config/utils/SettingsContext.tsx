@@ -242,8 +242,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
             const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
 
-            // can't find a relevant value, we hide it
-            if (!EEPROMData) {
+            // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
+            if (!EEPROMData && v.type !== 'hybrid') {
                 return false;
             }
             // If filterNonDefault is enabled, make sure the current value equals the default value
