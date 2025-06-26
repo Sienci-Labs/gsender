@@ -594,9 +594,10 @@ class GrblHalController {
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.feeder.reset();
             this.sender.rewind();
             this.sender.stopCountdown();
-            this.feeder.reset();
+
         });
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
