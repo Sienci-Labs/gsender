@@ -50,7 +50,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                 ...movementPos,
                 x: Number(wpos.x),
                 y: Number(wpos.y),
-                z: Number(wpos.y),
+                z: Number(wpos.z),
                 a: Number(wpos.a),
             });
         }
