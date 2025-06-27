@@ -77,7 +77,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 dark:bg-dark">
             <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
             <div className="flex flex-row items-center border border-gray-200 h-16 rounded-lg justify-between">
-                <div className="w-1/4 mx-auto">
+                <div className="w-1/4 min-w-64  mx-auto px-2">
                     <MachineProfileSelector />
                 </div>
 
