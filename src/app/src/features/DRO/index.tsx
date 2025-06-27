@@ -325,6 +325,7 @@ function DRO({
                     wpos={wpos.z}
                     disabled={!canClick}
                     homingMode={homingMode}
+                    disableGotoZero={isRotaryMode}
                 />
                 {(isRotaryMode ||
                     (rotaryFunctionsEnabled && axes.includes('A'))) && (

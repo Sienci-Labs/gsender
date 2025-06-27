@@ -27,6 +27,7 @@ interface AxisRowProps {
     disabled: boolean;
     homingMode: boolean;
     disablePositionUpdate?: boolean;
+    disableGotoZero?: boolean;
 }
 
 export function AxisRow({
@@ -37,6 +38,7 @@ export function AxisRow({
     disabled,
     homingMode,
     disablePositionUpdate,
+    disableGotoZero,
 }: AxisRowProps) {
     const { shouldWarnZero } = useWorkspaceState();
 
@@ -95,7 +97,7 @@ export function AxisRow({
 
             <WCSInput
                 disabled={disabled}
-                value={disablePositionUpdate ? undefined : wpos}
+                value={disablePositionUpdate ? undefined : (wpos as string)}
                 axis={axis}
                 movementHandler={handleManualOffset}
             />
@@ -105,7 +107,7 @@ export function AxisRow({
             </span>
 
             <Button
-                disabled={disabled}
+                disabled={disabled || disableGotoZero}
                 onClick={() => gotoZero(axis)}
                 variant="alt"
                 size="sm"
