@@ -35,6 +35,7 @@ interface SettingRowProps {
 }
 
 function returnSettingControl(
+    connected: boolean,
     setting: gSenderSetting,
     value: gSenderSettingsValues = 0,
     index: number = -1,
@@ -117,7 +118,13 @@ function returnSettingControl(
                 />
             );
         case 'wizard':
-            return setting.wizard();
+            if (setting.label !== 'Square up CNC rails') {
+                return setting.wizard();
+            } else if (connected) {
+                return setting.wizard();
+            } else {
+                return <></>;
+            }
         case 'jog':
             return <JogInput value={value} index={index} onChange={handler} />;
         default:
@@ -218,6 +225,7 @@ export function SettingRow({
             </span>
             <span className="w-1/5 max-xl:w-2/5 text-xs px-4 dark:text-gray-200">
                 {returnSettingControl(
+                    connected,
                     displaySetting,
                     populatedValue.value,
                     setting.globalIndex,
