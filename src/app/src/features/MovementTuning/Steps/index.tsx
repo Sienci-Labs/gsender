@@ -33,6 +33,7 @@ import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -41,8 +42,11 @@ const Steps = () => {
     const [markLocationCompleted, setMarkLocationCompleted] = useState(false);
     const [moveAxisCompleted, setMoveAxisCompleted] = useState(false);
     const [setTravelCompleted, setSetTravelCompleted] = useState(false);
-    const [moveDistance, setMoveDistance] = useState(100);
-    const [measuredDistance, setMeasuredDistance] = useState(100);
+    const { units } = useWorkspaceState();
+    const [moveDistance, setMoveDistance] = useState(units === 'mm' ? 100 : 25);
+    const [measuredDistance, setMeasuredDistance] = useState(
+        units === 'mm' ? 100 : 25,
+    );
     const { settings } = useTypedSelector((state) => state.controller.settings);
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
@@ -50,6 +54,7 @@ const Steps = () => {
     const controllerStatus = useTypedSelector(
         (state) => state?.controller.state?.status,
     );
+
     const isDisabled =
         !isConnected ||
         (controllerStatus?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
@@ -433,7 +438,7 @@ const Steps = () => {
                                                 }
                                                 disabled={currentStep !== 1}
                                                 className="w-28"
-                                                suffix="mm"
+                                                suffix={units ?? 'mm'}
                                             />
                                         </div>
                                     </div>
