@@ -179,6 +179,7 @@ class GrblLineParserResultStatus {
         // Ov:100,100,100 indicates current override values in percent of programmed values for feed, rapids, and spindle speed, respectively.
         if (_.has(result, 'Ov')) {
             payload.ov = _.get(result, 'Ov', []).map(v => Number(v));
+            payload.ovTimestamp = Date.now();
         }
 
         // Accessory State (v1.1)

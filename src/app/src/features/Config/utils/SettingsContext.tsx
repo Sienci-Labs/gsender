@@ -23,6 +23,7 @@ import {
     FIRMWARE_TYPES_T,
     MachineProfile,
 } from 'app/definitions/firmware';
+import pubsub from "pubsub-js";
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -188,11 +189,23 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setMachineProfile(latest);
     }, []);
 
-    useEffect(() => {
+    function repopulateSettings() {
         const [populatedSettings, globalValues] =
             populateSettingsValues(settings);
         setSettings([...populatedSettings]);
         setSettingsValues([...globalValues]);
+    }
+
+    useEffect(() => {
+        repopulateSettings()
+        /*const [populatedSettings, globalValues] =
+            populateSettingsValues(settings);
+        setSettings([...populatedSettings]);
+        setSettingsValues([...globalValues]);*/
+        pubsub.subscribe('repopulate', () => {
+            console.log('repopulate called')
+            return repopulateSettings()
+        })
     }, []);
 
     useEffect(() => {
@@ -229,8 +242,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
             const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
 
-            // can't find a relevant value, we hide it
-            if (!EEPROMData) {
+            // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
+            if (!EEPROMData && v.type !== 'hybrid') {
                 return false;
             }
             // If filterNonDefault is enabled, make sure the current value equals the default value
@@ -286,13 +299,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return true; // default in cases where we don't know the default
         }
 
-        const settingIsNumberValue = !(
-            Number.isNaN(inputDefault) || Number.isNaN(inputDefault)
-        );
-
-        return settingIsNumberValue
-            ? `${Number(settingData.value)}` === `${Number(inputDefault)}`
-            : settingData.value === inputDefault;
+        return isEqual(settingData.value, inputDefault);
     }
 
     function toggleFilterNonDefault() {

@@ -289,6 +289,17 @@ const migrateStore = (): void => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.5.1')) {
+        const currentSpindleSetting = store.get('workspace.spindleFunctions', false);
+        const machineProfileSpindleSetting = store.get('workspace.machineProfile.spindle', false);
+        if (currentSpindleSetting) {
+            return;
+        }
+        if (machineProfileSpindleSetting) {
+            store.set('workspace.spindleFunctions', true);
+        }
+    }
+
     if (semver.lt(cnc.version, '1.4.8')) {
         const delay = store.get('widgets.spindle.delay');
         if (delay) {

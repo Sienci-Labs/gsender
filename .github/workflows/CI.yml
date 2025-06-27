@@ -6,7 +6,6 @@ on:
     branches:
       - master
       - dev
-      - CI_update
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
@@ -195,6 +194,13 @@ jobs:
             releases/macos/*
           prerelease: true
           draft: true
+      - name: Upload Mac Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac_artifact
+          path: releases/macos/*.dmg
+          compression-level: 0 # no compression
+          retention-days: 2
   build-windows:
     name: Build Windows packages
     runs-on: windows-latest
@@ -234,7 +240,7 @@ jobs:
       - name: Install necessary dependencies and perform initial checks
         run: |
           yarn install
-      - name: Run "build" script
+      - name: Run "build-latest" script
         if: github.ref_type == 'tag'
         run: yarn run build
       - name: Run "build-latest" script
@@ -276,6 +282,13 @@ jobs:
             releases/windows/*
           prerelease: true
           draft: true
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_artifact
+          path: releases/windows/*.exe
+          compression-level: 0 # no compression
+          retention-days: 2
 
   build-pi:
     name: Build Raspberry PI packages

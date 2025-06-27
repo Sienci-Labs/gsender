@@ -157,7 +157,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 ? PROBE_TYPE_AUTO
                 : String(toolDiameter),
         );
-    }, [touchplateType, toolDiameter]);
+    }, [touchplateType]);
 
     useEffect(() => {
         if (units === METRIC_UNITS) {
@@ -353,7 +353,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 className={cx(
                     'flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 cursor-pointer rounded min-h-10',
                     {
-                        'bg-blue-50 dark:bg-gray-800 hover:bg-blue-50':
+                        'bg-robin-200 dark:bg-gray-800 hover:bg-robin-200':
                             option.value === value,
                     },
                 )}
@@ -375,7 +375,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                             }}
                             size="sm"
                         >
-                            <X className="h-6 w-6 cursor-pointer" />
+                            {option.value !== PROBE_TYPE_AUTO &&
+                                option.value !== PROBE_TYPE_TIP && (
+                                    <X className="h-6 w-6 cursor-pointer" />
+                                )}
                         </Button>
                     )}
                 </div>

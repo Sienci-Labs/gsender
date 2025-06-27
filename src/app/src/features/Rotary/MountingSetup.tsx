@@ -23,7 +23,7 @@ import { HOLE_TYPES } from './utils/mountingSetupMacros';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 
-const MountingSetup = () => {
+const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState({
         'mounting-track-lines-up': {
@@ -114,7 +114,6 @@ const MountingSetup = () => {
         } = options;
 
         let gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
-        let localNumberOfHoles = numberOfHoles;
 
         const setupKey = `${linesUp}-${endMillDiameter}-${numberOfHoles}-${extensionTrackLength}`;
 
@@ -125,7 +124,6 @@ const MountingSetup = () => {
             case 'does-not-line-up-quarter-inch-ten-four-hundred':
             case 'does-not-line-up-quarter-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
-                localNumberOfHoles = 'two';
                 break;
 
             case 'does-not-line-up-eighth-inch-six-four-hundred':
@@ -133,7 +131,6 @@ const MountingSetup = () => {
             case 'does-not-line-up-eighth-inch-ten-four-hundred':
             case 'does-not-line-up-eighth-inch-ten-six-hundred':
                 gcode = HOLE_TYPES.DOESNT_LINE_UP_EIGHTH;
-                localNumberOfHoles = 'two';
                 break;
 
             // Standard 30" track with 6 holes
@@ -203,7 +200,11 @@ const MountingSetup = () => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm" onClick={() => setOpen(true)}>
+                <Button
+                    size="sm"
+                    onClick={() => setOpen(true)}
+                    disabled={isDisabled}
+                >
                     Mounting Setup
                 </Button>
             </DialogTrigger>
@@ -217,7 +218,7 @@ const MountingSetup = () => {
                         prevent bottoming out.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="flex flex-col justify-between gap-8">
+                <div className="flex flex-col justify-between gap-8 mt-8">
                     {Object.entries(options).map(([key, option]) => (
                         <div key={key} className="grid grid-cols-2 gap-2">
                             <p>{option.label}</p>

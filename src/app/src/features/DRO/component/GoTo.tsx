@@ -13,6 +13,7 @@ import Switch from 'app/components/Switch';
 import controller from 'app/lib/controller';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import {METRIC_UNITS} from "app/constants";
 
 interface GotoProps {
     units: string;
@@ -22,6 +23,7 @@ interface GotoProps {
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
     const { mode } = useWorkspaceState();
+
     const controllerType = useTypedSelector((state) => state.controller.type);
     const [relativeMovement, setRelativeMovement] = useState(false);
     const [movementPos, setMovementPos] = useState({
@@ -48,7 +50,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                 ...movementPos,
                 x: Number(wpos.x),
                 y: Number(wpos.y),
-                z: Number(wpos.y),
+                z: Number(wpos.z),
                 a: Number(wpos.a),
             });
         }
@@ -64,7 +66,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     function goToLocation() {
         const code = [];
-        const unitModal = 'G90';
+        const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
         const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
 
         // Build axis commands based on non-zero values
@@ -99,13 +101,23 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     }
     function onPopoverOpen(open) {
         if (open) {
-            setMovementPos({
-                ...movementPos,
-                x: Number(wpos.x),
-                y: Number(wpos.y),
-                z: Number(wpos.y),
-                a: Number(wpos.a),
-            });
+            if (relativeMovement) {
+                setMovementPos({
+                    ...movementPos,
+                    x: Number(0),
+                    y: Number(0),
+                    z: Number(0),
+                    a: Number(0),
+                });
+            } else {
+                setMovementPos({
+                    ...movementPos,
+                    x: Number(wpos.x),
+                    y: Number(wpos.y),
+                    z: Number(wpos.z),
+                    a: Number(wpos.a),
+                });
+            }
         }
     }
 
@@ -122,6 +134,14 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
                     <h1>Go To Location</h1>
+                    <div className="flex flex-row text-sm text-gray-400 justify-between">
+                        <span>ABS</span>
+                        <Switch
+                            checked={relativeMovement}
+                            onChange={onToggleSwap}
+                        />
+                        <span>INC</span>
+                    </div>
                     <UnitInput
                         units={units}
                         label="X"
@@ -148,14 +168,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         onChange={(v) => onValueEdit(v, 'a')}
                         disabled={!aAxisIsAvailble}
                     />
-                    <div className="flex flex-row text-sm text-gray-400 justify-between">
-                        <span>ABS</span>
-                        <Switch
-                            checked={relativeMovement}
-                            onChange={onToggleSwap}
-                        />
-                        <span>INC</span>
-                    </div>
+
                     <Button variant="alt" onClick={goToLocation}>
                         Go!
                     </Button>

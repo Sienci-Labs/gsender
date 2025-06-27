@@ -320,19 +320,18 @@ class GrblController {
                 const words = ensureArray(data.words);
 
                 { // Program Mode: M0, M1
+                    // Look to check if first char is $ so we don't pause when updating an EEPROM macro.
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({
-                            data: 'M0',
-                            comment: commentString
-                        }); // Hold reason
+                        const payload = { data: 'M0', comment: commentString };
+                        this.feeder.hold(payload);
+                        this.emit('feeder:pause', payload);
                     } else if (programMode === 'M1') {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({
-                            data: 'M1',
-                            comment: commentString
-                        }); // Hold reason
+                        const payload = { data: 'M1', comment: commentString };
+                        this.feeder.hold(payload);// Hold reason
+                        this.emit('feeder:pause', payload);
                     }
                 }
 
@@ -586,6 +585,7 @@ class GrblController {
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.feeder.reset();
             this.sender.rewind();
             this.sender.stopCountdown();
         });
@@ -850,7 +850,30 @@ class GrblController {
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
+                this.emit('controller:state', GRBL, this.state);
+            } else {
+                // Grbl v0.9
+                this.emit('serialport:read', res.raw);
+            }
+        });
 
+        this.runner.on('startupAlarm', (res) => {
+            const alarm = _.find(GRBL_ALARMS, { code: 'Homing' });
+
+            if (alarm) {
+                // Grbl v1.1
+                this.emit('serialport:read', `ALARM:Homing (${alarm.message})`);
+                this.emit('error', {
+                    type: ALARM,
+                    code: 'Homing',
+                    description: alarm.description,
+                    line: 'N/A',
+                    lineNumber: '',
+                    origin: 'Startup',
+                    controller: GRBL
+                });
+                // Force propogation of current state on alarm
+                this.state = this.runner.state;
                 this.emit('controller:state', GRBL, this.state);
             } else {
                 // Grbl v0.9
@@ -1694,8 +1717,7 @@ class GrblController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
 
@@ -1722,8 +1744,7 @@ class GrblController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
             },
@@ -2091,7 +2112,21 @@ class GrblController {
             block.push(POSTHOOK_COMPLETE);
         }
 
-        // If we're not skipping, add a prehook complete to show dialog to continue toolchange operation
+        // If we're not skipping, add a prehook                { // Program Mode: M0, M1
+        //                     // Look to check if first char is $ so we don't pause when updating an EEPROM macro.
+        //                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
+        //                     if (programMode === 'M0' && !looksLikeEEPROM) {
+        //                         log.debug('M0 Program Pause');
+        //                         const payload = { data: 'M0', comment: commentString };
+        //                         this.feeder.hold(payload);
+        //                         this.emit('feeder:pause', payload);
+        //                     } else if (programMode === 'M1' && !looksLikeEEPROM) {
+        //                         log.debug('M1 Program Pause');
+        //                         const payload = { data: 'M1', comment: commentString };
+        //                         this.feeder.hold(payload);// Hold reason
+        //                         this.emit('feeder:pause', payload);
+        //                     }
+        //                 } complete to show dialog to continue toolchange operation
         if (!skipDialog) {
             block.push(`${PREHOOK_COMPLETE} ;${comment}`);
         }

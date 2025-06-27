@@ -4,6 +4,7 @@ import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const MeasurementStep = () => {
     const {
@@ -13,6 +14,7 @@ const MeasurementStep = () => {
         completeStep,
         updateTriangle,
     } = useSquaring();
+    const { units } = useWorkspaceState();
 
     const [measurementInputs, setMeasurementInputs] = useState({
         '1-2': '',
@@ -121,7 +123,7 @@ const MeasurementStep = () => {
                                                             }),
                                                         );
                                                     }}
-                                                    suffix="mm"
+                                                    suffix={units ?? 'mm'}
                                                 />
                                                 <Button
                                                     disabled={

@@ -35,7 +35,7 @@
     "build-i18n": "concurrently --kill-others-on-fail --names \"build-i18n-server,build-i18n-app\" \"npm run build-i18n-server\" \"npm run build-i18n-app\"",
     "build-i18n-server": "i18next-scanner --config i18next-scanner.config.server.js \"src/server/**/*.{html,js,jsx}\" \"!src/server/i18n/**\" \"!**/node_modules/**\"",
     "build-i18n-app": "i18next-scanner --config i18next-scanner.config.app.js \"src/app_old/**/*.{html,js,jsx}\" \"!src/app_old/i18n/**\" \"!**/node_modules/**\"",
-    "build-latest": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\"",
+    "build-latest": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\" && npm run copy-css",
     "build-dev": "concurrently --kill-others-on-fail --names \"build-dev-css,build-dev-server,build-dev-app,build-dev-css\" \"npm run build-dev-server\" \"npm run build-dev-app\" \"npm run build-dev-css\"",
     "build-dev-server": "cross-env NODE_ENV=development webpack-cli --progress --config webpack.config.server.development.js && npm run build-i18n-server",
     "build-dev-app": "npm run build-i18n-app",

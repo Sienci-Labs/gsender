@@ -667,6 +667,23 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(setIpList(ipList));
     });
 
+    controller.addListener('feeder:pause', (payload: { data: string, comment: string }) => {
+        console.log(payload);
+        Confirm({
+            title: `${payload.data} pause detected`,
+            confirmLabel: 'Resume',
+            content: 'Press Resume to continue.',
+
+            cancelLabel: 'Stop',
+            onConfirm: () => {
+                controller.command('feeder:start')
+            },
+            onClose: () => {
+                controller.command('feeder:stop')
+            }
+        })
+    })
+
     controller.addListener('requestEstimateData', () => {
         if (finishLoad) {
             finishLoad = false;

@@ -110,7 +110,10 @@ export function generateSenderSettings(settings) {
     const dirtySettings = {};
     settings.map((s) => {
         if (s.dirty) {
-            dirtySettings[s.key] = s.value;
+            dirtySettings[s.key] = {
+                value: s.value,
+                onUpdate: s.onUpdate || null,
+            };
             s.dirty = false;
         }
     });
@@ -126,16 +129,23 @@ export function updateAllSettings(settings, eeprom) {
         );
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);
-        toast.success(`Updated ${eepromNumber} EEPROM values.`, { position: 'bottom-right' });
+        toast.success(`Updated ${eepromNumber} EEPROM values.`, {
+            position: 'bottom-right',
+        });
     }
 
     const settingsToUpdate = generateSenderSettings(settings);
     const updateableSettingsNumber = Object.keys(settingsToUpdate).length;
     if (updateableSettingsNumber > 0) {
         Object.keys(settingsToUpdate).map((k) => {
-            store.set(k, settingsToUpdate[k]);
+            store.set(k, settingsToUpdate[k].value);
+            if (settingsToUpdate[k].onUpdate) {
+                settingsToUpdate[k].onUpdate();
+            }
         });
-        toast.success(`Updated ${updateableSettingsNumber} settings.`, { position: 'bottom-right' });
+        toast.success(`Updated ${updateableSettingsNumber} settings.`, {
+            position: 'bottom-right',
+        });
     }
 
     pubsub.publish('config:saved');

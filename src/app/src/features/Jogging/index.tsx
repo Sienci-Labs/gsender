@@ -178,17 +178,27 @@ export function Jogging() {
             const units = store.get('workspace.units', 'mm');
             setFirmware(firmwareType);
 
+            let convertedJogValues = JSON.parse(JSON.stringify(jogValues));
+
             if (units === 'in') {
-                jogValues.xyStep = convertValue(jogValues.xyStep, 'mm', 'in');
-                jogValues.zStep = convertValue(jogValues.zStep, 'mm', 'in');
-                jogValues.feedrate = convertValue(
-                    jogValues.feedrate,
+                convertedJogValues.xyStep = convertValue(
+                    convertedJogValues.xyStep,
+                    'mm',
+                    'in',
+                );
+                convertedJogValues.zStep = convertValue(
+                    convertedJogValues.zStep,
+                    'mm',
+                    'in',
+                );
+                convertedJogValues.feedrate = convertValue(
+                    convertedJogValues.feedrate,
                     'mm',
                     'in',
                 );
             }
 
-            setJogSpeed({ ...jogValues });
+            setJogSpeed({ ...convertedJogValues });
             setInitialized(true);
         }
     }, [initialized]);

@@ -108,7 +108,7 @@ gSender is free software, provided as-is and available under the [GNU GPLv3 lice
 gSender is also designed in a way that it can be run locally on your computer browser or otherwise compiled for use on other systems which aren't listed in the downloads. There will soon be documentation on how you can set this up yourself listed below once there's been a bit more testing completed.
 
 
-## 🕣 Development History
+## 🕣 Development Hiyarnstory
 
 ### 1.5.0 (June 18th, 2025)
 - All new user experience - we've streamlined and modernized the UI, with a focus on touch device and usability.  It should seem familiar to previous gSender users with a number of new improvements.

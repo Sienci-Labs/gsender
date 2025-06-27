@@ -8,34 +8,22 @@ const SpindleLaserStatus = () => {
     const { settings } = useTypedSelector((state) => state.controller.settings);
     const { spindle } = useTypedSelector((state) => state.controller.modal);
     const spindleFunctions = store.get('workspace.spindleFunctions', false);
-
-    if (!isConnected) return null;
-
     const spindleOn = spindleFunctions && spindle !== 'M5';
 
-    const label = {
-        '0': (
-            <SpindleLaserStatusVariant
-                label="Spindle"
-                color={spindleOn ? 'spindle' : 'disabled'}
-            />
-        ),
-        '1': (
-            <SpindleLaserStatusVariant
-                label="Laser"
-                color={spindleOn ? 'laser' : 'disabled'}
-            />
-        ),
-    }[settings.$32] || (
-        <SpindleLaserStatusVariant label="Spindle" color="disabled" />
-    );
+    if (!isConnected || !spindleOn) return null;
 
-    if (!spindleOn) {
-        return <></>;
-    }
     return (
-        <div className="absolute top-4 left-1/2 flex ml-72 max-sm:hidden">
-            {label}
+        <div className="absolute left-1/2 ml-56 flex max-sm:hidden">
+            <SpindleLaserStatusVariant
+                label={settings.$32 === '0' ? 'Spindle' : 'Laser'}
+                color={
+                    spindleOn
+                        ? settings.$32 === '0'
+                            ? 'spindle'
+                            : 'laser'
+                        : 'disabled'
+                }
+            />
         </div>
     );
 };

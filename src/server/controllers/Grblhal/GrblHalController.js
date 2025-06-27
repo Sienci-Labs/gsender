@@ -57,7 +57,7 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
-    //GRBL_HAL_ALARMS,
+    GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
     GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
@@ -326,10 +326,14 @@ class GrblHalController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0' && !looksLikeEEPROM) {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
+                        const payload = { data: 'M0', comment: commentString };
+                        this.feeder.hold(payload);
+                        this.emit('feeder:pause', payload);
                     } else if (programMode === 'M1' && !looksLikeEEPROM) {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
+                        const payload = { data: 'M1', comment: commentString };
+                        this.feeder.hold(payload);// Hold reason
+                        this.emit('feeder:pause', payload);
                     }
                 }
 
@@ -590,9 +594,11 @@ class GrblHalController {
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.feeder.reset();
             this.sender.rewind();
             this.sender.stopCountdown();
         });
+
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
 
@@ -814,7 +820,8 @@ class GrblHalController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || this.state.status.subState;
             //const alarm = _.find(this.settings.alarms, { id: code });
-            const alarm = this.settings?.alarms && this.settings.alarms[code.toString()];
+            // default to grbl hal alarm constants we have saved if the alarms arent populated yet (ex. when there's an error on startup)
+            const alarm = this.settings?.alarms ? this.settings.alarms[code.toString()] : _.find(GRBL_HAL_ALARMS, { code: code });
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -1562,7 +1569,7 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
-                        modalGCode.push(`${modal.units} ${modal.spindle} F${feedRate} S${spindleRate}`);
+                        modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
@@ -1571,6 +1578,7 @@ class GrblHalController {
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
+                    modalGCode.push(`F${feedRate}`);
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
@@ -1728,8 +1736,8 @@ class GrblHalController {
             },
             'unlock': () => {
                 this.feeder.reset();
-                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
                 this.writeln('$X');
+                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
             },
             'populateConfig': () => {
                 this.writeln('$$');
@@ -1774,8 +1782,7 @@ class GrblHalController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
 
@@ -1802,8 +1809,7 @@ class GrblHalController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
             },
