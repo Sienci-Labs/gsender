@@ -353,6 +353,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Square up CNC rails',
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
+                        hidden: () => {
+                            const connected = controller.portOpen
+                            return !connected;
+                        }
                     },
                     {
                         type: 'eeprom',

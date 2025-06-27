@@ -118,13 +118,7 @@ function returnSettingControl(
                 />
             );
         case 'wizard':
-            if (setting.label !== 'Square up CNC rails') {
-                return setting.wizard();
-            } else if (connected) {
-                return setting.wizard();
-            } else {
-                return <></>;
-            }
+            return setting.wizard();
         case 'jog':
             return <JogInput value={value} index={index} onChange={handler} />;
         default:
