@@ -185,6 +185,45 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
         );
     };
 
+    const categoryOrder = [
+        JOGGING_CATEGORY,
+        LOCATION_CATEGORY,
+        MACRO_CATEGORY,
+        PROBING_CATEGORY,
+        COOLANT_CATEGORY,
+        CARVING_CATEGORY,
+        OVERRIDES_CATEGORY,
+        GENERAL_CATEGORY,
+        TOOLBAR_CATEGORY,
+        VISUALIZER_CATEGORY,
+    ];
+
+    const sortedDataSet = dataSet.sort((a, b) => {
+        const aCategory = allShuttleControlEvents[a.cmd]
+            ? allShuttleControlEvents[a.cmd].category
+            : a.category;
+        const bCategory = allShuttleControlEvents[b.cmd]
+            ? allShuttleControlEvents[b.cmd].category
+            : b.category;
+
+        const aIndex = categoryOrder.indexOf(aCategory);
+        const bIndex = categoryOrder.indexOf(bCategory);
+
+        // If categories are different, sort by category order
+        if (aIndex !== bIndex) {
+            return aIndex - bIndex;
+        }
+
+        // If categories are the same, sort alphabetically by title
+        const aTitle = allShuttleControlEvents[a.cmd]
+            ? allShuttleControlEvents[a.cmd].title
+            : a.title;
+        const bTitle = allShuttleControlEvents[b.cmd]
+            ? allShuttleControlEvents[b.cmd].title
+            : b.title;
+        return aTitle.localeCompare(bTitle);
+    });
+
     return (
         <div className="absolute w-full">
             <Table>
