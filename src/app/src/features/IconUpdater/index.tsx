@@ -35,8 +35,6 @@ export function IconUpdater() {
                 setReleaseNotes(info);
                 setShowUpdater(true);
             });
-        } else {
-            console.log('not Electron');
         }
     }, []);
 

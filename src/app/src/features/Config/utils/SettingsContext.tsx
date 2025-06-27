@@ -203,7 +203,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSettings([...populatedSettings]);
         setSettingsValues([...globalValues]);*/
         pubsub.subscribe('repopulate', () => {
-            console.log('repopulate called')
             return repopulateSettings()
         })
     }, []);

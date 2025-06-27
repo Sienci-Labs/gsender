@@ -11,8 +11,6 @@ export const restoreDefault = async (): Promise<void> => {
 };
 
 const restoreSettings = (state: object, isSync?: boolean): void => {
-    console.log('Restoring settings');
-    console.log(state);
     store.restoreState(state, () => {
         setTimeout(() => {
             pubsub.publish('repopulate');
