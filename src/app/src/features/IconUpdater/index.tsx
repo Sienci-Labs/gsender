@@ -36,7 +36,6 @@ export function IconUpdater() {
                 setShowUpdater(true);
             });
             window.ipcRenderer.on('maximize-window', () => {
-                console.log('maximized');
                 setTimeout(() => {
                     window.dispatchEvent(new Event('resize'));
                 }, 500)

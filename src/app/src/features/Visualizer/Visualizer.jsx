@@ -1122,7 +1122,6 @@ class Visualizer extends Component {
     }
 
     resizeRenderer() {
-        console.log('resize renderer');
         if (!(this.camera && this.renderer)) {
             return;
         }
