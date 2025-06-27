@@ -35,6 +35,12 @@ export function IconUpdater() {
                 setReleaseNotes(info);
                 setShowUpdater(true);
             });
+            window.ipcRenderer.on('maximize-window', () => {
+                console.log('maximized');
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 500)
+            })
         }
     }, []);
 

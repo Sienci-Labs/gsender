@@ -343,7 +343,7 @@ const main = () => {
           minWidth: 550 / factor,
           minHeight: 460 / factor,
           useContentSize: true,
-          title: "gSender Edge",
+          title: "gSender",
           parent: window,
         };
         // Hash router URL should look like '{url}/#/widget/:id'
