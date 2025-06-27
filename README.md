@@ -110,6 +110,22 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development Hiyarnstory
 
+
+### 1.5.1 (June 27, 2025)
+- Addressed issues where jog values kept reconverting.
+- Fixed crash when importing settings.
+- Updated some AltMill and LongMill default values.
+- Removed Zoom icons from visualizer.
+- Override sliders have switched to decaf and are now less jumpy.
+- Fixed unit issue with Go To popover and default values no longer populate Z with Y value
+- Using tuning tools (Squaring and Steps/mm) now refresh EEPROM state and respect UI units
+- Abs/Inc toggle in go to moved to top.
+- Fixed issue where M0 in macros could result in a paused feeder state after unlocking preventing further code sending
+- Fixed issue where Machine status overlapped unlock and connect on smaller resolutions and made them unclickable
+- Disabling a drawer tool now defaults you to the first drawer element
+- Fixed issue with tool select in probing working inconsistently and defaulting to Auto
+- Rotary Axis travel resolution and maximum rate appearing again when connected with GRBL.
+
 ### 1.5.0 (June 18th, 2025)
 - All new user experience - we've streamlined and modernized the UI, with a focus on touch device and usability.  It should seem familiar to previous gSender users with a number of new improvements.
 - Firmware now detected on connection - no more firmware selector, gSender can just use the correct controller type.
