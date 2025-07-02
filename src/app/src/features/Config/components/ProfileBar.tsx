@@ -1,6 +1,5 @@
 import { PiLightning } from 'react-icons/pi';
-import { CiImport } from 'react-icons/ci';
-import { CiExport } from 'react-icons/ci';
+import { PiUploadSimpleBold, PiDownloadSimpleBold } from 'react-icons/pi';
 import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import {
@@ -76,20 +75,20 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     return (
         <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 dark:bg-dark">
             <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
-            <div className="flex flex-row items-center border border-gray-200 h-16 rounded-lg justify-between">
+            <div className="flex flex-row items-center border border-gray-200 h-12 rounded-lg justify-between">
                 <div className="w-1/4 min-w-64  mx-auto px-2">
                     <MachineProfileSelector />
                 </div>
 
-                <div className="grid h-full max-w-lg grid-cols-4 font-medium">
+                <div className="grid h-full max-w-lg grid-cols-4 font-medium divide-x">
+                    <RestoreDefaultDialog />
                     <ActionButton
-                        icon={<CiExport />}
-                        label="Export"
-                        onClick={() => exportFirmwareSettings(rawEEPROM)}
-                        disabled={!connected}
+                        icon={<PiLightning />}
+                        label="Flash"
+                        onClick={toggleFlash}
                     />
                     <ActionButton
-                        icon={<CiImport />}
+                        icon={<PiDownloadSimpleBold />}
                         label="Import"
                         onClick={() => {
                             inputRef.current.click();
@@ -97,11 +96,11 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                         }}
                         disabled={!connected}
                     />
-                    <RestoreDefaultDialog />
                     <ActionButton
-                        icon={<PiLightning />}
-                        label="Flash"
-                        onClick={toggleFlash}
+                        icon={<PiUploadSimpleBold />}
+                        label="Export"
+                        onClick={() => exportFirmwareSettings(rawEEPROM)}
+                        disabled={!connected}
                     />
                 </div>
             </div>

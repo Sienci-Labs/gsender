@@ -246,10 +246,12 @@ export function SettingRow({
                         <BiReset />
                     </button>
                 )}
-                {setting.type === 'hybrid' && firmwareType === GRBLHAL && (
+                {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
                     <span className="text-robin-500 text-4xl">
                         <FaMicrochip />
                     </span>
+                ) : (
+                    <span className="text-robin-500 min-w-9" />
                 )}
             </span>
             <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5 flex flex-col gap-2">

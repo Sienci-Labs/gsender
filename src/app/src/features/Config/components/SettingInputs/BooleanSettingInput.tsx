@@ -13,5 +13,9 @@ export function BooleanSettingInput({
     disabled = () => false,
 }: BooleanSettingInputProps) {
     const isDisabled = disabled();
-    return <Switch checked={value} onChange={onChange} disabled={isDisabled} />;
+    return (
+        <div className="flex justify-end">
+            <Switch checked={value} onChange={onChange} disabled={isDisabled} />
+        </div>
+    );
 }
