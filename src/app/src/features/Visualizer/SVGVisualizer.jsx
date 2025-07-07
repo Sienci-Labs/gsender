@@ -168,10 +168,12 @@ class SVGVisualizer extends Component {
         );
         if (group && svg) {
             const reduxBBox = this.props.bbox;
+            let stroke= 1;
             let bbox = JSON.parse(JSON.stringify(reduxBBox)); // make shallow copy
             // convert from inches to mm
             const { content } = this.props;
             if (content.includes('G20')) {
+                stroke = 25.4;
                 bbox.max.x *= 25.4;
                 bbox.max.y *= 25.4;
                 bbox.min.x *= 25.4;
@@ -179,8 +181,6 @@ class SVGVisualizer extends Component {
                 bbox.delta.x *= 25.4;
                 bbox.delta.y *= 25.4;
             }
-            console.log(bbox)
-            console.log(reduxBBox);
 
             // represents the unit length of the svg in each dimension
             let xLength = bbox.delta.x;
@@ -215,6 +215,7 @@ class SVGVisualizer extends Component {
                     ' ' +
                     (Math.abs(yLength) + Math.abs(yLength) / 2),
             );
+            svg.setAttribute('stroke-width', `${stroke}px`);
             group.setAttribute('transform', 'translate(0,0) scale(1,-1)');
         }
     }
