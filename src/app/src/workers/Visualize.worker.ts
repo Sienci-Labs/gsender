@@ -55,6 +55,7 @@ interface Path {
 interface Modal {
     motion: string;
     plane?: string;
+    units?: string;
 }
 
 interface SpindleValues {
@@ -236,7 +237,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v0: Vector3,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane , units} = modal;
+                    const { motion, plane, units} = modal;
                     const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
@@ -568,13 +569,13 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             vm.virtualize(line);
         }
 
-        const data = vm.getData();
+        const { estimates } = vm.getData();
         const modalChanges = vm.getModalChanges();
         const feedrateChanges = vm.getFeedrateChanges();
         fileInfo = vm.generateFileStats();
         parsedDataToSend = {
-            data: data.data,
-            estimates: data.estimates,
+            data: [],
+            estimates: estimates,
             info: fileInfo,
             modalChanges,
             feedrateChanges,
@@ -612,6 +613,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         needsVisualization,
         parsedData: parsedDataToSend,
     };
+    console.log(parsedDataToSend);
 
     if (isLaser) {
         message.spindleSpeeds = spindleSpeeds;

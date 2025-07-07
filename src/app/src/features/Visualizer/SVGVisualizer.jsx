@@ -250,7 +250,7 @@ class SVGVisualizer extends Component {
                         ? currentTheme.get(G0_PART) + opacity
                         : currentTheme.get(G1_PART) + opacity;
                 node.setAttribute('stroke', stroke);
-                console.log(node);
+
                 return group.appendChild(node);
 
             });
