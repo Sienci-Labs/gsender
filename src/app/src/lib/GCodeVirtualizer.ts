@@ -244,6 +244,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     estimates: number[] = [];
 
+    setEstimate: boolean = false;
+
     modalChanges: ModalChanges = [
         {
             change: null,
@@ -1040,6 +1042,7 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     virtualize(line = ''): void {
+        this.setEstimate = false // Reset on each line
         if (!line) {
             this.fn.callback();
             return;
@@ -1157,7 +1160,11 @@ class GCodeVirtualizer extends EventEmitter {
         if (this.estimates.length < this.data.length) {
             this.estimates.push(0);
         }
-
+        */
+        if (!this.setEstimate) {
+            this.estimates.push(0); // Same as above but use flag instead of array length
+        }
+        /*
         // add new data structure
         this.data.push({
             Scode: null,
@@ -1438,6 +1445,7 @@ class GCodeVirtualizer extends EventEmitter {
         this.lastF = f;
         this.totalTime += moveDuration;
         this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
+        this.setEstimate = true;
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
