@@ -35,9 +35,21 @@ export const visualizeResponse = async ({ data }) => {
         reduxStore.dispatch(updateFileProcessing(false));
 
 
-        // No longer store parsedData, just send message
-        pubsub.publish('parsedData:stored');
+        // if there's new parsed data, send to redux
+        if (parsedData) {
+            await replaceParsedData(parsedData).then(() => {
+                pubsub.publish('parsedData:stored');
+            });
 
+            // reduxStore.dispatch({
+            //     type: UPDATE_FILE_PARSED_DATA,
+            //     payload: {
+            //         value: parsedData
+            //     }
+            // });
+        } else {
+            pubsub.publish('parsedData:stored');
+        }
 
         // Handle file load
         pubsub.publish('file:load', data);
