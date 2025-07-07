@@ -17,6 +17,7 @@ export const buttonStyle = tv({
             active: 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200',
         },
         size: {
+            xs: 'h-6 text-sm',
             sm: 'h-8 text-sm',
             md: 'h-10 text-base',
             lg: 'h-12 text-lg',

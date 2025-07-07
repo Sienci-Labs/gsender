@@ -116,7 +116,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
+                                        <div className="bg-amber-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
                                             <RiFolderUploadLine
                                                 onClick={() =>
                                                     handleRecentFileUpload(
