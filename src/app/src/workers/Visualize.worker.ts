@@ -454,134 +454,42 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         maxFeedrates,
     });
 
-    if (!isEmpty(parsedData) && !isNewFile) {
-        const { data, info, modalChanges, feedrateChanges } = parsedData;
-        fileInfo = info;
-
-        let modalIndex = 0; // track changes
-        let iterationsNeeded = modalChanges[modalIndex].count; // initialize
-        let modal = vm.getCurrentModal(); // get the default modal
-        let modalCounter = 0; // tracking how long until the modal change comes
-
-        let feedrateIndex = 0; // track changes
-        let iterationsNeededF = feedrateChanges[feedrateIndex].count; // initialize
-        let feedrateCounter = 0; // tracking how long until the feed change comes
-
-        for (let i = 0; i < data.length; i++) {
-            // update modal
-            if (modalCounter === iterationsNeeded) {
-                do {
-                    modalIndex++;
-                    modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
-                    iterationsNeeded = modalChanges[modalIndex].count; // update the new count
-                    modalCounter = 0; // reset counter
-                } while (iterationsNeeded === 0); // handle another modal change on same line
-            }
-            // update feedrate
-            if (feedrateCounter === iterationsNeededF) {
-                feedrateIndex++;
-                vm.setFeedrate(feedrateChanges[feedrateIndex].change); // change the feed
-                iterationsNeededF = feedrateChanges[feedrateIndex].count; // update the new count
-                feedrateCounter = 0; // reset counter
-            }
-
-            const entry = data[i];
-            if (entry.lineData) {
-                const { v1, v2, v0, shouldUseAddCurve, dwellTime } =
-                    entry.lineData;
-
-                if (modal.motion === 'G4') {
-                    vm.addToTotalTime(dwellTime);
-                } else {
-                    const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
-                    if (modal.motion === 'G1' || modal.motion === 'G0') {
-                        if (shouldUseAddCurve) {
-                            addCurve(modal, v1, v2);
-                        } else {
-                            addLine(modal, v1, v2);
-                        }
-                        vm.calculateMachiningTime(targetPosition, v1);
-                    } else {
-                        addArcCurve(modal, v1, v2, v0);
-                        vm.calculateMachiningTime(targetPosition, v1);
-                    }
-                }
-            }
-
-            let spindleValues = {
-                spindleOn: false,
-                spindleSpeed: 0,
+    vm.on('data', (data: any) => {
+        let spindleValues = {
+            spindleOn: false,
+            spindleSpeed: 0,
+        };
+        if (isLaser && needsVisualization) {
+            updateSpindleStateFromLine(data);
+            spindleValues = {
+                spindleOn,
+                spindleSpeed,
             };
 
-            if (isLaser && needsVisualization) {
-                if (entry.Scode) {
-                    const spindleValue = entry.Scode;
-                    spindleSpeeds.add(spindleValue);
-                    spindleSpeed = spindleValue;
-                    spindleOn = spindleValue > 0;
-                }
-                spindleValues = {
-                    spindleOn,
-                    spindleSpeed,
-                };
-
-                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
-            }
-
-            onData();
-
-            modalCounter++;
-            feedrateCounter++;
+            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
         }
+        onData();
+    });
 
-        let newFileInfo = vm.generateFileStats();
-        fileInfo.estimatedTime = newFileInfo.estimatedTime;
-        // update estimated time
-        parsedDataToSend = {
-            data: parsedData.data,
-            estimates: parsedData.estimates,
-            info: fileInfo,
-            modalChanges,
-            feedrateChanges,
-        };
-    } else {
-        vm.on('data', (data: any) => {
-            let spindleValues = {
-                spindleOn: false,
-                spindleSpeed: 0,
-            };
-            if (isLaser && needsVisualization) {
-                updateSpindleStateFromLine(data);
-                spindleValues = {
-                    spindleOn,
-                    spindleSpeed,
-                };
+    const lines = content.split(/\r?\n/).reverse();
 
-                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
-            }
-            onData();
-        });
-
-        const lines = content.split(/\r?\n/).reverse();
-
-        while (lines.length) {
-            let line = lines.pop();
-            vm.virtualize(line);
-        }
-
-        const { estimates } = vm.getData();
-        //const modalChanges = vm.getModalChanges();
-        //const feedrateChanges = vm.getFeedrateChanges();
-        fileInfo = vm.generateFileStats();
-        parsedDataToSend = {
-            data: [],
-            estimates: estimates,
-            info: fileInfo,
-            modalChanges: [],
-            feedrateChanges: [],
-        };
-        console.log(parsedDataToSend)
+    while (lines.length) {
+        let line = lines.pop();
+        vm.virtualize(line);
     }
+
+    const { estimates } = vm.getData();
+    //const modalChanges = vm.getModalChanges();
+    //const feedrateChanges = vm.getFeedrateChanges();
+    fileInfo = vm.generateFileStats();
+    parsedDataToSend = {
+        data: [],
+        estimates: estimates,
+        info: fileInfo,
+        modalChanges: [],
+        feedrateChanges: [],
+    };
+    console.log(parsedDataToSend)
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
