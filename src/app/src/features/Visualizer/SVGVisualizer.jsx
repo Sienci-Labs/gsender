@@ -179,6 +179,8 @@ class SVGVisualizer extends Component {
                 bbox.delta.x *= 25.4;
                 bbox.delta.y *= 25.4;
             }
+            console.log(bbox)
+            console.log(reduxBBox);
 
             // represents the unit length of the svg in each dimension
             let xLength = bbox.delta.x;
@@ -220,7 +222,7 @@ class SVGVisualizer extends Component {
     handleSceneRender(vizualization) {
         const { paths } = vizualization;
         const { currentTheme } = this.props.state;
-
+        console.log(paths);
         let svg = document.getElementById(
             !this.isSecondaryVisualizer ? 'svg' : 'svg2',
         );
@@ -248,8 +250,9 @@ class SVGVisualizer extends Component {
                         ? currentTheme.get(G0_PART) + opacity
                         : currentTheme.get(G1_PART) + opacity;
                 node.setAttribute('stroke', stroke);
-
+                console.log(node);
                 return group.appendChild(node);
+
             });
 
             svg.appendChild(group);

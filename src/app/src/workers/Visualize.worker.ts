@@ -164,7 +164,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         normal: {
             addLine: (modal: Modal, v1: Vector3, v2: Vector3) => {
                 if (needsVisualization) {
-                    const { motion } = modal;
+                    const { motion, units } = modal;
 
                     const newV1 = rotateAxis('y', v1);
                     v1.y = newV1.y;
@@ -182,19 +182,20 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
                     // svg
                     if (shouldIncludeSVG) {
+                        const multiplier = units === 'G21' ? 1 : 25.4 // We need to make path bigger for inches
                         svgInitialization(motion);
                         SVGVertices.push({
-                            x1: v1.x,
-                            y1: v1.y,
-                            x2: v2.x,
-                            y2: v2.y,
+                            x1: v1.x * multiplier,
+                            y1: v1.y * multiplier,
+                            x2: v2.x * multiplier,
+                            y2: v2.y * multiplier,
                         });
                     }
                 }
             },
             // For rotary visualization
             addCurve: (modal: Modal, v1: Vector3, v2: Vector3) => {
-                const { motion } = modal;
+                const { motion, units } = modal;
 
                 const updatedV1 = rotateAxis('y', v1);
                 const updatedV2 = rotateAxis('y', v2);
@@ -235,7 +236,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v0: Vector3,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane } = modal;
+                    const { motion, plane , units} = modal;
+                    const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
                         (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2,
@@ -277,10 +279,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             vertices.push(point.x, point.y, z);
                             if (shouldIncludeSVG && i > 0) {
                                 SVGVertices.push({
-                                    x1: pointA.x,
-                                    y1: pointA.y,
-                                    x2: pointB.x,
-                                    y2: pointB.y,
+                                    x1: pointA.x * multiplier,
+                                    y1: pointA.y * multiplier,
+                                    x2: pointB.x * multiplier,
+                                    y2: pointB.y * multiplier,
                                 });
                             }
                         } else if (plane === 'G18') {
@@ -288,10 +290,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             vertices.push(point.y, z, point.x);
                             if (shouldIncludeSVG && i > 0) {
                                 SVGVertices.push({
-                                    x1: pointA.y,
-                                    y1: z,
-                                    x2: pointB.y,
-                                    y2: z,
+                                    x1: pointA.y * multiplier,
+                                    y1: z * multiplier,
+                                    x2: pointB.y * multiplier,
+                                    y2: z * multiplier,
                                 });
                             }
                         } else if (plane === 'G19') {
@@ -300,10 +302,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             if (shouldIncludeSVG && i > 0) {
                                 if (i > 0) {
                                     SVGVertices.push({
-                                        x1: z,
-                                        y1: pointA.x,
-                                        x2: z,
-                                        y2: pointB.x,
+                                        x1: z * multiplier,
+                                        y1: pointA.x * multiplier,
+                                        x2: z * multiplier,
+                                        y2: pointB.x * multiplier,
                                     });
                                 }
                             }
@@ -330,7 +332,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         },
         svg: {
             addLine: (modal: Modal, v1: Vector3, v2: Vector3) => {
-                const { motion } = modal;
+                const { motion, units } = modal;
+                const multiplier = units === 'G21' ? 1 : 25.4;
                 // initialize
                 if (currentMotion === '') {
                     currentMotion = motion;
@@ -345,10 +348,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     }
                 }
                 SVGVertices.push({
-                    x1: v1.x,
-                    y1: v1.y,
-                    x2: v2.x,
-                    y2: v2.y,
+                    x1: v1.x * multiplier,
+                    y1: v1.y * multiplier,
+                    x2: v2.x * multiplier,
+                    y2: v2.y * multiplier,
                 });
             },
             addArcCurve: (
@@ -357,7 +360,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v2: Vector3,
                 v0: Vector3,
             ) => {
-                const { motion, plane } = modal;
+                const { motion, plane, units } = modal;
+                const multiplier = units === 'G21' ? 1 : 25.4;
                 const isClockwise = motion === 'G2';
                 const radius = Math.sqrt(
                     (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2,
@@ -401,26 +405,26 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     if (plane === 'G17') {
                         // XY-plane
                         SVGVertices.push({
-                            x1: pointA.x,
-                            y1: pointA.y,
-                            x2: pointB.x,
-                            y2: pointB.y,
+                            x1: pointA.x * multiplier,
+                            y1: pointA.y * multiplier,
+                            x2: pointB.x * multiplier,
+                            y2: pointB.y * multiplier,
                         });
                     } else if (plane === 'G18') {
                         // ZX-plane
                         SVGVertices.push({
-                            x1: pointA.y,
-                            y1: z,
-                            x2: pointB.y,
-                            y2: z,
+                            x1: pointA.y * multiplier,
+                            y1: z * multiplier,
+                            x2: pointB.y * multiplier,
+                            y2: z * multiplier,
                         });
                     } else if (plane === 'G19') {
                         // YZ-plane
                         SVGVertices.push({
-                            x1: z,
-                            y1: pointA.x,
-                            x2: z,
-                            y2: pointB.x,
+                            x1: z * multiplier,
+                            y1: pointA.x * multiplier,
+                            x2: z * multiplier,
+                            y2: pointB.x * multiplier,
                         });
                     }
                 }
