@@ -264,7 +264,7 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 await getParsedData().then((value) => {
-                    const parsedData = value;
+                    const parsedData = null;
                     visualizeWorker.postMessage({
                         content,
                         visualizer,
@@ -317,7 +317,7 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         await getParsedData().then((value) => {
-            const parsedData = value;
+            const parsedData = null;
             visualizeWorker.postMessage({
                 content,
                 visualizer,
