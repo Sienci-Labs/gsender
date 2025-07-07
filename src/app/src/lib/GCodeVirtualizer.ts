@@ -331,12 +331,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.z,
                 targetPosition.a,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            };
         },
         // G1: Linear Move
         // Usage
@@ -404,12 +398,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.z,
                 targetPosition.a,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            };
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -513,12 +501,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.y,
                 targetPosition.z,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                v0: this.offsetG92(v0),
-            };
         },
         G3: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G3') {
@@ -603,12 +585,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.y,
                 targetPosition.z,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                v0: this.offsetG92(v0),
-            };
         },
         // G4: Dwell
         // Parameters
@@ -629,10 +605,6 @@ class GCodeVirtualizer extends EventEmitter {
                 dwellTime = params.S;
             }
             this.totalTime += dwellTime;
-
-            this.data[this.totalLines].lineData = {
-                dwellTime: dwellTime,
-            };
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
         G10: (_params: Record<string, any>): void => {},
@@ -1094,7 +1066,6 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
-                this.data[this.totalLines].Scode = code;
             }
         }
 
@@ -1181,6 +1152,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
         }
 
+        /*
         // if the line didnt have time calcs involved, push 0 time
         if (this.estimates.length < this.data.length) {
             this.estimates.push(0);
@@ -1193,7 +1165,7 @@ class GCodeVirtualizer extends EventEmitter {
         });
         this.modalCounter++;
         this.feedrateCounter++;
-
+        */
         this.totalLines += 1;
         this.fn.callback();
         this.emit('data', parsedLine);
@@ -1495,10 +1467,9 @@ class GCodeVirtualizer extends EventEmitter {
         return 2 * time; // cut in half before, so double to get full time spent.
     }
 
-    getData(): { data: Data; estimates: number[] } {
-        this.data.pop(); // get rid of the last entry, as it is a temp one with null values
+    getData(): { estimates: number[] } {
+        //this.data.pop(); // get rid of the last entry, as it is a temp one with null values
         return {
-            data: this.data,
             estimates: this.estimates,
         };
     }

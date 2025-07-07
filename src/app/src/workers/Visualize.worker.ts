@@ -570,16 +570,17 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         }
 
         const { estimates } = vm.getData();
-        const modalChanges = vm.getModalChanges();
-        const feedrateChanges = vm.getFeedrateChanges();
+        //const modalChanges = vm.getModalChanges();
+        //const feedrateChanges = vm.getFeedrateChanges();
         fileInfo = vm.generateFileStats();
         parsedDataToSend = {
             data: [],
             estimates: estimates,
             info: fileInfo,
-            modalChanges,
-            feedrateChanges,
+            modalChanges: [],
+            feedrateChanges: [],
         };
+        console.log(parsedDataToSend)
     }
 
     let tFrames = new Uint32Array(frames);
