@@ -47,6 +47,7 @@ interface iSettingsContext {
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
     eepromIsDefault: (v: object) => boolean;
+    isSettingDefault: (v: object) => boolean;
 }
 
 interface SettingsProviderProps {
@@ -84,13 +85,6 @@ export function useSettings() {
         console.error('useSettings must be used within SettingsContext');
     }
     return context;
-}
-
-export function isSettingDefault(v: gSenderSetting) {
-    if ('key' in v) {
-        return isEqual(v.value, v.defaultValue);
-    }
-    return true; // Default to true to non-key settings aren't always highlighted.
 }
 
 function fetchStoreValue(key: string) {
@@ -197,11 +191,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }
 
     useEffect(() => {
-        repopulateSettings()
-        /*const [populatedSettings, globalValues] =
-            populateSettingsValues(settings);
-        setSettings([...populatedSettings]);
-        setSettingsValues([...globalValues]);*/
+        repopulateSettings();
         pubsub.subscribe('repopulate', () => {
             return repopulateSettings()
         })
@@ -296,13 +286,34 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
                 : machineProfile.grblHALeepromSettings;
-        const inputDefault = get(profileDefaults, settingData.setting, '-');
+
+        const settingKey = settingData.type === 'hybrid' ? settingData.eID : settingData.setting;
+
+        const inputDefault = get(profileDefaults, settingKey, '-');
 
         if (inputDefault === '-') {
             return true; // default in cases where we don't know the default
         }
 
+        // Lookup hybrid current value because stored value is actually the local state
+        if (settingData.type === 'hybrid') {
+            console.log(detectedEEPROM[settingKey]);
+            console.log(inputDefault);
+            console.log(isEqual(detectedEEPROM[settingKey], inputDefault))
+            return isEqual(detectedEEPROM[settingKey], inputDefault);
+        }
+
         return isEqual(settingData.value, inputDefault);
+    }
+
+    function isSettingDefault(v: gSenderSetting) {
+        if (v.type === 'hybrid' && connected) {
+            return eepromIsDefault(v);
+        }
+        if ('key' in v) {
+            return isEqual(v.value, v.defaultValue);
+        }
+        return true; // Default to true to non-key settings aren't always highlighted.
     }
 
     function toggleFilterNonDefault() {
@@ -359,6 +370,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,
+        isSettingDefault
     };
 
     return (

@@ -789,7 +789,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Spindle on delay',
-                        key: 'workspace.spindleDelay',
+                        key: 'widgets.spindle.delay',
                         description:
                             'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',

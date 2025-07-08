@@ -10,7 +10,6 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import {
-    isSettingDefault,
     useSettings,
 } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
@@ -138,6 +137,7 @@ export function SettingRow({
         setSettingsValues,
         firmwareType,
         connected,
+        isSettingDefault
     } = useSettings();
 
     const displaySetting = { ...setting };
