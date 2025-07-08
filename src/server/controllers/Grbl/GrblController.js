@@ -1855,7 +1855,8 @@ class GrblController {
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
-                let jogFeedrate;
+                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+
                 if ($20 === '1') {
                     $130 = Number($130);
                     $131 = Number($131);
@@ -1927,7 +1928,6 @@ class GrblController {
                         //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
-                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });
