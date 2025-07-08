@@ -234,6 +234,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * @param v - The setting to filter
      */
     function settingsFilter(v: gSenderSetting) {
+        // Early return on disconnected wizard
+        /*if (v.type === "wizard" && !connected) {
+            return false;
+        }*/
+        // Hide hidden when filtering
+        if ('hidden' in v) {
+            return !v.hidden();
+        }
+
         if (v.type === 'eeprom' || v.type === 'hybrid') {
             // Always exclude eeprom/hybrids when not connected
             if (!connectionState) {
@@ -274,11 +283,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         if (searchTerm.length === 0 || !searchTerm) {
             return true;
-        }
-
-        // Hide hidden when filtering
-        if ('hidden' in v) {
-            return !v.hidden();
         }
 
         if (v)
