@@ -941,7 +941,7 @@ class GrblHalController {
                 this.initController();
             }
 
-            await delay(300);
+            await delay(500);
             this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
         });
 
