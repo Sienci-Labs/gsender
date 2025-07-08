@@ -1931,7 +1931,7 @@ class GrblHalController {
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);

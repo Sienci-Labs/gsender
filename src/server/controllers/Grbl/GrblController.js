@@ -1855,7 +1855,7 @@ class GrblController {
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
-                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
 
                 if ($20 === '1') {
                     $130 = Number($130);
