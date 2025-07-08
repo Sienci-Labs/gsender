@@ -297,17 +297,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         // Lookup hybrid current value because stored value is actually the local state
         if (settingData.type === 'hybrid') {
-            console.log(detectedEEPROM[settingKey]);
-            console.log(inputDefault);
-            console.log(isEqual(detectedEEPROM[settingKey], inputDefault))
-            return isEqual(detectedEEPROM[settingKey], inputDefault);
+            return isEqual(Number(detectedEEPROM[settingKey]).toFixed(3), Number(inputDefault).toFixed(3));
         }
 
         return isEqual(settingData.value, inputDefault);
     }
 
     function isSettingDefault(v: gSenderSetting) {
-        if (v.type === 'hybrid' && connected) {
+        if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
             return eepromIsDefault(v);
         }
         if ('key' in v) {
