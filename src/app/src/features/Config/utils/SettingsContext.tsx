@@ -48,6 +48,7 @@ interface iSettingsContext {
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
     eepromIsDefault: (v: object) => boolean;
     isSettingDefault: (v: object) => boolean;
+    getEEPROMDefaultValue: (v: string) => string | number;
 }
 
 interface SettingsProviderProps {
@@ -317,6 +318,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setFilterNonDefault(!filterNonDefault);
     }
 
+    function getEEPROMDefaultValue(key) : number | string {
+        const profileDefaults =
+            controllerType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : machineProfile.grblHALeepromSettings;
+
+        return get(profileDefaults, key, '-');
+    };
+
     // Populate eeprom descriptions as needed
     useEffect(() => {
         if (!settings.length) {
@@ -367,7 +377,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,
-        isSettingDefault
+        isSettingDefault,
+        getEEPROMDefaultValue
     };
 
     return (

@@ -137,7 +137,8 @@ export function SettingRow({
         setSettingsValues,
         firmwareType,
         connected,
-        isSettingDefault
+        isSettingDefault,
+        getEEPROMDefaultValue
     } = useSettings();
 
     const displaySetting = { ...setting };
@@ -165,6 +166,15 @@ export function SettingRow({
     }
 
     function handleProgramSettingReset(setting) {
+        if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
+            console.log('Hybrid reset', setting);
+            const defaultVal = getEEPROMDefaultValue(setting.eID);
+            if (defaultVal !== '-') {
+                handleSingleSettingReset(setting.eID, defaultVal)
+            } else {
+                toast.warn(`No default found for $${setting.eID}.`);
+            }
+        }
         if ('key' in setting) {
             if (setting.defaultValue !== null) {
                 store.set(setting.key, setting.defaultValue);
