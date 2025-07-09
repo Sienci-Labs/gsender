@@ -22,7 +22,7 @@
  */
 
 import config from '../services/configstore';
-import { PROGRAM_EVENTS } from '../../app_old/constants';
+import { PROGRAM_EVENTS } from '../../app/src/constants';
 
 const noop = () => {};
 
