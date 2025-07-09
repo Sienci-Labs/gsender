@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import get from 'lodash/get';
 import download from 'downloadjs';
-import ip from 'ip';
+import { isV4Format } from 'app/lib/utils';
 
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
@@ -59,7 +59,7 @@ export const connectToLastDevice = (callback) => {
     const baudrate = connectionConfig.get('baudrate');
     const defaultFirmware = store.get('workspace.defaultFirmware', GRBL);
 
-    const isNetwork = ip.isV4Format(port); // Do we look like an IP address?
+    const isNetwork = isV4Format(port); // Do we look like an IP address?
 
     controller.openPort(
         port,
@@ -116,7 +116,7 @@ export const startFlash = (port, profile, hex = null, isHal = false) => {
         const connectionConfig = new WidgetConfig('connection');
         const baudrate = connectionConfig.get('baudrate');
         const controllerType = isHal ? GRBLHAL : GRBL;
-        const isNetwork = ip.isV4Format(port);
+        const isNetwork = isV4Format(port);
 
         controller.openPort(port, controllerType, {
             baudrate,

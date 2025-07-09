@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import ip from 'ip';
 import cn from 'classnames';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { isV4Format } from 'app/lib/utils';
 
 import controller from 'app/lib/controller';
 import store from 'app/store';
@@ -133,7 +133,7 @@ function Connection(props: ConnectionProps) {
             return;
 
         // TODO: Add autoconnect for ethernet
-        if (ip.isV4Format(port)) return;
+        if (isV4Format(port)) return;
 
         handleConnect(port, ConnectionType.USB);
     }
