@@ -168,7 +168,6 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
-            console.log('Startup/restart message - rewind sender');
             this.emit('startup', payload);
             return;
         }

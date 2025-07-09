@@ -55,12 +55,14 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_HAL_ACTIVE_STATE_HOLD,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_RUN,
+    GRBL_HAL_ACTIVE_STATE_HOME,
 } from './constants';
 import {
     METRIC_UNITS,
@@ -834,7 +836,7 @@ class GrblHalController {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
-            } else if (this.state?.status?.activeState === GRBL_ACTIVE_STATE_HOME) {
+            } else if (this.state?.status?.activeState === GRBL_HAL_ACTIVE_STATE_HOME) {
                 errorOrigin = 'Console';
                 line = '$H';
             } else if (outstanding > 0) {
@@ -1628,7 +1630,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1726,7 +1728,7 @@ class GrblHalController {
                 } else {
                     this.writeln('$H');
                 }
-                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -2163,8 +2165,14 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
+        this.actionMask.replyStatusReport =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
+            (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
+            this.actionMask.replyStatusReport;
+
+        this.actionMask.replyParserState =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) ||
+            this.actionMask.replyParserState;
 
         this.connection.write(data, {
             ...context,
