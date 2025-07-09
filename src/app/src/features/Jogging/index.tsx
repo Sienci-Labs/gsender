@@ -910,6 +910,10 @@ export function Jogging() {
     useShuttleEvents(shuttleControlEvents);
 
     const isRotaryMode = mode === 'ROTARY';
+    const showA =
+        (rotaryWidgetState.tab.show && firmwareType === 'grblHAL') ||
+        isRotaryMode;
+    const noA = !rotaryWidgetState.tab.show || !isRotaryMode;
 
     return (
         <>
@@ -953,16 +957,16 @@ export function Jogging() {
                     )}
                 </div>
             </div>
-            <div className="flex gap-4 max-xl:gap-2 max-xl:scale-90">
-                <div className="flex w-full items-center justify-center">
+            <div className="flex gap-1 w-full justify-around">
+                <div
+                    className={cx('flex items-center justify-center', {
+                        'px-7': noA,
+                    })}
+                >
                     <div
                         className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3':
-                                (rotaryWidgetState.tab.show &&
-                                    firmwareType === 'grblHAL') ||
-                                isRotaryMode,
-                            'grid-cols-1 gap-y-1':
-                                !rotaryWidgetState.tab.show && !isRotaryMode,
+                            'grid-cols-2 gap-y-3': showA,
+                            'grid-cols-1 gap-y-1 xl:gap-y-2': noA,
                         })}
                     >
                         <JogInput
