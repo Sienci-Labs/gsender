@@ -24,7 +24,7 @@ export const Alerts = () => {
         setShowMaintenanceAlert(false);
         //setModalEnabled(store.get('widgets.visualizer.jobEndModal'));
         setJobEndAlertEnabled(
-            store.get('widgets.visualizer.JobEndModal', true),
+            store.get('widgets.visualizer.jobEndModal', true),
         );
         setMaintenanceAlertsEnabled(
             store.get('widgets.visualizer.maintenanceTaskNotifications', true),

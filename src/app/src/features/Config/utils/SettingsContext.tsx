@@ -24,6 +24,8 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from "pubsub-js";
+import {undefined} from "zod";
+import * as boolean from "boolean";
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -60,6 +62,12 @@ const defaultState: iSettingsContext = {
     settingsToUpdate: {},
     EEPROMToUpdate: {},
     EEPROM: {},
+    getEEPROMDefaultValue(v: string): string | number {
+        return undefined;
+    },
+    isSettingDefault(v: object): boolean {
+        return false;
+    },
     rawEEPROM: {},
     machineProfile: {},
     firmwareType: 'Grbl',
@@ -74,7 +82,7 @@ const defaultState: iSettingsContext = {
     settingsFilter: () => true,
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
-    eepromIsDefault: (_v) => false,
+    eepromIsDefault: (_v) => false
 };
 
 export const SettingsContext =
@@ -225,10 +233,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * @param v - The setting to filter
      */
     function settingsFilter(v: gSenderSetting) {
-        // Early return on disconnected wizard
-        /*if (v.type === "wizard" && !connected) {
-            return false;
-        }*/
         // Hide hidden when filtering
         if ('hidden' in v) {
             return !v.hidden();
@@ -311,7 +315,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         if ('key' in v) {
             return isEqual(v.value, v.defaultValue);
         }
-        return true; // Default to true to non-key settings aren't always highlighted.
+        return true; // Default to true, so non-key settings aren't always highlighted.
     }
 
     function toggleFilterNonDefault() {
