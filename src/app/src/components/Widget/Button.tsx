@@ -22,7 +22,7 @@
  */
 
 import classNames from 'classnames';
-import Anchor from '../Anchor';
+
 import { WidgetProps } from './definitions';
 
 const Button: React.FC<WidgetProps> = ({
@@ -32,7 +32,7 @@ const Button: React.FC<WidgetProps> = ({
     ...props
 }) => {
     return (
-        <Anchor
+        <button
             {...props}
             className={classNames(
                 className,
