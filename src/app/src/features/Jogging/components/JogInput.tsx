@@ -13,37 +13,62 @@ interface JogInputProps {
 
 export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
     const units = store.get('workspace.units', METRIC_UNITS);
-    const getStep = () => {
-        if (label === 'at') {
-            return 1000; // feedrate should change by 1000
-        } else if (units === IMPERIAL_UNITS) {
-            return 0.1; // smaller increments for inches
-        } else {
-            return 1;
+    const getStep = (increment = false) => {
+        let step;
+
+        if (currentValue === 0) {
+            if (!increment) {
+                return 0;
+            }
+            return 0.1;
         }
+        if (currentValue < 0.1) {
+            step = 0.01;
+        } else if (currentValue < 1) {
+            step = 0.1;
+        } else if (currentValue < 10) {
+            step = 1;
+        } else if (currentValue < 100) {
+            step = 10;
+        } else if (currentValue < 1000) {
+            step = 100;
+        } else if (currentValue < 10000) {
+            step = 1000;
+        } else {
+            step = 10000;
+        }
+
+        if (!increment && currentValue - step <= 0) {
+            if (step !== 0.001) {
+                step /= 10;
+            } else {
+                return 0;
+            }
+        }
+        return step;
     };
 
     const formatNewValue = (newValue: number) => {
         if (units === IMPERIAL_UNITS) {
             return Number(newValue.toFixed(3));
         } else {
-            return Number(newValue.toFixed(2));
+            return Number(newValue.toFixed(3));
         }
     };
 
     return (
         <div className="flex flex-row justify-end items-center gap-2">
-            <Label className="min-w-[3ch] text-right whitespace-nowrap">
+            <Label className="min-w-[2ch] text-right whitespace-nowrap">
                 {label}
             </Label>
-            <div className="flex flex-row justify-between items-center gap-2 rounded-full bg-gray-200 shadow-inner">
+            <div className="grid grid-cols-[1fr_5fr_1fr] max-w-28 items-center gap-0 rounded-full bg-gray-200 shadow-inner">
                 <Button
                     type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         onChange(formatNewValue(currentValue - getStep()));
                     }}
-                    size="xs"
+                    size="mini"
                     icon={<FaMinus />}
                 />
                 <ControlledInput
@@ -57,9 +82,9 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     type="button"
                     onClick={(e) => {
                         e.preventDefault();
-                        onChange(formatNewValue(currentValue + getStep()));
+                        onChange(formatNewValue(currentValue + getStep(true)));
                     }}
-                    size="xs"
+                    size="mini"
                     icon={<FaPlus />}
                 />
             </div>
