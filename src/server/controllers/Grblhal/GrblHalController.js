@@ -1308,6 +1308,7 @@ class GrblHalController {
 
         callback(); // register controller
 
+        console.log('we are reopening');
         this.workflow.stop();
 
         // Clear action values
@@ -1379,6 +1380,10 @@ class GrblHalController {
     }
 
     loadFile(gcode, { name }) {
+        if (!this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
     }

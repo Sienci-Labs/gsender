@@ -232,8 +232,11 @@ class CNCEngine {
                     }
 
                     controller.addConnection(socket);
+
+
                     // Load file to controller if it exists
                     if (this.hasFileLoaded()) {
+                        console.log('Load file firing on reconnect');
                         controller.loadFile(this.gcode, this.meta);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
@@ -241,6 +244,14 @@ class CNCEngine {
                     }
 
                     this.connection.addController(controller);
+
+                    /* CHECKING: IF controller open already, don't reopen
+                    if (controller.isOpen()) {
+                        log.debug('Already an open connection, returning');
+                        store.set(`controllers[${JSON.stringify(port)}]`, controller);
+                        callback(null);
+                        return;
+                    }*/
 
                     controller.open(port, baudrate, refresh, (err = null) => {
                         if (err) {
