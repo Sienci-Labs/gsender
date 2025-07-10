@@ -207,7 +207,7 @@ class CNCEngine {
                 },
                 'firmwareFound': (controllerType = GRBL, options, callback = noop, refresh = false) => {
                     let { port, baudrate, rtscts, network } = { ...options };
-
+                    log.debug('firmwareFound event fired');
                     if (typeof callback !== 'function') {
                         callback = noop;
                     }
@@ -245,24 +245,14 @@ class CNCEngine {
 
                     this.connection.addController(controller);
 
-                    /* CHECKING: IF controller open already, don't reopen
-                    if (controller.isOpen()) {
-                        log.debug('Already an open connection, returning');
-                        store.set(`controllers[${JSON.stringify(port)}]`, controller);
-                        callback(null);
-                        return;
-                    }*/
-
                     controller.open(port, baudrate, refresh, (err = null) => {
                         if (err) {
                             callback(err);
                             return;
                         }
 
-                        // System Trigger: Open a serial port
-                        // this.event.trigger('port:open');
-
-                        if (store.get(`controllers["${port}"]`)) {
+                        // Throw error if port is used and it's not a second client connecting
+                        if (!refresh && store.get(`controllers["${port}"]`)) {
                             log.error(`Serial port "${port}" was not properly closed`);
                         }
                         store.set(`controllers[${JSON.stringify(port)}]`, controller);

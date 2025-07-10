@@ -1299,7 +1299,7 @@ class GrblHalController {
         };
     }
 
-    open(port, baudrate, refresh, callback = noop) {
+    open(port, baudrate, refresh = false, callback = noop) {
         if (!refresh) {
             this.connection.on('data', this.connectionEventListener.data);
             this.connection.on('close', this.connectionEventListener.close);
@@ -1308,7 +1308,11 @@ class GrblHalController {
 
         callback(); // register controller
 
-        console.log('we are reopening');
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
+
         this.workflow.stop();
 
         // Clear action values
