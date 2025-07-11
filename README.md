@@ -128,6 +128,8 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Stock turning and Probe Rotary Z disabled for grbl controllers when in non-Rotary mode
 - Config look and Feel tweaks
 - Shortcuts rearranged so more commonly set ones are higher up
+- File stat feed rates now convert correctly
+- Zero All on grblHAL no longer sends Zero on A if A Axis not reported
 
 ### 1.5.1 (June 27, 2025)
 - Addressed issues where jog values kept reconverting.
