@@ -252,6 +252,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: '',
                         key: 'widgets.axes.jog.precise',
                     },
+                    {
+                        label: 'Jog Delay',
+                        type: 'number',
+                        unit: 'ms',
+                        description:
+                            'Where regular presses or clicks make single movements, holding for at least this long will begin jogging continuously. Some might prefer a longer delay like 700. (0 to disable continuous jogging, Default 200)',
+                        key: 'widgets.axes.jog.threshold',
+                    }
                 ],
             },
             {
