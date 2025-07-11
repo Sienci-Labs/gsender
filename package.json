@@ -488,7 +488,6 @@
     "text-table": "~0.2.0",
     "transform-loader": "~0.2.4",
     "typescript-eslint": "^7.16.1",
-    "unenv": "^1.10.0",
     "url-loader": "~1.1.2",
     "vite-css-modules": "^1.4.2",
     "vite-plugin-node-polyfills": "^0.23.0",
