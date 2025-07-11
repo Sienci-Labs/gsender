@@ -108,8 +108,25 @@ gSender is free software, provided as-is and available under the [GNU GPLv3 lice
 gSender is also designed in a way that it can be run locally on your computer browser or otherwise compiled for use on other systems which aren't listed in the downloads. There will soon be documentation on how you can set this up yourself listed below once there's been a bit more testing completed.
 
 
-## 🕣 Development Hiyarnstory
+## 🕣 Development History
 
+### 1.5.2 (July 15, 2025)
+- Fix issues with remote mode disconnecting main client and jobs stopping when connecting from remote mode.
+- Significantly sped up file loading and rendering on larger files
+- Job end notifications will no longer appear if toggled off
+- SVG visualization no longer teeny-tiny on inches postprocessor files
+- Plus and Minus buttons returned to jog speeds with the prior existing logic
+- AutoZero touchplate renamed to just AutoZero
+- Generating a surfacing file no longer causes issues on main visualizer if not sent there
+- Motors sections again will disappear from config when empty
+- Restore defaults and default highlight works correctly in Config on settings considered hybrid between grbl/grblHAL
+- Prevented situations where alarm list was not populating correctly
+- Continuous jog without soft limits now sends more sane values when jogging in Inches across both controllers
+- Load bar now appears correctly in surfacing and rotary surfacing tools
+- Stopping a file that has an early M0 already sent will no longer pop up the pause modal
+- Stock turning and Probe Rotary Z disabled for grbl controllers when in non-Rotary mode
+- Config look and Feel tweaks
+- Shortcuts rearranged so more commonly set ones are higher up
 
 ### 1.5.1 (June 27, 2025)
 - Addressed issues where jog values kept reconverting.
