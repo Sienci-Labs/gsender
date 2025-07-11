@@ -409,7 +409,7 @@
     "use-stay-awake": "^0.1.7",
     "uuid": "~3.3.2",
     "vaul": "^0.9.1",
-    "vite": "^5.4.2",
+    "vite": "5.4.14",
     "vite-tsconfig-paths": "^5.0.1",
     "watch": "~1.0.2",
     "webappengine": "~1.2.0",
