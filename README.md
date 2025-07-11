@@ -117,7 +117,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - SVG visualization no longer teeny-tiny on inches postprocessor files
 - Plus and Minus buttons returned to jog speeds with the prior existing logic
 - AutoZero touchplate renamed to just AutoZero
-- Commands sent later in connection cycle to reduce situations where Error 1 is sent when unlocking and resetting the board
+- Commands sent later in connection cycle to reduce situations where Error 1 occurs when unlocking and resetting the board
 - Generating a surfacing file no longer causes issues on main visualizer if not sent there
 - Motors sections again will disappear from config when empty
 - Restore defaults and default highlight works correctly in Config on settings considered hybrid between grbl/grblHAL
