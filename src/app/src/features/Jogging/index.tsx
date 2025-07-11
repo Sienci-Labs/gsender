@@ -55,7 +55,7 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
-    const [jogThreshold, setJogThreshold] = useState<number>(0);
+    const [jogThreshold, setJogThreshold] = useState<number>(store.get('widgets.axes.jog.threshold', 200));
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -71,13 +71,18 @@ export function Jogging() {
     });
 
     useEffect(() => {
-        setJogThreshold(store.get('widgets.axes.jog.threshold', 200));
         store.on('change', () => {
+            // Update jog threshold if it's different
             const newThreshold = store.get('widgets.axes.jog.threshold', 200);
-            console.log(`Updating threshold to ${newThreshold}`);
-            setJogThreshold(newThreshold);
+            if (newThreshold !== jogThreshold) {
+                setJogThreshold(newThreshold);
+            }
         })
     }, [])
+
+    useEffect(() => {
+        jogHelper.current?.updateThreshold(jogThreshold);
+    }, [jogThreshold])
 
     useEffect(() => {
         jogSpeedRef.current = jogSpeed;

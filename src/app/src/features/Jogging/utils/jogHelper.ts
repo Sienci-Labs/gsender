@@ -88,6 +88,10 @@ class JogHelper {
         }, this.timeout);
     }
 
+    updateThreshold(threshold: number) {
+        this.timeout = threshold + 100;
+    }
+
     onKeyUp() {
         const timer = new Date().getTime() - this.startTime;
 
