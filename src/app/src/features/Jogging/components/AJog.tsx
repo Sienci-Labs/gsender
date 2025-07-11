@@ -14,13 +14,14 @@ export function AJog({
     distance,
     canClick,
     isRotaryMode,
+    threshold = 200,
 }: JoggerProps) {
     const axis = isRotaryMode ? 'Y' : 'A';
 
     const aPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ [axis]: 1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => aPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
@@ -28,7 +29,7 @@ export function AJog({
     const aMinusJogHandlers = useLongPress(
         () => continuousJogAxis({ [axis]: -1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => aMinusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
