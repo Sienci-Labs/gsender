@@ -1266,6 +1266,11 @@ class GrblController {
 
         callback(); // register controller
 
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
+
         // log.debug(`Connected to serial port "${port}"`);
         this.workflow.stop();
 
@@ -1324,6 +1329,11 @@ class GrblController {
     }
 
     loadFile(gcode, meta) {
+        if (!this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
+
         log.debug(`Loading file '${meta.name}' to controller`);
         this.command('gcode:load', meta, gcode);
     }
