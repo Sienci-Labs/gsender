@@ -28,7 +28,7 @@ import { toast } from 'app/lib/toaster';
 import { RecentFile } from '../definitions';
 import { FileData } from '..';
 
-export const RECENT_FILE_LIMIT = 5;
+export const RECENT_FILE_LIMIT = 8;
 
 export const recentFileExists = (
     filePath: string,
@@ -100,7 +100,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
 
 export const getRecentFiles = (): RecentFile[] => {
     const savedFiles = store.get('workspace.recentFiles', []);
-    return savedFiles.slice(0, 3);
+    return savedFiles.slice();
 };
 
 export const updateStoredRecentFiles = (recentFiles: RecentFile[]) => {
