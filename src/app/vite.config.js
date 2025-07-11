@@ -55,10 +55,10 @@ export default defineConfig({
     },
     build: {
         sourcemap: true,
-        rollupOptions: {
+        /*rollupOptions: {
             rollupOptions: {
                 external: ['unenv/node/process']
             }
-        }
+        }*/
     },
 });
