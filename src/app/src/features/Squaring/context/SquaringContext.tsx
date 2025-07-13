@@ -1,5 +1,6 @@
 import { ButtonVariants } from 'app/components/Button';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 import { createContext, useContext, ReactNode, useState } from 'react';
 
 type Point = {
@@ -70,7 +71,7 @@ export type SquaringContextType = {
     completeStep: (buttonLabel: string) => void;
     updateTriangle: (side: keyof Triangle, value: number) => void;
     updateStepValue: (buttonLabel: string, value: number) => void;
-    jogMachine: (axis: string, value: number) => void;
+    jogMachine: (axis: string, value: number, units: string) => void;
     goToNextMainStep: () => void;
     goToPreviousMainStep: () => void;
     resetSquaring: () => void;
@@ -112,190 +113,196 @@ const initialShapes: Shapes = {
     ],
 };
 
-const initialMainSteps: MainStep[] = [
-    {
-        title: 'Mark Reference Points',
-        description:
-            "First, we'll mark three points on your machine in a triangle.",
-        subSteps: [
-            {
-                buttonLabel: 'Mark Point 1',
-                buttonVariant: 'secondary',
-                description:
-                    "First, we'll mark three points on your machine in a triangle. Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.",
-                completed: false,
-                output: null,
-                shapeActions: [
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 0,
-                        isActive: true,
-                        show: true,
-                        clearPrevious: true,
-                        label: '1',
-                    },
-                ],
-            },
-            {
-                buttonLabel: 'Move X-axis',
-                buttonVariant: 'primary',
-                description:
-                    'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
-                value: 300,
-                completed: false,
-                output: null,
-                shapeActions: [
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 0,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: false,
-                        label: '1',
-                    },
-                    {
-                        shapeType: 'arrows',
-                        shapeID: 0,
-                        isActive: true,
-                        show: true,
-                        clearPrevious: true,
-                        label: 'X',
-                    },
-                ],
-            },
-            {
-                buttonLabel: 'Mark Point 2',
-                description:
-                    'Now mark the second location with the second piece of tape.',
-                completed: false,
-                output: null,
-                shapeActions: [
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 0,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: true,
-                        label: '1',
-                    },
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 1,
-                        isActive: true,
-                        show: true,
-                        clearPrevious: false,
-                        label: '2',
-                    },
-                ],
-            },
-            {
-                buttonLabel: 'Move Y-axis',
-                description:
-                    'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
-                value: 300,
-                completed: false,
-                output: null,
-                shapeActions: [
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 0,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: true,
-                        label: '1',
-                    },
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 1,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: false,
-                        label: '2',
-                    },
-                    {
-                        shapeType: 'arrows',
-                        shapeID: 1,
-                        isActive: true,
-                        show: true,
-                        clearPrevious: false,
-                        label: 'Y',
-                    },
-                ],
-            },
-            {
-                buttonLabel: 'Mark Point 3',
-                description:
-                    'Place the last piece of tape with an X mark at the current position.',
-                completed: false,
-                output: null,
-                shapeActions: [
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 0,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: true,
-                        label: '1',
-                    },
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 1,
-                        isActive: false,
-                        show: true,
-                        clearPrevious: false,
-                        label: '2',
-                    },
-                    {
-                        shapeType: 'circlePoints',
-                        shapeID: 2,
-                        isActive: true,
-                        show: true,
-                        clearPrevious: false,
-                        label: '3',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        title: 'Take Measurements',
-        description:
-            "Now, measure the distances between the points you've marked and enter them below.",
-        subSteps: [
-            {
-                buttonLabel: 'Measure Distance 1-2',
-                description:
-                    "Now, measure the distances between the points you've marked and enter them below. Measure the distance between points 1 and 2.",
-                completed: false,
-                output: null,
-            },
-            {
-                buttonLabel: 'Measure Distance 2-3',
-                description: 'Measure the distance between points 2 and 3.',
-                completed: false,
-                output: null,
-            },
-            {
-                buttonLabel: 'Measure Distance 1-3',
-                description: 'Measure the distance between points 1 and 3.',
-                completed: false,
-                output: null,
-            },
-        ],
-    },
-    {
-        title: 'Results',
-        description: 'Review the results and get adjustment recommendations.',
-        subSteps: [
-            {
-                buttonLabel: 'View Results',
-                description: 'View the squaring results and recommendations.',
-                completed: false,
-                output: null,
-            },
-        ],
-    },
-];
+const initialMainSteps = (): MainStep[] => {
+    const units = store.get('workspace.units', 'mm');
+
+    return [
+        {
+            title: 'Mark Reference Points',
+            description:
+                "First, we'll mark three points on your machine in a triangle.",
+            subSteps: [
+                {
+                    buttonLabel: 'Mark Point 1',
+                    buttonVariant: 'secondary',
+                    description:
+                        "First, we'll mark three points on your machine in a triangle. Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.",
+                    completed: false,
+                    output: null,
+                    shapeActions: [
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 0,
+                            isActive: true,
+                            show: true,
+                            clearPrevious: true,
+                            label: '1',
+                        },
+                    ],
+                },
+                {
+                    buttonLabel: 'Move X-axis',
+                    buttonVariant: 'primary',
+                    description:
+                        'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
+                    value: units === 'mm' ? 300 : 12,
+                    completed: false,
+                    output: null,
+                    shapeActions: [
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 0,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: false,
+                            label: '1',
+                        },
+                        {
+                            shapeType: 'arrows',
+                            shapeID: 0,
+                            isActive: true,
+                            show: true,
+                            clearPrevious: true,
+                            label: 'X',
+                        },
+                    ],
+                },
+                {
+                    buttonLabel: 'Mark Point 2',
+                    description:
+                        'Now mark the second location with the second piece of tape.',
+                    completed: false,
+                    output: null,
+                    shapeActions: [
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 0,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: true,
+                            label: '1',
+                        },
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 1,
+                            isActive: true,
+                            show: true,
+                            clearPrevious: false,
+                            label: '2',
+                        },
+                    ],
+                },
+                {
+                    buttonLabel: 'Move Y-axis',
+                    description:
+                        'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
+                    value: units === 'mm' ? 300 : 12,
+                    completed: false,
+                    output: null,
+                    shapeActions: [
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 0,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: true,
+                            label: '1',
+                        },
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 1,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: false,
+                            label: '2',
+                        },
+                        {
+                            shapeType: 'arrows',
+                            shapeID: 1,
+                            isActive: true,
+                            show: true,
+                            clearPrevious: false,
+                            label: 'Y',
+                        },
+                    ],
+                },
+                {
+                    buttonLabel: 'Mark Point 3',
+                    description:
+                        'Place the last piece of tape with an X mark at the current position.',
+                    completed: false,
+                    output: null,
+                    shapeActions: [
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 0,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: true,
+                            label: '1',
+                        },
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 1,
+                            isActive: false,
+                            show: true,
+                            clearPrevious: false,
+                            label: '2',
+                        },
+                        {
+                            shapeType: 'circlePoints',
+                            shapeID: 2,
+                            isActive: true,
+                            show: true,
+                            clearPrevious: false,
+                            label: '3',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title: 'Take Measurements',
+            description:
+                "Now, measure the distances between the points you've marked and enter them below.",
+            subSteps: [
+                {
+                    buttonLabel: 'Measure Distance 1-2',
+                    description:
+                        "Now, measure the distances between the points you've marked and enter them below. Measure the distance between points 1 and 2.",
+                    completed: false,
+                    output: null,
+                },
+                {
+                    buttonLabel: 'Measure Distance 2-3',
+                    description: 'Measure the distance between points 2 and 3.',
+                    completed: false,
+                    output: null,
+                },
+                {
+                    buttonLabel: 'Measure Distance 1-3',
+                    description: 'Measure the distance between points 1 and 3.',
+                    completed: false,
+                    output: null,
+                },
+            ],
+        },
+        {
+            title: 'Results',
+            description:
+                'Review the results and get adjustment recommendations.',
+            subSteps: [
+                {
+                    buttonLabel: 'View Results',
+                    description:
+                        'View the squaring results and recommendations.',
+                    completed: false,
+                    output: null,
+                },
+            ],
+        },
+    ];
+};
 
 const SquaringContext = createContext<SquaringContextType | undefined>(
     undefined,
@@ -307,7 +314,7 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
     const [jogValues, setJogValues] = useState<JogValues>({ x: 0, y: 0, z: 0 });
     const [currentMainStep, setCurrentMainStep] = useState(0);
     const [currentSubStep, setCurrentSubStep] = useState(0);
-    const [mainSteps, setMainSteps] = useState<MainStep[]>(initialMainSteps);
+    const [mainSteps, setMainSteps] = useState<MainStep[]>(initialMainSteps());
 
     const isStepEnabled = (mainStepIndex: number, subStepIndex: number) => {
         // If it's a previous main step, it's always enabled
@@ -464,8 +471,9 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
         setTriangle((prev) => ({ ...prev, [id]: value }));
     };
 
-    const jogMachine = async (axis: string, value: number) => {
-        controller.command('gcode', `G91 G0${axis} ${value}`);
+    const jogMachine = async (axis: string, value: number, units: string) => {
+        const unitsGcode = units === 'mm' ? 'G21' : 'G20';
+        controller.command('gcode', `G91 ${unitsGcode} G0 ${axis}${value}`);
         // Update jogValues based on the axis and value
         setJogValues((prev) => ({
             ...prev,
@@ -489,7 +497,7 @@ export const SquaringProvider = ({ children }: { children: ReactNode }) => {
 
     const resetSquaring = () => {
         // Create deep copies of initial states to ensure a fresh start
-        const freshMainSteps = JSON.parse(JSON.stringify(initialMainSteps));
+        const freshMainSteps = JSON.parse(JSON.stringify(initialMainSteps()));
 
         // Reset all substeps to not completed
         freshMainSteps.forEach((mainStep: MainStep) => {

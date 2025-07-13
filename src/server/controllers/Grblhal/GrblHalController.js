@@ -57,7 +57,7 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
-    //GRBL_HAL_ALARMS,
+    GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
     GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
@@ -326,10 +326,14 @@ class GrblHalController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0' && !looksLikeEEPROM) {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
+                        const payload = { data: 'M0', comment: commentString };
+                        this.feeder.hold(payload);
+                        this.emit('feeder:pause', payload);
                     } else if (programMode === 'M1' && !looksLikeEEPROM) {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
+                        const payload = { data: 'M1', comment: commentString };
+                        this.feeder.hold(payload);// Hold reason
+                        this.emit('feeder:pause', payload);
                     }
                 }
 
@@ -590,9 +594,11 @@ class GrblHalController {
         });
         this.workflow.on('stop', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+            this.feeder.reset();
             this.sender.rewind();
             this.sender.stopCountdown();
         });
+
         this.workflow.on('pause', (...args) => {
             this.emit('workflow:state', this.workflow.state);
 
@@ -814,7 +820,8 @@ class GrblHalController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || this.state.status.subState;
             //const alarm = _.find(this.settings.alarms, { id: code });
-            const alarm = this.settings?.alarms && this.settings.alarms[code.toString()];
+            // default to grbl hal alarm constants we have saved if the alarms arent populated yet (ex. when there's an error on startup)
+            const alarm = this.settings?.alarms ? this.settings.alarms[code.toString()] : _.find(GRBL_HAL_ALARMS, { code: code });
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -934,7 +941,7 @@ class GrblHalController {
                 this.initController();
             }
 
-            await delay(300);
+            await delay(500);
             this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
         });
 
@@ -1292,7 +1299,7 @@ class GrblHalController {
         };
     }
 
-    open(port, baudrate, refresh, callback = noop) {
+    open(port, baudrate, refresh = false, callback = noop) {
         if (!refresh) {
             this.connection.on('data', this.connectionEventListener.data);
             this.connection.on('close', this.connectionEventListener.close);
@@ -1300,6 +1307,11 @@ class GrblHalController {
         }
 
         callback(); // register controller
+
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
 
         this.workflow.stop();
 
@@ -1372,6 +1384,10 @@ class GrblHalController {
     }
 
     loadFile(gcode, { name }) {
+        if (!this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
     }
@@ -1562,7 +1578,7 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
-                        modalGCode.push(`${modal.units} ${modal.spindle} F${feedRate} S${spindleRate}`);
+                        modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
@@ -1571,6 +1587,7 @@ class GrblHalController {
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
+                    modalGCode.push(`F${feedRate}`);
                     modalGCode.push(setModalGcode);
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
@@ -1728,8 +1745,8 @@ class GrblHalController {
             },
             'unlock': () => {
                 this.feeder.reset();
-                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
                 this.writeln('$X');
+                this.write(GRBLHAL_REALTIME_COMMANDS.CMD_SOFT_STOP);
             },
             'populateConfig': () => {
                 this.writeln('$$');
@@ -1774,8 +1791,7 @@ class GrblHalController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
 
@@ -1802,8 +1818,7 @@ class GrblHalController {
                     queue.forEach((command, index) => {
                         setTimeout(() => {
                             this.connection.writeImmediate(command);
-                            this.connection.writeImmediate('?');
-                        }, 50 * (index + 1));
+                        }, 25 * (index + 1));
                     });
                 }
             },
@@ -1920,12 +1935,12 @@ class GrblHalController {
             },
             'jog:start': () => {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
-                console.log(args);
+
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);

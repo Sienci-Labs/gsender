@@ -66,6 +66,7 @@ export interface ControllerListeners {
     'gcode:loaded': Array<Function>; // TO BE DEPRECATED
     'gcode:toolChange': Array<Function>;
     'feeder:status': Array<Function>;
+    'feeder:pause':  Array<Function>;
     'workflow:pause': Array<Function>;
     'sender:status': Array<Function>;
     'workflow:state': Array<Function>;
@@ -169,6 +170,7 @@ class Controller {
         'gcode:loaded': [], // TO BE DEPRECATED
         'gcode:toolChange': [],
         'feeder:status': [],
+        'feeder:pause': [],
         'workflow:pause': [],
         'sender:status': [],
         'workflow:state': [],

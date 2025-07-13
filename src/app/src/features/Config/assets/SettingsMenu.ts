@@ -38,6 +38,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
+import pubsub from 'pubsub-js';
 
 export interface SettingsMenuSection {
     label: string;
@@ -85,6 +86,7 @@ export interface gSenderSetting {
     disabled?: () => boolean;
     hidden?: () => boolean;
     onDisable?: () => void;
+    onUpdate?: () => void;
     min?: number;
     max?: number;
 }
@@ -191,15 +193,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Dark mode',
                         key: 'workspace.enableDarkMode',
-                        description: 'Change the app colours for reduced eye strain, better contrast, or just for fun!',
+                        description:
+                            'Change the app colours for reduced eye strain, better contrast, or just for fun!',
                         type: 'boolean',
                     },
                     {
                         label: 'Visualizer theme',
                         key: 'widgets.visualizer.theme',
-                        description: 'Independant colour control for the visualizer.',
+                        description:
+                            'Independant colour control for the visualizer.',
                         type: 'select',
                         options: ['Light', 'Dark'],
+                        onUpdate: () => {
+                            pubsub.publish('theme:change');
+                        },
                     },
                     {
                         label: 'Lightweight options',
@@ -229,8 +236,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Rapid',
                         type: 'jog',
-                        description:
-                            '',
+                        description: '',
                         key: 'widgets.axes.jog.rapid',
                     },
                     {
@@ -243,8 +249,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Precise',
                         type: 'jog',
-                        description:
-                            '',
+                        description: '',
                         key: 'widgets.axes.jog.precise',
                     },
                 ],
@@ -348,6 +353,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Square up CNC rails',
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
+                        hidden: () => {
+                            const connected = controller.portOpen
+                            return !connected;
+                        }
                     },
                     {
                         type: 'eeprom',
@@ -780,7 +789,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Spindle on delay',
-                        key: 'workspace.spindleDelay',
+                        key: 'widgets.spindle.delay',
                         description:
                             'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',
@@ -1058,7 +1067,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Travel resolution in steps per degree. ($103)',
                         type: 'hybrid',
                         eID: '$103',
-                        unit: 'rpm',
+                        unit: 'step/deg',
                     },
                     {
                         label: 'Max speed',
@@ -1067,7 +1076,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Max axis speed, also used for G0 rapids. ($113)',
                         type: 'hybrid',
                         eID: '$113',
-                        unit: 'rpm',
+                        unit: 'deg/min',
                     },
                     { type: 'eeprom', eID: '$123' },
                     {
@@ -1169,7 +1178,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangePosition',
                         unit: 'mm',
                         description:
-                            "The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)",
+                            'The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',

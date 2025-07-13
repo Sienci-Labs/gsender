@@ -3,6 +3,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const MarkingStep = () => {
     const {
@@ -13,6 +14,7 @@ const MarkingStep = () => {
         updateStepValue,
         jogMachine,
     } = useSquaring();
+    const { units } = useWorkspaceState();
 
     const currentMainStepData = mainSteps[currentMainStep];
     const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
@@ -22,7 +24,7 @@ const MarkingStep = () => {
     };
 
     const handleJog = (buttonLabel: string, value: number, axis: string) => {
-        jogMachine(axis, value);
+        jogMachine(axis, value, units ?? 'mm');
         handleStepComplete(buttonLabel);
     };
 
@@ -120,7 +122,7 @@ const MarkingStep = () => {
                                                         disabled={
                                                             !isCurrentStep
                                                         }
-                                                        suffix="mm"
+                                                        suffix={units ?? 'mm'}
                                                     />
                                                 </div>
                                             ) : (
@@ -136,7 +138,9 @@ const MarkingStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Diagram</h3>
+                <h3 className="text-lg font-semibold dark:text-white">
+                    Diagram
+                </h3>
                 <TriangleDiagram />
             </div>
         </div>

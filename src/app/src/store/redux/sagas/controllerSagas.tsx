@@ -264,7 +264,7 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 await getParsedData().then((value) => {
-                    const parsedData = value;
+                    const parsedData = null;
                     visualizeWorker.postMessage({
                         content,
                         visualizer,
@@ -317,7 +317,7 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         await getParsedData().then((value) => {
-            const parsedData = value;
+            const parsedData = null;
             visualizeWorker.postMessage({
                 content,
                 visualizer,
@@ -666,6 +666,23 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('ip:list', (ipList: string[]) => {
         reduxStore.dispatch(setIpList(ipList));
     });
+
+    controller.addListener('feeder:pause', (payload: { data: string, comment: string }) => {
+        console.log(payload);
+        Confirm({
+            title: `${payload.data} pause detected`,
+            confirmLabel: 'Resume',
+            content: 'Press Resume to continue.',
+
+            cancelLabel: 'Stop',
+            onConfirm: () => {
+                controller.command('feeder:start')
+            },
+            onClose: () => {
+                controller.command('feeder:stop')
+            }
+        })
+    })
 
     controller.addListener('requestEstimateData', () => {
         if (finishLoad) {

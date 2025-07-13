@@ -85,24 +85,16 @@ const MacroItem = ({
             position: 'bottom-right',
         });
     };
-
     return (
         <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
-            {macro.description.trim() ? (
-                <Tooltip content={macro.description.trim()}>
+                <Tooltip content={macro.name}>
                     <MacroButton
                         onMacroRun={onMacroRun}
                         disabled={disabled}
                         macro={macro}
                     />
                 </Tooltip>
-            ) : (
-                <MacroButton
-                    onMacroRun={onMacroRun}
-                    disabled={disabled}
-                    macro={macro}
-                />
-            )}
+
 
             <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">

@@ -110,6 +110,42 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.5.2 (July 15, 2025)
+- Fix issues with remote mode disconnecting main client and jobs stopping when connecting from remote mode.
+- Significantly sped up file loading and rendering on larger files
+- Job end notifications will no longer appear if toggled off
+- SVG visualization no longer teeny-tiny on inches postprocessor files
+- Plus and Minus buttons returned to jog speeds with the prior existing logic
+- AutoZero touchplate renamed to just AutoZero
+- Commands sent later in connection cycle to reduce situations where Error 1 occurs when unlocking and resetting the board
+- Generating a surfacing file no longer causes issues on main visualizer if not sent there
+- Motors sections again will disappear from config when empty
+- Restore defaults and default highlight works correctly in Config on settings considered hybrid between grbl/grblHAL
+- Prevented situations where alarm list was not populating correctly
+- Continuous jog without soft limits now sends more sane values when jogging in Inches across both controllers
+- Load bar now appears correctly in surfacing and rotary surfacing tools
+- Stopping a file that has an early M0 already sent will no longer pop up the pause modal
+- Stock turning and Probe Rotary Z disabled for grbl controllers when in non-Rotary mode
+- Config look and Feel tweaks
+- Shortcuts rearranged so more commonly set ones are higher up
+- File stat feed rates now convert correctly
+- Zero All on grblHAL no longer sends Zero on A if A Axis not reported
+
+### 1.5.1 (June 27, 2025)
+- Addressed issues where jog values kept reconverting.
+- Fixed crash when importing settings.
+- Updated some AltMill and LongMill default values.
+- Removed Zoom icons from visualizer.
+- Override sliders have switched to decaf and are now less jumpy.
+- Fixed unit issue with Go To popover and default values no longer populate Z with Y value
+- Using tuning tools (Squaring and Steps/mm) now refresh EEPROM state and respect UI units
+- Abs/Inc toggle in go to moved to top.
+- Fixed issue where M0 in macros could result in a paused feeder state after unlocking preventing further code sending
+- Fixed issue where Machine status overlapped unlock and connect on smaller resolutions and made them unclickable
+- Disabling a drawer tool now defaults you to the first drawer element
+- Fixed issue with tool select in probing working inconsistently and defaulting to Auto
+- Rotary Axis travel resolution and maximum rate appearing again when connected with GRBL.
+
 ### 1.5.0 (June 18th, 2025)
 - All new user experience - we've streamlined and modernized the UI, with a focus on touch device and usability.  It should seem familiar to previous gSender users with a number of new improvements.
 - Firmware now detected on connection - no more firmware selector, gSender can just use the correct controller type.

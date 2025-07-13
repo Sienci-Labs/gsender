@@ -67,7 +67,7 @@ export function AlarmListing() {
 
     return (
         <div className="">
-            <ol className="relative  h-[500px]  overflow-y-scroll no-scrollbar">
+            <ol className="relative overflow-y-auto fixed-tool-area">
                 {alarms.map((alarm) => (
                     <AlarmItem key={alarm.id} alarm={alarm} />
                 ))}

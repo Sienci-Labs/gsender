@@ -19,8 +19,10 @@ const SecondaryVisualizer = ({
 }) => {
     return (
         <>
-            {showLoading && <Loading />}
-            {showRendering && <Rendering />}
+            <div className="z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2">
+                {showLoading && <Loading />}
+                {showRendering && <Rendering />}
+            </div>
 
             {WebGL.isWebGLAvailable() && (
                 <VisualizerWrapper

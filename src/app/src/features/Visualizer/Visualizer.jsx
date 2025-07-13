@@ -1007,8 +1007,13 @@ class Visualizer extends Component {
                 if (this.outlineRunning) {
                     return;
                 }
-
+                toast.info('Generating outline g-code...');
                 this.outlineRunning = true;
+
+                // We want to make sure that in situations outline fails, you can try again in ~5 seconds
+                setTimeout((() => {
+                    this.outlineRunning = false;
+                }), 5000)
 
                 const vertices = this.props.actions.getHull();
                 const outlineWorker = new Worker(

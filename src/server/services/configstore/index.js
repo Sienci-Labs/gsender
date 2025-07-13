@@ -29,6 +29,14 @@ import logger from '../../lib/logger';
 
 const log = logger('service:configstore');
 
+const defaultJobStats = {
+    jobs: [],
+    totalRuntime: 0,
+    totalJobs: 0,
+    jobsCompleted: 0,
+    jobsCancelled: 0,
+};
+
 const defaultState = { // default state
     checkForUpdates: false,
     controller: {
@@ -181,6 +189,10 @@ class ConfigStore extends events.EventEmitter {
                 task.id = currID;
                 currID++;
             });
+        }
+
+        if (!this.config.jobStats) {
+            this.config.jobStats = defaultJobStats;
         }
 
         return true;

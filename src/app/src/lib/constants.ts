@@ -26,11 +26,11 @@ export const modifierKeys = ['shift', 'alt', 'ctrl', 'meta'];
 export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
 
 export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
-export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero Touchplate';
+export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero';
 export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
 export const TOUCHPLATE_TYPES = {
     TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
-    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero Touchplate',
+    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero',
     TOUCHPLATE_TYPE_ZERO: 'Z Probe',
 };
 

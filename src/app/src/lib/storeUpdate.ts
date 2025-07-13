@@ -2,6 +2,7 @@ import store from '../store';
 import defaultState from '../store/defaultState';
 import api from '../api';
 import { toast } from 'app/lib/toaster';
+import pubsub from "pubsub-js";
 
 export const restoreDefault = async (): Promise<void> => {
     await api.events.clearAll();
@@ -10,16 +11,14 @@ export const restoreDefault = async (): Promise<void> => {
 };
 
 const restoreSettings = (state: object, isSync?: boolean): void => {
-    store.restoreState(state);
-
-    // if this is being called for importing settings, need to reload
-    // if sync, no reload needed
-    /*if (!isSync) {
+    store.restoreState(state, () => {
         setTimeout(() => {
-            window.location.reload();
-        }, 250);
-    }*/
-    toast.success('Settings restored', { position: 'bottom-right' });
+            pubsub.publish('repopulate');
+            toast.success('Settings restored', { position: 'bottom-right' });
+        }, 50)
+
+    });
+
 };
 
 export const storeUpdate = async (

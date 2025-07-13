@@ -53,11 +53,11 @@ export function Configuration() {
         (state: RootState) => state.controller.settings.settings,
     );
 
-    const { $20, $13, $23 } = settings;
+    const { $20, $13, $22 } = settings;
 
     const reportInchesString = $13 === '1' ? 'Enabled' : 'Disabled';
-    const softLimitsString = $23 === '1' ? 'Enabled' : 'Disabled';
-    const homingEnabledString = Number($20) > 0 ? 'Enabled' : 'Disabled';
+    const softLimitsString = $20 === '1' ? 'Enabled' : 'Disabled';
+    const homingEnabledString = Number($22) > 0 ? 'Enabled' : 'Disabled';
 
     return (
         <div className="flex flex-col gap-1">

@@ -18,7 +18,7 @@ const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
     };
 
     return (
-        <div className={styles.row}>
+        <div className={styles.switchRow}>
             <Switch
                 checked={bool}
                 onChange={booleanOnChange}

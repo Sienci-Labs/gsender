@@ -9,11 +9,12 @@ import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { mapPositionToUnits } from 'app/lib/units';
-import {useWorkspaceState} from "app/hooks/useWorkspaceState.ts";
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
 
 interface OverridesProps {
     ovF: number;
     ovS: number;
+    ovTimestamp: number;
     feedrate: string;
     spindle: string;
     isConnected: boolean;
@@ -26,13 +27,31 @@ const debouncedFeedHandler = debounce((value) => {
     controller.command('feedOverride', Number(value));
 }, 750);
 
+let globalOvTimestamp = 0;
+let globalLocalOvFTimestamp = 0;
+let globalLocalOvSTimestamp = 0;
+
+const debouncedOvFUpdateHandler = debounce((ovF, setLocalOvF) => {
+    if (globalOvTimestamp > globalLocalOvFTimestamp) {
+        setLocalOvF(ovF);
+    }
+}, 1000);
+
+const debouncedOvSUpdateHandler = debounce((ovS, setLocalOvS) => {
+    if (globalOvTimestamp > globalLocalOvSTimestamp) {
+        setLocalOvS(ovS);
+    }
+}, 1000);
+
 const Overrides: React.FC<OverridesProps> = ({
     ovF,
     ovS,
+    ovTimestamp,
     feedrate,
     spindle,
     isConnected,
 }) => {
+    globalOvTimestamp = ovTimestamp;
     const { units } = useWorkspaceState();
 
     const [showSpindleOverride, setShowSpindleOverride] = useState(
@@ -70,17 +89,11 @@ const Overrides: React.FC<OverridesProps> = ({
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setLocalOvF(ovF);
-        }, 500);
-        return () => clearTimeout(timer);
+        debouncedOvFUpdateHandler(ovF, setLocalOvF);
     }, [ovF]);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setLocalOvS(ovS);
-        }, 500);
-        return () => clearTimeout(timer);
+        debouncedOvSUpdateHandler(ovS, setLocalOvS);
     }, [ovS]);
 
     return (
@@ -105,9 +118,11 @@ const Overrides: React.FC<OverridesProps> = ({
                 disabled={!isConnected}
                 onChange={(values) => {
                     setLocalOvF(values[0]);
+                    globalLocalOvFTimestamp = Date.now();
                 }}
                 onButtonPress={(values) => {
                     setLocalOvF(values[0]);
+                    globalLocalOvFTimestamp = Date.now();
                     debouncedFeedHandler(values[0]);
                 }}
                 onPointerUp={(_e) => {
@@ -137,9 +152,11 @@ const Overrides: React.FC<OverridesProps> = ({
                     disabled={!isConnected}
                     onChange={(values) => {
                         setLocalOvS(values[0]);
+                        globalLocalOvSTimestamp = Date.now();
                     }}
                     onButtonPress={(values) => {
                         setLocalOvS(values[0]);
+                        globalLocalOvSTimestamp = Date.now();
                         debouncedSpindleHandler(values[0]);
                     }}
                     onPointerUp={(_e) => {

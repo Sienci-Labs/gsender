@@ -11,15 +11,17 @@ import {
 } from './utils/probeCommands';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
-import { TOOLBAR_CATEGORY } from 'app/constants';
+import { TOOLBAR_CATEGORY, WORKSPACE_MODE } from 'app/constants';
 import { useNavigate } from 'react-router';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Actions = () => {
     const navigate = useNavigate();
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
     );
+    const { mode: workspaceMode } = useWorkspaceState();
 
     const runProbing = (name = 'rotary', commands: string) => {
         Confirm({
@@ -62,6 +64,8 @@ const Actions = () => {
     useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
 
+    const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+
     return (
         <div className="grid grid-cols-2 gap-3">
             <Button
@@ -70,7 +74,7 @@ const Actions = () => {
             >
                 Rotary Surfacing
             </Button>
-            <MountingSetup />
+            <MountingSetup isDisabled={isInRotaryMode} />
             <Button
                 size="sm"
                 variant="primary"
@@ -85,7 +89,7 @@ const Actions = () => {
                 onClick={() =>
                     runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
                 }
-                disabled={!isConnected}
+                disabled={!isConnected || isInRotaryMode}
             >
                 Y-Axis Alignment
             </Button>

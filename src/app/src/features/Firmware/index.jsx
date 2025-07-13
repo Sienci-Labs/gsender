@@ -11,11 +11,6 @@ import {
 } from 'app/constants';
 import store from 'app/store';
 import libController from 'app/lib/controller';
-import {
-    Toaster,
-    TOASTER_INFO,
-    TOASTER_UNTIL_CLOSE,
-} from 'app/lib/toaster/ToasterLib';
 
 import { GRBL_SETTINGS } from 'app/constants/firmware/grbl';
 import { GRBL_HAL_SETTINGS } from 'app/constants/firmware/grblHAL';
@@ -159,16 +154,30 @@ const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
 
     return (
         <FirmwareContext.Provider value={contextValue}>
+            <div className="bg-yellow-100 border-t-4 border-yellow-500 rounded-b text-yellow-900 px-4 py-3 shadow-md mb-4" role="alert">
+                <div className="flex">
+                    <div className="py-1">
+                        <svg className="fill-current h-6 w-6 text-yellow-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path
+                                d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p className="font-bold">Deprecated Tool</p>
+                        <p className="text-sm">This tool has been deprecated and will be removed in a future version.  We recommend you use Config instead.</p>
+                    </div>
+                </div>
+            </div>
             <div className={styles.toolModal}>
                 <div className={styles.firmwareHeader}>
                     <h3 className={styles.firmwareHeaderText}>Firmware Tool</h3>
                 </div>
                 <div className={styles.firmwareContainer}>
-                    <SettingsArea />
+                    <SettingsArea/>
 
-                    <div className={styles.divider} />
+                    <div className={styles.divider}/>
 
-                    <ActionArea />
+                    <ActionArea/>
                 </div>
             </div>
         </FirmwareContext.Provider>

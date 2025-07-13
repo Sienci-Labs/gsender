@@ -105,14 +105,6 @@ const PrimaryVisualizer = ({
                             })}
                             onClick={() => actions.handleLiteModeToggle()}
                         />
-                        <FiZoomIn
-                            className="cursor-pointer"
-                            onClick={() => actions.camera.zoomIn()}
-                        />
-                        <FiZoomOut
-                            className="cursor-pointer"
-                            onClick={() => actions.camera.zoomOut()}
-                        />
                     </div>
 
                     <CameraDisplay
