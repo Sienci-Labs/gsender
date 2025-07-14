@@ -275,14 +275,12 @@ const Steps = () => {
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-none">
-                                        No, Cancel
-                                    </AlertDialogCancel>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                         className="border border-blue-500"
                                         onClick={handleUpdateEEPROM}
                                     >
-                                        Yes, Update Steps-Per-MM
+                                        Update EEPROM Settings
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
