@@ -1,5 +1,5 @@
 {
-  "name": "gSender Edge",
+  "name": "gSender-Edge",
   "version": "1.6.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
