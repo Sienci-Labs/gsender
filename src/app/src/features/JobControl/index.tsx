@@ -94,7 +94,10 @@ const JobControl: React.FC<JobControlProps> = ({
         <>
             <div className="z-10 absolute bottom-[30%] portrait:max-lg:bottom-[calc(50%+85px)] max-sm:bottom-[30%] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
-                    <ProgressArea senderStatus={senderStatus}></ProgressArea>
+                    <ProgressArea
+                        senderStatus={senderStatus}
+                        workflowState={workflowState}
+                    ></ProgressArea>
                 )}
             </div>
             <div className="relative h-full">

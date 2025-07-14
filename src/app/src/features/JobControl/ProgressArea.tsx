@@ -34,11 +34,13 @@ import {
     convertMillisecondsToTimeStamp,
     convertSecondsToDHMS,
 } from 'app/lib/datetime';
+import { WORKFLOW_STATE_PAUSED } from '../../constants';
 
 import WoodcuttingProgress from './WoodcuttingProgress';
 
 interface Props {
     senderStatus: SenderStatus;
+    workflowState?: string;
 }
 
 /**
@@ -46,7 +48,7 @@ interface Props {
  * @prop {Object} state Default state given from parent component
  *
  */
-const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
+const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
     const { total, received, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
 
@@ -121,6 +123,8 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
         translationNumber = percentageValue - 40 + '%';
     }
 
+    const isPaused = workflowState === WORKFLOW_STATE_PAUSED;
+
     return (
         <div className="w-64">
             <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
@@ -137,7 +141,10 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                         <span>%</span>
                     </div>
 
-                    <WoodcuttingProgress percentage={percentageValue} />
+                    <WoodcuttingProgress
+                        percentage={percentageValue}
+                        isPaused={isPaused}
+                    />
                 </div>
                 <TooltipProvider>
                     <Tooltip>
@@ -153,7 +160,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus }) => {
                     </Tooltip>
                 </TooltipProvider>
             </div>
-            <div className="w-full flex flex-row justify-between gap-2 text-gray-500 text-sm whitespace-nowrap">
+            <div className="w-full flex flex-row justify-between gap-2 text-gray-400 text-sm whitespace-nowrap">
                 <span>{`${received} / ${total} Lines`}</span>
                 <span>
                     {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
