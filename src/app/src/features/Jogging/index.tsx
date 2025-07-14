@@ -55,6 +55,7 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
+    const [jogThreshold, setJogThreshold] = useState<number>(store.get('widgets.axes.jog.threshold', 200));
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -68,6 +69,20 @@ export function Jogging() {
         aStep: 0,
         feedrate: 0,
     });
+
+    useEffect(() => {
+        store.on('change', () => {
+            // Update jog threshold if it's different
+            const newThreshold = store.get('widgets.axes.jog.threshold', 200);
+            if (newThreshold !== jogThreshold) {
+                setJogThreshold(newThreshold);
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        jogHelper.current?.updateThreshold(jogThreshold);
+    }, [jogThreshold])
 
     useEffect(() => {
         jogSpeedRef.current = jogSpeed;
@@ -923,6 +938,7 @@ export function Jogging() {
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
@@ -946,6 +962,7 @@ export function Jogging() {
                         distance={jogSpeed.zStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
                         <AJog
@@ -953,6 +970,7 @@ export function Jogging() {
                             feedrate={jogSpeed.feedrate}
                             canClick={canClick}
                             isRotaryMode={isRotaryMode}
+                            threshold={jogThreshold}
                         />
                     )}
                 </div>

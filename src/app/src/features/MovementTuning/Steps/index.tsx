@@ -345,10 +345,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 0
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : markLocationCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -357,7 +357,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 0 &&
                                         !markLocationCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 0 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -385,10 +385,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                                     currentStep === 1
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : moveAxisCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-amber-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -397,7 +397,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 1 &&
                                         !moveAxisCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 1 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -448,10 +448,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 2
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : setTravelCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -460,7 +460,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 2 &&
                                         !setTravelCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 2 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
