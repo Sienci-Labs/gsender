@@ -345,10 +345,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 0
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : markLocationCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-25 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -385,10 +385,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                                     currentStep === 1
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : moveAxisCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-25 dark:bg-dark dark:border-amber-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-amber-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -448,10 +448,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 2
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : setTravelCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-25 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
