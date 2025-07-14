@@ -142,7 +142,7 @@ export function handleManualOffset(value: string | number, axis: Axis) {
 }
 
 export function homeMachine() {
-    controller.command('gcode', '$H');
+    controller.command('homing');
 }
 
 export function homeAxis(axis: string) {
