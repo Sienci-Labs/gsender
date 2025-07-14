@@ -631,6 +631,11 @@ class GrblController {
         });
 
         this.runner.on('status', (res) => {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.initialized = true;
+                this.initController();
+            }
+
             if (this.homingStarted) {
                 this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
@@ -932,7 +937,8 @@ class GrblController {
             // Clear sender - for physical buttons
             //this.sender.unload();
 
-            if (!this.initialized) {
+            //Init if no settings or not initialized
+            if (!this.initialized || !this.runner.hasSettings()) {
                 this.initialized = true;
 
                 // Initialize controller
@@ -1862,7 +1868,6 @@ class GrblController {
             'jog:start': () => {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
 
-                //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
