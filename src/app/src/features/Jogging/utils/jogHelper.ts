@@ -22,6 +22,7 @@
  */
 
 import _ from 'lodash';
+import store from "app/store";
 
 type JogHelperProps = {
     jogCB: (coordinates: Record<string, number>, feedrate: number) => void;
@@ -59,6 +60,7 @@ class JogHelper {
         startContinuousJogCB,
         stopContinuousJogCB,
     }: JogHelperProps) {
+        this.timeout = store.get('widgets.axes.jog.threshold', 200)
         this.jog = _.throttle(jogCB, 150, { trailing: false });
         this.continuousJog = _.throttle(startContinuousJogCB, 150, {
             trailing: false,
