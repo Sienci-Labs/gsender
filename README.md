@@ -117,6 +117,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - SVG visualization no longer teeny-tiny on inches postprocessor files
 - Plus and Minus buttons returned to jog speeds with the prior existing logic
 - AutoZero touchplate renamed to just AutoZero
+- Added new Config option for Jog Delay, which configures how long a keypress/UI press/gamepad press before swapping to continuous jogging.
 - Commands sent later in connection cycle to reduce situations where Error 1 occurs when unlocking and resetting the board
 - Generating a surfacing file no longer causes issues on main visualizer if not sent there
 - Motors sections again will disappear from config when empty
@@ -130,6 +131,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Shortcuts rearranged so more commonly set ones are higher up
 - File stat feed rates now convert correctly
 - Zero All on grblHAL no longer sends Zero on A if A Axis not reported
+- Various look and feel changes
 
 ### 1.5.1 (June 27, 2025)
 - Addressed issues where jog values kept reconverting.
