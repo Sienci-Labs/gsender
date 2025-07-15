@@ -29,7 +29,6 @@ class GrblHalLineParserResultTool {
         if (!r) {
             return null;
         }
-        console.log(r);
 
         const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
 
@@ -40,7 +39,7 @@ class GrblHalLineParserResultTool {
             }, {});
 
         const payload = {
-            toolId: Number(r[1]),
+            id: Number(r[1]),
             toolOffsets: offsetMap,
             toolRadius: Number(r[3])
         };

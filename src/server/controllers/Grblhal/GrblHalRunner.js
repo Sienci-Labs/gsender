@@ -270,14 +270,13 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultTool) {
-            console.log(payload);
-            this.emit('raw', payload.raw);
+            this.emit('serialport:read', payload.raw);
             delete payload.raw;
             const nextSettings = {
                 ...this.settings,
                 toolTable: {
                     ...this.settings.toolTable,
-                    [payload.toolId]: payload
+                    [payload.id]: payload
                 }
             };
             if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {

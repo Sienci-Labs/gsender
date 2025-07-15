@@ -935,7 +935,7 @@ class GrblHalController {
             }
 
             await delay(300);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n$#\n');
         });
 
         this.toolChanger = new ToolChanger({
