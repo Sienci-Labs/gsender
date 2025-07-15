@@ -342,6 +342,8 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
+                // TODO:  Perhaps we look at this in the future and make a decision whether to comment it
+                // based on if ATC is 1 in flags
                 /*if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
