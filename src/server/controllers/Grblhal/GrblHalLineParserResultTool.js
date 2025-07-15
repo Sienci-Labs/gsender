@@ -34,7 +34,7 @@ class GrblHalLineParserResultTool {
 
         const offsetMap = r[2].split(',')
             .reduce((acc, cur, i) => {
-                acc[axes[i]] = Number(cur);
+                acc[axes[i]] = Number(Number(cur).toFixed(3));
                 return acc;
             }, {});
 

@@ -342,17 +342,17 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
-                if (_.includes(words, 'M6')) {
+                /*if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
                             data: 'M6',
                             comment: commentString
-                        }); // Hold reason
+                        });
                         line = line.replace('M6', '(M6)');
                     }
-                }
+                }*/
 
                 if (this.isInRotaryMode) {
                     const containsACommand = A_AXIS_COMMANDS.test(line);
@@ -1000,7 +1000,7 @@ class GrblHalController {
                 } else {
                     // Every 20 status reports, request a full one
                     if (this.actionMask.queryStatusCount === 20) {
-                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                         this.actionMask.queryStatusCount = 0;
                     } else {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80

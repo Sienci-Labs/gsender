@@ -1,19 +1,9 @@
-import store from 'app/store';
 import { Input } from 'app/components/shadcn/Input.tsx';
 import { useEffect, useState } from 'react';
-
-function lookupToolName(id: number): string {
-    return store.get(`widgets.atc.toolMap.${id}`, '-');
-}
-
-function setToolName(id, value) {
-    let toolMap = store.get(`widgets.atc.toolMap`);
-    toolMap = {
-        ...toolMap,
-        [id]: value,
-    };
-    store.set(`widgets.atc.toolMap`, toolMap);
-}
+import {
+    lookupToolName,
+    setToolName,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 
 export function ToolNameInput({ id = 0 }: { id: number }) {
     const [name, setName] = useState('-');
