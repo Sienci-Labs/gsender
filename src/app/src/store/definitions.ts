@@ -4,7 +4,11 @@ import {
     RENDER_STATE,
     TOGGLE_STATUS,
 } from '../constants';
-import { EEPROMSettings, EEPROMDescriptions, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import {
+    EEPROMSettings,
+    EEPROMDescriptions,
+    FIRMWARE_TYPES_T,
+} from 'app/definitions/firmware';
 import { BasicObject, BasicPosition, BBox } from 'app/definitions/general';
 import { Axes } from 'app/features/Axes/definitions';
 import { Connection } from 'app/features/Connection/definitions';
@@ -57,7 +61,10 @@ export interface FirmwareOptions {
     SPINDLE: string;
 }
 
+export interface ToolTable {}
+
 export interface ControllerSettings {
+    toolTable: any;
     //TODO
     parameters: BasicObject;
     settings: EEPROMSettings;
