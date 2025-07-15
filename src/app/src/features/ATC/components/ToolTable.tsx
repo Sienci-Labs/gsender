@@ -2,6 +2,7 @@ import { unimplemented } from 'app/features/ATC/utils/ATCFunctions.ts';
 import Button from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
+import { ATCStatusButton } from 'app/features/ATC/components/ATCStatusButton.tsx';
 
 export interface ToolInstance {
     id: number;
@@ -49,12 +50,13 @@ export function ToolTable({ tools = {} }) {
                                 Probe All
                             </Button>
                         </th>
+                        {/*
                         <th scope="col" className="px-6 py-3">
                             X
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            Y
-                        </th>
+                        Y
+                        </th>*/}
                     </tr>
                 </thead>
                 <tbody>
@@ -77,20 +79,21 @@ export function ToolTable({ tools = {} }) {
                                 </td>
                                 <td className="px-4 py-2 flex flex-row items-center gap-4">
                                     {value.toolOffsets.z}
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
+                                    <ATCStatusButton
                                         onClick={() => probeRackTool(value.id)}
+                                        statusPredicate={() =>
+                                            value.toolOffsets.z < 0
+                                        }
                                     >
                                         Probe
-                                    </Button>
+                                    </ATCStatusButton>
                                 </td>
-                                <td className="px-4 py-2">
+                                {/*<td className="px-4 py-2">
                                     {value.toolOffsets.x}
                                 </td>
                                 <td className="px-4 py-2">
                                     {value.toolOffsets.y}
-                                </td>
+                                </td>*/}
                             </tr>
                         );
                     })}
