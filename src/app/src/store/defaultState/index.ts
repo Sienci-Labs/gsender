@@ -53,6 +53,7 @@ const defaultState: State = {
         reverseWidgets: false,
         spindleFunctions: false,
         coolantFunctions: true,
+        atcEnabled: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,
@@ -325,7 +326,7 @@ const defaultState: State = {
             cutDirectionFlipped: false,
             shouldDwell: false,
             flood: false,
-            mist: false
+            mist: false,
         },
         visualizer: {
             minimized: false,

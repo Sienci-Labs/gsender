@@ -8,14 +8,13 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap, IoMdMove } from 'react-icons/io';
+import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
-    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -191,13 +190,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Dark mode',
                         key: 'workspace.enableDarkMode',
-                        description: 'Change the app colours for reduced eye strain, better contrast, or just for fun!',
+                        description:
+                            'Change the app colours for reduced eye strain, better contrast, or just for fun!',
                         type: 'boolean',
                     },
                     {
                         label: 'Visualizer theme',
                         key: 'widgets.visualizer.theme',
-                        description: 'Independant colour control for the visualizer.',
+                        description:
+                            'Independant colour control for the visualizer.',
                         type: 'select',
                         options: ['Light', 'Dark'],
                     },
@@ -229,8 +230,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Rapid',
                         type: 'jog',
-                        description:
-                            '',
+                        description: '',
                         key: 'widgets.axes.jog.rapid',
                     },
                     {
@@ -243,8 +243,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Precise',
                         type: 'jog',
-                        description:
-                            '',
+                        description: '',
                         key: 'widgets.axes.jog.precise',
                     },
                 ],
@@ -1135,6 +1134,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        type: 'boolean',
+                        label: 'Enable ATCi Controls',
+                        key: 'workspace.atcEnabled',
+                        description: 'Enable ATCi Controls',
+                    },
+                    {
                         label: 'Passthrough',
                         type: 'boolean',
                         key: 'workspace.toolChange.passthrough',
@@ -1169,7 +1174,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangePosition',
                         unit: 'mm',
                         description:
-                            "The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)",
+                            'The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)',
                         hidden: () => {
                             const strategy = store.get(
                                 'workspace.toolChangeOption',
