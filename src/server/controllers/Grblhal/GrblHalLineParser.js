@@ -43,6 +43,7 @@ import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
+import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 
 class GrblHalLineParser {
     parse(line) {
@@ -105,6 +106,9 @@ class GrblHalLineParser {
             //[ALARMCODE:16||Power on selftest (POS) failed.]
             GrblHalLineParserResultAlarmDetails,
 
+            // Tool
+            GrblHalLineParserResultTool,
+
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
 
@@ -120,6 +124,7 @@ class GrblHalLineParser {
 
             // Grbl X.Xx ['$' for help]
             GrblHalLineParserResultStartup,
+
         ];
 
         for (let parser of parsers) {

@@ -50,6 +50,7 @@ import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
+import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 
 const log = logger('controller:grblHAL');
 
@@ -108,7 +109,8 @@ class GrblHalRunner extends events.EventEmitter {
         },
         descriptions: {
         },
-        alarms: {}
+        alarms: {},
+        toolTable: {},
     };
 
     parser = new GrblHalLineParser();
@@ -267,6 +269,22 @@ class GrblHalRunner extends events.EventEmitter {
             this.emit('parserstate', payload);
             return;
         }
+        if (type === GrblHalLineParserResultTool) {
+            console.log(payload);
+            this.emit('raw', payload.raw);
+            delete payload.raw;
+            const nextSettings = {
+                ...this.settings,
+                toolTable: {
+                    ...this.settings.toolTable,
+                    [payload.toolId]: payload
+                }
+            };
+            if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
+                this.settings = nextSettings;
+            }
+            return;
+        }
         if (type === GrblHalLineParserResultParameters) {
             const { name, value } = payload;
             const nextSettings = {
@@ -414,6 +432,10 @@ class GrblHalRunner extends events.EventEmitter {
 
     setTool(tool) {
         this.state.parserstate.modal.tool = tool;
+    }
+
+    getToolTable(settings = this.settings) {
+        return _.get(settings, 'toolTable', {});
     }
 
     getParameters() {
