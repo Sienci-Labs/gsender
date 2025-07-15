@@ -151,6 +151,9 @@ const defaultState: State = {
         enableDarkMode: false,
     },
     widgets: {
+        atc: {
+            toolMap: {},
+        },
         axes: {
             minimized: false,
             axes: ['x', 'y', 'z'],

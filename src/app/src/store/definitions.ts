@@ -22,6 +22,7 @@ import { Surfacing } from 'app/features/Surfacing/definitions';
 import {
     VISUALIZER_TYPES_T,
     Visualizer,
+    ATC,
 } from 'app/features/Visualizer/definitions';
 import {
     Modal,
@@ -227,6 +228,7 @@ export interface State {
         spindle: SpindleState;
         surfacing: Surfacing;
         visualizer: Visualizer;
+        atc: ATC;
     };
     commandKeys: CommandKeys;
 }

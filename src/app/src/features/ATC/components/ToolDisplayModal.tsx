@@ -12,13 +12,11 @@ export function ToolDisplayModal({
         (state: RootState) => state.controller.settings.toolTable,
     );
 
-    console.log(toolTableData);
-
     return (
         <Dialog open={showToolTable} onOpenChange={onOpenChange}>
             <DialogTitle>Tool Table</DialogTitle>
             <DialogContent className="overflow-hidden p-0 shadow-lg w-2/5">
-                <div className="flex flex-col bg-white w-2/5">
+                <div className="flex flex-col bg-white">
                     <h1>Tool Table</h1>
                     <ToolTable tools={toolTableData} hideFunctions={false} />
                 </div>
