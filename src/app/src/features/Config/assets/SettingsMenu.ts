@@ -257,7 +257,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'number',
                         unit: 'ms',
                         description:
-                            'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 200)',
+                            'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
                         key: 'widgets.axes.jog.threshold',
                         min: 50
                     }
