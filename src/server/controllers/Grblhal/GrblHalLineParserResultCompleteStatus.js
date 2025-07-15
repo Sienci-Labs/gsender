@@ -11,8 +11,6 @@ class GrblHalLineParserResultCompleteStatus {
             return null;
         }
 
-        console.log(r);
-
         const state = r[1];
         let subState = r[2] || '';
         subState = subState.replace(':', '');
@@ -27,6 +25,8 @@ class GrblHalLineParserResultCompleteStatus {
                 result[parts[0]] = parts[1].split(',') || null;
             });
         }
+
+        console.log(result);
 
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
@@ -79,6 +79,20 @@ class GrblHalLineParserResultCompleteStatus {
                 payload.pinState[pin] = true;
             });
         }
+
+        // Current Tool
+        if (_.has(result, 'T')) {
+            // Handle updating current tool
+            payload.currentTool = Number(result.T[0]);
+        }
+
+        // Has Homed
+        if (_.has(result, 'H')) {
+            payload.hasHomed = Boolean(Number(result.H[0]));
+            // handle hasHomed
+        }
+
+        console.log(payload);
 
         return {
             type: GrblHalLineParserResultCompleteStatus,

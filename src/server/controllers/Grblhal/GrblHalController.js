@@ -157,6 +157,7 @@ class GrblHalController {
             reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
+        queryStatusCount: 0,
 
         // Respond to user input
         replyParserState: false, // $G
@@ -204,6 +205,7 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -996,7 +998,15 @@ class GrblHalController {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     this.actionMask.alarmCompleteReport = false;
                 } else {
-                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    // Every 20 status reports, request a full one
+                    if (this.actionMask.queryStatusCount === 20) {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        this.actionMask.queryStatusCount = 0;
+                    } else {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                        this.actionMask.queryStatusCount += 1;
+                    }
+
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
                     }
@@ -1229,6 +1239,7 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+        this.actionMask.queryStatusCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;

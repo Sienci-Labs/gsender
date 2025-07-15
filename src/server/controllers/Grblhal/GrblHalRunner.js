@@ -73,6 +73,8 @@ class GrblHalRunner extends events.EventEmitter {
             subState: '',
             probeActive: false,
             pinState: {},
+            currentTool: -1,
+            hasHomed: false
         },
         parserstate: {
             modal: {
