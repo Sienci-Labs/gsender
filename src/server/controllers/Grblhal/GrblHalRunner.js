@@ -100,7 +100,10 @@ class GrblHalRunner extends events.EventEmitter {
     };
 
     settings = {
-        version: '',
+        version: {
+            version: '',
+            semver: -1
+        },
         parameters: {
         },
         settings: {
@@ -344,9 +347,18 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultVersion) {
             const { version } = payload;
+
+            const parts = version.split('.');
+            const last = parts[parts.length - 1].replace(':', '');
+            const semver = Number(last);
+
             const nextSettings = { // enforce change
                 ...this.settings,
-                version: version
+                version: {
+                    ...this.settings.version,
+                    version,
+                    semver
+                }
             };
             if (!_.isEqual(this.settings.version, nextSettings.version)) {
                 this.settings = nextSettings; // enforce change

@@ -25,9 +25,6 @@ class GrblHalLineParserResultCompleteStatus {
                 result[parts[0]] = parts[1].split(',') || null;
             });
         }
-
-        console.log(result);
-
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
             payload.activeState = state;
