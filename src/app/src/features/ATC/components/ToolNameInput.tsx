@@ -7,7 +7,12 @@ function lookupToolName(id: number): string {
 }
 
 function setToolName(id, value) {
-    store.set(`widgets.atc.toolMap.${id}`, value);
+    let toolMap = store.get(`widgets.atc.toolMap`);
+    toolMap = {
+        ...toolMap,
+        [id]: value,
+    };
+    store.set(`widgets.atc.toolMap`, toolMap);
 }
 
 export function ToolNameInput({ id = 0 }: { id: number }) {
