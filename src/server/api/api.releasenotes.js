@@ -26,6 +26,25 @@
 
 const releases = [
     {
+        'version': '1.5.1',
+        'date': 'June 27th, 2025',
+        'notes': [
+            'Addressed issues where jog values kept reconverting.',
+            'Fixed crash when importing settings.',
+            'Updated some AltMill and LongMill default values.',
+            'Removed Zoom icons from visualizer.',
+            'Override sliders have switched to decaf and are now less jumpy.',
+            'Fixed unit issue with Go To popover and default values no longer populate Z with Y value',
+            'Using tuning tools (Squaring and Steps/mm) now refresh EEPROM state and respect UI units',
+            'Abs/Inc toggle in go to moved to top.',
+            'Fixed issue where M0 in macros could result in a paused feeder state after unlocking preventing further code sending',
+            'Fixed issue where Machine status overlapped unlock and connect on smaller resolutions and made them unclickable',
+            'Disabling a drawer tool now defaults you to the first drawer element',
+            'Fixed issue with tool select in probing working inconsistently and defaulting to Auto',
+            'Rotary Axis travel resolution and maximum rate appearing again when connected with GRBL.',
+        ]
+    },
+    {
         'version': '1.5.0',
         'date': 'June 18th, 2025',
         'notes': [
@@ -61,22 +80,6 @@ const releases = [
             'Macros no longer overflow the macro widget.',
             'Tweak to 30X30 machine profile for missing acceleration change for $111.',
             'Fixed rare situation where connecting to grblHAL controller, disconnecting, and reconnecting to GRBL controller caused invalid laser/spindle mode toggle behaviour.'
-        ]
-    },
-    {
-        'version': '1.4.10',
-        'date': 'October 28, 2024',
-        'notes': [
-            'Jog no longer sends double jog commands on touch devices',
-            '$G output emitted to UI when connected using grblHAL and manually sent',
-            'Altmill profile updated $103 A steps to account for compiled microstepping',
-            'SLB profiles updated with new values',
-            'Updated defaults on Mk2, Mk1, and MillOne profiles',
-            'AutoZero touch routine updated when running specific diameter bits to be more accurate, and retract distance on Z slightly increased for non-tip routines.',
-            'Rotary toggle no longer updates values when cancelled on grblHAL.',
-            'Changed Spindle/Laser toggle behaviour for when to use gSender settings vs EEPROM settings for laser offset and spindle/laser min and max.',
-            'Custom theme visualizer background now saving correctly.',
-            'Altmill profile now at top of profiles with other Sienci Machines'
         ]
     },
 ];

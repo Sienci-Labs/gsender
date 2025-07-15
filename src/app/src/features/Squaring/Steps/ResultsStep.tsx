@@ -48,7 +48,7 @@ const ResultsStep = () => {
             const $100 = eepromAdjustment.x.amount.toFixed(3);
             const $101 = eepromAdjustment.y.amount.toFixed(3);
 
-            controller.command('gcode', [`$100=${$100}`, `$101=${$101}`]);
+            controller.command('gcode', [`$100=${$100}`, `$101=${$101}`, '$$']);
 
             toast.info('Updated EEPROM values', { position: 'bottom-right' });
         } catch (error) {
@@ -171,15 +171,15 @@ const ResultsStep = () => {
                         </h3>
                         <div className="space-y-1 w-full">
                             <p>
-                                Based on your measurements, we recommend
-                                updating your steps per mm values to improve
-                                machine accuracy.
+                                We also noticed from the results that your
+                                motor movement settings could be updated
+                                to improve your machines accuracy.
                             </p>
                             {/* <div className="grid grid-cols-2 gap-4"> */}
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
                                     <div className="text-sm text-gray-600 dark:text-white">
-                                        X-Axis Steps/mm
+                                        X-axis step/mm
                                     </div>
                                     <div className="text-xl font-bold">
                                         Current: {currentXSteps}
@@ -191,7 +191,7 @@ const ResultsStep = () => {
                                 </div>
                                 <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
                                     <div className="text-sm text-gray-600 dark:text-white">
-                                        Y-Axis Steps/mm
+                                        Y-axis step/mm
                                     </div>
                                     <div className="text-xl font-bold">
                                         Current: {currentYSteps}
@@ -221,12 +221,11 @@ const ResultsStep = () => {
                                                     <p>
                                                         This action cannot be
                                                         undone. This will update
-                                                        the steps-per-mm values
-                                                        for both X and Y axes in
-                                                        the EEPROM settings.
+                                                        your machines built-in
+                                                        X and Y step per mm values.
                                                     </p>
                                                     <p>
-                                                        X-Axis ($100):{' '}
+                                                        X-axis ($100):{' '}
                                                         <strong>
                                                             {eepromAdjustment.x.amount.toFixed(
                                                                 3,
@@ -234,7 +233,7 @@ const ResultsStep = () => {
                                                         </strong>
                                                     </p>
                                                     <p>
-                                                        Y-Axis ($101):{' '}
+                                                        Y-axis ($101):{' '}
                                                         <strong>
                                                             {eepromAdjustment.y.amount.toFixed(
                                                                 3,
@@ -244,14 +243,12 @@ const ResultsStep = () => {
                                                 </div>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel className="border-none">
-                                                    No, Cancel
-                                                </AlertDialogCancel>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                 <AlertDialogAction
                                                     className="border border-blue-500"
                                                     onClick={handleUpdateEEPROM}
                                                 >
-                                                    Yes, Update EEPROM Settings
+                                                    Update EEPROM Settings
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>

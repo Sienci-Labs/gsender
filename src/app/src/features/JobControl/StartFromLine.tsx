@@ -102,9 +102,8 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                     <div className="">
                         <div className="mb-4">
                             <p className="mb-2">
-                                Recover a carve disrupted by power loss,
-                                disconnection, mechanical malfunction, or other
-                                failures
+                                Recover a job after power loss, mechanical
+                                malfunction, disconnection, or other failure.
                             </p>
                             <p className="mb-0 text-black dark:text-white">
                                 Your job was last stopped around line:{' '}
@@ -172,15 +171,14 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                     />
                                 </Tooltip>
                                 <span className="text-sm col-span-2">
-                                    (Safe Height is the value above Z max)
+                                    (amount above the max height of the file)
                                 </span>
                             </div>
                         </div>
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
-                                Accounts for all past CNC movements, units,
-                                spindle speeds, laser power, Start/Stop g-code,
-                                and any other file modals or setup.
+                                Calculates all your CNC movements, attributes,
+                                and gS automations to pick up right where you left off.
                             </p>
                         </div>
                         <div className="flex justify-center">

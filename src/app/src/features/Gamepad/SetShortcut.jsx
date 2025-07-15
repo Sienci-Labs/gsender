@@ -166,6 +166,33 @@ const SetShortcut = () => {
             return acc;
         }, []);
 
+        const categoryOrder = [
+            JOGGING_CATEGORY,
+            LOCATION_CATEGORY,
+            MACRO_CATEGORY,
+            PROBING_CATEGORY,
+            SPINDLE_LASER_CATEGORY,
+            COOLANT_CATEGORY,
+            CARVING_CATEGORY,
+            OVERRIDES_CATEGORY,
+            GENERAL_CATEGORY,
+            TOOLBAR_CATEGORY,
+            VISUALIZER_CATEGORY,
+        ];
+
+        data.sort((a, b) => {
+            const aIndex = categoryOrder.indexOf(a.category);
+            const bIndex = categoryOrder.indexOf(b.category);
+
+            // If categories are different, sort by category order
+            if (aIndex !== bIndex) {
+                return aIndex - bIndex;
+            }
+
+            // If categories are the same, sort alphabetically by category name
+            return a.category.localeCompare(b.category);
+        });
+
         return data;
     };
 
@@ -180,7 +207,7 @@ const SetShortcut = () => {
                 [LOCATION_CATEGORY]: 'bg-orange-100 text-orange-800',
                 [JOGGING_CATEGORY]: 'bg-red-100 text-red-800',
                 [PROBING_CATEGORY]: 'bg-purple-100 text-purple-800',
-                [SPINDLE_LASER_CATEGORY]: 'bg-gray-800 text-gray-300',
+                [SPINDLE_LASER_CATEGORY]: 'bg-gray-700 text-gray-300',
                 [GENERAL_CATEGORY]: 'bg-gray-200 text-gray-800',
                 [TOOLBAR_CATEGORY]: 'bg-indigo-100 text-indigo-800',
                 [MACRO_CATEGORY]: 'bg-blue-50 text-blue-600',

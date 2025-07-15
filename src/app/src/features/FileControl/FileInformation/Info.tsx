@@ -1,8 +1,10 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Info = () => {
-    const { toolSet, movementSet, spindleSet, estimatedTime } =
+    const { toolSet, movementSet, spindleSet, estimatedTime, fileModal } =
         useTypedSelector((state) => state.file);
+    const { units } = useWorkspaceState();
 
     const toolSetFormatted = toolSet.map((tool) => tool.replace('T', ''));
     const movementSetFormatted = movementSet
@@ -12,8 +14,34 @@ const Info = () => {
         Number(spindle.replace('S', '')),
     );
 
-    const feedrateMin = Math.min(...movementSetFormatted);
-    const feedrateMax = Math.max(...movementSetFormatted);
+    // Convert feedrate values based on fileModal and preferred units
+    const convertFeedrate = (feedrate: number): number => {
+        const isFileInInches = fileModal?.includes('G20');
+        const isFileInMm = fileModal?.includes('G21');
+        const userPrefersInches = units === 'in';
+        const userPrefersMm = units === 'mm';
+
+        if (isFileInInches && userPrefersMm) {
+            return feedrate * 25.4;
+        }
+
+        if (isFileInMm && userPrefersInches) {
+            return feedrate / 25.4;
+        }
+
+        return feedrate;
+    };
+
+    const formatNumber = (num: number): string => {
+        if (Number.isInteger(num)) {
+            return num.toString();
+        }
+        return num.toFixed(2).replace(/\.?0+$/, '');
+    };
+
+    const convertedFeedrates = movementSetFormatted.map(convertFeedrate);
+    const feedrateMin = Math.min(...convertedFeedrates);
+    const feedrateMax = Math.max(...convertedFeedrates);
     const spindleMin = Math.min(...spindleSetFormatted);
     const spindleMax = Math.max(...spindleSetFormatted);
 
@@ -35,6 +63,11 @@ const Info = () => {
 
     const formattedEstimatedTime = formatEstimatedTime(estimatedTime);
 
+    const formattedFeedrate =
+        feedrateMin === feedrateMax
+            ? `${formatNumber(feedrateMin)} ${units === 'mm' ? 'mm/min' : 'in/min'}`
+            : `${formatNumber(feedrateMin)}-${formatNumber(feedrateMax)} ${units === 'mm' ? 'mm/min' : 'in/min'}`;
+
     return (
         <div className="text-gray-900 dark:text-gray-300">
             <div className="flex gap-1">
@@ -44,9 +77,7 @@ const Info = () => {
 
             <div className="flex gap-1">
                 <span className="font-bold">Feed</span>
-                <span>
-                    {feedrateMin}-{feedrateMax} mm/min
-                </span>
+                <span>{formattedFeedrate}</span>
             </div>
 
             <div className="flex gap-1">

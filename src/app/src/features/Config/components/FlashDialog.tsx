@@ -180,7 +180,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 <SelectTrigger className="bg-white bg-opacity-100">
                                     <SelectValue placeholder={port} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white bg-opacity-100">
+                                <SelectContent className="bg-white bg-opacity-100 z-[10000]">
                                     {ports.map((p) => (
                                         <SelectItem key={p.port} value={p.port}>
                                             {p.port}
@@ -200,7 +200,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 <SelectTrigger className="bg-white bg-opacity-100">
                                     <SelectValue placeholder="Select board type" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white bg-opacity-100">
+                                <SelectContent className="bg-white bg-opacity-100 z-[10000]">
                                     {CONTROLLER_TYPES.map((p) => (
                                         <SelectItem key={p} value={p}>
                                             {p}

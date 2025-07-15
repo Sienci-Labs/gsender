@@ -34,6 +34,7 @@ export const visualizeResponse = async ({ data }) => {
 
         reduxStore.dispatch(updateFileProcessing(false));
 
+
         // if there's new parsed data, send to redux
         if (parsedData) {
             await replaceParsedData(parsedData).then(() => {

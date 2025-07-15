@@ -29,7 +29,9 @@ const Workspace = () => {
     useEffect(() => {
         const { pathname } = location;
         if (pathname === '/') {
-            window.dispatchEvent(new Event('resize')); // Manual resize dispatch for visualizer on navigating to carve
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize')); // Manual resize dispatch for visualizer on navigating to carve
+            }, 100)
         }
 
         document.title = `gSender ${pkg.version}`;

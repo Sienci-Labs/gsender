@@ -9,11 +9,11 @@ import {
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
-export function ZJog({ feedrate, distance, canClick }: JoggerProps) {
+export function ZJog({ feedrate, distance, canClick, threshold=200 }: JoggerProps) {
     const zPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ Z: 1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => zPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
@@ -21,7 +21,7 @@ export function ZJog({ feedrate, distance, canClick }: JoggerProps) {
     const zMinusJogHandlers = useLongPress(
         () => continuousJogAxis({ Z: -1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => zMinusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },

@@ -55,6 +55,7 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
+    const [jogThreshold, setJogThreshold] = useState<number>(store.get('widgets.axes.jog.threshold', 200));
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -68,6 +69,20 @@ export function Jogging() {
         aStep: 0,
         feedrate: 0,
     });
+
+    useEffect(() => {
+        store.on('change', () => {
+            // Update jog threshold if it's different
+            const newThreshold = store.get('widgets.axes.jog.threshold', 200);
+            if (newThreshold !== jogThreshold) {
+                setJogThreshold(newThreshold);
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        jogHelper.current?.updateThreshold(jogThreshold);
+    }, [jogThreshold])
 
     useEffect(() => {
         jogSpeedRef.current = jogSpeed;
@@ -178,17 +193,27 @@ export function Jogging() {
             const units = store.get('workspace.units', 'mm');
             setFirmware(firmwareType);
 
+            let convertedJogValues = JSON.parse(JSON.stringify(jogValues));
+
             if (units === 'in') {
-                jogValues.xyStep = convertValue(jogValues.xyStep, 'mm', 'in');
-                jogValues.zStep = convertValue(jogValues.zStep, 'mm', 'in');
-                jogValues.feedrate = convertValue(
-                    jogValues.feedrate,
+                convertedJogValues.xyStep = convertValue(
+                    convertedJogValues.xyStep,
+                    'mm',
+                    'in',
+                );
+                convertedJogValues.zStep = convertValue(
+                    convertedJogValues.zStep,
+                    'mm',
+                    'in',
+                );
+                convertedJogValues.feedrate = convertValue(
+                    convertedJogValues.feedrate,
                     'mm',
                     'in',
                 );
             }
 
-            setJogSpeed({ ...jogValues });
+            setJogSpeed({ ...convertedJogValues });
             setInitialized(true);
         }
     }, [initialized]);
@@ -900,6 +925,10 @@ export function Jogging() {
     useShuttleEvents(shuttleControlEvents);
 
     const isRotaryMode = mode === 'ROTARY';
+    const showA =
+        (rotaryWidgetState.tab.show && firmwareType === 'grblHAL') ||
+        isRotaryMode;
+    const noA = !rotaryWidgetState.tab.show || !isRotaryMode;
 
     return (
         <>
@@ -909,6 +938,7 @@ export function Jogging() {
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
@@ -932,6 +962,7 @@ export function Jogging() {
                         distance={jogSpeed.zStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
                         <AJog
@@ -939,20 +970,21 @@ export function Jogging() {
                             feedrate={jogSpeed.feedrate}
                             canClick={canClick}
                             isRotaryMode={isRotaryMode}
+                            threshold={jogThreshold}
                         />
                     )}
                 </div>
             </div>
-            <div className="flex gap-4 max-xl:gap-2 max-xl:scale-90">
-                <div className="flex w-full items-center justify-center">
+            <div className="flex gap-1 w-full justify-around">
+                <div
+                    className={cx('flex items-center justify-center', {
+                        'px-7': noA,
+                    })}
+                >
                     <div
                         className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3':
-                                (rotaryWidgetState.tab.show &&
-                                    firmwareType === 'grblHAL') ||
-                                isRotaryMode,
-                            'grid-cols-1 gap-y-1':
-                                !rotaryWidgetState.tab.show && !isRotaryMode,
+                            'grid-cols-2 gap-y-3': showA,
+                            'grid-cols-1 gap-y-1 xl:gap-y-2': noA,
                         })}
                     >
                         <JogInput

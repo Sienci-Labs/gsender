@@ -70,8 +70,8 @@
     "tailwindcss": "^3.4.10",
     "usb": "^2.11.0",
     "uuid": "~3.3.2",
-    "vite": "^5.4.2",
-    "vite-tsconfig-paths": "^5.0.1",
+    "vite": "5.4.2",
+    "vite-tsconfig-paths": "5.0.1",
     "watch": "~1.0.2",
     "webappengine": "~1.2.0",
     "winston": "~3.2.1"

@@ -3,6 +3,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const MarkingStep = () => {
     const {
@@ -13,6 +14,7 @@ const MarkingStep = () => {
         updateStepValue,
         jogMachine,
     } = useSquaring();
+    const { units } = useWorkspaceState();
 
     const currentMainStepData = mainSteps[currentMainStep];
     const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
@@ -22,7 +24,7 @@ const MarkingStep = () => {
     };
 
     const handleJog = (buttonLabel: string, value: number, axis: string) => {
-        jogMachine(axis, value);
+        jogMachine(axis, value, units ?? 'mm');
         handleStepComplete(buttonLabel);
     };
 
@@ -52,10 +54,10 @@ const MarkingStep = () => {
                                 key={step.buttonLabel}
                                 className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : isPastStep
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -63,7 +65,7 @@ const MarkingStep = () => {
                                         <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
                                     )}
                                     {!isCurrentStep && !isPastStep && (
-                                        <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                        <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                     )}
                                     {isCurrentStep && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -120,7 +122,7 @@ const MarkingStep = () => {
                                                         disabled={
                                                             !isCurrentStep
                                                         }
-                                                        suffix="mm"
+                                                        suffix={units ?? 'mm'}
                                                     />
                                                 </div>
                                             ) : (
@@ -136,7 +138,9 @@ const MarkingStep = () => {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-semibold">Diagram</h3>
+                <h3 className="text-lg font-semibold dark:text-white">
+                    Diagram
+                </h3>
                 <TriangleDiagram />
             </div>
         </div>

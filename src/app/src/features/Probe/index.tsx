@@ -403,6 +403,7 @@ const ProbeWidget = () => {
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
         }
+
         const options = {
             axes,
             modal,

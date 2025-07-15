@@ -663,13 +663,13 @@ class Visualizer extends Component {
     componentDidMount() {
         this.subscribe();
 
-        store.on('change', () => {
+        /*store.on('change', () => {
             const { theme } = this.state;
             const { theme: storeTheme } = store.get('widgets.visualizer');
             if (theme !== storeTheme) {
                 pubsub.publish('theme:change', storeTheme);
             }
-        })
+        })*/
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
@@ -1384,7 +1384,8 @@ class Visualizer extends Component {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('theme:change', (msg, theme) => {
+            pubsub.subscribe('theme:change', (msg) => {
+                const theme = this.config.get('theme', 'dark');
                 this.setState(
                     {
                         theme: theme,

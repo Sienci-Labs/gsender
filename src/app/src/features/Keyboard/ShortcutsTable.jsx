@@ -159,7 +159,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 [LOCATION_CATEGORY]: 'bg-orange-100 text-orange-800',
                 [JOGGING_CATEGORY]: 'bg-red-100 text-red-800',
                 [PROBING_CATEGORY]: 'bg-purple-100 text-purple-800',
-                [SPINDLE_LASER_CATEGORY]: 'bg-gray-800 text-gray-300',
+                [SPINDLE_LASER_CATEGORY]: 'bg-gray-700 text-gray-300',
                 [GENERAL_CATEGORY]: 'bg-gray-200 text-gray-800',
                 [TOOLBAR_CATEGORY]: 'bg-indigo-100 text-indigo-800',
                 [MACRO_CATEGORY]: 'bg-blue-50 text-blue-600',
@@ -184,6 +184,46 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             </div>
         );
     };
+
+    const categoryOrder = [
+        JOGGING_CATEGORY,
+        LOCATION_CATEGORY,
+        MACRO_CATEGORY,
+        PROBING_CATEGORY,
+        SPINDLE_LASER_CATEGORY,
+        COOLANT_CATEGORY,
+        CARVING_CATEGORY,
+        OVERRIDES_CATEGORY,
+        GENERAL_CATEGORY,
+        TOOLBAR_CATEGORY,
+        VISUALIZER_CATEGORY,
+    ];
+
+    const sortedDataSet = dataSet.sort((a, b) => {
+        const aCategory = allShuttleControlEvents[a.cmd]
+            ? allShuttleControlEvents[a.cmd].category
+            : a.category;
+        const bCategory = allShuttleControlEvents[b.cmd]
+            ? allShuttleControlEvents[b.cmd].category
+            : b.category;
+
+        const aIndex = categoryOrder.indexOf(aCategory);
+        const bIndex = categoryOrder.indexOf(bCategory);
+
+        // If categories are different, sort by category order
+        if (aIndex !== bIndex) {
+            return aIndex - bIndex;
+        }
+
+        // If categories are the same, sort alphabetically by title
+        const aTitle = allShuttleControlEvents[a.cmd]
+            ? allShuttleControlEvents[a.cmd].title
+            : a.title;
+        const bTitle = allShuttleControlEvents[b.cmd]
+            ? allShuttleControlEvents[b.cmd].title
+            : b.title;
+        return aTitle.localeCompare(bTitle);
+    });
 
     return (
         <div className="absolute w-full">

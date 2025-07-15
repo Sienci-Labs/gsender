@@ -37,6 +37,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
+import pubsub from 'pubsub-js';
 
 export interface SettingsMenuSection {
     label: string;
@@ -84,6 +85,7 @@ export interface gSenderSetting {
     disabled?: () => boolean;
     hidden?: () => boolean;
     onDisable?: () => void;
+    onUpdate?: () => void;
     min?: number;
     max?: number;
 }
@@ -201,6 +203,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Independant colour control for the visualizer.',
                         type: 'select',
                         options: ['Light', 'Dark'],
+                        onUpdate: () => {
+                            pubsub.publish('theme:change');
+                        },
                     },
                     {
                         label: 'Lightweight options',
@@ -246,6 +251,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: '',
                         key: 'widgets.axes.jog.precise',
                     },
+                    {
+                        label: 'Jog Delay',
+                        type: 'number',
+                        unit: 'ms',
+                        description:
+                            'Where regular presses or clicks make single movements, holding for at least this long will begin jogging continuously. Some might prefer a longer delay like 700. (0 to disable continuous jogging, Default 200)',
+                        key: 'widgets.axes.jog.threshold',
+                        min: 150
+                    }
                 ],
             },
             {
@@ -347,6 +361,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Square up CNC rails',
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
+                        hidden: () => {
+                            const connected = controller.portOpen
+                            return !connected;
+                        }
                     },
                     {
                         type: 'eeprom',
@@ -779,7 +797,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Spindle on delay',
-                        key: 'workspace.spindleDelay',
+                        key: 'widgets.spindle.delay',
                         description:
                             'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',
@@ -1057,7 +1075,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Travel resolution in steps per degree. ($103)',
                         type: 'hybrid',
                         eID: '$103',
-                        unit: 'rpm',
+                        unit: 'step/deg',
                     },
                     {
                         label: 'Max speed',
@@ -1066,7 +1084,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Max axis speed, also used for G0 rapids. ($113)',
                         type: 'hybrid',
                         eID: '$113',
-                        unit: 'rpm',
+                        unit: 'deg/min',
                     },
                     { type: 'eeprom', eID: '$123' },
                     {

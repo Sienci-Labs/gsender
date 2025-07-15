@@ -93,7 +93,6 @@ const HalFlashModal = ({ onClose }) => {
       fileReader.onload = (e) => {
         const { result } = e.target;
         if (result && !isCancel) {
-          console.log(result);
           setFileContent(result);
         }
       };

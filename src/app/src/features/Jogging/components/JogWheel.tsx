@@ -20,9 +20,10 @@ export interface JogWheelProps {
     canClick?: boolean;
     feedrate: number;
     distance: number;
+    threshold:number
 }
 
-export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
+export function JogWheel({ distance, feedrate, canClick, threshold = 200}: JogWheelProps) {
     const { mode } = useWorkspaceState();
 
     const isRotaryMode = mode === WORKSPACE_MODE.ROTARY;
@@ -30,24 +31,24 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const xPlusJogHandlers = useLongPress(
         () => continuousJogAxis({ X: 1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => xPlusJog(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
     )();
     const xMinusJogHandlers = useLongPress(() => xMinusJog(1, feedrate, true), {
-        threshold: 200,
+        threshold,
         onCancel: () => xMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     })();
 
     const yPlusJogHandlers = useLongPress(() => yPlusJog(1, feedrate, true), {
-        threshold: 200,
+        threshold,
         onCancel: () => yPlusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     })();
     const yMinusJogHandlers = useLongPress(() => yMinusJog(1, feedrate, true), {
-        threshold: 200,
+        threshold,
         onCancel: () => yMinusJog(distance, feedrate, false),
         onFinish: stopContinuousJog,
     })();
@@ -55,7 +56,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const xPlusYMinusHandlers = useLongPress(
         () => continuousJogAxis({ X: 1, Y: -1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => xPlusYMinus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
@@ -63,7 +64,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const xPlusYPlusHandlers = useLongPress(
         () => continuousJogAxis({ X: 1, Y: 1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => xPlusYPlus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
@@ -72,7 +73,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const xMinusYPlusHandlers = useLongPress(
         () => continuousJogAxis({ X: -1, Y: 1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => xMinusYPlus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },
@@ -80,7 +81,7 @@ export function JogWheel({ distance, feedrate, canClick }: JogWheelProps) {
     const xMinusYMinusHandlers = useLongPress(
         () => continuousJogAxis({ X: -1, Y: -1 }, feedrate),
         {
-            threshold: 200,
+            threshold,
             onCancel: () => xMinusYMinus(distance, feedrate, false),
             onFinish: stopContinuousJog,
         },

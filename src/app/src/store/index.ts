@@ -11,6 +11,7 @@ import ImmutableStore from 'app/lib/immutable-store';
 import log from 'app/lib/log';
 import defaultState from './defaultState';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
+import {TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD} from "app/lib/constants.ts";
 
 interface UserData {
     path: string;
@@ -287,6 +288,25 @@ store.on(
 const migrateStore = (): void => {
     if (!cnc.version) {
         return;
+    }
+
+    // Set probe type to AutoZero if it was formerly "AutoZero Touchplate"
+    if (semver.lt(cnc.version, '1.5.3')) {
+        const currentProbeSettings = store.get('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_STANDARD)
+        if (currentProbeSettings === 'AutoZero Touchplate') {
+            store.set('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_AUTOZERO)
+        }
+    }
+
+    if (semver.lt(cnc.version, '1.5.1')) {
+        const currentSpindleSetting = store.get('workspace.spindleFunctions', false);
+        const machineProfileSpindleSetting = store.get('workspace.machineProfile.spindle', false);
+        if (currentSpindleSetting) {
+            return;
+        }
+        if (machineProfileSpindleSetting) {
+            store.set('workspace.spindleFunctions', true);
+        }
     }
 
     if (semver.lt(cnc.version, '1.4.8')) {

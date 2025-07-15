@@ -186,6 +186,7 @@ const defaultState: State = {
                 },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                 distances: [],
+                threshold: 200
             },
             mdi: {
                 disabled: false,

@@ -126,6 +126,11 @@ class GrblRunner extends events.EventEmitter {
 
             const probeActive = raw.includes('Pn:P');
 
+            // if this is an initial alarm, make sure to send it to the controller
+            if (payload.activeState === GRBL_ACTIVE_STATE_ALARM && this.state.status.activeState !== GRBL_ACTIVE_STATE_ALARM) {
+                this.emit('startupAlarm');
+            }
+
             const nextState = {
                 ...this.state,
                 status: {

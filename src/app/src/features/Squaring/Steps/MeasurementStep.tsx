@@ -4,6 +4,7 @@ import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const MeasurementStep = () => {
     const {
@@ -13,6 +14,7 @@ const MeasurementStep = () => {
         completeStep,
         updateTriangle,
     } = useSquaring();
+    const { units } = useWorkspaceState();
 
     const [measurementInputs, setMeasurementInputs] = useState({
         '1-2': '',
@@ -79,10 +81,10 @@ const MeasurementStep = () => {
                                 key={step.buttonLabel}
                                 className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
                                     isCurrentStep
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : isPastStep
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -90,7 +92,7 @@ const MeasurementStep = () => {
                                         <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
                                     )}
                                     {!isCurrentStep && !isPastStep && (
-                                        <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                        <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                     )}
                                     {isCurrentStep && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -121,7 +123,7 @@ const MeasurementStep = () => {
                                                             }),
                                                         );
                                                     }}
-                                                    suffix="mm"
+                                                    suffix={units ?? 'mm'}
                                                 />
                                                 <Button
                                                     disabled={
