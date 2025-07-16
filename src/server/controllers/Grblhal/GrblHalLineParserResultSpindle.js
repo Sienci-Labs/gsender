@@ -41,8 +41,6 @@ class GrblHalLineParserResultSpindle {
 
         payload.label = parts[0];
 
-        console.log(parts[2]);
-
         // We have more info, we can assume some of it - this will be easier with $spindleESH report
         if (parts.length > 1) {
             payload.id = Number(parts[1].slice(-1)); // Last value is ID to use, convert to number
