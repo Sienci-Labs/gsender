@@ -3,6 +3,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
+import Button from "app/components/Button";
 
 export function ToolDisplayModal({
     showToolTable = false,
@@ -14,7 +15,7 @@ export function ToolDisplayModal({
 
     return (
         <Dialog open={showToolTable} onOpenChange={onOpenChange}>
-            <DialogTitle>Tool Table</DialogTitle>
+            <DialogTitle><Button onClick={onOpenChange}>Tool Table</Button></DialogTitle>
             <DialogContent className="overflow-hidden p-0 shadow-lg w-2/5">
                 <div className="flex flex-col bg-white">
                     <ToolTable tools={toolTableData} hideFunctions={false} />

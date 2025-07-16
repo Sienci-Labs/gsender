@@ -17,16 +17,16 @@ export function ATC() {
     }
 
     return (
-        <div className="flex flex-col  w-full gap-4">
-            <div className="flex flex-row w-full justify-end">
-                <Button onClick={toggleToolTable}>Show Tool Table</Button>
+        <div className="flex flex-col  w-full gap-4 relative">
+            <div className="flex flex-row w-full justify-end absolute top-0 right-2">
+                <ToolDisplayModal
+                    showToolTable={showToolTable}
+                    onOpenChange={toggleToolTable}
+                />
             </div>
             <ToolDisplay />
             <ToolRackFunctions />
-            <ToolDisplayModal
-                showToolTable={showToolTable}
-                onOpenChange={toggleToolTable}
-            />
+
         </div>
     );
 }
