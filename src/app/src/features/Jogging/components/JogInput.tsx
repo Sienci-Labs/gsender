@@ -26,20 +26,29 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
             step = 0.01;
         } else if (currentValue < 1) {
             step = 0.1;
-        } else if (currentValue < 10) {
+        } else if (currentValue < 10 || (!increment && currentValue - 10 < 1)) {
             step = 1;
-        } else if (currentValue < 100) {
+        } else if (
+            currentValue < 100 ||
+            (!increment && currentValue - 100 < 100)
+        ) {
             step = 10;
-        } else if (currentValue < 1000) {
+        } else if (
+            currentValue < 1000 ||
+            (!increment && currentValue - 1000 < 1000)
+        ) {
             step = 100;
-        } else if (currentValue < 10000) {
+        } else if (
+            currentValue < 10000 ||
+            (!increment && currentValue - 10000 < 10000)
+        ) {
             step = 1000;
         } else {
             step = 10000;
         }
 
         if (!increment && currentValue - step <= 0) {
-            if (step !== 0.001) {
+            if (step > 0.001) {
                 step /= 10;
             } else {
                 return 0;
