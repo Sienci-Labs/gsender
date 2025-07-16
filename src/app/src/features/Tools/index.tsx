@@ -6,6 +6,7 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
+import SDCard from '../SDCard';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { ATC } from 'app/features/ATC';
@@ -43,6 +44,10 @@ const tabs = [
     {
         label: 'Console',
         content: Console,
+    },
+    {
+        label: 'SDCard',
+        content: SDCard,
     },
 ];
 
