@@ -157,6 +157,7 @@ class GrblHalController {
             reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
+        queryStatusCount: 0,
 
         // Respond to user input
         replyParserState: false, // $G
@@ -204,6 +205,7 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -344,17 +346,19 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
-                if (_.includes(words, 'M6')) {
+                // TODO:  Perhaps we look at this in the future and make a decision whether to comment it
+                // based on if ATC is 1 in flags
+                /*if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
                             data: 'M6',
                             comment: commentString
-                        }); // Hold reason
+                        });
                         line = line.replace('M6', '(M6)');
                     }
-                }
+                }*/
 
                 if (this.isInRotaryMode) {
                     const containsACommand = A_AXIS_COMMANDS.test(line);
@@ -942,7 +946,7 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n$#\n');
         });
 
         this.toolChanger = new ToolChanger({
@@ -1003,7 +1007,15 @@ class GrblHalController {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     this.actionMask.alarmCompleteReport = false;
                 } else {
-                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    // Every 20 status reports, request a full one
+                    if (this.actionMask.queryStatusCount === 20) {
+                        this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        this.actionMask.queryStatusCount = 0;
+                    } else {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                        this.actionMask.queryStatusCount += 1;
+                    }
+
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
                     }
@@ -1236,6 +1248,7 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+        this.actionMask.queryStatusCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;

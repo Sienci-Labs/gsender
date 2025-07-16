@@ -21,24 +21,34 @@
  *
  */
 
-class GrblHalLineParserResultVersion {
+class GrblHalLineParserResultTool {
     static parse(line) {
-        // * Grbl v1.1
-        //   [VER:]
-        const r = line.match(/^\[(?:VER:)(.+)\]$/);
+        //   [T:1|0.000,0.000,0.000,0.000|0.000]
+        //
+        const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
         if (!r) {
             return null;
         }
-        console.log(r);
+
+        const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+
+        const offsetMap = r[2].split(',')
+            .reduce((acc, cur, i) => {
+                acc[axes[i]] = Number(Number(cur).toFixed(3));
+                return acc;
+            }, {});
+
         const payload = {
-            version: r[1]
+            id: Number(r[1]),
+            toolOffsets: offsetMap,
+            toolRadius: Number(r[3])
         };
 
         return {
-            type: GrblHalLineParserResultVersion,
+            type: GrblHalLineParserResultTool,
             payload: payload
         };
     }
 }
 
-export default GrblHalLineParserResultVersion;
+export default GrblHalLineParserResultTool;

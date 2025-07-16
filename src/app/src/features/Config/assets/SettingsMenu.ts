@@ -8,14 +8,13 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap, IoMdMove } from 'react-icons/io';
+import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
-    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -1152,6 +1151,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable ATCi Controls',
+                        key: 'workspace.atcEnabled',
+                        description: 'Enable ATCi Controls',
+                    },
                     {
                         label: 'Passthrough',
                         type: 'boolean',

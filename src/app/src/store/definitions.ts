@@ -4,7 +4,11 @@ import {
     RENDER_STATE,
     TOGGLE_STATUS,
 } from '../constants';
-import { EEPROMSettings, EEPROMDescriptions, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import {
+    EEPROMSettings,
+    EEPROMDescriptions,
+    FIRMWARE_TYPES_T,
+} from 'app/definitions/firmware';
 import { BasicObject, BasicPosition, BBox } from 'app/definitions/general';
 import { Axes } from 'app/features/Axes/definitions';
 import { Connection } from 'app/features/Connection/definitions';
@@ -18,6 +22,7 @@ import { Surfacing } from 'app/features/Surfacing/definitions';
 import {
     VISUALIZER_TYPES_T,
     Visualizer,
+    ATC,
 } from 'app/features/Visualizer/definitions';
 import {
     Modal,
@@ -57,7 +62,10 @@ export interface FirmwareOptions {
     SPINDLE: string;
 }
 
+export interface ToolTable {}
+
 export interface ControllerSettings {
+    toolTable: any;
     //TODO
     parameters: BasicObject;
     settings: EEPROMSettings;
@@ -220,6 +228,7 @@ export interface State {
         spindle: SpindleState;
         surfacing: Surfacing;
         visualizer: Visualizer;
+        atc: ATC;
     };
     commandKeys: CommandKeys;
 }
