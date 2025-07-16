@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - dev
+      - chris-test
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
