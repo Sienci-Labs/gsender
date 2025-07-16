@@ -10,6 +10,8 @@ class GrblHalLineParserResultSpindle {
             return null;
         }
 
+        console.log(r);
+
         // Handle new spindle update early
         /*
             [SPINDLE:0|0|0|*DIRV|PWM|0.0,1000.0]
@@ -39,10 +41,12 @@ class GrblHalLineParserResultSpindle {
 
         payload.label = parts[0];
 
+        console.log(parts[2]);
+
         // We have more info, we can assume some of it - this will be easier with $spindleESH report
         if (parts.length > 1) {
             payload.id = Number(parts[1].slice(-1)); // Last value is ID to use, convert to number
-            payload.capabilities = parts[2].trim(); // Capabilities string
+            payload.capabilities = (parts[2] || '').trim(); // Capabilities string
             payload.enabled = !!parts[3]; // "Current" text parsed - true if exists, false otherwise
             // Do we have a laser potential
             payload.laser = payload.capabilities.indexOf('L') > -1;
