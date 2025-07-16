@@ -80,6 +80,11 @@ export interface gSenderInfo {
     hasUpdate: boolean;
 }
 
+export interface SDCardFile {
+    fileName: string;
+    fileSize: number;
+}
+
 export interface ControllerState {
     type: FIRMWARE_TYPES_T;
     settings: ControllerSettings;
@@ -99,6 +104,13 @@ export interface ControllerState {
     };
     terminalHistory: Array<string>;
     spindles: Array<Spindle>;
+    sdcard: {
+        isMounted: boolean;
+        files: Array<{
+            fileName: string;
+            fileSize: number;
+        }>;
+    };
 }
 
 export interface PortInfo {
