@@ -41,7 +41,7 @@ class CameraDisplay extends PureComponent {
     render = () => {
         let { camera, cameraPosition } = this.props;
         return (
-            <div className={styles.container}>
+            <div className="rounded bg-opacity-50 bg-gray-600 w-24 absolute bottom-5 portrait:right-5 portrait:left-auto left-5">
                 <h3 className={styles.viewTitle}>{cameraPosition}</h3>
                 <div className={styles.buttonContainer}>
                     <button

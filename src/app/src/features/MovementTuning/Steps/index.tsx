@@ -43,9 +43,9 @@ const Steps = () => {
     const [moveAxisCompleted, setMoveAxisCompleted] = useState(false);
     const [setTravelCompleted, setSetTravelCompleted] = useState(false);
     const { units } = useWorkspaceState();
-    const [moveDistance, setMoveDistance] = useState(units === 'mm' ? 100 : 25);
+    const [moveDistance, setMoveDistance] = useState(units === 'mm' ? 100 : 4);
     const [measuredDistance, setMeasuredDistance] = useState(
-        units === 'mm' ? 100 : 25,
+        units === 'mm' ? 100 : 4,
     );
     const { settings } = useTypedSelector((state) => state.controller.settings);
     const isConnected = useTypedSelector(
@@ -67,8 +67,8 @@ const Steps = () => {
         setMarkLocationCompleted(false);
         setMoveAxisCompleted(false);
         setSetTravelCompleted(false);
-        setMoveDistance(100);
-        setMeasuredDistance(100);
+        setMoveDistance(units === 'mm' ? 100 : 4);
+        setMeasuredDistance(units === 'mm' ? 100 : 4);
     };
 
     const handleUpdateEEPROM = () => {
@@ -158,7 +158,24 @@ const Steps = () => {
                                 onChange={(data: {
                                     label: string;
                                     value: typeof selectedAxis;
-                                }) => setSelectedAxis(data.value)}
+                                }) => {
+                                    setSelectedAxis(data.value);
+                                    if (data.value === 'z') {
+                                        setMoveDistance(
+                                            units === 'mm' ? -50 : -2,
+                                        );
+                                        setMeasuredDistance(
+                                            units === 'mm' ? -50 : -2,
+                                        );
+                                    } else {
+                                        setMoveDistance(
+                                            units === 'mm' ? 100 : 4,
+                                        );
+                                        setMeasuredDistance(
+                                            units === 'mm' ? 100 : 4,
+                                        );
+                                    }
+                                }}
                                 value={{
                                     label: `${selectedAxis.toUpperCase()}-Axis`,
                                     value: selectedAxis,
@@ -275,14 +292,14 @@ const Steps = () => {
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-none">
-                                        No, Cancel
+                                    <AlertDialogCancel>
+                                        Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         className="border border-blue-500"
                                         onClick={handleUpdateEEPROM}
                                     >
-                                        Yes, Update Steps-Per-MM
+                                        Update EEPROM Settings
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -492,7 +509,7 @@ const Steps = () => {
                                                 }
                                                 disabled={currentStep !== 2}
                                                 className="w-28"
-                                                suffix="mm"
+                                                suffix={units ?? 'mm'}
                                             />
                                         </div>
                                     </div>

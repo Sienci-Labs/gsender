@@ -26,6 +26,33 @@
 
 const releases = [
     {
+        'version': '1.5.2',
+        'date': 'July 15th, 2025',
+        'notes': [
+            'Fix issues with remote mode disconnecting main client and jobs stopping when connecting from remote mode.',
+            'Significantly sped up file loading and rendering on larger files',
+            'Job end notifications will no longer appear if toggled off',
+            'SVG visualization no longer teeny-tiny on inches postprocessor files',
+            'Plus and Minus buttons returned to jog speeds with the prior existing logic',
+            'AutoZero touchplate renamed to just AutoZero',
+            'Added new Config option for Jog Delay, which configures how long a keypress/UI press/gamepad press before swapping to continuous jogging.',
+            'Commands sent later in connection cycle to reduce situations where Error 1 occurs when unlocking and resetting the board',
+            'Generating a surfacing file no longer causes issues on main visualizer if not sent there',
+            'Motors sections again will disappear from config when empty',
+            'Restore defaults and default highlight works correctly in Config on settings considered hybrid between grbl/grblHAL',
+            'Prevented situations where alarm list was not populating correctly',
+            'Continuous jog without soft limits now sends more sane values when jogging in Inches across both controllers',
+            'Load bar now appears correctly in surfacing and rotary surfacing tools',
+            'Stopping a file that has an early M0 already sent will no longer pop up the pause modal',
+            'Stock turning and Probe Rotary Z disabled for grbl controllers when in non-Rotary mode',
+            'Config look and Feel tweaks',
+            'Shortcuts rearranged so more commonly set ones are higher up',
+            'File stat feed rates now convert correctly',
+            'Zero All on grblHAL no longer sends Zero on A if A Axis not reported',
+            'Various look and feel changes',
+        ]
+    },
+    {
         'version': '1.5.1',
         'date': 'June 27th, 2025',
         'notes': [
