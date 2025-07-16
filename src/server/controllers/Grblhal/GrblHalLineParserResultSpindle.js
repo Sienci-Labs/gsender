@@ -10,8 +10,6 @@ class GrblHalLineParserResultSpindle {
             return null;
         }
 
-        console.log(r);
-
         // Handle new spindle update early
         /*
             [SPINDLE:0|0|0|*DIRV|PWM|0.0,1000.0]
