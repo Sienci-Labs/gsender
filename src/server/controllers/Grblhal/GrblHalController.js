@@ -975,6 +975,10 @@ class GrblHalController {
             this.emit('settings:group', this.runner.settings.groups);
         });
 
+        this.runner.on('sdcard', (payload) => {
+            this.emit('sdcard:files', payload);
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
@@ -2165,7 +2169,38 @@ class GrblHalController {
             },
             'runner:resetSettings': () => {
                 this.runner.deleteSettings();
-            }
+            },
+            'sdcard:mount': () => {
+                this.writeln('$FM');
+            },
+            'sdcard:list:files': () => {
+                const [type = 'cnc'] = args;
+
+                if (type === 'cnc') {
+                    this.writeln('$F');
+                    return;
+                }
+
+                if (type === 'all') {
+                    this.writeln('$F+');
+                    return;
+                }
+            },
+            'sdcard:file:output': () => {
+                const [filePath] = args;
+
+                this.writeln(`$F<=${filePath}`);
+            },
+            'sdcard:file:run': () => {
+                const [filePath] = args;
+
+                this.writeln(`$F=${filePath}`);
+            },
+            'sdcard:file:delete': () => {
+                const [filePath] = args;
+
+                this.writeln(`$FD=${filePath}`);
+            },
         }[cmd];
 
         if (!handler) {

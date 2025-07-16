@@ -44,6 +44,7 @@ import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDe
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
+import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 
 class GrblHalLineParser {
     parse(line) {
@@ -108,6 +109,9 @@ class GrblHalLineParser {
 
             // Tool
             GrblHalLineParserResultTool,
+
+            // [FILE:/test.gcode|SIZE:100]
+            GbrlHalLineParserResultSDCard,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
