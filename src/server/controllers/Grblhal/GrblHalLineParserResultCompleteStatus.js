@@ -89,8 +89,6 @@ class GrblHalLineParserResultCompleteStatus {
             // handle hasHomed
         }
 
-        console.log(payload);
-
         return {
             type: GrblHalLineParserResultCompleteStatus,
             payload

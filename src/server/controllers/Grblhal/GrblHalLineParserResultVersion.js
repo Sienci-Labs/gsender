@@ -29,7 +29,7 @@ class GrblHalLineParserResultVersion {
         if (!r) {
             return null;
         }
-        console.log(r);
+
         const payload = {
             version: r[1]
         };

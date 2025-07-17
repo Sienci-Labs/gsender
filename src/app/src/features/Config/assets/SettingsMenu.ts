@@ -30,6 +30,7 @@ import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.ts
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
 import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import { ATCIWizard } from "app/features/Config/components/wizards/ATCiWizard.tsx";
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -1147,6 +1148,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Tool Changing',
         icon: IoIosSwap,
+        wizard: ATCIWizard,
         settings: [
             {
                 label: '',
