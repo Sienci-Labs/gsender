@@ -238,7 +238,7 @@ export function* initialize(): Generator<any, void, any> {
 
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch(
-                updateFileRenderState({ renderState: RENDER_NO_FILE }),
+                updateFileRenderState({ renderState: RENDER_LOADING }),
             );
             setTimeout(() => {
                 const renderState = _get(
@@ -264,17 +264,17 @@ export function* initialize(): Generator<any, void, any> {
                     { type: 'module' },
                 );
                 visualizeWorker.onmessage = visualizeResponse;
-                await getParsedData().then((value) => {
-                    const parsedData = null;
-                    visualizeWorker.postMessage({
-                        content,
-                        visualizer,
-                        parsedData,
-                        isNewFile,
-                        accelerations,
-                        maxFeedrates,
-                    });
+                // await getParsedData().then((value) => {
+                const parsedData = null;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer,
+                    parsedData,
+                    isNewFile,
+                    accelerations,
+                    maxFeedrates,
                 });
+                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -317,20 +317,20 @@ export function* initialize(): Generator<any, void, any> {
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        await getParsedData().then((value) => {
-            const parsedData = null;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldIncludeSVG,
-                needsVisualization,
-                parsedData,
-                isNewFile,
-                accelerations,
-                maxFeedrates,
-            });
+        // await getParsedData().then((value) => {
+        const parsedData = null;
+        visualizeWorker.postMessage({
+            content,
+            visualizer,
+            isLaser,
+            shouldIncludeSVG,
+            needsVisualization,
+            parsedData,
+            isNewFile,
+            accelerations,
+            maxFeedrates,
         });
+        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
