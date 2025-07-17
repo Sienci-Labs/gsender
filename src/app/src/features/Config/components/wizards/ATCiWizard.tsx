@@ -6,6 +6,8 @@ import {toast} from "sonner";
 import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
 import {firmwareSemver} from "app/lib/firmwareSemver.ts";
 import controller from "app/lib/controller.ts";
+import {delay} from "lodash";
+import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 
 
 // Check firmware
@@ -22,9 +24,29 @@ function enableATCiWizard(firmware, version) {
     }
 
     const code = [
-
+        '$485=1',
+        '$675=2',
+        '$6=1',
+        '$370=0',
+        '$372=8',
+        '$752=0',
+        '$753=1',
+        '$762=2',
+        '$763=3',
+        '$650=1',
+        '$534=1'
     ]
     controller.command('gcode', code);
+
+    delay(() => {
+        Confirm({
+            title: 'ATCi - Restart your Controller',
+            content:
+                'Please manually restart your CNC controller (power cycle) and reconnect to gSender for these settings to take effect.',
+            confirmLabel: 'OK',
+            hideClose: true,
+        });
+    }, 500);
 }
 
 export function ATCIWizard() {
