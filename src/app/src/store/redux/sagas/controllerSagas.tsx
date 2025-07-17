@@ -113,6 +113,7 @@ import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import { Spindle } from 'app/features/Spindle/definitions';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -891,7 +892,7 @@ export function* initialize(): Generator<any, void, any> {
         }
     });
 
-    controller.addListener('spindle:add', (spindle: any) => {
+    controller.addListener('spindle:add', (spindle: Spindle) => {
         if (Object.hasOwn(spindle, 'id')) {
             reduxStore.dispatch(addSpindle(spindle));
         }

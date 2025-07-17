@@ -24,7 +24,7 @@ import {
 import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
-import ActiveIndicator from './components/ActiveIndicator';
+// import ActiveIndicator from './components/ActiveIndicator';
 import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -43,10 +43,6 @@ interface SpindleState {
     };
     spindleMax: number;
     spindleMin: number;
-    spindle: {
-        label: string;
-        value: number;
-    };
 }
 
 const SpindleWidget = () => {
@@ -62,10 +58,6 @@ const SpindleWidget = () => {
         laser: config.get('laser', { duration: 0, power: 0, maxPower: 0 }),
         spindleMax: config.get('spindleMax', 0),
         spindleMin: config.get('spindleMin', 0),
-        spindle: {
-            label: 'Default Spindle',
-            value: 0,
-        },
     }));
 
     const {
@@ -103,7 +95,12 @@ const SpindleWidget = () => {
         $13: state.controller.settings.settings.$13 ?? '0',
         spindle: state.controller.spindles.find((s) => s.enabled) ?? {
             label: 'Default Spindle',
-            value: 0,
+            id: '0',
+            enabled: true,
+            capabilities: '',
+            laser: false,
+            raw: '',
+            order: 0,
         },
         laserMax: Number(state.controller.settings.settings.$730 ?? 255),
         laserMin: Number(state.controller.settings.settings.$731 ?? 0),
@@ -419,13 +416,6 @@ const SpindleWidget = () => {
                 `M104 Q${selectedSpindle.value}`,
                 '$spindles',
             ]);
-            setState((prevState) => ({
-                ...prevState,
-                spindle: {
-                    ...selectedSpindle,
-                    value: Number(selectedSpindle.value),
-                },
-            }));
         },
         enableSpindleMode() {
             const preferredUnits =
@@ -604,7 +594,7 @@ const SpindleWidget = () => {
     useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
 
-    const active = getSpindleActiveState();
+    // const active = getSpindleActiveState();
 
     const givenMode = laserAsSpindle ? LASER_MODE : SPINDLE_MODE;
 
@@ -621,7 +611,7 @@ const SpindleWidget = () => {
                         <SpindleSelector
                             spindles={availableSpindles}
                             onChange={actions.handleHALSpindleSelect}
-                            spindle={state.spindle}
+                            spindle={spindle}
                             disabled={!canClick()}
                         />
                     )}
