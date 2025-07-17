@@ -1013,7 +1013,8 @@ class GrblHalController {
                 } else {
                     // Every 20 status reports, request a full one
                     if (this.actionMask.queryStatusCount === 20) {
-                        this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        //this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT);
                         this.actionMask.queryStatusCount = 0;
                     } else {
                         this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
