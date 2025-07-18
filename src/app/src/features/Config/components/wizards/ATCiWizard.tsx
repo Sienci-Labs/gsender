@@ -8,6 +8,7 @@ import {firmwareSemver} from "app/lib/firmwareSemver.ts";
 import controller from "app/lib/controller.ts";
 import {delay} from "lodash";
 import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import store from "app/store";
 
 
 // Check firmware
@@ -37,6 +38,7 @@ function enableATCiWizard(firmware, version) {
         '$534=1'
     ]
     controller.command('gcode', code);
+    store.set('workspace.atcEnabled', true);
 
     delay(() => {
         Confirm({
