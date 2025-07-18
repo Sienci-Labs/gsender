@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { useSquaring } from '../context/SquaringContext';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const TriangleDiagram = () => {
     const { currentMainStep, currentSubStep, mainSteps, triangle } =
         useSquaring();
+    const { units } = useWorkspaceState();
 
     // Make the triangle responsive to container width
     const baseSize = 200; // This will be the reference size
@@ -123,7 +125,7 @@ const TriangleDiagram = () => {
             { points: '1-3', value: triangle.c, key: 'c' as const },
         ];
         return distances[lineIndex].value
-            ? `${distances[lineIndex].value}mm`
+            ? `${distances[lineIndex].value}${units}`
             : `Measure ${distances[lineIndex].points}`;
     };
 
@@ -204,7 +206,8 @@ const TriangleDiagram = () => {
                                 fontSize: '10px',
                             }}
                         >
-                            {currentSubStepData?.value}mm X-axis
+                            {currentSubStepData?.value}
+                            {units} X-axis
                         </text>
                     </>
                 )}
@@ -228,7 +231,8 @@ const TriangleDiagram = () => {
                                 fontSize: '10px',
                             }}
                         >
-                            {currentSubStepData?.value}mm Y-axis
+                            {currentSubStepData?.value}
+                            {units} Y-axis
                         </text>
                     </>
                 )}
