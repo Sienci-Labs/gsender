@@ -245,8 +245,8 @@ const ResultsStep = () => {
                                                 <div className="space-y-4">
                                                     <p>
                                                         This will update the X-axis ($100) and
-                                                        Y-axis ($101) step/{units}{' '} values
-                                                        in your CNC firmware to the new ones below:
+                                                        Y-axis ($101) step/mm values in your
+                                                        CNC firmware to the new ones below:
                                                     </p>
                                                     <p>
                                                         X-axis:{' '}
