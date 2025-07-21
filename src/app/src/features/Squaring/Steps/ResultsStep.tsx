@@ -192,7 +192,7 @@ const ResultsStep = () => {
                 {needsEEPROMAdjustment && (
                     <div className="flex flex-col justify-center items-start space-y-1 dark:text-white">
                         <h3 className="text-lg font-semibold">
-                            EEPROM Adjustment Recommendations
+                            Other Recommendations
                         </h3>
                         <div className="space-y-1 w-full">
                             <p>
@@ -234,24 +234,22 @@ const ResultsStep = () => {
                                             <Button disabled={isUpdating}>
                                                 {isUpdating
                                                     ? 'Updating...'
-                                                    : 'Update EEPROM Settings'}
+                                                    : 'Update step/mm'}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent className="bg-white">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Update EEPROM Values
+                                                    Update Firmware
                                                 </AlertDialogTitle>
                                                 <div className="space-y-4">
                                                     <p>
-                                                        This action cannot be
-                                                        undone. This will update
-                                                        your machines built-in X
-                                                        and Y step per {units}{' '}
-                                                        values.
+                                                        This will update the X-axis ($100) and
+                                                        Y-axis ($101) step/{units}{' '} values
+                                                        in your CNC firmware to the new ones below:
                                                     </p>
                                                     <p>
-                                                        X-axis ($100):{' '}
+                                                        X-axis:{' '}
                                                         <strong>
                                                             {eepromAdjustment.x.amount.toFixed(
                                                                 3,
@@ -259,7 +257,7 @@ const ResultsStep = () => {
                                                         </strong>
                                                     </p>
                                                     <p>
-                                                        Y-axis ($101):{' '}
+                                                        Y-axis:{' '}
                                                         <strong>
                                                             {eepromAdjustment.y.amount.toFixed(
                                                                 3,
@@ -276,7 +274,7 @@ const ResultsStep = () => {
                                                     className="border border-blue-500"
                                                     onClick={handleUpdateEEPROM}
                                                 >
-                                                    Update EEPROM Settings
+                                                    Update Firmware
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
@@ -286,7 +284,7 @@ const ResultsStep = () => {
                                 <div className="mt-1 xl:mt-4 text-sm text-yellow-600 dark:text-yellow-400">
                                     <p className="font-bold">Warning</p>
                                     <p>
-                                        Updating EEPROM values can affect your
+                                        Updating Firmware values can affect your
                                         machine's accuracy. Make sure to verify
                                         the new settings after applying them.
                                     </p>
