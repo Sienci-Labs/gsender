@@ -248,7 +248,7 @@ const Steps = () => {
                                     className="bg-white text-black"
                                     variant="outline"
                                 >
-                                    Update step/mm
+                                    Update step per mm
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
