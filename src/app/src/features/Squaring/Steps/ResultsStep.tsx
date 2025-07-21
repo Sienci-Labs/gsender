@@ -140,6 +140,13 @@ const ResultsStep = () => {
                 <div className="flex flex-row items-start gap-4">
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-white">
+                            Results
+                        </h3>
+                        {renderResult()}
+                    </div> 
+                    
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-semibold dark:text-white">
                             Measured Dimensions
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
@@ -180,21 +187,14 @@ const ResultsStep = () => {
                             </div>
                         </div>
                     </div>
-
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-semibold dark:text-white">
-                            Results
-                        </h3>
-                        {renderResult()}
-                    </div>
                 </div>
 
                 {needsEEPROMAdjustment && (
-                    <div className="flex flex-col justify-center items-start space-y-1 dark:text-white">
-                        <h3 className="text-lg font-semibold">
+                    <div className="flex flex-col justify-center items-start space-y-1">
+                        <h3 className="text-lg font-semibold dark:text-white">
                             Other Recommendations
                         </h3>
-                        <div className="space-y-1 w-full">
+                        <div className="space-y-1 text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                             <p>
                                 We also noticed from the results that your motor
                                 movement settings could be updated to improve
