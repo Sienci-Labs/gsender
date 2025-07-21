@@ -272,6 +272,12 @@ const Steps = () => {
                                             )
                                         </p>
                                         <p>
+                                            From:{' '}
+                                            <strong>
+                                                {originalStepsPerMM}
+                                            </strong>
+                                        </p>
+                                        <p>
                                             To:{' '}
                                             <strong>
                                                 {calculateNewStepsPerMM({
