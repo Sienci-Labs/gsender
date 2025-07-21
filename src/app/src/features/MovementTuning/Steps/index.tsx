@@ -34,6 +34,7 @@ import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { toFixedIfNecessary } from 'app/lib/rounding';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -235,11 +236,17 @@ const Steps = () => {
                 <div className="flex flex-col gap-4">
                     <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                         <span>
-                            Your {selectedAxis.toUpperCase()}-axis movement was off by{' '}
+                            Your {selectedAxis.toUpperCase()}-axis movement was
+                            off by{' '}
                             <strong>
-                                {moveDistance - measuredDistance} mm.
+                                {toFixedIfNecessary(
+                                    moveDistance - measuredDistance,
+                                    4,
+                                )}{' '}
+                                {units}.
                             </strong>{' '}
-                            Consider updating your {selectedAxis.toUpperCase()}-axis step/mm value in your CNC firmware.
+                            Consider updating your {selectedAxis.toUpperCase()}
+                            -axis step/mm value in your CNC firmware.
                         </span>
 
                         <AlertDialog>
@@ -273,9 +280,7 @@ const Steps = () => {
                                         </p>
                                         <p>
                                             From:{' '}
-                                            <strong>
-                                                {originalStepsPerMM}
-                                            </strong>
+                                            <strong>{currentStepsPerMM}</strong>
                                         </p>
                                         <p>
                                             To:{' '}
@@ -322,7 +327,8 @@ const Steps = () => {
             <div className="flex flex-col gap-4">
                 <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
                     <p>
-                        Your {selectedAxis.toUpperCase()}-axis looks accurate, so you should be good to go!
+                        Your {selectedAxis.toUpperCase()}-axis looks accurate,
+                        so you should be good to go!
                     </p>
                 </div>
 
