@@ -248,7 +248,7 @@ const Steps = () => {
                                     className="bg-white text-black"
                                     variant="outline"
                                 >
-                                    Update step per mm
+                                    Update step/mm
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
@@ -258,7 +258,7 @@ const Steps = () => {
                                     </AlertDialogTitle>
                                     <div className="space-y-4">
                                         <p>
-                                            This will update the {' '}
+                                            This will update the{' '}
                                             <strong>
                                                 {selectedAxis.toUpperCase()}
                                                 -axis
@@ -270,12 +270,6 @@ const Steps = () => {
                                                 )}
                                             </strong>{' '}
                                             )
-                                        </p>
-                                        <p>
-                                            From:{' '}
-                                            <strong>
-                                                {originalStepsPerMM}
-                                            </strong>
                                         </p>
                                         <p>
                                             To:{' '}
