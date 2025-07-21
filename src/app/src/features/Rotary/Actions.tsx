@@ -11,7 +11,7 @@ import {
 } from './utils/probeCommands';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
-import { TOOLBAR_CATEGORY, WORKSPACE_MODE } from 'app/constants';
+import { GRBL, TOOLBAR_CATEGORY, WORKSPACE_MODE } from 'app/constants';
 import { useNavigate } from 'react-router';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
@@ -21,6 +21,7 @@ const Actions = () => {
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
     );
+    const firmwareType = useTypedSelector((state) => state.controller.type);
     const { mode: workspaceMode } = useWorkspaceState();
 
     const runProbing = (name = 'rotary', commands: string) => {
@@ -71,6 +72,7 @@ const Actions = () => {
             <Button
                 size="sm"
                 onClick={() => navigate('/tools/rotary-surfacing')}
+                disabled={firmwareType === GRBL && !isInRotaryMode}
             >
                 Rotary Surfacing
             </Button>
@@ -79,7 +81,9 @@ const Actions = () => {
                 size="sm"
                 variant="primary"
                 onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}
-                disabled={!isConnected}
+                disabled={
+                    !isConnected || (firmwareType === GRBL && !isInRotaryMode)
+                }
             >
                 Probe Rotary Z-Axis
             </Button>
