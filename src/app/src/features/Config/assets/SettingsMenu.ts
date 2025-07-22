@@ -174,7 +174,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Safe height',
                         key: 'workspace.safeRetractHeight',
                         type: 'number',
-                        unit: 'mm',
+                        unit: 'variable',
                         description:
                             "Amount Z-axis will move up before moving in X/Y/A using go tos, corner-movements, or parking. (Doesn't apply to files, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
