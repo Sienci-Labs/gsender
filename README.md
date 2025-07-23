@@ -42,12 +42,12 @@ gSender is available for the following systems and does not yet support headless
 * Zero-setting and Go Tos (with safe height)
 * 3D toolpath visualization (no machine connection required)
 * Probing in any direction plus safe continuity detection ensures no broken cutting tools
-* Built-in gadgets for surface probing, stock flattening, firmware editing, command navigation, and more
-* Responsive screen design and workspace customizations including visualizer light and dark theme
+* Built-in gadgets for stock flattening, stock rounding, XY squaring, axis movement tuning, firmware flashing, and more
+* Responsive screen design and workspace customizations including light and dark themes
 * File insight on load (feed range, spindle range, tools used, estimated cutting time, and overall, max, and min dimensions)
 * Feed override and active job status indicators
 * Fully exposed keyboard shortcuts for external keyboard/keypad control
-* Joystick support built-in for a variety of controllers
+* Gamepad support built-in for a variety of controllers
 * Safe height movements - accommodates machines with or without endstops
 * Homing cycle and quick-movement locations available for machines with homing hardware
 * Full spindle/laser support via manual control widgets, active alerting, and live overrides
@@ -55,15 +55,11 @@ gSender is available for the following systems and does not yet support headless
 * Macros buttons (rearrangeable) with enhanced macro variables and individually assignable keyboard shortcuts
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
-* Optional automatic handling for common error throwing g-code
-* Firmware tool for easier grbl EEPROM changes, loading defaults, and grbl flashing
-* Surfacing tool auto-generates surfacing g-code based on machine cutting area and other preferences, ready to execute
-* Calibration tool for axis alignment - a step by step process to make sure your CNC is square
-* Movement tuning tool for calibrating motor axis movements
-* Tool change functionality - pause, ignore, or run code blocks on M6 commands
+* Supports 4th and rotary axes, even on vanilla grbl devices by hijacking Y-axis movements
+* Built-in wizards to handle tool changing even on vanilla grbl CNCs
 * Start-from-line functionality to resume jobs part-way through in case of failure of abort
-* Outline functionality indicates the rough bounds of the job before cutting
-* Customizable g-code injection at job start & end
+* Job outlining to see the rough bounds of your file before cutting
+* Customizable g-code injection events
 * Tooltips for data entry points
 * Alarm warning explanations to better contextualize CNC errors
 * Sleep management to keep PC awake during g-code sending
