@@ -1334,8 +1334,8 @@ class GrblController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, meta) {
-        if (!this.workflow.isIdle()) {
+    loadFile(gcode, meta, refresh = false) {
+        if (refresh && !this.workflow.isIdle()) {
             log.debug('Skip loading file: workflow is not idle');
             return; // Don't reload file if controller is running;
         }

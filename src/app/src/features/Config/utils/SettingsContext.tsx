@@ -24,8 +24,7 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from "pubsub-js";
-import {undefined} from "zod";
-import * as boolean from "boolean";
+
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
