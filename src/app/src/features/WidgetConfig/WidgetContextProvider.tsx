@@ -14,12 +14,10 @@ export const WidgetConfigProvider = ({
 
     const get = (key: string, defaultValue: any): void =>
         config.get(key, defaultValue);
-    const set = (key: string, value: any): boolean =>
-        config.set(translateKey(key, widgetId), value);
-    const unset = (key: string): object =>
-        config.unset(translateKey(key, widgetId));
+    const set = (key: string, value: any): boolean => config.set(key, value);
+    const unset = (key: string): object => config.unset(key);
     const replace = (key: string, value: any): object =>
-        config.replace(translateKey(key, widgetId), value);
+        config.replace(key, value);
 
     const actions = { get, set, unset, replace };
 
