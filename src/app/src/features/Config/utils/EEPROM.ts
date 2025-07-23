@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import {GRBL_SETTINGS} from "app/features/Config/assets/SettingsDescriptions.ts";
 import BooleanInput from 'app/features/Config/components/EEPROMInputs/BooleanInput.tsx';
 import BitfieldInput from 'app/features/Config/components/EEPROMInputs/BitfieldInput.tsx';
 import ExclusiveBitfieldInput from 'app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx';
@@ -28,6 +29,17 @@ export function getFilteredEEPROMSettings(
 ) {
     return Object.keys(eeprom).map((setting, index) => {
         const properties = settings.find((obj) => obj.setting === setting);
+
+        // Below is to grab the grbl unit as configured and use it as a fallback if it's not parsed
+        // in the settings description.  It will be replaced in grblHAL by the actual unit.
+        const grblProperties = GRBL_SETTINGS.find((obj) => obj.setting === setting);
+
+        let baseUnit = '';
+        if (grblProperties) {
+            baseUnit = grblProperties.units
+        }
+
+
         const eKey = setting.replace('$', '');
         const halData = get(halDescriptions, `${eKey}`, {
             group: -1,
@@ -35,6 +47,7 @@ export function getFilteredEEPROMSettings(
         const halGroup = get(halGroups, `${halData.group}.label`, '');
 
         return {
+            unit: baseUnit,
             ...(properties || {}),
             globalIndex: index,
             setting,

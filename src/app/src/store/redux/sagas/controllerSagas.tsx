@@ -671,7 +671,6 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
-            console.log(payload);
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
