@@ -45,13 +45,18 @@ export function zeroWCS(axis: string, value: number = 0) {
     controller.command('gcode', `G10 L20 P0 ${axisCode}${value}`);
 }
 
+export function hasAxis(state, axis): boolean {
+    const axes = get(state, 'controller.state.axes.axes', []);
+    return axes.includes(axis);
+}
+
 export function zeroAllAxes() {
     const reduxStoreInstance = reduxStore.getState();
     const firmware = get(reduxStoreInstance, 'controller.type', 'Grbl');
 
     controller.command('gcode', `G10 L20 P0 X0 Y0 Z0`);
 
-    if (firmware === 'grblHAL') {
+    if (firmware === 'grblHAL' && hasAxis(reduxStoreInstance, 'A')) {
         controller.command('gcode', 'G10 L20 P0 A0');
     }
 }
@@ -137,7 +142,7 @@ export function handleManualOffset(value: string | number, axis: Axis) {
 }
 
 export function homeMachine() {
-    controller.command('gcode', '$H');
+    controller.command('homing');
 }
 
 export function homeAxis(axis: string) {

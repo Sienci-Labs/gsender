@@ -35,8 +35,11 @@ export function IconUpdater() {
                 setReleaseNotes(info);
                 setShowUpdater(true);
             });
-        } else {
-            console.log('not Electron');
+            window.ipcRenderer.on('maximize-window', () => {
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 500)
+            })
         }
     }, []);
 

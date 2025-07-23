@@ -115,6 +115,10 @@ class WindowManager {
       this.windows.splice(index, 1);
     });
 
+    window.on('maximize', (event) => {
+        window.webContents.send('maximize-window');
+    });
+
     // Open every external link in a new window
     // https://github.com/electron/electron/blob/master/docs/api/web-contents.md
     webContents.on("new-window", (event, url) => {

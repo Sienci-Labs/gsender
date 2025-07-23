@@ -55,6 +55,7 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
+    const [jogThreshold, setJogThreshold] = useState<number>(store.get('widgets.axes.jog.threshold', 200));
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -68,6 +69,20 @@ export function Jogging() {
         aStep: 0,
         feedrate: 0,
     });
+
+    useEffect(() => {
+        store.on('change', () => {
+            // Update jog threshold if it's different
+            const newThreshold = store.get('widgets.axes.jog.threshold', 200);
+            if (newThreshold !== jogThreshold) {
+                setJogThreshold(newThreshold);
+            }
+        })
+    }, [])
+
+    useEffect(() => {
+        jogHelper.current?.updateThreshold(jogThreshold);
+    }, [jogThreshold])
 
     useEffect(() => {
         jogSpeedRef.current = jogSpeed;
@@ -910,15 +925,20 @@ export function Jogging() {
     useShuttleEvents(shuttleControlEvents);
 
     const isRotaryMode = mode === 'ROTARY';
+    const showA =
+        (rotaryWidgetState.tab.show && firmwareType === 'grblHAL') ||
+        isRotaryMode;
+    const noA = !rotaryWidgetState.tab.show || !isRotaryMode;
 
     return (
         <>
-            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 max-xl:scale-90">
+            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 portrait:scale-100 max-xl:scale-90">
                 <div className="min-w-[180px] relative">
                     <JogWheel
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
@@ -942,6 +962,7 @@ export function Jogging() {
                         distance={jogSpeed.zStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
                         <AJog
@@ -949,20 +970,21 @@ export function Jogging() {
                             feedrate={jogSpeed.feedrate}
                             canClick={canClick}
                             isRotaryMode={isRotaryMode}
+                            threshold={jogThreshold}
                         />
                     )}
                 </div>
             </div>
-            <div className="flex gap-4 max-xl:gap-2 max-xl:scale-90">
-                <div className="flex w-full items-center justify-center">
+            <div className="flex gap-1 w-full justify-around">
+                <div
+                    className={cx('flex items-center justify-center', {
+                        'px-7': noA,
+                    })}
+                >
                     <div
                         className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3':
-                                (rotaryWidgetState.tab.show &&
-                                    firmwareType === 'grblHAL') ||
-                                isRotaryMode,
-                            'grid-cols-1 gap-y-1':
-                                !rotaryWidgetState.tab.show && !isRotaryMode,
+                            'grid-cols-2 gap-y-3': showA,
+                            'grid-cols-1 gap-y-1 xl:gap-y-2': noA,
                         })}
                     >
                         <JogInput
@@ -990,7 +1012,7 @@ export function Jogging() {
                         />
                     </div>
                 </div>
-                <div className="flex float-right max-xl:scale-90">
+                <div className="flex float-right portrait:scale-100 max-xl:scale-90">
                     <SpeedSelector handleClick={updateJogValues} />
                 </div>
             </div>

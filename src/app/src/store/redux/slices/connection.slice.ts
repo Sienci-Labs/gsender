@@ -47,10 +47,11 @@ const connectionSlice = createSlice({
                 isConnected: boolean;
             }>,
         ) => {
+            const { isConnected: prevIsConnected } = state;
             const { port, baudrate, isConnected } = action.payload;
             state.port = port;
             state.baudrate = baudrate;
-            state.isConnected = isConnected;
+            state.isConnected = prevIsConnected ? true : isConnected;
         },
         setConnectionState: (state, action: PayloadAction<{ isConnected: boolean }>) => {
           state.isConnected = action.payload.isConnected;

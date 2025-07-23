@@ -17,6 +17,7 @@ export interface Axes {
         normal: JogSpeed;
         precise: JogSpeed;
         step: number;
+        threshold: number;
         distances: number[];
     };
     mdi: MDI;

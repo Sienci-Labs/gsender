@@ -6,8 +6,10 @@ import Spindle from '../Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Macros from '../Macros';
+import SDCard from '../SDCard';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { ATC } from 'app/features/ATC';
 
 interface TabItem {
     label: string;
@@ -28,6 +30,10 @@ const tabs = [
         content: Spindle,
     },
     {
+        label: 'ATC',
+        content: ATC,
+    },
+    {
         label: 'Coolant',
         content: Coolant,
     },
@@ -39,11 +45,16 @@ const tabs = [
         label: 'Console',
         content: Console,
     },
+    {
+        label: 'SDCard',
+        content: SDCard,
+    },
 ];
 
 const Tools = () => {
     const rotary = useWidgetState('rotary');
-    const { spindleFunctions, coolantFunctions } = useWorkspaceState();
+    const { spindleFunctions, coolantFunctions, atcEnabled } =
+        useWorkspaceState();
 
     const filteredTabs = tabs.filter((tab) => {
         if (tab.label === 'Rotary' && !rotary.tab.show) {
@@ -51,6 +62,9 @@ const Tools = () => {
         }
 
         if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+            return false;
+        }
+        if (tab.label === 'ATC' && !atcEnabled) {
             return false;
         }
 

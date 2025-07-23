@@ -36,10 +36,10 @@ export function RapidPositionButtons() {
     }
 
     return (
-        <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform">
+        <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait">
             <div className="grid grid-cols-2 text-3xl gap-2 font-bold">
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 portrait:w-10 portrait:h-8"
                     onClick={() => jogToCorner(BACK_LEFT)}
                 >
                     <img
@@ -49,7 +49,7 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 portrait:w-10 portrait:h-8"
                     onClick={() => jogToCorner(BACK_RIGHT)}
                 >
                     <img
@@ -59,7 +59,7 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 portrait:w-10 portrait:h-8"
                     onClick={() => jogToCorner(FRONT_LEFT)}
                 >
                     <img
@@ -69,7 +69,7 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6"
+                    className="w-8 h-6 portrait:w-10 portrait:h-8"
                     onClick={() => jogToCorner(FRONT_RIGHT)}
                 >
                     <img

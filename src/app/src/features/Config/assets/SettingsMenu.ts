@@ -8,14 +8,13 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap, IoMdMove } from 'react-icons/io';
+import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
-    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -31,6 +30,7 @@ import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.ts
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
 import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import { ATCIWizard } from "app/features/Config/components/wizards/ATCiWizard.tsx";
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -252,6 +252,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: '',
                         key: 'widgets.axes.jog.precise',
                     },
+                    {
+                        label: 'Continuous jog delay',
+                        type: 'number',
+                        unit: 'ms',
+                        description:
+                            'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
+                        key: 'widgets.axes.jog.threshold',
+                        min: 50
+                    }
                 ],
             },
             {
@@ -353,6 +362,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Square up CNC rails',
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
+                        hidden: () => {
+                            const connected = controller.portOpen
+                            return !connected;
+                        }
                     },
                     {
                         type: 'eeprom',
@@ -785,7 +798,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Spindle on delay',
-                        key: 'workspace.spindleDelay',
+                        key: 'widgets.spindle.delay',
                         description:
                             'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',
@@ -1135,10 +1148,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Tool Changing',
         icon: IoIosSwap,
+        wizard: ATCIWizard,
         settings: [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable ATCi Controls',
+                        key: 'workspace.atcEnabled',
+                        description: 'Enable ATCi Controls',
+                    },
                     {
                         label: 'Passthrough',
                         type: 'boolean',

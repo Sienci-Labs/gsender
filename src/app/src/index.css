@@ -25,7 +25,8 @@ html,
     }
     input {
     }
-    textarea:focus, input:focus{
+    textarea:focus,
+    input:focus {
         outline: none;
     }
     *:focus {
@@ -50,7 +51,6 @@ html,
     initial-value: 0deg;
     syntax: '<angle>';
 }
-
 
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
@@ -82,12 +82,17 @@ html,
         transform: scale(1.4) translatex(-20px) perspective(160px)
             rotateX(55deg);
     }
+
+    .rapidButtonTransformPortrait {
+        transform: scale(1.4) translatex(-30px) perspective(160px)
+            rotateX(55deg);
+    }
 }
 
 @layer components {
     .stripes {
         position: relative;
-        overflow: hidden
+        overflow: hidden;
     }
 
     .stripes:before {
@@ -96,20 +101,19 @@ html,
         right: 0;
         height: 100%;
         width: calc(100% + 22px);
-        content: "";
+        content: '';
         background-image: linear-gradient(
-                -45deg,
-                #689AC9 5%,
-                transparent 5% 45%,
-                #689AC9 45% 55%,
-                transparent 55% 95%,
-                #689AC9 95%
+            -45deg,
+            #689ac9 5%,
+            transparent 5% 45%,
+            #689ac9 45% 55%,
+            transparent 55% 95%,
+            #689ac9 95%
         );
         background-size: 22px 22px;
         animation: slide 1s infinite linear;
     }
 }
-
 
 @layer base {
     @keyframes slide {

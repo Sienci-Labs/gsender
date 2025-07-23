@@ -157,6 +157,7 @@ class GrblHalController {
             reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
+        queryStatusCount: 0,
 
         // Respond to user input
         replyParserState: false, // $G
@@ -204,6 +205,7 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -344,17 +346,19 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
-                if (_.includes(words, 'M6')) {
+                // TODO:  Perhaps we look at this in the future and make a decision whether to comment it
+                // based on if ATC is 1 in flags
+                /*if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
                             data: 'M6',
                             comment: commentString
-                        }); // Hold reason
+                        });
                         line = line.replace('M6', '(M6)');
                     }
-                }
+                }*/
 
                 if (this.isInRotaryMode) {
                     const containsACommand = A_AXIS_COMMANDS.test(line);
@@ -921,7 +925,7 @@ class GrblHalController {
             this.emit('grblHal:info', res);
         });
 
-        this.runner.on('startup', async (res) => {
+        this.runner.on('startup', async (res, semver) => {
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -941,8 +945,16 @@ class GrblHalController {
                 this.initController();
             }
 
-            await delay(300);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+            console.log(semver);
+
+            await delay(500);
+            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            await delay(25);
+            if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
+                this.connection.writeln('$spindlesh');
+            } else {
+                this.connection.writeln('$spindles');
+            }
         });
 
         this.toolChanger = new ToolChanger({
@@ -969,6 +981,10 @@ class GrblHalController {
 
         this.runner.on('groupDetail', (payload) => {
             this.emit('settings:group', this.runner.settings.groups);
+        });
+
+        this.runner.on('sdcard', (payload) => {
+            this.emit('sdcard:files', payload);
         });
 
         const queryStatusReport = () => {
@@ -1003,7 +1019,16 @@ class GrblHalController {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                     this.actionMask.alarmCompleteReport = false;
                 } else {
-                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                    // Every 20 status reports, request a full one
+                    if (this.actionMask.queryStatusCount === 20) {
+                        //this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT);
+                        this.actionMask.queryStatusCount = 0;
+                    } else {
+                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                        this.actionMask.queryStatusCount += 1;
+                    }
+
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
                     }
@@ -1236,6 +1261,7 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+        this.actionMask.queryStatusCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
@@ -1299,7 +1325,7 @@ class GrblHalController {
         };
     }
 
-    open(port, baudrate, refresh, callback = noop) {
+    open(port, baudrate, refresh = false, callback = noop) {
         if (!refresh) {
             this.connection.on('data', this.connectionEventListener.data);
             this.connection.on('close', this.connectionEventListener.close);
@@ -1307,6 +1333,11 @@ class GrblHalController {
         }
 
         callback(); // register controller
+
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
 
         this.workflow.stop();
 
@@ -1379,6 +1410,10 @@ class GrblHalController {
     }
 
     loadFile(gcode, { name }) {
+        if (!this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
     }
@@ -1926,12 +1961,12 @@ class GrblHalController {
             },
             'jog:start': () => {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
-                console.log(args);
+
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);
@@ -2143,7 +2178,38 @@ class GrblHalController {
             },
             'runner:resetSettings': () => {
                 this.runner.deleteSettings();
-            }
+            },
+            'sdcard:mount': () => {
+                this.writeln('$FM');
+            },
+            'sdcard:list:files': () => {
+                const [type = 'cnc'] = args;
+
+                if (type === 'cnc') {
+                    this.writeln('$F');
+                    return;
+                }
+
+                if (type === 'all') {
+                    this.writeln('$F+');
+                    return;
+                }
+            },
+            'sdcard:file:output': () => {
+                const [filePath] = args;
+
+                this.writeln(`$F<=${filePath}`);
+            },
+            'sdcard:file:run': () => {
+                const [filePath] = args;
+
+                this.writeln(`$F=${filePath}`);
+            },
+            'sdcard:file:delete': () => {
+                const [filePath] = args;
+
+                this.writeln(`$FD=${filePath}`);
+            },
         }[cmd];
 
         if (!handler) {

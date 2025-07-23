@@ -30,4 +30,7 @@ export interface Spindle {
     id: string;
     label: string;
     capabilities: string;
+    laser: boolean;
+    raw: string;
+    order: number
 }
