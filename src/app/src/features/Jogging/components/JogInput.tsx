@@ -57,6 +57,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
         return step;
     };
 
+    // rounds the values
     const formatNewValue = (newValue: number) => {
         if (units === IMPERIAL_UNITS) {
             return Number(newValue.toFixed(3));
