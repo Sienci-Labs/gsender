@@ -375,7 +375,7 @@ class Visualizer extends Component {
             const imperialCoordinateSystem = this.group.getObjectByName(
                 'ImperialCoordinateSystem',
             );
-            if (imperialCoordinateSystem) {
+            if (imperialCoordinateSystem) {``
                 imperialCoordinateSystem.visible =
                     visible && state.units === IMPERIAL_UNITS;
             }

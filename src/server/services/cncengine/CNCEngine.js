@@ -237,7 +237,7 @@ class CNCEngine {
                     // Load file to controller if it exists
                     if (this.hasFileLoaded()) {
                         console.log('Load file firing on reconnect');
-                        controller.loadFile(this.gcode, this.meta);
+                        controller.loadFile(this.gcode, this.meta, refresh);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
                         log.debug('No file in CNCEngine to load to sender');
