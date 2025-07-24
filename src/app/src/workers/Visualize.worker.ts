@@ -22,7 +22,6 @@
  */
 
 import { ArcCurve, Vector3 } from 'three';
-import isEmpty from 'lodash/isEmpty';
 
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 
@@ -482,14 +481,15 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const modalChanges = vm.getModalChanges();
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
+
     parsedDataToSend = {
         data: [],
         estimates: estimates,
         info: fileInfo,
         modalChanges: [],
         feedrateChanges: [],
+        invalidLines: fileInfo.invalidLines
     };
-    console.log(parsedDataToSend)
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
@@ -522,7 +522,6 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         needsVisualization,
         parsedData: parsedDataToSend,
     };
-    console.log(parsedDataToSend);
 
     if (isLaser) {
         message.spindleSpeeds = spindleSpeeds;

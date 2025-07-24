@@ -76,7 +76,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                     value: 'four-hundred',
                 },
                 {
-                    label: '600mm',
+                    label: '460mm',
                     value: 'six-hundred',
                 },
             ],

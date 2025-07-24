@@ -10,8 +10,8 @@ import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
-import { LuPencilRuler } from 'react-icons/lu';
-import { AiFillTool } from 'react-icons/ai';
+import { TbRulerMeasure } from 'react-icons/tb';
+import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
 import { Stats } from './features/Stats';
 import { Jobs } from './features/Stats/Jobs';
@@ -72,7 +72,7 @@ export const ReactRoutes = () => {
                                 <div className="grid lg:grid-cols-3 grid-cols-2 gap-4 fixed-select-tool-area overflow-y-auto overflow-x-hidden">
                                     <ToolCard
                                         title="Surfacing"
-                                        description="Generate toolpaths to surface and level your material"
+                                        description="Flatten your wasteboard or other non-flat stock"
                                         icon={GiFlatPlatform}
                                         link="/tools/surfacing"
                                     />
@@ -86,35 +86,35 @@ export const ReactRoutes = () => {
 
                                     <ToolCard
                                         title="Movement Tuning"
-                                        description="Use this tool adjust the movement of your machine"
-                                        icon={AiFillTool}
+                                        description="Ensure that each axis of your machine is moving accurately"
+                                        icon={TbRulerMeasure}
                                         link="/tools/movement-tuning"
                                     />
 
                                     <ToolCard
                                         title="XY Squaring"
-                                        description="Use this tool to ensure your machine is squared correctly"
-                                        icon={LuPencilRuler}
+                                        description="Get your CNC accurately aligned to make square cuts"
+                                        icon={MdSquareFoot}
                                         link="/tools/squaring"
                                     />
 
                                     <ToolCard
                                         title="Keyboard Shortcuts"
-                                        description="Use this tool to adjust the keyboard shortcuts of your machine"
+                                        description="Set up keyboard shortcuts for easy navigation and control"
                                         icon={FaKeyboard}
                                         link="/tools/keyboard-shortcuts"
                                     />
 
                                     <ToolCard
                                         title="Gamepad"
-                                        description="Use this tool to adjust the keyboard shortcuts of your machine"
+                                        description="Easy hand-held CNC control using pre-made or custom profiles"
                                         icon={FaGamepad}
                                         link="/tools/gamepad"
                                     />
 
                                     <ToolCard
-                                        title="Firmware"
-                                        description="Update the firmware on your machine"
+                                        title="Old Firmware"
+                                        description="This is depreciated and used to be used for updating firmware"
                                         icon={FaMicrochip}
                                         link="/tools/firmware"
                                     />

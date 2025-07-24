@@ -21,12 +21,17 @@ import {
     determineEEPROMAdjustment,
 } from '../utils';
 import { toast } from 'app/lib/toaster';
+import { METRIC_UNITS } from 'app/constants';
+import store from 'app/store';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
-const FM_LOWER_OFFSET_THRESHOLD = 2; // mm
+const FM_LOWER_OFFSET_THRESHOLD =
+    store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 2 : 0.079;
 
 const ResultsStep = () => {
     const { triangle, jogValues } = useSquaring();
     const [isUpdating, setIsUpdating] = useState(false);
+    const { units } = useWorkspaceState();
 
     const calculatedHypotenuse = calculateHypotenuse(triangle);
     const hypotenuseDiff = Math.abs(calculatedHypotenuse - triangle.c).toFixed(
@@ -38,6 +43,9 @@ const ResultsStep = () => {
         Number(hypotenuseDiff) <= FM_LOWER_OFFSET_THRESHOLD;
 
     const eepromAdjustment = determineEEPROMAdjustment(triangle, jogValues);
+    const needsEEPROMAdjustment =
+        eepromAdjustment.x.needsAdjustment ||
+        eepromAdjustment.y.needsAdjustment;
     const { settings } = reduxStore.getState().controller.settings;
     const currentXSteps = Number(settings.$100);
     const currentYSteps = Number(settings.$101);
@@ -79,15 +87,17 @@ const ResultsStep = () => {
                         Your machine is slightly out of square
                     </p>
                     <p>
-                        The deviation is minor ({hypotenuseDiff}mm) but you may
-                        want to adjust the right Y-axis rail to achieve better
-                        squareness.
+                        The deviation is minor ({hypotenuseDiff}
+                        {units}) but you may want to adjust the right Y-axis
+                        rail to achieve better squareness.
                     </p>
 
                     <p>
                         You can move your either the right y-axis rail forward
-                        by {hypotenuseDiff}mm or the left y-axis rail backward
-                        by {hypotenuseDiff}mm.
+                        by {hypotenuseDiff}
+                        {units} or the left y-axis rail backward by{' '}
+                        {hypotenuseDiff}
+                        {units}.
                     </p>
                 </div>
             );
@@ -101,12 +111,24 @@ const ResultsStep = () => {
                 </p>
                 <p>
                     The machine is off by {angle.toFixed(2)}° or{' '}
-                    <strong>{hypotenuseDiff}mm</strong> on the diagonal.
+                    <strong>
+                        {hypotenuseDiff}
+                        {units}
+                    </strong>{' '}
+                    on the diagonal.
                 </p>
                 <p>
                     You can move your either the right y-axis rail forward by{' '}
-                    <strong>{hypotenuseDiff}mm</strong> or the left y-axis rail
-                    backward by <strong>{hypotenuseDiff}mm</strong>.
+                    <strong>
+                        {hypotenuseDiff}
+                        {units}
+                    </strong>{' '}
+                    or the left y-axis rail backward by{' '}
+                    <strong>
+                        {hypotenuseDiff}
+                        {units}
+                    </strong>
+                    .
                 </p>
             </div>
         );
@@ -118,6 +140,13 @@ const ResultsStep = () => {
                 <div className="flex flex-row items-start gap-4">
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-white">
+                            Results
+                        </h3>
+                        {renderResult()}
+                    </div> 
+                    
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-semibold dark:text-white">
                             Measured Dimensions
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
@@ -126,7 +155,8 @@ const ResultsStep = () => {
                                     Bottom Edge (1-2)
                                 </div>
                                 <div className="text-xl font-bold">
-                                    {triangle.a}mm
+                                    {triangle.a}
+                                    {units}
                                 </div>
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
@@ -134,7 +164,8 @@ const ResultsStep = () => {
                                     Right Edge (2-3)
                                 </div>
                                 <div className="text-xl font-bold">
-                                    {triangle.b}mm
+                                    {triangle.b}
+                                    {units}
                                 </div>
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
@@ -142,7 +173,8 @@ const ResultsStep = () => {
                                     Diagonal (1-3)
                                 </div>
                                 <div className="text-xl font-bold">
-                                    {triangle.c}mm
+                                    {triangle.c}
+                                    {units}
                                 </div>
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
@@ -155,25 +187,18 @@ const ResultsStep = () => {
                             </div>
                         </div>
                     </div>
-
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-semibold dark:text-white">
-                            Results
-                        </h3>
-                        {renderResult()}
-                    </div>
                 </div>
 
-                {!isSquare && (
-                    <div className="flex flex-col justify-center items-start space-y-1 dark:text-white">
-                        <h3 className="text-lg font-semibold">
-                            EEPROM Adjustment Recommendations
+                {needsEEPROMAdjustment && (
+                    <div className="flex flex-col justify-center items-start space-y-1">
+                        <h3 className="text-lg font-semibold dark:text-white">
+                            Other Recommendations
                         </h3>
-                        <div className="space-y-1 w-full">
+                        <div className="space-y-1 text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                             <p>
-                                We also noticed from the results that your
-                                motor movement settings could be updated
-                                to improve your machines accuracy.
+                                We also noticed from the results that your motor
+                                movement settings could be updated to improve
+                                your machines accuracy.
                             </p>
                             {/* <div className="grid grid-cols-2 gap-4"> */}
                             <div className="grid grid-cols-2 gap-2 mt-1">
@@ -209,23 +234,22 @@ const ResultsStep = () => {
                                             <Button disabled={isUpdating}>
                                                 {isUpdating
                                                     ? 'Updating...'
-                                                    : 'Update EEPROM Settings'}
+                                                    : 'Update step/mm'}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent className="bg-white">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Update EEPROM Values
+                                                    Update Firmware
                                                 </AlertDialogTitle>
                                                 <div className="space-y-4">
                                                     <p>
-                                                        This action cannot be
-                                                        undone. This will update
-                                                        your machines built-in
-                                                        X and Y step per mm values.
+                                                        This will update the X-axis ($100) and
+                                                        Y-axis ($101) step/mm values in your
+                                                        CNC firmware to the new ones below:
                                                     </p>
                                                     <p>
-                                                        X-axis ($100):{' '}
+                                                        X-axis:{' '}
                                                         <strong>
                                                             {eepromAdjustment.x.amount.toFixed(
                                                                 3,
@@ -233,7 +257,7 @@ const ResultsStep = () => {
                                                         </strong>
                                                     </p>
                                                     <p>
-                                                        Y-axis ($101):{' '}
+                                                        Y-axis:{' '}
                                                         <strong>
                                                             {eepromAdjustment.y.amount.toFixed(
                                                                 3,
@@ -243,12 +267,14 @@ const ResultsStep = () => {
                                                 </div>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogCancel>
+                                                    Cancel
+                                                </AlertDialogCancel>
                                                 <AlertDialogAction
                                                     className="border border-blue-500"
                                                     onClick={handleUpdateEEPROM}
                                                 >
-                                                    Update EEPROM Settings
+                                                    Update Firmware
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
@@ -258,7 +284,7 @@ const ResultsStep = () => {
                                 <div className="mt-1 xl:mt-4 text-sm text-yellow-600 dark:text-yellow-400">
                                     <p className="font-bold">Warning</p>
                                     <p>
-                                        Updating EEPROM values can affect your
+                                        Updating Firmware values can affect your
                                         machine's accuracy. Make sure to verify
                                         the new settings after applying them.
                                     </p>

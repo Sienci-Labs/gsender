@@ -238,7 +238,7 @@ export function* initialize(): Generator<any, void, any> {
 
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch(
-                updateFileRenderState({ renderState: RENDER_NO_FILE }),
+                updateFileRenderState({ renderState: RENDER_LOADING }),
             );
             setTimeout(() => {
                 const renderState = _get(
@@ -264,17 +264,17 @@ export function* initialize(): Generator<any, void, any> {
                     { type: 'module' },
                 );
                 visualizeWorker.onmessage = visualizeResponse;
-                await getParsedData().then((value) => {
-                    const parsedData = null;
-                    visualizeWorker.postMessage({
-                        content,
-                        visualizer,
-                        parsedData,
-                        isNewFile,
-                        accelerations,
-                        maxFeedrates,
-                    });
+                // await getParsedData().then((value) => {
+                const parsedData = null;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer,
+                    parsedData,
+                    isNewFile,
+                    accelerations,
+                    maxFeedrates,
                 });
+                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -317,20 +317,20 @@ export function* initialize(): Generator<any, void, any> {
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        await getParsedData().then((value) => {
-            const parsedData = null;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldIncludeSVG,
-                needsVisualization,
-                parsedData,
-                isNewFile,
-                accelerations,
-                maxFeedrates,
-            });
+        // await getParsedData().then((value) => {
+        const parsedData = null;
+        visualizeWorker.postMessage({
+            content,
+            visualizer,
+            isLaser,
+            shouldIncludeSVG,
+            needsVisualization,
+            parsedData,
+            isNewFile,
+            accelerations,
+            maxFeedrates,
         });
+        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
@@ -671,7 +671,6 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
-            console.log(payload);
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
@@ -791,13 +790,28 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'error',
         (
-            error: { type: typeof ALARM | typeof ERROR; lineNumber: number },
+            error: { type: typeof ALARM | typeof ERROR; lineNumber: number, code: number, line: string },
             _wasRunning: boolean,
         ) => {
             // const homingEnabled = _get(
             //     reduxStore.getState(),
             //     'controller.settings.settings.$22',
             // );
+
+            console.log(error);
+
+            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings', false);
+            if (showLineWarnings) {
+                pubsub.publish('helper:info', {
+                    title: 'Invalid Line',
+                    description: (
+                        <div className="flex flex-col gap-2">
+                            <p>The following line caused an <b>error {error.code}</b>: <i>'{error.line}'</i></p>
+                            <p>Press Start to resume the job.</p>
+                        </div>
+                    )
+                })
+            }
 
             if (ALARM_ERROR_TYPES.includes(error.type)) {
                 updateAlarmsErrors(error);
