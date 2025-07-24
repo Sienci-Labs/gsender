@@ -29,13 +29,16 @@ export const actions = {
             .update(headlessSettings)
             .then(() => {
                 //App restart logic goes here
+
                 if (isElectron()) {
                     //call the event that handles app restart with remote settings
-                    // @ts-ignore
-                    window.ipcRenderer.send(
-                        'remoteMode-restart',
-                        headlessSettings,
-                    );
+                    setTimeout(() => {
+                        // @ts-ignore
+                        window.ipcRenderer.send(
+                            'remoteMode-restart',
+                            headlessSettings,
+                        );
+                    }, 500);
                 }
             })
             .catch((error) => {
