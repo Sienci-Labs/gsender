@@ -806,7 +806,7 @@ export function* initialize(): Generator<any, void, any> {
                     title: 'Invalid Line',
                     description: (
                         <div>
-                            <p>The following line caused an error {error.code}: <i>{error.line}</i></p>
+                            <p>The following line caused an <b>error {error.code}</b>: <i>{error.line}</i></p>
                         </div>
                     )
                 })
