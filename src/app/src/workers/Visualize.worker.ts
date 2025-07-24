@@ -481,13 +481,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const modalChanges = vm.getModalChanges();
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
-    console.log(vm.vmState);
+
     parsedDataToSend = {
         data: [],
         estimates: estimates,
         info: fileInfo,
         modalChanges: [],
         feedrateChanges: [],
+        invalidLines: fileInfo.invalidLines
     };
 
     let tFrames = new Uint32Array(frames);

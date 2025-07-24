@@ -922,6 +922,30 @@ class Visualizer extends Component {
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
 
+                const showWarningsOnLoad = store.get('widgets.visualizer.showWarning', false);
+                if (showWarningsOnLoad) {
+                    const invalidLines = _get(data, 'parsedData.invalidLines', []);
+                    if (invalidLines.length > 0) {
+                        // Put it in the modal somehow
+                        const description = (
+                            <div>
+                                <p>Detected {invalidLines.length} invalid lines.  Your file may not run correctly.</p>
+                                <br />
+                                <ol>
+                                    {
+                                        invalidLines.map((line) => (<li><b>{line}</b></li>))
+                                    }
+                                </ol>
+
+                            </div>
+                        )
+                        pubsub.publish('helper:info', {
+                            title: "Invalid Lines Detected",
+                            description
+                        })
+                    }
+                }
+
                 const isPrimaryVisualizer =
                     !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
                 const isSecondaryVisualizer =
