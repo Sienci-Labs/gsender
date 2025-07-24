@@ -40,9 +40,9 @@ export function RemoteModeDialog({
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
 
     useEffect(() => {
-        setIp(remoteIp);
-        setPort(remotePort);
-        setRemoteEnabled(remoteOn);
+        remoteIp && setIp(remoteIp);
+        remotePort && setPort(remotePort);
+        remoteOn && setRemoteEnabled(remoteOn);
     }, [remoteIp, remotePort, remoteOn]);
 
     useEffect(() => {
