@@ -264,7 +264,7 @@ class GCodeVirtualizer extends EventEmitter {
     ];
     feedrateCounter: number = 0;
 
-    INVALID_GCODE_REGEX = /([^NGMXYZITPJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+    INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;

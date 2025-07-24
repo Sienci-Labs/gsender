@@ -790,13 +790,27 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'error',
         (
-            error: { type: typeof ALARM | typeof ERROR; lineNumber: number },
+            error: { type: typeof ALARM | typeof ERROR; lineNumber: number, code: number, line: string },
             _wasRunning: boolean,
         ) => {
             // const homingEnabled = _get(
             //     reduxStore.getState(),
             //     'controller.settings.settings.$22',
             // );
+
+            console.log(error);
+
+            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings', false);
+            if (showLineWarnings) {
+                pubsub.publish('helper:info', {
+                    title: 'Invalid Line',
+                    description: (
+                        <div>
+                            <p>The following line caused an error {error.code}: <i>{error.line}</i></p>
+                        </div>
+                    )
+                })
+            }
 
             if (ALARM_ERROR_TYPES.includes(error.type)) {
                 updateAlarmsErrors(error);
