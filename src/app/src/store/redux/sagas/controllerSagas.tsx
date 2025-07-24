@@ -805,8 +805,9 @@ export function* initialize(): Generator<any, void, any> {
                 pubsub.publish('helper:info', {
                     title: 'Invalid Line',
                     description: (
-                        <div>
-                            <p>The following line caused an <b>error {error.code}</b>: <i>{error.line}</i></p>
+                        <div className="flex flex-col gap-2">
+                            <p>The following line caused an <b>error {error.code}</b>: <i>'{error.line}'</i></p>
+                            <p>Press Start to resume the job.</p>
                         </div>
                     )
                 })
