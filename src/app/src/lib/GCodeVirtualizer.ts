@@ -1070,7 +1070,6 @@ class GCodeVirtualizer extends EventEmitter {
         }*/
 
         if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
-            console.log(`Bad line - ${line}`);
             this.vmState.invalidLines.push(line);
         }
 

@@ -1039,6 +1039,7 @@ class Visualizer extends Component {
                 }), 5000)
 
                 const vertices = this.props.actions.getHull();
+                console.log(vertices.length);
                 const outlineWorker = new Worker(
                     new URL('../../workers/Outline.worker.js', import.meta.url),
                     { type: 'module' },
@@ -1057,7 +1058,7 @@ class Visualizer extends Component {
                     // Enable the outline button again
                     this.outlineRunning = false;
                 };
-
+                console.log('Pre postmessage');
                 outlineWorker.postMessage({
                     isLaser,
                     parsedData: vertices,

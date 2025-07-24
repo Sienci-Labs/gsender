@@ -72,7 +72,6 @@ export function RemoteModeDialog({
             port,
             headlessStatus: remoteEnabled,
         };
-        console.log(payload);
 
         // Validations
         if (Number(port) < 1025 || Number(port) > 65535) {
