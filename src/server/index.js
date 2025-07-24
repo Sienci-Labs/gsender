@@ -35,6 +35,7 @@ import httpProxy from 'http-proxy';
 import escapeRegExp from 'lodash/escapeRegExp';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
+import get from 'lodash/get';
 import size from 'lodash/size';
 import trimEnd from 'lodash/trimEnd';
 import uniqWith from 'lodash/uniqWith';
@@ -141,9 +142,12 @@ const createServer = (options, callback) => {
     // If headless setting is ON, change to correct port and IP
     const remoteSettings = config.get('remoteSettings', {});
     // Don't do this if: disabled, default IP, dev mode
-    if (remoteSettings.headlessStatus && !isInDevelopmentMode && remoteSettings.ip !== '0.0.0.0') {
-        port = remoteSettings.port;
-        host = remoteSettings.ip;
+    const setPort = get(remoteSettings, 'port', null);
+    const setIP = get(remoteSettings, 'ip', null);
+
+    if (remoteSettings.headlessStatus && !isInDevelopmentMode && setIP && setPort && setIP !== '0.0.0.0' && remoteSettings.ip.length > 0) {
+        port = setPort;
+        host = setIP;
     }
 
     const mountPoints = uniqWith([
