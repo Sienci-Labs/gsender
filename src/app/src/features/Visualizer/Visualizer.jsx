@@ -927,13 +927,14 @@ class Visualizer extends Component {
                     const invalidLines = _get(data, 'parsedData.invalidLines', []);
                     if (invalidLines.length > 0) {
                         // Put it in the modal somehow
+                        const lineSample = invalidLines.slice(0, 5);
                         const description = (
                             <div>
-                                <p>Detected {invalidLines.length} invalid lines.  Your file may not run correctly.</p>
-                                <br />
+                                <p>Detected {invalidLines.length} invalid lines on file load.  Your job may not run correctly.</p>
+                                <p>Sample invalid lines found include:</p>
                                 <ol>
                                     {
-                                        invalidLines.map((line) => (<li><b>{line}</b></li>))
+                                        lineSample.map((line) => (<li className="text-xs">-<b> {line}</b></li>))
                                     }
                                 </ol>
 
