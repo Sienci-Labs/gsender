@@ -19,8 +19,13 @@ export function ToolNameInput({ id = 0 }: { id: number }) {
     }
 
     return (
-        <div>
-            <Input type="text" value={name} onChange={handleNameRemap} />
+        <div className="text-xs text-muted">
+            <Input
+                className="bg-gray-50 px-1 py-0 text-xs border-gray-200 text-gray-400 font-italic"
+                type="text"
+                value={name}
+                onChange={handleNameRemap}
+            />
         </div>
     );
 }

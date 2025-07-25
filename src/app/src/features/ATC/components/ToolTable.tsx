@@ -1,17 +1,14 @@
-import { unimplemented } from 'app/features/ATC/utils/ATCFunctions.ts';
-import Button from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
-import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
-import { ATCStatusButton } from 'app/features/ATC/components/ATCStatusButton.tsx';
 import { useState } from 'react';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from 'app/components/shadcn/Collapsible.tsx';
-import { Badge } from 'app/components/shadcn/Badge.tsx';
+import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
 import { ChevronDown } from 'lucide-react';
-
+import { StatusBadge } from 'app/features/ATC/components/ui/StatusBadge.tsx';
+import { ProbeButton } from 'app/features/ATC/components/ui/ProbeButton.tsx';
 import {
     Table,
     TableBody,
@@ -20,6 +17,8 @@ import {
     TableHeader,
     TableRow,
 } from 'app/components/shadcn/Table';
+
+import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 
 export interface ToolInstance {
     id: number;
@@ -57,7 +56,6 @@ const ToolSection = ({
     defaultOpen?: boolean;
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
-    console.log(tools);
 
     return (
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -76,13 +74,11 @@ const ToolSection = ({
                 />
             </CollapsibleTrigger>
             <CollapsibleContent className="">
-                <div className="z-[9999] mt-2">
-                    <p>test</p>
+                <div className="mt-2">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className={//////////////////ou.xsecrrrrrrrrrt l
-                                    ';9>)?<???R????PO{T>YC cccccccccclccccccccccccccclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclccccfcc''''''''''''''18'// }>Tool</TableHead>
+                                <TableHead>Tool</TableHead>
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Action</TableHead>
@@ -90,10 +86,32 @@ const ToolSection = ({
                         </TableHeader>
 
                         <TableBody>
-                            {tools.map((tool) => {
-                                console.log(tool);
-                                return <div>hi</div>;
-                            })}
+                            {tools.map((tool) => (
+                                <TableRow key={tool.id}>
+                                    <TableCell className="font-mono">
+                                        <div className="flex flex-col">
+                                            <span className="font-semibold">
+                                                T{tool.id}
+                                            </span>
+                                            <ToolNameInput id={tool.id} />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-md font-mono font-semibold text-sm text-blue-500">
+                                            {tool.toolOffsets.z.toFixed(3)}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={'probed'} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <ProbeButton
+                                            status={'probed'}
+                                            onProbe={() => onProbe?.(tool.id)}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </div>

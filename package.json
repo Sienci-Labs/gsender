@@ -254,7 +254,7 @@
     "chalk": "~2.4.2",
     "chart.js": "^4.4.7",
     "chroma-js": "^2.4.2",
-    "class-variance-authority": "^0.7.0",
+    "class-variance-authority": "^0.7.1",
     "classnames": "~2.2.6",
     "cli-color": "~1.4.0",
     "cmdk": "^1.0.0",
