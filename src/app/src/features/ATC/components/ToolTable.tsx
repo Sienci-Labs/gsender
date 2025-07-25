@@ -19,6 +19,7 @@ import {
 } from 'app/components/shadcn/Table';
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
+import Button from 'app/components/Button';
 
 export interface ToolInstance {
     id: number;
@@ -59,9 +60,9 @@ const ToolSection = ({
 
     return (
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-gray-100/30 hover:bg-muted/50 rounded-lg transition-colors">
                 <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{title}</h3>
+                    <h3 className="font-semibold text-blue-500">{title}</h3>
                     <Badge
                         variant="secondary"
                         className="min-w-[30px] justify-center"
@@ -81,7 +82,11 @@ const ToolSection = ({
                                 <TableHead>Tool</TableHead>
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead>Action</TableHead>
+                                <TableHead>
+                                    <Button size="sm" variant="primary">
+                                        Probe All
+                                    </Button>
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
 
@@ -97,7 +102,7 @@ const ToolSection = ({
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-md font-mono font-semibold text-sm text-blue-500">
+                                        <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-center rounded-md font-mono font-semibold text-sm text-blue-500">
                                             {tool.toolOffsets.z.toFixed(3)}
                                         </div>
                                     </TableCell>
@@ -138,7 +143,7 @@ export function ToolTable({ tools = {} }: ToolTableProps) {
     );
 
     return (
-        <div className="sm:rounded-lg w-full h-[500px]">
+        <div className="sm:rounded-lg w-full h-[500px] gap-1 flex flex-col">
             <ToolSection
                 title="On-Rack Tools"
                 tools={onRackTools}
