@@ -50,20 +50,16 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         try {
             importFirmwareSettings(file, (e) => {
                 const uploadedSettings = JSON.parse(e.target.result);
-                let newSetting = false;
-                setEEPROM((prev) =>
-                    prev.map((item) => {
-                        let value = item.value;
-                        if (uploadedSettings[item.setting]) {
-                            newSetting = true;
-                            value = uploadedSettings[item.setting];
-                        }
-                        return { ...item, value: value, dirty: true };
-                    }),
-                );
-            });
-            toast.success('EEPROM Settings imported', {
-                position: 'bottom-right',
+                const code = [];
+                console.log(uploadedSettings);
+                for (const [key, value] of Object.entries(uploadedSettings)) {
+                    code.push(`${key}=${value}`);
+                }
+                code.push('$$');
+                console.log(code);
+                toast.success('EEPROM Settings imported', {
+                    position: 'bottom-right',
+                });
             });
         } catch (e) {
             toast.error('Unable to import settings', {
