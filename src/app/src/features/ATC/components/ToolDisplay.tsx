@@ -7,7 +7,8 @@ import {
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import {LoadToolFlyout} from "app/features/ATC/components/LoadToolFlyout.tsx";
+import { LoadToolFlyout } from 'app/features/ATC/components/LoadToolFlyout.tsx';
+import LoadToolPopover from 'app/features/ATC/components/LoadToolPopover.tsx';
 
 export function ToolDisplay() {
     const currentTool = useTypedSelector(
@@ -38,7 +39,7 @@ export function ToolDisplay() {
                 </div>
             </div>
             <div className="flex flex-row gap-4 w-full">
-                <LoadToolFlyout />
+                <LoadToolPopover />
                 <Button variant="primary" onClick={unloadTool}>
                     Unload
                 </Button>
