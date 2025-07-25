@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import store from 'app/store';
 import { MachineProfile } from 'app/definitions/firmware';
+import ip from "ip";
 
 export function ConfigRow({
     label,
@@ -59,6 +60,8 @@ export function Configuration() {
     const softLimitsString = $20 === '1' ? 'Enabled' : 'Disabled';
     const homingEnabledString = Number($22) > 0 ? 'Enabled' : 'Disabled';
 
+    const looksLikeIP = ip.isV4Format(connectionPort);
+
     return (
         <div className="flex flex-col gap-1">
             <div className="font-bold mb-2 dark:text-white">
@@ -66,7 +69,10 @@ export function Configuration() {
                 <span className="font-normal">{machineProfile.type}</span>
             </div>
             <ConfigRow connected={connected} label={'Connection'}>
-                <b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud
+                {
+                    looksLikeIP ? <b>{connectionPort}</b> : <span><b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud</span>
+                }
+
             </ConfigRow>
             <ConfigRow connected={connected} label={'Axes'}>
                 <b>{axesList.join(', ')}</b>

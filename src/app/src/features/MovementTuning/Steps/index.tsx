@@ -34,6 +34,7 @@ import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { toFixedIfNecessary } from 'app/lib/rounding';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -235,12 +236,17 @@ const Steps = () => {
                 <div className="flex flex-col gap-4">
                     <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                         <span>
-                            Your {selectedAxis.toUpperCase()}-axis is off by{' '}
+                            Your {selectedAxis.toUpperCase()}-axis movement was
+                            off by{' '}
                             <strong>
-                                {moveDistance - measuredDistance} mm.
+                                {toFixedIfNecessary(
+                                    moveDistance - measuredDistance,
+                                    4,
+                                )}{' '}
+                                {units}.
                             </strong>{' '}
-                            Consider updating the steps-per-mm value in the
-                            firmware.
+                            Consider updating your {selectedAxis.toUpperCase()}
+                            -axis step/mm value in your CNC firmware.
                         </span>
 
                         <AlertDialog>
@@ -249,35 +255,35 @@ const Steps = () => {
                                     className="bg-white text-black"
                                     variant="outline"
                                 >
-                                    Update Steps-Per-MM
+                                    Update step/mm
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                        Update EEPROM Value
+                                        Update Firmware
                                     </AlertDialogTitle>
                                     <div className="space-y-4">
                                         <p>
-                                            This action cannot be undone. This
-                                            will update the steps-per-mm value
-                                            for the{' '}
+                                            This will update the{' '}
                                             <strong>
                                                 {selectedAxis.toUpperCase()}
                                                 -axis
                                             </strong>{' '}
-                                            in the EEPROM settings.
-                                        </p>
-                                        <p>
-                                            EEPROM Setting:{' '}
+                                            step/mm value in your CNC firmware ({' '}
                                             <strong>
                                                 {getEEPROMSettingKey(
                                                     selectedAxis,
                                                 )}
-                                            </strong>
+                                            </strong>{' '}
+                                            )
                                         </p>
                                         <p>
-                                            Update To:{' '}
+                                            From:{' '}
+                                            <strong>{currentStepsPerMM}</strong>
+                                        </p>
+                                        <p>
+                                            To:{' '}
                                             <strong>
                                                 {calculateNewStepsPerMM({
                                                     originalStepsPerMM:
@@ -299,7 +305,7 @@ const Steps = () => {
                                         className="border border-blue-500"
                                         onClick={handleUpdateEEPROM}
                                     >
-                                        Update EEPROM Settings
+                                        Update Firmware
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -321,9 +327,8 @@ const Steps = () => {
             <div className="flex flex-col gap-4">
                 <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
                     <p>
-                        Your {selectedAxis.toUpperCase()}-axis is tuned, there
-                        is no need to update the steps per mm in the EEPROM
-                        settings.
+                        Your {selectedAxis.toUpperCase()}-axis looks accurate,
+                        so you should be good to go!
                     </p>
                 </div>
 

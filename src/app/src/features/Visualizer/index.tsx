@@ -670,6 +670,14 @@ class Visualizer extends Component {
                 pubsub.publish('theme:change', storeTheme);
             }
         })*/
+
+        store.on('change', () => {
+            const storeUnits = store.get('workspace.units');
+            const { units } = this.state;
+            if (units !== storeUnits) {
+                this.setState({ units: storeUnits });
+            }
+        });
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();

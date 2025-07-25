@@ -32,6 +32,7 @@ interface VMState {
     feedrates: Set<string>;
     bbox: BBox;
     usedAxes: Set<string>;
+    invalidLines: string[];
 }
 
 type Data = Array<{
@@ -232,6 +233,7 @@ class GCodeVirtualizer extends EventEmitter {
             },
         },
         usedAxes: new Set(),
+        invalidLines: []
     };
 
     // data to save so we don't have to reparse
@@ -261,6 +263,10 @@ class GCodeVirtualizer extends EventEmitter {
         },
     ];
     feedrateCounter: number = 0;
+
+    //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+    //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
+    VALID_GCODE_REGEX = /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -997,6 +1003,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.vmState.feedrates = new Set<string>();
             this.vmState.tools = new Set<string>();
             this.vmState.spindle = new Set<string>();
+            this.vmState.invalidLines = [];
         }
     }
 
@@ -1055,6 +1062,15 @@ class GCodeVirtualizer extends EventEmitter {
 
         if (line === '') {
             return;
+        }
+
+        /*if (line.this.INVALID_GCODE_REGEX.test(line)) {
+            console.log(`Bad line - ${line}`);
+            this.vmState.invalidLines.push(line);
+        }*/
+
+        if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
+            this.vmState.invalidLines.push(line);
         }
 
         const parsedLine = parseLine(line);
@@ -1203,6 +1219,7 @@ class GCodeVirtualizer extends EventEmitter {
             bbox: this.getBBox(),
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
+            invalidLines: this.vmState.invalidLines,
         };
     }
 

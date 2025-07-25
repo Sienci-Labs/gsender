@@ -255,17 +255,6 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-                        <InputArea label="Spindle RPM">
-                            <ControlledInput
-                                id="spindleRPM"
-                                value={surfacingState.spindleRPM}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix="RPM"
-                                type="number"
-                            />
-                        </InputArea>
                         <InputArea label="Feed Rate">
                             <ControlledInput
                                 id="feedrate"
@@ -277,7 +266,17 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-
+                        <InputArea label="Spindle RPM">
+                            <ControlledInput
+                                id="spindleRPM"
+                                value={surfacingState.spindleRPM}
+                                onChange={handleChange}
+                                wrapperClassName="col-span-3"
+                                className={inputStyle}
+                                suffix="RPM"
+                                type="number"
+                            />
+                        </InputArea>
                         <div>
                             <InputArea label="Enable Rehoming">
                                 <Switch

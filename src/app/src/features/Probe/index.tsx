@@ -201,7 +201,7 @@ const ProbeWidget = () => {
         },
         onOpenChange: (isOpen: boolean): void => {
             if (isOpen) {
-                setConnectionMade(false)
+                setConnectionMade(false);
                 actions.startConnectivityTest();
             } else {
                 if (testInterval) {
@@ -369,6 +369,7 @@ const ProbeWidget = () => {
         config.set('useTLO', useTLO);
         config.set('probeDepth', probeDepth);
         config.set('touchPlateHeight', touchPlateHeight);
+        config.set('direction', direction);
     });
 
     const determineProbeOptions = (probeCommand: ProbeCommand) => {
@@ -455,8 +456,6 @@ const ProbeWidget = () => {
         setAvailableTools(store.get('workspace.tools', []));
         setTouchplateType(store.get('workspace.probeProfile.touchplateType'));
         setTouchplate(store.get('workspace.probeProfile', {}));
-        setDirection(config.get('direction', 0));
-        // setProbeAxis(config.get('probeAxis', 'Z'));
         setProbeCommand(config.get('probeCommand', 'G38.2'));
         setUseTLO(config.get('useTLO'));
         setProbeDepth(config.get('probeDepth') || {});

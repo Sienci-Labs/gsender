@@ -777,6 +777,8 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
+                console.log(preferences);
+
                 this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
@@ -787,6 +789,7 @@ class GrblController {
                     }
 
                     if (preferences.showLineWarnings) {
+                        console.log('Pause branch');
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
@@ -1334,8 +1337,8 @@ class GrblController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, meta) {
-        if (!this.workflow.isIdle()) {
+    loadFile(gcode, meta, refresh = false) {
+        if (refresh && !this.workflow.isIdle()) {
             log.debug('Skip loading file: workflow is not idle');
             return; // Don't reload file if controller is running;
         }

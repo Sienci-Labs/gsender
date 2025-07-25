@@ -132,6 +132,17 @@ const SurfacingTool = () => {
                             turning off hard and soft limits so you don&apos;t
                             encounter alarms or errors.
                         </p>
+                        <div className="grid grid-cols-5 items-center gap-4">
+                            <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                Start Position
+                            </span>
+                            <div className="flex items-center col-span-3 justify-center">
+                                <MachinePosition
+                                    surfacing={surfacing}
+                                    setSurfacing={setSurfacing}
+                                />
+                            </div>
+                        </div>
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <ControlledInput
@@ -206,7 +217,6 @@ const SurfacingTool = () => {
                                 />
                             </div>
                         </InputArea>
-
                         <InputArea label="Bit Diameter">
                             <ControlledInput
                                 type="number"
@@ -219,6 +229,30 @@ const SurfacingTool = () => {
                                         'bitDiameter',
                                         Number(e.target.value),
                                     )
+                                }
+                            />
+                        </InputArea>
+                        <InputArea label="Stepover">
+                            <ControlledInput
+                                type="number"
+                                suffix="%"
+                                className={inputStyle}
+                                value={surfacing.stepover}
+                                wrapperClassName="col-span-3"
+                                onChange={(e) =>
+                                    onChange('stepover', Number(e.target.value))
+                                }
+                            />
+                        </InputArea>
+                        <InputArea label="Feed Rate">
+                            <ControlledInput
+                                type="number"
+                                suffix={`${units}/min`}
+                                className={inputStyle}
+                                value={surfacing.feedrate}
+                                wrapperClassName="col-span-3"
+                                onChange={(e) =>
+                                    onChange('feedrate', Number(e.target.value))
                                 }
                             />
                         </InputArea>
@@ -252,42 +286,6 @@ const SurfacingTool = () => {
                                 </div>
                             </div>
                         </InputArea>
-                        <InputArea label="Feed Rate">
-                            <ControlledInput
-                                type="number"
-                                suffix={`${units}/min`}
-                                className={inputStyle}
-                                value={surfacing.feedrate}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('feedrate', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-                        <InputArea label="Stepover">
-                            <ControlledInput
-                                type="number"
-                                suffix="%"
-                                className={inputStyle}
-                                value={surfacing.stepover}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('stepover', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <div className="grid grid-cols-5 items-center gap-4">
-                            <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-                                Start Position
-                            </span>
-                            <div className="flex items-center col-span-3 justify-center">
-                                <MachinePosition
-                                    surfacing={surfacing}
-                                    setSurfacing={setSurfacing}
-                                />
-                            </div>
-                        </div>
                         <InputArea label="Coolant Control">
                             <div className="grid grid-cols-2 gap-2 col-span-3">
                                 <span className="font-light text-sm max-w-20 dark:text-white">
