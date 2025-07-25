@@ -21,32 +21,34 @@
  *
  */
 
-import _trim from 'lodash/trim';
-
-const pattern = new RegExp(/^([a-zA-Z0-9]+)\s+((?:\d+\.){1,2}\d+[a-zA-Z0-9\-\.]*)([^\[]*\[[^\]]+\].*)?/);
-
-class GrblHalLineParserResultStartup {
+class GrblHalLineParserResultTool {
     static parse(line) {
-        const r = line.match(pattern);
+        //   [T:1|0.000,0.000,0.000,0.000|0.000]
+        //
+        const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
         if (!r) {
             return null;
         }
 
-        const firmware = r[1];
-        const version = r[2];
-        const message = _trim(r[3]);
+        const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+
+        const offsetMap = r[2].split(',')
+            .reduce((acc, cur, i) => {
+                acc[axes[i]] = Number(Number(cur).toFixed(3));
+                return acc;
+            }, {});
 
         const payload = {
-            firmware,
-            version,
-            message,
+            id: Number(r[1]),
+            toolOffsets: offsetMap,
+            toolRadius: Number(r[3])
         };
 
         return {
-            type: GrblHalLineParserResultStartup,
+            type: GrblHalLineParserResultTool,
             payload: payload
         };
     }
 }
 
-export default GrblHalLineParserResultStartup;
+export default GrblHalLineParserResultTool;

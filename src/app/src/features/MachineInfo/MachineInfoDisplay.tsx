@@ -16,14 +16,14 @@ export function MachineInfoDisplay({
     pinned,
     setPinned,
 }: MachineInfoDisplayProps) {
-    const { pins, modals, isConnected, settings } = useTypedSelector(
-        (state) => ({
+    const { pins, modals, isConnected, settings, currentTool } =
+        useTypedSelector((state) => ({
             pins: state.controller.state.status?.pinState,
             modals: state.controller.modal,
             isConnected: state.connection.isConnected,
             settings: state.controller.settings,
-        }),
-    );
+            currentTool: state.controller.state.status?.currentTool,
+        }));
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');
 
@@ -124,6 +124,12 @@ export function MachineInfoDisplay({
                     </div>
                 </div>
             </div>
+            {currentTool >= 0 && (
+                <div className="text-gray-500 flex w-full gap-4">
+                    <span>Current tool: </span>
+                    <span className="text-black">T{currentTool}</span>
+                </div>
+            )}
             <div className="flex flex-row gap-4 items-center mt-4">
                 <span className="text-gray-500 dark:text-white">
                     Lock Stepper Motors

@@ -26,6 +26,7 @@ export interface Workspace {
     reverseWidgets: boolean;
     spindleFunctions: boolean;
     coolantFunctions: boolean;
+    atcEnabled: boolean;
     sendUsageData: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;

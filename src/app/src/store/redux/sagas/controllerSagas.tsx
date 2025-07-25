@@ -79,10 +79,12 @@ import {
     updateHomingFlag,
     updateSenderStatus,
     updateControllerType,
+    addSDCardFileToList,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
+    SDCardFile,
     SerialPortOptions,
     WORKFLOW_STATES_T,
 } from '../../definitions';
@@ -912,6 +914,11 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:start', () => {
         errors = [];
+    });
+
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        if (!file) return;
+        reduxStore.dispatch(addSDCardFileToList({ file }));
     });
 
     yield null;

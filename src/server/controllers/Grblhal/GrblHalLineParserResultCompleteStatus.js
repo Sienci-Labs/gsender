@@ -25,7 +25,6 @@ class GrblHalLineParserResultCompleteStatus {
                 result[parts[0]] = parts[1].split(',') || null;
             });
         }
-
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
             payload.activeState = state;
@@ -76,6 +75,18 @@ class GrblHalLineParserResultCompleteStatus {
             pins.split('').forEach(pin => {
                 payload.pinState[pin] = true;
             });
+        }
+
+        // Current Tool
+        if (_.has(result, 'T')) {
+            // Handle updating current tool
+            payload.currentTool = Number(result.T[0]);
+        }
+
+        // Has Homed
+        if (_.has(result, 'H')) {
+            payload.hasHomed = Boolean(Number(result.H[0]));
+            // handle hasHomed
         }
 
         return {
