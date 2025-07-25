@@ -33,7 +33,7 @@ const tools: Tool[] = [
     { id: '2', number: 'T2', identifier: '1/8" Drill', status: 'unprobed' },
     { id: '3', number: 'T3', identifier: '3/8" Face Mill', status: 'probed' },
     { id: '4', number: 'T4', identifier: '1/2" Ball End', status: 'offrack' },
-    { id: '5', number: 'T5', identifier: '', status: 'unprobed' },
+    { id: '5', number: 'T5', identifier: '-', status: 'unprobed' },
     { id: '6', number: 'T6', identifier: 'Spot Drill', status: 'probed' },
 ];
 
@@ -148,14 +148,14 @@ const ToolChangerPopover: React.FC = () => {
                                         </div>
                                     </SelectValue>
                                 </SelectTrigger>
-                                <SelectContent className="bg-white">
+                                <SelectContent className="w-full flex-1 bg-white">
                                     {tools.map((tool) => (
                                         <SelectItem
                                             key={tool.id}
                                             value={tool.id}
                                         >
-                                            <div className="flex items-center gap-2 w-full">
-                                                <span className="font-mono font-semibold text-slate-800 min-w-[2rem]">
+                                            <div className="flex items-center gap-1 min-w-0">
+                                                <span className="font-mono font-semibold text-slate-800 shrink-0">
                                                     {tool.number}
                                                 </span>
                                                 {tool.identifier && (
@@ -163,20 +163,20 @@ const ToolChangerPopover: React.FC = () => {
                                                         {tool.identifier}
                                                     </span>
                                                 )}
-                                                <div className="ml-auto">
-                                                    {toolStatuses[tool.id] ===
-                                                        'probed' && (
-                                                        <CheckCircle className="w-3 h-3 text-green-600" />
-                                                    )}
-                                                    {toolStatuses[tool.id] ===
-                                                        'unprobed' && (
-                                                        <AlertTriangle className="w-3 h-3 text-amber-600" />
-                                                    )}
-                                                    {toolStatuses[tool.id] ===
-                                                        'offrack' && (
-                                                        <AlertCircle className="w-3 h-3 text-orange-600" />
-                                                    )}
-                                                </div>
+                                            </div>
+                                            <div className="flex-none">
+                                                {toolStatuses[tool.id] ===
+                                                    'probed' && (
+                                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                                )}
+                                                {toolStatuses[tool.id] ===
+                                                    'unprobed' && (
+                                                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                                )}
+                                                {toolStatuses[tool.id] ===
+                                                    'offrack' && (
+                                                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                                                )}
                                             </div>
                                         </SelectItem>
                                     ))}
@@ -184,7 +184,6 @@ const ToolChangerPopover: React.FC = () => {
                             </Select>
                         </div>
 
-                        {/* Load Button */}
                         <Button
                             onClick={handleLoad}
                             disabled={isLoading || currentStatus === 'offrack'}
