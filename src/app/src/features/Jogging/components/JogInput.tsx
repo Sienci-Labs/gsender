@@ -1,9 +1,8 @@
 import { Label } from 'app/components/Label';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { FaMinus, FaPlus } from 'react-icons/fa';
-import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
-import store from 'app/store';
 import Button from 'app/components/Button';
+import { toFixedIfNecessary } from 'app/lib/rounding';
 
 interface JogInputProps {
     label: string;
@@ -12,7 +11,6 @@ interface JogInputProps {
 }
 
 export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
-    const units = store.get('workspace.units', METRIC_UNITS);
     const getStep = (increment = false) => {
         let step;
 
@@ -22,7 +20,9 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
             }
             return 0.1;
         }
-        if (currentValue < 0.1) {
+        if (currentValue < 0.01) {
+            step = 0.001;
+        } else if (currentValue < 0.1) {
             step = 0.01;
         } else if (currentValue < 1) {
             step = 0.1;
@@ -58,11 +58,33 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
     };
 
     // rounds the values
-    const formatNewValue = (newValue: number) => {
-        if (units === IMPERIAL_UNITS) {
-            return Number(newValue.toFixed(3));
+    const formatNewValue = (newValue: number, increment = false) => {
+        // sometimes js math messes up the value. ex. 0.7 when pressing + will give you 0.799999999.
+        // this causes problems for this rounding scheme.
+        // so we need to round to 4 decimal places first to get rid of any infinite decimals.
+        // I chose 4 because it's 1 more than our max decimal places, so it shouldn't affect the number we want to display.
+        newValue = Number(newValue.toFixed(4));
+        console.log(newValue);
+        if (newValue < 1) {
+            return toFixedIfNecessary(newValue, 3); // round to max 3 decimal places
+        } else if (newValue < 10) {
+            return toFixedIfNecessary(newValue, 2); // round to max 2 decimal places
         } else {
-            return Number(newValue.toFixed(3));
+            const digitCount = newValue.toFixed(0).length;
+            const x = Number('1'.padEnd(digitCount - 1, '0')); // ex. newValue = 100, x = 10
+            const lower = Number('1'.padEnd(digitCount, '0')); // 10, 100, 1000, etc
+            const higher = Number('2'.padEnd(digitCount, '0')); // 20, 200, 2000, etc
+
+            if (newValue >= lower && newValue < higher) {
+                // ex. >= 10 && < 20
+                return increment
+                    ? Math.floor(newValue / x) * x // ex. 115->120
+                    : Math.ceil(newValue / x) * x; // ex. 115->110
+            } else {
+                // ex. increment: 45.1->55, 45.5->56
+                // ex. decrement: 45.1->35, 45.5->36
+                return Math.round(newValue / x) * x;
+            }
         }
     };
 
@@ -92,7 +114,9 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     type="button"
                     onClick={(e) => {
                         e.preventDefault();
-                        onChange(formatNewValue(currentValue + getStep(true)));
+                        onChange(
+                            formatNewValue(currentValue + getStep(true), true),
+                        );
                     }}
                     size="mini"
                     icon={<FaPlus />}
