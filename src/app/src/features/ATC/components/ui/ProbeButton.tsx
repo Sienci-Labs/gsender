@@ -30,7 +30,6 @@ export const ProbeButton = ({
     };
 
     const config = getButtonConfig();
-    console.log(config);
 
     return (
         <Button

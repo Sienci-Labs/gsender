@@ -83,7 +83,11 @@ const ToolSection = ({
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>
-                                    <Button size="sm" variant="primary">
+                                    <Button
+                                        size="sm"
+                                        variant="primary"
+                                        onClick={probeEntireRack}
+                                    >
                                         Probe All
                                     </Button>
                                 </TableHead>
@@ -112,7 +116,9 @@ const ToolSection = ({
                                     <TableCell>
                                         <ProbeButton
                                             status={'probed'}
-                                            onProbe={() => onProbe?.(tool.id)}
+                                            onProbe={() =>
+                                                probeRackTool(tool.id)
+                                            }
                                         />
                                     </TableCell>
                                 </TableRow>
