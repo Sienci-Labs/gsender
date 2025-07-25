@@ -83,13 +83,17 @@ const ToolSection = ({
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>
-                                    <Button
-                                        size="sm"
-                                        variant="primary"
-                                        onClick={probeEntireRack}
-                                    >
-                                        Probe All
-                                    </Button>
+                                    {defaultOpen ? (
+                                        <Button
+                                            size="sm"
+                                            variant="primary"
+                                            onClick={probeEntireRack}
+                                        >
+                                            Probe All
+                                        </Button>
+                                    ) : (
+                                        'Actions'
+                                    )}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
