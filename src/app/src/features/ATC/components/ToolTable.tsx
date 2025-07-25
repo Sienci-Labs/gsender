@@ -11,14 +11,15 @@ import {
 } from 'app/components/shadcn/Collapsible.tsx';
 import { Badge } from 'app/components/shadcn/Badge.tsx';
 import { ChevronDown } from 'lucide-react';
-import Table from 'app/components/Table';
+
 import {
+    Table,
     TableBody,
+    TableCell,
     TableHead,
     TableHeader,
     TableRow,
-    TableCell,
-} from 'app/components/shadcn/Table.tsx';
+} from 'app/components/shadcn/Table';
 
 export interface ToolInstance {
     id: number;
@@ -74,19 +75,26 @@ const ToolSection = ({
                     className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                 />
             </CollapsibleTrigger>
-            <CollapsibleContent>
-                <div className="mt-2">
+            <CollapsibleContent className="">
+                <div className="z-[9999] mt-2">
+                    <p>test</p>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Tool</TableHead>
+                                <TableHead className={//////////////////ou.xsecrrrrrrrrrt l
+                                    ';9>)?<???R????PO{T>YC cccccccccclccccccccccccccclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclclccccfcc''''''''''''''18'// }>Tool</TableHead>
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Action</TableHead>
                             </TableRow>
                         </TableHeader>
 
-                        <TableBody></TableBody>
+                        <TableBody>
+                            {tools.map((tool) => {
+                                console.log(tool);
+                                return <div>hi</div>;
+                            })}
+                        </TableBody>
                     </Table>
                 </div>
             </CollapsibleContent>
@@ -118,6 +126,12 @@ export function ToolTable({ tools = {} }: ToolTableProps) {
                 tools={onRackTools}
                 onProbe={() => {}}
                 defaultOpen={true}
+            />
+            <ToolSection
+                title="Off-Rack Tools"
+                tools={offRackTools}
+                onProbe={() => {}}
+                defaultOpen={false}
             />
             {/*<table className="w-full text-sm text-left rtl:text-right text-gray-500">
                 <thead className="text-lg text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
