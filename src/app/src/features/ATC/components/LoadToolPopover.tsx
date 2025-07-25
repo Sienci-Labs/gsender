@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     Settings,
-    Search,
     Loader2,
     CheckCircle,
     AlertTriangle,
@@ -20,6 +19,7 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
 import { Button } from 'app/components/Button';
+import controller from 'app/lib/controller.ts';
 
 interface Tool {
     id: string;
@@ -34,12 +34,11 @@ const tools: Tool[] = [
     { id: '3', number: 'T3', identifier: '3/8" Face Mill', status: 'probed' },
     { id: '4', number: 'T4', identifier: '1/2" Ball End', status: 'offrack' },
     { id: '5', number: 'T5', identifier: '-', status: 'unprobed' },
-    { id: '6', number: 'T6', identifier: 'Spot Drill', status: 'probed' },
+    { id: '6', number: 'T10', identifier: 'Spot Drill', status: 'offrack' },
 ];
 
-const ToolChangerPopover: React.FC = () => {
+const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
     const [selectedToolId, setSelectedToolId] = useState<string>(tools[0].id);
-    const [isProbing, setIsProbing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [toolStatuses, setToolStatuses] = useState<
         Record<string, Tool['status']>
@@ -49,25 +48,13 @@ const ToolChangerPopover: React.FC = () => {
         tools.find((tool) => tool.id === selectedToolId) || tools[0];
     const currentStatus = toolStatuses[selectedToolId] || selectedTool.status;
 
-    const handleProbe = async () => {
-        if (currentStatus === 'probed') return;
-
-        setIsProbing(true);
-        // Simulate probing process
-        setTimeout(() => {
-            setToolStatuses((prev) => ({
-                ...prev,
-                [selectedToolId]: 'probed',
-            }));
-            setIsProbing(false);
-        }, 2000);
-    };
-
     const handleLoad = async () => {
         setIsLoading(true);
         // Simulate loading process
+        controller.command('gcode', [`M6 T${selectedToolId}`]);
         setTimeout(() => {
             setIsLoading(false);
+            setIsOpen(false);
         }, 700);
     };
 
@@ -110,25 +97,22 @@ const ToolChangerPopover: React.FC = () => {
     const StatusIcon = statusConfig.icon;
 
     return (
-        <Popover>
+        <Popover open={isOpen}>
             <PopoverTrigger asChild>
-                <Button variant="primary">
+                <Button variant="primary" onClick={() => setIsOpen(!isOpen)}>
                     <Settings className="w-4 h-4 mr-2" />
                     Load
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-96 p-6" align="end">
                 <div className="space-y-2">
-                    {/* Header */}
                     <div>
                         <h3 className="text-lg font-semibold text-slate-800">
                             Select Tool
                         </h3>
                     </div>
 
-                    {/* Tool Selection and Actions */}
                     <div className="flex items-center gap-3">
-                        {/* Tool Select */}
                         <div className="flex-1">
                             <Select
                                 value={selectedToolId}
@@ -186,7 +170,7 @@ const ToolChangerPopover: React.FC = () => {
 
                         <Button
                             onClick={handleLoad}
-                            disabled={isLoading || currentStatus === 'offrack'}
+                            disabled={isLoading}
                             variant="primary"
                             className={`${
                                 currentStatus === 'offrack'
@@ -204,8 +188,6 @@ const ToolChangerPopover: React.FC = () => {
                             )}
                         </Button>
                     </div>
-
-                    {/* Status Indicator */}
                     <div
                         className={`rounded-lg p-4 border ${statusConfig.bgColor} ${statusConfig.borderColor}`}
                     >
