@@ -15,6 +15,7 @@ import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
+import controller from 'app/lib/controller.ts';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
@@ -57,6 +58,7 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
                 }
                 code.push('$$');
                 console.log(code);
+                controller.command('gcode', code);
                 toast.success('EEPROM Settings imported', {
                     position: 'bottom-right',
                 });
