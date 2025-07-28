@@ -11,13 +11,10 @@ import { LoadToolFlyout } from 'app/features/ATC/components/LoadToolFlyout.tsx';
 import LoadToolPopover from 'app/features/ATC/components/LoadToolPopover.tsx';
 import { PiEmpty } from 'react-icons/pi';
 import { useState } from 'react';
-export function ToolDisplay() {
+export function ToolDisplay({ tools }) {
     const [loadToolPopoverOpen, setLoadToolPopoverOpen] = useState(false);
     const currentTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
-    );
-    const toolTable = useTypedSelector(
-        (state: RootState) => state.controller.settings.toolTable,
     );
 
     return (
@@ -36,7 +33,7 @@ export function ToolDisplay() {
                 <div className="flex flex-row gap-4">
                     <span>Offset:</span>
                     <span className="font-bold">
-                        {getToolAxisOffset(currentTool, 'Z', toolTable)}
+                        {getToolAxisOffset(currentTool, 'Z', tools)}
                     </span>
                 </div>
             </div>
@@ -44,6 +41,7 @@ export function ToolDisplay() {
                 <LoadToolPopover
                     isOpen={loadToolPopoverOpen}
                     setIsOpen={setLoadToolPopoverOpen}
+                    tools={tools}
                 />
                 <Button
                     className="flex flex-row gap-2 items-center"

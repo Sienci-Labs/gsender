@@ -20,6 +20,10 @@ import {
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import Button from 'app/components/Button';
+import { FIXED_RACK_SIZE } from 'app/features/ATC/utils/ATCiConstants.ts';
+import partition from 'lodash/partition';
+
+export type ToolStatus = 'probed' | 'unprobed' | 'offrack';
 
 export interface ToolInstance {
     id: number;
@@ -32,7 +36,8 @@ export interface ToolInstance {
         c?: number;
     };
     toolRadius: number;
-    description?: string;
+    nickname?: string;
+    status: ToolStatus;
 }
 
 export function probeRackTool(toolID: number) {
@@ -42,8 +47,6 @@ export function probeRackTool(toolID: number) {
 export function probeEntireRack() {
     controller.command('gcode', ['G65 P300', '$#']);
 }
-
-const FIXED_RACK_SIZE = 8;
 
 const ToolSection = ({
     title,
@@ -106,7 +109,10 @@ const ToolSection = ({
                                             <span className="font-semibold">
                                                 T{tool.id}
                                             </span>
-                                            <ToolNameInput id={tool.id} />
+                                            <ToolNameInput
+                                                id={tool.id}
+                                                nickname={tool.nickname}
+                                            />
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -115,11 +121,11 @@ const ToolSection = ({
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <StatusBadge status={'probed'} />
+                                        <StatusBadge status={tool.status} />
                                     </TableCell>
                                     <TableCell>
                                         <ProbeButton
-                                            status={'probed'}
+                                            status={tool.status}
                                             onProbe={() =>
                                                 probeRackTool(tool.id)
                                             }
@@ -140,18 +146,17 @@ export interface IToolListing {
 }
 
 export interface ToolTableProps {
-    tools: IToolListing;
+    tools: ToolInstance[];
     onProbe?: (toolId: string) => void;
 }
 
-export function ToolTable({ tools = {} }: ToolTableProps) {
-    const onRackTools: ToolInstance[] = Object.values(tools).filter(
+export function ToolTable({ tools = [] }: ToolTableProps) {
+    const [onRackTools, offRackTools] = partition(
+        tools,
         (tool) => tool.id <= FIXED_RACK_SIZE,
     );
-    const offRackTools: ToolInstance[] = Object.values(tools).filter(
-        (tool) => tool.id > FIXED_RACK_SIZE,
-    );
-
+    console.log(onRackTools);
+    console.log(offRackTools);
     return (
         <div className="sm:rounded-lg w-full h-[500px] gap-1 flex flex-col">
             <ToolSection

@@ -2,9 +2,38 @@ import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import get from 'lodash/get';
 import controller from 'app/lib/controller.ts';
+import {
+    IToolListing,
+    ToolInstance,
+} from 'app/features/ATC/components/ToolTable.tsx';
+import { FIXED_RACK_SIZE } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');
+}
+
+export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
+    const toolsArray = [];
+
+    if (!tools) {
+        return [];
+    }
+
+    Object.values(tools).forEach((tool) => {
+        tool = { ...tool };
+        tool.nickname = lookupToolName(tool.id);
+        if (tool.toolOffsets.z < 0) {
+            tool.status = 'probed';
+        } else {
+            tool.status = 'unprobed';
+        }
+        if (tool.id > FIXED_RACK_SIZE) {
+            tool.status = 'offrack';
+        }
+        toolsArray.push(tool);
+    });
+    console.log(toolsArray);
+    return toolsArray;
 }
 
 export function lookupToolName(id: number): string {
@@ -20,13 +49,13 @@ export function setToolName(id, value) {
     store.set(`widgets.atc.toolMap`, toolMap);
 }
 
-export function getToolAxisOffset(tool, axis, table): string {
-    const tableTool = get(table, `${tool}`);
+export function getToolAxisOffset(tool, axis, table: ToolInstance[]): string {
+    const tableTool = table.find((tool) => tool.id === tool);
     if (!tableTool) {
         return 'Empty';
     }
 
-    return get(tableTool, `toolOffsets.${axis}`, '-');
+    return get(tableTool, `toolOffsets.${axis}`, '-') as string;
 }
 
 export function unloadTool() {

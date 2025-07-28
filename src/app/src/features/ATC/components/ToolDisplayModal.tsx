@@ -8,11 +8,9 @@ import Button from 'app/components/Button';
 export function ToolDisplayModal({
     showToolTable = false,
     onOpenChange = () => {},
+    tools,
 }) {
-    const toolTableData = useTypedSelector(
-        (state: RootState) => state.controller.settings.toolTable,
-    );
-
+    console.log('modal', tools);
     return (
         <Dialog open={showToolTable} onOpenChange={onOpenChange}>
             <DialogTitle>
@@ -20,7 +18,11 @@ export function ToolDisplayModal({
             </DialogTitle>
             <DialogContent className="overflow-hidden p-0 shadow-lg w-2/5">
                 <div className="flex flex-col bg-white overflow-y-auto h-full p-4 gap-4">
-                    <ToolTable tools={toolTableData} hideFunctions={false} />
+                    <ToolTable
+                        tools={tools}
+                        hideFunctions={false}
+                        tools={tools}
+                    />
                 </div>
             </DialogContent>
         </Dialog>

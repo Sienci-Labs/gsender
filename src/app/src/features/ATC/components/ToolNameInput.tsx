@@ -5,12 +5,14 @@ import {
     setToolName,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 
-export function ToolNameInput({ id = 0 }: { id: number }) {
-    const [name, setName] = useState('-');
-
-    useEffect(() => {
-        setName(lookupToolName(id));
-    }, []);
+export function ToolNameInput({
+    id = 0,
+    nickname = '-',
+}: {
+    id: number;
+    nickname: string;
+}) {
+    const [name, setName] = useState(nickname);
 
     function handleNameRemap(e) {
         const value = e.target.value;

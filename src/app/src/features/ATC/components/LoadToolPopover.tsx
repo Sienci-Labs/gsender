@@ -20,33 +20,18 @@ import {
 } from 'app/components/shadcn/Select.tsx';
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
+import {
+    ToolInstance,
+    ToolStatus,
+} from 'app/features/ATC/components/ToolTable.tsx';
 
-interface Tool {
-    id: string;
-    number: string;
-    identifier?: string;
-    status: 'probed' | 'unprobed' | 'offrack';
-}
-
-const tools: Tool[] = [
-    { id: '1', number: 'T1', identifier: '1/4" End Mill', status: 'probed' },
-    { id: '2', number: 'T2', identifier: '1/8" Drill', status: 'unprobed' },
-    { id: '3', number: 'T3', identifier: '3/8" Face Mill', status: 'probed' },
-    { id: '4', number: 'T4', identifier: '1/2" Ball End', status: 'offrack' },
-    { id: '5', number: 'T5', identifier: '-', status: 'unprobed' },
-    { id: '6', number: 'T10', identifier: 'Spot Drill', status: 'offrack' },
-];
-
-const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
-    const [selectedToolId, setSelectedToolId] = useState<string>(tools[0].id);
+const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen, tools = [] }) => {
+    const [selectedToolId, setSelectedToolId] = useState<string>('1');
     const [isLoading, setIsLoading] = useState(false);
-    const [toolStatuses, setToolStatuses] = useState<
-        Record<string, Tool['status']>
-    >(tools.reduce((acc, tool) => ({ ...acc, [tool.id]: tool.status }), {}));
 
     const selectedTool =
         tools.find((tool) => tool.id === selectedToolId) || tools[0];
-    const currentStatus = toolStatuses[selectedToolId] || selectedTool.status;
+    const currentStatus = selectedTool?.status || 'probed';
 
     const handleLoad = async () => {
         setIsLoading(true);
@@ -58,7 +43,7 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
         }, 700);
     };
 
-    const getStatusConfig = (status: Tool['status']) => {
+    const getStatusConfig = (status: ToolStatus) => {
         switch (status) {
             case 'probed':
                 return {
@@ -96,6 +81,8 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
     const statusConfig = getStatusConfig(currentStatus);
     const StatusIcon = statusConfig.icon;
 
+    console.log('load tools', tools);
+
     return (
         <Popover open={isOpen}>
             <PopoverTrigger asChild>
@@ -122,11 +109,11 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
                                     <SelectValue>
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono font-semibold text-slate-800">
-                                                {selectedTool.number}
+                                                {selectedTool?.id}
                                             </span>
-                                            {selectedTool.identifier && (
+                                            {selectedTool?.nickname && (
                                                 <span className="text-slate-600 text-sm truncate">
-                                                    {selectedTool.identifier}
+                                                    {selectedTool.nickname}
                                                 </span>
                                             )}
                                         </div>
@@ -140,25 +127,23 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen }) => {
                                         >
                                             <div className="flex items-center gap-1 min-w-0">
                                                 <span className="font-mono font-semibold text-slate-800 shrink-0">
-                                                    {tool.number}
+                                                    {tool?.id}
                                                 </span>
-                                                {tool.identifier && (
+                                                {tool?.nickname && (
                                                     <span className="text-slate-600 text-sm truncate">
-                                                        {tool.identifier}
+                                                        {tool.nickname}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex-none">
-                                                {toolStatuses[tool.id] ===
-                                                    'probed' && (
+                                                {tool?.status === 'probed' && (
                                                     <CheckCircle className="w-4 h-4 text-green-600" />
                                                 )}
-                                                {toolStatuses[tool.id] ===
+                                                {tool?.status ===
                                                     'unprobed' && (
                                                     <AlertTriangle className="w-4 h-4 text-amber-600" />
                                                 )}
-                                                {toolStatuses[tool.id] ===
-                                                    'offrack' && (
+                                                {tool?.status === 'offrack' && (
                                                     <AlertCircle className="w-4 h-4 text-orange-600" />
                                                 )}
                                             </div>

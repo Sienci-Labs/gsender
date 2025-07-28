@@ -1,6 +1,6 @@
-import { ToolStatus } from 'app/features/ATC/components/ui/StatusBadge.tsx';
 import { Button } from 'app/components/Button/';
 import { Settings } from 'lucide-react';
+import { ToolStatus } from 'app/features/ATC/components/ToolTable.tsx';
 
 export const ProbeButton = ({
     status,
@@ -9,6 +9,7 @@ export const ProbeButton = ({
     status: ToolStatus;
     onProbe?: () => void;
 }) => {
+    console.log(status);
     const getButtonConfig = () => {
         switch (status) {
             case 'probed':
@@ -21,10 +22,15 @@ export const ProbeButton = ({
                     variant: 'warning' as const,
                     text: 'Probe Tool',
                 };
-            case 'off-rack':
+            case 'offrack':
                 return {
                     variant: 'error' as const,
                     text: 'Off Rack',
+                };
+            default:
+                return {
+                    variant: 'error' as const,
+                    text: 'Unknown',
                 };
         }
     };

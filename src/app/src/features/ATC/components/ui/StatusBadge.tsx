@@ -1,7 +1,7 @@
 import { Badge } from 'app/features/ATC/components/ui/Badge';
 
-export type ToolStatus = 'probed' | 'unprobed' | 'off-rack';
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
+import { ToolStatus } from 'app/features/ATC/components/ToolTable.tsx';
 
 export const StatusBadge = ({ status }: { status: ToolStatus }) => {
     const statusConfig = {
@@ -15,10 +15,15 @@ export const StatusBadge = ({ status }: { status: ToolStatus }) => {
             icon: AlertCircle,
             label: 'Unprobed',
         },
-        'off-rack': {
+        offrack: {
             variant: 'error' as const,
             icon: XCircle,
             label: 'Off Rack',
+        },
+        default: {
+            variant: 'error' as const,
+            icon: XCircle,
+            label: 'Unknown',
         },
     };
 
