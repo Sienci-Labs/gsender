@@ -765,7 +765,7 @@ class Visualizer extends Component {
         const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
         const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = units === IMPERIAL_UNITS ? inches.height : mm.height;
+        const height = 170;
 
         const { currentTheme } = this.props.state;
 
@@ -1251,7 +1251,7 @@ class Visualizer extends Component {
         const metricGridCount = Math.ceil(mmMax / 9);
 
         const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = units === IMPERIAL_UNITS ? inches.height : mm.height;
+        const height = 170;
         const gridCount =
             units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
         const gridSpacing =
