@@ -732,7 +732,6 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-        console.log(metGroup.getObjectByName('GridLine').material);
 
        /*{
             // Imperial Coordinate System
