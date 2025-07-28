@@ -374,7 +374,8 @@ class Visualizer extends Component {
             const imperialCoordinateSystem = this.group.getObjectByName(
                 'ImperialCoordinateSystem',
             );
-            if (imperialCoordinateSystem) {``
+            if (imperialCoordinateSystem) {
+                ``;
                 imperialCoordinateSystem.visible =
                     visible && state.units === IMPERIAL_UNITS;
             }
@@ -604,7 +605,8 @@ class Visualizer extends Component {
     }
 
     async uploadGCodeFile(gcode) {
-        const serializedFile = new File([gcode], 'surfacing.gcode');
+        const name = this.props.fileName || 'surfacing.gcode';
+        const serializedFile = new File([gcode], name);
 
         await uploadGcodeFileToServer(
             serializedFile,
@@ -731,7 +733,8 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-        {
+
+       /*{
             // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
                 o.material.color.set(currentTheme.get(GRID_PART));
@@ -741,9 +744,14 @@ class Visualizer extends Component {
         {
             // Metric Coordinate System
             _each(metGroup.getObjectByName('GridLine').children, (o) => {
+                console.log('before', o.material.color);k
                 o.material.color.set(currentTheme.get(GRID_PART));
+                console.log('after', o.material.color);
             });
-        }
+            const o = metGroup.getObjectByName('GridLine');
+            console.log(o);
+            console.log(o.material.color);
+        }*/
 
         this.recolorGridLabels(IMPERIAL_UNITS);
         this.recolorGridLabels(METRIC_UNITS);
@@ -758,7 +766,7 @@ class Visualizer extends Component {
         const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
         const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = units === IMPERIAL_UNITS ? inches.height : mm.height;
+        const height = 170;
 
         const { currentTheme } = this.props.state;
 
@@ -921,27 +929,40 @@ class Visualizer extends Component {
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
 
-                const showWarningsOnLoad = store.get('widgets.visualizer.showWarning', false);
+                const showWarningsOnLoad = store.get(
+                    'widgets.visualizer.showWarning',
+                    false,
+                );
                 if (showWarningsOnLoad) {
-                    const invalidLines = _get(data, 'parsedData.invalidLines', []);
+                    const invalidLines = _get(
+                        data,
+                        'parsedData.invalidLines',
+                        [],
+                    );
                     if (invalidLines.length > 0) {
                         // Put it in the modal somehow
                         const lineSample = invalidLines.slice(0, 5);
                         const description = (
-                            <div className={"flex flex-col gap-2"}>
-                                <p>Detected {invalidLines.length} invalid lines on file load.  Your job may not run correctly.</p>
+                            <div className={'flex flex-col gap-2'}>
+                                <p>
+                                    Detected {invalidLines.length} invalid lines
+                                    on file load. Your job may not run
+                                    correctly.
+                                </p>
                                 <p>Sample invalid lines found include:</p>
                                 <ol>
-                                    {
-                                        lineSample.map((line) => (<li className="text-xs">-<b> {line}</b></li>))
-                                    }
+                                    {lineSample.map((line) => (
+                                        <li className="text-xs">
+                                            -<b> {line}</b>
+                                        </li>
+                                    ))}
                                 </ol>
                             </div>
-                        )
+                        );
                         pubsub.publish('helper:info', {
-                            title: "Invalid Lines Detected",
-                            description
-                        })
+                            title: 'Invalid Lines Detected',
+                            description,
+                        });
                     }
                 }
 
@@ -1034,12 +1055,11 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 // We want to make sure that in situations outline fails, you can try again in ~5 seconds
-                setTimeout((() => {
+                setTimeout(() => {
                     this.outlineRunning = false;
-                }), 5000)
+                }, 5000);
 
                 const vertices = this.props.actions.getHull();
-                console.log(vertices.length);
                 const outlineWorker = new Worker(
                     new URL('../../workers/Outline.worker.js', import.meta.url),
                     { type: 'module' },
@@ -1058,7 +1078,6 @@ class Visualizer extends Component {
                     // Enable the outline button again
                     this.outlineRunning = false;
                 };
-                console.log('Pre postmessage');
                 outlineWorker.postMessage({
                     isLaser,
                     parsedData: vertices,
@@ -1233,7 +1252,7 @@ class Visualizer extends Component {
         const metricGridCount = Math.ceil(mmMax / 9);
 
         const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = units === IMPERIAL_UNITS ? inches.height : mm.height;
+        const height = 170;
         const gridCount =
             units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
         const gridSpacing =
@@ -2519,6 +2538,7 @@ export default connect(
         const fileType = _get(store, 'file.fileType');
         const controllerType = _get(store, 'controller.type');
         const senderStatus = _get(store, 'controller.sender.status');
+        const fileName = _get(store, 'file.name');
 
         return {
             machinePosition,
@@ -2536,6 +2556,7 @@ export default connect(
             fileType,
             controllerType,
             senderStatus,
+            fileName
         };
     },
     null,

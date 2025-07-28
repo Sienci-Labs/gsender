@@ -15,6 +15,7 @@ import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
+import controller from 'app/lib/controller.ts';
 
 interface ProfileBarProps {
     setShowFlashDialog: () => void;
@@ -50,20 +51,17 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         try {
             importFirmwareSettings(file, (e) => {
                 const uploadedSettings = JSON.parse(e.target.result);
-                let newSetting = false;
-                setEEPROM((prev) =>
-                    prev.map((item) => {
-                        let value = item.value;
-                        if (uploadedSettings[item.setting]) {
-                            newSetting = true;
-                            value = uploadedSettings[item.setting];
-                        }
-                        return { ...item, value: value, dirty: true };
-                    }),
-                );
-            });
-            toast.success('EEPROM Settings imported', {
-                position: 'bottom-right',
+                const code = [];
+
+                for (const [key, value] of Object.entries(uploadedSettings)) {
+                    code.push(`${key}=${value}`);
+                }
+                code.push('$$');
+
+                controller.command('gcode', code);
+                toast.success('EEPROM Settings imported', {
+                    position: 'bottom-right',
+                });
             });
         } catch (e) {
             toast.error('Unable to import settings', {

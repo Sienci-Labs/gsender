@@ -93,11 +93,12 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
-            axes: {
-                count: 3,
-                axes: ['X', 'Y', 'Z']
-            },
-        }
+
+        },
+        axes: {
+            count: 0,
+            axes: []
+        },
     };
 
     settings = {
@@ -488,6 +489,15 @@ class GrblHalRunner extends events.EventEmitter {
 
     deleteSettings() {
         this.settings.settings = {};
+    }
+
+    hasSettings() {
+        return !_.isEmpty(this.settings.settings);
+    }
+
+    hasAXS() {
+        const axs = _.get(this.state, 'axes.axes', []);
+        return !_.isEmpty(axs);
     }
 }
 
