@@ -36,6 +36,18 @@ export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
     return toolsArray;
 }
 
+function setToolStatus(tool: ToolInstance): ToolInstance {
+    if (tool.toolOffsets.z < 0) {
+        tool.status = 'probed';
+    } else {
+        tool.status = 'unprobed';
+    }
+    if (tool.id > FIXED_RACK_SIZE) {
+        tool.status = 'offrack';
+    }
+    return tool;
+}
+
 export function lookupToolName(id: number): string {
     return store.get(`widgets.atc.toolMap.${id}`, '-');
 }
@@ -47,6 +59,17 @@ export function setToolName(id, value) {
         [id]: value,
     };
     store.set(`widgets.atc.toolMap`, toolMap);
+}
+
+export function lookupSpecificTool(toolID, toolTable): ToolInstance {
+    let tool = toolTable.find((tool) => tool.id === toolID);
+    if (!tool) {
+        return null;
+    }
+    tool = { ...tool };
+    tool.nickname = lookupToolName(tool.id);
+    tool = setToolStatus(tool);
+    return tool;
 }
 
 export function getToolAxisOffset(tool, axis, table: ToolInstance[]): string {
