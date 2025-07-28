@@ -82,7 +82,7 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
+import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
@@ -644,6 +644,11 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.initialized = true;
+                this.initController();
+            }
+
             //
             if (this.homingStarted) {
                 // We look at bit instead of faking it with machine positions

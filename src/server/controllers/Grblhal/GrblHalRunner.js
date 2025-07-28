@@ -447,6 +447,10 @@ class GrblHalRunner extends events.EventEmitter {
     deleteSettings() {
         this.settings.settings = {};
     }
+
+    hasSettings() {
+        return !_.isEmpty(this.settings.settings);
+    }
 }
 
 export default GrblHalRunner;
