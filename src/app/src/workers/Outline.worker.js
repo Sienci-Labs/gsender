@@ -26,6 +26,7 @@ import chunk from 'lodash/chunk';
 
 self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
+    console.log('outline called');
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
