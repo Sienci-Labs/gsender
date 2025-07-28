@@ -52,12 +52,12 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
             importFirmwareSettings(file, (e) => {
                 const uploadedSettings = JSON.parse(e.target.result);
                 const code = [];
-                console.log(uploadedSettings);
+
                 for (const [key, value] of Object.entries(uploadedSettings)) {
                     code.push(`${key}=${value}`);
                 }
                 code.push('$$');
-                console.log(code);
+
                 controller.command('gcode', code);
                 toast.success('EEPROM Settings imported', {
                     position: 'bottom-right',

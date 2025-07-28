@@ -22,12 +22,11 @@
  */
 
 import hull from 'hull.js';
-im
 import chunk from 'lodash/chunk';
 
 self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [] } = data;
-    console.log('testing!!!');
+
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
         parsedData.forEach((n) => vertices.push(n.toFixed(3)));
