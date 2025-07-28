@@ -732,7 +732,7 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-        {
+       /*{
             // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
                 o.material.color.set(currentTheme.get(GRID_PART));
@@ -742,9 +742,14 @@ class Visualizer extends Component {
         {
             // Metric Coordinate System
             _each(metGroup.getObjectByName('GridLine').children, (o) => {
+                console.log('before', o.material.color);k
                 o.material.color.set(currentTheme.get(GRID_PART));
+                console.log('after', o.material.color);
             });
-        }
+            const o = metGroup.getObjectByName('GridLine');
+            console.log(o);
+            console.log(o.material.color);
+        }*/
 
         this.recolorGridLabels(IMPERIAL_UNITS);
         this.recolorGridLabels(METRIC_UNITS);
