@@ -605,7 +605,8 @@ class Visualizer extends Component {
     }
 
     async uploadGCodeFile(gcode) {
-        const serializedFile = new File([gcode], 'surfacing.gcode');
+        const name = this.props.fileName || 'surfacing.gcode';
+        const serializedFile = new File([gcode], name);
 
         await uploadGcodeFileToServer(
             serializedFile,
@@ -2537,6 +2538,7 @@ export default connect(
         const fileType = _get(store, 'file.fileType');
         const controllerType = _get(store, 'controller.type');
         const senderStatus = _get(store, 'controller.sender.status');
+        const fileName = _get(store, 'file.name');
 
         return {
             machinePosition,
@@ -2554,6 +2556,7 @@ export default connect(
             fileType,
             controllerType,
             senderStatus,
+            fileName
         };
     },
     null,
