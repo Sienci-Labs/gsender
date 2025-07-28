@@ -89,11 +89,12 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
-            axes: {
-                count: 0,
-                axes: []
-            },
-        }
+
+        },
+        axes: {
+            count: 0,
+            axes: []
+        },
     };
 
     settings = {
@@ -453,9 +454,7 @@ class GrblHalRunner extends events.EventEmitter {
     }
 
     hasAXS() {
-        console.log(this.state.parserState.axes.axes);
-        const axs = _.get(this.state, 'parserstate.axes.axes', []);
-        console.log(axs);
+        const axs = _.get(this.state, 'axes.axes', []);
         return !_.isEmpty(axs);
     }
 }
