@@ -453,6 +453,7 @@ class GrblHalRunner extends events.EventEmitter {
     }
 
     hasAXS() {
+        console.log(this.state.parserState.axes.axes);
         const axs = _.get(this.state, 'parserstate.axes.axes', []);
         console.log(axs);
         return !_.isEmpty(axs);

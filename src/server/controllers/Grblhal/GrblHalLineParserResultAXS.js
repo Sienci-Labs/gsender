@@ -5,8 +5,6 @@ class GrblHalLineParserResultAXS {
             return null;
         }
 
-        console.log(r);
-
         const axisInformation = r[1].split(':');
 
         const axisCount = Number(axisInformation[0]);
