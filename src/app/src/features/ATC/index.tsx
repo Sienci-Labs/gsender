@@ -40,7 +40,6 @@ export function ATC() {
                 />
             </div>
             <ToolDisplay tools={tools} />
-            <ToolRackFunctions tools={tools} />
         </div>
     );
 }

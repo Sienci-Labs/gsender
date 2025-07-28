@@ -12,7 +12,11 @@ export function ToolNameInput({
     id: number;
     nickname: string;
 }) {
-    const [name, setName] = useState(nickname);
+    const [name, setName] = useState('-');
+
+    useEffect(() => {
+        setName(lookupToolName(id));
+    }, []);
 
     function handleNameRemap(e) {
         const value = e.target.value;
