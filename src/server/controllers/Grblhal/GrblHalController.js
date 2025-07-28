@@ -649,6 +649,11 @@ class GrblHalController {
                 this.initController();
             }
 
+            // Make sure we also have axs parsed.
+            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.writeln('$I');
+            }
+
             //
             if (this.homingStarted) {
                 // We look at bit instead of faking it with machine positions
