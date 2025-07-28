@@ -113,10 +113,10 @@ export const LIGHT_THEME_VALUES = new Map([
     [YAXIS_PART, '#06b881'], //Light Green
     [ZAXIS_PART, '#295d8d'], //Light Green
     [LIMIT_PART, '#5191cc'], //Indian Red
-    [CUTTING_PART, '#000000'],
+    [CUTTING_PART, '#FFF'],
     [JOGGING_PART, '#0ef6ae'], // Light Green
-    [PLANNED_PART, '#dff204'], // Yellow
-    [G0_PART, '#0ef6ae'], // Light Green
+    [PLANNED_PART, '#c9883d'], // Yellow
+    [G0_PART, '#295d8d'], // Light Green
     [G1_PART, '#111827'], // Dark Blue
     [G2_PART, '#111827'], // Dark Blue
     [G3_PART, '#111827'], // Dark Blue

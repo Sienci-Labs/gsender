@@ -41,7 +41,7 @@ onmessage = function ({ data }) {
         spindleChanges,
         theme,
     } = data;
-
+    console.log('worker theme', theme);
     let savedColors = [];
 
     const updateLaserModeColors = () => {
@@ -72,6 +72,7 @@ onmessage = function ({ data }) {
         colors.forEach((colorTag) => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
+            console.log('color', color);
             colorArray.push(...color.toArray(), opacity);
         });
         savedColors = colorArray;
@@ -92,6 +93,7 @@ onmessage = function ({ data }) {
         G3: new THREE.Color(theme.get(G3_PART)),
         default: defaultColor,
     };
+    console.log('motionColor', motionColor);
 
     //this.geometry.setFromPoints(this.vertices);
     const colorArray = getColorTypedArray(colors, motionColor);
