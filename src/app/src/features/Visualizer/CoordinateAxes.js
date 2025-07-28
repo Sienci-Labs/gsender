@@ -69,7 +69,6 @@ class CoordinateAxes {
         const red = '#df3b3b';
         const green = '#06b881';
         const blue = '#5191cc';
-        console.log("other height", height);
 
         this.group.add(
             buildAxis(
