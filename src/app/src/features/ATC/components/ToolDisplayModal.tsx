@@ -24,7 +24,7 @@ export function ToolDisplayModal({
                     Tools
                 </Button>
             </DialogTitle>
-            <DialogContent className="overflow-hidden p-0 shadow-lg w-2/5">
+            <DialogContent className="overflow-hidden p-0 shadow-lg w-3/5">
                 <div className="flex flex-col bg-white overflow-y-auto h-full p-4 gap-4">
                     <ToolTable
                         tools={tools}
