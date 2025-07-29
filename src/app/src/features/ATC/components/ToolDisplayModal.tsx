@@ -11,7 +11,6 @@ export function ToolDisplayModal({
     onOpenChange = () => {},
     tools,
 }) {
-    console.log('modal', tools);
     return (
         <Dialog open={showToolTable} onOpenChange={onOpenChange}>
             <DialogTitle >

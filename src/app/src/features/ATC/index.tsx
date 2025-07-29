@@ -18,7 +18,6 @@ export function ATC() {
     );
 
     useEffect(() => {
-        console.log(toolTableData);
         setTools(mapToolNicknamesAndStatus(toolTableData));
     }, [toolTableData]);
 

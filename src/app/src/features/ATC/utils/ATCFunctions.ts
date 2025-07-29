@@ -32,7 +32,6 @@ export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
         }
         toolsArray.push(tool);
     });
-    console.log(toolsArray);
     return toolsArray;
 }
 
@@ -62,7 +61,6 @@ export function setToolName(id, value) {
 }
 
 export function lookupSpecificTool(toolID = -1, toolTable = {}): ToolInstance {
-    console.log(toolTable);
     let tool = Object.values(toolTable).find((tool) => tool.id === toolID);
     if (!tool) {
         return null;

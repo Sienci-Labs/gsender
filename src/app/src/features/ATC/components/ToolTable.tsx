@@ -45,6 +45,7 @@ export function probeRackTool(toolID: number) {
 }
 
 export function probeEntireRack() {
+    console.log('called');
     controller.command('gcode', ['G65 P300', '$#']);
 }
 
@@ -155,8 +156,7 @@ export function ToolTable({ tools = [] }: ToolTableProps) {
         tools,
         (tool) => tool.id <= FIXED_RACK_SIZE,
     );
-    console.log(onRackTools);
-    console.log(offRackTools);
+
     return (
         <div className="sm:rounded-lg w-full h-[500px] gap-1 flex flex-col">
             <ToolSection

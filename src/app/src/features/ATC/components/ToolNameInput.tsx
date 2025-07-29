@@ -31,6 +31,7 @@ export function ToolNameInput({
                 type="text"
                 value={name}
                 onChange={handleNameRemap}
+                disabled={id < 1}
             />
         </div>
     );

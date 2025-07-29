@@ -9,7 +9,6 @@ export const ProbeButton = ({
     status: ToolStatus;
     onProbe?: () => void;
 }) => {
-    console.log(status);
     const getButtonConfig = () => {
         switch (status) {
             case 'probed':

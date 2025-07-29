@@ -1,8 +1,9 @@
-import { ToolStatus } from 'app/features/ATC/components/ToolTable.tsx';
+import {ToolInstance, ToolStatus} from 'app/features/ATC/components/ToolTable.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
+import {ToolNameInput} from "app/features/ATC/components/ToolNameInput.tsx";
 
 interface ToolInfoWidgetProps {
     toolNumber: number;
@@ -19,7 +20,16 @@ export function CurrentToolInfo({
     status = 'probed',
     onLoadTool,
 }) {
-    const [selectedTool, setSelectedTool] = useState({});
+    const [selectedTool, setSelectedTool] = useState<ToolInstance>({
+        id: -1,
+        nickname: '-',
+        toolOffsets: {
+            x: 0,
+            y: 0,
+            z: 0
+        }, status: 'unprobed',
+        toolRadius: 0
+    });
     const currentTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
     );
@@ -27,11 +37,13 @@ export function CurrentToolInfo({
         (state: RootState) => state.controller.settings.toolTable,
     );
 
+
     useEffect(() => {
         if (currentTool) {
             let populatedTool = lookupSpecificTool(currentTool, toolTable);
-            console.log(populatedTool);
+            console.log(currentTool);
             if (populatedTool) {
+                console.log(populatedTool);
                 setSelectedTool(populatedTool);
             }
         }
@@ -42,7 +54,7 @@ export function CurrentToolInfo({
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <h1 className="text-xl font-bold text-gray-900">
-                        {toolNumber ? `T${toolNumber}` : 'Empty'}
+                        {currentTool ? `T${currentTool}` : 'Empty'}
                     </h1>
                 </div>
 
@@ -64,9 +76,7 @@ export function CurrentToolInfo({
                     <span className="text-sm font-medium text-gray-700 w-20">
                         Tool Name:
                     </span>
-                    <div className="flex-1 border border-gray-300 rounded px-3 py-2 bg-gray-50">
-                        <span className="text-gray-800">{nickname || '-'}</span>
-                    </div>
+                    <ToolNameInput id={selectedTool?.id} nickname={selectedTool?.nickname} />
                 </div>
 
                 {/* Z Offset Row */}

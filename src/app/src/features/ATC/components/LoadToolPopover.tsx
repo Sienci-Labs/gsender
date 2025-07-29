@@ -81,7 +81,6 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen, tools = [] }) => {
     const statusConfig = getStatusConfig(currentStatus);
     const StatusIcon = statusConfig.icon;
 
-    console.log('load tools', tools);
 
     return (
         <Popover open={isOpen}>
