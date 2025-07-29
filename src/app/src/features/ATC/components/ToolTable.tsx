@@ -53,13 +53,14 @@ const ToolSection = ({
     title,
     tools,
     onProbe,
+    disabled,
     defaultOpen = true,
 }: {
     title: string;
     tools: ToolInstance[];
     onProbe?: (toolId: string) => void;
     defaultOpen?: boolean;
-    disabled;
+    disabled?: boolean;
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -153,7 +154,7 @@ export interface ToolTableProps {
     onProbe?: (toolId: string) => void;
 }
 
-export function ToolTable({ tools = [] }: ToolTableProps) {
+export function ToolTable({ tools = [], disabled }: ToolTableProps) {
     const [onRackTools, offRackTools] = partition(
         tools,
         (tool) => tool.id <= FIXED_RACK_SIZE,
@@ -166,12 +167,14 @@ export function ToolTable({ tools = [] }: ToolTableProps) {
                 tools={onRackTools}
                 onProbe={() => {}}
                 defaultOpen={true}
+                disabled={disabled}
             />
             <ToolSection
                 title="Off-Rack Tools"
                 tools={offRackTools}
                 onProbe={() => {}}
                 defaultOpen={false}
+                disabled={disabled}
             />
         </div>
     );

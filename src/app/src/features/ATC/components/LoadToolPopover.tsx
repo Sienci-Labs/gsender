@@ -87,7 +87,7 @@ const ToolChangerPopover: React.FC = ({
     const StatusIcon = statusConfig.icon;
 
     return (
-        <Popover open={isOpen}>
+        <Popover open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
             <PopoverTrigger asChild>
                 <Button
                     disabled={disabled}

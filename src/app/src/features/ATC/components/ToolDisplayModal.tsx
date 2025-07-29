@@ -30,6 +30,7 @@ export function ToolDisplayModal({
                         tools={tools}
                         hideFunctions={false}
                         tools={tools}
+                        disabled={disabled}
                     />
                 </div>
             </DialogContent>
