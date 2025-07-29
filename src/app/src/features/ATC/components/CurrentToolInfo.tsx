@@ -12,7 +12,6 @@ import controller from 'app/lib/controller.ts';
 
 export function CurrentToolInfo({
     toolNumber = 1,
-    zOffset = 0,
     status = 'probed',
     onLoadTool,
     disabled,
@@ -63,7 +62,7 @@ export function CurrentToolInfo({
                 </div>
 
                 {/* Conditional Load Button */}
-                {status === 'Off-rack' && (
+                {selectedTool?.status === 'offrack' && (
                     <button
                         onClick={onLoadTool}
                         className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 whitespace-nowrap"
