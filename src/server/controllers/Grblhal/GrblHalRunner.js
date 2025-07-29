@@ -183,6 +183,8 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultCompleteStatus) {
             delete payload.raw;
+
+            console.log(payload);
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
             // A current work coordinate offset is now sent to easily convert
