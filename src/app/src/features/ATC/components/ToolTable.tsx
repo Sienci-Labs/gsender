@@ -59,6 +59,7 @@ const ToolSection = ({
     tools: ToolInstance[];
     onProbe?: (toolId: string) => void;
     defaultOpen?: boolean;
+    disabled;
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -92,6 +93,7 @@ const ToolSection = ({
                                             size="sm"
                                             variant="primary"
                                             onClick={probeEntireRack}
+                                            disabled={disabled}
                                         >
                                             Probe All
                                         </Button>

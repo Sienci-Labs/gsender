@@ -25,7 +25,12 @@ import {
     ToolStatus,
 } from 'app/features/ATC/components/ToolTable.tsx';
 
-const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen, tools = [] }) => {
+const ToolChangerPopover: React.FC = ({
+    isOpen,
+    setIsOpen,
+    disabled,
+    tools = [],
+}) => {
     const [selectedToolId, setSelectedToolId] = useState<string>('1');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -81,11 +86,14 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen, tools = [] }) => {
     const statusConfig = getStatusConfig(currentStatus);
     const StatusIcon = statusConfig.icon;
 
-
     return (
         <Popover open={isOpen}>
             <PopoverTrigger asChild>
-                <Button variant="primary" onClick={() => setIsOpen(!isOpen)}>
+                <Button
+                    disabled={disabled}
+                    variant="primary"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
                     <Settings className="w-4 h-4 mr-2" />
                     Load
                 </Button>

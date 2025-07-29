@@ -21,7 +21,7 @@ export function ATC() {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const disabledButton = !!isConnected;
+    const disabledButton = !isConnected;
 
     useEffect(() => {
         setTools(mapToolNicknamesAndStatus(toolTableData));

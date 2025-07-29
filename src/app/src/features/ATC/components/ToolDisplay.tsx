@@ -25,6 +25,7 @@ export function ToolDisplay({ tools, disabled }) {
                     isOpen={loadToolPopoverOpen}
                     setIsOpen={setLoadToolPopoverOpen}
                     tools={tools}
+                    disabled={disabled}
                 />
                 <Button
                     className="flex flex-row gap-2 items-center"
