@@ -18,7 +18,7 @@ export const StatusBadge = ({ status }: { status: ToolStatus }) => {
         offrack: {
             variant: 'error' as const,
             icon: XCircle,
-            label: 'Off Rack',
+            label: 'Off-rack',
         },
         default: {
             variant: 'error' as const,

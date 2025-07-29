@@ -84,7 +84,7 @@ const ToolSection = ({
                 <div className="mt-2">
                     <Table>
                         <TableHeader>
-                            <TableRow>
+                            <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr]">
                                 <TableHead>Tool</TableHead>
                                 <TableHead>Z Offset</TableHead>
                                 <TableHead>Status</TableHead>
@@ -107,7 +107,10 @@ const ToolSection = ({
 
                         <TableBody>
                             {tools.map((tool) => (
-                                <TableRow key={tool.id}>
+                                <TableRow
+                                    key={tool.id}
+                                    className="grid grid-cols-[2fr_1fr_1fr_1fr]"
+                                >
                                     <TableCell className="font-mono">
                                         <div className="flex flex-col">
                                             <span className="font-semibold">
