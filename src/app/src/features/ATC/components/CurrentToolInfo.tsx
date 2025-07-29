@@ -94,7 +94,7 @@ export function CurrentToolInfo({
                     <div className="flex-1 flex-row flex gap-7">
                         <div className="flex items-center gap-3">
                             <span className="text-robin-900 font-medium border-2 rounded-lg px-3 py-2 font-mono border-robin-300 bg-robin-100">
-                                {zOffset.toFixed(3)}
+                                {selectedTool?.toolOffsets?.z?.toFixed(3)}
                             </span>
                         </div>
                         <Button
