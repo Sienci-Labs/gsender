@@ -1,26 +1,21 @@
-import {ToolInstance, ToolStatus} from 'app/features/ATC/components/ToolTable.tsx';
+import {
+    ToolInstance,
+    ToolStatus,
+} from 'app/features/ATC/components/ToolTable.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
-import {ToolNameInput} from "app/features/ATC/components/ToolNameInput.tsx";
+import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import { Button } from 'app/components/Button';
-import controller from "app/lib/controller.ts";
-
-interface ToolInfoWidgetProps {
-    toolNumber: number;
-    nickname?: string;
-    zOffset: number;
-    status: ToolStatus;
-    onLoadTool?: () => void;
-}
+import controller from 'app/lib/controller.ts';
 
 export function CurrentToolInfo({
     toolNumber = 1,
-    nickname = 0,
     zOffset = 0,
     status = 'probed',
     onLoadTool,
+    disabled,
 }) {
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
         id: 0,
@@ -28,9 +23,10 @@ export function CurrentToolInfo({
         toolOffsets: {
             x: 0,
             y: 0,
-            z: 0
-        }, status: 'unprobed',
-        toolRadius: 0
+            z: 0,
+        },
+        status: 'unprobed',
+        toolRadius: 0,
     });
     const currentTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
@@ -44,8 +40,8 @@ export function CurrentToolInfo({
         if (id < 1) {
             return;
         }
-        controller.command('gcode', [`G65P301Q${id}`,'$#']);
-    }
+        controller.command('gcode', [`G65P301Q${id}`, '$#']);
+    };
 
     useEffect(() => {
         if (currentTool) {
@@ -84,7 +80,10 @@ export function CurrentToolInfo({
                     <span className="text-sm font-medium text-gray-700 w-20">
                         Tool Name:
                     </span>
-                    <ToolNameInput id={selectedTool?.id} nickname={selectedTool?.nickname} />
+                    <ToolNameInput
+                        id={selectedTool?.id}
+                        nickname={selectedTool?.nickname}
+                    />
                 </div>
 
                 {/* Z Offset Row */}
@@ -104,7 +103,7 @@ export function CurrentToolInfo({
                                     ? 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
                                     : 'bg-orange-500 hover:bg-orange-600 text-white focus:ring-orange-500'
                             }`}
-                            disabled={currentTool < 1}
+                            disabled={disabled || currentTool < 1}
                             onClick={() => probeTool(currentTool)}
                         >
                             Probe
