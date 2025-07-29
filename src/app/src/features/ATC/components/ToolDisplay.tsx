@@ -12,7 +12,7 @@ import LoadToolPopover from 'app/features/ATC/components/LoadToolPopover.tsx';
 import { PiEmpty } from 'react-icons/pi';
 import { useState } from 'react';
 import { CurrentToolInfo } from 'app/features/ATC/components/CurrentToolInfo.tsx';
-export function ToolDisplay({ tools }) {
+export function ToolDisplay({ tools, disabled }) {
     const [loadToolPopoverOpen, setLoadToolPopoverOpen] = useState(false);
 
     return (
@@ -30,11 +30,11 @@ export function ToolDisplay({ tools }) {
                     className="flex flex-row gap-2 items-center"
                     variant="primary"
                     onClick={unloadTool}
+                    disabled={disabled}
                 >
                     <PiEmpty />
                     Unload
                 </Button>
-                <Button onClick={unimplemented}>Replace</Button>
             </div>
         </div>
     );

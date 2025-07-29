@@ -17,11 +17,21 @@ export function ATC() {
         (state: RootState) => state.controller.settings.toolTable,
     );
 
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+
+    const disabledButton = !!isConnected;
+
     useEffect(() => {
         setTools(mapToolNicknamesAndStatus(toolTableData));
     }, [toolTableData]);
 
     function toggleToolTable(isOpen) {
+        if (!isConnected) {
+            return;
+        }
+
         if (isOpen) {
             controller.command('gcode', ['$#']);
         }
@@ -36,9 +46,10 @@ export function ATC() {
                     showToolTable={showToolTable}
                     onOpenChange={toggleToolTable}
                     tools={tools}
+                    disabled={disabledButton}
                 />
             </div>
-            <ToolDisplay tools={tools} />
+            <ToolDisplay tools={tools} disabled={disabledButton} />
         </div>
     );
 }
