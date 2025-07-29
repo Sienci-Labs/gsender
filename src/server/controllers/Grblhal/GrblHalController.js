@@ -157,7 +157,6 @@ class GrblHalController {
             reply: false // wait for an `ok` or `error` response
         },
         queryStatusReport: false,
-        queryStatusCount: 0,
 
         // Respond to user input
         replyParserState: false, // $G
@@ -206,7 +205,6 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
-
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -347,19 +345,17 @@ class GrblHalController {
                 }
 
                 // // M6 Tool Change
-                // TODO:  Perhaps we look at this in the future and make a decision whether to comment it
-                // based on if ATC is 1 in flags
-                /*if (_.includes(words, 'M6')) {
+                if (_.includes(words, 'M6')) {
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
                         log.debug('M6 Tool Change');
                         this.feeder.hold({
                             data: 'M6',
                             comment: commentString
-                        });
+                        }); // Hold reason
                         line = line.replace('M6', '(M6)');
                     }
-                }*/
+                }
 
                 if (this.isInRotaryMode) {
                     const containsACommand = A_AXIS_COMMANDS.test(line);
@@ -956,8 +952,6 @@ class GrblHalController {
                 // Initialize controller
                 this.initController();
             }
-
-            console.log(semver);
 
             await delay(500);
             this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$#\n');

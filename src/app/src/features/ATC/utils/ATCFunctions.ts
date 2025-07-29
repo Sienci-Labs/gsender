@@ -61,8 +61,9 @@ export function setToolName(id, value) {
     store.set(`widgets.atc.toolMap`, toolMap);
 }
 
-export function lookupSpecificTool(toolID, toolTable): ToolInstance {
-    let tool = toolTable.find((tool) => tool.id === toolID);
+export function lookupSpecificTool(toolID = -1, toolTable = {}): ToolInstance {
+    console.log(toolTable);
+    let tool = Object.values(toolTable).find((tool) => tool.id === toolID);
     if (!tool) {
         return null;
     }
