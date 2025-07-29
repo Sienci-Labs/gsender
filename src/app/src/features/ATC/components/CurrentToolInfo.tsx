@@ -23,7 +23,7 @@ export function CurrentToolInfo({
     onLoadTool,
 }) {
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
-        id: 1,
+        id: 0,
         nickname: '-',
         toolOffsets: {
             x: 0,
@@ -40,17 +40,6 @@ export function CurrentToolInfo({
         (state: RootState) => state.controller.settings.toolTable,
     );
 
-    useEffect(() => {
-        if (currentTool) {
-            let populatedTool = lookupSpecificTool(currentTool, toolTable);
-            console.log(currentTool);
-            if (populatedTool) {
-                console.log(populatedTool);
-                setSelectedTool(populatedTool);
-            }
-        }
-    }, []);
-
     const probeTool = (id) => {
         if (id < 1) {
             return;
@@ -61,7 +50,6 @@ export function CurrentToolInfo({
     useEffect(() => {
         if (currentTool) {
             let populatedTool = lookupSpecificTool(currentTool, toolTable);
-            console.log(currentTool);
             if (populatedTool) {
                 console.log(populatedTool);
                 setSelectedTool(populatedTool);
