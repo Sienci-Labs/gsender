@@ -156,11 +156,6 @@ const ToolChangerPopover: React.FC = ({ isOpen, setIsOpen, tools = [] }) => {
                             onClick={handleLoad}
                             disabled={isLoading}
                             variant="primary"
-                            className={`${
-                                currentStatus === 'offrack'
-                                    ? 'bg-slate-100 text-slate-400 hover:bg-slate-100 hover:text-slate-400 cursor-not-allowed'
-                                    : 'bg-blue-500 text-white hover:bg-blue-700'
-                            }`}
                         >
                             {isLoading ? (
                                 <>
