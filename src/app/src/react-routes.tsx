@@ -9,7 +9,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaMicrochip, FaSdCard } from 'react-icons/fa';
 import { LuPencilRuler } from 'react-icons/lu';
 import { AiFillTool } from 'react-icons/ai';
 import { Alarms } from './features/Stats/Alarms';
@@ -39,6 +39,7 @@ import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
 import { BiSolidCylinder } from 'react-icons/bi';
+import SDCard from './features/SDCard';
 
 export const ReactRoutes = () => {
     return (
@@ -117,6 +118,13 @@ export const ReactRoutes = () => {
                                         description="Update the firmware on your machine"
                                         icon={FaMicrochip}
                                         link="/tools/firmware"
+                                    />
+
+                                    <ToolCard
+                                        title="SD Card"
+                                        description="Manage your SD card"
+                                        icon={FaSdCard}
+                                        link="/tools/sd-card"
                                     />
                                 </div>
                             </div>
@@ -211,6 +219,18 @@ export const ReactRoutes = () => {
                                 <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
                                     <Firmware />
                                 </div>
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="sd-card"
+                        element={
+                            <Page
+                                title="SD Card"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <SDCard />
                             </Page>
                         }
                     />
