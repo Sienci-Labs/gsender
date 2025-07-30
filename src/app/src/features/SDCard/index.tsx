@@ -2,6 +2,7 @@ import controller from 'app/lib/controller';
 import Button from 'app/components/Button';
 import { handleSDCardMount } from './utils';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import FileExplorer from './FileExplorer';
 
 const SDCard = () => {
     const isMounted = useTypedSelector(
@@ -16,7 +17,12 @@ const SDCard = () => {
         <div className="flex flex-col gap-2 h-full justify-center">
             <Button onClick={handleSDCardMount}>Mount SD Card</Button>
 
-            {isMounted && <Button onClick={handleGetFiles}>Get Files</Button>}
+            {/* {isMounted && <Button onClick={handleGetFiles}>Get Files</Button>} */}
+            <Button onClick={handleGetFiles}>Get Files</Button>
+
+            <div className="flex-1">
+                <FileExplorer />
+            </div>
         </div>
     );
 };
