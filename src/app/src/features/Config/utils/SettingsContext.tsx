@@ -232,8 +232,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * @param v - The setting to filter
      */
     function settingsFilter(v: gSenderSetting) {
+        if (filterNonDefault) {
+            if (v.type === 'wizard' || v.type === 'event') {
+                // we don't have defaults for these
+                return false;
+            }
+        }
+
         // Hide hidden when filtering
-        if ('hidden' in v) {
+        if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
             return !v.hidden();
         }
 
@@ -266,13 +273,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 );
             }
             return false;
-        }
-
-        if (filterNonDefault) {
-            if (v.type === 'wizard' || v.type === 'event') {
-                // we don't have defaults for these
-                return false;
-            }
         }
 
         if (searchTerm.length === 0 || !searchTerm) {
