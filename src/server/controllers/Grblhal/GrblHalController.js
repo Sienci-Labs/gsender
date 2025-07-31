@@ -41,6 +41,7 @@ import ensurePositiveNumber from '../../lib/ensure-positive-number';
 import evaluateAssignmentExpression from '../../lib/evaluate-assignment-expression';
 import logger from '../../lib/logger';
 import translateExpression from '../../lib/translate-expression';
+import YModem from '../../lib/YModem';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
@@ -205,6 +206,11 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
+    // YMODEM transfer
+    ymodem = null;
+
+    ymodemTransferInProgress = false;
 
 
     constructor(engine, connection, options) {
@@ -985,6 +991,11 @@ class GrblHalController {
 
         this.runner.on('sdcard', (payload) => {
             this.emit('sdcard:files', payload);
+        });
+
+        // YMODEM event handling
+        this.runner.on('ymodem', (payload) => {
+            this.handleYModemEvent(payload);
         });
 
         const queryStatusReport = () => {
@@ -2210,6 +2221,16 @@ class GrblHalController {
 
                 this.writeln(`$FD=${filePath}`);
             },
+            'ymodem:start': () => {
+                const [filePath, remoteFilename] = args;
+                this.startYModemTransfer(filePath, remoteFilename);
+            },
+            'ymodem:cancel': () => {
+                this.cancelYModemTransfer();
+            },
+            'ymodem:overwrite': () => {
+                this.confirmYModemOverwrite();
+            },
         }[cmd];
 
         if (!handler) {
@@ -2311,6 +2332,131 @@ class GrblHalController {
                 this.sender.next({ forceEnd: true }); // force job end
             }
         }, 5000);
+    }
+
+    /**
+     * Handle YMODEM events from GRBLHAL
+     * @param {Object} payload - YMODEM event payload
+     */
+    handleYModemEvent(payload) {
+        const { type, ...data } = payload;
+
+        switch (type) {
+        case 'ready':
+            this.emit('ymodem:ready', data);
+            break;
+        case 'progress':
+            this.emit('ymodem:progress', data);
+            break;
+        case 'complete':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:complete', data);
+            break;
+        case 'error':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:error', data);
+            break;
+        case 'file_received':
+            this.emit('ymodem:file_received', data);
+            break;
+        case 'cancelled':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:cancelled', data);
+            break;
+        case 'timeout':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:timeout', data);
+            break;
+        case 'crc_error':
+            this.emit('ymodem:crc_error', data);
+            break;
+        case 'packet_error':
+            this.emit('ymodem:packet_error', data);
+            break;
+        case 'storage_full':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:storage_full', data);
+            break;
+        case 'file_exists':
+            this.emit('ymodem:file_exists', data);
+            break;
+        case 'invalid_filename':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:invalid_filename', data);
+            break;
+        case 'unsupported_type':
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:unsupported_type', data);
+            break;
+        default:
+            log.warn(`Unknown YMODEM event type: ${type}`);
+        }
+    }
+
+    /**
+     * Start YMODEM file transfer
+     * @param {string} filePath - Path to the file to transfer
+     * @param {string} remoteFilename - Optional remote filename
+     */
+    async startYModemTransfer(filePath, remoteFilename = null) {
+        if (this.ymodemTransferInProgress) {
+            throw new Error('YMODEM transfer already in progress');
+        }
+
+        if (!this.ymodem) {
+            this.ymodem = new YModem(this.connection);
+            
+            // Set up YMODEM event listeners
+            this.ymodem.on('transfer:start', (data) => {
+                this.emit('ymodem:transfer:start', data);
+            });
+
+            this.ymodem.on('transfer:progress', (data) => {
+                this.emit('ymodem:transfer:progress', data);
+            });
+
+            this.ymodem.on('transfer:complete', (data) => {
+                this.ymodemTransferInProgress = false;
+                this.emit('ymodem:transfer:complete', data);
+            });
+
+            this.ymodem.on('transfer:error', (data) => {
+                this.ymodemTransferInProgress = false;
+                this.emit('ymodem:transfer:error', data);
+            });
+
+            this.ymodem.on('transfer:cancelled', (data) => {
+                this.ymodemTransferInProgress = false;
+                this.emit('ymodem:transfer:cancelled', data);
+            });
+        }
+
+        try {
+            this.ymodemTransferInProgress = true;
+            await this.ymodem.sendFile(filePath, remoteFilename);
+        } catch (error) {
+            this.ymodemTransferInProgress = false;
+            throw error;
+        }
+    }
+
+    /**
+     * Cancel current YMODEM transfer
+     */
+    cancelYModemTransfer() {
+        if (this.ymodem && this.ymodemTransferInProgress) {
+            this.ymodem.cancel();
+        }
+    }
+
+    /**
+     * Confirm YMODEM file overwrite
+     */
+    confirmYModemOverwrite() {
+        if (this.ymodem) {
+            // Send 'Y' to confirm overwrite
+            this.connection.write('Y\n');
+        }
     }
 }
 

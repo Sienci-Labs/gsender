@@ -45,6 +45,7 @@ import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmD
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
+import GrblHalLineParserResultYModem from './GrblHalLineParserResultYModem';
 
 class GrblHalLineParser {
     parse(line) {
@@ -112,6 +113,9 @@ class GrblHalLineParser {
 
             // [FILE:/test.gcode|SIZE:100]
             GbrlHalLineParserResultSDCard,
+
+            // YMODEM protocol responses
+            GrblHalLineParserResultYModem,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,

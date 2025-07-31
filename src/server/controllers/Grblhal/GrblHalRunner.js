@@ -52,6 +52,7 @@ import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmD
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
+import GrblHalLineParserResultYModem from './GrblHalLineParserResultYModem';
 
 const log = logger('controller:grblHAL');
 
@@ -425,6 +426,11 @@ class GrblHalRunner extends events.EventEmitter {
 
         if (type === GbrlHalLineParserResultSDCard) {
             this.emit('sdcard', payload);
+            return;
+        }
+
+        if (type === GrblHalLineParserResultYModem) {
+            this.emit('ymodem', payload);
             return;
         }
 
