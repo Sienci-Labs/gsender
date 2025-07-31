@@ -34,8 +34,9 @@ class Connection extends EventEmitter {
                     return;
                 }
 
-                const grblR = data.match(/.*Grbl.*/i);
-                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/i);
+                // Note - Do we need two grblHAL clauses if we're using i insensitive flag? - ie grblHAL|GrblHAL
+                const grblR = data.match(/.*(grbl|fluidnc).*/i);
+                const grblHalR = data.match(/.*(grblhal).*/i);
 
                 if (grblHalR) {
                     this.controllerType = GRBLHAL;
