@@ -34,8 +34,10 @@ class Connection extends EventEmitter {
                     return;
                 }
 
-                const grblR = data.match(/.*Grbl.*/i);
-                const grblHalR = data.match(/.*(grblHAL|GrblHAL).*/i);
+                // Note - Do we need two grblHAL clauses if we're using i insensitive flag? - ie grblHAL|GrblHAL
+                // https://regex101.com/r/oPVkkF/1
+                const grblR = data.match(/.*(grbl|fluidnc).*/i);
+                const grblHalR = data.match(/.*(grblhal).*/i);
 
                 if (grblHalR) {
                     this.controllerType = GRBLHAL;
@@ -181,6 +183,7 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
+                this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
@@ -193,9 +196,9 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('$I\n');
+                    this.connection.writeImmediate('\x18');
                     this.count++;
-                }, 1000);
+                }, 800);
             }
         });
     };
