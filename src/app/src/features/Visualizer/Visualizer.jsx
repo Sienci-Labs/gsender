@@ -1060,28 +1060,33 @@ class Visualizer extends Component {
                 }, 5000);
 
                 const vertices = this.props.actions.getHull();
-                const outlineWorker = new Worker(
-                    new URL('../../workers/Outline.worker.js', import.meta.url),
-                    { type: 'module' },
-                );
+                console.log('outline vertices', vertices);
+                try {
+                    const outlineWorker = new Worker(
+                        new URL('../../workers/Outline.worker.js', import.meta.url),
+                        { type: 'module' },
+                    );
 
-                const laserOnOutline = store.get(
-                    'widgets.spindle.laser.laserOnOutline',
-                    false,
-                );
-                const spindleMode = store.get('widgets.spindle.mode');
-                // outline toggled on and currently in laser mode
-                const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+                    const laserOnOutline = store.get(
+                        'widgets.spindle.laser.laserOnOutline',
+                        false,
+                    );
+                    const spindleMode = store.get('widgets.spindle.mode');
+                    // outline toggled on and currently in laser mode
+                    const isLaser = laserOnOutline && spindleMode === LASER_MODE;
 
-                outlineWorker.onmessage = ({ data }) => {
-                    outlineResponse({ data }, laserOnOutline);
-                    // Enable the outline button again
-                    this.outlineRunning = false;
-                };
-                outlineWorker.postMessage({
-                    isLaser,
-                    parsedData: vertices,
-                });
+                    outlineWorker.onmessage = ({ data }) => {
+                        outlineResponse({ data }, laserOnOutline);
+                        // Enable the outline button again
+                        this.outlineRunning = false;
+                    };
+                    outlineWorker.postMessage({
+                        isLaser,
+                        parsedData: vertices,
+                    });
+                } catch(e) {
+                    console.log(e);
+                }
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

@@ -21,23 +21,30 @@
  *
  */
 
-import hull from 'hull.js';
 import chunk from 'lodash/chunk';
+//import ch from 'convex-hull';
+import hull from '@markroland/concave-hull'
 
 self.onmessage = ({ data }) => {
+    console.log(data);
     const { isLaser = false, parsedData = [] } = data;
     console.log('outline called');
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
-        parsedData.forEach((n) => vertices.push(n.toFixed(3)));
+        parsedData.forEach((n) => vertices.push(Number(n.toFixed(3))));
+        console.log(parsedData);
         vertices = chunk(vertices, 3);
+        console.log(vertices);
 
-        const fileHull = hull(vertices, concavity);
+        //const fileHull = hull(vertices);
+        //const fileHull = ch(vertices);
+        //const fileHull = hull.concaveHull(vertices, 3);
+        //console.log(fileHull);
 
-        const gCode = convertPointsToGCode(fileHull, isLaser);
+        //const gCode = convertPointsToGCode(fileHull, isLaser);
 
-        return gCode;
+        return [];
     };
 
     function convertPointsToGCode(points, isLaser = false) {
