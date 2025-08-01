@@ -10,6 +10,7 @@ export interface Rotary {
             startHeight: number;
             finalHeight: number;
             enableRehoming: boolean;
+            shouldDwell: boolean;
         };
     };
     tab: {
