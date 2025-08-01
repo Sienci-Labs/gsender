@@ -27,7 +27,6 @@ class Connection extends EventEmitter {
             log.silly(`< ${data}`);
             if (this.controllerType === null) {
                 data = ('' + data).replace(/\s+$/, '');
-                console.log(data);
                 if (!data) {
                     log.warn(
                         'Empty result parsed from Connection Class Parser',
