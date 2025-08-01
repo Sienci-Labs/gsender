@@ -27,6 +27,7 @@ class Connection extends EventEmitter {
             log.silly(`< ${data}`);
             if (this.controllerType === null) {
                 data = ('' + data).replace(/\s+$/, '');
+                console.log(data);
                 if (!data) {
                     log.warn(
                         'Empty result parsed from Connection Class Parser',
@@ -35,6 +36,7 @@ class Connection extends EventEmitter {
                 }
 
                 // Note - Do we need two grblHAL clauses if we're using i insensitive flag? - ie grblHAL|GrblHAL
+                // https://regex101.com/r/oPVkkF/1
                 const grblR = data.match(/.*(grbl|fluidnc).*/i);
                 const grblHalR = data.match(/.*(grblhal).*/i);
 
@@ -182,6 +184,7 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
+                this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
@@ -194,9 +197,9 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('$I\n');
+                    this.connection.writeImmediate('\x18');
                     this.count++;
-                }, 1000);
+                }, 800);
             }
         });
     };
