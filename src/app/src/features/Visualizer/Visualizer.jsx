@@ -241,6 +241,7 @@ class Visualizer extends Component {
         if (showAnimation) {
             if (this.isAgitated) {
                 // Call the render() function up to 60 times per second (i.e. 60fps)
+                this.animationLoopRunning = true;
                 requestAnimationFrame(this.renderAnimationLoop);
 
                 const rpm = 300;
@@ -248,10 +249,17 @@ class Visualizer extends Component {
             } else {
                 const rpm = 0;
                 this.rotateCuttingTool(rpm);
+
+                // Continue the loop even when not agitated to check for state changes
+                this.animationLoopRunning = true;
+                requestAnimationFrame(this.renderAnimationLoop);
             }
 
             // Update the scene
             this.updateScene();
+        } else {
+            // If animation is disabled, stop the loop
+            this.animationLoopRunning = false;
         }
     };
 
@@ -273,6 +281,9 @@ class Visualizer extends Component {
         this.cuttingPointer = null;
         this.limits = null;
         this.visualizer = null;
+
+        // Animation state
+        this.animationLoopRunning = false;
     }
 
     addStoreEvents() {
@@ -322,11 +333,18 @@ class Visualizer extends Component {
         // Handle WebGL context restoration
         const handleContextRestored = () => {
             console.log('Visualizer: WebGL context restored, recreating scene');
+            const wasAnimationRunning = this.animationLoopRunning;
+
             if (this.node) {
                 this.createScene(this.node);
                 setTimeout(() => {
                     this.resizeRenderer();
                     this.updateScene({ forceUpdate: true });
+
+                    // Restart animation loop if it was running before
+                    if (wasAnimationRunning) {
+                        this.startAnimationLoop();
+                    }
                 }, 50);
             }
         };
@@ -595,6 +613,19 @@ class Visualizer extends Component {
             }
         }
 
+        // Also check if we need to start the animation loop when showAnimation changes
+        const shouldShowAnimation = this.showAnimation();
+        if (
+            shouldShowAnimation &&
+            this.isAgitated &&
+            !this.animationLoopRunning
+        ) {
+            this.animationLoopRunning = true;
+            requestAnimationFrame(this.renderAnimationLoop);
+        } else if (!shouldShowAnimation && this.animationLoopRunning) {
+            this.animationLoopRunning = false;
+        }
+
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
             if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
@@ -653,6 +684,10 @@ class Visualizer extends Component {
         this.unsubscribe();
         this.removeResizeEventListener();
         this.clearScene();
+
+        // Stop animation loop
+        this.animationLoopRunning = false;
+        this.isAgitated = false;
 
         // Clean up WebGL context handlers
         if (this.contextLostHandler) {
@@ -1132,7 +1167,10 @@ class Visualizer extends Component {
 
                 try {
                     const outlineWorker = new Worker(
-                        new URL('../../workers/Outline.worker.js', import.meta.url),
+                        new URL(
+                            '../../workers/Outline.worker.js',
+                            import.meta.url,
+                        ),
                         { type: 'module' },
                     );
 
@@ -1142,15 +1180,21 @@ class Visualizer extends Component {
                     );
                     const spindleMode = store.get('widgets.spindle.mode');
                     // outline toggled on and currently in laser mode
-                    const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+                    const isLaser =
+                        laserOnOutline && spindleMode === LASER_MODE;
 
-                    const outlineMode = store.get('workspace.outlineMode', 'Detailed');
+                    const outlineMode = store.get(
+                        'workspace.outlineMode',
+                        'Detailed',
+                    );
                     console.log('outlineMode', outlineMode);
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
                         outlineWorker.terminate();
-                        toast.error('Outline generation timed out. Please try again.');
+                        toast.error(
+                            'Outline generation timed out. Please try again.',
+                        );
                         this.outlineRunning = false;
                     }, 15000);
 
@@ -1163,9 +1207,9 @@ class Visualizer extends Component {
                     outlineWorker.postMessage({
                         isLaser,
                         parsedData: vertices,
-                        mode: outlineMode
+                        mode: outlineMode,
                     });
-                } catch(e) {
+                } catch (e) {
                     console.log(e);
                 }
             }),
@@ -2766,6 +2810,12 @@ class Visualizer extends Component {
                             );
                             this.resizeRenderer();
                             this.updateScene({ forceUpdate: true });
+
+                            // Restart animation loop if it was running before
+                            if (this.isAgitated) {
+                                this.startAnimationLoop();
+                            }
+
                             resolve();
                         } else {
                             console.warn(
@@ -2783,6 +2833,19 @@ class Visualizer extends Component {
 
             attemptCreation();
         });
+    }
+
+    startAnimationLoop() {
+        const showAnimation = this.showAnimation();
+        if (showAnimation && this.isAgitated && !this.animationLoopRunning) {
+            this.animationLoopRunning = true;
+            requestAnimationFrame(this.renderAnimationLoop);
+        }
+    }
+
+    stopAnimationLoop() {
+        this.animationLoopRunning = false;
+        this.isAgitated = false;
     }
 }
 
