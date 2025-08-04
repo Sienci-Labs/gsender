@@ -192,7 +192,7 @@ const About = () => {
             {!hasUpdate && (
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
-                        <h2 className="text-2xl font-bold">Release Notes</h2>
+                        <h2 className="text-2xl font-bold dark:text-white">Release Notes</h2>
 
                         <a
                             className="text-sm text-blue-500 underline"
