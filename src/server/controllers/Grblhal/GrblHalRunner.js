@@ -52,6 +52,7 @@ import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmD
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
+import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
 
 const log = logger('controller:grblHAL');
 
@@ -174,6 +175,11 @@ class GrblHalRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('status', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultATCI) {
+            console.log('ATCI Caught');
+            console.log(payload);
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
