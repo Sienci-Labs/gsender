@@ -45,6 +45,7 @@ import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmD
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
+import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
 
 class GrblHalLineParser {
     parse(line) {
@@ -65,6 +66,9 @@ class GrblHalLineParser {
 
             // ALARM:
             GrblHalLineParserResultAlarm,
+
+            // [MSG:ATCI:key:value|another_key:value]
+            GrblHalLineParserResultATCI,
 
             // [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
             // [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)

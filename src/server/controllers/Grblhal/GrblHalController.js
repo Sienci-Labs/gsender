@@ -991,7 +991,13 @@ class GrblHalController {
         });
 
         this.runner.on('sdcard', (payload) => {
+            console.log(payload);
             this.emit('sdcard:files', payload);
+        });
+
+        this.runner.on('atci', (payload) => {
+            console.log(payload);
+            this.emit('atci', payload);
         });
 
         const queryStatusReport = () => {

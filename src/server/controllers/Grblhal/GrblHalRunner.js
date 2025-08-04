@@ -119,6 +119,7 @@ class GrblHalRunner extends events.EventEmitter {
         },
         alarms: {},
         toolTable: {},
+        atci: {}
     };
 
     parser = new GrblHalLineParser();
@@ -178,8 +179,26 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultATCI) {
+            delete payload.raw;
             console.log('ATCI Caught');
             console.log(payload);
+
+            const nextSettings = {
+                ...this.settings,
+                atci: {
+                    ...this.settings.atci,
+                    ...payload.values
+                }
+            };
+            if (!_.isEqual(this.settings.atci, nextSettings.atci)) {
+                this.settings = nextSettings;
+            }
+
+            // If the payload has a subtype, emit a dialog request;
+            if (Number(payload.subtype) >= 0) {
+                this.emit('atci', payload);
+            }
+
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
@@ -285,7 +304,6 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultTool) {
-            this.emit('serialport:read', payload.raw);
             delete payload.raw;
             const nextSettings = {
                 ...this.settings,

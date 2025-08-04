@@ -7,14 +7,14 @@ class GrblHalLineParserResultATCI {
 
         let message = null;
         let description = null;
-        const substate = r[1] || null;
+        const subtype = r[1] || null;
         const valueString = r[2] || '';
         let valueArray = valueString.split('|');
 
-        // Pop title and message off values if substate exists indicating a dialog
-        if (substate) {
-             message = valueArray.shift();
-             description = valueArray.shift();
+        // Pop title and message off values if subtype exists indicating a dialog
+        if (Number(subtype) >= 0) {
+            message = valueArray.shift();
+            description = valueArray.shift();
         }
 
         const values = {};
@@ -26,7 +26,7 @@ class GrblHalLineParserResultATCI {
 
         const payload = {
             message,
-            substate,
+            subtype,
             description,
             values
         };
