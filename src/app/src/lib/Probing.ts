@@ -271,7 +271,7 @@ export const get3AxisAutoRoutine = ({
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
             'G10 L20 P0 Z5',
-            'G21 G91 G0 Z2',
+            'G21 G91 G0 Z3',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
             'G21 G91 G0 X2',
