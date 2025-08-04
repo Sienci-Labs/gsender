@@ -1054,13 +1054,8 @@ class Visualizer extends Component {
                 toast.info('Generating outline g-code...');
                 this.outlineRunning = true;
 
-                // We want to make sure that in situations outline fails, you can try again in ~5 seconds
-                setTimeout(() => {
-                    this.outlineRunning = false;
-                }, 5000);
-
                 const vertices = this.props.actions.getHull();
-                console.log('outline vertices', vertices);
+
                 try {
                     const outlineWorker = new Worker(
                         new URL('../../workers/Outline.worker.js', import.meta.url),
@@ -1075,7 +1070,18 @@ class Visualizer extends Component {
                     // outline toggled on and currently in laser mode
                     const isLaser = laserOnOutline && spindleMode === LASER_MODE;
 
+                    const outlineMode = store.get('workspace.outlineMode', 'Detailed');
+                    console.log('outlineMode', outlineMode);
+
+                    // We want to make sure that in situations outline fails, you can try again in ~5 seconds
+                    const maxRuntime = setTimeout(() => {
+                        outlineWorker.terminate();
+                        toast.error('Outline generation timed out. Please try again.');
+                        this.outlineRunning = false;
+                    }, 15000);
+
                     outlineWorker.onmessage = ({ data }) => {
+                        clearTimeout(maxRuntime);
                         outlineResponse({ data }, laserOnOutline);
                         // Enable the outline button again
                         this.outlineRunning = false;
@@ -1083,6 +1089,7 @@ class Visualizer extends Component {
                     outlineWorker.postMessage({
                         isLaser,
                         parsedData: vertices,
+                        mode: outlineMode
                     });
                 } catch(e) {
                     console.log(e);

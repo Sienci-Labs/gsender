@@ -444,6 +444,12 @@ export const LIGHTWEIGHT_OPTIONS = {
     EVERYTHING: EVERYTHING,
 };
 
+// Outline Modes
+export const OUTLINE_MODE_DETAILED = 'Detailed';
+export const OUTLINE_MODE_SIMPLE = 'Square';
+export const OUTLINE_MODES = [OUTLINE_MODE_DETAILED, OUTLINE_MODE_SIMPLE];
+export const OUTLINE_TIMEOUT = 15000;
+
 // const SPINDLE_LABELS = {
 //     SLB_SPINDLE: "SLB_SPINDLE",
 //     HUANYANG_V1: "Huanyang v1",

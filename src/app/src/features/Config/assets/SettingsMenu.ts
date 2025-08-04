@@ -29,7 +29,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
+import {GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES} from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -182,11 +182,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Outline Mode',
                         key: 'workspace.outlineMode',
                         type: 'select',
-                        description: 'Simple is the quickest computationally and draws a square bounding box around the toolpath area and traverses it.  Complex more closely follows the toolpath itself.',
-                        options: [
-                            'Simple',
-                            'Complex'
-                        ]
+                        description: 'Square is the quickest computationally and draws a square bounding box around the toolpath area and traverses it.  Detailed more closely follows the toolpath itself.',
+                        options: OUTLINE_MODES
                     },
                     {
                         label: 'Send usage data',
