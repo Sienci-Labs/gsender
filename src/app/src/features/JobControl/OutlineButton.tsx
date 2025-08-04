@@ -2,15 +2,67 @@ import cx from 'classnames';
 import { Button } from 'app/components/shadcn/Button';
 import { TbVector } from 'react-icons/tb';
 import pubsub from 'pubsub-js';
+import store from 'app/store';
+import { LASER_MODE } from 'app/constants';
+import { outlineResponse } from 'app/workers/Outline.response';
+import { toast } from 'app/lib/toaster';
+import { store as reduxStore } from 'app/store/redux';
+import { get } from 'lodash';
 
 interface OutlineButtonProps {
     disabled: boolean;
 }
 
+let outlineRunning = false;
+
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
     // TODO
     const runOutline = () => {
-        pubsub.publish('outline:start');
+        const liteMode = store.get('widgets.visualizer.liteMode', false);
+        if (liteMode) {
+            // lightweight mode
+            if (outlineRunning) {
+                return;
+            }
+            try {
+                const outlineWorker = new Worker(
+                    new URL('app/workers/Outline.worker.js', import.meta.url),
+                    { type: 'module' },
+                );
+                const bbox = get(reduxStore.getState(), 'file.bbox');
+                const laserOnOutline = store.get(
+                    'widgets.spindle.laser.laserOnOutline',
+                    false,
+                );
+                const spindleMode = store.get('widgets.spindle.mode');
+                const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+
+                const maxRuntime = setTimeout(() => {
+                    outlineWorker.terminate();
+                    toast.error(
+                        'Outline generation timed out. Please try again.',
+                    );
+                    outlineRunning = false;
+                }, 15000);
+
+                outlineWorker.onmessage = ({ data }) => {
+                    clearTimeout(maxRuntime);
+                    outlineResponse({ data });
+                    // Enable the outline button again
+                    outlineRunning = false;
+                };
+                outlineWorker.postMessage({
+                    isLaser,
+                    parsedData: [],
+                    mode: 'Square',
+                    bbox: bbox,
+                });
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            pubsub.publish('outline:start');
+        }
     };
 
     return (
