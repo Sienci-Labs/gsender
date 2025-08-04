@@ -94,6 +94,7 @@ export function Jobs() {
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
             <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
                 <StatCard>
+                    <CardHeader>Job History</CardHeader>
                     <SortableTable
                         defaultData={defaultData}
                         data={jobs}
