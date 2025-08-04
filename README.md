@@ -113,6 +113,39 @@ gSender is also designed in a way that it can be run locally on your computer br
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.5.3 (August 4, 2025)
+- Outline runs if visualizer disabled in lightweight mode
+- Added new config option for outline - can now run detailed (old routines, travels rough shape of toolpath) or square (the bounding box)
+- Alterations to connection to make grbl detection more robust.  FluidNC should now catch as grbl.
+- Fixed unit miscalculation on file stats
+- Remote mode configuration made more robust to reduce situations where the app fails to start.
+- Unit conversion fixes in squaring and calibration tools
+- Stock turning and Probe rotary properly disable when in non-rotary mode
+- Jog presets in config now reflect selected Carve screen units.
+- Units again appear in config when connected to grbl board.
+- Fixed load state issue when previous file was paused
+- Corner selection in probing now persists between gSender sessions.
+- Re-added the bad file and bad line detection with some improvements.  They should now appear in the Helper.
+- Rename rotary install track length to appropriate value
+- Stats connection summary formatted correctly for ethernet connection.
+- Firmware settings imports now apply immediately on import.
+- Gamepad profiles now represent the button name if known instead of just numbers.
+- Visualizer grid now respects carve screen units.
+- Visualizer colours now correct with Light visualizer theme.
+- Spindle dropdown again reflects the current firmware spindle.
+- AXS parsing should be more robust on grblHAL devices.
+- Fixed edge cases in surfacing generation that could miss strip in center.
+- Spindle/Laser toggle behaviour more closely matches 1.4.12 implementation.
+- Z jogging popup re-added to calibration tools.
+- Various config sorting and filtering changes.
+- Load File area looks a little better in dark mode.
+- Fixed cases where visualizer could go blank and not re-appear until toggling camera.
+- Added spindle delay option to rotary surfacing tool.
+- Plus and Minus buttons behaviour tweaks on jog feeds and distances
+- Force Hard and Soft Limits config options type updated and no longer crash the application.
+- Various look and feel and text changes.
+
+
 ### 1.5.2 (July 15, 2025)
 - Fix issues with remote mode disconnecting main client and jobs stopping when connecting from remote mode
 - Significantly sped up file loading and rendering on larger files
