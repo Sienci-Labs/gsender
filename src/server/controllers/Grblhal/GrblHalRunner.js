@@ -333,7 +333,8 @@ class GrblHalRunner extends events.EventEmitter {
             if (!_.isEqual(this.settings.version, nextSettings.version)) {
                 this.settings = nextSettings; // enforce change
             }
-            this.emit('startup', payload);
+            // Should no longer need to do this here for redundancy
+            //this.emit('startup', payload);
             return;
         }
         if (type === GrblHalLineParserResultCode) {

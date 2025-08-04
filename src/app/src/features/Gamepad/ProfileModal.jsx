@@ -13,7 +13,7 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
-import { defaultOptions } from 'app/store/gamepad';
+import { defaultOptions, gamepadMapping } from 'app/store/gamepad';
 
 import { AVAILABILITY_TYPES } from './utils';
 import { GamepadContext } from './utils/context';
@@ -76,18 +76,33 @@ const ProfileModal = () => {
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
 
+        const defaultButtonMapping = gamepadInfo.buttons.map((_, index) => ({
+            label: index,
+            value: index,
+            primaryAction: null,
+            secondaryAction: null,
+        }));
+
+        const buttonMapping =
+            {
+                // Standard mapping for gamepad, if the number of available buttons is 17
+                standard: gamepadMapping.standard.buttons.map((button) => ({
+                    label: button.label,
+                    value: button.value,
+                    primaryAction: null,
+                    secondaryAction: null,
+                })),
+                // Fallback to default mapping if no mapping is found, initialize all buttons from the gamepad
+                DEFAULT: defaultButtonMapping,
+            }[gamepadInfo?.mapping ?? 'DEFAULT'] || defaultButtonMapping;
+
         const updatedProfiles = [
             ...profiles,
             {
                 id: [gamepadInfo.id],
                 name: inputRef.current.value || gamepadInfo.id,
                 mapping: gamepadInfo.mapping,
-                buttons: gamepadInfo.buttons.map((_, index) => ({
-                    label: index,
-                    value: index,
-                    primaryAction: null,
-                    secondaryAction: null,
-                })),
+                buttons: buttonMapping,
                 axes: gamepadInfo.axes,
                 joystickOptions: defaultOptions.joystickOptions,
                 lockout: {
