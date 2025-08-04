@@ -179,6 +179,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
+                        label: 'Outline Mode',
+                        key: 'workspace.outlineMode',
+                        type: 'select',
+                        description: 'Simple is the quickest computationally and draws a square bounding box around the toolpath area and traverses it.  Complex more closely follows the toolpath itself.',
+                        options: [
+                            'Simple',
+                            'Complex'
+                        ]
+                    },
+                    {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:

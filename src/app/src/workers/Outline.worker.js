@@ -25,19 +25,15 @@ import chunk from 'lodash/chunk';
 import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    console.log('WE IN IT')
     const { isLaser = false, parsedData = [] } = data;
-    console.log('outline called');
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
         parsedData.forEach((n) => vertices.push(n.toFixed(3)));
-        console.log(parsedData);
         vertices = chunk(vertices, 3);
-        console.log(vertices);
 
         //const fileHull = hull(vertices);
-        let fileHull = concaveman(vertices);
+        let fileHull = concaveman(vertices, Infinity, 0.01);
         fileHull = fileHull.slice(1); // Pop the first element since it's the same as the last and will result in weird movements.
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
