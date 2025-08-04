@@ -34,6 +34,7 @@ export interface Workspace {
     timeSpentRunning: number;
     longestTimeRun: number;
     defaultFirmware: string;
+    outlineMode: string;
     park: object;
     jobTimes: number[];
     toolChange: {
