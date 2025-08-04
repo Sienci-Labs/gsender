@@ -179,10 +179,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
-                        label: 'Outline Mode',
+                        label: 'Outline style',
                         key: 'workspace.outlineMode',
                         type: 'select',
-                        description: 'Square is the quickest computationally and draws a square bounding box around the toolpath area and traverses it.  Detailed more closely follows the toolpath itself.',
+                        description: 'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
                         options: OUTLINE_MODES
                     },
                     {
