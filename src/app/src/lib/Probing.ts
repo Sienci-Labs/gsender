@@ -353,7 +353,7 @@ export const get3AxisAutoRoutine = ({
             'G38.2 Z-5 F75',
             'G4 P0.15',
             `G10 L20 ${p} Z5`,
-            'G21 G91 G0 Z2',
+            'G21 G91 G0 Z5',
         );
     } else if (axes.x) {
         code.push(
