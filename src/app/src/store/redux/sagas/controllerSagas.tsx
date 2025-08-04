@@ -932,6 +932,14 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(addSDCardFileToList({ file }));
     });
 
+    controller.addListener('atci', (payload) => {
+        console.log('ARRIVED', payload);
+        switch (payload.subtype) {
+            case 0:
+                console.log(0);
+        }
+    })
+
     yield null;
 }
 
