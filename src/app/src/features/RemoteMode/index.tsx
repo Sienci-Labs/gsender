@@ -14,6 +14,7 @@ import {
 } from 'app/components/shadcn/Select.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import Button from 'app/components/Button';
+import ipLib from 'ip';
 //import Select from 'react-select';
 import { Switch } from 'app/components/shadcn/Switch';
 import { useEffect, useState } from 'react';
@@ -40,9 +41,9 @@ export function RemoteModeDialog({
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
 
     useEffect(() => {
-        setIp(remoteIp);
-        setPort(remotePort);
-        setRemoteEnabled(remoteOn);
+        remoteIp && setIp(remoteIp);
+        remotePort && setPort(remotePort);
+        remoteOn && setRemoteEnabled(remoteOn);
     }, [remoteIp, remotePort, remoteOn]);
 
     useEffect(() => {
@@ -65,23 +66,37 @@ export function RemoteModeDialog({
         setIp(v);
     }
 
+    function onConfirmUpdate() {
+        const payload = {
+            ip,
+            port,
+            headlessStatus: remoteEnabled,
+        };
+
+        // Validations
+        if (Number(port) < 1025 || Number(port) > 65535) {
+            toast.error('Invalid Port Number - Must be between 1025 and 65535');
+            return;
+        }
+
+        if (!ipLib.isV4Format(ip)) {
+            toast.error(`Invalid IP Address - ${ip} does not look like a valid V4 IP address`);
+            return;
+        }
+
+        onClose(false);
+        actions.saveSettings(payload);
+        setHeadlessSettings(payload);
+        toast.success('Updated Wireless Control Settings', {
+            position: 'bottom-right',
+        });
+    }
+
     function saveRemotePreferences(e) {
         e.preventDefault();
 
         Confirm({
-            onConfirm: () => {
-                const payload = {
-                    ip,
-                    port,
-                    headlessStatus: remoteEnabled,
-                };
-                onClose(false);
-                actions.saveSettings(payload);
-                setHeadlessSettings(payload);
-                toast.success('Updated Wireless Control Settings', {
-                    position: 'bottom-right',
-                });
-            },
+            onConfirm: onConfirmUpdate,
             confirmLabel: 'Save Settings',
             title: 'Save Wireless CNC Settings',
             content:

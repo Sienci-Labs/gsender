@@ -349,7 +349,6 @@ export class GCodeProcessor {
             vmState.seenWordSet[word[0]] = true;
         }
 
-        console.log('testing');
         if (INVALID_GCODE_REGEX.test(gline.asString())) {
             vmState.invalidGcode.add(gline.asString());
         }

@@ -82,7 +82,7 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
+import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
@@ -161,7 +161,8 @@ class GrblHalController {
         // Respond to user input
         replyParserState: false, // $G
         replyStatusReport: false, // ?
-        alarmCompleteReport: false //0x87
+        alarmCompleteReport: false, //0x87
+        axsReportCount: 0
     };
 
     actionTime = {
@@ -644,6 +645,17 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.initialized = true;
+                this.initController();
+            }
+
+            // Make sure we also have axs parsed - at most two times or we get endless loop
+            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
+                this.writeln('$I');
+                this.actionMask.axsReportCount++;
+            }
+
             //
             if (this.homingStarted) {
                 // We look at bit instead of faking it with machine positions
@@ -1236,6 +1248,7 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+        this.actionMask.axsReportCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
@@ -1701,6 +1714,10 @@ class GrblHalController {
             },
             'feeder:stop': () => {
                 this.feeder.reset();
+
+                delay(100).then(() => {
+                    this.write('~');
+                });
             },
             'feedhold': () => {
                 this.event.trigger(FEED_HOLD);

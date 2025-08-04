@@ -223,7 +223,6 @@ class SVGVisualizer extends Component {
     handleSceneRender(vizualization) {
         const { paths } = vizualization;
         const { currentTheme } = this.props.state;
-        console.log(paths);
         let svg = document.getElementById(
             !this.isSecondaryVisualizer ? 'svg' : 'svg2',
         );

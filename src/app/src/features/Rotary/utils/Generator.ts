@@ -3,6 +3,7 @@ import reduxStore from 'app/store/redux';
 import {
     METRIC_UNITS,
     STOCK_TURNING_METHOD,
+    SURFACING_DWELL_DURATION,
     WORKSPACE_MODE,
 } from 'app/constants';
 
@@ -49,11 +50,14 @@ export class StockTurningGenerator {
         const units = store.get('workspace.units');
         const safeHeight = this.getSafeZValue();
 
-        const { feedrate, spindleRPM, enableRehoming } = this.options;
+        const { feedrate, spindleRPM, enableRehoming, shouldDwell } =
+            this.options;
 
         const wcs =
             reduxStore.getState().controller.state?.parserstate?.modal?.wcs ||
             'G54';
+
+        const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
 
         const headerBlock = [
             '(Header)',
@@ -63,6 +67,7 @@ export class StockTurningGenerator {
             `G1 F${feedrate}`,
             'G90',
             `M3 S${spindleRPM}`,
+            ...dwell,
             '(Header End)',
             '\n',
         ];

@@ -32,7 +32,7 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
-    GRBLHAL,
+    GRBLHAL, OUTLINE_MODE_DETAILED,
 } from '../../constants';
 
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
@@ -60,6 +60,7 @@ const defaultState: State = {
         timeSpentRunning: 0,
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
+        outlineMode: OUTLINE_MODE_DETAILED,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
@@ -138,6 +139,8 @@ const defaultState: State = {
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
+            forceHardLimits: false,
+            forceSoftLimits: false
         },
         shouldWarnZero: false,
         diagnostics: {

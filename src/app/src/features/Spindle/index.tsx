@@ -29,6 +29,7 @@ import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { findIndex } from 'lodash';
 
 interface SpindleState {
     minimized: boolean;
@@ -271,23 +272,27 @@ const SpindleWidget = () => {
         const active = getSpindleActiveState();
 
         // get previously saved spindle values
-        const spindleMin = config.get('spindleMin', 0);
-        const spindleMax = config.get('spindleMax', 0);
+        const prevSpindleMin = config.get('spindleMin', 0);
+        const prevSpindleMax = config.get('spindleMax', 0);
 
-        // save current laser values
-        let laser = config.get('laser', {
-            maxPower: 0,
-            minPower: 0,
-        });
+        const SLBLaserExists =
+            controllerType === GRBLHAL &&
+            findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
 
-        laser.maxPower = laserMax;
-        laser.minPower = laserMin;
-        config.set('laser', laser);
+        // save current laser values if laser spindle doesnt exist
+        if (!SLBLaserExists) {
+            let laser = config.get('laser', {
+                maxPower: 0,
+                minPower: 0,
+            });
+            laser.maxPower = spindleMax;
+            laser.minPower = spindleMin;
+            config.set('laser', laser);
+        }
 
-        const powerCommands =
-            spindle.label === 'SLB_LASER'
-                ? []
-                : [`$30=${spindleMax}`, `$31=${spindleMin}`];
+        const powerCommands = SLBLaserExists
+            ? []
+            : [`$30=${prevSpindleMax}`, `$31=${prevSpindleMin}`];
 
         if (active) {
             setIsSpindleOn(false);
@@ -301,7 +306,19 @@ const SpindleWidget = () => {
             '$32=0',
             units,
         ];
-        updateControllerSettings(spindleMax, spindleMin, '0');
+
+        // only update max/min if slb laser doesnt exist
+        if (!SLBLaserExists) {
+            updateControllerSettings(prevSpindleMax, prevSpindleMin, '0');
+        } else {
+            // update only laser/spindle mode eeprom if slb laser exists
+            dispatch(
+                updatePartialControllerSettings({
+                    $32: '0',
+                }),
+            );
+        }
+
         controller.command('gcode', commands);
     };
 
@@ -317,14 +334,19 @@ const SpindleWidget = () => {
         });
         const { minPower, maxPower } = laser;
 
-        // save current spindle values
-        config.set('spindleMin', spindleMin);
-        config.set('spindleMax', spindleMax);
+        const SLBLaserExists =
+            controllerType === GRBLHAL &&
+            findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
 
-        const powerCommands =
-            spindle.label === 'SLB_LASER'
-                ? []
-                : [`$30=${maxPower}`, `$31=${minPower}`];
+        // save current spindle values if laser spindle doesnt exist
+        if (!SLBLaserExists) {
+            config.set('spindleMin', spindleMin);
+            config.set('spindleMax', spindleMax);
+        }
+
+        const powerCommands = SLBLaserExists
+            ? []
+            : [`$30=${maxPower}`, `$31=${minPower}`];
 
         if (active) {
             setIsLaserOn(false);
@@ -337,7 +359,18 @@ const SpindleWidget = () => {
             '$32=1',
             units,
         ];
-        updateControllerSettings(maxPower, minPower, '1');
+
+        // only update max/min if slb laser doesnt exist
+        if (!SLBLaserExists) {
+            updateControllerSettings(maxPower, minPower, '1');
+        } else {
+            // update only laser/spindle mode eeprom if slb laser exists
+            dispatch(
+                updatePartialControllerSettings({
+                    $32: '1',
+                }),
+            );
+        }
         controller.command('gcode', commands);
     };
 

@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
-import { LuRefreshCw } from 'react-icons/lu';
+import { LuMove, LuRefreshCw } from 'react-icons/lu';
+import { cx } from 'class-variance-authority';
 
 import Button from 'app/components/Button';
+import { Jogging } from 'app/features/Jogging';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover';
 
 import { useSquaring } from '../context/SquaringContext';
 import MarkingStep from './MarkingStep';
 import MeasurementStep from './MeasurementStep';
 import ResultsStep from './ResultsStep';
-
 import xySquaringImage from '../assets/XY_squaring_example.jpg';
-import { Jogging } from 'app/features/Jogging';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { cx } from 'class-variance-authority';
-import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 
 const Steps = () => {
     const [started, setStarted] = useState(false);
@@ -137,6 +141,20 @@ const Steps = () => {
                         icon={<LuRefreshCw className="w-4 h-4" />}
                         text="Restart Wizard"
                     />
+
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                icon={<LuMove className="w-4 h-4" />}
+                                text="Jog Controls"
+                            />
+                        </PopoverTrigger>
+
+                        <PopoverContent className="w-auto">
+                            <Jogging />
+                        </PopoverContent>
+                    </Popover>
                 </div>
                 <div
                     className={cx('flex gap-2', {

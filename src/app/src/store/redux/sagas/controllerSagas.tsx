@@ -790,7 +790,12 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'error',
         (
-            error: { type: typeof ALARM | typeof ERROR; lineNumber: number, code: number, line: string },
+            error: {
+                type: typeof ALARM | typeof ERROR;
+                lineNumber: number;
+                code: number;
+                line: string;
+            },
             _wasRunning: boolean,
         ) => {
             // const homingEnabled = _get(
@@ -800,17 +805,23 @@ export function* initialize(): Generator<any, void, any> {
 
             console.log(error);
 
-            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings', false);
-            if (showLineWarnings) {
+            const showLineWarnings = store.get(
+                'widgets.visualizer.showLineWarnings',
+                false,
+            );
+            if (showLineWarnings && error.type === ERROR) {
                 pubsub.publish('helper:info', {
                     title: 'Invalid Line',
                     description: (
                         <div className="flex flex-col gap-2">
-                            <p>The following line caused an <b>error {error.code}</b>: <i>'{error.line}'</i></p>
+                            <p>
+                                The following line caused an{' '}
+                                <b>error {error.code}</b>: <i>'{error.line}'</i>
+                            </p>
                             <p>Press Start to resume the job.</p>
                         </div>
-                    )
-                })
+                    ),
+                });
             }
 
             if (ALARM_ERROR_TYPES.includes(error.type)) {

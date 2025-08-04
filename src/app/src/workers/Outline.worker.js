@@ -21,22 +21,43 @@
  *
  */
 
-import hull from 'hull.js';
 import chunk from 'lodash/chunk';
+import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = [] } = data;
-    const getOutlineGcode = (concavity = 60) => {
+    const { isLaser = false, parsedData = [], mode } = data;
+    console.log(`Received mode: ${mode}`);
+
+    const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
         parsedData.forEach((n) => vertices.push(n.toFixed(3)));
         vertices = chunk(vertices, 3);
 
-        const fileHull = hull(vertices, concavity);
+        //const fileHull = hull(vertices);
+        let fileHull = concaveman(vertices);
+        fileHull = fileHull.slice(1); // Pop the first element since it's the same as the last and will result in weird movements.
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 
         return gCode;
     };
+
+    const getSimpleOutline = () => {
+        return [
+            '%X0=posx,Y0=posy,Z0=posz',
+            '%MM=modal.distance',
+            'G21 G91 G0 Z5',
+            'G90',
+            'G0 X0 Y0',
+            'G0 X[xmin] Y[ymax]',
+            'G0 X[xmax] Y[ymax]',
+            'G0 X[xmax] Y[ymin]',
+            'G0 X[xmin] Y[ymin]',
+            'G0 X[X0] Y[Y0]',
+            'G21 G91 G0 Z-5',
+            '[MM]',
+        ]
+    }
 
     function convertPointsToGCode(points, isLaser = false) {
         const gCode = [];
@@ -61,7 +82,12 @@ self.onmessage = ({ data }) => {
         gCode.push('[MM]');
         return gCode;
     }
-
-    const outlineGcode = getOutlineGcode();
+    let outlineGcode;
+    if (mode === 'Square') {
+        outlineGcode = getSimpleOutline();
+    } else {
+        outlineGcode = getOutlineGcode();
+    }
+    //const outlineGcode = getOutlineGcode();
     postMessage({ outlineGcode });
 };
