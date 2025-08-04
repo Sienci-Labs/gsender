@@ -25,7 +25,7 @@ import chunk from 'lodash/chunk';
 import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = [], mode } = data;
+    const { isLaser = false, parsedData = [], mode, bbox } = data;
     console.log(`Received mode: ${mode}`);
 
     const getOutlineGcode = (concavity = 20) => {
@@ -43,21 +43,38 @@ self.onmessage = ({ data }) => {
     };
 
     const getSimpleOutline = () => {
-        return [
-            '%X0=posx,Y0=posy,Z0=posz',
-            '%MM=modal.distance',
-            'G21 G91 G0 Z5',
-            'G90',
-            'G0 X0 Y0',
-            'G0 X[xmin] Y[ymax]',
-            'G0 X[xmax] Y[ymax]',
-            'G0 X[xmax] Y[ymin]',
-            'G0 X[xmin] Y[ymin]',
-            'G0 X[X0] Y[Y0]',
-            'G21 G91 G0 Z-5',
-            '[MM]',
-        ]
-    }
+        if (parsedData && parsedData.length <= 0) {
+            return [
+                '%X0=posx,Y0=posy,Z0=posz',
+                '%MM=modal.distance',
+                'G21 G91 G0 Z5',
+                'G90',
+                'G0 X0 Y0',
+                `G0 X[${bbox.min.x}] Y[${bbox.max.y}]`,
+                `G0 X[${bbox.max.x}] Y[${bbox.max.y}]`,
+                `G0 X[${bbox.max.x}] Y[${bbox.min.y}]`,
+                `G0 X[${bbox.min.x}] Y[${bbox.min.y}]`,
+                'G0 X[X0] Y[Y0]',
+                'G21 G91 G0 Z-5',
+                '[MM]',
+            ];
+        } else {
+            return [
+                '%X0=posx,Y0=posy,Z0=posz',
+                '%MM=modal.distance',
+                'G21 G91 G0 Z5',
+                'G90',
+                'G0 X0 Y0',
+                'G0 X[xmin] Y[ymax]',
+                'G0 X[xmax] Y[ymax]',
+                'G0 X[xmax] Y[ymin]',
+                'G0 X[xmin] Y[ymin]',
+                'G0 X[X0] Y[Y0]',
+                'G21 G91 G0 Z-5',
+                '[MM]',
+            ];
+        }
+    };
 
     function convertPointsToGCode(points, isLaser = false) {
         const gCode = [];

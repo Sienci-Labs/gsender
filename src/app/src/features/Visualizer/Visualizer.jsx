@@ -733,8 +733,7 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-
-       /*{
+        /*{
             // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
                 o.material.color.set(currentTheme.get(GRID_PART));
@@ -1058,7 +1057,10 @@ class Visualizer extends Component {
 
                 try {
                     const outlineWorker = new Worker(
-                        new URL('../../workers/Outline.worker.js', import.meta.url),
+                        new URL(
+                            '../../workers/Outline.worker.js',
+                            import.meta.url,
+                        ),
                         { type: 'module' },
                     );
 
@@ -1068,15 +1070,21 @@ class Visualizer extends Component {
                     );
                     const spindleMode = store.get('widgets.spindle.mode');
                     // outline toggled on and currently in laser mode
-                    const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+                    const isLaser =
+                        laserOnOutline && spindleMode === LASER_MODE;
 
-                    const outlineMode = store.get('workspace.outlineMode', 'Detailed');
+                    const outlineMode = store.get(
+                        'workspace.outlineMode',
+                        'Detailed',
+                    );
                     console.log('outlineMode', outlineMode);
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
                         outlineWorker.terminate();
-                        toast.error('Outline generation timed out. Please try again.');
+                        toast.error(
+                            'Outline generation timed out. Please try again.',
+                        );
                         this.outlineRunning = false;
                     }, 15000);
 
@@ -1089,9 +1097,9 @@ class Visualizer extends Component {
                     outlineWorker.postMessage({
                         isLaser,
                         parsedData: vertices,
-                        mode: outlineMode
+                        mode: outlineMode,
                     });
-                } catch(e) {
+                } catch (e) {
                     console.log(e);
                 }
             }),
@@ -2568,7 +2576,7 @@ export default connect(
             fileType,
             controllerType,
             senderStatus,
-            fileName
+            fileName,
         };
     },
     null,
