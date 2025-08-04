@@ -139,6 +139,8 @@ const defaultState: State = {
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
+            forceHardLimits: false,
+            forceSoftLimits: false
         },
         shouldWarnZero: false,
         diagnostics: {

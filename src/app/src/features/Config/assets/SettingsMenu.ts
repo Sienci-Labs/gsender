@@ -1097,14 +1097,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$123' },
                     {
                         label: 'Force hard limits',
-                        key: '',
+                        key: 'workspace.rotaryAxis.forceHardLimits',
                         description:
                             'Updates hard limits when toggling into rotary mode.',
                         type: 'boolean',
                     },
                     {
                         label: 'Force soft limits',
-                        key: '',
+                        key: 'workspace.rotaryAxis.forceSoftLimits',
                         description:
                             'Updates soft limits when toggling into rotary mode.',
                         type: 'boolean',

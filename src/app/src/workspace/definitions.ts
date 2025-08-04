@@ -74,6 +74,8 @@ export interface Workspace {
     rotaryAxis: {
         firmwareSettings: RotarySettings;
         defaultFirmwareSettings: RotarySettings;
+        forceHardLimits: boolean;
+        forceSoftLimits: boolean;
     };
     shouldWarnZero: boolean;
     diagnostics: {
