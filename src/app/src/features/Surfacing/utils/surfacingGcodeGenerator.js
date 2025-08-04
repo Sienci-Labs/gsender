@@ -46,7 +46,7 @@ export default class Generator {
             spindle = M3,
             shouldDwell,
             mist,
-            flood
+            flood,
         } = { ...defaultSurfacingState, ...surfacing };
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
@@ -63,14 +63,14 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
+            `${spindle} S${spindleRPM}`,
+            ...dwell,
             `G0 Z${z}`,
             'G0 X0 Y0',
             ...m7,
             ...m8,
-            `${spindle} S${spindleRPM}`,
             `G0 Z${z}`,
             `G1 F${feedrate}`,
-            ...dwell,
             '(Header End)',
             '\n',
         ];
@@ -127,7 +127,7 @@ export default class Generator {
             cutDirectionFlipped,
             skimDepth,
             mist,
-            flood
+            flood,
         } = this.surfacing;
 
         const stepoverPercentage = stepover > 80 ? 80 / 100 : stepover / 100;

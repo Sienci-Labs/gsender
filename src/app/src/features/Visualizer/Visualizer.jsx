@@ -241,6 +241,7 @@ class Visualizer extends Component {
         if (showAnimation) {
             if (this.isAgitated) {
                 // Call the render() function up to 60 times per second (i.e. 60fps)
+                this.animationLoopRunning = true;
                 requestAnimationFrame(this.renderAnimationLoop);
 
                 const rpm = 300;
@@ -248,10 +249,17 @@ class Visualizer extends Component {
             } else {
                 const rpm = 0;
                 this.rotateCuttingTool(rpm);
+
+                // Continue the loop even when not agitated to check for state changes
+                this.animationLoopRunning = true;
+                requestAnimationFrame(this.renderAnimationLoop);
             }
 
             // Update the scene
             this.updateScene();
+        } else {
+            // If animation is disabled, stop the loop
+            this.animationLoopRunning = false;
         }
     };
 
@@ -273,6 +281,9 @@ class Visualizer extends Component {
         this.cuttingPointer = null;
         this.limits = null;
         this.visualizer = null;
+
+        // Animation state
+        this.animationLoopRunning = false;
     }
 
     addStoreEvents() {
@@ -287,15 +298,68 @@ class Visualizer extends Component {
         this.addStoreEvents();
         this.addResizeEventListener();
 
+        // Ensure the DOM element is available before creating the scene
         if (this.node) {
-            this.createScene(this.node);
-
+            // Add a small delay to ensure the DOM is fully rendered
             setTimeout(() => {
-                this.resizeRenderer();
+                this.createScene(this.node);
+
+                // Force an initial render after scene creation
+                setTimeout(() => {
+                    this.resizeRenderer();
+                    this.updateScene({ forceUpdate: true });
+                }, 50);
             }, 0);
+        } else {
+            console.warn(
+                'Visualizer: DOM node not available during componentDidMount',
+            );
         }
 
-        this.resizeRenderer();
+        // Set up WebGL context loss handling
+        this.setupWebGLContextHandling();
+    }
+
+    setupWebGLContextHandling() {
+        // Handle WebGL context loss
+        const handleContextLost = (event) => {
+            console.warn('Visualizer: WebGL context lost');
+            event.preventDefault();
+            this.renderer = null;
+            this.scene = null;
+            this.camera = null;
+        };
+
+        // Handle WebGL context restoration
+        const handleContextRestored = () => {
+            console.log('Visualizer: WebGL context restored, recreating scene');
+            const wasAnimationRunning = this.animationLoopRunning;
+
+            if (this.node) {
+                this.createScene(this.node);
+                setTimeout(() => {
+                    this.resizeRenderer();
+                    this.updateScene({ forceUpdate: true });
+
+                    // Restart animation loop if it was running before
+                    if (wasAnimationRunning) {
+                        this.startAnimationLoop();
+                    }
+                }, 50);
+            }
+        };
+
+        // Add event listeners to the window
+        window.addEventListener('webglcontextlost', handleContextLost, false);
+        window.addEventListener(
+            'webglcontextrestored',
+            handleContextRestored,
+            false,
+        );
+
+        // Store references for cleanup
+        this.contextLostHandler = handleContextLost;
+        this.contextRestoredHandler = handleContextRestored;
     }
 
     componentDidUpdate(prevProps) {
@@ -309,6 +373,16 @@ class Visualizer extends Component {
         const state = this.props.state;
         const isConnected = this.props.isConnected;
 
+        // Check if scene needs to be recreated (e.g., if renderer was lost)
+        if (this.node && !this.isSceneInitialized() && this.props.show) {
+            console.log(
+                'Visualizer: Scene not properly initialized, attempting to recreate',
+            );
+            this.retrySceneCreation().catch((error) => {
+                console.error('Visualizer: Failed to recreate scene:', error);
+            });
+        }
+
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
         //this.resizeRenderer();
@@ -320,7 +394,9 @@ class Visualizer extends Component {
             this.props.show === true &&
             shouldZoom
         ) {
-            this.viewport.update();
+            if (this.viewport) {
+                this.viewport.update();
+            }
 
             // Set forceUpdate to true when enabling or disabling 3D view
             forceUpdate = true;
@@ -341,14 +417,16 @@ class Visualizer extends Component {
 
         // Projection
         if (prevState.projection !== state.projection) {
-            if (state.projection === 'orthographic') {
-                this.camera.toOrthographic();
-                this.camera.setZoom(1.3);
-                this.camera.setFov(ORTHOGRAPHIC_FOV);
-            } else {
-                this.camera.toPerspective();
-                this.camera.setZoom(1.3);
-                this.camera.setFov(PERSPECTIVE_FOV);
+            if (this.camera) {
+                if (state.projection === 'orthographic') {
+                    this.camera.toOrthographic();
+                    this.camera.setZoom(1.3);
+                    this.camera.setFov(ORTHOGRAPHIC_FOV);
+                } else {
+                    this.camera.toPerspective();
+                    this.camera.setZoom(1.3);
+                    this.camera.setFov(PERSPECTIVE_FOV);
+                }
             }
             if (this.viewport && shouldZoom) {
                 this.viewport.update();
@@ -375,7 +453,6 @@ class Visualizer extends Component {
                 'ImperialCoordinateSystem',
             );
             if (imperialCoordinateSystem) {
-                ``;
                 imperialCoordinateSystem.visible =
                     visible && state.units === IMPERIAL_UNITS;
             }
@@ -536,6 +613,19 @@ class Visualizer extends Component {
             }
         }
 
+        // Also check if we need to start the animation loop when showAnimation changes
+        const shouldShowAnimation = this.showAnimation();
+        if (
+            shouldShowAnimation &&
+            this.isAgitated &&
+            !this.animationLoopRunning
+        ) {
+            this.animationLoopRunning = true;
+            requestAnimationFrame(this.renderAnimationLoop);
+        } else if (!shouldShowAnimation && this.animationLoopRunning) {
+            this.animationLoopRunning = false;
+        }
+
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
             if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
@@ -594,6 +684,26 @@ class Visualizer extends Component {
         this.unsubscribe();
         this.removeResizeEventListener();
         this.clearScene();
+
+        // Stop animation loop
+        this.animationLoopRunning = false;
+        this.isAgitated = false;
+
+        // Clean up WebGL context handlers
+        if (this.contextLostHandler) {
+            window.removeEventListener(
+                'webglcontextlost',
+                this.contextLostHandler,
+                false,
+            );
+        }
+        if (this.contextRestoredHandler) {
+            window.removeEventListener(
+                'webglcontextrestored',
+                this.contextRestoredHandler,
+                false,
+            );
+        }
     }
 
     updateGridChildColor(name, color) {
@@ -733,8 +843,7 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-
-       /*{
+        /*{
             // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
                 o.material.color.set(currentTheme.get(GRID_PART));
@@ -1054,34 +1163,55 @@ class Visualizer extends Component {
                 toast.info('Generating outline g-code...');
                 this.outlineRunning = true;
 
-                // We want to make sure that in situations outline fails, you can try again in ~5 seconds
-                setTimeout(() => {
-                    this.outlineRunning = false;
-                }, 5000);
-
                 const vertices = this.props.actions.getHull();
-                const outlineWorker = new Worker(
-                    new URL('../../workers/Outline.worker.js', import.meta.url),
-                    { type: 'module' },
-                );
 
-                const laserOnOutline = store.get(
-                    'widgets.spindle.laser.laserOnOutline',
-                    false,
-                );
-                const spindleMode = store.get('widgets.spindle.mode');
-                // outline toggled on and currently in laser mode
-                const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+                try {
+                    const outlineWorker = new Worker(
+                        new URL(
+                            '../../workers/Outline.worker.js',
+                            import.meta.url,
+                        ),
+                        { type: 'module' },
+                    );
 
-                outlineWorker.onmessage = ({ data }) => {
-                    outlineResponse({ data }, laserOnOutline);
-                    // Enable the outline button again
-                    this.outlineRunning = false;
-                };
-                outlineWorker.postMessage({
-                    isLaser,
-                    parsedData: vertices,
-                });
+                    const laserOnOutline = store.get(
+                        'widgets.spindle.laser.laserOnOutline',
+                        false,
+                    );
+                    const spindleMode = store.get('widgets.spindle.mode');
+                    // outline toggled on and currently in laser mode
+                    const isLaser =
+                        laserOnOutline && spindleMode === LASER_MODE;
+
+                    const outlineMode = store.get(
+                        'workspace.outlineMode',
+                        'Detailed',
+                    );
+                    console.log('outlineMode', outlineMode);
+
+                    // We want to make sure that in situations outline fails, you can try again in ~5 seconds
+                    const maxRuntime = setTimeout(() => {
+                        outlineWorker.terminate();
+                        toast.error(
+                            'Outline generation timed out. Please try again.',
+                        );
+                        this.outlineRunning = false;
+                    }, 15000);
+
+                    outlineWorker.onmessage = ({ data }) => {
+                        clearTimeout(maxRuntime);
+                        outlineResponse({ data }, laserOnOutline);
+                        // Enable the outline button again
+                        this.outlineRunning = false;
+                    };
+                    outlineWorker.postMessage({
+                        isLaser,
+                        parsedData: vertices,
+                        mode: outlineMode,
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1116,6 +1246,13 @@ class Visualizer extends Component {
     getVisibleWidth() {
         const el = this.node;
 
+        if (!el) {
+            console.warn(
+                'Visualizer: Node not available for width calculation',
+            );
+            return 360; // Fallback width
+        }
+
         const visibleWidth = Math.max(
             Number(el?.parentNode?.clientWidth) || 0,
             360,
@@ -1144,10 +1281,21 @@ class Visualizer extends Component {
         // this function runs as the visualizer is getting removed,
         // resulting in a null container
         if (!container) {
-            return 0;
+            console.warn(
+                `Visualizer: Container with ID '${containerID}' not found for height calculation`,
+            );
+            return 360; // Fallback height
         }
 
-        return container.clientHeight;
+        const height = container.clientHeight;
+        if (height === 0) {
+            console.warn(
+                'Visualizer: Container height is zero, using fallback',
+            );
+            return 360; // Fallback height
+        }
+
+        return height;
 
         // const clientHeight = isSecondary
         //     ? container.clientHeight - 2
@@ -1166,15 +1314,40 @@ class Visualizer extends Component {
 
     resizeRenderer() {
         if (!(this.camera && this.renderer)) {
+            console.warn(
+                'Visualizer: Cannot resize renderer - camera or renderer not available',
+            );
             return;
         }
 
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
+
         if (width === 0 || height === 0) {
-            log.warn(
-                `The width (${width}) and height (${height}) cannot be a zero value`,
+            console.warn(
+                `Visualizer: Zero dimensions detected during resize - width: ${width}, height: ${height}. Using fallback dimensions.`,
             );
+            // Use fallback dimensions to prevent rendering issues
+            const fallbackWidth = Math.max(width, 360);
+            const fallbackHeight = Math.max(height, 360);
+
+            this.camera.setSize(fallbackWidth, fallbackHeight);
+            this.camera.aspect = fallbackWidth / fallbackHeight;
+            this.camera.updateProjectionMatrix();
+
+            this.renderer.setSize(fallbackWidth, fallbackHeight);
+            if (this.copyComposer)
+                this.copyComposer.setSize(fallbackWidth, fallbackHeight);
+            if (this.fxaaComposer)
+                this.fxaaComposer.setSize(fallbackWidth, fallbackHeight);
+            if (this.bloomComposer)
+                this.bloomComposer.setSize(fallbackWidth, fallbackHeight);
+            if (this.finalComposer)
+                this.finalComposer.setSize(fallbackWidth, fallbackHeight);
+
+            // Update the scene with fallback dimensions
+            this.updateScene({ forceUpdate: true });
+            return;
         }
 
         // https://github.com/mrdoob/three.js/blob/dev/examples/js/cameras/CombinedCamera.js#L156
@@ -1199,13 +1372,15 @@ class Visualizer extends Component {
             );
         }
 
-        this.controls.handleResize();
+        if (this.controls) {
+            this.controls.handleResize();
+        }
 
         this.renderer.setSize(width, height);
-        this.copyComposer.setSize(width, height);
-        this.fxaaComposer.setSize(width, height);
-        this.bloomComposer.setSize(width, height);
-        this.finalComposer.setSize(width, height);
+        if (this.copyComposer) this.copyComposer.setSize(width, height);
+        if (this.fxaaComposer) this.fxaaComposer.setSize(width, height);
+        if (this.bloomComposer) this.bloomComposer.setSize(width, height);
+        if (this.finalComposer) this.finalComposer.setSize(width, height);
 
         // Update the scene
         this.updateScene();
@@ -1388,232 +1563,278 @@ class Visualizer extends Component {
     //
     createScene(el) {
         if (!el || el?.firstChild) {
+            console.warn(
+                'Visualizer: Cannot create scene - element not available or already has children',
+            );
             return;
         }
 
-        const { state, isConnected } = this.props;
-        const { units, objects, currentTheme, liteMode } = state;
-        const width = this.getVisibleWidth();
-        const height = this.getVisibleHeight();
-        const isLaser = isLaserMode();
+        try {
+            const { state, isConnected } = this.props;
+            const { units, objects, currentTheme, liteMode } = state;
+            let width = this.getVisibleWidth();
+            let height = this.getVisibleHeight();
+            const isLaser = isLaserMode();
 
-        // WebGLRenderer
-        this.renderer = new THREE.WebGLRenderer({
-            alpha: true,
-            antialias: true,
-        });
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.BasicShadowMap;
-        this.renderer.setClearColor(
-            new THREE.Color(currentTheme.get(BACKGROUND_PART)),
-            1,
-        );
-        this.renderer.setSize(width, height);
-        this.renderer.clear();
+            // Ensure minimum dimensions if they're zero
+            if (width === 0 || height === 0) {
+                console.warn(
+                    `Visualizer: Zero dimensions detected - width: ${width}, height: ${height}`,
+                );
+                width = Math.max(width, 360);
+                height = Math.max(height, 360);
+            }
 
-        // To actually be able to display anything with Three.js, we need three things:
-        // A scene, a camera, and a renderer so we can render the scene with the camera.
-        this.scene = new THREE.Scene();
+            console.log(
+                `Visualizer: Creating scene with dimensions ${width}x${height}`,
+            );
 
-        this.camera = this.createCombinedCamera(width, height);
+            // WebGLRenderer
+            this.renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true,
+            });
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.BasicShadowMap;
+            this.renderer.setClearColor(
+                new THREE.Color(currentTheme.get(BACKGROUND_PART)),
+                1,
+            );
+            this.renderer.setSize(width, height);
+            this.renderer.clear();
 
-        //Set default camera position to 3D
-        this.camera.up.set(0, 0, 1);
-        this.camera.position.set(
-            -CAMERA_DISTANCE,
-            -CAMERA_DISTANCE,
-            CAMERA_DISTANCE,
-        );
+            // To actually be able to display anything with Three.js, we need three things:
+            // A scene, a camera, and a renderer so we can render the scene with the camera.
+            this.scene = new THREE.Scene();
 
-        this.controls = this.createTrackballControls(
-            this.camera,
-            this.renderer.domElement,
-        );
+            this.camera = this.createCombinedCamera(width, height);
 
-        this.setCameraMode(state.cameraMode);
+            //Set default camera position to 3D
+            this.camera.up.set(0, 0, 1);
+            this.camera.position.set(
+                -CAMERA_DISTANCE,
+                -CAMERA_DISTANCE,
+                CAMERA_DISTANCE,
+            );
 
-        // Projection
-        if (state.projection === 'orthographic') {
-            this.camera.toOrthographic();
-            this.camera.setZoom(1);
-            this.camera.setFov(ORTHOGRAPHIC_FOV);
-        } else {
-            this.camera.toPerspective();
-            this.camera.setZoom(1);
-            this.camera.setFov(PERSPECTIVE_FOV);
-        }
+            this.controls = this.createTrackballControls(
+                this.camera,
+                this.renderer.domElement,
+            );
 
-        {
-            // Directional Light
-            const color = 0xffffff;
-            const intensity = 1;
-            let light;
+            this.setCameraMode(state.cameraMode);
 
-            light = new THREE.DirectionalLight(color, intensity);
-            light.position.set(-1, -1, 1);
-            this.scene.add(light);
+            // Projection
+            if (state.projection === 'orthographic') {
+                this.camera.toOrthographic();
+                this.camera.setZoom(1);
+                this.camera.setFov(ORTHOGRAPHIC_FOV);
+            } else {
+                this.camera.toPerspective();
+                this.camera.setZoom(1);
+                this.camera.setFov(PERSPECTIVE_FOV);
+            }
 
-            light = new THREE.DirectionalLight(color, intensity);
-            light.position.set(1, -1, 1);
-            this.scene.add(light);
-        }
+            {
+                // Directional Light
+                const color = 0xffffff;
+                const intensity = 1;
+                let light;
 
-        {
-            // Ambient Light
-            const light = new THREE.AmbientLight(colornames('gray 25')); // soft white light
-            this.scene.add(light);
-        }
+                light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(-1, -1, 1);
+                this.scene.add(light);
 
-        {
-            // Imperial Coordinate System
-            const visible = objects.coordinateSystem.visible;
-            const imperialCoordinateSystem =
-                this.createCoordinateSystem(IMPERIAL_UNITS);
-            imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
-            imperialCoordinateSystem.visible =
-                visible && units === IMPERIAL_UNITS;
-            this.group.add(imperialCoordinateSystem);
-        }
+                light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(1, -1, 1);
+                this.scene.add(light);
+            }
 
-        {
-            // Metric Coordinate System
-            const visible = objects.coordinateSystem.visible;
-            const metricCoordinateSystem =
-                this.createCoordinateSystem(METRIC_UNITS);
-            metricCoordinateSystem.name = 'MetricCoordinateSystem';
-            metricCoordinateSystem.visible = visible && units === METRIC_UNITS;
-            this.group.add(metricCoordinateSystem);
-        }
+            {
+                // Ambient Light
+                const light = new THREE.AmbientLight(colornames('gray 25')); // soft white light
+                this.scene.add(light);
+            }
 
-        {
-            // Imperial Grid Line Numbers
-            const visible = objects.gridLineNumbers.visible;
-            const imperialGridLineNumbers =
-                this.createGridLineNumbers(IMPERIAL_UNITS);
-            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
-            imperialGridLineNumbers.visible =
-                visible && units === IMPERIAL_UNITS;
-            this.group.add(imperialGridLineNumbers);
-        }
+            {
+                // Imperial Coordinate System
+                const visible = objects.coordinateSystem.visible;
+                const imperialCoordinateSystem =
+                    this.createCoordinateSystem(IMPERIAL_UNITS);
+                imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
+                imperialCoordinateSystem.visible =
+                    visible && units === IMPERIAL_UNITS;
+                this.group.add(imperialCoordinateSystem);
+            }
 
-        {
-            // Metric Grid Line Numbers
-            const visible = objects.gridLineNumbers.visible;
-            const metricGridLineNumbers =
-                this.createGridLineNumbers(METRIC_UNITS);
-            metricGridLineNumbers.name = 'MetricGridLineNumbers';
-            metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
-            this.group.add(metricGridLineNumbers);
-        }
+            {
+                // Metric Coordinate System
+                const visible = objects.coordinateSystem.visible;
+                const metricCoordinateSystem =
+                    this.createCoordinateSystem(METRIC_UNITS);
+                metricCoordinateSystem.name = 'MetricCoordinateSystem';
+                metricCoordinateSystem.visible =
+                    visible && units === METRIC_UNITS;
+                this.group.add(metricCoordinateSystem);
+            }
 
-        {
-            // Cutting Tool
-            Promise.all([
-                loadSTL('assets/models/stl/bit.stl').then(
-                    (geometry) => geometry,
-                ),
-                loadTexture('assets/textures/brushed-steel-texture.jpg').then(
-                    (texture) => texture,
-                ),
-            ]).then((result) => {
-                const [geometry, texture] = result;
+            {
+                // Imperial Grid Line Numbers
+                const visible = objects.gridLineNumbers.visible;
+                const imperialGridLineNumbers =
+                    this.createGridLineNumbers(IMPERIAL_UNITS);
+                imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+                imperialGridLineNumbers.visible =
+                    visible && units === IMPERIAL_UNITS;
+                this.group.add(imperialGridLineNumbers);
+            }
 
-                // Rotate the geometry 90 degrees about the X axis.
-                geometry.rotateX(-Math.PI / 2);
+            {
+                // Metric Grid Line Numbers
+                const visible = objects.gridLineNumbers.visible;
+                const metricGridLineNumbers =
+                    this.createGridLineNumbers(METRIC_UNITS);
+                metricGridLineNumbers.name = 'MetricGridLineNumbers';
+                metricGridLineNumbers.visible =
+                    visible && units === METRIC_UNITS;
+                this.group.add(metricGridLineNumbers);
+            }
 
-                // Scale the geometry data.
-                geometry.scale(0.5, 0.5, 0.5);
+            {
+                // Cutting Tool
+                Promise.all([
+                    loadSTL('assets/models/stl/bit.stl').then(
+                        (geometry) => geometry,
+                    ),
+                    loadTexture(
+                        'assets/textures/brushed-steel-texture.jpg',
+                    ).then((texture) => texture),
+                ])
+                    .then((result) => {
+                        const [geometry, texture] = result;
 
-                // Compute the bounding box.
-                geometry.computeBoundingBox();
+                        // Rotate the geometry 90 degrees about the X axis.
+                        geometry.rotateX(-Math.PI / 2);
 
-                // Set the desired position from the origin rather than its center.
-                const height =
-                    geometry.boundingBox.max.z - geometry.boundingBox.min.z;
-                geometry.translate(0, 0, height / 2);
+                        // Scale the geometry data.
+                        geometry.scale(0.5, 0.5, 0.5);
 
-                let material = new THREE.MeshLambertMaterial({
-                    map: texture,
-                    opacity: 0.9,
-                    transparent: false,
-                    emissive: 0xcccccc,
-                    emissiveIntensity: 0.5,
-                    color: '#caf0f8',
+                        // Compute the bounding box.
+                        geometry.computeBoundingBox();
+
+                        // Set the desired position from the origin rather than its center.
+                        const height =
+                            geometry.boundingBox.max.z -
+                            geometry.boundingBox.min.z;
+                        geometry.translate(0, 0, height / 2);
+
+                        let material = new THREE.MeshLambertMaterial({
+                            map: texture,
+                            opacity: 0.9,
+                            transparent: false,
+                            emissive: 0xcccccc,
+                            emissiveIntensity: 0.5,
+                            color: '#caf0f8',
+                        });
+
+                        if (geometry.hasColors) {
+                            material.vertexColors = true;
+                        }
+
+                        const mesh = new THREE.Mesh(geometry, material);
+                        const object = new THREE.Object3D();
+                        object.add(mesh);
+
+                        this.cuttingTool = object;
+                        this.cuttingTool.name = 'CuttingTool';
+                        this.cuttingTool.visible =
+                            isConnected &&
+                            !isLaser &&
+                            (liteMode
+                                ? state.objects.cuttingTool.visibleLite
+                                : state.objects.cuttingTool.visible);
+
+                        this.group.add(this.cuttingTool);
+                        // Update the scene
+                        this.updateScene();
+                    })
+                    .catch((error) => {
+                        console.error(
+                            'Visualizer: Failed to load cutting tool assets:',
+                            error,
+                        );
+                    });
+            }
+
+            {
+                // Laser Tool
+                this.setupScene();
+
+                // add tool
+                this.laserPointer = new LaserPointer({
+                    color: currentTheme.get(CUTTING_PART),
+                    diameter: 4,
                 });
-
-                if (geometry.hasColors) {
-                    material.vertexColors = true;
-                }
-
-                const mesh = new THREE.Mesh(geometry, material);
-                const object = new THREE.Object3D();
-                object.add(mesh);
-
-                this.cuttingTool = object;
-                this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible =
+                this.laserPointer.name = 'LaserPointer';
+                this.laserPointer.visible =
                     isConnected &&
-                    !isLaser &&
+                    isLaser &&
                     (liteMode
                         ? state.objects.cuttingTool.visibleLite
                         : state.objects.cuttingTool.visible);
 
-                this.group.add(this.cuttingTool);
+                this.group.add(this.laserPointer);
+
                 // Update the scene
                 this.updateScene();
-            });
+            }
+
+            {
+                // Cutting Pointer
+                this.createCuttingPointer();
+            }
+
+            {
+                // Limits
+                const limits = _get(this.machineProfile, 'limits');
+                const {
+                    xmin = 0,
+                    xmax = 0,
+                    ymin = 0,
+                    ymax = 0,
+                    zmin = 0,
+                    zmax = 0,
+                } = { ...limits };
+                this.limits = this.createLimits(
+                    xmin,
+                    xmax,
+                    ymin,
+                    ymax,
+                    zmin,
+                    zmax,
+                );
+                this.limits.name = 'Limits';
+                this.limits.visible = objects.limits.visible;
+                this.updateLimitsPosition();
+            }
+
+            this.scene.add(this.group);
+
+            // Append the renderer to the DOM
+            setTimeout(() => {
+                if (el && !el.firstChild) {
+                    el.appendChild(this.renderer.domElement);
+                    console.log(
+                        'Visualizer: Scene created and DOM element appended successfully',
+                    );
+
+                    // Force an immediate render
+                    this.updateScene({ forceUpdate: true });
+                }
+            }, 0);
+        } catch (error) {
+            console.error('Visualizer: Error creating scene:', error);
         }
-
-        {
-            // Laser Tool
-            this.setupScene();
-
-            // add tool
-            this.laserPointer = new LaserPointer({
-                color: currentTheme.get(CUTTING_PART),
-                diameter: 4,
-            });
-            this.laserPointer.name = 'LaserPointer';
-            this.laserPointer.visible =
-                isConnected &&
-                isLaser &&
-                (liteMode
-                    ? state.objects.cuttingTool.visibleLite
-                    : state.objects.cuttingTool.visible);
-
-            this.group.add(this.laserPointer);
-
-            // Update the scene
-            this.updateScene();
-        }
-
-        {
-            // Cutting Pointer
-            this.createCuttingPointer();
-        }
-
-        {
-            // Limits
-            const limits = _get(this.machineProfile, 'limits');
-            const {
-                xmin = 0,
-                xmax = 0,
-                ymin = 0,
-                ymax = 0,
-                zmin = 0,
-                zmax = 0,
-            } = { ...limits };
-            this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
-            this.limits.name = 'Limits';
-            this.limits.visible = objects.limits.visible;
-            this.updateLimitsPosition();
-        }
-
-        this.scene.add(this.group);
-
-        setTimeout(() => {
-            el.appendChild(this.renderer.domElement);
-        }, 0);
     }
 
     // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html,
@@ -1722,7 +1943,19 @@ class Visualizer extends Component {
         const needUpdateScene = this.props.show || forceUpdate;
 
         if (this.renderer && needUpdateScene) {
-            this.renderer.render(this.scene, this.camera);
+            try {
+                this.renderer.render(this.scene, this.camera);
+            } catch (error) {
+                console.error('Visualizer: Error rendering scene:', error);
+            }
+        } else if (!this.renderer) {
+            console.warn(
+                'Visualizer: Cannot update scene - renderer not available',
+            );
+        } else if (!needUpdateScene) {
+            console.debug(
+                'Visualizer: Scene update skipped - not shown and not forced',
+            );
         }
     }
 
@@ -2498,10 +2731,39 @@ class Visualizer extends Component {
         !noPan && this.pan(-1 * panSpeed, 0);
     }
 
+    forceSceneRefresh() {
+        console.log('Visualizer: Forcing complete scene refresh');
+
+        // Clear existing scene
+        this.clearScene();
+
+        // Recreate scene if node is available
+        if (this.node) {
+            this.createScene(this.node);
+            setTimeout(() => {
+                this.resizeRenderer();
+                this.updateScene({ forceUpdate: true });
+            }, 50);
+        }
+    }
+
     render() {
         if (!WebGL.isWebGLAvailable()) {
-            return null;
+            console.warn('Visualizer: WebGL not available, cannot render');
+            return (
+                <div className="overflow-hidden h-full w-full rounded-lg flex items-center justify-center bg-gray-100">
+                    <div className="text-center">
+                        <p className="text-gray-600">
+                            WebGL is not available in your browser
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Please enable WebGL or try a different browser
+                        </p>
+                    </div>
+                </div>
+            );
         }
+
         return (
             <div
                 className="overflow-hidden h-full w-full rounded-lg"
@@ -2509,6 +2771,81 @@ class Visualizer extends Component {
                 id="visualizer-wrapper"
             />
         );
+    }
+
+    isSceneInitialized() {
+        return !!(this.renderer && this.scene && this.camera && this.group);
+    }
+
+    retrySceneCreation(maxRetries = 3) {
+        if (this.isSceneInitialized()) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            let retryCount = 0;
+
+            const attemptCreation = () => {
+                if (retryCount >= maxRetries) {
+                    reject(
+                        new Error(
+                            `Failed to create scene after ${maxRetries} attempts`,
+                        ),
+                    );
+                    return;
+                }
+
+                retryCount++;
+                console.log(
+                    `Visualizer: Attempting to create scene (attempt ${retryCount}/${maxRetries})`,
+                );
+
+                if (this.node) {
+                    this.createScene(this.node);
+
+                    setTimeout(() => {
+                        if (this.isSceneInitialized()) {
+                            console.log(
+                                'Visualizer: Scene created successfully on retry',
+                            );
+                            this.resizeRenderer();
+                            this.updateScene({ forceUpdate: true });
+
+                            // Restart animation loop if it was running before
+                            if (this.isAgitated) {
+                                this.startAnimationLoop();
+                            }
+
+                            resolve();
+                        } else {
+                            console.warn(
+                                `Visualizer: Scene creation failed on attempt ${retryCount}, retrying...`,
+                            );
+                            setTimeout(attemptCreation, 1000); // Wait 1 second before retry
+                        }
+                    }, 100);
+                } else {
+                    reject(
+                        new Error('DOM node not available for scene creation'),
+                    );
+                }
+            };
+
+            attemptCreation();
+        });
+    }
+
+    startAnimationLoop() {
+        const showAnimation = this.showAnimation();
+        if (showAnimation && this.isAgitated && !this.animationLoopRunning) {
+            this.animationLoopRunning = true;
+            requestAnimationFrame(this.renderAnimationLoop);
+        }
+    }
+
+    stopAnimationLoop() {
+        this.animationLoopRunning = false;
+        this.isAgitated = false;
     }
 }
 
@@ -2556,7 +2893,7 @@ export default connect(
             fileType,
             controllerType,
             senderStatus,
-            fileName
+            fileName,
         };
     },
     null,

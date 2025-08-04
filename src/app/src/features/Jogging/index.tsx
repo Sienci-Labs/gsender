@@ -55,7 +55,9 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
-    const [jogThreshold, setJogThreshold] = useState<number>(store.get('widgets.axes.jog.threshold', 200));
+    const [jogThreshold, setJogThreshold] = useState<number>(
+        store.get('widgets.axes.jog.threshold', 200),
+    );
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -77,12 +79,12 @@ export function Jogging() {
             if (newThreshold !== jogThreshold) {
                 setJogThreshold(newThreshold);
             }
-        })
-    }, [])
+        });
+    }, []);
 
     useEffect(() => {
         jogHelper.current?.updateThreshold(jogThreshold);
-    }, [jogThreshold])
+    }, [jogThreshold]);
 
     useEffect(() => {
         jogSpeedRef.current = jogSpeed;
@@ -926,9 +928,8 @@ export function Jogging() {
 
     const isRotaryMode = mode === 'ROTARY';
     const showA =
-        (rotaryWidgetState.tab.show && firmwareType === 'grblHAL') ||
-        isRotaryMode;
-    const noA = !rotaryWidgetState.tab.show || !isRotaryMode;
+        (firmwareType === 'grblHAL' || isRotaryMode) &&
+        rotaryWidgetState.tab.show;
 
     return (
         <>
@@ -978,13 +979,13 @@ export function Jogging() {
             <div className="flex gap-1 w-full justify-around">
                 <div
                     className={cx('flex items-center justify-center', {
-                        'px-7': noA,
+                        'px-7': !showA,
                     })}
                 >
                     <div
                         className={cx('grid gap-x-1 items-center', {
                             'grid-cols-2 gap-y-3': showA,
-                            'grid-cols-1 gap-y-1 xl:gap-y-2': noA,
+                            'grid-cols-1 gap-y-1 xl:gap-y-2': !showA,
                         })}
                     >
                         <JogInput
@@ -997,14 +998,13 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmwareType === 'grblHAL' || isRotaryMode) &&
-                            rotaryWidgetState.tab.show && (
-                                <JogInput
-                                    label="A°"
-                                    currentValue={jogSpeed.aStep}
-                                    onChange={updateAStep}
-                                />
-                            )}
+                        {showA && (
+                            <JogInput
+                                label="A°"
+                                currentValue={jogSpeed.aStep}
+                                onChange={updateAStep}
+                            />
+                        )}
                         <JogInput
                             label="at"
                             currentValue={jogSpeed.feedrate}

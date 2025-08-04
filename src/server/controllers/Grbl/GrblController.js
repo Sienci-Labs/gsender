@@ -1671,6 +1671,10 @@ class GrblController {
             },
             'feeder:stop': () => {
                 this.feeder.reset();
+
+                delay(100).then(() => {
+                    this.write('~');
+                });
             },
             'feedhold': () => {
                 this.event.trigger(FEED_HOLD);
