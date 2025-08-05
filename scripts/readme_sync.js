@@ -1,4 +1,4 @@
-import fs from 'fs';
+const fs = require("fs");
 
 export function parseLatestReadmeNotes() {
     const readme = fs.readFileSync('README.md', 'utf8');
