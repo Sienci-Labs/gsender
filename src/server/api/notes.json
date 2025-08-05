@@ -1,12 +1,5 @@
 [
   {
-    "version": "1.5.4",
-    "date": "November 15, 2025",
-    "notes": [
-      "test"
-    ]
-  },
-  {
     "version": "1.5.3",
     "date": "August 4, 2025",
     "notes": [
@@ -67,6 +60,25 @@
       "File stat feed rates now convert correctly",
       "Zero All on grblHAL no longer sends Zero on A if A Axis not reported",
       "Various look and feel changes"
+    ]
+  },
+  {
+    "version": "1.5.1",
+    "date": "June 27, 2025",
+    "notes": [
+      "Addressed issues where jog values kept reconverting",
+      "Fixed crash when importing settings",
+      "Updated some AltMill and LongMill default values",
+      "Removed Zoom icons from visualizer",
+      "Override sliders have switched to decaf and are now less jumpy",
+      "Fixed unit issue with Go To popover and default values no longer populate Z with Y value",
+      "Using tuning tools (Squaring and Steps/mm) now refresh EEPROM state and respect UI units",
+      "Abs/Inc toggle in Go To popup moved to top",
+      "Fixed issue where M0 in macros could result in a paused feeder state after unlocking preventing further code sending",
+      "Fixed issue where Machine status overlapped unlock and connect on smaller resolutions and made them unclickable",
+      "Disabling a drawer tool now defaults you to the first drawer element",
+      "Fixed issue with tool select in probing working inconsistently and defaulting to Auto",
+      "Rotary Axis travel resolution and maximum rate appearing again when connected with grbl"
     ]
   }
 ]

@@ -8,6 +8,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
+import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx';
 
 export function ATC() {
     const [showToolTable, setShowToolTable] = useState(false);
@@ -40,15 +41,17 @@ export function ATC() {
     }
 
     return (
-        <div className="flex flex-col  w-full gap-4 relative">
-            <div className="flex flex-row w-full justify-end absolute top-0 right-2">
+        <div className="flex flex-col  w-full gap-2 relative">
+            <div className="flex flex-col gap-2 w-36 justify-end absolute top-0 right-16">
                 <ToolDisplayModal
                     showToolTable={showToolTable}
                     onOpenChange={toggleToolTable}
                     tools={tools}
                     disabled={disabledButton}
                 />
+                <AdvancedOptions />
             </div>
+
             <ToolDisplay tools={tools} disabled={disabledButton} />
         </div>
     );

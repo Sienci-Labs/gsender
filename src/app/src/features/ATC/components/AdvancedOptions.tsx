@@ -1,0 +1,71 @@
+import {
+    Collapsible,
+    CollapsibleTrigger,
+    CollapsibleContent,
+} from 'app/components/shadcn/Collapsible.tsx';
+import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
+import Button from 'app/components/Button';
+import { useState } from 'react';
+import { LuHardHat } from 'react-icons/lu';
+
+export function AdvancedOptions() {
+    const [isOpen, setIsOpen] = useState(false);
+    const handleButtonClick = (action: string) => {
+        console.log(`${action} clicked`);
+        // Add your button action logic here
+    };
+    return (
+        <div className="flex w-36">
+            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+                <CollapsibleTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        className="justify-between px-3 py-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                    >
+                        <div className="flex items-center gap-2">
+                            <LuHardHat className="h-4 w-4" />
+                            <span>Advanced Options</span>
+                        </div>
+                        {isOpen ? (
+                            <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                        ) : (
+                            <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                        )}
+                    </Button>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                    <div className="px-3 pb-1 space-y-1">
+                        <Button
+                            onClick={() =>
+                                handleButtonClick('Release from Spindle')
+                            }
+                            size="sm"
+                            variant="primary"
+                        >
+                            Release from Spindle
+                        </Button>
+
+                        <Button
+                            onClick={() => handleButtonClick('Save to Rack')}
+                            size="sm"
+                            variant="primary"
+                        >
+                            Save to Rack
+                        </Button>
+
+                        <Button
+                            onClick={() =>
+                                handleButtonClick('Load and Save to Rack')
+                            }
+                            size="sm"
+                            variant="primary"
+                        >
+                            Load and Save to Rack
+                        </Button>
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+        </div>
+    );
+}
