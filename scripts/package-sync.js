@@ -59,4 +59,6 @@ fs.writeFileSync(target, content + "\n", "utf8");
 fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
 
 // Update readme notes
-parseLatestReadmeNotes();
+const readme = fs.readFileSync('README.md', 'utf8');
+const notes = parseLatestReadmeNotes(readme);
+fs.writeFileSync('./src/server/api/notes.json', JSON.stringify(notes, null, 2));
