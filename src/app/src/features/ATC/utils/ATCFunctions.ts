@@ -95,3 +95,5 @@ export function loadAndSaveToRack(toolID) {
 export function saveToRack(toolID) {
     controller.command('gcode', [`G65P902Q${toolID}`, '$#']);
 }
+
+export type LoadToolMode = 'load' | 'save' | 'loadAndSave';

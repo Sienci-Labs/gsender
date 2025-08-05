@@ -6,13 +6,18 @@ import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.t
 import controller from 'app/lib/controller.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
+import {
+    LoadToolMode,
+    mapToolNicknamesAndStatus,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx';
 
 export function ATC() {
     const [showToolTable, setShowToolTable] = useState(false);
     const [tools, setTools] = useState<ToolInstance[]>([]);
+    const [loadToolPopoverOpen, setLoadToolPopoverOpen] = useState(false);
+    const [loadToolMode, setLoadToolMode] = useState<LoadToolMode>('load');
 
     const toolTableData = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -49,10 +54,19 @@ export function ATC() {
                     tools={tools}
                     disabled={disabledButton}
                 />
-                <AdvancedOptions disabled={disabledButton} />
+                <AdvancedOptions
+                    disabled={disabledButton}
+                    setLoadToolMode={setLoadToolMode}
+                />
             </div>
 
-            <ToolDisplay tools={tools} disabled={disabledButton} />
+            <ToolDisplay
+                tools={tools}
+                disabled={disabledButton}
+                loadToolMode={loadToolMode}
+                loadToolPopoverOpen={loadToolPopoverOpen}
+                setLoadToolPopoverOpen={setLoadToolPopoverOpen}
+            />
         </div>
     );
 }
