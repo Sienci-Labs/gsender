@@ -31,7 +31,7 @@ export function parseLatestReadmeNotes() {
             currentVersion.notes.push(line.replace('- ', ''));
         }
     }
-    console.log(process.cwd());
+
     collectedNotes.push(currentVersion);
     fs.writeFileSync('./src/server/api/notes.json', JSON.stringify(collectedNotes, null, 2));
 }
