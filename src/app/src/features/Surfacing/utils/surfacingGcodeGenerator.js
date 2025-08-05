@@ -69,7 +69,6 @@ export default class Generator {
             'G0 X0 Y0',
             ...m7,
             ...m8,
-            `G0 Z${z}`,
             `G1 F${feedrate}`,
             '(Header End)',
             '\n',
