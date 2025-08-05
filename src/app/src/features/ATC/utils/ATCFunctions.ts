@@ -83,3 +83,7 @@ export function getToolAxisOffset(tool, axis, table: ToolInstance[]): string {
 export function unloadTool() {
     controller.command('gcode', ['M6T0', '$#']);
 }
+
+export function releaseToolFromSpindle() {
+    controller.command('gcode', ['G65 P900', '$#']);
+}

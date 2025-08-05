@@ -7,6 +7,7 @@ import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
 import Button from 'app/components/Button';
 import { useState } from 'react';
 import { LuHardHat } from 'react-icons/lu';
+import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 export function AdvancedOptions() {
     const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,7 @@ export function AdvancedOptions() {
                 <CollapsibleTrigger asChild>
                     <Button
                         variant="ghost"
-                        className="justify-between px-3 py-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                        className="justify-between px-3 py-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-b border-b-blue-500"
                     >
                         <div className="flex items-center gap-2">
                             <LuHardHat className="h-4 w-4" />
@@ -37,9 +38,7 @@ export function AdvancedOptions() {
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                     <div className="px-3 pb-1 space-y-1">
                         <Button
-                            onClick={() =>
-                                handleButtonClick('Release from Spindle')
-                            }
+                            onClick={releaseToolFromSpindle}
                             size="sm"
                             variant="primary"
                         >
