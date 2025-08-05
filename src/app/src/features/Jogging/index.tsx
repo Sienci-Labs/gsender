@@ -965,7 +965,7 @@ export function Jogging() {
                         canClick={canClick}
                         threshold={jogThreshold}
                     />
-                    {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
+                    {showA && (
                         <AJog
                             distance={jogSpeed.aStep}
                             feedrate={jogSpeed.feedrate}
