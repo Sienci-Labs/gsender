@@ -23,8 +23,8 @@
 
 // import fs from 'fs';
 // import path from 'path';
-
-const releases = [
+import releases from './notes.json';
+/*const releases = [
     {
         'version': '1.5.2',
         'date': 'July 15th, 2025',
@@ -109,7 +109,7 @@ const releases = [
             'Fixed rare situation where connecting to grblHAL controller, disconnecting, and reconnecting to GRBL controller caused invalid laser/spindle mode toggle behaviour.'
         ]
     },
-];
+];*/
 
 export const fetchReleaseNotes = (req, res) => {
     try {
