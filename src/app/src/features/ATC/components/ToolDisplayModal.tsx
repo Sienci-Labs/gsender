@@ -5,15 +5,26 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import Button from 'app/components/Button';
 import { LuTable } from 'react-icons/lu';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import controller from 'app/lib/controller.ts';
 
-export function ToolDisplayModal({
-    showToolTable = false,
-    onOpenChange = () => {},
-    tools,
-    disabled,
-}) {
+export function ToolDisplayModal() {
+    const { connected, setShowTable, showTable, tools, disabled } =
+        useToolChange();
+    function onOpenChange(isOpen) {
+        if (!connected) {
+            return;
+        }
+
+        if (isOpen) {
+            controller.command('gcode', ['$#']);
+        }
+
+        setShowTable(!showTable);
+    }
+
     return (
-        <Dialog open={showToolTable} onOpenChange={onOpenChange}>
+        <Dialog open={showTable} onOpenChange={onOpenChange}>
             <DialogTitle>
                 <Button
                     onClick={onOpenChange}
@@ -29,7 +40,6 @@ export function ToolDisplayModal({
                     <ToolTable
                         tools={tools}
                         hideFunctions={false}
-                        tools={tools}
                         disabled={disabled}
                     />
                 </div>

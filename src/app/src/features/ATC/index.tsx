@@ -1,73 +1,30 @@
-import { ToolRackFunctions } from 'app/features/ATC/components/ToolRackFunctions.tsx';
 import { ToolDisplay } from 'app/features/ATC/components/ToolDisplay.tsx';
-import Button from 'app/components/Button';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
 import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
-import {
-    LoadToolMode,
-    mapToolNicknamesAndStatus,
-} from 'app/features/ATC/utils/ATCFunctions.ts';
-import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx';
-import { ToolchangeProvider } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import {
+    ToolChangeContext,
+    ToolchangeProvider,
+    useToolChange,
+} from 'app/features/ATC/utils/ToolChangeContext.tsx';
 
 export function ATC() {
-    const [showToolTable, setShowToolTable] = useState(false);
-    const [tools, setTools] = useState<ToolInstance[]>([]);
-    const [loadToolPopoverOpen, setLoadToolPopoverOpen] = useState(false);
-    const [loadToolMode, setLoadToolMode] = useState<LoadToolMode>('load');
-
-    const toolTableData = useTypedSelector(
-        (state: RootState) => state.controller.settings.toolTable,
-    );
-
-    const isConnected = useTypedSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
-
-    const disabledButton = !isConnected;
-
-    useEffect(() => {
-        setTools(mapToolNicknamesAndStatus(toolTableData));
-    }, [toolTableData]);
-
-    function toggleToolTable(isOpen) {
-        if (!isConnected) {
-            return;
-        }
-
-        if (isOpen) {
-            controller.command('gcode', ['$#']);
-        }
-
-        setShowToolTable(!showToolTable);
-    }
+    const { tools, disabled, loadToolOpen, setLoadToolOpen } = useToolChange();
 
     return (
         <ToolchangeProvider>
             <div className="flex flex-col  w-full gap-2 relative">
                 <div className="flex flex-col gap-2 w-36 justify-end absolute top-0 right-16">
-                    <ToolDisplayModal
-                        showToolTable={showToolTable}
-                        onOpenChange={toggleToolTable}
-                        tools={tools}
-                        disabled={disabledButton}
-                    />
-                    <AdvancedOptions
-                        disabled={disabledButton}
-                        setLoadToolMode={setLoadToolMode}
-                    />
+                    <ToolDisplayModal />
+                    <AdvancedOptions disabled={disabled} />
                 </div>
 
                 <ToolDisplay
                     tools={tools}
-                    disabled={disabledButton}
-                    loadToolMode={loadToolMode}
-                    loadToolPopoverOpen={loadToolPopoverOpen}
-                    setLoadToolPopoverOpen={setLoadToolPopoverOpen}
+                    disabled={disabled}
+                    loadToolPopoverOpen={loadToolOpen}
+                    setLoadToolPopoverOpen={setLoadToolOpen}
                 />
             </div>
         </ToolchangeProvider>
