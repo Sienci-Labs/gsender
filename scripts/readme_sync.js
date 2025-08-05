@@ -1,7 +1,4 @@
-import fs from 'node:fs';
-
-export function parseLatestReadmeNotes() {
-    const readme = fs.readFileSync('README.md', 'utf8');
+export function parseLatestReadmeNotes(readme) {
     let re = /### (\d.\d.\d) \((.*)\)/;
 
     const notes = readme.split('<summary>Expand to see all version notes</summary>')[1];
@@ -33,5 +30,5 @@ export function parseLatestReadmeNotes() {
     }
 
     collectedNotes.push(currentVersion);
-    fs.writeFileSync('./src/server/api/notes.json', JSON.stringify(collectedNotes, null, 2));
+    return collectedNotes;
 }
