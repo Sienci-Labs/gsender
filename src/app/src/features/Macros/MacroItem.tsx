@@ -47,13 +47,14 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 ref={ref}
                 onClick={run}
                 disabled={disabled}
-                className={cn('w-full block', {
+                className={cn('block', {
                     'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100 ':
                         running,
                     'opacity-50 cursor-not-allowed': disabled,
                 })}
                 active={running}
                 variant="ghost"
+                noPadding
             >
                 <span className="w-[12ch] text-left truncate whitespace-nowrap text-overflow-ellipsis max-w-[12ch]">
                     {running ? 'Running...' : macro.name}
@@ -87,14 +88,13 @@ const MacroItem = ({
     };
     return (
         <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
-                <Tooltip content={macro.name}>
-                    <MacroButton
-                        onMacroRun={onMacroRun}
-                        disabled={disabled}
-                        macro={macro}
-                    />
-                </Tooltip>
-
+            <Tooltip content={macro.name}>
+                <MacroButton
+                    onMacroRun={onMacroRun}
+                    disabled={disabled}
+                    macro={macro}
+                />
+            </Tooltip>
 
             <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">
