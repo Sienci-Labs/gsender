@@ -87,3 +87,11 @@ export function unloadTool() {
 export function releaseToolFromSpindle() {
     controller.command('gcode', ['G65 P900', '$#']);
 }
+
+export function loadAndSaveToRack(toolID) {
+    controller.command('gcode', [`G65P901Q${toolID}`, '$#']);
+}
+
+export function saveToRack(toolID) {
+    controller.command('gcode', [`G65P902Q${toolID}`, '$#']);
+}

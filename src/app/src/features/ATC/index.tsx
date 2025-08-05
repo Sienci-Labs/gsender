@@ -49,7 +49,7 @@ export function ATC() {
                     tools={tools}
                     disabled={disabledButton}
                 />
-                <AdvancedOptions />
+                <AdvancedOptions disabled={disabledButton} />
             </div>
 
             <ToolDisplay tools={tools} disabled={disabledButton} />

@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { LuHardHat } from 'react-icons/lu';
 import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
 
-export function AdvancedOptions() {
+export function AdvancedOptions({ disabled }) {
     const [isOpen, setIsOpen] = useState(false);
     const handleButtonClick = (action: string) => {
         console.log(`${action} clicked`);
@@ -40,6 +40,7 @@ export function AdvancedOptions() {
                         <Button
                             onClick={releaseToolFromSpindle}
                             size="sm"
+                            disabled={disabled}
                             variant="primary"
                         >
                             Release from Spindle
@@ -48,6 +49,7 @@ export function AdvancedOptions() {
                         <Button
                             onClick={() => handleButtonClick('Save to Rack')}
                             size="sm"
+                            disabled={disabled}
                             variant="primary"
                         >
                             Save to Rack
@@ -58,6 +60,7 @@ export function AdvancedOptions() {
                                 handleButtonClick('Load and Save to Rack')
                             }
                             size="sm"
+                            disabled={disabled}
                             variant="primary"
                         >
                             Load and Save to Rack
