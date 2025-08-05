@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const _uniq = require("lodash/uniq");
 const findImports = require("find-imports");
+const { parseLatestReadmeNotes } = require('./readme_sync');
 
 // Copy necessary properties from 'package.json' to 'src/app/package.json'
 const pkg = require("../package.json");
@@ -56,3 +57,6 @@ const secondContent = JSON.stringify(pkgApp, null, 2);
 
 fs.writeFileSync(target, content + "\n", "utf8");
 fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
+
+// Update readme notes
+parseLatestReadmeNotes();
