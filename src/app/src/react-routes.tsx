@@ -9,7 +9,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaMicrochip, FaSdCard } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
@@ -39,6 +39,7 @@ import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
 import { BiSolidCylinder } from 'react-icons/bi';
+import SDCard from 'app/features/SDCard';
 
 export const ReactRoutes = () => {
     return (
@@ -110,6 +111,15 @@ export const ReactRoutes = () => {
                                         description="Easy hand-held CNC control using pre-made or custom profiles"
                                         icon={FaGamepad}
                                         link="/tools/gamepad"
+                                    />
+
+                                    <ToolCard
+                                        title={'SD Card'}
+                                        description={
+                                            'Manage and view files on your SD card'
+                                        }
+                                        icon={FaSdCard}
+                                        link={'/tools/sd'}
                                     />
 
                                     <ToolCard
@@ -200,6 +210,7 @@ export const ReactRoutes = () => {
                         path="gamepad/:gamepadProfileId"
                         element={<Profile />}
                     />
+                    <Route path={'sd'} element={<SDCard />} />
                     <Route
                         path="firmware"
                         element={
