@@ -17,6 +17,7 @@ export const ToolChangeContext = createContext<IToolChangeContext>({
     tools: [],
     showTable: false,
     setShowTable: () => {},
+    currentTool: -1,
 });
 
 export function useToolChange() {
@@ -37,6 +38,7 @@ export interface IToolChangeContext {
     tools: ToolInstance[];
     showTable: boolean;
     setShowTable: (show: boolean) => void;
+    currentTool: number;
 }
 
 export const ToolchangeProvider = ({ children }) => {
@@ -45,6 +47,7 @@ export const ToolchangeProvider = ({ children }) => {
     const [tools, setTools] = useState<ToolInstance[]>([]);
     const [showTable, setShowTable] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
+    const [currentTool, setCurrentTool] = useState<number>(-1);
 
     const toolTableData = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -53,7 +56,14 @@ export const ToolchangeProvider = ({ children }) => {
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
-    console.log(isConnected, 'connection');
+
+    const reportedTool = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.currentTool,
+    );
+
+    useEffect(() => {
+        setCurrentTool(reportedTool);
+    }, [reportedTool]);
 
     useEffect(() => {
         setTools(mapToolNicknamesAndStatus(toolTableData));
@@ -74,6 +84,7 @@ export const ToolchangeProvider = ({ children }) => {
         tools: tools,
         showTable: showTable,
         setShowTable: setShowTable,
+        currentTool,
     };
 
     return (
