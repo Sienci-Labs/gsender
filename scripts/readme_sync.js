@@ -1,4 +1,4 @@
-export function parseLatestReadmeNotes(readme) {
+function parseLatestReadmeNotes(readme) {
     let re = /### (\d.\d.\d) \((.*)\)/;
 
     const notes = readme.split('<summary>Expand to see all version notes</summary>')[1];
@@ -32,3 +32,7 @@ export function parseLatestReadmeNotes(readme) {
     collectedNotes.push(currentVersion);
     return collectedNotes;
 }
+
+module.exports = {
+    parseLatestReadmeNotes,
+};

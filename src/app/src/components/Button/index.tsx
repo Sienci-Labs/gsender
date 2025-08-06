@@ -39,6 +39,7 @@ export type ButtonProps = ButtonVariants &
         children?: React.ReactNode;
         icon?: JSX.Element;
         disabled?: boolean;
+        noPadding?: boolean;
         className?: string;
         text?: string;
         active?: boolean;
@@ -51,6 +52,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             variant,
             size,
             disabled,
+            noPadding,
             className,
             children,
             icon,
@@ -69,6 +71,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 })}
                 size={size}
                 disabled={disabled}
+                noPadding={noPadding}
                 ref={ref}
                 {...rest}
             >

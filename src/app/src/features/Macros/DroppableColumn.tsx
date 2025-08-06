@@ -2,7 +2,6 @@ import { useDroppable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import Tooltip from 'app/components/Tooltip';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 import MacroItem from './MacroItem';
@@ -87,27 +86,14 @@ const SortableMacroItem = ({
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {macro.description.trim() !== '' ? (
-                <Tooltip content={macro.description} location="default">
-                    <MacroItem
-                        key={macro.id}
-                        macro={macro}
-                        onRun={handleRunMacro}
-                        onEdit={handleEditMacro}
-                        onDelete={onDeleteClick}
-                        disabled={disabled}
-                    />
-                </Tooltip>
-            ) : (
-                <MacroItem
-                    key={macro.id}
-                    macro={macro}
-                    onRun={handleRunMacro}
-                    onEdit={handleEditMacro}
-                    onDelete={onDeleteClick}
-                    disabled={disabled}
-                />
-            )}
+            <MacroItem
+                key={macro.id}
+                macro={macro}
+                onRun={handleRunMacro}
+                onEdit={handleEditMacro}
+                onDelete={onDeleteClick}
+                disabled={disabled}
+            />
         </div>
     );
 };

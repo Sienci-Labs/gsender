@@ -55,7 +55,7 @@ const Container = ({ columns, children }: ContainerProps) => {
     const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
 
     return (
-        <div className="grid grid-cols-2 absolute h-full w-full gap-1">
+        <div className="grid grid-cols-[1fr_1fr] absolute h-full w-full gap-1">
             {children}
         </div>
     );
