@@ -8,13 +8,17 @@ import Button from 'app/components/Button';
 import { useState } from 'react';
 import { LuHardHat } from 'react-icons/lu';
 import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 
-export function AdvancedOptions({ disabled }) {
+export function AdvancedOptions() {
+    const { disabled } = useToolChange();
     const [isOpen, setIsOpen] = useState(false);
+
     const handleButtonClick = (action: string) => {
         console.log(`${action} clicked`);
         // Add your button action logic here
     };
+
     return (
         <div className="flex w-36">
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>

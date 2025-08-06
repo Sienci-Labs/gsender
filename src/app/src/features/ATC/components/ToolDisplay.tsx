@@ -12,12 +12,9 @@ import LoadToolPopover from 'app/features/ATC/components/LoadToolPopover.tsx';
 import { PiEmpty } from 'react-icons/pi';
 import { useState } from 'react';
 import { CurrentToolInfo } from 'app/features/ATC/components/CurrentToolInfo.tsx';
-export function ToolDisplay({
-    tools,
-    disabled,
-    loadToolPopoverOpen,
-    setLoadToolPopoverOpen,
-}) {
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+export function ToolDisplay() {
+    const { tools, disabled, loadToolOpen, setLoadToolOpen } = useToolChange();
     return (
         <div className="w-full flex flex-col gap-1">
             <div className="flex flex-col gap-2">
@@ -25,8 +22,8 @@ export function ToolDisplay({
             </div>
             <div className="flex flex-row gap-4 w-full">
                 <LoadToolPopover
-                    isOpen={loadToolPopoverOpen}
-                    setIsOpen={setLoadToolPopoverOpen}
+                    isOpen={loadToolOpen}
+                    setIsOpen={setLoadToolOpen}
                     tools={tools}
                     disabled={disabled}
                 />
