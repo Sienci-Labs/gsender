@@ -69,7 +69,7 @@ const ToolChangerPopover: React.FC = ({
 
     const handleLoadOpen = () => {
         setLoadToolMode('load');
-        setIsOpen(!isOpen);
+        setIsOpen(true);
     };
 
     const getStatusConfig = (status: ToolStatus) => {

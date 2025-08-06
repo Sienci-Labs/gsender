@@ -95,12 +95,12 @@ export function loadTool(toolID) {
 
 export function loadAndSaveToRack(toolID) {
     console.log('Load and Save called');
-    controller.command('gcode', [`G65P901Q${toolID}`, '$#']);
+    controller.command('gcode', [`G65 P901 Q${toolID}`, '$#']);
 }
 
 export function saveToRack(toolID) {
     console.log('Save called');
-    controller.command('gcode', [`G65P902Q${toolID}`, '$#']);
+    controller.command('gcode', [`G65 P902 Q${toolID}`, '$#']);
 }
 
 export type LoadToolMode = 'load' | 'save' | 'loadAndSave';

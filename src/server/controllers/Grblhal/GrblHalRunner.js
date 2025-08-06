@@ -195,7 +195,7 @@ class GrblHalRunner extends events.EventEmitter {
             }
 
             // If the payload has a subtype, emit a dialog request;
-            if (Number(payload.subtype) >= 0) {
+            if (payload.subtype) {
                 this.emit('atci', payload);
             }
 
@@ -452,6 +452,7 @@ class GrblHalRunner extends events.EventEmitter {
         }
 
         if (type === GbrlHalLineParserResultSDCard) {
+            console.log('SDCard Caught');
             this.emit('sdcard', payload);
             return;
         }
