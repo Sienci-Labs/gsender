@@ -87,27 +87,14 @@ const SortableMacroItem = ({
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {macro.description.trim() !== '' ? (
-                <Tooltip content={macro.description} location="default">
-                    <MacroItem
-                        key={macro.id}
-                        macro={macro}
-                        onRun={handleRunMacro}
-                        onEdit={handleEditMacro}
-                        onDelete={onDeleteClick}
-                        disabled={disabled}
-                    />
-                </Tooltip>
-            ) : (
-                <MacroItem
-                    key={macro.id}
-                    macro={macro}
-                    onRun={handleRunMacro}
-                    onEdit={handleEditMacro}
-                    onDelete={onDeleteClick}
-                    disabled={disabled}
-                />
-            )}
+            <MacroItem
+                key={macro.id}
+                macro={macro}
+                onRun={handleRunMacro}
+                onEdit={handleEditMacro}
+                onDelete={onDeleteClick}
+                disabled={disabled}
+            />
         </div>
     );
 };

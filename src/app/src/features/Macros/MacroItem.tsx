@@ -11,6 +11,7 @@ import {
 import Tooltip from 'app/components/Tooltip';
 import { toast } from 'app/lib/toaster';
 import Button from 'app/components/Button';
+import cx from 'classnames';
 
 type Macro = {
     id: string;
@@ -87,8 +88,22 @@ const MacroItem = ({
         });
     };
     return (
-        <div className="flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
-            <Tooltip content={macro.name}>
+        <div
+            className={cx(
+                'flex items-center justify-between bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 dark:bg-dark dark:border-dark-lighter dark:text-white',
+                {
+                    '!bg-gray-300 !border-gray-400 !dark:bg-dark !cursor-not-allowed':
+                        disabled,
+                },
+            )}
+        >
+            <Tooltip
+                content={
+                    macro.description.trim() !== ''
+                        ? macro.name + ': ' + macro.description
+                        : macro.name
+                }
+            >
                 <MacroButton
                     onMacroRun={onMacroRun}
                     disabled={disabled}
