@@ -179,10 +179,6 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultATCI) {
-            delete payload.raw;
-            console.log('ATCI Caught');
-            console.log(payload);
-
             const nextSettings = {
                 ...this.settings,
                 atci: {
