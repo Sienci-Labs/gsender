@@ -23,7 +23,7 @@ export function ToolNameInput({
         setToolName(id, value);
         setName(value);
     }
-    console.log(id);
+
     return (
         <div className="text-xs text-muted">
             <Input

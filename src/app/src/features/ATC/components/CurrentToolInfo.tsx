@@ -46,7 +46,6 @@ export function CurrentToolInfo({
         if (currentTool) {
             let populatedTool = lookupSpecificTool(currentTool, toolTable);
             if (populatedTool) {
-                console.log(populatedTool);
                 setSelectedTool(populatedTool);
             }
         }

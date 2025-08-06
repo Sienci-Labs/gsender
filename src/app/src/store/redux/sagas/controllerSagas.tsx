@@ -933,7 +933,6 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('atci', (payload) => {
-        console.log('New ATCI Dialog request', payload);
         if (payload.subtype === '0') {
             Confirm({
                 title: payload.message,

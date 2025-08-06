@@ -1187,7 +1187,6 @@ class Visualizer extends Component {
                         'workspace.outlineMode',
                         'Detailed',
                     );
-                    console.log('outlineMode', outlineMode);
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {

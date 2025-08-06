@@ -47,7 +47,6 @@ const ToolChangerPopover: React.FC = ({
     const currentStatus = selectedTool?.status || 'probed';
 
     const handleLoad = async () => {
-        console.log(mode);
         setIsLoading(true);
         // Three different codes based on what the user wants to do
         switch (mode) {
