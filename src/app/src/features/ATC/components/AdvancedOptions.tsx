@@ -11,12 +11,17 @@ import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 
 export function AdvancedOptions() {
-    const { disabled } = useToolChange();
+    const { disabled, setLoadToolMode, setLoadToolOpen } = useToolChange();
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleButtonClick = (action: string) => {
-        console.log(`${action} clicked`);
-        // Add your button action logic here
+    const handleLoadAndSave = () => {
+        setLoadToolMode('loadAndSave');
+        setLoadToolOpen(true);
+    };
+
+    const handleSaveToRack = () => {
+        setLoadToolMode('save');
+        setLoadToolOpen(true);
     };
 
     return (
@@ -51,7 +56,7 @@ export function AdvancedOptions() {
                         </Button>
 
                         <Button
-                            onClick={() => handleButtonClick('Save to Rack')}
+                            onClick={handleSaveToRack}
                             size="sm"
                             disabled={disabled}
                             variant="primary"
@@ -60,9 +65,7 @@ export function AdvancedOptions() {
                         </Button>
 
                         <Button
-                            onClick={() =>
-                                handleButtonClick('Load and Save to Rack')
-                            }
+                            onClick={handleLoadAndSave}
                             size="sm"
                             disabled={disabled}
                             variant="primary"

@@ -24,6 +24,13 @@ import {
     ToolInstance,
     ToolStatus,
 } from 'app/features/ATC/components/ToolTable.tsx';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import {
+    loadAndSaveToRack,
+    loadTool,
+    LoadToolMode,
+    saveToRack,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 
 const ToolChangerPopover: React.FC = ({
     isOpen,
@@ -31,6 +38,7 @@ const ToolChangerPopover: React.FC = ({
     disabled,
     tools = [],
 }) => {
+    const { mode, setLoadToolMode } = useToolChange();
     const [selectedToolId, setSelectedToolId] = useState<string>('1');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -39,13 +47,29 @@ const ToolChangerPopover: React.FC = ({
     const currentStatus = selectedTool?.status || 'probed';
 
     const handleLoad = async () => {
+        console.log(mode);
         setIsLoading(true);
+        // Three different codes based on what the user wants to do
+        switch (mode) {
+            case 'load':
+                loadTool(selectedToolId);
+                break;
+            case 'save':
+                saveToRack(selectedToolId);
+                break;
+            case 'loadAndSave':
+                loadAndSaveToRack(selectedToolId);
+        }
         // Simulate loading process
-        controller.command('gcode', [`M6 T${selectedToolId}`]);
         setTimeout(() => {
             setIsLoading(false);
             setIsOpen(false);
         }, 700);
+    };
+
+    const handleLoadOpen = () => {
+        setLoadToolMode('load');
+        setIsOpen(!isOpen);
     };
 
     const getStatusConfig = (status: ToolStatus) => {
@@ -83,6 +107,17 @@ const ToolChangerPopover: React.FC = ({
         }
     };
 
+    const getModeTitle = (tcMode: LoadToolMode) => {
+        switch (tcMode) {
+            case 'load':
+                return 'Load Tool';
+            case 'save':
+                return 'Save Tool';
+            case 'loadAndSave':
+                return 'Load and Save Tool';
+        }
+    };
+
     const statusConfig = getStatusConfig(currentStatus);
     const StatusIcon = statusConfig.icon;
 
@@ -92,7 +127,7 @@ const ToolChangerPopover: React.FC = ({
                 <Button
                     disabled={disabled}
                     variant="primary"
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={handleLoadOpen}
                 >
                     <Settings className="w-4 h-4 mr-2" />
                     Load
@@ -102,7 +137,7 @@ const ToolChangerPopover: React.FC = ({
                 <div className="space-y-2">
                     <div>
                         <h3 className="text-lg font-semibold text-slate-800">
-                            Select Tool
+                            {getModeTitle(mode)}
                         </h3>
                     </div>
 

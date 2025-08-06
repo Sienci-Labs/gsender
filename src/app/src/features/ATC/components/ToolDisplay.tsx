@@ -14,7 +14,9 @@ import { useState } from 'react';
 import { CurrentToolInfo } from 'app/features/ATC/components/CurrentToolInfo.tsx';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 export function ToolDisplay() {
-    const { tools, disabled, loadToolOpen, setLoadToolOpen } = useToolChange();
+    const { tools, disabled, loadToolOpen, setLoadToolOpen, setLoadToolMode } =
+        useToolChange();
+
     return (
         <div className="w-full flex flex-col gap-1">
             <div className="flex flex-col gap-2">

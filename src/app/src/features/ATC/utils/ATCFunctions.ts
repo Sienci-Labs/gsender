@@ -88,11 +88,18 @@ export function releaseToolFromSpindle() {
     controller.command('gcode', ['G65 P900', '$#']);
 }
 
+export function loadTool(toolID) {
+    console.log('Load called');
+    controller.command('gcode', [`M6 T${toolID}`]);
+}
+
 export function loadAndSaveToRack(toolID) {
+    console.log('Load and Save called');
     controller.command('gcode', [`G65P901Q${toolID}`, '$#']);
 }
 
 export function saveToRack(toolID) {
+    console.log('Save called');
     controller.command('gcode', [`G65P902Q${toolID}`, '$#']);
 }
 
