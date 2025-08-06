@@ -933,12 +933,50 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('atci', (payload) => {
-        console.log('ARRIVED', payload);
-        switch (payload.subtype) {
-            case 0:
-                console.log(0);
+        console.log('New ATCI Dialog request', payload);
+        if (payload.subtype === '0') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'Continue',
+                cancelLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('cyclestart');
+                },
+                onClose: () => {
+                    controller.command('reset');
+                },
+            });
+        } else if (payload.subtype === '1') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'OK',
+                cancelLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('unhold');
+                },
+                hideClose: true,
+            });
+        } else if (payload.subtype === '2') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('reset');
+                },
+                hideClose: true,
+            });
+        } else {
+            Confirm({
+                title: 'ATCi requested a dialog.',
+                content: 'Continue to unhold, Reset to stop action.',
+                confirmLabel: 'Continue',
+                cancelLabel: 'Reset',
+            });
         }
-    })
+    });
 
     yield null;
 }

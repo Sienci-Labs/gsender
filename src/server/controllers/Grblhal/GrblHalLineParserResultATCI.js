@@ -15,7 +15,6 @@ class GrblHalLineParserResultATCI {
 
         // Pop title and message off values if subtype exists indicating a dialog
         if (subtype) {
-            console.log(`subtype: ${subtype}`);
             message = valueArray.shift();
             description = valueArray.shift();
         }

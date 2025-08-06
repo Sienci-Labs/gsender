@@ -99,7 +99,7 @@ export interface ControllerListeners {
     'flash:message': Array<Function>;
     'flash:progress': Array<Function>;
     'spindle:add': Array<Function>;
-    'atci': Array<Function>;
+    atci: Array<Function>;
 
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
@@ -213,7 +213,7 @@ class Controller {
         requestEstimateData: [],
         'job:start': [],
         'sdcard:files': [],
-        'acti': [],
+        atci: [],
     };
 
     context = {
