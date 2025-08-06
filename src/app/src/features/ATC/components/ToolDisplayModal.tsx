@@ -25,7 +25,7 @@ export function ToolDisplayModal() {
 
     return (
         <Dialog open={showTable} onOpenChange={onOpenChange}>
-            <DialogTitle>
+            <DialogTitle className="flex justify-end">
                 <Button
                     onClick={onOpenChange}
                     className="flex flex-row items-center gap-2"
