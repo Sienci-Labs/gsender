@@ -997,7 +997,6 @@ class GrblHalController {
         });
 
         this.runner.on('atci', (payload) => {
-            console.log(payload);
             this.emit('serialport:read', payload.raw);
             delete payload.raw;
             if (payload.subtype) {

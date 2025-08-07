@@ -210,7 +210,18 @@ export const ReactRoutes = () => {
                         path="gamepad/:gamepadProfileId"
                         element={<Profile />}
                     />
-                    <Route path={'sd'} element={<SDCard />} />
+                    <Route
+                        path={'sd'}
+                        element={
+                            <Page
+                                title="SD Card"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <SDCard />
+                            </Page>
+                        }
+                    />
                     <Route
                         path="firmware"
                         element={

@@ -347,7 +347,6 @@ export const {
     toolChange,
     updateHomingFlag,
     resetHoming,
-    updateTerminalHistory,
     updateSettingsDescriptions,
     updateAlarmDescriptions,
     addSpindle,
