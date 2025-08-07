@@ -2204,7 +2204,7 @@ class GrblHalController {
             'sdcard:mount': () => {
                 this.writeln('$FM');
             },
-            'sdcard:list:files': () => {
+            'sdcard:list': () => {
                 const [type = 'cnc'] = args;
 
                 if (type === 'cnc') {
@@ -2217,17 +2217,12 @@ class GrblHalController {
                     return;
                 }
             },
-            'sdcard:file:output': () => {
-                const [filePath] = args;
-
-                this.writeln(`$F<=${filePath}`);
-            },
-            'sdcard:file:run': () => {
+            'sdcard:run': () => {
                 const [filePath] = args;
 
                 this.writeln(`$F=${filePath}`);
             },
-            'sdcard:file:delete': () => {
+            'sdcard:delete': () => {
                 const [filePath] = args;
 
                 this.writeln(`$FD=${filePath}`);

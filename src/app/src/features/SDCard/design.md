@@ -56,3 +56,14 @@ interface AppState {
   files: File[];
   isMounted: boolean;
 }
+
+
+Controller API:
+
+sdcard:list
+
+sdcard:mount [args: type:string (cnc | all)]
+
+sdcard:delete [args: filepath: string]
+
+sdcard:run [args: filepath: string]

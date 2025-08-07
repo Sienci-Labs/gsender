@@ -12,12 +12,12 @@ class GbrlHalLineParserResultSDCard {
 
         // Extract FILE and SIZE from the match
         const fileMatch = r[0].match(/\[FILE:\/([^|]+)\|SIZE:(\d+)\]/);
-        const fileName = fileMatch ? fileMatch[1] : '';
-        const fileSize = fileMatch ? parseInt(fileMatch[2], 10) : 0;
+        const name = fileMatch ? fileMatch[1] : '';
+        const size = fileMatch ? parseInt(fileMatch[2], 10) : 0;
 
         const payload = {
-            fileName,
-            fileSize
+            name,
+            size
         };
 
         return {
