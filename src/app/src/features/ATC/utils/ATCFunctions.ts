@@ -12,8 +12,11 @@ export function unimplemented() {
     toast.info('Unimplemented :(');
 }
 
-export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
-    const toolsArray = [];
+export function mapToolNicknamesAndStatus(
+    tools: IToolListing,
+    rackSize: number = 0,
+): ToolInstance[] {
+    const toolsArray: ToolInstance[] = [];
 
     if (!tools) {
         return [];
@@ -27,7 +30,7 @@ export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
         } else {
             tool.status = 'unprobed';
         }
-        if (tool.id > FIXED_RACK_SIZE) {
+        if (tool.id > rackSize) {
             tool.status = 'offrack';
         }
         toolsArray.push(tool);
@@ -35,13 +38,13 @@ export function mapToolNicknamesAndStatus(tools: IToolListing): ToolInstance[] {
     return toolsArray;
 }
 
-function setToolStatus(tool: ToolInstance): ToolInstance {
+function setToolStatus(tool: ToolInstance, rackSize): ToolInstance {
     if (tool.toolOffsets.z < 0) {
         tool.status = 'probed';
     } else {
         tool.status = 'unprobed';
     }
-    if (tool.id > FIXED_RACK_SIZE) {
+    if (tool.id > rackSize) {
         tool.status = 'offrack';
     }
     return tool;
@@ -60,14 +63,18 @@ export function setToolName(id, value) {
     store.set(`widgets.atc.toolMap`, toolMap);
 }
 
-export function lookupSpecificTool(toolID = -1, toolTable = {}): ToolInstance {
+export function lookupSpecificTool(
+    toolID = -1,
+    toolTable = {},
+    rackSize,
+): ToolInstance {
     let tool = Object.values(toolTable).find((tool) => tool.id === toolID);
     if (!tool) {
         return null;
     }
     tool = { ...tool };
     tool.nickname = lookupToolName(tool.id);
-    tool = setToolStatus(tool);
+    tool = setToolStatus(tool, rackSize);
     return tool;
 }
 

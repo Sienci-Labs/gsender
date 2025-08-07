@@ -9,8 +9,10 @@ import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
+    const { rackSize } = useToolChange();
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
         id: 0,
         nickname: '-',
@@ -39,7 +41,11 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
 
     useEffect(() => {
         if (currentTool) {
-            let populatedTool = lookupSpecificTool(currentTool, toolTable);
+            let populatedTool = lookupSpecificTool(
+                currentTool,
+                toolTable,
+                rackSize,
+            );
             if (populatedTool) {
                 setSelectedTool(populatedTool);
             }
