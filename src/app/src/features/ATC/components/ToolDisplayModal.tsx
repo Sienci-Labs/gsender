@@ -30,6 +30,7 @@ export function ToolDisplayModal() {
                     onClick={onOpenChange}
                     className="flex flex-row items-center gap-2"
                     disabled={disabled}
+                    size="sm"
                 >
                     <LuTable />
                     Tools

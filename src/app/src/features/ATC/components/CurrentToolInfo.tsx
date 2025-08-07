@@ -10,12 +10,7 @@ import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 
-export function CurrentToolInfo({
-    toolNumber = 1,
-    status = 'probed',
-    onLoadTool,
-    disabled,
-}) {
+export function CurrentToolInfo({ status = 'probed', disabled }) {
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
         id: 0,
         nickname: '-',
@@ -59,16 +54,6 @@ export function CurrentToolInfo({
                         {currentTool ? `T${currentTool}` : 'Empty'}
                     </h1>
                 </div>
-
-                {/* Conditional Load Button */}
-                {selectedTool?.status === 'offrack' && (
-                    <button
-                        onClick={onLoadTool}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 whitespace-nowrap"
-                    >
-                        Load Tool {toolNumber} to Rack
-                    </button>
-                )}
             </div>
 
             {/* Table-style Information */}
@@ -76,7 +61,7 @@ export function CurrentToolInfo({
                 {/* Nickname Row */}
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-700 w-20">
-                        Tool Name:
+                        Name:
                     </span>
                     <ToolNameInput
                         id={selectedTool?.id}
@@ -87,7 +72,7 @@ export function CurrentToolInfo({
                 {/* Z Offset Row */}
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-700 w-20">
-                        Tool Offset:
+                        Offset:
                     </span>
                     <div className="flex-1 flex-row flex gap-7">
                         <div className="flex items-center gap-3">
@@ -96,11 +81,12 @@ export function CurrentToolInfo({
                             </span>
                         </div>
                         <Button
-                            className={`ml-auto px-3 py-1 rounded text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            className={`ml-auto     rounded text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                                 status === 'Probed'
                                     ? 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
                                     : 'bg-orange-500 hover:bg-orange-600 text-white focus:ring-orange-500'
                             }`}
+                            size="sm"
                             disabled={disabled || currentTool < 1}
                             onClick={() => probeTool(currentTool)}
                         >

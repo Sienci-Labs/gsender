@@ -31,14 +31,18 @@ export function AdvancedOptions() {
     };
 
     return (
-        <div className="flex w-36">
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                <CollapsibleTrigger asChild>
-                    <Button
+        <div className="flex w-full pt-10">
+            <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                className="w-full"
+            >
+                <CollapsibleTrigger asChild className="p-0 w-full">
+                    <button
                         variant="ghost"
-                        className="justify-between px-3 py-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-b border-b-blue-500"
+                        className="flex w-full flex-row px-1 py-1 items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                             <LuHardHat className="h-4 w-4" />
                             <span>Advanced Options</span>
                         </div>
@@ -47,11 +51,11 @@ export function AdvancedOptions() {
                         ) : (
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
                         )}
-                    </Button>
+                    </button>
                 </CollapsibleTrigger>
 
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <div className="px-3 pb-1 space-y-1">
+                    <div className="flex flex-col gap-1">
                         <Button
                             onClick={releaseToolFromSpindle}
                             size="sm"

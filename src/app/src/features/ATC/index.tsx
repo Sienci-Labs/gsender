@@ -8,13 +8,16 @@ import { ToolchangeProvider } from 'app/features/ATC/utils/ToolChangeContext.tsx
 export function ATC() {
     return (
         <ToolchangeProvider>
-            <div className="flex flex-col  w-full gap-2 relative">
-                <div className="flex flex-col gap-2 w-36 justify-end absolute top-0 right-16">
+            <div className="w-full relative box-border">
+                <div className="flex flex-col justify-end absolute top-2 right-2">
                     <ToolDisplayModal />
+                </div>
+                <div className="grid grid-cols-[3fr_2fr] gap-0">
+                    <div>
+                        <ToolDisplay />
+                    </div>
                     <AdvancedOptions />
                 </div>
-
-                <ToolDisplay />
             </div>
         </ToolchangeProvider>
     );
