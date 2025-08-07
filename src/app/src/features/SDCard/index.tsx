@@ -1,24 +1,35 @@
-import controller from 'app/lib/controller';
-import Button from 'app/components/Button';
-import { handleSDCardMount } from './utils';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { StatusIndicator } from 'app/features/SDCard/components/StatusIndicator.tsx';
+import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
+import { FileList } from 'app/features/SDCard/components/FileList.tsx';
+import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 
-const SDCard = () => {
-    const isMounted = useTypedSelector(
-        (state) => state.controller.sdcard.isMounted,
-    );
-
-    const handleGetFiles = () => {
-        controller.command('sdcard:list');
-    };
+const SDCardElement = () => {
+    const { isMounted } = useSDCard();
 
     return (
-        <div className="flex flex-col gap-2 h-full justify-center">
-            <Button onClick={handleSDCardMount}>Mount SD Card</Button>
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                        SD Card Manager
+                    </h1>
+                    <p className="text-gray-600">
+                        Manage files on your CNC SD card
+                    </p>
+                </div>
 
-            {isMounted && <Button onClick={handleGetFiles}>Get Files</Button>}
+                <div className="space-y-8">
+                    <StatusIndicator isMounted={isMounted} />
+                    <ActionButtons />
+                    <FileList />
+                </div>
+            </div>
         </div>
     );
+};
+
+const SDCard = () => {
+    return <SDCardElement />;
 };
 
 export default SDCard;

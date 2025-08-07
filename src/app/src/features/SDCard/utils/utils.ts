@@ -1,5 +1,5 @@
-import controller from 'app/lib/controller';
-import { updateSDCardMountStatus } from 'app/store/redux/slices/controller.slice';
+import controller from 'app/lib/controller.ts';
+import { updateSDCardMountStatus } from 'app/store/redux/slices/controller.slice.ts';
 import reduxStore from 'app/store/redux';
 
 export const handleSDCardMount = () => {
@@ -11,3 +11,11 @@ export const handleSDCardMount = () => {
         }
     });
 };
+
+export function mountSDCard() {
+    controller.command('sdcard:mount');
+}
+
+export function refreshSDCardFiles() {
+    controller.command('sdcard:list');
+}
