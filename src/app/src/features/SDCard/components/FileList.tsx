@@ -12,6 +12,8 @@ import {
 } from 'app/components/shadcn/Table';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import controller from 'app/lib/controller.ts';
+import reduxStore from 'app/store/redux';
+import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';
 
 const formatFileSize = (bytes: number): string => {
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -27,7 +29,7 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export const FileList: React.FC = () => {
-    const { files, isLoading, runSDFile, deleteSDFile } = useSDCard();
+    const { files, isLoading, runSDFile } = useSDCard();
 
     if (files.length === 0) {
         return (
@@ -47,6 +49,7 @@ export const FileList: React.FC = () => {
             content: `Are you sure you want to delete ${fileName}?`,
             onConfirm: () => {
                 controller.command('sdcard:delete', fileName);
+                reduxStore.dispatch(clearSDCardFiles({ path: fileName }));
             },
         });
     }
