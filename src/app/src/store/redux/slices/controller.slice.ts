@@ -334,6 +334,9 @@ const controllerSlice = createSlice({
 
             state.sdcard.files = [...filteredFiles, action.payload.file];
         },
+        clearSDCardFiles: (state) => {
+            state.sdcard.files = [];
+        },
     },
 });
 
@@ -353,6 +356,7 @@ export const {
     updateControllerType,
     updateSDCardMountStatus,
     addSDCardFileToList,
+    clearSDCardFiles,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;

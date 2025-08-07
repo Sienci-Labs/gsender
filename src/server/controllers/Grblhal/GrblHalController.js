@@ -2228,6 +2228,10 @@ class GrblHalController {
                 const [filePath] = args;
 
                 this.writeln(`$FD=${filePath}`);
+                this.emit('sdcard:clear');
+                delay(100).then(() => {
+                    this.writeln('$F');
+                });
             },
         }[cmd];
 

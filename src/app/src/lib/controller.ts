@@ -109,6 +109,7 @@ export interface ControllerListeners {
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
     'sdcard:files': Array<Function>;
+    'sdcard:clear': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -213,6 +214,7 @@ class Controller {
         requestEstimateData: [],
         'job:start': [],
         'sdcard:files': [],
+        'sdcard:clear': [],
         atci: [],
     };
 

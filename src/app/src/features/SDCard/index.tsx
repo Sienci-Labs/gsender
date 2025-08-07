@@ -6,7 +6,7 @@ const SDCardElement = () => {
     const { isMounted } = useSDCard();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="bg-gray-50 h-full">
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <div className="space-y-8">
                     <StatusIndicator isMounted={isMounted} />

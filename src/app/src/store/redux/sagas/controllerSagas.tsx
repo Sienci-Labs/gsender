@@ -80,6 +80,7 @@ import {
     updateSenderStatus,
     updateControllerType,
     addSDCardFileToList,
+    clearSDCardFiles,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
@@ -930,6 +931,10 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('sdcard:files', (file: SDCardFile) => {
         if (!file) return;
         reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    controller.addListener('sdcard:clear', () => {
+        reduxStore.dispatch(clearSDCardFiles());
     });
 
     controller.addListener('atci', (payload) => {
