@@ -991,7 +991,8 @@ class GrblHalController {
         });
 
         this.runner.on('sdcard', (payload) => {
-            console.log(payload);
+            this.emit('serialport:read', payload.raw);
+            delete payload.raw;
             this.emit('sdcard:files', payload);
         });
 

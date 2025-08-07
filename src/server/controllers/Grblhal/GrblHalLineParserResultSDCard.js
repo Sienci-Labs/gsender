@@ -1,4 +1,4 @@
-class GbrlHalLineParserResultSDCard {
+class GrblHalLineParserResultSDCard {
     static parse(line) {
         // Match the following pattern:
         // [FILE:/Control-Box-test-code.nc|SIZE:66]
@@ -13,6 +13,10 @@ class GbrlHalLineParserResultSDCard {
         // Extract FILE and SIZE from the match
         const fileMatch = r[0].match(/\[FILE:\/([^|]+)\|SIZE:(\d+)\]/);
         const name = fileMatch ? fileMatch[1] : '';
+
+        if (name.startsWith('._')) {
+            return null; // hide mac dot hidden files
+        }
         const size = fileMatch ? parseInt(fileMatch[2], 10) : 0;
 
         const payload = {
@@ -21,10 +25,10 @@ class GbrlHalLineParserResultSDCard {
         };
 
         return {
-            type: GbrlHalLineParserResultSDCard,
+            type: GrblHalLineParserResultSDCard,
             payload: payload
         };
     }
 }
 
-export default GbrlHalLineParserResultSDCard;
+export default GrblHalLineParserResultSDCard;

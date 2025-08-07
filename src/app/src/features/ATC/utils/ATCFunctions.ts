@@ -66,7 +66,7 @@ export function setToolName(id, value) {
 export function lookupSpecificTool(
     toolID = -1,
     toolTable = {},
-    rackSize,
+    rackSize: number = 0,
 ): ToolInstance {
     let tool = Object.values(toolTable).find((tool) => tool.id === toolID);
     if (!tool) {

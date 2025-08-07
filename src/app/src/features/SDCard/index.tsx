@@ -9,7 +9,7 @@ const SDCard = () => {
     );
 
     const handleGetFiles = () => {
-        controller.command('sdcard:list:files');
+        controller.command('sdcard:list');
     };
 
     return (
