@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, JSX, useEffect, useState } from 'react';
 import {
     LoadToolMode,
     mapToolNicknamesAndStatus,
@@ -6,6 +6,7 @@ import {
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
 
 export const ToolChangeContext = createContext<IToolChangeContext>({
     mode: 'load',
@@ -18,6 +19,7 @@ export const ToolChangeContext = createContext<IToolChangeContext>({
     showTable: false,
     setShowTable: () => {},
     currentTool: -1,
+    atcAvailable: false,
 });
 
 export function useToolChange() {
@@ -39,9 +41,10 @@ export interface IToolChangeContext {
     showTable: boolean;
     setShowTable: (show: boolean) => void;
     currentTool: number;
+    atcAvailable: boolean;
 }
 
-export const ToolchangeProvider = ({ children }) => {
+export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     const [loadToolMode, setLoadToolMode] = useState<LoadToolMode>('load');
     const [toolPopoutOpen, setToolPopoutOpen] = useState<boolean>(false);
     const [tools, setTools] = useState<ToolInstance[]>([]);
@@ -60,6 +63,12 @@ export const ToolchangeProvider = ({ children }) => {
     const reportedTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
     );
+
+    const settings = useTypedSelector(
+        (state: RootState) => state.controller.settings,
+    );
+    const atc: string = get(settings, 'info.NEWOPT.ATC', '0');
+    const atcAvailable = atc === '1';
 
     useEffect(() => {
         setCurrentTool(reportedTool);
@@ -85,6 +94,7 @@ export const ToolchangeProvider = ({ children }) => {
         showTable: showTable,
         setShowTable: setShowTable,
         currentTool,
+        atcAvailable,
     };
 
     return (
