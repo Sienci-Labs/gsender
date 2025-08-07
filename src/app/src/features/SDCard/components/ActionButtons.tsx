@@ -6,6 +6,7 @@ import {
     mountSDCard,
     refreshSDCardFiles,
 } from 'app/features/SDCard/utils/utils.ts';
+import Button from 'app/components/Button';
 
 export function ActionButtons() {
     const { isMounted, isLoading, setIsLoading } = useSDCard();
@@ -25,35 +26,35 @@ export function ActionButtons() {
                 )}
 
                 {isMounted && (
-                    <button
+                    <Button
                         onClick={() => mountSDCard()}
                         disabled={isLoading}
-                        className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                        className="flex flex-row items-center gap-2"
                     >
                         <HardDrive className="w-4 h-4" />
                         <span>Re-mount</span>
-                    </button>
+                    </Button>
                 )}
 
-                <button
+                <Button
                     onClick={refreshSDCardFiles}
                     disabled={false}
-                    className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="flex flex-row items-center gap-2"
                 >
                     <RefreshCw
                         className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
                     />
                     <span>Refresh Files</span>
-                </button>
+                </Button>
 
-                <button
+                <Button
                     onClick={() => setUploadModalOpen(true)}
                     disabled={false}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="flex flex-row items-center gap-2"
                 >
                     <Upload className="w-4 h-4" />
                     <span>Upload</span>
-                </button>
+                </Button>
             </div>
 
             <UploadModal
