@@ -933,8 +933,8 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(addSDCardFileToList({ file }));
     });
 
-    controller.addListener('sdcard:clear', () => {
-        reduxStore.dispatch(clearSDCardFiles());
+    controller.addListener('sdcard:clear', (path: string) => {
+        reduxStore.dispatch(clearSDCardFiles({ path }));
     });
 
     controller.addListener('atci', (payload) => {
