@@ -30,6 +30,8 @@ export function AdvancedOptions() {
         setLoadToolOpen(true);
     };
 
+    const loadAndSaveDisabled = !connected || currentTool === 0;
+
     return (
         <div className="flex w-full pt-10">
             <Collapsible
@@ -77,7 +79,7 @@ export function AdvancedOptions() {
                         <Button
                             onClick={handleLoadAndSave}
                             size="sm"
-                            disabled={disabled && !currentTool > 0}
+                            disabled={loadAndSaveDisabled}
                             variant="primary"
                         >
                             Load and Save to Rack
