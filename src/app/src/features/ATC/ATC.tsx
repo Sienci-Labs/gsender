@@ -3,10 +3,14 @@ import { ToolDisplay } from 'app/features/ATC/components/ToolDisplay.tsx';
 import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ATCUnavailable } from 'app/features/ATC/components/ATCUnavailable.tsx';
+import { Disconnected } from 'app/features/ATC/components/Disconnected.tsx';
 
 export function ATC() {
-    const { atcAvailable } = useToolChange();
+    const { atcAvailable, connected } = useToolChange();
 
+    if (!connected) {
+        return <Disconnected />;
+    }
     if (!atcAvailable) {
         return <ATCUnavailable />;
     }
