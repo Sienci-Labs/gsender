@@ -20,6 +20,7 @@ export const ToolChangeContext = createContext<IToolChangeContext>({
     setShowTable: () => {},
     currentTool: -1,
     atcAvailable: false,
+    rackSize: 0,
 });
 
 export function useToolChange() {
@@ -42,6 +43,7 @@ export interface IToolChangeContext {
     setShowTable: (show: boolean) => void;
     currentTool: number;
     atcAvailable: boolean;
+    rackSize: number;
 }
 
 export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
@@ -51,6 +53,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     const [showTable, setShowTable] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
     const [currentTool, setCurrentTool] = useState<number>(-1);
+    const [rackSize, setRackSize] = useState<number>(0); // TODO:  This might appear in the firmware in the future, for now use reported macro value
 
     const toolTableData = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -68,6 +71,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
         (state: RootState) => state.controller.settings,
     );
     const atc: string = get(settings, 'info.NEWOPT.ATC', '0');
+    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
     const atcAvailable = atc === '1';
 
     useEffect(() => {
@@ -75,13 +79,20 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     }, [reportedTool]);
 
     useEffect(() => {
-        setTools(mapToolNicknamesAndStatus(toolTableData));
-    }, [toolTableData]);
+        setTools(mapToolNicknamesAndStatus(toolTableData, rackSize));
+    }, [toolTableData, rackSize]);
 
     useEffect(() => {
-        console.log(`updating connection state to ${isConnected}`);
         setConnected(isConnected);
     }, [isConnected]);
+
+    useEffect(() => {
+        if (reportedRackSize > 0) {
+            setRackSize(reportedRackSize);
+        } else {
+            setRackSize(tools.length);
+        }
+    }, [reportedRackSize, tools]);
 
     const payload = {
         mode: loadToolMode,
@@ -95,6 +106,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
         setShowTable: setShowTable,
         currentTool,
         atcAvailable,
+        rackSize,
     };
 
     return (
