@@ -198,8 +198,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
-            console.log('Startup/restart message - rewind sender');
-            this.emit('startup', payload);
+            //this.emit('startup', payload, this.settings.version.semver);
             return;
         }
         if (type === GrblHalLineParserResultCompleteStatus) {
@@ -388,7 +387,7 @@ class GrblHalRunner extends events.EventEmitter {
                 this.settings = nextSettings; // enforce change
             }
             // Should no longer need to do this here for redundancy
-            //this.emit('startup', payload);
+            this.emit('startup', payload, semver);
             return;
         }
         if (type === GrblHalLineParserResultCode) {

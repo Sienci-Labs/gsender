@@ -954,7 +954,7 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
             console.log(semver);
             if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
@@ -1178,6 +1178,8 @@ class GrblHalController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
+        await delay(50);
+        this.writeln('$I');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
     }
