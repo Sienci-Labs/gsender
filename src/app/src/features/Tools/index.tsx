@@ -8,7 +8,7 @@ import Rotary from '../Rotary';
 import Macros from '../Macros';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { ATC } from 'app/features/ATC';
+import { ATCWidget } from 'app/features/ATC';
 
 interface TabItem {
     label: string;
@@ -30,7 +30,7 @@ const tabs = [
     },
     {
         label: 'ATC',
-        content: ATC,
+        content: ATCWidget,
     },
     {
         label: 'Coolant',
