@@ -328,7 +328,11 @@ const controllerSlice = createSlice({
                 file: SDCardFile;
             }>,
         ) => {
-            state.sdcard.files = [...state.sdcard.files, action.payload.file];
+            const filteredFiles = state.sdcard.files.filter(
+                (file) => file.name == action.payload.file.name,
+            );
+            console.log(filteredFiles);
+            state.sdcard.files = [...filteredFiles, action.payload.file];
         },
     },
 });
