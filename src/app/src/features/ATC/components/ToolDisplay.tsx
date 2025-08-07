@@ -19,7 +19,7 @@ export function ToolDisplay() {
 
     return (
         <div className="w-full flex flex-col gap-1">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
                 <CurrentToolInfo disabled={disabled} />
             </div>
             <div className="flex flex-row gap-4 w-full">

@@ -31,14 +31,14 @@ export function AdvancedOptions() {
     };
 
     return (
-        <div className="flex w-36">
+        <div className="flex w-full pt-12 bg-blue-500">
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
                 <CollapsibleTrigger asChild>
                     <Button
                         variant="ghost"
-                        className="justify-between px-3 py-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-b border-b-blue-500"
+                        className="p-1 justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-b border-b-blue-500"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                             <LuHardHat className="h-4 w-4" />
                             <span>Advanced Options</span>
                         </div>
@@ -51,7 +51,7 @@ export function AdvancedOptions() {
                 </CollapsibleTrigger>
 
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <div className="px-3 pb-1 space-y-1">
+                    <div className="flex flex-col gap-1">
                         <Button
                             onClick={releaseToolFromSpindle}
                             size="sm"

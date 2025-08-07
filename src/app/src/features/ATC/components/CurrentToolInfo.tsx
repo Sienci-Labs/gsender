@@ -59,16 +59,6 @@ export function CurrentToolInfo({
                         {currentTool ? `T${currentTool}` : 'Empty'}
                     </h1>
                 </div>
-
-                {/* Conditional Load Button */}
-                {selectedTool?.status === 'offrack' && (
-                    <button
-                        onClick={onLoadTool}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 whitespace-nowrap"
-                    >
-                        Load Tool {toolNumber} to Rack
-                    </button>
-                )}
             </div>
 
             {/* Table-style Information */}
@@ -96,11 +86,12 @@ export function CurrentToolInfo({
                             </span>
                         </div>
                         <Button
-                            className={`ml-auto px-3 py-1 rounded text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            className={`ml-auto     rounded text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                                 status === 'Probed'
                                     ? 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
                                     : 'bg-orange-500 hover:bg-orange-600 text-white focus:ring-orange-500'
                             }`}
+                            size="sm"
                             disabled={disabled || currentTool < 1}
                             onClick={() => probeTool(currentTool)}
                         >
