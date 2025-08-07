@@ -1,6 +1,6 @@
 class GrblHalLineParserResultATCI {
     static parse(line) {
-        const r = line.match(/^\[(MSG:ATCI):?(\d*)?\|(.*)]$/);
+        const r = line.match(/^\[(MSG:(?:Error: )?ATCI):?(\d*)?\|(.*)]$/);
         if (!r) {
             return null;
         }

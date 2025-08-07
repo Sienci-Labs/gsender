@@ -190,11 +190,7 @@ class GrblHalRunner extends events.EventEmitter {
                 this.settings = nextSettings;
             }
 
-            // If the payload has a subtype, emit a dialog request;
-            if (payload.subtype) {
-                this.emit('atci', payload);
-            }
-
+            this.emit('atci', payload);
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
