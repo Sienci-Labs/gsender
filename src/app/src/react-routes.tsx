@@ -114,7 +114,7 @@ export const ReactRoutes = () => {
                                     />
 
                                     <ToolCard
-                                        title={'SD Card'}
+                                        title={'SD Card Manager'}
                                         description={
                                             'Manage and view files on your SD card'
                                         }
@@ -214,7 +214,7 @@ export const ReactRoutes = () => {
                         path={'sd'}
                         element={
                             <Page
-                                title="SD Card"
+                                title="SD Card Manager"
                                 withGoBackButton
                                 withFixedArea
                             >
