@@ -953,7 +953,7 @@ export function* initialize(): Generator<any, void, any> {
                 confirmLabel: 'OK',
                 cancelLabel: 'Reset',
                 onConfirm: () => {
-                    controller.command('unhold');
+                    controller.command('cyclestart');
                 },
                 hideClose: true,
             });

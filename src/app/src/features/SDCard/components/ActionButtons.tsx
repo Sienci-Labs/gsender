@@ -12,7 +12,7 @@ export function ActionButtons() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     return (
         <>
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-3">
                 {!isMounted && (
                     <button
                         onClick={() => mountSDCard()}

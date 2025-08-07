@@ -1,6 +1,7 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useState } from 'react';
+import controller from 'app/lib/controller.ts';
 
 export function useSDCard() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -16,16 +17,19 @@ export function useSDCard() {
     };
 
     const runSDFile = (path) => {
+        console.log(path);
         console.log('running SD file');
+        controller.command('sdcard:run', path);
     };
 
     const deleteSDCard = (path) => {
+        console.log(path);
         console.log('deleting file from SD card');
     };
 
     console.log(isMounted, files);
     return {
-        isMounted,
+        isMounted: true,
         files,
         isLoading,
         setIsLoading,

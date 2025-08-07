@@ -10,6 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from 'app/components/shadcn/Table';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import controller from 'app/lib/controller.ts';
 
 const formatFileSize = (bytes: number): string => {
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -37,6 +39,16 @@ export const FileList: React.FC = () => {
                 </p>
             </div>
         );
+    }
+
+    function handleDelete(fileName: string) {
+        Confirm({
+            title: 'Delete File',
+            content: `Are you sure you want to delete ${fileName}?`,
+            onConfirm: () => {
+                controller.command('sdcard:delete', fileName);
+            },
+        });
     }
 
     return (
@@ -87,7 +99,7 @@ export const FileList: React.FC = () => {
 
                                         <button
                                             onClick={() =>
-                                                setDeleteConfirm(file.name)
+                                                handleDelete(file.name)
                                             }
                                             disabled={isLoading}
                                             className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"

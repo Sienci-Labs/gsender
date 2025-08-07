@@ -1,9 +1,9 @@
 import { CheckCircle, HardDrive, XCircle } from 'lucide-react';
+import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
 
 export function StatusIndicator({ isMounted }) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Status Card */}
             <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -27,6 +27,9 @@ export function StatusIndicator({ isMounted }) {
                         <span>{isMounted ? 'Mounted' : 'Unmounted'}</span>
                     </div>
                 </div>
+            </div>
+            <div className="bg-white flex items-center justify-center px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+                <ActionButtons />
             </div>
         </div>
     );

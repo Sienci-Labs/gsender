@@ -20,7 +20,6 @@ const SDCardElement = () => {
 
                 <div className="space-y-8">
                     <StatusIndicator isMounted={isMounted} />
-                    <ActionButtons />
                     <FileList />
                 </div>
             </div>
