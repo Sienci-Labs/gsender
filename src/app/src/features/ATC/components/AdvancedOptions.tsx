@@ -31,12 +31,16 @@ export function AdvancedOptions() {
     };
 
     return (
-        <div className="flex w-full pt-12 bg-blue-500">
-            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                <CollapsibleTrigger asChild>
-                    <Button
+        <div className="flex w-full pt-10">
+            <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                className="w-full"
+            >
+                <CollapsibleTrigger asChild className="p-0 w-full">
+                    <button
                         variant="ghost"
-                        className="p-1 justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg border border-b border-b-blue-500"
+                        className="flex w-full flex-row px-1 py-1 items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
                     >
                         <div className="flex items-center gap-1">
                             <LuHardHat className="h-4 w-4" />
@@ -47,7 +51,7 @@ export function AdvancedOptions() {
                         ) : (
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
                         )}
-                    </Button>
+                    </button>
                 </CollapsibleTrigger>
 
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
