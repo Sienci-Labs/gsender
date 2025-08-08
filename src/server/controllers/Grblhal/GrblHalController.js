@@ -1197,13 +1197,20 @@ class GrblHalController {
         this.ymodem.on('progress', (progress) => {
             console.log(progress);
         });
+        this.ymodem.on('abort', () => {
+            console.log('aborted');
+            this.ymodemTransferInProgress = false;
+            this.connection.on('data', this.connectionEventListener.data); // restore the general data handler
+        });
         this.ymodem.on('error', (err) => {
             this.ymodemTransferInProgress = false;
+            this.connection.on('data', this.connectionEventListener.data); // Restore the general data handler
             console.log(err);
         });
         this.ymodem.on('complete', () => {
             this.ymodemTransferInProgress = false;
-            console.log('job done, messsages resume');
+            this.connection.on('data', this.connectionEventListener.data); // restore the parser data handler
+            console.log('job done, messages resume');
         });
     }
 

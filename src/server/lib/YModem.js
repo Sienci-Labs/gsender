@@ -5,20 +5,6 @@
 import events from 'events';
 
 export class YModem extends events.EventEmitter {
-    static SOH = 0x01;
-
-    static STX = 0x02;
-
-    static EOT = 0x04;
-
-    static ACK = 0x06;
-
-    static NAK = 0x15;
-
-    static CAN = 0x18;
-
-    static C = 'C'.charCodeAt(0);
-
     constructor(comms) {
         super();
         this.comms = comms;
@@ -29,6 +15,7 @@ export class YModem extends events.EventEmitter {
         this.crc = new Uint8Array(2);
         this.response = YModem.NAK;
         this.dataTransferredCallback = null;
+        this.onData = null;
     }
 
     onDataTransferred(callback) {
@@ -42,10 +29,12 @@ export class YModem extends events.EventEmitter {
         let state = 'NAK';
         const fileSize = file.size;
         let bytesRemaining = fileSize;
-        const reader = file.stream().getReader();
+        this.
+        const reader = file.data.stream().getReader(); // Time to read the blob
 
-        this.comms.eventMode = false;
-        this.comms.purgeQueue();
+        // Turn on other writing, wait to clear - best way to handle for us?
+        //this.comms.eventMode = false;
+        //this.comms.purgeQueue();
 
         this.clearPayload();
 
@@ -71,14 +60,16 @@ export class YModem extends events.EventEmitter {
 
             if (state === 'ACK') {
                 this.hdr[0] = YModem.EOT;
-                this.comms.writeBytes(this.hdr.slice(0, 1));
+                this.comms.write(this.hdr.slice(0, 1));
             }
         }
 
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        this.comms.purgeQueue();
-        this.comms.eventMode = true;
+        /// Is this just a delay or???
+        //this.comms.purgeQueue();
+        //this.comms.eventMode = true;
+        this.emit('complete', state === 'ACK');
 
         return state === 'ACK';
     }
@@ -118,11 +109,12 @@ export class YModem extends events.EventEmitter {
     }
 
     async send(length) {
-        this.comms.purgeQueue();
-        this.comms.writeBytes(this.hdr);
-        this.comms.writeBytes(this.payload.slice(0, length));
+        //this.comms.purgeQueue();
+        this.comms.write(this.hdr);
+        this.comms.write(this.payload.slice(0, length));
         this.response = YModem.NAK;
 
+        // TODO:  How do we check this, check implementation on ioSender side
         await this.comms.waitForByte(this.packetNum === 0 ? 8000 : 2000, this.crc);
 
         switch (this.response) {
