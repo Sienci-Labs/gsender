@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise  */
 /* eslint-disable no-await-in-loop  */
 /* eslint-disable no-return-assign */
-export class YModem {
+export class YModem extends Event.EventEmitter {
     static SOH = 0x01;
 
     static STX = 0x02;
