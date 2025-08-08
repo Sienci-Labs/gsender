@@ -19,7 +19,7 @@ function goToParkLocation() {
     controller.command('gcode', code);
 }
 
-export function Parking({disabled = false}) {
+export function Parking({ disabled = false }) {
     const shuttleControlEvents = {
         HOMING_PARK: {
             title: 'Park ',
@@ -28,7 +28,12 @@ export function Parking({disabled = false}) {
             preventDefault: false,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => goToParkLocation(),
+            callback: () => {
+                if (disabled) {
+                    return;
+                }
+                goToParkLocation();
+            },
         },
     };
 

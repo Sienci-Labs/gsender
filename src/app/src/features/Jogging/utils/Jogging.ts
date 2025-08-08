@@ -7,6 +7,8 @@ import {
     GRBLHAL,
 } from 'app/constants';
 import store from 'app/store';
+import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 
 export interface JogSpeeds {
     aStep: number;
@@ -51,9 +53,10 @@ export interface JoggerProps {
     feedrate: number;
     canClick?: boolean;
     isRotaryMode?: boolean;
+    threshold?: number;
 }
 
-export function cancelJog(state, firmwareType) {
+export function cancelJog(state: GRBL_ACTIVE_STATES_T, firmwareType: FIRMWARE_TYPES_T) {
     if (state) {
         if (state === GRBL_ACTIVE_STATE_JOG) {
             return controller.command('jog:cancel');

@@ -14,7 +14,6 @@ import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
-    GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
@@ -26,6 +25,8 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -59,25 +60,32 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     fileLoaded,
     onStop,
 }) => {
-    function canRun() {
+    function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
+        const currentActiveState = reduxActiveState || activeState;
         return (
-            activeState === GRBL_ACTIVE_STATE_IDLE ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
+            currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD
         );
     }
 
-    function canPause() {
-        const { state } = workflow;
+    function canPause(
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ) {
+        const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
 
         return (
             includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state) &&
-            (activeState === GRBL_ACTIVE_STATE_RUN ||
-                activeState === GRBL_ACTIVE_STATE_HOLD)
+            (currentActiveState === GRBL_ACTIVE_STATE_RUN ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD)
         );
     }
 
-    function canStop() {
-        const { state } = workflow;
+    function canStop(reduxWorkflow?: { state: WORKFLOW_STATES_T }) {
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
         return includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state);
     }
 
@@ -88,6 +96,30 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             (type === START && canRun()) ||
             (type === PAUSE && canPause()) ||
             (type === STOP && canStop())
+        ) {
+            return false;
+        }
+        return true;
+    };
+
+    const shortcutIsDisabled = () => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const fileLoaded = get(reduxStore.getState(), 'file.fileLoaded');
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+        const workflow = get(reduxStore.getState(), 'controller.workflow');
+
+        if (!isConnected || !fileLoaded) {
+            return true;
+        } else if (
+            (type === START && canRun(activeState)) ||
+            (type === PAUSE && canPause(activeState, workflow)) ||
+            (type === STOP && canStop(workflow))
         ) {
             return false;
         }
@@ -114,6 +146,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handleRun();
             },
         },
@@ -130,6 +165,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handlePause();
             },
         },
@@ -143,6 +181,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handleStop();
             },
         },
@@ -153,7 +194,12 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             category: CARVING_CATEGORY,
             keys: '',
             cmd: 'RUN_OUTLINE',
-            callback: () => pubsub.publish('outline:start'),
+            callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
+                pubsub.publish('outline:start');
+            },
         },
     };
 

@@ -13,8 +13,9 @@ import {
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
 import get from 'lodash/get';
+import cx from 'classnames';
 
-export function RapidPositionButtons() {
+export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,
     );
@@ -39,8 +40,12 @@ export function RapidPositionButtons() {
         <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait">
             <div className="grid grid-cols-2 text-3xl gap-2 font-bold">
                 <button
-                    className="w-8 h-6 portrait:w-10 portrait:h-8"
+                    className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
+                        'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
+                            disabled,
+                    })}
                     onClick={() => jogToCorner(BACK_LEFT)}
+                    disabled={disabled}
                 >
                     <img
                         src={blVector}
@@ -49,8 +54,12 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6 portrait:w-10 portrait:h-8"
+                    className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
+                        'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
+                            disabled,
+                    })}
                     onClick={() => jogToCorner(BACK_RIGHT)}
+                    disabled={disabled}
                 >
                     <img
                         src={brVector}
@@ -59,8 +68,12 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6 portrait:w-10 portrait:h-8"
+                    className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
+                        'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
+                            disabled,
+                    })}
                     onClick={() => jogToCorner(FRONT_LEFT)}
+                    disabled={disabled}
                 >
                     <img
                         src={flVector}
@@ -69,8 +82,12 @@ export function RapidPositionButtons() {
                     />
                 </button>
                 <button
-                    className="w-8 h-6 portrait:w-10 portrait:h-8"
+                    className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
+                        'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
+                            disabled,
+                    })}
                     onClick={() => jogToCorner(FRONT_RIGHT)}
+                    disabled={disabled}
                 >
                     <img
                         src={frVector}
