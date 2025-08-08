@@ -58,6 +58,8 @@ import {
     getMovementGCode,
 } from './utils/RapidPosition';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import reduxStore from 'app/store/redux';
+
 interface DROProps {
     axes: AxesArray;
     mposController: DROPosition;
@@ -76,7 +78,6 @@ function DRO({
     mposController,
     wposController,
     workflowState,
-    unitLabel,
     isConnected,
     activeState,
     homingEnabled,
@@ -117,6 +118,43 @@ function DRO({
         setHomingMode((prev) => !prev);
     }
 
+    const canClick = useCallback((): boolean => {
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    }, [isConnected, workflowState, activeState])();
+
+    const canRunShortcut = (needsHoming?: boolean): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+        const homingValue = get(
+            reduxStore.getState(),
+            'controller.settings.settings.$22',
+        );
+        const homingEnabled = Number(homingValue) > 0;
+
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+        if (needsHoming && !homingEnabled) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    };
+
     const shuttleControlEvents = {
         ZERO_X_AXIS: {
             title: 'Zero X Axis',
@@ -126,7 +164,12 @@ function DRO({
             payload: { axis: AXIS_X },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('X', 0),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('X', 0);
+            },
         },
         ZERO_Y_AXIS: {
             title: 'Zero Y Axis',
@@ -136,7 +179,12 @@ function DRO({
             payload: { axis: AXIS_Y },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('Y', 0),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('Y', 0);
+            },
         },
         ZERO_Z_AXIS: {
             title: 'Zero Z Axis',
@@ -146,7 +194,12 @@ function DRO({
             payload: { axis: AXIS_Z },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('Z', 0),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('Z', 0);
+            },
         },
         ZERO_A_AXIS: {
             id: 72,
@@ -157,7 +210,12 @@ function DRO({
             payload: { axis: AXIS_A },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('A', 0),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('A', 0);
+            },
         },
         ZERO_ALL_AXIS: {
             title: 'Zero All',
@@ -167,7 +225,12 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => zeroAllAxes(),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroAllAxes();
+            },
         },
         GO_TO_A_AXIS_ZERO: {
             id: 73,
@@ -178,7 +241,12 @@ function DRO({
             payload: { axisList: [AXIS_A] },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => gotoZero('A'),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('A');
+            },
         },
         GO_TO_X_AXIS_ZERO: {
             title: 'Go to X Zero',
@@ -188,7 +256,12 @@ function DRO({
             payload: { axisList: [AXIS_X] },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => gotoZero('X'),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('X');
+            },
         },
         GO_TO_Y_AXIS_ZERO: {
             title: 'Go to Y Zero',
@@ -198,7 +271,12 @@ function DRO({
             payload: { axisList: [AXIS_Y] },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => gotoZero('Y'),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('Y');
+            },
         },
         GO_TO_Z_AXIS_ZERO: {
             title: 'Go to Z Zero',
@@ -208,7 +286,12 @@ function DRO({
             payload: { axisList: [AXIS_Z] },
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => gotoZero('Z'),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('Z');
+            },
         },
         GO_TO_XY_AXIS_ZERO: {
             title: 'Go to XY Zero',
@@ -218,7 +301,12 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => goXYAxes(),
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                goXYAxes();
+            },
         },
         HOMING_GO_TO_BACK_LEFT_CORNER: {
             title: 'Rapid Position - Back Left Corner',
@@ -228,7 +316,12 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_LEFT),
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(BACK_LEFT);
+            },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
             title: 'Rapid Position - Back Right Corner',
@@ -238,7 +331,12 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_RIGHT),
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(BACK_RIGHT);
+            },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
             title: 'Rapid Position - Front Left Corner',
@@ -248,7 +346,12 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_LEFT),
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(FRONT_LEFT);
+            },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
             title: 'Rapid Position - Front Right Corner',
@@ -258,21 +361,17 @@ function DRO({
             preventDefault: true,
             isActive: true,
             category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_RIGHT),
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(FRONT_RIGHT);
+            },
         },
     };
 
     useShuttleEvents(shuttleControlEvents);
     useKeybinding(shuttleControlEvents);
-
-    const canClick = useCallback((): boolean => {
-        if (!isConnected) return false;
-        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
-
-        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
-
-        return includes(states, activeState);
-    }, [isConnected, workflowState, activeState])();
 
     const isRotaryMode = mode === 'ROTARY';
 
@@ -291,7 +390,9 @@ function DRO({
             <UnitBadge />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
-                {isConnected && homingEnabled && <RapidPositionButtons />}
+                {isConnected && homingEnabled && (
+                    <RapidPositionButtons disabled={!canClick} />
+                )}
                 {isConnected && homingEnabled && (
                     <Parking disabled={!canClick} />
                 )}

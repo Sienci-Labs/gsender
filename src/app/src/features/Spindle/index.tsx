@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import debounce from 'lodash/debounce';
 import pubsub from 'pubsub-js';
@@ -29,7 +29,8 @@ import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { findIndex } from 'lodash';
+import { findIndex, get } from 'lodash';
+import reduxStore from 'app/store/redux';
 
 interface SpindleState {
     minimized: boolean;
@@ -60,6 +61,8 @@ const SpindleWidget = () => {
         spindleMax: config.get('spindleMax', 0),
         spindleMin: config.get('spindleMin', 0),
     }));
+
+    const stateRef = useRef<SpindleState>(state);
 
     const {
         workflow,
@@ -161,6 +164,10 @@ const SpindleWidget = () => {
         }
     }, [state, laserAsSpindle, spindleMax, spindleMin]);
 
+    useEffect(() => {
+        stateRef.current = state;
+    }, [state]);
+
     const updateSpindleSpeed = useCallback(
         (speed: number) => {
             if (state.spindleSpeed !== speed) {
@@ -216,6 +223,23 @@ const SpindleWidget = () => {
         controllerType,
         controllerState?.status?.activeState,
     ]);
+
+    const canClickShortcut = (): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflow = get(reduxStore.getState(), 'controller.workflow');
+        const controllerType = get(reduxStore.getState(), 'controller.type');
+        const controllerState = get(reduxStore.getState(), 'controller.state');
+
+        if (!isConnected) return false;
+        if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
+        if (![GRBL, GRBLHAL].includes(controllerType)) return false;
+
+        const activeState = controllerState?.status?.activeState;
+        return activeState === GRBL_ACTIVE_STATE_IDLE;
+    };
 
     const getSpindleActiveState = useCallback((): boolean => {
         return spindleModal !== 'M5';
@@ -377,7 +401,9 @@ const SpindleWidget = () => {
     const actions = {
         handleModeToggle: () => {
             const newMode =
-                state.mode === LASER_MODE ? SPINDLE_MODE : LASER_MODE;
+                stateRef.current.mode === LASER_MODE
+                    ? SPINDLE_MODE
+                    : LASER_MODE;
             setState((prevState) => ({ ...prevState, mode: newMode }));
             if (newMode === SPINDLE_MODE) {
                 enableSpindleMode();
@@ -388,11 +414,11 @@ const SpindleWidget = () => {
         },
         sendM3: () => {
             setIsSpindleOn(true);
-            controller.command('gcode', `M3 S${state.spindleSpeed}`);
+            controller.command('gcode', `M3 S${stateRef.current.spindleSpeed}`);
         },
         sendM4: () => {
             setIsSpindleOn(true);
-            controller.command('gcode', `M4 S${state.spindleSpeed}`);
+            controller.command('gcode', `M4 S${stateRef.current.spindleSpeed}`);
         },
         sendM5: () => {
             setIsLaserOn(false);
@@ -400,7 +426,9 @@ const SpindleWidget = () => {
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
-            const laserPower = state.laser.maxPower * (state.laser.power / 100);
+            const laserPower =
+                stateRef.current.laser.maxPower *
+                (stateRef.current.laser.power / 100);
 
             setIsLaserOn(true);
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
@@ -436,6 +464,36 @@ const SpindleWidget = () => {
             const { power, duration } = state.laser;
             const maxPower =
                 spindle.label === 'SLB_LASER' ? laserMax : state.laser.maxPower;
+            controller.command('lasertest:on', power, duration, maxPower);
+            setTimeout(() => {
+                actions.sendM5();
+            }, duration * 1000);
+        },
+        runShortcutLaserTest: () => {
+            const spindle = get(
+                reduxStore.getState(),
+                'controller.spindles',
+            ).find((s) => s.enabled) ?? {
+                label: 'Default Spindle',
+                id: '0',
+                enabled: true,
+                capabilities: '',
+                laser: false,
+                raw: '',
+                order: 0,
+            };
+            const laserMax = Number(
+                get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$730',
+                ) ?? 255,
+            );
+            const { power, duration } = stateRef.current.laser;
+            const maxPower =
+                spindle.label === 'SLB_LASER'
+                    ? laserMax
+                    : stateRef.current.laser.maxPower;
+
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
                 actions.sendM5();
@@ -583,7 +641,12 @@ const SpindleWidget = () => {
             preventDefault: false,
             isActive: true,
             category: SPINDLE_LASER_CATEGORY,
-            callback: () => actions.handleModeToggle(),
+            callback: () => {
+                if (!canClickShortcut()) {
+                    return;
+                }
+                actions.handleModeToggle();
+            },
         },
         CW_LASER_ON: {
             title: 'CW / Laser On',
@@ -593,7 +656,10 @@ const SpindleWidget = () => {
             isActive: true,
             category: SPINDLE_LASER_CATEGORY,
             callback: () => {
-                state.mode === LASER_MODE
+                if (!canClickShortcut()) {
+                    return;
+                }
+                stateRef.current.mode === LASER_MODE
                     ? actions.sendLaserM3()
                     : actions.sendM3();
             },
@@ -606,8 +672,11 @@ const SpindleWidget = () => {
             isActive: true,
             category: SPINDLE_LASER_CATEGORY,
             callback: () => {
-                state.mode === LASER_MODE
-                    ? actions.runLaserTest()
+                if (!canClickShortcut()) {
+                    return;
+                }
+                stateRef.current.mode === LASER_MODE
+                    ? actions.runShortcutLaserTest()
                     : actions.sendM4();
             },
         },
@@ -619,6 +688,9 @@ const SpindleWidget = () => {
             isActive: true,
             category: SPINDLE_LASER_CATEGORY,
             callback: () => {
+                if (!canClickShortcut()) {
+                    return;
+                }
                 actions.sendM5();
             },
         },

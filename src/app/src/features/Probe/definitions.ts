@@ -125,6 +125,7 @@ export interface AvailableTool {
 
 export interface State {
     connectionMade: boolean;
+    connectionMadeRef: React.MutableRefObject<boolean>;
     canClick: boolean;
     show: boolean;
     availableProbeCommands: ProbeCommand[];

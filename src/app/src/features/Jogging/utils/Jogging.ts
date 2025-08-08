@@ -51,6 +51,7 @@ export interface JoggerProps {
     feedrate: number;
     canClick?: boolean;
     isRotaryMode?: boolean;
+    threshold?: number;
 }
 
 export function cancelJog(state, firmwareType) {
