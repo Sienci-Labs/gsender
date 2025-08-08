@@ -233,7 +233,7 @@ class GrblHalRunner extends events.EventEmitter {
             };
 
             if (!_.isEqual(this.state.status, nextState.status)) {
-                this.state = nextState; // e0.nforce change
+                this.state = nextState; // enforce change
             }
 
             this.emit('status', payload);
