@@ -84,6 +84,7 @@ import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
 import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
+import { YModem } from 'server/lib/YModem';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -205,6 +206,9 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
+    ymodem = null;
+    ymodemTransferInProgress = false;
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -1010,6 +1014,11 @@ class GrblHalController {
                 return;
             }
 
+            // If transferring over ymodem, we cannot send any other commands or bad things happen.
+            if (this.ymodemTransferInProgress) {
+                return;
+            }
+
             const now = new Date().getTime();
 
             // The status report query (?) is a realtime command, it does not consume the receive buffer.
@@ -1057,6 +1066,11 @@ class GrblHalController {
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             if (!(this.ready)) {
+                return;
+            }
+
+            // Do not send any commands while we are transferring a file or else bad things happen
+            if (this.ymodemTransferInProgress) {
                 return;
             }
 
@@ -1174,6 +1188,23 @@ class GrblHalController {
                 }
             }
         }, 250);
+
+        // YModem instance
+        this.ymodem = new YModem(this.connection);
+        this.ymodem.on('start', () => {
+            this.ymodemTransferInProgress = true;
+        });
+        this.ymodem.on('progress', (progress) => {
+            console.log(progress);
+        });
+        this.ymodem.on('error', (err) => {
+            this.ymodemTransferInProgress = false;
+            console.log(err);
+        });
+        this.ymodem.on('complete', () => {
+            this.ymodemTransferInProgress = false;
+            console.log('job done, messsages resume');
+        });
     }
 
     async initController() {
@@ -2229,6 +2260,15 @@ class GrblHalController {
 
                 this.writeln(`$FD=${filePath}`);
             },
+            'ymodem:upload': () => {
+                const [fileData] = args;
+                this.ymodem.upload(fileData);
+                console.log(fileData);
+                console.log('Upload starts');
+            },
+            'ymodem:cancel': () => {
+                console.log('cancel upload');
+            }
         }[cmd];
 
         if (!handler) {

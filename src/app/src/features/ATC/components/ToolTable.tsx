@@ -46,7 +46,6 @@ export function probeRackTool(toolID: number) {
 }
 
 export function probeEntireRack() {
-    console.log('called');
     controller.command('gcode', ['G65 P300', '$#']);
 }
 
@@ -160,7 +159,7 @@ export interface ToolTableProps {
 
 export function ToolTable({ tools = [], disabled }: ToolTableProps) {
     const { rackSize } = useToolChange();
-    console.log(rackSize);
+
     const [onRackTools, offRackTools] = partition(
         tools,
         (tool) => tool.id <= rackSize,

@@ -332,7 +332,6 @@ class Visualizer extends Component {
 
         // Handle WebGL context restoration
         const handleContextRestored = () => {
-            console.log('Visualizer: WebGL context restored, recreating scene');
             const wasAnimationRunning = this.animationLoopRunning;
 
             if (this.node) {
@@ -2731,8 +2730,6 @@ class Visualizer extends Component {
     }
 
     forceSceneRefresh() {
-        console.log('Visualizer: Forcing complete scene refresh');
-
         // Clear existing scene
         this.clearScene();
 

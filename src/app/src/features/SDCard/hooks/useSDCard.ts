@@ -12,22 +12,18 @@ export function useSDCard() {
         (state: RootState) => state.controller.sdcard?.files,
     );
 
-    const uploadFileToSDCard = (files) => {
-        console.log('uploading file to SD card');
+    const uploadFileToSDCard = (file) => {
+        controller.command('ymodem:upload', file);
     };
 
     const runSDFile = (path) => {
-        console.log(path);
-        console.log('running SD file');
         controller.command('sdcard:run', path);
     };
 
     const deleteSDCard = (path) => {
-        console.log(path);
         console.log('deleting file from SD card');
     };
 
-    console.log(isMounted, files);
     return {
         isMounted: true,
         files,

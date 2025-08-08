@@ -1,7 +1,10 @@
 /* eslint-disable no-bitwise  */
 /* eslint-disable no-await-in-loop  */
 /* eslint-disable no-return-assign */
-export class YModem extends Event.EventEmitter {
+
+import events from 'events';
+
+export class YModem extends events.EventEmitter {
     static SOH = 0x01;
 
     static STX = 0x02;
@@ -17,6 +20,7 @@ export class YModem extends Event.EventEmitter {
     static C = 'C'.charCodeAt(0);
 
     constructor(comms) {
+        super();
         this.comms = comms;
         this.packetNum = 0;
         this.bytes = 0;
@@ -31,6 +35,9 @@ export class YModem extends Event.EventEmitter {
         this.dataTransferredCallback = callback;
     }
 
+    /**
+     * File should look like {data: blob, name: string, size:string }
+     */
     async upload(file) {
         let state = 'NAK';
         const fileSize = file.size;
