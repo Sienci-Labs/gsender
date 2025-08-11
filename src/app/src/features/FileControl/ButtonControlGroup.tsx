@@ -47,6 +47,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
+import { get } from 'lodash';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +87,14 @@ const ButtonControlGroup = () => {
         };
     }, []);
 
+    const canRunShortcut = () => {
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+        return workflowState !== WORKFLOW_STATE_RUNNING;
+    };
+
     const shuttleControlEvents = {
         LOAD_FILE: {
             title: 'Load File',
@@ -98,6 +107,9 @@ const ButtonControlGroup = () => {
             category: CARVING_CATEGORY,
             callback: throttle(
                 () => {
+                    if (!canRunShortcut()) {
+                        return;
+                    }
                     handleClickLoadFile();
                 },
                 300,
@@ -114,7 +126,7 @@ const ButtonControlGroup = () => {
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
-                if (!fileLoadedRef.current) {
+                if (!fileLoadedRef.current || !canRunShortcut()) {
                     return;
                 }
                 controller.command('gcode:unload');

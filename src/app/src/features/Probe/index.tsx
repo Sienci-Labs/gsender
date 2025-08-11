@@ -22,7 +22,7 @@
  */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -161,6 +161,8 @@ const ProbeWidget = () => {
     const [direction, setDirection] = useState<number>(
         config.get('direction', 0),
     );
+
+    const connectionMadeRef = useRef<boolean>(false);
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
@@ -372,6 +374,10 @@ const ProbeWidget = () => {
         config.set('direction', direction);
     });
 
+    useEffect(() => {
+        connectionMadeRef.current = connectionMade;
+    }, [connectionMade]);
+
     const determineProbeOptions = (probeCommand: ProbeCommand) => {
         const { axes, tool } = probeCommand;
         return {
@@ -480,6 +486,7 @@ const ProbeWidget = () => {
     const state: State = {
         show: modalIsOpen,
         connectionMade: connectionMade,
+        connectionMadeRef: connectionMadeRef,
         canClick: canClick(),
         availableProbeCommands: availableProbeCommands,
         selectedProbeCommand: selectedProbeCommand,

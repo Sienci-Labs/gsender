@@ -49,6 +49,7 @@ interface RunProbeProps {
 const RunProbe = ({ actions, state }: RunProbeProps) => {
     const {
         connectionMade,
+        connectionMadeRef,
         canClick,
         show,
         availableProbeCommands,
@@ -82,7 +83,12 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
             preventDefault: false,
             isActive: true,
             category: PROBING_CATEGORY,
-            callback: () => startProbe(),
+            callback: () => {
+                if (!connectionMadeRef.current) {
+                    return;
+                }
+                startProbe();
+            },
         },
         CONFIRM_PROBE: {
             title: 'Confirm Probe',
@@ -92,7 +98,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
             isActive: true,
             category: PROBING_CATEGORY,
             callback: () => {
-                if (connectionMade) {
+                if (connectionMadeRef.current) {
                     return;
                 }
 

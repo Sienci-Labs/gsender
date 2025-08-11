@@ -21,12 +21,10 @@
  *
  */
 
-import Button from 'app/components/Button';
 import { Slider } from 'app/components/shadcn/Slider';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
-import { stopCoolant } from 'app/features/Coolant/utils/actions.ts';
 
 type Props = {
     actions: {

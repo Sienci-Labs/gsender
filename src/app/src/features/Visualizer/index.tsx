@@ -94,6 +94,10 @@ import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import shuttleEvents from '../../lib/shuttleEvents';
 
+interface Views {
+    type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
+}
+
 class Visualizer extends Component {
     static propTypes = {
         widgetId: PropTypes.string,
@@ -897,6 +901,13 @@ class Visualizer extends Component {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
             switch (Number(amount)) {
                 case 1:
                     controller.write('\x93');
@@ -918,6 +929,13 @@ class Visualizer extends Component {
             }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
             switch (Number(amount)) {
                 case 1:
                     controller.write('\x9C');
@@ -938,27 +956,7 @@ class Visualizer extends Component {
                     return;
             }
         },
-        START_JOB: (_, { type }) => {
-            const { controllerType } = this.props;
-            // if it's a grblHAL only shortcut, don't run it
-            if (type === GRBLHAL && controllerType !== GRBLHAL) {
-                this.showToast();
-                return;
-            }
-            if (this.workflowControl) {
-                this.workflowControl.startRun();
-            }
-        },
-        PAUSE_JOB: (_, { type }) => {
-            const { controllerType } = this.props;
-            // if it's a grblHAL only shortcut, don't run it
-            if (type === GRBLHAL && controllerType !== GRBLHAL) {
-                this.showToast();
-                return;
-            }
-            this.actions.handlePause();
-        },
-        VISUALIZER_VIEW: (_, { type }) => {
+        VISUALIZER_VIEW: (_, { type }: Views) => {
             const {
                 to3DView,
                 toTopView,
@@ -968,7 +966,7 @@ class Visualizer extends Component {
             } = this.actions.camera;
 
             const changeCamera = {
-                isometirc: to3DView,
+                isometric: to3DView,
                 top: toTopView,
                 front: toFrontView,
                 right: toRightSideView,
@@ -1161,7 +1159,7 @@ class Visualizer extends Component {
             title: '3D / Isometric',
             keys: '',
             cmd: 'VISUALIZER_VIEW_3D',
-            payload: { type: 'isometirc' },
+            payload: { type: 'isometric' },
             preventDefault: true,
             isActive: true,
             category: VISUALIZER_CATEGORY,

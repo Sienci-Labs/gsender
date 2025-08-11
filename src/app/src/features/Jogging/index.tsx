@@ -43,6 +43,7 @@ import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { convertValue } from './utils/units';
+import reduxStore from 'app/store/redux';
 
 export interface JogValueObject {
     xyStep: number;
@@ -90,10 +91,10 @@ export function Jogging() {
         jogSpeedRef.current = jogSpeed;
     }, [jogSpeed]);
 
-    const axes = useSelector((state: RootState) => {
-        const controllerState = state.controller.state;
-        return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
-    });
+    // const axes = useSelector((state: RootState) => {
+    //     const controllerState = state.controller.state;
+    //     return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
+    // });
 
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
@@ -121,6 +122,28 @@ export function Jogging() {
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
+
+    const canClickShortcut = (): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    };
 
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
@@ -647,6 +670,9 @@ export function Jogging() {
             _: Event,
             { axis = null }: { axis: { [key: string]: number } | null },
         ) => {
+            if (!canClickShortcut()) {
+                return;
+            }
             const isInRotaryMode =
                 store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
 
@@ -871,6 +897,13 @@ export function Jogging() {
             isActive: true,
             category: JOGGING_CATEGORY,
             callback: (event: Event, _: Record<string, number> | null) => {
+                const isConnected = get(
+                    reduxStore.getState(),
+                    'connection.isConnected',
+                );
+                if (!isConnected) {
+                    return;
+                }
                 if (event) {
                     preventDefault(event);
                 }
