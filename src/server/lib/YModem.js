@@ -29,7 +29,7 @@ export class YModem extends events.EventEmitter {
         let state = 'NAK';
         const fileSize = file.size;
         let bytesRemaining = fileSize;
-        this.
+
         const reader = file.data.stream().getReader(); // Time to read the blob
 
         // Turn on other writing, wait to clear - best way to handle for us?
