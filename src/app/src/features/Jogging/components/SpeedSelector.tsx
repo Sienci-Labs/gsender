@@ -1,5 +1,5 @@
-import cn from 'classnames';
 import { useEffect, useState, useRef } from 'react';
+import cn from 'classnames';
 import pubsub from 'pubsub-js';
 import get from 'lodash/get';
 
@@ -163,21 +163,19 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
     return (
         <div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32 max-xl:w-28">
             <SpeedSelectButton
-                active={rapidActive}
-                onClick={() => handleSpeedChange('Rapid')}
-                label="Rapid"
+                active={preciseActive}
+                onClick={() => handleSpeedChange('Precise')}
+                label="Precise"
             />
-
             <SpeedSelectButton
                 active={normalActive}
                 onClick={() => handleSpeedChange('Normal')}
                 label="Normal"
             />
-
             <SpeedSelectButton
-                active={preciseActive}
-                onClick={() => handleSpeedChange('Precise')}
-                label="Precise"
+                active={rapidActive}
+                onClick={() => handleSpeedChange('Rapid')}
+                label="Rapid"
             />
         </div>
     );
