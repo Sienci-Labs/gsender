@@ -1,10 +1,13 @@
 import QRCode from 'react-qr-code';
-import React from 'react';
 import { FaCopy } from 'react-icons/fa';
-import Button from 'app/components/Button';
 
-function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
+import Button from 'app/components/Button';
+import { toast } from 'app/lib/toaster';
+
+async function copyToClipboard(text: string) {
+    await navigator.clipboard.writeText(text);
+
+    toast.info('Copied link to clipboard');
 }
 
 export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
@@ -23,9 +26,9 @@ export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
                     type="button"
                     className="flex flex-row items-center justify-center gap-1"
                     onClick={() => copyToClipboard(safeAddress)}
-                >
-                    <span>Copy</span> <FaCopy />
-                </Button>
+                    text="Copy"
+                    icon={<FaCopy />}
+                />
             </div>
         </div>
     );
