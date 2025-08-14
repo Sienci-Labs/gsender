@@ -157,7 +157,7 @@ function DRO({
 
     const shuttleControlEvents = {
         ZERO_X_AXIS: {
-            title: 'Zero X Axis',
+            title: 'Zero X-axis',
             keys: ['shift', 'w'].join('+'),
             cmd: 'ZERO_X_AXIS',
             preventDefault: true,
@@ -172,7 +172,7 @@ function DRO({
             },
         },
         ZERO_Y_AXIS: {
-            title: 'Zero Y Axis',
+            title: 'Zero Y-axis',
             keys: ['shift', 'e'].join('+'),
             cmd: 'ZERO_Y_AXIS',
             preventDefault: true,
@@ -187,7 +187,7 @@ function DRO({
             },
         },
         ZERO_Z_AXIS: {
-            title: 'Zero Z Axis',
+            title: 'Zero Z-axis',
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
             preventDefault: true,
@@ -203,7 +203,7 @@ function DRO({
         },
         ZERO_A_AXIS: {
             id: 72,
-            title: 'Zero A Axis',
+            title: 'Zero A-axis',
             keys: ['shift', '0'].join('+'),
             cmd: 'ZERO_A_AXIS',
             preventDefault: true,
@@ -309,7 +309,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_BACK_LEFT_CORNER: {
-            title: 'Rapid Position - Back Left Corner',
+            title: 'Go to Back Left Corner',
             keys: '',
             cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
             payload: {},
@@ -324,7 +324,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
-            title: 'Rapid Position - Back Right Corner',
+            title: 'Go to Back Right Corner',
             keys: '',
             cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
             payload: {},
@@ -339,7 +339,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
-            title: 'Rapid Position - Front Left Corner',
+            title: 'Go to Front Left Corner',
             keys: '',
             cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
             payload: {},
@@ -354,7 +354,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
-            title: 'Rapid Position - Front Right Corner',
+            title: 'Go to Front Right Corner',
             keys: '',
             cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
             payload: {},
