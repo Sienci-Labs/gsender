@@ -30,7 +30,7 @@ const MachineInfo = () => {
             cmd: 'DISPLAY_MACHINE_INFO',
             preventDefault: false,
             isActive: true,
-            category: GENERAL_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: () => setOpen((prev) => !prev),
         },
     };
