@@ -218,7 +218,7 @@ function DRO({
             },
         },
         ZERO_ALL_AXIS: {
-            title: 'Zero All',
+            title: 'Zero all axes',
             keys: ['shift', 'q'].join('+'),
             cmd: 'ZERO_ALL_AXIS',
             payload: { axis: 'all' },
@@ -234,7 +234,7 @@ function DRO({
         },
         GO_TO_A_AXIS_ZERO: {
             id: 73,
-            title: 'Go to A Zero',
+            title: 'Go to A zero',
             keys: ['shift', '1'].join('+'),
             cmd: 'GO_TO_A_AXIS_ZERO',
             preventDefault: true,
@@ -249,7 +249,7 @@ function DRO({
             },
         },
         GO_TO_X_AXIS_ZERO: {
-            title: 'Go to X Zero',
+            title: 'Go to X zero',
             keys: ['shift', 's'].join('+'),
             cmd: 'GO_TO_X_AXIS_ZERO',
             preventDefault: true,
@@ -264,7 +264,7 @@ function DRO({
             },
         },
         GO_TO_Y_AXIS_ZERO: {
-            title: 'Go to Y Zero',
+            title: 'Go to Y zero',
             keys: ['shift', 'd'].join('+'),
             cmd: 'GO_TO_Y_AXIS_ZERO',
             preventDefault: true,
@@ -279,7 +279,7 @@ function DRO({
             },
         },
         GO_TO_Z_AXIS_ZERO: {
-            title: 'Go to Z Zero',
+            title: 'Go to Z zero',
             keys: ['shift', 'f'].join('+'),
             cmd: 'GO_TO_Z_AXIS_ZERO',
             preventDefault: true,
@@ -294,7 +294,7 @@ function DRO({
             },
         },
         GO_TO_XY_AXIS_ZERO: {
-            title: 'Go to XY Zero',
+            title: 'Go to XY zero',
             keys: ['shift', 'a'].join('+'),
             cmd: 'GO_TO_XY_AXIS_ZERO',
             payload: { axisList: [AXIS_X, AXIS_Y] },
@@ -309,7 +309,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_BACK_LEFT_CORNER: {
-            title: 'Go to Back Left Corner',
+            title: 'Go to Back Left corner',
             keys: '',
             cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
             payload: {},
@@ -324,7 +324,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
-            title: 'Go to Back Right Corner',
+            title: 'Go to Back Right corner',
             keys: '',
             cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
             payload: {},
@@ -339,7 +339,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
-            title: 'Go to Front Left Corner',
+            title: 'Go to Front Left corner',
             keys: '',
             cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
             payload: {},
@@ -354,7 +354,7 @@ function DRO({
             },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
-            title: 'Go to Front Right Corner',
+            title: 'Go to Front Right corner',
             keys: '',
             cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
             payload: {},
