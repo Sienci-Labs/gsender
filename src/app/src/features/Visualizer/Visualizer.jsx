@@ -935,7 +935,7 @@ class Visualizer extends Component {
             Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
         const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const imperialGridCount = Math.round(inchesMax / 3);
+        const imperialGridCount = Math.round(inchesMax / 4);
         const metricGridCount = Math.round(mmMax / 9);
 
         const gridCount =
@@ -1423,7 +1423,7 @@ class Visualizer extends Component {
             Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
         const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const imperialGridCount = Math.ceil(inchesMax / 3);
+        const imperialGridCount = Math.ceil(inchesMax / 4);
         const metricGridCount = Math.ceil(mmMax / 9);
 
         const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
@@ -1503,7 +1503,7 @@ class Visualizer extends Component {
             Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
         const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const imperialGridCount = Math.round(inchesMax / 3);
+        const imperialGridCount = Math.round(inchesMax / 4);
         const metricGridCount = Math.round(mmMax / 9);
 
         const gridCount =
@@ -2403,6 +2403,16 @@ class Visualizer extends Component {
         if (shouldRenderVisualization) {
             this.vizualization = vizualization;
             this.renderCallback = callback;
+
+            // we may need to redraw grid if machine size is diff
+            const machineProfile = store.get('workspace.machineProfile');
+            if (
+                machineProfile &&
+                !_isEqual(this.machineProfile.mm, machineProfile.mm)
+            ) {
+                this.machineProfile = { ...machineProfile };
+                this.redrawGrids();
+            }
 
             const colorsWorker = new Worker(
                 new URL('../../workers/colors.worker.js', import.meta.url),
