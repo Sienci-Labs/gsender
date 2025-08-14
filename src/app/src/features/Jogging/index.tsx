@@ -889,7 +889,7 @@ export function Jogging() {
         },
         STOP_JOG: {
             // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Cancel Jog Move',
+            title: 'Cancel jog move',
             keys: '',
             cmd: 'STOP_JOG',
             payload: { force: true },
