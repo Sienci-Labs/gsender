@@ -16,9 +16,9 @@ export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
     return (
         <div className="flex flex-col items-center text-sm text-gray-600 gap-4 px-4 justify-center dark:text-white">
             <h1 className="text-blue-500 text-2xl">Scan QR Code</h1>
-            <p>Scan with your phone camera to control your CNC:</p>
+            <p>Scan with your phone camera to control your CNC</p>
             <QRCode size={200} value={phoneAddress} viewBox="0 0 200 200" />
-            <p>Or type the text below into a web browser on any other device:</p>
+            <p>Or type the text below into a web browser for any other device:</p>
             <div className="flex flex-row items-center gap-2  text-xs font-semibold text-blue-500 bg-gray-100 border border-gray-200 rounded-lg dark:bg-dark dark:border-gray-700 dark:text-white">
                 <div className="px-2">{webAddress}</div>
                 <Button
