@@ -20,10 +20,15 @@ export interface JogWheelProps {
     canClick?: boolean;
     feedrate: number;
     distance: number;
-    threshold:number
+    threshold: number;
 }
 
-export function JogWheel({ distance, feedrate, canClick, threshold = 200}: JogWheelProps) {
+export function JogWheel({
+    distance,
+    feedrate,
+    canClick,
+    threshold = 200,
+}: JogWheelProps) {
     const { mode } = useWorkspaceState();
 
     const isRotaryMode = mode === WORKSPACE_MODE.ROTARY;
@@ -91,7 +96,8 @@ export function JogWheel({ distance, feedrate, canClick, threshold = 200}: JogWh
         'fill-blue-500 hover:fill-blue-600 active:fill-blue-700';
     const altColourClass =
         'fill-robin-500 hover:fill-blue-400 active:fill-robin-700';
-    const disabledColorClass = 'fill-gray-400 hover:fill-gray-400';
+    const disabledColorClass =
+        'fill-gray-400 hover:fill-gray-400 pointer-events-none';
 
     return (
         <svg
