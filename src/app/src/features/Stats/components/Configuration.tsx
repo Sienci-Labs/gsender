@@ -77,16 +77,16 @@ export function Configuration() {
             <ConfigRow connected={connected} label={'Axes'}>
                 <b>{axesList.join(', ')}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Soft Limits'}>
+            <ConfigRow connected={connected} label={'Soft limits'}>
                 <b>{softLimitsString}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Homing'}>
                 <b>{homingEnabledString}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Home Location'}>
+            <ConfigRow connected={connected} label={'Home location'}>
                 <b>{homingString($20)}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Report Inches'}>
+            <ConfigRow connected={connected} label={'Report inches'}>
                 <b>{reportInchesString}</b>
             </ConfigRow>
         </div>
