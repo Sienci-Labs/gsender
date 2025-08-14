@@ -36,7 +36,7 @@ const NotificationsArea = () => {
             cmd: 'DISPLAY_NOTIFICATIONS',
             preventDefault: false,
             isActive: true,
-            category: GENERAL_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: () => setOpen((prev) => !prev),
         },
     };
