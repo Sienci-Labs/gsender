@@ -72,7 +72,7 @@ const Actions = () => {
             },
         },
         PROBE_ROTARY_Y_AXIS: {
-            title: 'Rotary Y-axis alignment',
+            title: 'Rotary Y-axis Alignment',
             keys: '',
             cmd: 'PROBE_ROTARY_Y_AXIS',
             preventDefault: false,
