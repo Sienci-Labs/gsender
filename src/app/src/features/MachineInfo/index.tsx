@@ -25,7 +25,7 @@ const MachineInfo = () => {
 
     const shuttleControlEvents = {
         DISPLAY_MACHINE_INFO: {
-            title: 'Toggle Machine Info Disply',
+            title: 'Display Machine Info',
             keys: '',
             cmd: 'DISPLAY_MACHINE_INFO',
             preventDefault: false,
