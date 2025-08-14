@@ -31,7 +31,7 @@ const NotificationsArea = () => {
 
     const shuttleControlEvents = {
         DISPLAY_NOTIFICATIONS: {
-            title: 'Toggle Notifications Display',
+            title: 'Display Notifications',
             keys: '',
             cmd: 'DISPLAY_NOTIFICATIONS',
             preventDefault: false,
