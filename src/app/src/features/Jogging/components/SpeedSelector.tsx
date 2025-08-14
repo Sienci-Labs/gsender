@@ -106,7 +106,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 
     const shuttleControlEvents = {
         SET_R_JOG_PRESET: {
-            title: 'Select Rapid Jog Preset',
+            title: 'Set to Rapid Preset',
             keys: ['shift', 'v'].join('+'),
             cmd: 'SET_R_JOG_PRESET',
             preventDefault: false,
@@ -115,7 +115,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
             callback: () => handleSpeedChange('Rapid'),
         },
         SET_N_JOG_PRESET: {
-            title: 'Select Normal Jog Preset',
+            title: 'Set to Normal Preset',
             keys: ['shift', 'c'].join('+'),
             cmd: 'SET_N_JOG_PRESET',
             preventDefault: false,
@@ -124,7 +124,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
             callback: () => handleSpeedChange('Normal'),
         },
         SET_P_JOG_PRESET: {
-            title: 'Select Precise Jog Preset',
+            title: 'Set to Precise Preset',
             keys: ['shift', 'x'].join('+'),
             cmd: 'SET_P_JOG_PRESET',
             preventDefault: false,
@@ -133,7 +133,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
             callback: () => handleSpeedChange('Precise'),
         },
         CYCLE_JOG_PRESETS: {
-            title: 'Cycle Through Jog Presets',
+            title: 'Switch between Presets',
             keys: ['shift', 'z'].join('+'),
             cmd: 'CYCLE_JOG_PRESETS',
             preventDefault: false,
