@@ -2404,6 +2404,16 @@ class Visualizer extends Component {
             this.vizualization = vizualization;
             this.renderCallback = callback;
 
+            // we may need to redraw grid if machine size is diff
+            const machineProfile = store.get('workspace.machineProfile');
+            if (
+                machineProfile &&
+                !_isEqual(this.machineProfile.mm, machineProfile.mm)
+            ) {
+                this.machineProfile = { ...machineProfile };
+                this.redrawGrids();
+            }
+
             const colorsWorker = new Worker(
                 new URL('../../workers/colors.worker.js', import.meta.url),
                 { type: 'module' },
