@@ -7,7 +7,7 @@ import {
 } from 'app/components/shadcn/Popover';
 import useKeybinding from 'app/lib/useKeybinding.ts';
 import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
-import { GENERAL_CATEGORY } from 'app/constants';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
