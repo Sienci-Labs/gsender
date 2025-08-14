@@ -739,7 +739,7 @@ export function Jogging() {
         },
         SWITCH_WORKSPACE_MODE: {
             id: 103,
-            title: 'Switch Between Workspace Modes',
+            title: 'Toggle Rotary Mode',
             keys: ['ctrl', '5'].join('+'),
             cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
@@ -889,7 +889,7 @@ export function Jogging() {
         },
         STOP_JOG: {
             // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Jog Cancel',
+            title: 'Cancel Jog Move',
             keys: '',
             cmd: 'STOP_JOG',
             payload: { force: true },
