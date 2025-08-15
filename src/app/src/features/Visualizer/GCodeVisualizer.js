@@ -47,7 +47,7 @@ class GCodeVisualizer {
         this.frames = []; // Example
         this.frameIndex = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary
@@ -205,7 +205,7 @@ class GCodeVisualizer {
         if (v2 < v1) {
             // reset vars
             this.oldFrameIndex = null;
-            this.plannedColorArray = null;
+            this.plannedColorArray = [];
             this.plannedV1 = null;
             this.plannedState = STATES.START;
             // --rotary
@@ -372,7 +372,7 @@ class GCodeVisualizer {
         this.frameIndex = 0;
         this.framesLength = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary
