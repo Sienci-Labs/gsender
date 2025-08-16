@@ -23,6 +23,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     JOGGING_CATEGORY,
+    TOOLBAR_CATEGORY,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
@@ -744,7 +745,7 @@ export function Jogging() {
             cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
             isActive: true,
-            category: JOGGING_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: shuttleControlFunctions.UPDATE_WORKSPACE_MODE,
         },
         JOG_X_P: {
