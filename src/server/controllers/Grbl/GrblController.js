@@ -631,6 +631,11 @@ class GrblController {
         });
 
         this.runner.on('status', (res) => {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.initialized = true;
+                this.initController();
+            }
+
             if (this.homingStarted) {
                 this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
@@ -772,6 +777,8 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
+                console.log(preferences);
+
                 this.emit('serialport:read', `error:${code} (${error?.message})`);
 
                 if (error) {
@@ -782,6 +789,7 @@ class GrblController {
                     }
 
                     if (preferences.showLineWarnings) {
+                        console.log('Pause branch');
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
@@ -932,7 +940,8 @@ class GrblController {
             // Clear sender - for physical buttons
             //this.sender.unload();
 
-            if (!this.initialized) {
+            //Init if no settings or not initialized
+            if (!this.initialized || !this.runner.hasSettings()) {
                 this.initialized = true;
 
                 // Initialize controller
@@ -1266,6 +1275,11 @@ class GrblController {
 
         callback(); // register controller
 
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
+
         // log.debug(`Connected to serial port "${port}"`);
         this.workflow.stop();
 
@@ -1323,7 +1337,12 @@ class GrblController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, meta) {
+    loadFile(gcode, meta, refresh = false) {
+        if (refresh && !this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
+
         log.debug(`Loading file '${meta.name}' to controller`);
         this.command('gcode:load', meta, gcode);
     }
@@ -1652,6 +1671,10 @@ class GrblController {
             },
             'feeder:stop': () => {
                 this.feeder.reset();
+
+                delay(100).then(() => {
+                    this.write('~');
+                });
             },
             'feedhold': () => {
                 this.event.trigger(FEED_HOLD);
@@ -1851,11 +1874,12 @@ class GrblController {
             },
             'jog:start': () => {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
-                //const JOG_COMMAND_INTERVAL = 80;
+
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
-                let jogFeedrate;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
+
                 if ($20 === '1') {
                     $130 = Number($130);
                     $131 = Number($131);
@@ -1927,7 +1951,6 @@ class GrblController {
                         //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
-                    jogFeedrate = 10000;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });

@@ -10,7 +10,6 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
 import {
-    isSettingDefault,
     useSettings,
 } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
@@ -138,6 +137,8 @@ export function SettingRow({
         setSettingsValues,
         firmwareType,
         connected,
+        isSettingDefault,
+        getEEPROMDefaultValue
     } = useSettings();
 
     const displaySetting = { ...setting };
@@ -165,6 +166,14 @@ export function SettingRow({
     }
 
     function handleProgramSettingReset(setting) {
+        if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
+            const defaultVal = getEEPROMDefaultValue(setting.eID);
+            if (defaultVal !== '-') {
+                handleSingleSettingReset(setting.eID, defaultVal)
+            } else {
+                toast.error(`No default found for $${setting.eID}.`);
+            }
+        }
         if ('key' in setting) {
             if (setting.defaultValue !== null) {
                 store.set(setting.key, setting.defaultValue);
@@ -246,10 +255,12 @@ export function SettingRow({
                         <BiReset />
                     </button>
                 )}
-                {setting.type === 'hybrid' && firmwareType === GRBLHAL && (
+                {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
                     <span className="text-robin-500 text-4xl">
                         <FaMicrochip />
                     </span>
+                ) : (
+                    <span className="text-robin-500 min-w-9" />
                 )}
             </span>
             <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5 flex flex-col gap-2">

@@ -32,6 +32,7 @@ interface VMState {
     feedrates: Set<string>;
     bbox: BBox;
     usedAxes: Set<string>;
+    invalidLines: string[];
 }
 
 type Data = Array<{
@@ -232,6 +233,7 @@ class GCodeVirtualizer extends EventEmitter {
             },
         },
         usedAxes: new Set(),
+        invalidLines: []
     };
 
     // data to save so we don't have to reparse
@@ -243,6 +245,8 @@ class GCodeVirtualizer extends EventEmitter {
     ];
 
     estimates: number[] = [];
+
+    setEstimate: boolean = false;
 
     modalChanges: ModalChanges = [
         {
@@ -259,6 +263,10 @@ class GCodeVirtualizer extends EventEmitter {
         },
     ];
     feedrateCounter: number = 0;
+
+    //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+    //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
+    VALID_GCODE_REGEX = /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -331,12 +339,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.z,
                 targetPosition.a,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            };
         },
         // G1: Linear Move
         // Usage
@@ -404,12 +406,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.z,
                 targetPosition.a,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            };
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -513,12 +509,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.y,
                 targetPosition.z,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                v0: this.offsetG92(v0),
-            };
         },
         G3: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G3') {
@@ -603,12 +593,6 @@ class GCodeVirtualizer extends EventEmitter {
                 targetPosition.y,
                 targetPosition.z,
             );
-
-            this.data[this.totalLines].lineData = {
-                v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2),
-                v0: this.offsetG92(v0),
-            };
         },
         // G4: Dwell
         // Parameters
@@ -629,10 +613,6 @@ class GCodeVirtualizer extends EventEmitter {
                 dwellTime = params.S;
             }
             this.totalTime += dwellTime;
-
-            this.data[this.totalLines].lineData = {
-                dwellTime: dwellTime,
-            };
         },
         // G10: Coordinate System Data Tool and Work Offset Tables
         G10: (_params: Record<string, any>): void => {},
@@ -1023,6 +1003,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.vmState.feedrates = new Set<string>();
             this.vmState.tools = new Set<string>();
             this.vmState.spindle = new Set<string>();
+            this.vmState.invalidLines = [];
         }
     }
 
@@ -1068,6 +1049,7 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     virtualize(line = ''): void {
+        this.setEstimate = false // Reset on each line
         if (!line) {
             this.fn.callback();
             return;
@@ -1082,6 +1064,15 @@ class GCodeVirtualizer extends EventEmitter {
             return;
         }
 
+        /*if (line.this.INVALID_GCODE_REGEX.test(line)) {
+            console.log(`Bad line - ${line}`);
+            this.vmState.invalidLines.push(line);
+        }*/
+
+        if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
+            this.vmState.invalidLines.push(line);
+        }
+
         const parsedLine = parseLine(line);
         // collect spindle and feed rates
         for (let word of parsedLine.words) {
@@ -1094,7 +1085,6 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
-                this.data[this.totalLines].Scode = code;
             }
         }
 
@@ -1181,11 +1171,16 @@ class GCodeVirtualizer extends EventEmitter {
             }
         }
 
+        /*
         // if the line didnt have time calcs involved, push 0 time
         if (this.estimates.length < this.data.length) {
             this.estimates.push(0);
         }
-
+        */
+        if (!this.setEstimate) {
+            this.estimates.push(0); // Same as above but use flag instead of array length
+        }
+        /*
         // add new data structure
         this.data.push({
             Scode: null,
@@ -1193,7 +1188,7 @@ class GCodeVirtualizer extends EventEmitter {
         });
         this.modalCounter++;
         this.feedrateCounter++;
-
+        */
         this.totalLines += 1;
         this.fn.callback();
         this.emit('data', parsedLine);
@@ -1224,6 +1219,7 @@ class GCodeVirtualizer extends EventEmitter {
             bbox: this.getBBox(),
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
+            invalidLines: this.vmState.invalidLines,
         };
     }
 
@@ -1466,6 +1462,7 @@ class GCodeVirtualizer extends EventEmitter {
         this.lastF = f;
         this.totalTime += moveDuration;
         this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
+        this.setEstimate = true;
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
@@ -1495,10 +1492,9 @@ class GCodeVirtualizer extends EventEmitter {
         return 2 * time; // cut in half before, so double to get full time spent.
     }
 
-    getData(): { data: Data; estimates: number[] } {
-        this.data.pop(); // get rid of the last entry, as it is a temp one with null values
+    getData(): { estimates: number[] } {
+        //this.data.pop(); // get rid of the last entry, as it is a temp one with null values
         return {
-            data: this.data,
             estimates: this.estimates,
         };
     }

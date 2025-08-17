@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import store from 'app/store';
 import { MachineProfile } from 'app/definitions/firmware';
+import ip from "ip";
 
 export function ConfigRow({
     label,
@@ -53,11 +54,13 @@ export function Configuration() {
         (state: RootState) => state.controller.settings.settings,
     );
 
-    const { $20, $13, $23 } = settings;
+    const { $20, $13, $22 } = settings;
 
     const reportInchesString = $13 === '1' ? 'Enabled' : 'Disabled';
-    const softLimitsString = $23 === '1' ? 'Enabled' : 'Disabled';
-    const homingEnabledString = Number($20) > 0 ? 'Enabled' : 'Disabled';
+    const softLimitsString = $20 === '1' ? 'Enabled' : 'Disabled';
+    const homingEnabledString = Number($22) > 0 ? 'Enabled' : 'Disabled';
+
+    const looksLikeIP = ip.isV4Format(connectionPort);
 
     return (
         <div className="flex flex-col gap-1">
@@ -66,21 +69,24 @@ export function Configuration() {
                 <span className="font-normal">{machineProfile.type}</span>
             </div>
             <ConfigRow connected={connected} label={'Connection'}>
-                <b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud
+                {
+                    looksLikeIP ? <b>{connectionPort}</b> : <span><b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud</span>
+                }
+
             </ConfigRow>
             <ConfigRow connected={connected} label={'Axes'}>
                 <b>{axesList.join(', ')}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Soft Limits'}>
+            <ConfigRow connected={connected} label={'Soft limits'}>
                 <b>{softLimitsString}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Homing'}>
                 <b>{homingEnabledString}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Home Location'}>
+            <ConfigRow connected={connected} label={'Home location'}>
                 <b>{homingString($20)}</b>
             </ConfigRow>
-            <ConfigRow connected={connected} label={'Report Inches'}>
+            <ConfigRow connected={connected} label={'Report inches'}>
                 <b>{reportInchesString}</b>
             </ConfigRow>
         </div>

@@ -34,6 +34,7 @@ import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { toFixedIfNecessary } from 'app/lib/rounding';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -43,9 +44,9 @@ const Steps = () => {
     const [moveAxisCompleted, setMoveAxisCompleted] = useState(false);
     const [setTravelCompleted, setSetTravelCompleted] = useState(false);
     const { units } = useWorkspaceState();
-    const [moveDistance, setMoveDistance] = useState(units === 'mm' ? 100 : 25);
+    const [moveDistance, setMoveDistance] = useState(units === 'mm' ? 100 : 4);
     const [measuredDistance, setMeasuredDistance] = useState(
-        units === 'mm' ? 100 : 25,
+        units === 'mm' ? 100 : 4,
     );
     const { settings } = useTypedSelector((state) => state.controller.settings);
     const isConnected = useTypedSelector(
@@ -67,8 +68,8 @@ const Steps = () => {
         setMarkLocationCompleted(false);
         setMoveAxisCompleted(false);
         setSetTravelCompleted(false);
-        setMoveDistance(100);
-        setMeasuredDistance(100);
+        setMoveDistance(units === 'mm' ? 100 : 4);
+        setMeasuredDistance(units === 'mm' ? 100 : 4);
     };
 
     const handleUpdateEEPROM = () => {
@@ -158,7 +159,24 @@ const Steps = () => {
                                 onChange={(data: {
                                     label: string;
                                     value: typeof selectedAxis;
-                                }) => setSelectedAxis(data.value)}
+                                }) => {
+                                    setSelectedAxis(data.value);
+                                    if (data.value === 'z') {
+                                        setMoveDistance(
+                                            units === 'mm' ? -50 : -2,
+                                        );
+                                        setMeasuredDistance(
+                                            units === 'mm' ? -50 : -2,
+                                        );
+                                    } else {
+                                        setMoveDistance(
+                                            units === 'mm' ? 100 : 4,
+                                        );
+                                        setMeasuredDistance(
+                                            units === 'mm' ? 100 : 4,
+                                        );
+                                    }
+                                }}
                                 value={{
                                     label: `${selectedAxis.toUpperCase()}-Axis`,
                                     value: selectedAxis,
@@ -218,12 +236,17 @@ const Steps = () => {
                 <div className="flex flex-col gap-4">
                     <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                         <span>
-                            Your {selectedAxis.toUpperCase()}-axis is off by{' '}
+                            Your {selectedAxis.toUpperCase()}-axis movement was
+                            off by{' '}
                             <strong>
-                                {moveDistance - measuredDistance} mm.
+                                {toFixedIfNecessary(
+                                    moveDistance - measuredDistance,
+                                    4,
+                                )}{' '}
+                                {units}.
                             </strong>{' '}
-                            Consider updating the steps-per-mm value in the
-                            firmware.
+                            Consider updating your {selectedAxis.toUpperCase()}
+                            -axis step/mm value in your CNC firmware.
                         </span>
 
                         <AlertDialog>
@@ -232,35 +255,35 @@ const Steps = () => {
                                     className="bg-white text-black"
                                     variant="outline"
                                 >
-                                    Update Steps-Per-MM
+                                    Update step/mm
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                        Update EEPROM Value
+                                        Update Firmware
                                     </AlertDialogTitle>
                                     <div className="space-y-4">
                                         <p>
-                                            This action cannot be undone. This
-                                            will update the steps-per-mm value
-                                            for the{' '}
+                                            This will update the{' '}
                                             <strong>
                                                 {selectedAxis.toUpperCase()}
                                                 -axis
                                             </strong>{' '}
-                                            in the EEPROM settings.
-                                        </p>
-                                        <p>
-                                            EEPROM Setting:{' '}
+                                            step/mm value in your CNC firmware ({' '}
                                             <strong>
                                                 {getEEPROMSettingKey(
                                                     selectedAxis,
                                                 )}
-                                            </strong>
+                                            </strong>{' '}
+                                            )
                                         </p>
                                         <p>
-                                            Update To:{' '}
+                                            From:{' '}
+                                            <strong>{currentStepsPerMM}</strong>
+                                        </p>
+                                        <p>
+                                            To:{' '}
                                             <strong>
                                                 {calculateNewStepsPerMM({
                                                     originalStepsPerMM:
@@ -275,14 +298,14 @@ const Steps = () => {
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-none">
-                                        No, Cancel
+                                    <AlertDialogCancel>
+                                        Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         className="border border-blue-500"
                                         onClick={handleUpdateEEPROM}
                                     >
-                                        Yes, Update Steps-Per-MM
+                                        Update Firmware
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -304,9 +327,8 @@ const Steps = () => {
             <div className="flex flex-col gap-4">
                 <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
                     <p>
-                        Your {selectedAxis.toUpperCase()}-axis is tuned, there
-                        is no need to update the steps per mm in the EEPROM
-                        settings.
+                        Your {selectedAxis.toUpperCase()}-axis looks accurate,
+                        so you should be good to go!
                     </p>
                 </div>
 
@@ -345,10 +367,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 0
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : markLocationCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -357,7 +379,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 0 &&
                                         !markLocationCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 0 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -385,10 +407,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                                     currentStep === 1
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : moveAxisCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-amber-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -397,7 +419,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 1 &&
                                         !moveAxisCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 1 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -448,10 +470,10 @@ const Steps = () => {
                             <div
                                 className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
                                     currentStep === 2
-                                        ? 'bg-blue-50 border border-blue-200'
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : setTravelCompleted
-                                          ? 'bg-green-50 border border-green-200'
-                                          : 'bg-gray-50 border border-gray-200 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -460,7 +482,7 @@ const Steps = () => {
                                     )}
                                     {currentStep !== 2 &&
                                         !setTravelCompleted && (
-                                            <FaClipboard className="min-w-8 min-h-8 text-gray-300 dark:text-dark-lighter" />
+                                            <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
                                         )}
                                     {currentStep === 2 && (
                                         <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -492,7 +514,7 @@ const Steps = () => {
                                                 }
                                                 disabled={currentStep !== 2}
                                                 className="w-28"
-                                                suffix="mm"
+                                                suffix={units ?? 'mm'}
                                             />
                                         </div>
                                     </div>

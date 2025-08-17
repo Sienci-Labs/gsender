@@ -1,5 +1,35 @@
 import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from '../constants';
 
+export const gamepadMapping = {
+    standard: {
+        buttons: [
+            { label: 'A', value: 0 },
+            { label: 'B', value: 1 },
+            { label: 'X', value: 2 },
+            { label: 'Y', value: 3 },
+            { label: 'LB', value: 4 },
+            { label: 'RB', value: 5 },
+            { label: 'LT', value: 6 },
+            { label: 'RT', value: 7 },
+            { label: 'Back', value: 8 },
+            { label: 'Start', value: 9 },
+            { label: 'L3', value: 10 },
+            { label: 'R3', value: 11 },
+            { label: 'Up', value: 12 },
+            { label: 'Down', value: 13 },
+            { label: 'Left', value: 14 },
+            { label: 'Right', value: 15 },
+            { label: 'Home', value: 16 },
+        ],
+        axes: [
+            { label: 'Left Stick X', value: 0 },
+            { label: 'Left Stick Y', value: 1 },
+            { label: 'Right Stick X', value: 2 },
+            { label: 'Right Stick Y', value: 3 },
+        ],
+    },
+};
+
 export const defaultOptions = {
     joystickOptions: {
         stick1: {
@@ -53,104 +83,13 @@ export const profiles = [
         shortcuts: {},
         name: 'Logitech F710 Gamepad',
         mapping: 'standard',
-        buttons: [
-            {
-                label: 'A',
-                value: 0,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'B',
-                value: 1,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'X',
-                value: 2,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Y',
-                value: 3,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'LB',
-                value: 4,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'RB',
-                value: 5,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'LT',
-                value: 6,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'RT',
-                value: 7,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Back',
-                value: 8,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Start',
-                value: 9,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'L3',
-                value: 10,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'R3',
-                value: 11,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Up',
-                value: 12,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Down',
-                value: 13,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Left',
-                value: 14,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Right',
-                value: 15,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-        ],
+
+        buttons: gamepadMapping.standard.buttons.map((button) => ({
+            label: button.label,
+            value: button.value,
+            primaryAction: null,
+            secondaryAction: null,
+        })),
         axes: [0, 0, 0, 0],
         joystickOptions: defaultOptions.joystickOptions,
         lockout: {
@@ -173,110 +112,12 @@ export const profiles = [
         shortcuts: {},
         name: 'Xbox Controller',
         mapping: 'standard',
-        buttons: [
-            {
-                label: 'A',
-                value: 0,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'B',
-                value: 1,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'X',
-                value: 2,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Y',
-                value: 3,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'LB',
-                value: 4,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'RB',
-                value: 5,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'LT',
-                value: 6,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'RT',
-                value: 7,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Back',
-                value: 8,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Start',
-                value: 9,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'L3',
-                value: 10,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'R3',
-                value: 11,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Up',
-                value: 12,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Down',
-                value: 13,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Left',
-                value: 14,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Right',
-                value: 15,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-            {
-                label: 'Home',
-                value: 16,
-                primaryAction: null,
-                secondaryAction: null,
-            },
-        ],
+        buttons: gamepadMapping.standard.buttons.map((button) => ({
+            label: button.label,
+            value: button.value,
+            primaryAction: null,
+            secondaryAction: null,
+        })),
         axes: [0, 0, 0, 0],
         joystickOptions: defaultOptions.joystickOptions,
         lockout: {

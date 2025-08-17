@@ -30,7 +30,6 @@ export function IconUpdater() {
     useEffect(() => {
         if (isElectron()) {
             window.ipcRenderer.on('update_available', (token, info) => {
-                console.log('update found');
                 reduxStore.dispatch(updateReleaseNotes(info));
                 setReleaseNotes(info);
                 setShowUpdater(true);

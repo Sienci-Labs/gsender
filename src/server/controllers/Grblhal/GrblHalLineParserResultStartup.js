@@ -31,6 +31,7 @@ class GrblHalLineParserResultStartup {
         if (!r) {
             return null;
         }
+        console.log(r);
 
         const firmware = r[1];
         const version = r[2];

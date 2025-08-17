@@ -7,7 +7,7 @@ import {
 } from 'app/components/shadcn/Popover';
 import useKeybinding from 'app/lib/useKeybinding.ts';
 import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
-import { GENERAL_CATEGORY } from 'app/constants';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
@@ -25,12 +25,12 @@ const MachineInfo = () => {
 
     const shuttleControlEvents = {
         DISPLAY_MACHINE_INFO: {
-            title: 'Toggle Machine Info Disply',
+            title: 'Display Machine Info',
             keys: '',
             cmd: 'DISPLAY_MACHINE_INFO',
             preventDefault: false,
             isActive: true,
-            category: GENERAL_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: () => setOpen((prev) => !prev),
         },
     };

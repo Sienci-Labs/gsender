@@ -1,4 +1,7 @@
 import { ControlledInput } from 'app/components/ControlledInput';
+import { IMPERIAL_UNITS } from 'app/constants';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
 
 export interface JogInputProps {
     unit?: string;
@@ -8,9 +11,25 @@ export interface JogInputProps {
 }
 
 export function JogInput({ unit, value, index, onChange }: JogInputProps) {
+    const { units } = useWorkspaceState();
+    const needsConvert = units === IMPERIAL_UNITS;
+    let convertedValue = value;
+
+    if (needsConvert) {
+        convertedValue = {
+            ...convertedValue,
+            xyStep: convertToImperial(Number(value.xyStep)),
+            zStep: convertToImperial(Number(value.zStep)),
+            feedrate: convertToImperial(Number(value.feedrate)),
+        };
+    }
+
     // xyStep, aStep, zStep, feedrate = key
     function customJogUpdater(e, key) {
-        const updatedValue = Number(e.target.value);
+        let updatedValue = Number(e.target.value);
+        if (needsConvert) {
+            updatedValue = convertToMetric(updatedValue);
+        }
         const o = { ...value, [key]: updatedValue };
         onChange(o);
     }
@@ -22,8 +41,8 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'xyStep')}
-                    suffix="mm"
-                    value={value.xyStep}
+                    suffix={units}
+                    value={convertedValue.xyStep}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -31,8 +50,8 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'zStep')}
-                    suffix="mm"
-                    value={value.zStep}
+                    suffix={units}
+                    value={convertedValue.zStep}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -41,7 +60,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'aStep')}
                     suffix="deg"
-                    value={value.aStep}
+                    value={convertedValue.aStep}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -49,8 +68,8 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'feedrate')}
-                    suffix="mm/min"
-                    value={value.feedrate}
+                    suffix={`${units}/min`}
+                    value={convertedValue.feedrate}
                 />
             </div>
         </div>

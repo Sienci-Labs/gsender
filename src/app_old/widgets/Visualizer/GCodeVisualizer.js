@@ -25,7 +25,7 @@
 import * as THREE from 'three';
 import _get from 'lodash/get';
 import reduxStore from 'app/store/redux';
-import { CUTTING_PART, PLANNED_PART } from './constants';
+import { CUTTING_PART, PLANNED_PART, SECONDARY_COLOR } from './constants';
 import { checkIfRotaryFile } from '../../lib/rotary';
 
 const STATES = {
@@ -207,9 +207,9 @@ class GCodeVisualizer {
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
             const offsetIndex = v1 * 4;
-            const opacity = 0.3;
+            const opacity = 0.5;
             // grey
-            const runColor = new THREE.Color(this.theme.get(CUTTING_PART));
+            const runColor = new THREE.Color(SECONDARY_COLOR);
             const greyArray = [...runColor.toArray(), opacity];
             // yellow
             const yellowColor = new THREE.Color(this.theme.get(PLANNED_PART));

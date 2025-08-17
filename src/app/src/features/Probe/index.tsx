@@ -22,7 +22,7 @@
  */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -162,6 +162,8 @@ const ProbeWidget = () => {
         config.get('direction', 0),
     );
 
+    const connectionMadeRef = useRef<boolean>(false);
+
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
         x: 50,
@@ -201,7 +203,7 @@ const ProbeWidget = () => {
         },
         onOpenChange: (isOpen: boolean): void => {
             if (isOpen) {
-                setConnectionMade(false)
+                setConnectionMade(false);
                 actions.startConnectivityTest();
             } else {
                 if (testInterval) {
@@ -369,7 +371,12 @@ const ProbeWidget = () => {
         config.set('useTLO', useTLO);
         config.set('probeDepth', probeDepth);
         config.set('touchPlateHeight', touchPlateHeight);
+        config.set('direction', direction);
     });
+
+    useEffect(() => {
+        connectionMadeRef.current = connectionMade;
+    }, [connectionMade]);
 
     const determineProbeOptions = (probeCommand: ProbeCommand) => {
         const { axes, tool } = probeCommand;
@@ -455,8 +462,6 @@ const ProbeWidget = () => {
         setAvailableTools(store.get('workspace.tools', []));
         setTouchplateType(store.get('workspace.probeProfile.touchplateType'));
         setTouchplate(store.get('workspace.probeProfile', {}));
-        setDirection(config.get('direction', 0));
-        // setProbeAxis(config.get('probeAxis', 'Z'));
         setProbeCommand(config.get('probeCommand', 'G38.2'));
         setUseTLO(config.get('useTLO'));
         setProbeDepth(config.get('probeDepth') || {});
@@ -481,6 +486,7 @@ const ProbeWidget = () => {
     const state: State = {
         show: modalIsOpen,
         connectionMade: connectionMade,
+        connectionMadeRef: connectionMadeRef,
         canClick: canClick(),
         availableProbeCommands: availableProbeCommands,
         selectedProbeCommand: selectedProbeCommand,

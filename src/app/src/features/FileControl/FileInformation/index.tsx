@@ -15,8 +15,6 @@ import {
 } from 'app/components/shadcn/Tooltip';
 import { getRecentFiles } from '../utils/recentfiles';
 import { RecentFile } from '../definitions';
-import { GoFileCode } from 'react-icons/go';
-import { RiFolderUploadLine } from 'react-icons/ri';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { MdInfoOutline } from 'react-icons/md';
 import { LuFileCode2 } from 'react-icons/lu';
@@ -26,6 +24,8 @@ import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
 import isElectron from 'is-electron';
+import { ScrollArea } from 'app/components/shadcn/ScrollArea';
+import { LiaFileUploadSolid } from 'react-icons/lia';
 
 interface Props {
     handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
@@ -82,42 +82,16 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             >
                 {isElectron() && (
                     <div className="flex flex-col gap-2 max-xl:gap-1">
-                        <span className="ml-4 dark:text-white">
+                        <span className="ml-6 dark:text-white">
                             Recent Files
                         </span>
-
-                        {recentFiles.map(
-                            (file, index) =>
-                                index < 3 && (
-                                    <div className="flex flex-row border justify-between border-gray-300 dark:border-gray-600 rounded items-center h-10">
-                                        <div className="grid grid-cols-[30px_3fr] items-center gap-1">
-                                            <GoFileCode className="text-3xl text-gray-400 ml-1 dark:text-white" />
-                                            <div className="grid items-start">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
-                                                                {file.fileName}
-                                                            </span>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            {file.fileName}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-
-                                                <span className=" text-gray-500 text-xs dark:text-gray-400">
-                                                    {(file.fileSize
-                                                        ? file.fileSize /
-                                                          1000000
-                                                        : 0
-                                                    ).toFixed(2)}
-                                                    {' MB'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-blue-500 text-white text-3xl float-right p-1 rounded-r cursor-pointer">
-                                            <RiFolderUploadLine
+                        <ScrollArea className="ml-2 px-2 h-28 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
+                            <div className="grid divide-y items-center mr-2">
+                                {recentFiles.map(
+                                    (file, index) =>
+                                        index < 8 && (
+                                            <div
+                                                className="grid grid-cols-[30px_3fr] items-center gap-1 cursor-pointer py-2"
                                                 onClick={() =>
                                                     handleRecentFileUpload(
                                                         {
@@ -133,11 +107,33 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                                         true,
                                                     )
                                                 }
-                                            />
-                                        </div>
-                                    </div>
-                                ),
-                        )}
+                                            >
+                                                <div className="text-2xl float-right rounded-r dark:text-white">
+                                                    <LiaFileUploadSolid />
+                                                </div>
+                                                <div className="grid items-start">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
+                                                                    {
+                                                                        file.fileName
+                                                                    }
+                                                                </span>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                {file.fileName}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                            </div>
+                                        ),
+                                )}
+                            </div>
+                        </ScrollArea>
                     </div>
                 )}
                 <div

@@ -111,6 +111,7 @@ import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import { Spindle } from 'app/features/Spindle/definitions';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -237,7 +238,7 @@ export function* initialize(): Generator<any, void, any> {
 
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch(
-                updateFileRenderState({ renderState: RENDER_NO_FILE }),
+                updateFileRenderState({ renderState: RENDER_LOADING }),
             );
             setTimeout(() => {
                 const renderState = _get(
@@ -263,17 +264,17 @@ export function* initialize(): Generator<any, void, any> {
                     { type: 'module' },
                 );
                 visualizeWorker.onmessage = visualizeResponse;
-                await getParsedData().then((value) => {
-                    const parsedData = value;
-                    visualizeWorker.postMessage({
-                        content,
-                        visualizer,
-                        parsedData,
-                        isNewFile,
-                        accelerations,
-                        maxFeedrates,
-                    });
+                // await getParsedData().then((value) => {
+                const parsedData = null;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer,
+                    parsedData,
+                    isNewFile,
+                    accelerations,
+                    maxFeedrates,
                 });
+                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -316,20 +317,20 @@ export function* initialize(): Generator<any, void, any> {
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        await getParsedData().then((value) => {
-            const parsedData = value;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldIncludeSVG,
-                needsVisualization,
-                parsedData,
-                isNewFile,
-                accelerations,
-                maxFeedrates,
-            });
+        // await getParsedData().then((value) => {
+        const parsedData = null;
+        visualizeWorker.postMessage({
+            content,
+            visualizer,
+            isLaser,
+            shouldIncludeSVG,
+            needsVisualization,
+            parsedData,
+            isNewFile,
+            accelerations,
+            maxFeedrates,
         });
+        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
@@ -667,22 +668,24 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(setIpList(ipList));
     });
 
-    controller.addListener('feeder:pause', (payload: { data: string, comment: string }) => {
-        console.log(payload);
-        Confirm({
-            title: `${payload.data} pause detected`,
-            confirmLabel: 'Resume',
-            content: 'Press Resume to continue.',
+    controller.addListener(
+        'feeder:pause',
+        (payload: { data: string; comment: string }) => {
+            Confirm({
+                title: `${payload.data} pause detected`,
+                confirmLabel: 'Resume',
+                content: 'Press Resume to continue.',
 
-            cancelLabel: 'Stop',
-            onConfirm: () => {
-                controller.command('feeder:start')
-            },
-            onClose: () => {
-                controller.command('feeder:stop')
-            }
-        })
-    })
+                cancelLabel: 'Stop',
+                onConfirm: () => {
+                    controller.command('feeder:start');
+                },
+                onClose: () => {
+                    controller.command('feeder:stop');
+                },
+            });
+        },
+    );
 
     controller.addListener('requestEstimateData', () => {
         if (finishLoad) {
@@ -787,13 +790,39 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'error',
         (
-            error: { type: typeof ALARM | typeof ERROR; lineNumber: number },
+            error: {
+                type: typeof ALARM | typeof ERROR;
+                lineNumber: number;
+                code: number;
+                line: string;
+            },
             _wasRunning: boolean,
         ) => {
             // const homingEnabled = _get(
             //     reduxStore.getState(),
             //     'controller.settings.settings.$22',
             // );
+
+            console.log(error);
+
+            const showLineWarnings = store.get(
+                'widgets.visualizer.showLineWarnings',
+                false,
+            );
+            if (showLineWarnings && error.type === ERROR) {
+                pubsub.publish('helper:info', {
+                    title: 'Invalid Line',
+                    description: (
+                        <div className="flex flex-col gap-2">
+                            <p>
+                                The following line caused an{' '}
+                                <b>error {error.code}</b>: <i>'{error.line}'</i>
+                            </p>
+                            <p>Press Start to resume the job.</p>
+                        </div>
+                    ),
+                });
+            }
 
             if (ALARM_ERROR_TYPES.includes(error.type)) {
                 updateAlarmsErrors(error);
@@ -886,7 +915,7 @@ export function* initialize(): Generator<any, void, any> {
         }
     });
 
-    controller.addListener('spindle:add', (spindle: any) => {
+    controller.addListener('spindle:add', (spindle: Spindle) => {
         if (Object.hasOwn(spindle, 'id')) {
             reduxStore.dispatch(addSpindle(spindle));
         }

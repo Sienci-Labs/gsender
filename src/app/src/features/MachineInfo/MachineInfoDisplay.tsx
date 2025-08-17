@@ -72,19 +72,19 @@ export function MachineInfoDisplay({
             <div className="grid grid-cols-[3fr_2fr]">
                 <div className="flex flex-col pr-4">
                     <span className="underline float-left">
-                        Firmware Modals
+                        CNC Modals
                     </span>
                     <div className="flex flex-col justify-between items-center">
                         <ModalRow
-                            label="Probe Selection"
+                            label="Probe style"
                             value={isConnected ? probeSelection : '-'}
                         />
                         <ModalRow
-                            label="Coordinate System"
+                            label="Coordinate system"
                             value={isConnected ? modals.wcs : '-'}
                         />
                         <ModalRow
-                            label="Plane Selection"
+                            label="Plane selection"
                             value={isConnected ? modals.plane : '-'}
                         />
                         <ModalRow
@@ -92,7 +92,7 @@ export function MachineInfoDisplay({
                             value={isConnected ? modals.units : '-'}
                         />
                         <ModalRow
-                            label="Distance Mode"
+                            label="Distance mode"
                             value={isConnected ? modals.distance : '-'}
                         />
                         <ModalRow
@@ -112,21 +112,21 @@ export function MachineInfoDisplay({
                 <div className="flex flex-col border-l-2 border-l-gray-200 pl-4">
                     <span className="underline float-left">Pins</span>
                     <div className="flex flex-col justify-between items-center">
-                        <PinRow label="X Limit" on={pins?.X} />
-                        <PinRow label="Y Limit" on={pins?.Y} />
-                        <PinRow label="Z Limit" on={pins?.Z} />
-                        <PinRow label="A Limit" on={pins?.A} />
+                        <PinRow label="X limit" on={pins?.X} />
+                        <PinRow label="Y limit" on={pins?.Y} />
+                        <PinRow label="Z limit" on={pins?.Z} />
+                        <PinRow label="A limit" on={pins?.A} />
                         <PinRow label="Probe/TLS" on={pins?.P} />
                         <PinRow label="Door" on={pins?.D} />
-                        <PinRow label="Cycle-Start" on={pins?.S} />
+                        <PinRow label="Cycle start" on={pins?.S} />
                         <PinRow label="Hold" on={pins?.H} />
-                        <PinRow label="Soft-Reset" on={pins?.R} />
+                        <PinRow label="Soft reset" on={pins?.R} />
                     </div>
                 </div>
             </div>
             <div className="flex flex-row gap-4 items-center mt-4">
                 <span className="text-gray-500 dark:text-white">
-                    Lock Stepper Motors
+                    Lock stepper motors
                 </span>
                 <Switch
                     onChange={handleStepperMotorToggle}

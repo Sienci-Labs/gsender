@@ -58,6 +58,8 @@ import {
     getMovementGCode,
 } from './utils/RapidPosition';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import reduxStore from 'app/store/redux';
+
 interface DROProps {
     axes: AxesArray;
     mposController: DROPosition;
@@ -76,7 +78,6 @@ function DRO({
     mposController,
     wposController,
     workflowState,
-    unitLabel,
     isConnected,
     activeState,
     homingEnabled,
@@ -117,154 +118,6 @@ function DRO({
         setHomingMode((prev) => !prev);
     }
 
-    const shuttleControlEvents = {
-        ZERO_X_AXIS: {
-            title: 'Zero X Axis',
-            keys: ['shift', 'w'].join('+'),
-            cmd: 'ZERO_X_AXIS',
-            preventDefault: true,
-            payload: { axis: AXIS_X },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('X', 0),
-        },
-        ZERO_Y_AXIS: {
-            title: 'Zero Y Axis',
-            keys: ['shift', 'e'].join('+'),
-            cmd: 'ZERO_Y_AXIS',
-            preventDefault: true,
-            payload: { axis: AXIS_Y },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('Y', 0),
-        },
-        ZERO_Z_AXIS: {
-            title: 'Zero Z Axis',
-            keys: ['shift', 'r'].join('+'),
-            cmd: 'ZERO_Z_AXIS',
-            preventDefault: true,
-            payload: { axis: AXIS_Z },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('Z', 0),
-        },
-        ZERO_A_AXIS: {
-            id: 72,
-            title: 'Zero A Axis',
-            keys: ['shift', '0'].join('+'),
-            cmd: 'ZERO_A_AXIS',
-            preventDefault: true,
-            payload: { axis: AXIS_A },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => zeroWCS('A', 0),
-        },
-        ZERO_ALL_AXIS: {
-            title: 'Zero All',
-            keys: ['shift', 'q'].join('+'),
-            cmd: 'ZERO_ALL_AXIS',
-            payload: { axis: 'all' },
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => zeroAllAxes(),
-        },
-        GO_TO_A_AXIS_ZERO: {
-            id: 73,
-            title: 'Go to A Zero',
-            keys: ['shift', '1'].join('+'),
-            cmd: 'GO_TO_A_AXIS_ZERO',
-            preventDefault: true,
-            payload: { axisList: [AXIS_A] },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => gotoZero('A'),
-        },
-        GO_TO_X_AXIS_ZERO: {
-            title: 'Go to X Zero',
-            keys: ['shift', 's'].join('+'),
-            cmd: 'GO_TO_X_AXIS_ZERO',
-            preventDefault: true,
-            payload: { axisList: [AXIS_X] },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => gotoZero('X'),
-        },
-        GO_TO_Y_AXIS_ZERO: {
-            title: 'Go to Y Zero',
-            keys: ['shift', 'd'].join('+'),
-            cmd: 'GO_TO_Y_AXIS_ZERO',
-            preventDefault: true,
-            payload: { axisList: [AXIS_Y] },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => gotoZero('Y'),
-        },
-        GO_TO_Z_AXIS_ZERO: {
-            title: 'Go to Z Zero',
-            keys: ['shift', 'f'].join('+'),
-            cmd: 'GO_TO_Z_AXIS_ZERO',
-            preventDefault: true,
-            payload: { axisList: [AXIS_Z] },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => gotoZero('Z'),
-        },
-        GO_TO_XY_AXIS_ZERO: {
-            title: 'Go to XY Zero',
-            keys: ['shift', 'a'].join('+'),
-            cmd: 'GO_TO_XY_AXIS_ZERO',
-            payload: { axisList: [AXIS_X, AXIS_Y] },
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => goXYAxes(),
-        },
-        HOMING_GO_TO_BACK_LEFT_CORNER: {
-            title: 'Rapid Position - Back Left Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_LEFT),
-        },
-        HOMING_GO_TO_BACK_RIGHT_CORNER: {
-            title: 'Rapid Position - Back Right Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(BACK_RIGHT),
-        },
-        HOMING_GO_TO_FRONT_LEFT_CORNER: {
-            title: 'Rapid Position - Front Left Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_LEFT),
-        },
-        HOMING_GO_TO_FRONT_RIGHT_CORNER: {
-            title: 'Rapid Position - Front Right Corner',
-            keys: '',
-            cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
-            payload: {},
-            preventDefault: true,
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: () => jogToCorner(FRONT_RIGHT),
-        },
-    };
-
-    useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
-
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflowState === WORKFLOW_STATE_RUNNING) return false;
@@ -273,6 +126,252 @@ function DRO({
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
+
+    const canRunShortcut = (needsHoming?: boolean): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+        const homingValue = get(
+            reduxStore.getState(),
+            'controller.settings.settings.$22',
+        );
+        const homingEnabled = Number(homingValue) > 0;
+
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+        if (needsHoming && !homingEnabled) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    };
+
+    const shuttleControlEvents = {
+        ZERO_X_AXIS: {
+            title: 'Zero X-axis',
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_X_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_X },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('X', 0);
+            },
+        },
+        ZERO_Y_AXIS: {
+            title: 'Zero Y-axis',
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_Y_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Y },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('Y', 0);
+            },
+        },
+        ZERO_Z_AXIS: {
+            title: 'Zero Z-axis',
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'ZERO_Z_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Z },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('Z', 0);
+            },
+        },
+        ZERO_A_AXIS: {
+            id: 72,
+            title: 'Zero A-axis',
+            keys: ['shift', '0'].join('+'),
+            cmd: 'ZERO_A_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroWCS('A', 0);
+            },
+        },
+        ZERO_ALL_AXIS: {
+            title: 'Zero all axes',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_ALL_AXIS',
+            payload: { axis: 'all' },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                zeroAllAxes();
+            },
+        },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_A] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('A');
+            },
+        },
+        GO_TO_X_AXIS_ZERO: {
+            title: 'Go to X zero',
+            keys: ['shift', 's'].join('+'),
+            cmd: 'GO_TO_X_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_X] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('X');
+            },
+        },
+        GO_TO_Y_AXIS_ZERO: {
+            title: 'Go to Y zero',
+            keys: ['shift', 'd'].join('+'),
+            cmd: 'GO_TO_Y_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Y] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('Y');
+            },
+        },
+        GO_TO_Z_AXIS_ZERO: {
+            title: 'Go to Z zero',
+            keys: ['shift', 'f'].join('+'),
+            cmd: 'GO_TO_Z_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Z] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                gotoZero('Z');
+            },
+        },
+        GO_TO_XY_AXIS_ZERO: {
+            title: 'Go to XY zero',
+            keys: ['shift', 'a'].join('+'),
+            cmd: 'GO_TO_XY_AXIS_ZERO',
+            payload: { axisList: [AXIS_X, AXIS_Y] },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                goXYAxes();
+            },
+        },
+        HOMING_GO_TO_BACK_LEFT_CORNER: {
+            title: 'Go to Back Left corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(BACK_LEFT);
+            },
+        },
+        HOMING_GO_TO_BACK_RIGHT_CORNER: {
+            title: 'Go to Back Right corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_BACK_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(BACK_RIGHT);
+            },
+        },
+        HOMING_GO_TO_FRONT_LEFT_CORNER: {
+            title: 'Go to Front Left corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_LEFT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(FRONT_LEFT);
+            },
+        },
+        HOMING_GO_TO_FRONT_RIGHT_CORNER: {
+            title: 'Go to Front Right corner',
+            keys: '',
+            cmd: 'HOMING_GO_TO_FRONT_RIGHT_CORNER',
+            payload: {},
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut(true)) {
+                    return;
+                }
+                jogToCorner(FRONT_RIGHT);
+            },
+        },
+    };
+
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     const isRotaryMode = mode === 'ROTARY';
 
@@ -289,9 +388,11 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
-            <div className="w-full min-h-10 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
+            <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
-                {isConnected && homingEnabled && <RapidPositionButtons />}
+                {isConnected && homingEnabled && (
+                    <RapidPositionButtons disabled={!canClick} />
+                )}
                 {isConnected && homingEnabled && (
                     <Parking disabled={!canClick} />
                 )}

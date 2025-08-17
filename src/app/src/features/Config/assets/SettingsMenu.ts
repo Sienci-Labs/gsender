@@ -29,7 +29,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS } from 'app/constants';
+import {GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES} from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -174,9 +174,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Safe height',
                         key: 'workspace.safeRetractHeight',
                         type: 'number',
-                        unit: 'mm',
+                        unit: 'variable',
                         description:
-                            "Amount Z-axis will move up before moving in X/Y/A using go tos, corner-movements, or parking. (Doesn't apply to files, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
+                            "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
+                    },
+                    {
+                        label: 'Outline style',
+                        key: 'workspace.outlineMode',
+                        type: 'select',
+                        description: 'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
+                        options: OUTLINE_MODES
                     },
                     {
                         label: 'Send usage data',
@@ -252,6 +259,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: '',
                         key: 'widgets.axes.jog.precise',
                     },
+                    {
+                        label: 'Continuous jog delay',
+                        type: 'number',
+                        unit: 'ms',
+                        description:
+                            'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
+                        key: 'widgets.axes.jog.threshold',
+                        min: 50
+                    }
                 ],
             },
             {
@@ -789,7 +805,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'Spindle on delay',
-                        key: 'workspace.spindleDelay',
+                        key: 'widgets.spindle.delay',
                         description:
                             'Adds a delay to give the spindle time to spin up. ($392)',
                         type: 'hybrid',
@@ -1081,17 +1097,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$123' },
                     {
                         label: 'Force hard limits',
-                        key: '',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$21',
                         description:
-                            'Updates hard limits when toggling into rotary mode.',
-                        type: 'boolean',
+                            'Updates hard limits to this value when toggling into rotary mode.',
+                        type: 'number',
                     },
                     {
                         label: 'Force soft limits',
-                        key: '',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$20',
                         description:
-                            'Updates soft limits when toggling into rotary mode.',
-                        type: 'boolean',
+                            'Updates soft limits to this value when toggling into rotary mode.',
+                        type: 'number',
                     },
                 ],
             },

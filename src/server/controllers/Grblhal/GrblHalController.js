@@ -82,7 +82,7 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK } from 'server/controllers/Grbl/constants';
+import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
@@ -161,7 +161,8 @@ class GrblHalController {
         // Respond to user input
         replyParserState: false, // $G
         replyStatusReport: false, // ?
-        alarmCompleteReport: false //0x87
+        alarmCompleteReport: false, //0x87
+        axsReportCount: 0
     };
 
     actionTime = {
@@ -644,6 +645,17 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.initialized = true;
+                this.initController();
+            }
+
+            // Make sure we also have axs parsed - at most two times or we get endless loop
+            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
+                this.writeln('$I');
+                this.actionMask.axsReportCount++;
+            }
+
             //
             if (this.homingStarted) {
                 // We look at bit instead of faking it with machine positions
@@ -941,7 +953,7 @@ class GrblHalController {
                 this.initController();
             }
 
-            await delay(300);
+            await delay(500);
             this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
         });
 
@@ -1236,6 +1248,7 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+        this.actionMask.axsReportCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
@@ -1299,7 +1312,7 @@ class GrblHalController {
         };
     }
 
-    open(port, baudrate, refresh, callback = noop) {
+    open(port, baudrate, refresh = false, callback = noop) {
         if (!refresh) {
             this.connection.on('data', this.connectionEventListener.data);
             this.connection.on('close', this.connectionEventListener.close);
@@ -1307,6 +1320,11 @@ class GrblHalController {
         }
 
         callback(); // register controller
+
+        // Nothing else here matters if connecting to existing instantiated controller
+        if (refresh) {
+            return;
+        }
 
         this.workflow.stop();
 
@@ -1378,7 +1396,11 @@ class GrblHalController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, { name }) {
+    loadFile(gcode, { name }, refresh = false) {
+        if (refresh && !this.workflow.isIdle()) {
+            log.debug('Skip loading file: workflow is not idle');
+            return; // Don't reload file if controller is running;
+        }
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
     }
@@ -1692,6 +1714,10 @@ class GrblHalController {
             },
             'feeder:stop': () => {
                 this.feeder.reset();
+
+                delay(100).then(() => {
+                    this.write('~');
+                });
             },
             'feedhold': () => {
                 this.event.trigger(FEED_HOLD);
@@ -1926,12 +1952,12 @@ class GrblHalController {
             },
             'jog:start': () => {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
-                console.log(args);
+
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-                let jogFeedrate = (unitModal === 'G21') ? 10000 : 350;
+                let jogFeedrate = (unitModal === 'G21') ? 3000 : 118;
                 if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);

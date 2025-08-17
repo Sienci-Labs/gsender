@@ -295,6 +295,10 @@ class GrblRunner extends events.EventEmitter {
     forceOK() {
         this.emit('ok', { raw: 'force ok' });
     }
+
+    hasSettings() {
+        return !_.isEmpty(this.settings.settings);
+    }
 }
 
 export default GrblRunner;

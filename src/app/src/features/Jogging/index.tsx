@@ -23,6 +23,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     JOGGING_CATEGORY,
+    TOOLBAR_CATEGORY,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
@@ -43,6 +44,7 @@ import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { convertValue } from './utils/units';
+import reduxStore from 'app/store/redux';
 
 export interface JogValueObject {
     xyStep: number;
@@ -55,6 +57,9 @@ export function Jogging() {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
+    const [jogThreshold, setJogThreshold] = useState<number>(
+        store.get('widgets.axes.jog.threshold', 200),
+    );
     const jogSpeedRef = useRef<JogValueObject>({
         xyStep: 0,
         zStep: 0,
@@ -70,13 +75,27 @@ export function Jogging() {
     });
 
     useEffect(() => {
+        store.on('change', () => {
+            // Update jog threshold if it's different
+            const newThreshold = store.get('widgets.axes.jog.threshold', 200);
+            if (newThreshold !== jogThreshold) {
+                setJogThreshold(newThreshold);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        jogHelper.current?.updateThreshold(jogThreshold);
+    }, [jogThreshold]);
+
+    useEffect(() => {
         jogSpeedRef.current = jogSpeed;
     }, [jogSpeed]);
 
-    const axes = useSelector((state: RootState) => {
-        const controllerState = state.controller.state;
-        return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
-    });
+    // const axes = useSelector((state: RootState) => {
+    //     const controllerState = state.controller.state;
+    //     return get(controllerState, 'axes.axes', ['X', 'Y', 'Z']);
+    // });
 
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
@@ -104,6 +123,28 @@ export function Jogging() {
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
+
+    const canClickShortcut = (): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+
+        if (!isConnected) return false;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return false;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return includes(states, activeState);
+    };
 
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
@@ -630,6 +671,9 @@ export function Jogging() {
             _: Event,
             { axis = null }: { axis: { [key: string]: number } | null },
         ) => {
+            if (!canClickShortcut()) {
+                return;
+            }
             const isInRotaryMode =
                 store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
 
@@ -669,7 +713,7 @@ export function Jogging() {
         JOG_A_PLUS: {
             // Jog A+
             id: 100,
-            title: 'Jog: A+',
+            title: 'Jog A+ (CCW)',
             keys: ['ctrl', '6'].join('+'),
             cmd: 'JOG_A_PLUS',
             payload: {
@@ -683,7 +727,7 @@ export function Jogging() {
         JOG_A_MINUS: {
             // Jog A-
             id: 101,
-            title: 'Jog: A-',
+            title: 'Jog A- (CW)',
             keys: ['ctrl', '4'].join('+'),
             cmd: 'JOG_A_MINUS',
             payload: {
@@ -696,16 +740,16 @@ export function Jogging() {
         },
         SWITCH_WORKSPACE_MODE: {
             id: 103,
-            title: 'Switch Between Workspace Modes',
+            title: 'Toggle Rotary Mode',
             keys: ['ctrl', '5'].join('+'),
             cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
             isActive: true,
-            category: JOGGING_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: shuttleControlFunctions.UPDATE_WORKSPACE_MODE,
         },
         JOG_X_P: {
-            title: 'Jog: X+',
+            title: 'Jog X+ (right)',
             keys: 'shift+right',
             gamepadKeys: '15',
             keysName: 'Arrow Right',
@@ -719,7 +763,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_M: {
-            title: 'Jog: X-',
+            title: 'Jog X- (left)',
             keys: 'shift+left',
             gamepadKeys: '14',
             keysName: 'Arrow Left',
@@ -733,7 +777,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Y_P: {
-            title: 'Jog: Y+',
+            title: 'Jog Y+ (back)',
             keys: 'shift+up',
             gamepadKeys: '12',
             keysName: 'Arrow Up',
@@ -747,7 +791,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Y_M: {
-            title: 'Jog: Y-',
+            title: 'Jog Y- (fwd)',
             keys: 'shift+down',
             gamepadKeys: '13',
             keysName: 'Arrow Down',
@@ -761,7 +805,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Z_P: {
-            title: 'Jog: Z+',
+            title: 'Jog Z+ (up)',
             keys: 'shift+pageup',
             gamepadKeys: '5',
             keysName: 'Left Button',
@@ -775,7 +819,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Z_M: {
-            title: 'Jog: Z-',
+            title: 'Jog Z- (down)',
             keys: 'shift+pagedown',
             gamepadKeys: '4',
             keysName: 'Right Button',
@@ -789,7 +833,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_P_Y_M: {
-            title: 'Jog: X+ Y-',
+            title: 'Jog X+ Y-',
             keys: '',
             gamepadKeys: '13+15',
             keysName: 'Arrow Right and Arrow Down',
@@ -803,7 +847,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_M_Y_P: {
-            title: 'Jog: X- Y+',
+            title: 'Jog X- Y+',
             keys: '',
             gamepadKeys: '13+14',
             keysName: 'Arrow Left and Arrow Down',
@@ -817,7 +861,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_Y_P: {
-            title: 'Jog: X+ Y+',
+            title: 'Jog X+ Y+',
             keys: '',
             gamepadKeys: '12+15',
             keysName: 'Arrow Right and Arrow Up',
@@ -831,7 +875,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_Y_M: {
-            title: 'Jog: X- Y-',
+            title: 'Jog X- Y-',
             keys: '',
             gamepadKeys: '13+14',
             keysName: 'Arrow Left and Arrow Down',
@@ -846,7 +890,7 @@ export function Jogging() {
         },
         STOP_JOG: {
             // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Stop Jog',
+            title: 'Cancel jog move',
             keys: '',
             cmd: 'STOP_JOG',
             payload: { force: true },
@@ -854,6 +898,13 @@ export function Jogging() {
             isActive: true,
             category: JOGGING_CATEGORY,
             callback: (event: Event, _: Record<string, number> | null) => {
+                const isConnected = get(
+                    reduxStore.getState(),
+                    'connection.isConnected',
+                );
+                if (!isConnected) {
+                    return;
+                }
                 if (event) {
                     preventDefault(event);
                 }
@@ -910,15 +961,19 @@ export function Jogging() {
     useShuttleEvents(shuttleControlEvents);
 
     const isRotaryMode = mode === 'ROTARY';
+    const showA =
+        (firmwareType === 'grblHAL' || isRotaryMode) &&
+        rotaryWidgetState.tab.show;
 
     return (
         <>
-            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 max-xl:scale-90">
+            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 portrait:scale-100 max-xl:scale-90">
                 <div className="min-w-[180px] relative">
                     <JogWheel
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
                     <img
                         className="absolute top-0 left-0 pointer-events-none"
@@ -942,27 +997,29 @@ export function Jogging() {
                         distance={jogSpeed.zStep}
                         feedrate={jogSpeed.feedrate}
                         canClick={canClick}
+                        threshold={jogThreshold}
                     />
-                    {axes && (isRotaryMode || rotaryWidgetState.tab.show) && (
+                    {showA && (
                         <AJog
                             distance={jogSpeed.aStep}
                             feedrate={jogSpeed.feedrate}
                             canClick={canClick}
                             isRotaryMode={isRotaryMode}
+                            threshold={jogThreshold}
                         />
                     )}
                 </div>
             </div>
-            <div className="flex gap-4 max-xl:gap-2 max-xl:scale-90">
-                <div className="flex w-full items-center justify-center">
+            <div className="flex gap-1 w-full justify-around">
+                <div
+                    className={cx('flex items-center justify-center', {
+                        'px-7': !showA,
+                    })}
+                >
                     <div
                         className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3':
-                                (rotaryWidgetState.tab.show &&
-                                    firmwareType === 'grblHAL') ||
-                                isRotaryMode,
-                            'grid-cols-1 gap-y-1':
-                                !rotaryWidgetState.tab.show && !isRotaryMode,
+                            'grid-cols-2 gap-y-3': showA,
+                            'grid-cols-1 gap-y-1 xl:gap-y-2': !showA,
                         })}
                     >
                         <JogInput
@@ -975,14 +1032,13 @@ export function Jogging() {
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
-                        {(firmwareType === 'grblHAL' || isRotaryMode) &&
-                            rotaryWidgetState.tab.show && (
-                                <JogInput
-                                    label="A°"
-                                    currentValue={jogSpeed.aStep}
-                                    onChange={updateAStep}
-                                />
-                            )}
+                        {showA && (
+                            <JogInput
+                                label="A°"
+                                currentValue={jogSpeed.aStep}
+                                onChange={updateAStep}
+                            />
+                        )}
                         <JogInput
                             label="at"
                             currentValue={jogSpeed.feedrate}
@@ -990,7 +1046,7 @@ export function Jogging() {
                         />
                     </div>
                 </div>
-                <div className="flex float-right max-xl:scale-90">
+                <div className="flex float-right portrait:scale-100 max-xl:scale-90">
                     <SpeedSelector handleClick={updateJogValues} />
                 </div>
             </div>

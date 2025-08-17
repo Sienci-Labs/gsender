@@ -34,6 +34,7 @@ export interface Workspace {
     timeSpentRunning: number;
     longestTimeRun: number;
     defaultFirmware: string;
+    outlineMode: string;
     park: object;
     jobTimes: number[];
     toolChange: {
@@ -73,6 +74,8 @@ export interface Workspace {
     rotaryAxis: {
         firmwareSettings: RotarySettings;
         defaultFirmwareSettings: RotarySettings;
+        forceHardLimits: boolean;
+        forceSoftLimits: boolean;
     };
     shouldWarnZero: boolean;
     diagnostics: {

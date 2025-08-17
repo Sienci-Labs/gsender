@@ -8,6 +8,8 @@ import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 
+import cx from 'classnames';
+
 const SecondaryVisualizer = ({
     state,
     actions,
@@ -19,8 +21,17 @@ const SecondaryVisualizer = ({
 }) => {
     return (
         <>
-            {showLoading && <Loading />}
-            {showRendering && <Rendering />}
+            <div
+                className={cx(
+                    'z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2',
+                    {
+                        hidden: !showLoading && !showRendering,
+                    },
+                )}
+            >
+                {showLoading && <Loading />}
+                {showRendering && <Rendering />}
+            </div>
 
             {WebGL.isWebGLAvailable() && (
                 <VisualizerWrapper

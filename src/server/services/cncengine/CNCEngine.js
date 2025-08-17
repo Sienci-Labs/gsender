@@ -207,7 +207,7 @@ class CNCEngine {
                 },
                 'firmwareFound': (controllerType = GRBL, options, callback = noop, refresh = false) => {
                     let { port, baudrate, rtscts, network } = { ...options };
-
+                    log.debug('firmwareFound event fired');
                     if (typeof callback !== 'function') {
                         callback = noop;
                     }
@@ -232,9 +232,12 @@ class CNCEngine {
                     }
 
                     controller.addConnection(socket);
+
+
                     // Load file to controller if it exists
                     if (this.hasFileLoaded()) {
-                        controller.loadFile(this.gcode, this.meta);
+                        console.log('Load file firing on reconnect');
+                        controller.loadFile(this.gcode, this.meta, refresh);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
                         log.debug('No file in CNCEngine to load to sender');
@@ -248,10 +251,8 @@ class CNCEngine {
                             return;
                         }
 
-                        // System Trigger: Open a serial port
-                        // this.event.trigger('port:open');
-
-                        if (store.get(`controllers["${port}"]`)) {
+                        // Throw error if port is used and it's not a second client connecting
+                        if (!refresh && store.get(`controllers["${port}"]`)) {
                             log.error(`Serial port "${port}" was not properly closed`);
                         }
                         store.set(`controllers[${JSON.stringify(port)}]`, controller);

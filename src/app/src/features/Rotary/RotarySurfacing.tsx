@@ -57,6 +57,7 @@ const DEFAULT_VALUES_MM = {
     spindleRPM: 17000,
     feedrate: 3000,
     enableRehoming: false,
+    shouldDwell: false,
 };
 
 const RotarySurfacing = () => {
@@ -128,6 +129,7 @@ const RotarySurfacing = () => {
             stepover: +surfacingState.stepover,
             spindleRPM: +surfacingState.spindleRPM,
             enableRehoming: surfacingState.enableRehoming,
+            shouldDwell: surfacingState.shouldDwell,
         });
 
         const gcode = generator.generate();
@@ -255,17 +257,6 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-                        <InputArea label="Spindle RPM">
-                            <ControlledInput
-                                id="spindleRPM"
-                                value={surfacingState.spindleRPM}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix="RPM"
-                                type="number"
-                            />
-                        </InputArea>
                         <InputArea label="Feed Rate">
                             <ControlledInput
                                 id="feedrate"
@@ -277,11 +268,34 @@ const RotarySurfacing = () => {
                                 type="number"
                             />
                         </InputArea>
-
+                        <InputArea label="Spindle RPM">
+                            <ControlledInput
+                                id="spindleRPM"
+                                value={surfacingState.spindleRPM}
+                                onChange={handleChange}
+                                wrapperClassName="col-span-2"
+                                className={inputStyle}
+                                suffix="RPM"
+                                type="number"
+                            />
+                            <div className="flex items-center gap-2 justify-center">
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                    Delay
+                                </label>
+                                <Switch
+                                    checked={surfacingState.shouldDwell}
+                                    onChange={(checked) =>
+                                        setSurfacingState((prev) => ({
+                                            ...prev,
+                                            shouldDwell: checked,
+                                        }))
+                                    }
+                                />
+                            </div>
+                        </InputArea>
                         <div>
                             <InputArea label="Enable Rehoming">
                                 <Switch
-                                    id="enableRehoming"
                                     checked={surfacingState.enableRehoming}
                                     onChange={(checked) =>
                                         setSurfacingState((prev) => ({
@@ -314,6 +328,7 @@ const RotarySurfacing = () => {
                                     value="gcode"
                                     className="w-full"
                                     onClick={() => setTabSwitch(true)}
+                                    disabled={!gcode}
                                 >
                                     G-Code{' '}
                                     {gcode.length !== 0 ? (

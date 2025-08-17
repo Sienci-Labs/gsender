@@ -46,7 +46,7 @@ export default class Generator {
             spindle = M3,
             shouldDwell,
             mist,
-            flood
+            flood,
         } = { ...defaultSurfacingState, ...surfacing };
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
@@ -63,14 +63,13 @@ export default class Generator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             'G90',
+            `${spindle} S${spindleRPM}`,
+            ...dwell,
             `G0 Z${z}`,
             'G0 X0 Y0',
             ...m7,
             ...m8,
-            `${spindle} S${spindleRPM}`,
-            `G0 Z${z}`,
             `G1 F${feedrate}`,
-            ...dwell,
             '(Header End)',
             '\n',
         ];
@@ -127,7 +126,7 @@ export default class Generator {
             cutDirectionFlipped,
             skimDepth,
             mist,
-            flood
+            flood,
         } = this.surfacing;
 
         const stepoverPercentage = stepover > 80 ? 80 / 100 : stepover / 100;
@@ -398,8 +397,10 @@ export default class Generator {
             };
         }
 
-        function exitCondition(startPos, endPos, prevStartPos, prevEndPos) {
-            return endPos.x < startPos.x || endPos.y < startPos.y;
+        function exitCondition(startPos, endPos) {
+            // Exit when positions actually cross (not just close)
+            const shouldExit = endPos.x < startPos.x || endPos.y < startPos.y;
+            return shouldExit;
         }
 
         function processGcode(
@@ -433,10 +434,8 @@ export default class Generator {
 
                     if (length >= width) {
                         arr.push(`G1 Y${yValueStart}`);
-
-                        if (endPos.x >= startPos.x + stepoverAmount) {
-                            arr.push(`G1 X${xValueEnd}`);
-                        }
+                        // Always add the final X movement if we're moving in the X direction
+                        arr.push(`G1 X${xValueEnd}`);
                     }
 
                     if (endPos.y >= startPos.y) {
@@ -448,20 +447,30 @@ export default class Generator {
                     }
                 }
             } else {
+                // Add movements based on the spiral pattern
                 if (endPos.y >= startPos.y) {
                     arr.push(`G1 Y${yValueStart}`);
 
                     if (width >= length) {
+                        // For wider than long rectangles, complete the Y movement first
                         arr.push(`G1 X${xValueStart}`, `G1 Y${yValueEnd}`);
                     }
+                } else {
+                    // If Y positions have crossed, still add the final Y movement to complete the pattern
+                    arr.push(`G1 Y${yValueStart}`);
                 }
 
                 if (endPos.x >= startPos.x) {
                     if (length > width) {
+                        // For longer than wide rectangles, complete the X movement first
                         arr.push(`G1 X${xValueStart}`, `G1 Y${yValueEnd}`);
                     }
-
-                    if (endPos.x >= startPos.x + stepoverAmount) {
+                    // Add the final X movement to complete the spiral
+                    if (endPos.y < startPos.y) {
+                        // If Y positions have crossed, use xValueStart to complete the spiral properly
+                        arr.push(`G1 X${xValueStart}`);
+                    } else {
+                        // Normal spiral movement
                         arr.push(`G1 X${xValueEnd}`);
                     }
                 }
@@ -617,7 +626,7 @@ export default class Generator {
             ),
         );
 
-        if (exitCondition(startPos, endPos, prevStartPos, prevEndPos)) {
+        if (exitCondition(startPos, endPos)) {
             return arr;
         }
 

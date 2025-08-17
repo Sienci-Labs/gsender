@@ -89,11 +89,12 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
-            axes: {
-                count: 3,
-                axes: ['X', 'Y', 'Z']
-            },
-        }
+
+        },
+        axes: {
+            count: 0,
+            axes: []
+        },
     };
 
     settings = {
@@ -332,7 +333,8 @@ class GrblHalRunner extends events.EventEmitter {
             if (!_.isEqual(this.settings.version, nextSettings.version)) {
                 this.settings = nextSettings; // enforce change
             }
-            this.emit('startup', payload);
+            // Should no longer need to do this here for redundancy
+            //this.emit('startup', payload);
             return;
         }
         if (type === GrblHalLineParserResultCode) {
@@ -446,6 +448,15 @@ class GrblHalRunner extends events.EventEmitter {
 
     deleteSettings() {
         this.settings.settings = {};
+    }
+
+    hasSettings() {
+        return !_.isEmpty(this.settings.settings);
+    }
+
+    hasAXS() {
+        const axs = _.get(this.state, 'axes.axes', []);
+        return !_.isEmpty(axs);
     }
 }
 

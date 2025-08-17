@@ -23,6 +23,7 @@ import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import reduxStore from 'app/store/redux';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -38,39 +39,6 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
             controllerType: state.controller.type ?? 'grbl',
         }));
 
-    const shuttleControlEvents = {
-        MIST_COOLANT: {
-            title: 'Mist Coolant',
-            keys: '',
-            cmd: 'MIST_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => startMist(),
-        },
-        FLOOD_COOLANT: {
-            title: 'Flood Coolant',
-            keys: '',
-            cmd: 'FLOOD_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => startFlood(),
-        },
-        STOP_COOLANT: {
-            title: 'Stop Coolant',
-            keys: '',
-            cmd: 'STOP_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => stopCoolant(),
-        },
-    };
-
-    useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
-
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
         if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
@@ -84,6 +52,71 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         controllerType,
         controllerState?.status?.activeState,
     ]);
+
+    const canRunShortcut = (): boolean => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const workflow = get(reduxStore.getState(), 'controller.workflow');
+        const controllerType = get(reduxStore.getState(), 'controller.type');
+        const controllerState = get(reduxStore.getState(), 'controller.state');
+
+        if (!isConnected) return false;
+        if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
+        if (![GRBL, GRBLHAL].includes(controllerType)) return false;
+
+        const activeState = controllerState?.status?.activeState;
+        return activeState === GRBL_ACTIVE_STATE_IDLE;
+    };
+
+    const shuttleControlEvents = {
+        MIST_COOLANT: {
+            title: 'Mist coolant (M7)',
+            keys: '',
+            cmd: 'MIST_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                startMist();
+            },
+        },
+        FLOOD_COOLANT: {
+            title: 'Flood coolant (M8)',
+            keys: '',
+            cmd: 'FLOOD_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                startFlood();
+            },
+        },
+        STOP_COOLANT: {
+            title: 'Stop coolant (M9)',
+            keys: '',
+            cmd: 'STOP_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                stopCoolant();
+            },
+        },
+    };
+
+    useShuttleEvents(shuttleControlEvents);
+    useKeybinding(shuttleControlEvents);
 
     return (
         <div className="flex flex-col justify-around items-center h-full">

@@ -30,16 +30,18 @@ const buttonVariants = cva(
                 true: 'bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
             },
             size: {
-                default: 'h-10 px-4 max-xl:px-3 py-2 max-xl:py-1 w-full',
-                xs: 'h-8 rounded-md px-3 w-full',
-                sm: 'h-9 rounded-md px-3 w-full',
-                lg: 'h-11 rounded-md px-8 w-full',
+                mini: 'h-6 rounded-md px-[5px] w-full text-xs',
+                xs: 'h-6 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1  w-full text-sm',
+                sm: 'h-8 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1 w-full text-sm',
+                md: 'h-10 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1 w-full text-base',
+                lg: 'h-11 rounded-md px-8 max-xl:px-6 py-4 max-xl:py-2 w-full text-lg',
                 icon: 'h-10 w-10',
+                custom: '',
             },
         },
         defaultVariants: {
             variant: 'default',
-            size: 'default',
+            size: 'md',
         },
     },
 );

@@ -10,6 +10,7 @@ import reduxStore from 'app/store/redux';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';
+import { get } from 'lodash';
 
 interface HelperToggleProps {
     minimized: boolean;
@@ -20,8 +21,6 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
         wizardActive,
         infoHelperActive,
         title: helperTitle,
-        wizardMinimized,
-        infoHelperMinimized,
     } = useSelector((state: RootState) => state.helper);
     // const helperTitle = title;
     const helperEnabled = wizardActive || infoHelperActive;
@@ -32,6 +31,10 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
     // const bringAttention = helperEnabled && helperMinimized;
 
     const handleToggle = () => {
+        const { wizardMinimized, infoHelperMinimized } = get(
+            reduxStore.getState(),
+            'helper',
+        );
         // this toggle will always minimize all if one is opened
         if (wizardMinimized || infoHelperMinimized) {
             if (wizardMinimized) {
@@ -49,7 +52,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
 
     const shuttleControlEvents = {
         TOGGLE_INFO_HELPER: {
-            title: 'Toggle Helper Wizard',
+            title: 'Display Helper',
             keys: '',
             cmd: 'TOGGLE_INFO_HELPER',
             preventDefault: false,

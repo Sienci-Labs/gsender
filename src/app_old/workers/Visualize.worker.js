@@ -450,6 +450,7 @@ onmessage = function({ data }) {
 
         let newFileInfo = vm.generateFileStats();
         fileInfo.estimatedTime = newFileInfo.estimatedTime;
+        console.log(vm.vmState.invalidGcode);
         // update estimated time
         parsedDataToSend = {
             data: parsedData.data,
@@ -485,6 +486,8 @@ onmessage = function({ data }) {
         const data = vm.getData();
         const modalChanges = vm.getModalChanges();
         const feedrateChanges = vm.getFeedrateChanges();
+        console.log(vm.vmState.invalidGcode);
+        console.log(vm.vmState);
         fileInfo = vm.generateFileStats();
         parsedDataToSend = {
             data: data.data,

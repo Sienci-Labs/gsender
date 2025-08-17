@@ -1,11 +1,6 @@
 import Select from 'react-select';
 import cx from 'classnames';
-
-type Spindle = {
-    id: string;
-    label: string;
-    capabilities: string;
-};
+import { Spindle } from '../definitions';
 
 type FormattedSpindle = {
     label: string;
@@ -15,7 +10,7 @@ type FormattedSpindle = {
 type Props = {
     spindles: Spindle[];
     onChange: (selectedOption: FormattedSpindle | null) => void;
-    spindle: FormattedSpindle | null;
+    spindle: Spindle | null;
     disabled: boolean;
 };
 
@@ -27,6 +22,7 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 };
 
 const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
+    const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
     return (
         <div
@@ -40,7 +36,7 @@ const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
             <Select<FormattedSpindle>
                 options={formattedSpindles}
                 placeholder="Default Spindle"
-                value={spindle}
+                value={spindleFormatted}
                 onChange={onChange}
                 className="w-full z-10"
                 menuPlacement="top"

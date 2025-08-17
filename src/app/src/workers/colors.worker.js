@@ -41,7 +41,6 @@ onmessage = function ({ data }) {
         spindleChanges,
         theme,
     } = data;
-
     let savedColors = [];
 
     const updateLaserModeColors = () => {

@@ -32,6 +32,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
         showModal: false,
         needsRecovery: false,
         value: lastLine,
+        startFromLine: lastLine - 10 >= 0 ? lastLine - 10 : 0,
         waitForHoming: false,
         safeHeight:
             store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS
@@ -46,7 +47,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
     const lineTotal = useSelector((state: RootState) => state.file.total);
 
     const handleStartFromLine = () => {
-        const { safeHeight, value } = state;
+        const { safeHeight, startFromLine } = state;
         const units = store.get('workspace.units', METRIC_UNITS);
 
         setState((prev) => ({
@@ -57,7 +58,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
 
         const newSafeHeight =
             units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
-        controller.command('gcode:start', value, zMax, newSafeHeight);
+        controller.command('gcode:start', startFromLine, zMax, newSafeHeight);
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
@@ -102,22 +103,22 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                     <div className="">
                         <div className="mb-4">
                             <p className="mb-2">
-                                Recover a carve disrupted by power loss,
-                                disconnection, mechanical malfunction, or other
-                                failures
+                                Recover a job after power loss, mechanical
+                                malfunction, disconnection, or other failure.
                             </p>
                             <p className="mb-0 text-black dark:text-white">
-                                Your job was last stopped around line:{' '}
-                                <b>{lastLine}</b> on a g-code file with a total
-                                of <b>{lineTotal}</b> lines
+                                Your job of <b>{lineTotal}</b> lines was last
+                                stopped around line: <b>{lastLine}</b>.
                             </p>
                             {state.value > 0 && (
                                 <p>
-                                    Recommended starting lines:{' '}
+                                    For best success, we usually recommend
+                                    resuming about <strong>10 lines</strong>{' '}
+                                    earlier:{' '}
                                     <strong>
+                                        line{' '}
                                         {lastLine - 10 >= 0 ? lastLine - 10 : 0}
-                                    </strong>{' '}
-                                    - <strong>{lastLine}</strong>
+                                    </strong>
                                 </p>
                             )}
                         </div>
@@ -129,7 +130,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 <ControlledInput
                                     id="resumeJobLine"
                                     type="number"
-                                    value={state.value}
+                                    value={state.startFromLine}
                                     onChange={(e) => {
                                         const newValue = Number(e.target.value);
                                         if (
@@ -138,7 +139,8 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                         ) {
                                             setState((prev) => ({
                                                 ...prev,
-                                                value: Math.ceil(newValue),
+                                                startFromLine:
+                                                    Math.ceil(newValue),
                                             }));
                                         }
                                     }}
@@ -172,15 +174,15 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                     />
                                 </Tooltip>
                                 <span className="text-sm col-span-2">
-                                    (Safe Height is the value above Z max)
+                                    (amount above the max height of the file)
                                 </span>
                             </div>
                         </div>
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
-                                Accounts for all past CNC movements, units,
-                                spindle speeds, laser power, Start/Stop g-code,
-                                and any other file modals or setup.
+                                Calculates all your CNC movements, attributes,
+                                and gS automations to pick up right where you
+                                left off.
                             </p>
                         </div>
                         <div className="flex justify-center">

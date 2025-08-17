@@ -94,6 +94,10 @@ import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import shuttleEvents from '../../lib/shuttleEvents';
 
+interface Views {
+    type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
+}
+
 class Visualizer extends Component {
     static propTypes = {
         widgetId: PropTypes.string,
@@ -670,6 +674,14 @@ class Visualizer extends Component {
                 pubsub.publish('theme:change', storeTheme);
             }
         })*/
+
+        store.on('change', () => {
+            const storeUnits = store.get('workspace.units');
+            const { units } = this.state;
+            if (units !== storeUnits) {
+                this.setState({ units: storeUnits });
+            }
+        });
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
@@ -889,6 +901,13 @@ class Visualizer extends Component {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
             switch (Number(amount)) {
                 case 1:
                     controller.write('\x93');
@@ -910,6 +929,13 @@ class Visualizer extends Component {
             }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
             switch (Number(amount)) {
                 case 1:
                     controller.write('\x9C');
@@ -930,27 +956,7 @@ class Visualizer extends Component {
                     return;
             }
         },
-        START_JOB: (_, { type }) => {
-            const { controllerType } = this.props;
-            // if it's a grblHAL only shortcut, don't run it
-            if (type === GRBLHAL && controllerType !== GRBLHAL) {
-                this.showToast();
-                return;
-            }
-            if (this.workflowControl) {
-                this.workflowControl.startRun();
-            }
-        },
-        PAUSE_JOB: (_, { type }) => {
-            const { controllerType } = this.props;
-            // if it's a grblHAL only shortcut, don't run it
-            if (type === GRBLHAL && controllerType !== GRBLHAL) {
-                this.showToast();
-                return;
-            }
-            this.actions.handlePause();
-        },
-        VISUALIZER_VIEW: (_, { type }) => {
+        VISUALIZER_VIEW: (_, { type }: Views) => {
             const {
                 to3DView,
                 toTopView,
@@ -960,7 +966,7 @@ class Visualizer extends Component {
             } = this.actions.camera;
 
             const changeCamera = {
-                isometirc: to3DView,
+                isometric: to3DView,
                 top: toTopView,
                 front: toFrontView,
                 right: toRightSideView,
@@ -1078,7 +1084,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         FEEDRATE_OVERRIDE_RESET: {
-            title: 'Feed Reset',
+            title: 'Feed reset',
             keys: '',
             gamepadKeys: '',
             keysName: 'Feed Reset',
@@ -1138,7 +1144,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
         },
         SPINDLE_OVERRIDE_RESET: {
-            title: 'Spindle/Laser Reset',
+            title: 'Spindle/Laser reset',
             keys: '',
             gamepadKeys: '',
             keysName: 'Spindle/Laser Reset',
@@ -1150,17 +1156,17 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
         },
         VISUALIZER_VIEW_3D: {
-            title: '3D / Isometric',
+            title: 'See 3D view',
             keys: '',
             cmd: 'VISUALIZER_VIEW_3D',
-            payload: { type: 'isometirc' },
+            payload: { type: 'isometric' },
             preventDefault: true,
             isActive: true,
             category: VISUALIZER_CATEGORY,
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         VISUALIZER_VIEW_TOP: {
-            title: 'Top',
+            title: 'See Top view',
             keys: '',
             cmd: 'VISUALIZER_VIEW_TOP',
             payload: { type: 'top' },
@@ -1170,7 +1176,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         VISUALIZER_VIEW_FRONT: {
-            title: 'Front',
+            title: 'See Front view',
             keys: '',
             cmd: 'VISUALIZER_VIEW_FRONT',
             payload: { type: 'front' },
@@ -1180,7 +1186,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         VISUALIZER_VIEW_RIGHT: {
-            title: 'Right',
+            title: 'See Right view',
             keys: '',
             cmd: 'VISUALIZER_VIEW_RIGHT',
             payload: { type: 'right' },
@@ -1190,7 +1196,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         VISUALIZER_VIEW_LEFT: {
-            title: 'Left',
+            title: 'See Left view',
             keys: '',
             cmd: 'VISUALIZER_VIEW_LEFT',
             payload: { type: 'left' },
@@ -1200,7 +1206,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         VISUALIZER_VIEW_RESET: {
-            title: 'Reset View',
+            title: 'Reset view',
             keys: ['shift', 'n'].join('+'),
             cmd: 'VISUALIZER_VIEW_RESET',
             payload: { type: 'default' },
@@ -1210,7 +1216,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
         },
         LIGHTWEIGHT_MODE: {
-            title: 'Lightweight Mode',
+            title: 'Lightweight mode',
             keys: ['shift', 'm'].join('+'),
             cmd: 'LIGHTWEIGHT_MODE',
             preventDefault: true,
@@ -1219,7 +1225,7 @@ class Visualizer extends Component {
             callback: () => this.actions.handleLiteModeToggle(),
         },
         TOGGLE_SHORTCUTS: {
-            title: 'Toggle Shortcuts',
+            title: 'Toggle on/off shortcuts',
             keys: '^',
             cmd: 'TOGGLE_SHORTCUTS',
             preventDefault: false,
@@ -1258,7 +1264,7 @@ class Visualizer extends Component {
             }
         },
         VISUALIZER_VIEW_CYCLE: {
-            title: 'Cycle Through Visualizer Cameras',
+            title: 'Switch between views',
             keys: ['shift', 'b'].join('+'),
             cmd: 'VISUALIZER_VIEW_CYCLE',
             payload: { type: 'default' },
@@ -1268,7 +1274,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE,
         },
         VISUALIZER_ZOOM_IN: {
-            title: 'Zoom In',
+            title: 'Zoom in',
             keys: ['shift', 'p'].join('+'),
             cmd: 'VISUALIZER_ZOOM_IN',
             payload: { type: 'default' },
@@ -1278,7 +1284,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN,
         },
         VISUALIZER_ZOOM_OUT: {
-            title: 'Zoom Out',
+            title: 'Zoom out',
             keys: ['shift', 'o'].join('+'),
             cmd: 'VISUALIZER_ZOOM_OUT',
             payload: { type: 'default' },
@@ -1288,7 +1294,7 @@ class Visualizer extends Component {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT,
         },
         VISUALIZER_ZOOM_FIT: {
-            title: 'Zoom Fit',
+            title: 'Zoom fit',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },

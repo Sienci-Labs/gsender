@@ -14,7 +14,7 @@ import { StatTable } from 'app/features/Stats/components/StatTable.tsx';
 
 export function Stats() {
     return (
-        <div className="fixed-content-area overflow-y-scroll no-scrollbar">
+        <div className="fixed-content-area overflow-y-auto">
             <div className="grid grid-cols-6 grid-rows-6 gap-4">
                 <div
                     id="mainStats"

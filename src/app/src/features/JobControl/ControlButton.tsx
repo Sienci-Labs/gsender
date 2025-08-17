@@ -14,7 +14,6 @@ import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
-    GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
@@ -26,6 +25,8 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -59,25 +60,32 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     fileLoaded,
     onStop,
 }) => {
-    function canRun() {
+    function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
+        const currentActiveState = reduxActiveState || activeState;
         return (
-            activeState === GRBL_ACTIVE_STATE_IDLE ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
+            currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD
         );
     }
 
-    function canPause() {
-        const { state } = workflow;
+    function canPause(
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ) {
+        const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
 
         return (
             includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state) &&
-            (activeState === GRBL_ACTIVE_STATE_RUN ||
-                activeState === GRBL_ACTIVE_STATE_HOLD)
+            (currentActiveState === GRBL_ACTIVE_STATE_RUN ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD)
         );
     }
 
-    function canStop() {
-        const { state } = workflow;
+    function canStop(reduxWorkflow?: { state: WORKFLOW_STATES_T }) {
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
         return includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state);
     }
 
@@ -94,6 +102,30 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         return true;
     };
 
+    const shortcutIsDisabled = () => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const fileLoaded = get(reduxStore.getState(), 'file.fileLoaded');
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+        const workflow = get(reduxStore.getState(), 'controller.workflow');
+
+        if (!isConnected || !fileLoaded) {
+            return true;
+        } else if (
+            (type === START && canRun(activeState)) ||
+            (type === PAUSE && canPause(activeState, workflow)) ||
+            (type === STOP && canStop(workflow))
+        ) {
+            return false;
+        }
+        return true;
+    };
+
     const [disabled, setDisabled] = useState(isDisabled());
 
     useEffect(() => {
@@ -102,7 +134,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 
     const shuttleControlEvents = {
         START_JOB: {
-            title: 'Start Job',
+            title: 'Start job',
             keys: '~',
             gamepadKeys: '9',
             keysName: 'Start',
@@ -114,11 +146,14 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handleRun();
             },
         },
         PAUSE_JOB: {
-            title: 'Pause Job',
+            title: 'Pause job',
             keys: '!',
             gamepadKeys: '2',
             keysName: 'X',
@@ -130,11 +165,14 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handlePause();
             },
         },
         STOP_JOB: {
-            title: 'Stop Job',
+            title: 'Stop job',
             keys: '@',
             gamepadKeys: '3',
             keysName: 'Y',
@@ -143,17 +181,25 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
                 handleStop();
             },
         },
         RUN_OUTLINE: {
-            title: 'Run Outline',
+            title: 'Run outline',
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
             keys: '',
             cmd: 'RUN_OUTLINE',
-            callback: () => pubsub.publish('outline:start'),
+            callback: () => {
+                if (shortcutIsDisabled()) {
+                    return;
+                }
+                pubsub.publish('outline:start');
+            },
         },
     };
 
@@ -211,7 +257,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             <button
                 type="button"
                 className={cx(
-                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center h-12 max-xl:h-9 w-24 max-xl:w-22 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
+                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center portrait:h-12 h-12 max-xl:h-9 w-24 max-xl:w-22 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
                     '[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500',
                     {
                         'bg-gray-300 text-gray-600 dark:bg-dark dark:text-gray-400 cursor-not-allowed':

@@ -25,7 +25,7 @@
 import * as THREE from 'three';
 import _get from 'lodash/get';
 import { store as reduxStore } from 'app/store/redux';
-import { CUTTING_PART, PLANNED_PART } from './constants';
+import { CUTTING_PART, PLANNED_PART, SECONDARY_COLOR } from './constants';
 import { checkIfRotaryFile } from '../../lib/rotary';
 
 const STATES = {
@@ -47,7 +47,7 @@ class GCodeVisualizer {
         this.frames = []; // Example
         this.frameIndex = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary
@@ -187,13 +187,17 @@ class GCodeVisualizer {
                 }
                 colorAttr.needsUpdate = true;
             } else {
-                const colorArray = Array.from(
-                    { length: v2 - v1 },
-                    () => defaultColorArray,
-                ).flat(); // current movement
-                // cant set yet, because grey lines will also be calculated soon
-                this.plannedColorArray = colorArray;
-                this.plannedV1 = this.frames[this.frameIndex - 1];
+                // if v1 is 0, we don't want to add the planned colour array because it will be too long and
+                // cause the yellow colouring to be past what we are tracking
+                if (v1 > 0) {
+                    const colorArray = Array.from(
+                        { length: v2 - v1 },
+                        () => defaultColorArray,
+                    ).flat(); // current movement
+                    // cant set yet, because grey lines will also be calculated soon
+                    this.plannedColorArray = colorArray;
+                    this.plannedV1 = this.frames[this.frameIndex - 1];
+                }
             }
         }
 
@@ -201,7 +205,7 @@ class GCodeVisualizer {
         if (v2 < v1) {
             // reset vars
             this.oldFrameIndex = null;
-            this.plannedColorArray = null;
+            this.plannedColorArray = [];
             this.plannedV1 = null;
             this.plannedState = STATES.START;
             // --rotary
@@ -251,7 +255,7 @@ class GCodeVisualizer {
             const offsetIndex = v1 * 4;
             const opacity = this.isLaser ? 1 : 0.3;
             // grey
-            const runColor = new THREE.Color(this.theme.get(CUTTING_PART));
+            const runColor = new THREE.Color(SECONDARY_COLOR);
             const greyArray = [...runColor.toArray(), opacity];
             // yellow
             const yellowColor = new THREE.Color(this.theme.get(PLANNED_PART));
@@ -307,7 +311,9 @@ class GCodeVisualizer {
                 const plannedColor = new THREE.Color(
                     this.theme.get(PLANNED_PART),
                 );
+
                 const defaultColorArray = [...plannedColor.toArray(), 1]; // yellow
+
                 const colorArray = Array.from(
                     { length: this.frameIndex - v2FrameIndex + 1 },
                     () => defaultColorArray,
@@ -366,7 +372,7 @@ class GCodeVisualizer {
         this.frameIndex = 0;
         this.framesLength = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary
