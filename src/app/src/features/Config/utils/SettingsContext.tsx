@@ -19,12 +19,13 @@ import defaultStoreState from 'app/store/defaultState';
 import isEqual from 'lodash/isEqual';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import {
+    EEPROM,
     EEPROMSettings,
+    FilteredEEPROM,
     FIRMWARE_TYPES_T,
     MachineProfile,
 } from 'app/definitions/firmware';
-import pubsub from "pubsub-js";
-
+import pubsub from 'pubsub-js';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -49,7 +50,7 @@ interface iSettingsContext {
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
     eepromIsDefault: (v: object) => boolean;
     isSettingDefault: (v: object) => boolean;
-    getEEPROMDefaultValue: (v: string) => string | number;
+    getEEPROMDefaultValue: (v: EEPROM) => string | number;
 }
 
 interface SettingsProviderProps {
@@ -61,7 +62,7 @@ const defaultState: iSettingsContext = {
     settingsToUpdate: {},
     EEPROMToUpdate: {},
     EEPROM: {},
-    getEEPROMDefaultValue(v: string): string | number {
+    getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
     isSettingDefault(v: object): boolean {
@@ -81,7 +82,7 @@ const defaultState: iSettingsContext = {
     settingsFilter: () => true,
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
-    eepromIsDefault: (_v) => false
+    eepromIsDefault: (_v) => false,
 };
 
 export const SettingsContext =
@@ -138,7 +139,16 @@ function populateSettingsValues(
 export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettings] =
         useState<SettingsMenuSection[]>(SettingsMenu);
-    const [EEPROM, setEEPROM] = useState<object>([]);
+    const [EEPROM, setEEPROM] = useState<FilteredEEPROM[]>([
+        {
+            unit: '',
+            setting: '$',
+            globalIndex: 0,
+            value: '',
+            group: '',
+            groupID: 0,
+        },
+    ]);
     const [rawEEPROM, setRawEEPROM] = useState<object>({});
     const [machineProfile, setMachineProfile] = useState<MachineProfile>(
         {} as MachineProfile,
@@ -201,8 +211,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
-            return repopulateSettings()
-        })
+            return repopulateSettings();
+        });
     }, []);
 
     useEffect(() => {
@@ -241,10 +251,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         // Hide hidden when filtering
         if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
-            return !v.hidden();
+            if (v.hidden()) {
+                // only return if it's supposed to be hidden, otherwise we have more to check
+                return false;
+            }
         }
 
-        if (v.type === 'eeprom' || v.type === 'hybrid') {
+        if (v.type === 'eeprom') {
             // Always exclude eeprom/hybrids when not connected
             if (!connectionState) {
                 return false;
@@ -252,7 +265,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
 
             // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
-            if (!EEPROMData && v.type !== 'hybrid') {
+            if (!EEPROMData) {
                 return false;
             }
             // If filterNonDefault is enabled, make sure the current value equals the default value
@@ -261,6 +274,17 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                     return !eepromIsDefault(EEPROMData);
                 }
                 return false; // We don't know, default to hide
+            }
+        }
+
+        if (v.type === 'hybrid') {
+            // Always exclude eeprom/hybrids when not connected
+            if (!connectionState) {
+                return false;
+            }
+            // If filterNonDefault is enabled, make sure the current value equals the default value
+            if (filterNonDefault) {
+                return !eepromIsDefault(v);
             }
         }
 
@@ -285,13 +309,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 .includes(searchTerm.toLowerCase());
     }
 
-    function eepromIsDefault(settingData) {
+    function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
                 : machineProfile.grblHALeepromSettings;
 
-        const settingKey = settingData.type === 'hybrid' ? settingData.eID : settingData.setting;
+        const settingKey =
+            (settingData as gSenderSetting).type === 'hybrid'
+                ? (settingData as gSenderSetting).eID
+                : (settingData as FilteredEEPROM).setting;
 
         const inputDefault = get(profileDefaults, settingKey, '-');
 
@@ -300,8 +327,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         }
 
         // Lookup hybrid current value because stored value is actually the local state
-        if (settingData.type === 'hybrid') {
-            return isEqual(Number(detectedEEPROM[settingKey]).toFixed(3), Number(inputDefault).toFixed(3));
+        if ((settingData as gSenderSetting).type === 'hybrid') {
+            return isEqual(
+                Number(detectedEEPROM[settingKey]).toFixed(3),
+                Number(inputDefault).toFixed(3),
+            );
         }
 
         return isEqual(settingData.value, inputDefault);
@@ -321,14 +351,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setFilterNonDefault(!filterNonDefault);
     }
 
-    function getEEPROMDefaultValue(key) : number | string {
+    function getEEPROMDefaultValue(key: EEPROM): number | string {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
                 : machineProfile.grblHALeepromSettings;
 
         return get(profileDefaults, key, '-');
-    };
+    }
 
     // Populate eeprom descriptions as needed
     useEffect(() => {
@@ -381,7 +411,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         filterNonDefault,
         eepromIsDefault,
         isSettingDefault,
-        getEEPROMDefaultValue
+        getEEPROMDefaultValue,
     };
 
     return (

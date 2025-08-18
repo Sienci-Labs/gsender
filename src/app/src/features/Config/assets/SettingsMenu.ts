@@ -29,7 +29,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import {GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES} from 'app/constants';
+import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -39,6 +39,7 @@ import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
 import pubsub from 'pubsub-js';
+import { EEPROM } from 'app/definitions/firmware';
 
 export interface SettingsMenuSection {
     label: string;
@@ -74,7 +75,7 @@ export interface gSenderSetting {
     description?: string | any[];
     options?: string[] | number[];
     unit?: string;
-    eID?: string;
+    eID?: EEPROM;
     globalIndex?: number;
     value?: gSenderSettingsValues;
     defaultValue?: any;
@@ -101,7 +102,7 @@ export type gSenderSettings = gSenderSetting | gSenderSubSection;
 export type gSenderEEEPROMSettings = gSenderEEPROMSettingSection[];
 
 export interface gSenderEEPROMSetting {
-    eId: string;
+    eId: EEPROM;
     value?: gSenderSettingsValues;
     defaultValue?: gSenderSettingsValues;
     description?: string;

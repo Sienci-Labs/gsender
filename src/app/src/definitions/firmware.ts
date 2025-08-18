@@ -1,4 +1,5 @@
 import { FIRMWARE_TYPES, HOMING_LOCATIONS } from '../constants';
+import { BasicType } from './general';
 
 // Types
 
@@ -22,6 +23,33 @@ export interface EEPROMDescriptions {
     format: string;
     unitString: string;
     details: string;
+}
+
+export interface FilteredEEPROM {
+    unit: string;
+    setting: EEPROM;
+    message?: string;
+    category?: string;
+    units?: string;
+    inputType?: string;
+    maxChars?: number;
+    defaultValue?: BasicType;
+    values?: BasicType;
+    min?: number;
+    step?: number;
+    max?: number;
+    bits?: number;
+    numBits?: number;
+    requiredBit?: number;
+    globalIndex: number;
+    value: string;
+    description?: string;
+    details?: string;
+    group: BasicType;
+    groupID: number;
+    dataType?: string;
+    format?: string;
+    unitString?: string;
 }
 
 export interface RotaryModeFirmwareSettings {
