@@ -5,9 +5,13 @@ import Button from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 
 async function copyToClipboard(text: string) {
-    await navigator.clipboard.writeText(text);
-
-    toast.info('Copied link to clipboard');
+    try {
+        await navigator.clipboard.writeText(text);
+        toast.info('Copied link to clipboard');
+    } catch (error) {
+        console.error('Failed to copy link to clipboard:', error);
+        toast.error('Failed to copy link to clipboard');
+    }
 }
 
 export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
@@ -18,7 +22,9 @@ export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
             <h1 className="text-blue-500 text-2xl">Scan QR Code</h1>
             <p>Scan with your phone camera to control your CNC</p>
             <QRCode size={200} value={phoneAddress} viewBox="0 0 200 200" />
-            <p>Or type the text below into a web browser for any other device:</p>
+            <p>
+                Or type the text below into a web browser for any other device:
+            </p>
             <div className="flex flex-row items-center gap-2  text-xs font-semibold text-blue-500 bg-gray-100 border border-gray-200 rounded-lg dark:bg-dark dark:border-gray-700 dark:text-white">
                 <div className="px-2">{webAddress}</div>
                 <Button
