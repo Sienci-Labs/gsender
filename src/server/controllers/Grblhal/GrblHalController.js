@@ -1343,12 +1343,34 @@ class GrblHalController {
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (this.ready || counter <= 0) {
+                    if (this.ready) {
                         clearInterval(interval);
+                        return;
+                    } else if (counter <= 0) {
+                        clearInterval(interval);
+                        // The startup message always prints upon startup, after a reset, or at program end.
+                        // Setting the initial state when Grbl has completed re-initializing all systems.
+                        this.clearActionValues();
+
+                        // Set ready flag to true when a startup message has arrived
+                        this.ready = true;
+
+                        // Rewind any files in the sender
+                        this.workflow.stop();
+
+                        if (!this.initialized) {
+                            this.initialized = true;
+
+                            // Initialize controller
+                            this.initController();
+                        }
+
+                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
                         return;
                     }
                     if (this.connection) {
-                        this.write('$I\n');
+                        // this.write('$I\n');
+                        this.write('\x18');
                     }
                     counter--;
                 }, 3000);
