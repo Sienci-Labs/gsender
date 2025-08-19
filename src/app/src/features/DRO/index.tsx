@@ -500,23 +500,15 @@ function DRO({
     );
 }
 
-export default connect((reduxStore) => {
-    const mposController = get(
-        reduxStore,
-        'controller.mpos',
-        defaultDROPosition,
-    );
-    const wposController = get(
-        reduxStore,
-        'controller.wpos',
-        defaultDROPosition,
-    );
-    const axes: AxesArray = get(reduxStore, 'controller.state.axes.axes', [
+export default connect((redux) => {
+    const mposController = get(redux, 'controller.mpos', defaultDROPosition);
+    const wposController = get(redux, 'controller.wpos', defaultDROPosition);
+    const axes: AxesArray = get(redux, 'controller.state.axes.axes', [
         'X',
         'Y',
         'Z',
     ]);
-    const settings = get(reduxStore, 'controller.settings.settings', {});
+    const settings = get(redux, 'controller.settings.settings', {});
     const homingValue = Number(get(settings, '$22', 0));
     const homingEnabled = homingValue > 0;
     const singleAxisValue = homingValue & 2;
@@ -524,13 +516,13 @@ export default connect((reduxStore) => {
     const preferredUnits = store.get('workspace.units', METRIC_UNITS);
     const unitLabel = preferredUnits === METRIC_UNITS ? 'mm' : 'in';
 
-    const workflowState = get(reduxStore, 'controller.workflow.state', 'idle');
+    const workflowState = get(redux, 'controller.workflow.state', 'idle');
     const activeState = get(
-        store,
+        redux,
         'controller.state.status.activeState',
         'Idle',
     );
-    const isConnected = get(reduxStore, 'connection.isConnected', false);
+    const isConnected = get(redux, 'connection.isConnected', false);
 
     return {
         isConnected,
