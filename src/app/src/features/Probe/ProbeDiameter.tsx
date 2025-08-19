@@ -306,7 +306,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     const shuttleControlEvents = useRef({
         PROBE_DIAMETER_SCROLL_UP: {
-            title: 'Probe Diameter Scroll Up',
+            title: 'Tool Diameter scroll up',
             keys: '',
             cmd: 'PROBE_DIAMETER_SCROLL_UP',
             preventDefault: false,
@@ -315,7 +315,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             callback: probeDiameterScrollUp,
         },
         PROBE_DIAMETER_SCROLL_DOWN: {
-            title: 'Probe Diameter Scroll Down',
+            title: 'Tool Diameter scroll down',
             keys: '',
             cmd: 'PROBE_DIAMETER_SCROLL_DOWN',
             preventDefault: false,

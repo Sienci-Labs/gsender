@@ -45,7 +45,7 @@ const Actions = () => {
 
     const shuttleControlEvents = {
         PROBE_ROTARY_Z_AXIS: {
-            title: 'Run Probe Rotary Z-Axis',
+            title: 'Rotary Probe Z-axis',
             keys: '',
             cmd: 'PROBE_ROTARY_Z_AXIS',
             preventDefault: false,
@@ -72,7 +72,7 @@ const Actions = () => {
             },
         },
         PROBE_ROTARY_Y_AXIS: {
-            title: 'Run Y-Axis Alignment Probing',
+            title: 'Rotary Y-axis Alignment',
             keys: '',
             cmd: 'PROBE_ROTARY_Y_AXIS',
             preventDefault: false,

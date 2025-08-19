@@ -97,7 +97,7 @@ const ButtonControlGroup = () => {
 
     const shuttleControlEvents = {
         LOAD_FILE: {
-            title: 'Load File',
+            title: 'Load file',
             keys: ['shift', 'l'].join('+'),
             gamepadKeys: '0',
             keysName: 'A',
@@ -117,7 +117,7 @@ const ButtonControlGroup = () => {
             ),
         },
         UNLOAD_FILE: {
-            title: 'Unload File',
+            title: 'Unload file',
             keys: ['shift', 'k'].join('+'),
             gamepadKeys: '1',
             keysName: 'B',

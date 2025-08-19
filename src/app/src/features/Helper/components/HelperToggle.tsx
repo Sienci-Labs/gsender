@@ -52,7 +52,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
 
     const shuttleControlEvents = {
         TOGGLE_INFO_HELPER: {
-            title: 'Toggle Helper Wizard',
+            title: 'Display Helper',
             keys: '',
             cmd: 'TOGGLE_INFO_HELPER',
             preventDefault: false,

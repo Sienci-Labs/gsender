@@ -189,7 +189,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
 
     const shuttleControlEvents = {
         TOGGLE_MOUNTING_SETUP: {
-            title: 'Toggle Mounting Setup Display',
+            title: 'Rotary Mounting Setup',
             keys: '',
             cmd: 'TOGGLE_MOUNTING_SETUP',
             preventDefault: false,

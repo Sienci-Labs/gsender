@@ -10,7 +10,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { GENERAL_CATEGORY } from 'app/constants';
+import { TOOLBAR_CATEGORY } from 'app/constants';
 import reduxStore from 'app/store/redux';
 import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
 
@@ -31,12 +31,12 @@ const NotificationsArea = () => {
 
     const shuttleControlEvents = {
         DISPLAY_NOTIFICATIONS: {
-            title: 'Toggle Notifications Display',
+            title: 'Display Notifications',
             keys: '',
             cmd: 'DISPLAY_NOTIFICATIONS',
             preventDefault: false,
             isActive: true,
-            category: GENERAL_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: () => setOpen((prev) => !prev),
         },
     };

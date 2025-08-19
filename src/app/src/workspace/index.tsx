@@ -84,7 +84,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_RESET: {
-            title: 'Soft Reset',
+            title: 'Soft reset',
             keys: '%',
             cmd: 'CONTROLLER_COMMAND_RESET',
             payload: {
@@ -96,7 +96,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_HOMING: {
-            title: 'Homing',
+            title: 'Home machine',
             keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
             cmd: 'CONTROLLER_COMMAND_HOMING',
             payload: {
@@ -108,7 +108,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_REALTIME_REPORT: {
-            title: 'Realtime Report',
+            title: 'Realtime report',
             keys: '`',
             cmd: 'CONTROLLER_COMMAND_REALTIME_REPORT',
             payload: {
@@ -121,7 +121,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_ERROR_CLEAR: {
-            title: 'Error Clear',
+            title: 'Clear error',
             keys: '*',
             cmd: 'CONTROLLER_COMMAND_ERROR_CLEAR',
             payload: {
@@ -134,7 +134,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT: {
-            title: 'Toolchange Acknowledgement',
+            title: 'Acknowledge tool change',
             keys: ['ctrl', 'alt', 'command', 'a'].join('+'),
             cmd: 'CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT',
             payload: {
@@ -147,7 +147,7 @@ const Workspace = () => {
             callback: shuttleControlFunctions.CONTROLLER_COMMAND,
         },
         CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE: {
-            title: 'Virtual Stop Toggle',
+            title: 'Feed hold',
             keys: ['ctrl', '8'].join('+'),
             cmd: 'CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE',
             payload: {

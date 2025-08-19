@@ -606,11 +606,6 @@ class Visualizer extends Component {
 
         if (this.isAgitated !== state.isAgitated) {
             this.isAgitated = state.isAgitated;
-
-            if (this.isAgitated) {
-                // Call renderAnimationLoop when the state changes and isAgitated is true
-                requestAnimationFrame(this.renderAnimationLoop);
-            }
         }
 
         // Also check if we need to start the animation loop when showAnimation changes

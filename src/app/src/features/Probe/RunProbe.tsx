@@ -77,7 +77,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
     const shuttleControlEvents = {
         START_PROBE: {
-            title: 'Start Probing',
+            title: 'Begin probing',
             keys: '',
             cmd: 'START_PROBE',
             preventDefault: false,
@@ -91,7 +91,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
             },
         },
         CONFIRM_PROBE: {
-            title: 'Confirm Probe',
+            title: 'Confirm probe popup',
             keys: '',
             cmd: 'CONFIRM_PROBE',
             preventDefault: false,

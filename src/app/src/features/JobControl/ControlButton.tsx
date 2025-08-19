@@ -134,7 +134,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 
     const shuttleControlEvents = {
         START_JOB: {
-            title: 'Start Job',
+            title: 'Start job',
             keys: '~',
             gamepadKeys: '9',
             keysName: 'Start',
@@ -153,7 +153,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             },
         },
         PAUSE_JOB: {
-            title: 'Pause Job',
+            title: 'Pause job',
             keys: '!',
             gamepadKeys: '2',
             keysName: 'X',
@@ -172,7 +172,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             },
         },
         STOP_JOB: {
-            title: 'Stop Job',
+            title: 'Stop job',
             keys: '@',
             gamepadKeys: '3',
             keysName: 'Y',
@@ -188,7 +188,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             },
         },
         RUN_OUTLINE: {
-            title: 'Run Outline',
+            title: 'Run outline',
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,

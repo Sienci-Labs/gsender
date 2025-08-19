@@ -29,9 +29,6 @@ const buttonVariants = cva(
             disabled: {
                 true: 'bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
             },
-            noPadding: {
-                true: '!px-0 !py-0 !p-0 !max-xl:px-0 !max-xl:py-0 !max-xl:p-0',
-            },
             size: {
                 mini: 'h-6 rounded-md px-[5px] w-full text-xs',
                 xs: 'h-6 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1  w-full text-sm',
@@ -39,6 +36,7 @@ const buttonVariants = cva(
                 md: 'h-10 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1 w-full text-base',
                 lg: 'h-11 rounded-md px-8 max-xl:px-6 py-4 max-xl:py-2 w-full text-lg',
                 icon: 'h-10 w-10',
+                custom: '',
             },
         },
         defaultVariants: {
@@ -56,15 +54,7 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     (
-        {
-            className,
-            variant,
-            size,
-            disabled,
-            noPadding,
-            asChild = false,
-            ...props
-        },
+        { className, variant, size, disabled, asChild = false, ...props },
         ref,
     ) => {
         const Comp = asChild ? Slot : 'button';
@@ -72,10 +62,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <div className={cx({ 'cursor-not-allowed': disabled })}>
                 <Comp
                     className={cx(
-                        !disabled &&
-                            buttonVariants({ variant, noPadding, size }),
-                        disabled &&
-                            buttonVariants({ disabled, noPadding, size }),
+                        !disabled && buttonVariants({ variant, size }),
+                        disabled && buttonVariants({ disabled, size }),
                         className,
                     )}
                     ref={ref}
