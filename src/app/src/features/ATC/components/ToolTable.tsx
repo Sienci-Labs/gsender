@@ -52,7 +52,6 @@ export function probeEntireRack() {
 const ToolSection = ({
     title,
     tools,
-    onProbe,
     disabled,
     defaultOpen = true,
 }: {
