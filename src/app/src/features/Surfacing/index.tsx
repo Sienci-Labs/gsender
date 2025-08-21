@@ -180,6 +180,7 @@ const SurfacingTool = () => {
                                 />
                             </div>
                         </InputArea>
+
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <ControlledInput
@@ -217,6 +218,7 @@ const SurfacingTool = () => {
                                 />
                             </div>
                         </InputArea>
+
                         <InputArea label="Bit Diameter">
                             <ControlledInput
                                 type="number"
