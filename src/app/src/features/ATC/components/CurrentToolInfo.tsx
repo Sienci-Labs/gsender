@@ -84,7 +84,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                         <div className="flex items-center gap-3">
                             <span className="text-robin-900 font-medium border-2 rounded-lg px-3 py-2 font-mono border-robin-300 bg-robin-100">
                                 {currentTool === 0
-                                    ? '-'
+                                    ? '0.000'
                                     : selectedTool?.toolOffsets?.z?.toFixed(3)}
                             </span>
                         </div>
