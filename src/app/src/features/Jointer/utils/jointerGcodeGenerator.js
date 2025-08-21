@@ -111,6 +111,7 @@ export default class JointerGenerator {
             length,
             orientation,
             stepover,
+            leadInOut,
         } = this.jointer;
 
         const safeHeight = this.getSafeZValue();
@@ -123,27 +124,41 @@ export default class JointerGenerator {
         // Move to safe height first
         gcodeArr.push(`G0 Z${safeHeight}`);
 
-        // Single pass with stepover distance relative to orientation
+        // Single unidirectional pass with stepover distance and lead-in/out
         if (orientation === 'X') {
             // Jointing along X-axis (edge parallel to X)
-            // Stepover is the Y offset for the cut
-            gcodeArr.push(`G0 X0 Y${this.toFixedValue(-stepover / 2)}`);
+            // Start with lead-in: move to position before start
+            const startX = this.toFixedValue(0 - leadInOut);
+            const endX = this.toFixedValue(length + leadInOut);
+            
+            gcodeArr.push(`G0 X${startX} Y${this.toFixedValue(-stepover / 2)}`);
             gcodeArr.push(`G1 Z${actualDepth}`);
-            gcodeArr.push(`G1 Y${this.toFixedValue(stepover / 2)}`);
-            gcodeArr.push(`G1 X${this.toFixedValue(length)}`);
-            gcodeArr.push(`G1 Y${this.toFixedValue(-stepover / 2)}`);
+            gcodeArr.push(`(Lead-in to cutting start)`);
             gcodeArr.push(`G1 X0`);
+            gcodeArr.push(`(Cutting edge)`);
+            gcodeArr.push(`G1 X${this.toFixedValue(length)}`);
+            gcodeArr.push(`(Lead-out from cutting end)`);
+            gcodeArr.push(`G1 X${endX}`);
             gcodeArr.push(`G0 Z${safeHeight}`);
+            // Rapid move back to start position for next pass
+            gcodeArr.push(`G0 X0`);
         } else {
             // Jointing along Y-axis (edge parallel to Y)  
-            // Stepover is the X offset for the cut
-            gcodeArr.push(`G0 X${this.toFixedValue(-stepover / 2)} Y0`);
+            // Start with lead-in: move to position before start
+            const startY = this.toFixedValue(0 - leadInOut);
+            const endY = this.toFixedValue(length + leadInOut);
+            
+            gcodeArr.push(`G0 X${this.toFixedValue(-stepover / 2)} Y${startY}`);
             gcodeArr.push(`G1 Z${actualDepth}`);
-            gcodeArr.push(`G1 X${this.toFixedValue(stepover / 2)}`);
-            gcodeArr.push(`G1 Y${this.toFixedValue(length)}`);
-            gcodeArr.push(`G1 X${this.toFixedValue(-stepover / 2)}`);
+            gcodeArr.push(`(Lead-in to cutting start)`);
             gcodeArr.push(`G1 Y0`);
+            gcodeArr.push(`(Cutting edge)`);
+            gcodeArr.push(`G1 Y${this.toFixedValue(length)}`);
+            gcodeArr.push(`(Lead-out from cutting end)`);
+            gcodeArr.push(`G1 Y${endY}`);
             gcodeArr.push(`G0 Z${safeHeight}`);
+            // Rapid move back to start position for next pass
+            gcodeArr.push(`G0 Y0`);
         }
 
         gcodeArr.push(

@@ -58,6 +58,7 @@ const JointerTool = () => {
                 depthOfCut: convertToImperial(jointer.depthOfCut),
                 thickness: convertToImperial(jointer.thickness),
                 stepover: convertToImperial(jointer.stepover),
+                leadInOut: convertToImperial(jointer.leadInOut),
             };
         }
         return jointer;
@@ -77,6 +78,7 @@ const JointerTool = () => {
                     depthOfCut: convertToMetric(jointer.depthOfCut),
                     thickness: convertToMetric(jointer.thickness),
                     stepover: convertToMetric(jointer.stepover),
+                    leadInOut: convertToMetric(jointer.leadInOut),
                 });
             } else {
                 jointerConfig.set('', jointer);
@@ -127,8 +129,8 @@ const JointerTool = () => {
                     <div className="grid gap-4 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             <b>Jointer Tool:</b> Create perfect perpendicular edges on your material.
-                            Set the edge length, orientation (X or Y axis), depth of cut, material thickness, and trim width
-                            to generate precise jointing toolpaths.
+                            Set the edge length, orientation (X or Y axis), depth of cut, material thickness, trim width, and lead-in/out distance
+                            to generate precise jointing toolpaths with smooth entry and exit.
                         </p>
 
                         <Tooltip content="Length of the edge to be jointed - how far the cutting tool will travel">
@@ -213,6 +215,24 @@ const JointerTool = () => {
                                     wrapperClassName="col-span-3"
                                     onChange={(e) =>
                                         onChange('stepover', Number(e.target.value))
+                                    }
+                                />
+                                </InputArea>
+                            </div>
+                        </Tooltip>
+
+                        <Tooltip content="Extra travel distance before and after the cut - provides smoother entry/exit and better surface finish">
+                            <div className="w-full">
+                                <InputArea label="Lead-In/Out Distance">
+                                <ControlledInput
+                                    type="number"
+                                    suffix={units}
+                                    className={inputStyle}
+                                    value={jointer.leadInOut}
+                                    min={0}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange('leadInOut', Number(e.target.value))
                                     }
                                 />
                                 </InputArea>

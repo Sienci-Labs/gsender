@@ -339,6 +339,7 @@ const defaultState: State = {
             depthOfCut: 1,
             thickness: 20,
             stepover: 5,
+            leadInOut: 12.7,
             spindleRPM: 18000,
             spindle: M3 as SPINDLE,
             shouldDwell: false,

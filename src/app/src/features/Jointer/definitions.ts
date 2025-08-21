@@ -8,6 +8,7 @@ export interface Jointer {
     depthOfCut: number;
     thickness: number;
     stepover: number;
+    leadInOut: number;
     spindleRPM: number;
     spindle: SPINDLE;
     shouldDwell: boolean;
