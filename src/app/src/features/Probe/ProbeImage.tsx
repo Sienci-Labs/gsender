@@ -26,6 +26,7 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_ZERO,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from 'app/lib/constants';
 import XProbe from './assets/Block-X.gif';
 import YProbe from './assets/Block-Y.gif';
@@ -35,6 +36,7 @@ import ZProbe from './assets/Block-Z.gif';
 import ZOnlyProbe from './assets/Probe-Z.gif';
 import AutoZProbe from './assets/AutoZero-Z.gif';
 import AutoXYZProbe from './assets/AutoZero-Rem.gif';
+import TouchProbeImage from './assets/3D-Touch-Probe.svg';
 import { ProbeCommand, TOUCHPLATE_TYPES_T } from './definitions';
 
 interface Props {
@@ -56,6 +58,10 @@ const ProbeImage: React.FC<Props> = ({
         }
         if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
             return ZOnlyProbe;
+        }
+        if (touchplateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+            // Use the same 3D Touch probe image for all 3D Touch probe commands
+            return TouchProbeImage;
         }
         if (id === 'X Touch') {
             return XProbe;

@@ -26,6 +26,8 @@ export interface ProbeProfile {
         z: boolean;
     };
     touchplateType: TOUCHPLATE_TYPES_T;
+    ballDiameter?: number;
+    xyPlungeDistance?: number;
 }
 
 export interface ProbeCommand {
@@ -71,6 +73,8 @@ export interface ProbingOptions {
     $13: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
+    ballDiameter?: number;
+    xyPlungeDistance?: number;
 }
 
 export interface ProbeWidgetSettings {

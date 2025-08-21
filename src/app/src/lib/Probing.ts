@@ -3,6 +3,7 @@ import {
     PROBE_TYPE_TIP,
     PROBE_TYPES,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
@@ -697,6 +698,196 @@ export const get3AxisAutoDiameterRoutine = ({
     return code;
 };
 
+export const get3DTouchProbeRoutine = (
+    options: ProbingOptions,
+    probeCommand?: string,
+): Array<string> => {
+    const { axes, ballDiameter = 2, xyPlungeDistance = 10, zProbeDistance } = options;
+    const code: Array<string> = [];
+    const ballRadius = ballDiameter / 2;
+
+    // Handle specific probe commands for 3D Touch Probe
+    if (probeCommand === 'Circle Hole') {
+        code.push(
+            '; 3D Touch Probe - Circle Hole Center Finding',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            'G91 G21',
+            '; Move to center and find hole edges',
+            'G38.2 X-%XY_PLUNGE_DISTANCE F150',
+            'G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.3',
+            '%X1=[posx - %BALL_RADIUS]',
+            'G0 X[%XY_PLUNGE_DISTANCE + 5]',
+            'G38.2 X%XY_PLUNGE_DISTANCE F150',
+            'G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.3',
+            '%X2=[posx + %BALL_RADIUS]',
+            '%CENTER_X=[[%X1 + %X2] / 2]',
+            'G90 G0 X%CENTER_X',
+            'G91',
+            'G38.2 Y-%XY_PLUNGE_DISTANCE F150',
+            'G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.3',
+            '%Y1=[posy - %BALL_RADIUS]',
+            'G0 Y[%XY_PLUNGE_DISTANCE + 5]',
+            'G38.2 Y%XY_PLUNGE_DISTANCE F150',
+            'G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.3',
+            '%Y2=[posy + %BALL_RADIUS]',
+            '%CENTER_Y=[[%Y1 + %Y2] / 2]',
+            'G10 L20 P0 X%CENTER_X Y%CENTER_Y',
+            'G90 G0 X0 Y0',
+        );
+    } else if (probeCommand === 'Rect Hole') {
+        code.push(
+            '; 3D Touch Probe - Rectangular Hole Center Finding',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            'G91 G21',
+            '; Find X-axis edges',
+            'G38.2 X-%XY_PLUNGE_DISTANCE F150',
+            'G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.3',
+            '%X1=[posx - %BALL_RADIUS]',
+            'G0 X[%XY_PLUNGE_DISTANCE + 5]',
+            'G38.2 X%XY_PLUNGE_DISTANCE F150',
+            'G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.3',
+            '%X2=[posx + %BALL_RADIUS]',
+            '%CENTER_X=[[%X1 + %X2] / 2]',
+            'G90 G0 X%CENTER_X',
+            'G91',
+            '; Find Y-axis edges',
+            'G38.2 Y-%XY_PLUNGE_DISTANCE F150',
+            'G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.3',
+            '%Y1=[posy - %BALL_RADIUS]',
+            'G0 Y[%XY_PLUNGE_DISTANCE + 5]',
+            'G38.2 Y%XY_PLUNGE_DISTANCE F150',
+            'G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.3',
+            '%Y2=[posy + %BALL_RADIUS]',
+            '%CENTER_Y=[[%Y1 + %Y2] / 2]',
+            'G10 L20 P0 X%CENTER_X Y%CENTER_Y',
+            'G90 G0 X0 Y0',
+        );
+    } else if (axes.x && axes.y && axes.z) {
+        // XYZ probing (4-corner functionality with direction support)
+        code.push(
+            '; 3D Touch Probe - XYZ Touch (4-Corner capable)',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            `%Z_PROBE_DISTANCE=${zProbeDistance}`,
+            'G91 G21',
+            '; Z probing first - direct to material',
+            'G38.2 Z-%Z_PROBE_DISTANCE F150',
+            'G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Z0',
+            'G0 Z5',
+            '; X probing with ball compensation',
+            'G38.2 X-%XY_PLUNGE_DISTANCE F150',
+            'G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 X-%BALL_RADIUS',
+            'G0 X5',
+            '; Y probing with ball compensation',
+            'G38.2 Y-%XY_PLUNGE_DISTANCE F150',
+            'G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Y-%BALL_RADIUS',
+            'G90 G0 X0 Y0 Z5',
+        );
+    } else if (axes.x && axes.y) {
+        // XY probing for center finding
+        code.push(
+            '; 3D Touch Probe - XY Center Finding',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            'G91 G21',
+            'G38.2 X-%XY_PLUNGE_DISTANCE F150',
+            'G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 X-%BALL_RADIUS',
+            'G0 X[%XY_PLUNGE_DISTANCE + 10]',
+            'G38.2 X%XY_PLUNGE_DISTANCE F150',
+            'G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 X[posx/2 + %BALL_RADIUS]',
+            'G0 X-[posx/2]',
+            'G38.2 Y-%XY_PLUNGE_DISTANCE F150',
+            'G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Y-%BALL_RADIUS',
+            'G0 Y[%XY_PLUNGE_DISTANCE + 10]',
+            'G38.2 Y%XY_PLUNGE_DISTANCE F150',
+            'G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Y[posy/2 + %BALL_RADIUS]',
+            'G90 G0 X0 Y0',
+        );
+    } else if (axes.z) {
+        // Z-only probing - direct to material surface
+        code.push(
+            '; 3D Touch Probe - Z Only (Direct to Material)',
+            `%Z_PROBE_DISTANCE=${zProbeDistance}`,
+            'G91 G21',
+            'G38.2 Z-%Z_PROBE_DISTANCE F150',
+            'G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Z0',
+            'G0 Z5',
+        );
+    } else if (axes.x) {
+        // X-axis probing
+        code.push(
+            '; 3D Touch Probe - X Axis',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            'G91 G21',
+            'G38.2 X-%XY_PLUNGE_DISTANCE F150',
+            'G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 X-%BALL_RADIUS',
+            'G90 G0 X0',
+        );
+    } else if (axes.y) {
+        // Y-axis probing
+        code.push(
+            '; 3D Touch Probe - Y Axis',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%XY_PLUNGE_DISTANCE=${xyPlungeDistance}`,
+            'G91 G21',
+            'G38.2 Y-%XY_PLUNGE_DISTANCE F150',
+            'G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.3',
+            'G10 L20 P0 Y-%BALL_RADIUS',
+            'G90 G0 Y0',
+        );
+    }
+
+    return code;
+};
+
 export const getNextDirection = (
     direction: PROBE_DIRECTIONS,
 ): PROBE_DIRECTIONS => {
@@ -710,6 +901,7 @@ export const getNextDirection = (
 export const getProbeCode = (
     options: ProbingOptions,
     direction: PROBE_DIRECTIONS = 0,
+    probeCommandId?: string,
 ): Array<string> => {
     const { plateType, axes, probeType } = options;
 
@@ -729,6 +921,10 @@ export const getProbeCode = (
         } else {
             return get3AxisAutoDiameterRoutine({ ...options, direction });
         }
+    }
+
+    if (plateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+        return get3DTouchProbeRoutine({ ...options, direction }, probeCommandId);
     }
 
     // Standard plate, we modify some values for specific directions

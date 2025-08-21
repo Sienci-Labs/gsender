@@ -19,6 +19,7 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from 'app/lib/constants';
 import { AJogWizard } from 'app/features/Config/components/wizards/AJogWizard.tsx';
 import { ProbePinStatus } from 'app/features/Config/components/wizards/ProbePinStatus.tsx';
@@ -489,6 +490,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
+                            TOUCHPLATE_TYPE_3D_TOUCH,
                         ],
                     },
                     {
@@ -503,8 +505,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or 3D Touch Probe touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {
@@ -521,6 +523,38 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             );
                             // Hidden if we are using AutoZero or Z-only touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
+                    },
+                    {
+                        label: 'Ball Point Diameter',
+                        key: 'workspace.probeProfile.ballDiameter',
+                        description:
+                            'Ball point diameter for 3D Touch Probe. (Default 2mm)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Only show for 3D Touch Probe
+                            return probeType !== TOUCHPLATE_TYPE_3D_TOUCH;
+                        },
+                    },
+                    {
+                        label: 'XY plunge distance',
+                        key: 'workspace.probeProfile.xyPlungeDistance',
+                        description:
+                            'Maximum distance to plunge in X/Y directions for 3D Touch Probe. (Default 10mm)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Only show for 3D Touch Probe
+                            return probeType !== TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {
@@ -551,8 +585,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or 3D Touch Probe touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {
@@ -567,8 +601,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or 3D Touch Probe touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {
@@ -583,8 +617,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or 3D Touch Probe touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {

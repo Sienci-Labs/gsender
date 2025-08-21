@@ -98,6 +98,8 @@ const defaultState: State = {
                 z: true,
             },
             touchplateType: 'Standard Block',
+            ballDiameter: 2,
+            xyPlungeDistance: 10,
         },
         tools: [
             {

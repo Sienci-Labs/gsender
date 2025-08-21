@@ -1,0 +1,22 @@
+<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Probe shaft -->
+  <rect x="47" y="5" width="6" height="40" fill="none" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Probe body -->
+  <rect x="35" y="45" width="30" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Sensor housing -->
+  <rect x="30" y="65" width="40" height="25" fill="none" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Cable connection -->
+  <rect x="45" y="90" width="10" height="8" fill="none" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Ball tip -->
+  <circle cx="50" cy="115" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Stylus stem -->
+  <line x1="50" y1="98" x2="50" y2="107" stroke="currentColor" stroke-width="2"/>
+  
+  <!-- Text label -->
+  <text x="50" y="135" text-anchor="middle" font-size="8" fill="currentColor">3D Touch</text>
+</svg>

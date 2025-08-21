@@ -28,10 +28,12 @@ export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
 export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
 export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero';
 export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
+export const TOUCHPLATE_TYPE_3D_TOUCH = '3D Touch Probe';
 export const TOUCHPLATE_TYPES = {
     TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
     TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero',
     TOUCHPLATE_TYPE_ZERO: 'Z Probe',
+    TOUCHPLATE_TYPE_3D_TOUCH: '3D Touch Probe',
 };
 
 export const PROBE_TYPE_AUTO = 'Auto';

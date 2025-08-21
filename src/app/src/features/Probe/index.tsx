@@ -30,6 +30,7 @@ import {
     PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_ZERO,
     PROBE_TYPE_DIAMETER,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from 'app/lib/constants';
 import store from 'app/store';
 import { convertToImperial } from 'app/lib/units';
@@ -262,7 +263,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Z Touch',
                     safe: false,
-                    tool: false,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: false,
                         y: false,
@@ -277,7 +278,7 @@ const ProbeWidget = () => {
                     command = {
                         id: 'XYZ Touch',
                         safe: true,
-                        tool: true,
+                        tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                         axes: {
                             x: true,
                             y: true,
@@ -290,7 +291,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'XY Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: true,
                         y: true,
@@ -302,7 +303,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'X Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: true,
                         y: false,
@@ -314,9 +315,36 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Y Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: false,
+                        y: true,
+                        z: false,
+                    },
+                };
+                commands.push(command);
+            }
+
+            // Add special 3D Touch Probe commands
+            if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+                command = {
+                    id: 'Circle Hole',
+                    safe: true,
+                    tool: false,
+                    axes: {
+                        x: true,
+                        y: true,
+                        z: false,
+                    },
+                };
+                commands.push(command);
+
+                command = {
+                    id: 'Rect Hole',
+                    safe: true,
+                    tool: false,
+                    axes: {
+                        x: true,
                         y: true,
                         z: false,
                     },
@@ -411,6 +439,11 @@ const ProbeWidget = () => {
             retractDistance = convertToImperial(retractionDistance);
         }
 
+        // For 3D Touch Probe, use ball diameter instead of tool diameter
+        const effectiveToolDiameter = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+            ? (touchplate.ballDiameter || 2) 
+            : toolDiameter;
+
         const options = {
             axes,
             modal,
@@ -418,16 +451,20 @@ const ProbeWidget = () => {
             probeSlow: feedrate,
             units,
             retract: retractDistance,
-            toolDiameter,
+            toolDiameter: effectiveToolDiameter,
             zThickness,
             xyThickness,
             plateType: touchplate.touchplateType,
             $13,
             probeDistances,
             probeType,
+            ballDiameter: touchplate.ballDiameter || 2,
+            xyPlungeDistance: touchplate.xyPlungeDistance || 10,
+            zProbeDistance: probeDistances.z,
         };
 
-        const code = getProbeCode(options, direction);
+        const probeCommand = availableProbeCommands[selectedProbeCommand];
+        const code = getProbeCode(options, direction, probeCommand?.id);
         code.push(distance + '\n');
 
         return code;
