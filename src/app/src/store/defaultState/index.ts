@@ -331,6 +331,21 @@ const defaultState: State = {
             flood: false,
             mist: false
         },
+        jointer: {
+            bitDiameter: 6.35,
+            feedrate: 1000,
+            length: 100,
+            orientation: 'X',
+            depthOfCut: 1,
+            thickness: 20,
+            stepover: 5,
+            leadInOut: 12.7,
+            spindleRPM: 18000,
+            spindle: M3 as SPINDLE,
+            shouldDwell: false,
+            mist: false,
+            flood: false
+        },
         visualizer: {
             minimized: false,
             // 3D View

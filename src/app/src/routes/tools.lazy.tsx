@@ -3,6 +3,7 @@ import { GiFlatPlatform } from 'react-icons/gi';
 import { FaKeyboard, FaMicrochip, FaGamepad } from 'react-icons/fa';
 import { LuPencilRuler } from 'react-icons/lu';
 import { AiFillTool } from 'react-icons/ai';
+import { TbVectorTriangle } from 'react-icons/tb';
 
 import ToolCard from 'app/components/ToolCard';
 import Page from 'app/components/Page';
@@ -20,6 +21,13 @@ function Tools() {
                     description="Generate toolpaths to surface and level your material"
                     icon={GiFlatPlatform}
                     link="/surfacing"
+                />
+
+                <ToolCard
+                    title="Jointer"
+                    description="Create perfect perpendicular edges on your material"
+                    icon={TbVectorTriangle}
+                    link="/jointer"
                 />
 
                 <ToolCard

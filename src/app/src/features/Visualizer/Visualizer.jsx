@@ -1259,16 +1259,16 @@ class Visualizer extends Component {
     getVisibleHeight() {
         const { containerID, isSecondary } = this.props;
 
-        // if (isSecondary) {
-        //     const el = this.node;
+        if (isSecondary) {
+            const el = this.node;
 
-        //     const visibleHeight = Math.max(
-        //         Number(el?.parentNode?.clientHeight) || 0,
-        //         360,
-        //     );
+            const visibleHeight = Math.max(
+                Number(el?.parentNode?.clientHeight) || 0,
+                360,
+            );
 
-        //     return visibleHeight;
-        // }
+            return visibleHeight;
+        }
 
         const container = document.getElementById(containerID);
 
