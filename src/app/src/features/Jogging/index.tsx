@@ -23,6 +23,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     JOGGING_CATEGORY,
+    TOOLBAR_CATEGORY,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
@@ -712,7 +713,7 @@ export function Jogging() {
         JOG_A_PLUS: {
             // Jog A+
             id: 100,
-            title: 'Jog: A+',
+            title: 'Jog A+ (CCW)',
             keys: ['ctrl', '6'].join('+'),
             cmd: 'JOG_A_PLUS',
             payload: {
@@ -726,7 +727,7 @@ export function Jogging() {
         JOG_A_MINUS: {
             // Jog A-
             id: 101,
-            title: 'Jog: A-',
+            title: 'Jog A- (CW)',
             keys: ['ctrl', '4'].join('+'),
             cmd: 'JOG_A_MINUS',
             payload: {
@@ -739,16 +740,16 @@ export function Jogging() {
         },
         SWITCH_WORKSPACE_MODE: {
             id: 103,
-            title: 'Switch Between Workspace Modes',
+            title: 'Toggle Rotary Mode',
             keys: ['ctrl', '5'].join('+'),
             cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
             isActive: true,
-            category: JOGGING_CATEGORY,
+            category: TOOLBAR_CATEGORY,
             callback: shuttleControlFunctions.UPDATE_WORKSPACE_MODE,
         },
         JOG_X_P: {
-            title: 'Jog: X+',
+            title: 'Jog X+ (right)',
             keys: 'shift+right',
             gamepadKeys: '15',
             keysName: 'Arrow Right',
@@ -762,7 +763,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_M: {
-            title: 'Jog: X-',
+            title: 'Jog X- (left)',
             keys: 'shift+left',
             gamepadKeys: '14',
             keysName: 'Arrow Left',
@@ -776,7 +777,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Y_P: {
-            title: 'Jog: Y+',
+            title: 'Jog Y+ (back)',
             keys: 'shift+up',
             gamepadKeys: '12',
             keysName: 'Arrow Up',
@@ -790,7 +791,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Y_M: {
-            title: 'Jog: Y-',
+            title: 'Jog Y- (fwd)',
             keys: 'shift+down',
             gamepadKeys: '13',
             keysName: 'Arrow Down',
@@ -804,7 +805,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Z_P: {
-            title: 'Jog: Z+',
+            title: 'Jog Z+ (up)',
             keys: 'shift+pageup',
             gamepadKeys: '5',
             keysName: 'Left Button',
@@ -818,7 +819,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_Z_M: {
-            title: 'Jog: Z-',
+            title: 'Jog Z- (down)',
             keys: 'shift+pagedown',
             gamepadKeys: '4',
             keysName: 'Right Button',
@@ -832,7 +833,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_P_Y_M: {
-            title: 'Jog: X+ Y-',
+            title: 'Jog X+ Y-',
             keys: '',
             gamepadKeys: '13+15',
             keysName: 'Arrow Right and Arrow Down',
@@ -846,7 +847,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_M_Y_P: {
-            title: 'Jog: X- Y+',
+            title: 'Jog X- Y+',
             keys: '',
             gamepadKeys: '13+14',
             keysName: 'Arrow Left and Arrow Down',
@@ -860,7 +861,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_Y_P: {
-            title: 'Jog: X+ Y+',
+            title: 'Jog X+ Y+',
             keys: '',
             gamepadKeys: '12+15',
             keysName: 'Arrow Right and Arrow Up',
@@ -874,7 +875,7 @@ export function Jogging() {
             callback: shuttleControlFunctions.JOG,
         },
         JOG_X_Y_M: {
-            title: 'Jog: X- Y-',
+            title: 'Jog X- Y-',
             keys: '',
             gamepadKeys: '13+14',
             keysName: 'Arrow Left and Arrow Down',
@@ -889,7 +890,7 @@ export function Jogging() {
         },
         STOP_JOG: {
             // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Stop Jog',
+            title: 'Cancel jog move',
             keys: '',
             cmd: 'STOP_JOG',
             payload: { force: true },

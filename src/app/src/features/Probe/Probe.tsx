@@ -79,7 +79,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
 
     const shuttleControlEvents = {
         OPEN_PROBE: {
-            title: 'Toggle Probe Dialog',
+            title: 'Display probe popup',
             keys: '',
             cmd: 'OPEN_PROBE',
             preventDefault: false,
@@ -88,7 +88,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
             callback: toggleProbeDialog,
         },
         PROBE_ROUTINE_SCROLL_RIGHT: {
-            title: 'Probe Routine Scroll Right',
+            title: 'Probe Routine scroll right',
             keys: '',
             cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
             preventDefault: false,
@@ -97,7 +97,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
             callback: probeRoutineScrollRight,
         },
         PROBE_ROUTINE_SCROLL_LEFT: {
-            title: 'Probe Routine Scroll Left',
+            title: 'Probe Routine scroll left',
             keys: '',
             cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
             preventDefault: false,

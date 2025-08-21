@@ -35,22 +35,22 @@ export function StatTable() {
         <div className="flex flex-col px-10">
             <StatRow
                 connected={isConnected}
-                label="Total Jobs Run"
+                label="Total jobs run"
                 value={jobStats.completeJobs + jobStats.incompleteJobs}
             />
             <StatRow
                 connected={isConnected}
-                label="Total Time Cutting"
+                label="Total cutting time"
                 value={getTimeString(jobStats.totalCutTime)}
             />
             <StatRow
                 connected={isConnected}
-                label="Average Cut Time"
+                label="Average job time"
                 value={getTimeString(jobStats.averageCutTime)}
             />
             <StatRow
                 connected={isConnected}
-                label="Longest Cut Time"
+                label="Longest job"
                 value={getTimeString(jobStats.longestCutTime)}
             />
         </div>

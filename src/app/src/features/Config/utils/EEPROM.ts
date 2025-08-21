@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import {GRBL_SETTINGS} from "app/features/Config/assets/SettingsDescriptions.ts";
+import { GRBL_HAL_SETTINGS, GRBL_SETTINGS } from "app/features/Config/assets/SettingsDescriptions.ts";
 import BooleanInput from 'app/features/Config/components/EEPROMInputs/BooleanInput.tsx';
 import BitfieldInput from 'app/features/Config/components/EEPROMInputs/BitfieldInput.tsx';
 import ExclusiveBitfieldInput from 'app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx';
@@ -10,6 +10,8 @@ import DecimalInput from 'app/features/Config/components/EEPROMInputs/DecimalInp
 import StringInput from 'app/features/Config/components/EEPROMInputs/StringInput.tsx';
 import PasswordInput from 'app/features/Config/components/EEPROMInputs/PasswordInput.tsx';
 import Ipv4Input from 'app/features/Config/components/EEPROMInputs/Ipv4Input.tsx';
+import { EEPROM, EEPROMDescriptions, EEPROMSettings, FilteredEEPROM } from 'app/definitions/firmware';
+import { BasicObject } from 'app/definitions/general';
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
 export const EXCLUSIVE_BITFIELD_ID = 2;
@@ -22,17 +24,17 @@ export const PASSWORD_ID = 8;
 export const IPV4_ID = 9;
 
 export function getFilteredEEPROMSettings(
-    settings,
-    eeprom,
-    halDescriptions,
-    halGroups,
-) {
+    settings: typeof GRBL_HAL_SETTINGS | typeof GRBL_SETTINGS,
+    eeprom: EEPROMSettings,
+    halDescriptions: EEPROMDescriptions,
+    halGroups: BasicObject,
+): FilteredEEPROM[] {
     return Object.keys(eeprom).map((setting, index) => {
-        const properties = settings.find((obj) => obj.setting === setting);
+        const properties = settings.find((obj) => obj.setting === (setting as EEPROM));
 
         // Below is to grab the grbl unit as configured and use it as a fallback if it's not parsed
         // in the settings description.  It will be replaced in grblHAL by the actual unit.
-        const grblProperties = GRBL_SETTINGS.find((obj) => obj.setting === setting);
+        const grblProperties = GRBL_SETTINGS.find((obj) => obj.setting === (setting as EEPROM));
 
         let baseUnit = '';
         if (grblProperties) {
@@ -50,8 +52,8 @@ export function getFilteredEEPROMSettings(
             unit: baseUnit,
             ...(properties || {}),
             globalIndex: index,
-            setting,
-            value: eeprom[setting],
+            setting: setting as EEPROM,
+            value: eeprom[setting as EEPROM],
             ...halData,
             group: halGroup,
             groupID: halData.group,

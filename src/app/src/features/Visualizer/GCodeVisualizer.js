@@ -47,7 +47,7 @@ class GCodeVisualizer {
         this.frames = []; // Example
         this.frameIndex = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary
@@ -187,13 +187,17 @@ class GCodeVisualizer {
                 }
                 colorAttr.needsUpdate = true;
             } else {
-                const colorArray = Array.from(
-                    { length: v2 - v1 },
-                    () => defaultColorArray,
-                ).flat(); // current movement
-                // cant set yet, because grey lines will also be calculated soon
-                this.plannedColorArray = colorArray;
-                this.plannedV1 = this.frames[this.frameIndex - 1];
+                // if v1 is 0, we don't want to add the planned colour array because it will be too long and
+                // cause the yellow colouring to be past what we are tracking
+                if (v1 > 0) {
+                    const colorArray = Array.from(
+                        { length: v2 - v1 },
+                        () => defaultColorArray,
+                    ).flat(); // current movement
+                    // cant set yet, because grey lines will also be calculated soon
+                    this.plannedColorArray = colorArray;
+                    this.plannedV1 = this.frames[this.frameIndex - 1];
+                }
             }
         }
 
@@ -201,7 +205,7 @@ class GCodeVisualizer {
         if (v2 < v1) {
             // reset vars
             this.oldFrameIndex = null;
-            this.plannedColorArray = null;
+            this.plannedColorArray = [];
             this.plannedV1 = null;
             this.plannedState = STATES.START;
             // --rotary
@@ -368,7 +372,7 @@ class GCodeVisualizer {
         this.frameIndex = 0;
         this.framesLength = 0;
         this.oldFrameIndex = null;
-        this.plannedColorArray = null;
+        this.plannedColorArray = [];
         this.plannedV1 = null;
         this.plannedState = STATES.START;
         // --rotary

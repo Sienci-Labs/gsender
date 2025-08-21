@@ -72,7 +72,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 
     const shuttleControlEvents = {
         MIST_COOLANT: {
-            title: 'Mist Coolant',
+            title: 'Mist coolant (M7)',
             keys: '',
             cmd: 'MIST_COOLANT',
             preventDefault: false,
@@ -86,7 +86,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
             },
         },
         FLOOD_COOLANT: {
-            title: 'Flood Coolant',
+            title: 'Flood coolant (M8)',
             keys: '',
             cmd: 'FLOOD_COOLANT',
             preventDefault: false,
@@ -100,7 +100,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
             },
         },
         STOP_COOLANT: {
-            title: 'Stop Coolant',
+            title: 'Stop coolant (M9)',
             keys: '',
             cmd: 'STOP_COOLANT',
             preventDefault: false,
