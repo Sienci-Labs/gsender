@@ -28,6 +28,7 @@ import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import InputArea from 'app/components/InputArea';
 import { Button } from 'app/components/Button';
+import Tooltip from 'app/components/Tooltip';
 import VisualizerPreview from './components/VisualizerPreview';
 
 const defaultJointerState = get(defaultState, 'widgets.jointer', {});
@@ -126,166 +127,182 @@ const JointerTool = () => {
                     <div className="grid gap-4 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             <b>Jointer Tool:</b> Create perfect perpendicular edges on your material.
-                            Set the edge length, orientation (X or Y axis), depth of cut, material thickness, and cut width
+                            Set the edge length, orientation (X or Y axis), depth of cut, material thickness, and trim width
                             to generate precise jointing toolpaths.
                         </p>
 
-                        <InputArea label="Edge Length">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={jointer.length}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('length', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Orientation">
-                            <div className="col-span-3">
-                                <Select
-                                    value={jointer.orientation}
-                                    onValueChange={(value) => onChange('orientation', value)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select orientation" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="X">X-Axis (Edge parallel to X)</SelectItem>
-                                        <SelectItem value="Y">Y-Axis (Edge parallel to Y)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </InputArea>
-
-                        <InputArea label="Depth of Cut & Material Thickness">
-                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                        <Tooltip content="Length of the edge to be jointed - how far the cutting tool will travel">
+                            <InputArea label="Edge Length">
                                 <ControlledInput
                                     type="number"
                                     suffix={units}
                                     className={inputStyle}
-                                    value={jointer.depthOfCut}
-                                    min={0.1}
+                                    value={jointer.length}
+                                    wrapperClassName="col-span-3"
                                     onChange={(e) =>
-                                        onChange('depthOfCut', Number(e.target.value))
+                                        onChange('length', Number(e.target.value))
                                     }
                                 />
-                                <span className="flex justify-center items-center">
-                                    &
-                                </span>
-                                <ControlledInput
-                                    type="number"
-                                    suffix={units}
-                                    className={inputStyle}
-                                    value={jointer.thickness}
-                                    min={0.1}
-                                    onChange={(e) =>
-                                        onChange('thickness', Number(e.target.value))
-                                    }
-                                />
-                            </div>
-                        </InputArea>
+                            </InputArea>
+                        </Tooltip>
 
-                        <InputArea label="Cut Width">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={jointer.stepover}
-                                min={0.1}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('stepover', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
+                        <Tooltip content="Direction of the edge: X-Axis means edge runs left-to-right, Y-Axis means edge runs front-to-back">
+                            <InputArea label="Orientation">
+                                <div className="col-span-3">
+                                    <Select
+                                        value={jointer.orientation}
+                                        onValueChange={(value) => onChange('orientation', value)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select orientation" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="X">X-Axis (Edge parallel to X)</SelectItem>
+                                            <SelectItem value="Y">Y-Axis (Edge parallel to Y)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </InputArea>
+                        </Tooltip>
 
-                        <InputArea label="Bit Diameter">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={jointer.bitDiameter}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('bitDiameter', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Feed Rate">
-                            <ControlledInput
-                                type="number"
-                                suffix={`${units}/min`}
-                                className={inputStyle}
-                                value={jointer.feedrate}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('feedrate', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Spindle RPM">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
-                                <ControlledInput
-                                    type="number"
-                                    className={inputStyle}
-                                    value={jointer.spindleRPM}
-                                    suffix={'RPM'}
-                                    onChange={(e) =>
-                                        onChange('spindleRPM', Number(e.target.value))
-                                    }
-                                />
-                                <div className="flex items-center gap-2 justify-center">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-                                        Delay
-                                    </label>
-                                    <Switch
-                                        checked={jointer.shouldDwell}
-                                        onChange={(checked) => {
-                                            setJointer({
-                                                ...jointer,
-                                                shouldDwell: checked as boolean,
-                                            });
-                                        }}
+                        <Tooltip content="Depth of cut: How deep each pass cuts. Material thickness: Total thickness to joint through. Multiple passes will be made automatically">
+                            <InputArea label="Depth of Cut & Material Thickness">
+                                <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                                    <ControlledInput
+                                        type="number"
+                                        suffix={units}
+                                        className={inputStyle}
+                                        value={jointer.depthOfCut}
+                                        min={0.1}
+                                        onChange={(e) =>
+                                            onChange('depthOfCut', Number(e.target.value))
+                                        }
+                                    />
+                                    <span className="flex justify-center items-center">
+                                        &
+                                    </span>
+                                    <ControlledInput
+                                        type="number"
+                                        suffix={units}
+                                        className={inputStyle}
+                                        value={jointer.thickness}
+                                        min={0.1}
+                                        onChange={(e) =>
+                                            onChange('thickness', Number(e.target.value))
+                                        }
                                     />
                                 </div>
-                            </div>
-                        </InputArea>
+                            </InputArea>
+                        </Tooltip>
 
-                        <InputArea label="Coolant Control">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
-                                <span className="font-light text-sm max-w-20 dark:text-white">
-                                    Mist (M7)
-                                </span>
-                                <Switch
-                                    onChange={(value) =>
-                                        setJointer({
-                                            ...jointer,
-                                            mist: value,
-                                        })
+                        <Tooltip content="Width of material to trim from the edge - how much material will be removed to create a straight, square edge">
+                            <InputArea label="Trim Width">
+                                <ControlledInput
+                                    type="number"
+                                    suffix={units}
+                                    className={inputStyle}
+                                    value={jointer.stepover}
+                                    min={0.1}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange('stepover', Number(e.target.value))
                                     }
-                                    checked={jointer.mist ?? false}
-                                    className="h-20"
                                 />
-                                <span className="font-light text-sm max-w-20 dark:text-white">
-                                    Flood (M8)
-                                </span>
-                                <Switch
-                                    onChange={(value) =>
-                                        setJointer({
-                                            ...jointer,
-                                            flood: value,
-                                        })
+                            </InputArea>
+                        </Tooltip>
+
+                        <Tooltip content="Diameter of the cutting bit - affects cutting speed and surface finish quality">
+                            <InputArea label="Bit Diameter">
+                                <ControlledInput
+                                    type="number"
+                                    suffix={units}
+                                    className={inputStyle}
+                                    value={jointer.bitDiameter}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange('bitDiameter', Number(e.target.value))
                                     }
-                                    checked={jointer.flood ?? false}
-                                    className="h-20"
                                 />
-                            </div>
-                        </InputArea>
+                            </InputArea>
+                        </Tooltip>
+
+                        <Tooltip content="Speed at which the cutting tool moves through the material - higher speeds cut faster but may reduce surface quality">
+                            <InputArea label="Feed Rate">
+                                <ControlledInput
+                                    type="number"
+                                    suffix={`${units}/min`}
+                                    className={inputStyle}
+                                    value={jointer.feedrate}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange('feedrate', Number(e.target.value))
+                                    }
+                                />
+                            </InputArea>
+                        </Tooltip>
+
+                        <Tooltip content="Spindle rotation speed - higher RPM gives smoother cuts but generates more heat. Delay adds pause after spindle start for stabilization">
+                            <InputArea label="Spindle RPM">
+                                <div className="grid grid-cols-2 gap-2 col-span-3">
+                                    <ControlledInput
+                                        type="number"
+                                        className={inputStyle}
+                                        value={jointer.spindleRPM}
+                                        suffix={'RPM'}
+                                        onChange={(e) =>
+                                            onChange('spindleRPM', Number(e.target.value))
+                                        }
+                                    />
+                                    <div className="flex items-center gap-2 justify-center">
+                                        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                            Delay
+                                        </label>
+                                        <Switch
+                                            checked={jointer.shouldDwell}
+                                            onChange={(checked) => {
+                                                setJointer({
+                                                    ...jointer,
+                                                    shouldDwell: checked as boolean,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </InputArea>
+                        </Tooltip>
+
+                        <Tooltip content="Coolant options to keep the bit cool and clear debris: Mist (M7) for light cooling, Flood (M8) for heavy-duty cooling">
+                            <InputArea label="Coolant Control">
+                                <div className="grid grid-cols-2 gap-2 col-span-3">
+                                    <span className="font-light text-sm max-w-20 dark:text-white">
+                                        Mist (M7)
+                                    </span>
+                                    <Switch
+                                        onChange={(value) =>
+                                            setJointer({
+                                                ...jointer,
+                                                mist: value,
+                                            })
+                                        }
+                                        checked={jointer.mist ?? false}
+                                        className="h-20"
+                                    />
+                                    <span className="font-light text-sm max-w-20 dark:text-white">
+                                        Flood (M8)
+                                    </span>
+                                    <Switch
+                                        onChange={(value) =>
+                                            setJointer({
+                                                ...jointer,
+                                                flood: value,
+                                            })
+                                        }
+                                        checked={jointer.flood ?? false}
+                                        className="h-20"
+                                    />
+                                </div>
+                            </InputArea>
+                        </Tooltip>
                     </div>
                     <div className="flex flex-col border border-gray-200 rounded-md">
                         <Tabs defaultValue="visualizer-preview">
