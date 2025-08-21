@@ -132,7 +132,8 @@ const JointerTool = () => {
                         </p>
 
                         <Tooltip content="Length of the edge to be jointed - how far the cutting tool will travel">
-                            <InputArea label="Edge Length">
+                            <div className="w-full">
+                                <InputArea label="Edge Length">
                                 <ControlledInput
                                     type="number"
                                     suffix={units}
@@ -143,11 +144,13 @@ const JointerTool = () => {
                                         onChange('length', Number(e.target.value))
                                     }
                                 />
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Direction of the edge: X-Axis means edge runs left-to-right, Y-Axis means edge runs front-to-back">
-                            <InputArea label="Orientation">
+                            <div className="w-full">
+                                <InputArea label="Orientation">
                                 <div className="col-span-3">
                                     <Select
                                         value={jointer.orientation}
@@ -162,11 +165,13 @@ const JointerTool = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Depth of cut: How deep each pass cuts. Material thickness: Total thickness to joint through. Multiple passes will be made automatically">
-                            <InputArea label="Depth of Cut & Material Thickness">
+                            <div className="w-full">
+                                <InputArea label="Depth of Cut & Material Thickness">
                                 <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                     <ControlledInput
                                         type="number"
@@ -192,11 +197,13 @@ const JointerTool = () => {
                                         }
                                     />
                                 </div>
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Width of material to trim from the edge - how much material will be removed to create a straight, square edge">
-                            <InputArea label="Trim Width">
+                            <div className="w-full">
+                                <InputArea label="Trim Width">
                                 <ControlledInput
                                     type="number"
                                     suffix={units}
@@ -208,11 +215,13 @@ const JointerTool = () => {
                                         onChange('stepover', Number(e.target.value))
                                     }
                                 />
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Diameter of the cutting bit - affects cutting speed and surface finish quality">
-                            <InputArea label="Bit Diameter">
+                            <div className="w-full">
+                                <InputArea label="Bit Diameter">
                                 <ControlledInput
                                     type="number"
                                     suffix={units}
@@ -223,11 +232,13 @@ const JointerTool = () => {
                                         onChange('bitDiameter', Number(e.target.value))
                                     }
                                 />
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Speed at which the cutting tool moves through the material - higher speeds cut faster but may reduce surface quality">
-                            <InputArea label="Feed Rate">
+                            <div className="w-full">
+                                <InputArea label="Feed Rate">
                                 <ControlledInput
                                     type="number"
                                     suffix={`${units}/min`}
@@ -238,11 +249,13 @@ const JointerTool = () => {
                                         onChange('feedrate', Number(e.target.value))
                                     }
                                 />
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Spindle rotation speed - higher RPM gives smoother cuts but generates more heat. Delay adds pause after spindle start for stabilization">
-                            <InputArea label="Spindle RPM">
+                            <div className="w-full">
+                                <InputArea label="Spindle RPM">
                                 <div className="grid grid-cols-2 gap-2 col-span-3">
                                     <ControlledInput
                                         type="number"
@@ -268,11 +281,13 @@ const JointerTool = () => {
                                         />
                                     </div>
                                 </div>
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
 
                         <Tooltip content="Coolant options to keep the bit cool and clear debris: Mist (M7) for light cooling, Flood (M8) for heavy-duty cooling">
-                            <InputArea label="Coolant Control">
+                            <div className="w-full">
+                                <InputArea label="Coolant Control">
                                 <div className="grid grid-cols-2 gap-2 col-span-3">
                                     <span className="font-light text-sm max-w-20 dark:text-white">
                                         Mist (M7)
@@ -301,7 +316,8 @@ const JointerTool = () => {
                                         className="h-20"
                                     />
                                 </div>
-                            </InputArea>
+                                </InputArea>
+                            </div>
                         </Tooltip>
                     </div>
                     <div className="flex flex-col border border-gray-200 rounded-md">
