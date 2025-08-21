@@ -68,6 +68,9 @@ const ProbeWidget = () => {
         isConnected,
         $13,
         activeState,
+        mpos,
+        zMaxTravel,
+        homingEnabled,
     } = useTypedSelector((state) => ({
         distance: state.controller.state.parserstate?.modal.distance,
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -76,6 +79,9 @@ const ProbeWidget = () => {
         isConnected: state.connection.isConnected,
         $13: state.controller.settings.settings.$13 ?? '0',
         activeState: state.controller.state.status?.activeState,
+        mpos: state.controller.mpos,
+        zMaxTravel: state.controller.settings.settings.$132 ?? '170',
+        homingEnabled: Number(state.controller.settings.settings.$22) > 0,
     }));
 
     const { actions: config } = getWidgetConfigContext();
@@ -409,6 +415,13 @@ const ProbeWidget = () => {
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
+        }
+
+        if (homingEnabled) {
+            const newZProbeDistance = Number(
+                (Number(zMaxTravel) - Math.abs(mpos.z) - 2).toFixed(3), // subtract an extra mm
+            );
+            probeDistances.z = newZProbeDistance;
         }
 
         const options = {
