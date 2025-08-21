@@ -30,20 +30,7 @@ import InputArea from 'app/components/InputArea';
 import { Button } from 'app/components/Button';
 import VisualizerPreview from './components/VisualizerPreview';
 
-const defaultJointerState = get(defaultState, 'widgets.jointer', {
-    bitDiameter: 6.35,
-    feedrate: 1000,
-    length: 100,
-    orientation: 'X' as 'X' | 'Y',
-    depthOfCut: 1,
-    totalDepth: 3,
-    thickness: 20,
-    numberOfPasses: 3,
-    spindleRPM: 18000,
-    shouldDwell: false,
-    mist: false,
-    flood: false,
-});
+const defaultJointerState = get(defaultState, 'widgets.jointer', {});
 
 const JointerTool = () => {
     const navigate = useNavigate();
@@ -68,8 +55,8 @@ const JointerTool = () => {
                 feedrate: convertToImperial(jointer.feedrate),
                 length: convertToImperial(jointer.length),
                 depthOfCut: convertToImperial(jointer.depthOfCut),
-                totalDepth: convertToImperial(jointer.totalDepth),
                 thickness: convertToImperial(jointer.thickness),
+                stepover: convertToImperial(jointer.stepover),
             };
         }
         return jointer;
@@ -87,8 +74,8 @@ const JointerTool = () => {
                     feedrate: convertToMetric(jointer.feedrate),
                     length: convertToMetric(jointer.length),
                     depthOfCut: convertToMetric(jointer.depthOfCut),
-                    totalDepth: convertToMetric(jointer.totalDepth),
                     thickness: convertToMetric(jointer.thickness),
+                    stepover: convertToMetric(jointer.stepover),
                 });
             } else {
                 jointerConfig.set('', jointer);
@@ -138,8 +125,8 @@ const JointerTool = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-4 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
-                            <b>Jointer Tool:</b> Create perfect perpendicular edges on your material. 
-                            Set the length, orientation (X or Y axis), depth parameters, and number of passes 
+                            <b>Jointer Tool:</b> Create perfect perpendicular edges on your material.
+                            Set the edge length, orientation (X or Y axis), depth of cut, material thickness, and cut width
                             to generate precise jointing toolpaths.
                         </p>
 
@@ -173,55 +160,44 @@ const JointerTool = () => {
                             </div>
                         </InputArea>
 
-                        <InputArea label="Depth of Cut">
+                        <InputArea label="Depth of Cut & Material Thickness">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                                <ControlledInput
+                                    type="number"
+                                    suffix={units}
+                                    className={inputStyle}
+                                    value={jointer.depthOfCut}
+                                    min={0.1}
+                                    onChange={(e) =>
+                                        onChange('depthOfCut', Number(e.target.value))
+                                    }
+                                />
+                                <span className="flex justify-center items-center">
+                                    &
+                                </span>
+                                <ControlledInput
+                                    type="number"
+                                    suffix={units}
+                                    className={inputStyle}
+                                    value={jointer.thickness}
+                                    min={0.1}
+                                    onChange={(e) =>
+                                        onChange('thickness', Number(e.target.value))
+                                    }
+                                />
+                            </div>
+                        </InputArea>
+
+                        <InputArea label="Cut Width">
                             <ControlledInput
                                 type="number"
                                 suffix={units}
                                 className={inputStyle}
-                                value={jointer.depthOfCut}
+                                value={jointer.stepover}
+                                min={0.1}
                                 wrapperClassName="col-span-3"
                                 onChange={(e) =>
-                                    onChange('depthOfCut', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Total Depth">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={jointer.totalDepth}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('totalDepth', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Material Thickness">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={jointer.thickness}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('thickness', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-
-                        <InputArea label="Number of Passes">
-                            <ControlledInput
-                                type="number"
-                                className={inputStyle}
-                                value={jointer.numberOfPasses}
-                                min={1}
-                                max={20}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('numberOfPasses', Number(e.target.value))
+                                    onChange('stepover', Number(e.target.value))
                                 }
                             />
                         </InputArea>
@@ -335,7 +311,7 @@ const JointerTool = () => {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                        <div className="relative w-[calc(50vw-32px)] h-[calc(100vh-280px)]">
                             <div
                                 className={cx(
                                     'absolute w-full h-full top-0 left-0 rounded-md',

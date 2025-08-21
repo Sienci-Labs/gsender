@@ -6,9 +6,8 @@ export interface Jointer {
     length: number;
     orientation: 'X' | 'Y';
     depthOfCut: number;
-    totalDepth: number;
     thickness: number;
-    numberOfPasses: number;
+    stepover: number;
     spindleRPM: number;
     spindle: SPINDLE;
     shouldDwell: boolean;

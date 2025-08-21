@@ -7,10 +7,11 @@ import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
 import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
+import Jointer from './features/Jointer';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
-import { TbRulerMeasure } from 'react-icons/tb';
+import { TbRulerMeasure, TbVectorTriangle } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
 import { Stats } from './features/Stats';
@@ -75,6 +76,13 @@ export const ReactRoutes = () => {
                                         description="Flatten your wasteboard or other non-flat stock"
                                         icon={GiFlatPlatform}
                                         link="/tools/surfacing"
+                                    />
+
+                                    <ToolCard
+                                        title="Jointer"
+                                        description="Create perfect perpendicular edges on your material"
+                                        icon={TbVectorTriangle}
+                                        link="/tools/jointer"
                                     />
 
                                     <ToolCard
@@ -168,6 +176,18 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <Surfacing />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="jointer"
+                        element={
+                            <Page
+                                title="Jointer Tool"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <Jointer />
                             </Page>
                         }
                     />
