@@ -25,7 +25,7 @@ export function NumberSettingInput({
         convertedValue = convertToImperial(value);
     }
     return (
-        <div className="ring-1 ring-gray-300 flex flex-row flex-1 rounded">
+        <div className="flex flex-row flex-1">
             <ControlledInput
                 type="number"
                 value={convertedValue}
