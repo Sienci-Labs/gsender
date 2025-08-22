@@ -158,7 +158,7 @@ export function RemoteModeDialog({
                             <div className="flex flex-row w-full justify-start items-center gap-4">
                                 <span className="dark:text-white">Port:</span>
                                 <input
-                                    className="border border-gray-200 rounded p-2 focus:outline-none w-full"
+                                    className="border border-gray-200 rounded p-2 focus:outline-none w-full dark:bg-dark dark:text-white"
                                     type="number"
                                     value={port}
                                     onChange={updatePort}
