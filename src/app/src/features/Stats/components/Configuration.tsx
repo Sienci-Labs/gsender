@@ -19,7 +19,7 @@ export function ConfigRow({
 }) {
     return (
         <div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-white dark:bg-dark">
-            <div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
+            <div className="text-gray-700 pr-2 dark:text-white">
                 {label}
             </div>
             <div className="pl-2 dark:text-white">
