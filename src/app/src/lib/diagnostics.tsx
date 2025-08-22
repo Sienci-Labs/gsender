@@ -892,7 +892,7 @@ function generateSupportFile() {
         <Button
             icon={<PiFileZipFill className="text-blue-500 w-8 h-8" />}
             onClick={submitDiagnosticForm}
-            className="text-blue-500"
+            className=""
             size="lg"
             text="Download Diagnostic File"
         />
