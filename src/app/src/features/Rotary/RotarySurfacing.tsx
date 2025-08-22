@@ -264,8 +264,8 @@ const RotarySurfacing = () => {
                                 />
                             </div>
                         </InputArea>
-                        <div>
-                            <InputArea label="Enable Rehoming">
+                        <InputArea label="Enable Rehoming">
+                            <div className="flex items-center gap-2 justify-center">
                                 <Switch
                                     checked={surfacingState.enableRehoming}
                                     onChange={(checked) =>
@@ -275,15 +275,11 @@ const RotarySurfacing = () => {
                                         }))
                                     }
                                 />
-                            </InputArea>
-                            <div className="text-xs xl:text-sm text-gray-500 mt-3">
-                                This option creates a more consistent surface
-                                finish as your A axis will spin in only one
-                                direction across the entire length of your
-                                material. You will however need to rehome after
-                                surfacing to reset your A axis coordinates.
+                            </div> 
+                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
+                                Cut faster and cleaner by only rotating one direction, but you will need to rehome your A-axis at the end.
                             </div>
-                        </div>
+                        </InputArea>
                     </div>
                     <div className="flex flex-col border border-gray-200 rounded-md">
                         <Tabs defaultValue="visualizer">
