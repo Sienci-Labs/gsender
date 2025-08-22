@@ -22,7 +22,7 @@ export function ConfigRow({
             <div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
                 {label}
             </div>
-            <div className="bg-white pl-2 dark:text-white dark:bg-dark">
+            <div className="pl-2 dark:text-white">
                 {connected ? children : <b>-</b>}
             </div>
         </div>
