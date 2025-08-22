@@ -53,7 +53,7 @@ export const formatShortcut = (shortcut = [], isActive = true) => {
 };
 
 // Helper function to determine if a key should hide the shift key
-const shouldHideShiftForKey = (key) => {
+export const shouldHideShiftForKey = (key) => {
     // Special characters that are secondary to number keys
     const specialChars = [
         '!',
