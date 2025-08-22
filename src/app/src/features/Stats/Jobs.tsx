@@ -99,7 +99,7 @@ export function Jobs() {
                         defaultData={defaultData}
                         data={jobs}
                         columns={columnData}
-                        height="h-[calc(100vh-224px)]"
+                        height="h-[calc(100vh-260px)]"
                     />
                 </StatCard>
             </div>
