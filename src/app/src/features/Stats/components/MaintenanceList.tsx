@@ -236,7 +236,7 @@ export function MaintenanceList() {
                 pagination={false}
                 searchPlaceholder="Search Tasks..."
                 columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on
-                height="h-[calc(100vh-42px-224px)]"
+                height="h-[calc(100vh-40px-220px)]"
             />
             <MaintenanceAddTaskDialog
                 show={showAddForm}
