@@ -260,11 +260,14 @@ const main = () => {
         }
       });
 
-      ipcMain.on("clipboard", (channel, text) => {
+      ipcMain.handle('copy-to-clipboard', (_channel, text) => {
         if (!text) {
-          return;
+            return { success: false, error: 'No text to copy' };
         }
+
         clipboard.writeText(text);
+
+        return { success: true };
       });
 
       ipcMain.handle("grblLog:fetch", async (channel) => {
