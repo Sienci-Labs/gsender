@@ -204,7 +204,7 @@ function DRO({
         ZERO_A_AXIS: {
             id: 72,
             title: 'Zero A-axis',
-            keys: ['shift', '0'].join('+'),
+            keys: ['shift', 'y'].join('+'),
             cmd: 'ZERO_A_AXIS',
             preventDefault: true,
             payload: { axis: AXIS_A },
@@ -235,7 +235,7 @@ function DRO({
         GO_TO_A_AXIS_ZERO: {
             id: 73,
             title: 'Go to A zero',
-            keys: ['shift', '1'].join('+'),
+            keys: ['shift', 't'].join('+'),
             cmd: 'GO_TO_A_AXIS_ZERO',
             preventDefault: true,
             payload: { axisList: [AXIS_A] },
