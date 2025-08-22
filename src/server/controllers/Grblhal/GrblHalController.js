@@ -1628,7 +1628,7 @@ class GrblHalController {
 
                     const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                     let modalWcs = modal.wcs;
-                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                    if (modalWcs !== wcs && modalWcs === 'G54') {
                         modalWcs = wcs;
                     }
                     const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;
