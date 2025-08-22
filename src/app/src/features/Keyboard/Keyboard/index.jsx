@@ -558,11 +558,20 @@ const Keyboard = () => {
 
     return (
         <div className="flex flex-col gap-4 h-full dark:text-white">
+            <CategoryFilter
+                onChange={filter}
+                filterCategory={filterCategory}
+                datasetList={datasetList}
+            />
+            <div className="overflow-auto relative h-full border border-gray-200 rounded">
+                <ShortcutsTable
+                    dataSet={datasetList}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onShortcutToggle={toggleKeybinding}
+                />
+            </div>
             <div className="flex gap-4 justify-end">
-                <Button onClick={handlePrintShortcuts}>
-                    <i className="fas fa-print" />
-                    Print Shortcuts
-                </Button>
                 <Button
                     onClick={enableAllShortcuts}
                     disabled={allShortcutsEnabled}
@@ -577,20 +586,10 @@ const Keyboard = () => {
                     <i className="fas fa-toggle-off" />
                     Disable All Shortcuts
                 </Button>
-            </div>
-
-            <CategoryFilter
-                onChange={filter}
-                filterCategory={filterCategory}
-                datasetList={datasetList}
-            />
-            <div className="overflow-auto relative h-full border border-gray-200 rounded">
-                <ShortcutsTable
-                    dataSet={datasetList}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onShortcutToggle={toggleKeybinding}
-                />
+                <Button onClick={handlePrintShortcuts}>
+                    <i className="fas fa-print" />
+                    Print Shortcuts
+                </Button>
             </div>
 
             {showEditModal && stopCallback() && (
