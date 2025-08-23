@@ -542,10 +542,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'XY plunge distance',
-                        key: 'workspace.probeProfile.xyPlungeDistance',
+                        label: 'Z Plunge Distance',
+                        key: 'workspace.probeProfile.zPlungeDistance',
                         description:
-                            'Maximum distance to plunge in X/Y directions for 3D Touch Probe. (Default 10mm)',
+                            'Distance to plunge down into material after Z probing for XY operations. Allows probing thin materials directly. (Default 2mm)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {

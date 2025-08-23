@@ -478,7 +478,7 @@ const ProbeWidget = () => {
             probeDistances,
             probeType,
             ballDiameter: touchplate.ballDiameter || 2,
-            xyPlungeDistance: touchplate.xyPlungeDistance || 10,
+            zPlungeDistance: touchplate.zPlungeDistance || 2,
             zProbeDistance: probeDistances.z,
         };
 
