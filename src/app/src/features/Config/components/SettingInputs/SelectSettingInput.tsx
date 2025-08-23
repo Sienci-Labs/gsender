@@ -24,10 +24,10 @@ export function SelectSettingInput({
     const isDisabled = disabled();
     return (
         <Select onValueChange={onChange} disabled={isDisabled}>
-            <SelectTrigger className="bg-white bg-opacity-100">
+            <SelectTrigger className="bg-white bg-opacity-100 dark:border-gray-500">
                 <SelectValue placeholder={`${value}`} />
             </SelectTrigger>
-            <SelectContent className="bg-white bg-opacity-100">
+            <SelectContent className="bg-white bg-opacity-100 dark:border-gray-500">
                 {options.map((o) => (
                     <SelectItem value={`${o}`}>{o}</SelectItem>
                 ))}
