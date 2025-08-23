@@ -46,7 +46,7 @@ export function Alarms() {
                             cannot be undone.
                         </p>
                         <Button
-                            icon={<FaTrash className="text-gray-600 w-4 h-4" />}
+                            icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
                             onClick={deleteAlarms}
                             text="Clear Alarms & Errors"
                             size="lg"
