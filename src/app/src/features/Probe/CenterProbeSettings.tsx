@@ -41,14 +41,6 @@ const CenterProbeSettings: React.FC<Props> = ({
         onParamsChange({ probeZ: event.target.checked });
     };
 
-    const handleNumberChange = (field: keyof CenterProbeParameters) => (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const value = parseFloat(event.target.value);
-        if (!isNaN(value)) {
-            onParamsChange({ [field]: value });
-        }
-    };
 
     const handleDimensionChange = (axis: 'x' | 'y') => (
         event: React.ChangeEvent<HTMLInputElement>
@@ -114,63 +106,6 @@ const CenterProbeSettings: React.FC<Props> = ({
                     </p>
                 </div>
             )}
-
-            {/* Feed Rates */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                    <label className="font-medium text-sm mb-1">Rapid Feed Rate (mm/min)</label>
-                    <input
-                        type="number"
-                        value={centerProbeParams.rapidFeedRate}
-                        onChange={handleNumberChange('rapidFeedRate')}
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                        min="1"
-                        step="100"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label className="font-medium text-sm mb-1">Search Feed Rate (mm/min)</label>
-                    <input
-                        type="number"
-                        value={centerProbeParams.searchFeedRate}
-                        onChange={handleNumberChange('searchFeedRate')}
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                        min="1"
-                        step="10"
-                    />
-                </div>
-            </div>
-
-            {/* Latch Parameters */}
-            <div className="flex flex-col">
-                <label className="font-medium text-sm mb-2">Latch Parameters</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                        <label className="text-sm mb-1">Latch Feed Rate (mm/min)</label>
-                        <input
-                            type="number"
-                            value={centerProbeParams.latchFeedRate}
-                            onChange={handleNumberChange('latchFeedRate')}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                            min="1"
-                            step="5"
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label className="text-sm mb-1">Latch Distance (mm)</label>
-                        <input
-                            type="number"
-                            value={centerProbeParams.latchDistance}
-                            onChange={handleNumberChange('latchDistance')}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                            min="0.1"
-                            step="0.1"
-                        />
-                    </div>
-                </div>
-            </div>
 
             {/* Workpiece Dimensions */}
             <div className="flex flex-col">

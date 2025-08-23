@@ -350,10 +350,6 @@ const defaultState: State = {
         },
         centerProbe: {
             probeLocation: 'inner',
-            rapidFeedRate: 2000,
-            searchFeedRate: 80,
-            latchFeedRate: 40,
-            latchDistance: 1,
             workpieceDimensions: {
                 x: 10,
                 y: 10,

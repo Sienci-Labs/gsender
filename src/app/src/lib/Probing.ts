@@ -734,9 +734,10 @@ export const get3DTouchProbeRoutine = (
         const halfY = materialY / 2;
         const clearance = 10;
         
-        const searchFeed = centerProbeParams?.searchFeedRate || 150;
-        const latchFeed = centerProbeParams?.latchFeedRate || 75;
-        const latchDistance = centerProbeParams?.latchDistance || 5;
+        const rapidFeed = 2000;
+        const searchFeed = 150;
+        const latchFeed = 75;
+        const latchDistance = 3;
         
         const leftPos = halfX + clearance;
         const rightPos = halfX + clearance;
@@ -760,8 +761,8 @@ export const get3DTouchProbeRoutine = (
             centerCode.push(
                 'G90 G0 Z[START_Z + 5]',
                 'G38.2 Z-25 F200',
-                'G0 Z2',
-                'G38.2 Z-5 F75',
+                'G21 G91 G0 Z2',
+                'G38.2 Z-3 F75',
                 'G4 P0.3',
                 'G10 L20 P0 Z0',
                 'G0 Z5'
@@ -775,7 +776,7 @@ export const get3DTouchProbeRoutine = (
             `G91 G0 Z${zDown}`,
             `G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
             'G0 X-2',
-            `G38.2 X5 F[LATCH_FEED]`,
+            `G38.2 X3 F[LATCH_FEED]`,
             'G4 P0.3',
             '%X_LEFT=[posx - BALL_RADIUS]',
             'G91 G0 X-3',
@@ -786,7 +787,7 @@ export const get3DTouchProbeRoutine = (
             `G91 G0 Z${zDown}`,
             `G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
             'G0 X2',
-            `G38.2 X-5 F[LATCH_FEED]`,
+            `G38.2 X-3 F[LATCH_FEED]`,
             'G4 P0.3',
             '%X_RIGHT=[posx + BALL_RADIUS]',
             'G91 G0 X3',
@@ -797,7 +798,7 @@ export const get3DTouchProbeRoutine = (
             `G91 G0 Z${zDown}`,
             `G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
             'G0 Y-2',
-            `G38.2 Y5 F[LATCH_FEED]`,
+            `G38.2 Y3 F[LATCH_FEED]`,
             'G4 P0.3',
             '%Y_BACK=[posy - BALL_RADIUS]',
             'G91 G0 Y-3',
@@ -808,7 +809,7 @@ export const get3DTouchProbeRoutine = (
             `G91 G0 Z${zDown}`,
             `G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
             'G0 Y2',
-            `G38.2 Y-5 F[LATCH_FEED]`,
+            `G38.2 Y-3 F[LATCH_FEED]`,
             'G4 P0.3',
             '%Y_FRONT=[posy + BALL_RADIUS]',
             'G91 G0 Y3',

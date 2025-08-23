@@ -130,10 +130,6 @@ export interface AvailableTool {
 
 export interface CenterProbeParameters {
     probeLocation: 'inner' | 'outer';
-    rapidFeedRate: number; // mm/min
-    searchFeedRate: number; // mm/min  
-    latchFeedRate: number; // mm/min
-    latchDistance: number; // mm
     workpieceDimensions: {
         x: number; // mm
         y: number; // mm
