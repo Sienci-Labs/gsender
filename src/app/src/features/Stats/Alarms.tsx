@@ -41,7 +41,7 @@ export function Alarms() {
                 <StatCard>
                     <CardHeader>Clear Alarms & Errors</CardHeader>
                     <div className="flex flex-col gap-4 justify-center">
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 text-sm dark:text-white">
                             Clear all prior alarms and errors. This action
                             cannot be undone.
                         </p>
