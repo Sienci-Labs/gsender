@@ -760,6 +760,7 @@ export const get3DTouchProbeRoutine = (
             `G38.2 X5 F[LATCH_FEED]`,
             'G4 P0.3',
             '%X_LEFT=[posx - BALL_RADIUS]',
+            'G91 G0 X-3',
             'G90 G0 Z[START_Z + 5]',
             'G90 G0 X[START_X] Y[START_Y]',
             
@@ -770,6 +771,7 @@ export const get3DTouchProbeRoutine = (
             `G38.2 X-5 F[LATCH_FEED]`,
             'G4 P0.3',
             '%X_RIGHT=[posx + BALL_RADIUS]',
+            'G91 G0 X3',
             'G90 G0 Z[START_Z + 5]',
             'G90 G0 X[START_X] Y[START_Y]',
             
@@ -780,6 +782,7 @@ export const get3DTouchProbeRoutine = (
             `G38.2 Y5 F[LATCH_FEED]`,
             'G4 P0.3',
             '%Y_BACK=[posy - BALL_RADIUS]',
+            'G91 G0 Y-3',
             'G90 G0 Z[START_Z + 5]',
             'G90 G0 X[START_X] Y[START_Y]',
             
@@ -790,6 +793,7 @@ export const get3DTouchProbeRoutine = (
             `G38.2 Y-5 F[LATCH_FEED]`,
             'G4 P0.3',
             '%Y_FRONT=[posy + BALL_RADIUS]',
+            'G91 G0 Y3',
             'G90 G0 Z[START_Z + 5]',
             'G90 G0 X[START_X] Y[START_Y]',
             
