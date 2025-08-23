@@ -79,10 +79,10 @@ export function EventInput({ eventType }: EventInputProps): JSX.Element {
                 rows={8}
                 value={eventCommands}
                 onChange={onChange}
-                className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm text-gray-800 bg-white resize-none focus:outline-none dark:bg-dark dark:text-white"
+                className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm text-robin-500 bg-white resize-none focus:outline-none dark:bg-dark dark:text-white"
             />
             <button
-                className="bg-white shadow p-2 rounded border border-blue-500 text-blue-500 hover:bg-gray-100 dark:bg-dark dark:text-white dark:hover:bg-dark-lighter"
+                className="bg-white shadow p-2 rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-dark dark:text-white dark:hover:bg-dark-lighter"
                 onClick={onSave}
             >
                 Save Event
