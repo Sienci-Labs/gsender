@@ -160,7 +160,10 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                         <div className="flex flex-col space-y-4">
                             <div className="text-black leading-snug dark:text-white text-sm">
                                 <p className="mb-2">
-                                    Position the probe needle as close to the workpiece center as possible.
+                                    {centerProbeParams.probeLocation === 'inner' 
+                                        ? 'Position the probe needle inside the hole/pocket with Z height below the material surface and XY as close to center as possible.'
+                                        : 'Position the probe needle above the material surface with XY at the estimated center of the workpiece.'
+                                    }
                                 </p>
                                 <p className="mb-2">
                                     Push the probe needle gently to test that it triggers properly (green light should activate).

@@ -83,7 +83,7 @@ const ProbeImage: React.FC<Props> = ({
                 return TouchProbeXYZ;
             } else if (id === 'Center') {
                 return centerProbeParams?.probeLocation === 'outer' 
-                    ? TouchProbeCenterOut 
+                    ? TouchProbeZ 
                     : TouchProbeCenterIn;
             }
             // Fallback to XYZ image for any other 3D Touch probe commands

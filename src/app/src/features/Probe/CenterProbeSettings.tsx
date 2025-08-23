@@ -109,7 +109,9 @@ const CenterProbeSettings: React.FC<Props> = ({
 
             {/* Workpiece Dimensions */}
             <div className="flex flex-col">
-                <label className="font-medium text-sm mb-2">Workpiece Dimensions (mm)</label>
+                <label className="font-medium text-sm mb-2">
+                    {centerProbeParams.probeLocation === 'inner' ? 'Hole Dimensions (mm)' : 'Workpiece Dimensions (mm)'}
+                </label>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col">
                         <label className="text-sm mb-1">X Dimension</label>
