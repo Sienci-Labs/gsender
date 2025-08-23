@@ -59,7 +59,7 @@ export function LocationInput({
     return (
         <div className="flex flex-col gap-2">
             <div className="flex flex-row gap-2 items-center">
-                <span className="text-lg">X:</span>
+                <span className="text-md">X:</span>
                 <ControlledInput
                     value={value.x}
                     type="number"
@@ -68,7 +68,7 @@ export function LocationInput({
                 />
             </div>
             <div className="flex flex-row gap-2 items-center">
-                <span className="text-lg">Y:</span>
+                <span className="text-md">Y:</span>
                 <ControlledInput
                     value={value.y}
                     type="number"
@@ -77,7 +77,7 @@ export function LocationInput({
                 />
             </div>
             <div className="flex flex-row gap-2 items-center">
-                <span className="text-lg">Z:</span>
+                <span className="text-md">Z:</span>
                 <ControlledInput
                     value={value.z}
                     type="number"
