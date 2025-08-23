@@ -483,7 +483,7 @@ const ProbeWidget = () => {
         };
 
         const probeCommand = availableProbeCommands[selectedProbeCommand];
-        const code = getProbeCode(options, direction, probeCommand?.id);
+        const code = getProbeCode(options, direction, probeCommand?.id, centerProbeParams);
         code.push(distance + '\n');
 
         return code;

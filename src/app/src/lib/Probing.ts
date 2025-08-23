@@ -722,16 +722,84 @@ export const get3DTouchProbeRoutine = (
         const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
         const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
         
+        const debugCode = [
+            `; DEBUG: centerProbeParams = ${JSON.stringify(centerProbeParams)}`,
+            `; DEBUG: materialX = ${materialX}, materialY = ${materialY}`,
+        ];
+        code.push(...debugCode);
+        
         const halfX = materialX / 2;
         const halfY = materialY / 2;
-        const clearance = 15;
+        const clearance = 10;
         
         const searchFeed = centerProbeParams?.searchFeedRate || 150;
         const latchFeed = centerProbeParams?.latchFeedRate || 75;
         const latchDistance = centerProbeParams?.latchDistance || 5;
         
-        const emptyCode = [];
-        code.push(...emptyCode);
+        const leftPos = halfX + clearance;
+        const rightPos = halfX + clearance;
+        const backPos = halfY + clearance;
+        const frontPos = halfY + clearance;
+        const zDown = -(zPlungeDistance + 5);
+        
+        const centerCode = [
+            '%START_X=posx',
+            '%START_Y=posy',
+            '%START_Z=posz',
+            `%BALL_RADIUS=${ballRadius}`,
+            `%SEARCH_FEED=${searchFeed}`,
+            `%LATCH_FEED=${latchFeed}`,
+            'G90',
+            
+            'G90 G0 Z[START_Z + 5]',
+            
+            `G90 G0 X[START_X - ${leftPos}]`,
+            `G91 G0 Z${zDown}`,
+            `G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
+            'G0 X-2',
+            `G38.2 X5 F[LATCH_FEED]`,
+            'G4 P0.3',
+            '%X_LEFT=[posx - BALL_RADIUS]',
+            'G90 G0 Z[START_Z + 5]',
+            'G90 G0 X[START_X] Y[START_Y]',
+            
+            `G90 G0 X[START_X + ${rightPos}]`,
+            `G91 G0 Z${zDown}`,
+            `G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
+            'G0 X2',
+            `G38.2 X-5 F[LATCH_FEED]`,
+            'G4 P0.3',
+            '%X_RIGHT=[posx + BALL_RADIUS]',
+            'G90 G0 Z[START_Z + 5]',
+            'G90 G0 X[START_X] Y[START_Y]',
+            
+            `G90 G0 Y[START_Y - ${backPos}]`,
+            `G91 G0 Z${zDown}`,
+            `G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
+            'G0 Y-2',
+            `G38.2 Y5 F[LATCH_FEED]`,
+            'G4 P0.3',
+            '%Y_BACK=[posy - BALL_RADIUS]',
+            'G90 G0 Z[START_Z + 5]',
+            'G90 G0 X[START_X] Y[START_Y]',
+            
+            `G90 G0 Y[START_Y + ${frontPos}]`,
+            `G91 G0 Z${zDown}`,
+            `G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
+            'G0 Y2',
+            `G38.2 Y-5 F[LATCH_FEED]`,
+            'G4 P0.3',
+            '%Y_FRONT=[posy + BALL_RADIUS]',
+            'G90 G0 Z[START_Z + 5]',
+            'G90 G0 X[START_X] Y[START_Y]',
+            
+            '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
+            '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
+            'G0 X[CENTER_X] Y[CENTER_Y]',
+            'G10 L20 P0 X0 Y0',
+        ];
+        
+        code.push(...centerCode);
         return code;
     } else if (axes.x && axes.y && axes.z) {
         code.push(
