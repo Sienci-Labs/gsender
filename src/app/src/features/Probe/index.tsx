@@ -177,12 +177,13 @@ const ProbeWidget = () => {
             x: 10,
             y: 10,
         },
+        probeZ: false,
     };
 
     // Initialize state the same way as Surfacing
     const getInitialCenterProbeState = (): CenterProbeParameters => {
         const saved = centerProbeConfig.get('', defaultCenterProbeState);
-        return saved || defaultCenterProbeParams;
+        return { ...defaultCenterProbeParams, ...saved };
     };
 
     const [centerProbeParams, setCenterProbeParams] = useState<CenterProbeParameters>(getInitialCenterProbeState());

@@ -37,6 +37,10 @@ const CenterProbeSettings: React.FC<Props> = ({
         onParamsChange({ probeLocation: value });
     };
 
+    const handleProbeZChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onParamsChange({ probeZ: event.target.checked });
+    };
+
     const handleNumberChange = (field: keyof CenterProbeParameters) => (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -92,6 +96,24 @@ const CenterProbeSettings: React.FC<Props> = ({
                     </label>
                 </div>
             </div>
+
+            {/* Probe Z Option - Only for outer probing */}
+            {centerProbeParams.probeLocation === 'outer' && (
+                <div className="flex flex-col">
+                    <label className="flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={centerProbeParams.probeZ || false}
+                            onChange={handleProbeZChange}
+                            className="mr-2"
+                        />
+                        <span className="font-medium text-sm">Probe Z first (sets new Z0 reference)</span>
+                    </label>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-6">
+                        Performs Z probing before XY probing to establish material surface as Z0
+                    </p>
+                </div>
+            )}
 
             {/* Feed Rates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -722,9 +722,11 @@ export const get3DTouchProbeRoutine = (
         const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
         const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
         
+        const probeZ = centerProbeParams?.probeZ || false;
         const debugCode = [
             `; DEBUG: centerProbeParams = ${JSON.stringify(centerProbeParams)}`,
             `; DEBUG: materialX = ${materialX}, materialY = ${materialY}`,
+            `; DEBUG: probeZ = ${probeZ}`,
         ];
         code.push(...debugCode);
         
@@ -742,6 +744,8 @@ export const get3DTouchProbeRoutine = (
         const frontPos = halfY + clearance;
         const zDown = -(zPlungeDistance + 5);
         
+        const safeZHeight = probeZ ? '5' : '[START_Z + 5]';
+        
         const centerCode = [
             '%START_X=posx',
             '%START_Y=posy',
@@ -750,9 +754,23 @@ export const get3DTouchProbeRoutine = (
             `%SEARCH_FEED=${searchFeed}`,
             `%LATCH_FEED=${latchFeed}`,
             'G90',
-            
-            'G90 G0 Z[START_Z + 5]',
-            
+        ];
+        
+        if (probeZ) {
+            centerCode.push(
+                'G90 G0 Z[START_Z + 5]',
+                'G38.2 Z-25 F200',
+                'G0 Z2',
+                'G38.2 Z-5 F75',
+                'G4 P0.3',
+                'G10 L20 P0 Z0',
+                'G0 Z5'
+            );
+        } else {
+            centerCode.push('G90 G0 Z[START_Z + 5]');
+        }
+        
+        centerCode.push(
             `G90 G0 X[START_X - ${leftPos}]`,
             `G91 G0 Z${zDown}`,
             `G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
@@ -761,7 +779,7 @@ export const get3DTouchProbeRoutine = (
             'G4 P0.3',
             '%X_LEFT=[posx - BALL_RADIUS]',
             'G91 G0 X-3',
-            'G90 G0 Z[START_Z + 5]',
+            `G90 G0 Z${safeZHeight}`,
             'G90 G0 X[START_X] Y[START_Y]',
             
             `G90 G0 X[START_X + ${rightPos}]`,
@@ -772,7 +790,7 @@ export const get3DTouchProbeRoutine = (
             'G4 P0.3',
             '%X_RIGHT=[posx + BALL_RADIUS]',
             'G91 G0 X3',
-            'G90 G0 Z[START_Z + 5]',
+            `G90 G0 Z${safeZHeight}`,
             'G90 G0 X[START_X] Y[START_Y]',
             
             `G90 G0 Y[START_Y - ${backPos}]`,
@@ -783,7 +801,7 @@ export const get3DTouchProbeRoutine = (
             'G4 P0.3',
             '%Y_BACK=[posy - BALL_RADIUS]',
             'G91 G0 Y-3',
-            'G90 G0 Z[START_Z + 5]',
+            `G90 G0 Z${safeZHeight}`,
             'G90 G0 X[START_X] Y[START_Y]',
             
             `G90 G0 Y[START_Y + ${frontPos}]`,
@@ -794,14 +812,14 @@ export const get3DTouchProbeRoutine = (
             'G4 P0.3',
             '%Y_FRONT=[posy + BALL_RADIUS]',
             'G91 G0 Y3',
-            'G90 G0 Z[START_Z + 5]',
+            `G90 G0 Z${safeZHeight}`,
             'G90 G0 X[START_X] Y[START_Y]',
             
             '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
             '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
             'G0 X[CENTER_X] Y[CENTER_Y]',
-            'G10 L20 P0 X0 Y0',
-        ];
+            'G10 L20 P0 X0 Y0'
+        );
         
         code.push(...centerCode);
         return code;

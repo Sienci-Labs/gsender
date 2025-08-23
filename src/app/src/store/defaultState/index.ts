@@ -358,6 +358,7 @@ const defaultState: State = {
                 x: 10,
                 y: 10,
             },
+            probeZ: false,
         },
         visualizer: {
             minimized: false,

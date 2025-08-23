@@ -138,6 +138,7 @@ export interface CenterProbeParameters {
         x: number; // mm
         y: number; // mm
     };
+    probeZ: boolean; // Only for outer probing
 }
 
 export interface State {
