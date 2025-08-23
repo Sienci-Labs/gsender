@@ -163,7 +163,8 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-macos-x64.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-macos-arm64.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             yarn github-release delete \

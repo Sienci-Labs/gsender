@@ -27,7 +27,21 @@ gSender is available for the following systems and does not yet support headless
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
 | ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-PI-64Bit.deb) |
-     
+
+
+### Notes for MacOS users
+
+If you get the following error when running the gSender:
+
+```
+“gSender” is damaged and can’t be opened. You should move it to the Trash.
+```
+
+To fix this, you need to clear the extended attributes using the following command since gSender is not yet notarized with an Apple Developer ID, macOS may prevent it from running after installation or an upgrade.
+
+```bash
+xattr -c /Applications/gSender.app
+```
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -383,7 +397,7 @@ gSender is also designed in a way that it can be run locally on your computer br
   - Connect to and run jobs as normal on any grblHAL device
   - Connect over ethernet where hardware is supported
   - New grblHAL specific firmware tool that is dynamically generated based on reported settings
-  - New UI elements where appropriate to support new functionality such as single axis homing 
+  - New UI elements where appropriate to support new functionality such as single axis homing
 - Gamepad improvements
   - Restructured logic and mapping of buttons to actions
   - Add secondary functionality to buttons
@@ -545,7 +559,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Numerous surfacing tooltip and unit conversion issues fixed
 * Surfacing now lets you select M3 or M4 movement
 * Rapid position buttons now use $27 pulloff value for determining final positions
-* Outline tool now stores and restores modals on completion 
+* Outline tool now stores and restores modals on completion
 * Improvements to settings storage and persistence
 * Migrated from Electron 10 to Electron 18
 
@@ -559,7 +573,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Start-from-line should prefer selected WCS if different from default G54
 * Fixed issue with spindle max/min not saving in some situations
 * Disabled surfacing generation when job is running
-* Laser/Spindle EEPROM ($31) and spindle/laser min/max should more accurately be reflected in firmware UI 
+* Laser/Spindle EEPROM ($31) and spindle/laser min/max should more accurately be reflected in firmware UI
 * Macro movement and re-ordering should be easier and more consistent
 * Start-from-line should use a more sane decimal place for position values
 * Rapid position buttons should now account for machines not running Sienci-specific firmware and offset position from 0
@@ -576,7 +590,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### 1.0.4 (Feb 15, 2022)
 * Add support for distinct Spindle max and Spindle Min while in laser or spindle mode
-* "Pause" tool change workflow renamed to "Manual", and now allows jogging and macros to be run 
+* "Pause" tool change workflow renamed to "Manual", and now allows jogging and macros to be run
 * Default feed rate in "start from line" now reflects file unit modal
 * Fixed issue where units weren't consistent on Go-To buttons leading to Z plunge
 * Tool diameter selection hidden on Z probe to prevent user confusion
@@ -718,10 +732,10 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### Open Beta 0.6.8 (Jul 8, 2021)
 * Fix for duplicated keybinds
 * Fix for Carbide Create files and M0 commands
-* Fix for new macros not appearing as possible keybinds   
+* Fix for new macros not appearing as possible keybinds
 * Optional updates for future versions
-* New logging engine for electron app 
-* Socket polling to help keep connection alive  
+* New logging engine for electron app
+* Socket polling to help keep connection alive
 * PowerSaveBlock added to reduce cases of machine sleeping while running long jobs
 * Alterations to load file to hopefully reduces cases of the dialog appearing in some users
 
@@ -829,7 +843,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Logo implemented and the loading of Louis
 * Responsiveness overhaul on entire program
 * Mac (intel) version released March 8
-    
+
 ### Closed Alpha 3.0 (Feb 19, 2021)
 * Continuous jogging!
 * Unit switching in settings (metric/imperial)
@@ -850,7 +864,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### Closed Alpha 1.0 (Jan 29, 2021)
 * Still highly dependant on great infrastructure created by the CNCjs team
-* Established Electron installer, git, and certificates 
+* Established Electron installer, git, and certificates
 * Large visual overhaul in how widgets and displayed and operational flow of sender
 * New probing widget, machine profiles, settings, and visualizer
 
