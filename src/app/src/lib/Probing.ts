@@ -707,27 +707,21 @@ export const get3DTouchProbeRoutine = (
     const code: Array<string> = [];
     const ballRadius = ballDiameter / 2;
     
-    // Configure options to match Standard Block requirements
-    // Tool diameter = ball diameter, fixed values for missing configurations
     const processedOptions = {
         ...options,
-        toolDiameter: ballDiameter, // Ball diameter acts as tool diameter
-        direction: options.direction || 0, // Default to bottom-left corner
-        retract: 4, // Fixed 4mm retract distance
-        xyThickness: 0, // No XY thickness for 3D probe
-        zThickness: 0,  // No Z thickness for 3D probe
+        toolDiameter: ballDiameter,
+        direction: options.direction || 0,
+        retract: 4,
+        xyThickness: 0,
+        zThickness: 0,
     };
     
-    // Apply the same direction processing as Standard Block
     const standardProcessedOptions = updateOptionsForDirection(processedOptions, processedOptions.direction);
 
-    // Handle center probing command - always uses X and Y regardless of axes selection
     if (probeCommand === 'Center') {
-        // Calculate positioning based on workpiece dimensions
         const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
         const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
         
-        // For debugging - use simpler fixed values
         const halfX = materialX / 2;
         const halfY = materialY / 2;
         const clearance = 15;
@@ -736,79 +730,39 @@ export const get3DTouchProbeRoutine = (
         const latchFeed = centerProbeParams?.latchFeedRate || 75;
         const latchDistance = centerProbeParams?.latchDistance || 5;
         
-        // Simplified G-code without complex variable calculations
-        const leftX = -(halfX + clearance);  // Calculate position relative to start
-        const probeDistance = halfX + clearance + 10;
-        
-        const exampleCode = [
-            `; 3D Touch Probe - Center Finding (Outer Edges)`,
-            `; DEBUG: Material X=${materialX}, Y=${materialY}`,
-            `; DEBUG: Moving left ${leftX}mm, probing right ${probeDistance}mm`,
-            `%BALL_RADIUS=${ballRadius}`,
-            `%START_X=posx`,
-            `%START_Y=posy`, 
-            `%START_Z=posz`,
-            'G90',
-            '',
-            '; Probe Left Edge - simplified approach',
-            'G91 G0 Z5',  // Move up 5mm relative
-            `G90 G0 X[START_X${leftX}]`,  // Move to left position
-            `G91 G0 Z-${zPlungeDistance + 5}`,  // Plunge down relative
-            `G38.2 X${probeDistance} F${searchFeed}`,  // Probe right
-            'G0 X-2',  // Back off
-            `G38.2 X5 F${latchFeed}`,  // Fine probe
-            'G4 P0.3',
-            `%X_LEFT=[posx - ${ballRadius}]`,  // Store left edge with ball compensation
-            'G91 G0 Z5',  // Move up to safe height
-            'G90 G0 X[START_X]',  // Return to start X
-            '',
-            '; Stop here for debugging',
-        ];
-        code.push(...exampleCode);
-        return code;  // Return early for center probing, don't continue to axes-based conditions
+        const emptyCode = [];
+        code.push(...emptyCode);
+        return code;
     } else if (axes.x && axes.y && axes.z) {
-        // XYZ probing using identical Standard Block routine with configurable Z plunge
         code.push(
-            '; 3D Touch Probe - XYZ identical to Standard Block with configurable Z plunge',
             `%BALL_RADIUS=${ballRadius}`,
             `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
         );
         
-        // Override Z_ADJUST to use our configurable Z plunge instead of fixed 15mm
-        // After Z probe, we're at +Z_RETRACT_DISTANCE, need to move to -zPlungeDistance
-        // So total move = Z_RETRACT_DISTANCE + zPlungeDistance
         const customOptions = {
             ...standardProcessedOptions,
             zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
         };
         
-        // Use exact same Standard Block routine with custom Z plunge distance
         code.push(...get3AxisStandardRoutine(customOptions));
     } else if (axes.x && axes.y) {
-        // XY probing using Standard Block routine with 3D Touch Probe configuration
         code.push(
-            '; 3D Touch Probe - XY using Standard Block routine',
             `%BALL_RADIUS=${ballRadius}`,
             `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
         );
         code.push(...get3AxisStandardRoutine(standardProcessedOptions));
     } else if (axes.z) {
-        // Z-only probing - using Standard Block routine
         code.push(...getPreamble(standardProcessedOptions));
         code.push(...getSingleAxisStandardRoutine('Z'));
     } else if (axes.x) {
-        // X-axis probing using Standard Block routine
         code.push(
-            '; 3D Touch Probe - X Axis using Standard Block routine',
             `%BALL_RADIUS=${ballRadius}`,
             `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
         );
         code.push(...getPreamble(standardProcessedOptions));
         code.push(...getSingleAxisStandardRoutine('X'));
     } else if (axes.y) {
-        // Y-axis probing using Standard Block routine
         code.push(
-            '; 3D Touch Probe - Y Axis using Standard Block routine',
             `%BALL_RADIUS=${ballRadius}`,
             `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
         );
