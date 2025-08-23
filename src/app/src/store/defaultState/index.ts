@@ -348,6 +348,17 @@ const defaultState: State = {
             mist: false,
             flood: false
         },
+        centerProbe: {
+            probeLocation: 'inner',
+            rapidFeedRate: 2000,
+            searchFeedRate: 80,
+            latchFeedRate: 40,
+            latchDistance: 1,
+            workpieceDimensions: {
+                x: 10,
+                y: 10,
+            },
+        },
         visualizer: {
             minimized: false,
             // 3D View

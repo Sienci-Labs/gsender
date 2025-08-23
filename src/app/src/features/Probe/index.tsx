@@ -47,9 +47,11 @@ import {
 } from '../../constants';
 import { getProbeCode } from 'app/lib/Probing';
 import { getWidgetConfigContext } from '../WidgetConfig/WidgetContextProvider';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import {
     Actions,
     AvailableTool,
+    CenterProbeParameters,
     PROBE_TYPES_T,
     ProbeCommand,
     ProbeProfile,
@@ -59,6 +61,7 @@ import {
 import { BasicObject, UNITS_EN } from 'app/definitions/general';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import defaultState from 'app/store/defaultState';
 
 const ProbeWidget = () => {
     const {
@@ -80,6 +83,8 @@ const ProbeWidget = () => {
     }));
 
     const { actions: config } = getWidgetConfigContext();
+    const centerProbeConfig = new WidgetConfig('centerProbe');
+    const defaultCenterProbeState = get(defaultState, 'widgets.centerProbe', {});
 
     const calcToolDiamater = (
         newTouchplateType?: TOUCHPLATE_TYPES_T,
@@ -162,8 +167,28 @@ const ProbeWidget = () => {
     const [direction, setDirection] = useState<number>(
         config.get('direction', 0),
     );
+    const defaultCenterProbeParams: CenterProbeParameters = {
+        probeLocation: 'inner',
+        rapidFeedRate: 2000,
+        searchFeedRate: 80,
+        latchFeedRate: 40,
+        latchDistance: 1,
+        workpieceDimensions: {
+            x: 10,
+            y: 10,
+        },
+    };
+
+    // Initialize state the same way as Surfacing
+    const getInitialCenterProbeState = (): CenterProbeParameters => {
+        const saved = centerProbeConfig.get('', defaultCenterProbeState);
+        return saved || defaultCenterProbeParams;
+    };
+
+    const [centerProbeParams, setCenterProbeParams] = useState<CenterProbeParameters>(getInitialCenterProbeState());
 
     const connectionMadeRef = useRef<boolean>(false);
+
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
@@ -328,19 +353,7 @@ const ProbeWidget = () => {
             // Add special 3D Touch Probe commands
             if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH) {
                 command = {
-                    id: 'Circle Hole',
-                    safe: true,
-                    tool: false,
-                    axes: {
-                        x: true,
-                        y: true,
-                        z: false,
-                    },
-                };
-                commands.push(command);
-
-                command = {
-                    id: 'Rect Hole',
+                    id: 'Center',
                     safe: true,
                     tool: false,
                     axes: {
@@ -381,6 +394,10 @@ const ProbeWidget = () => {
                 setDirection(direction + 1);
             }
         },
+        updateCenterProbeParams: (params: Partial<CenterProbeParameters>): void => {
+            const updatedParams = { ...centerProbeParams, ...params };
+            setCenterProbeParams(updatedParams);
+        },
     };
 
     const availableProbeCommands = actions.generatePossibleProbeCommands();
@@ -400,7 +417,9 @@ const ProbeWidget = () => {
         config.set('probeDepth', probeDepth);
         config.set('touchPlateHeight', touchPlateHeight);
         config.set('direction', direction);
-    });
+        
+        centerProbeConfig.set('', centerProbeParams);
+    }, [probeCommand, useTLO, probeDepth, touchPlateHeight, direction, centerProbeParams]);
 
     useEffect(() => {
         connectionMadeRef.current = connectionMade;
@@ -534,6 +553,7 @@ const ProbeWidget = () => {
         direction: direction,
         probeType: probeType,
         connectivityTest: connectivityTest,
+        centerProbeParams: centerProbeParams,
     };
 
     return (

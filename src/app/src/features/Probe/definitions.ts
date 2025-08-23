@@ -119,12 +119,25 @@ export interface Actions {
     _setToolDiameter: (selection: { value: number }) => void;
     nextProbeDirection: () => void;
     _setProbeType: (value: string) => void;
+    updateCenterProbeParams: (params: Partial<CenterProbeParameters>) => void;
 }
 
 export interface AvailableTool {
     metricDiameter: number;
     imperialDiameter: number;
     type: string;
+}
+
+export interface CenterProbeParameters {
+    probeLocation: 'inner' | 'outer';
+    rapidFeedRate: number; // mm/min
+    searchFeedRate: number; // mm/min  
+    latchFeedRate: number; // mm/min
+    latchDistance: number; // mm
+    workpieceDimensions: {
+        x: number; // mm
+        y: number; // mm
+    };
 }
 
 export interface State {
@@ -141,4 +154,5 @@ export interface State {
     direction: number;
     probeType: PROBE_TYPES_T;
     connectivityTest: boolean;
+    centerProbeParams: CenterProbeParameters;
 }

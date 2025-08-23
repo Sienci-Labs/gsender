@@ -36,8 +36,10 @@ import { toast } from 'app/lib/toaster';
 
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
+import CenterProbeSettings from './CenterProbeSettings';
 import { Actions, State } from './definitions';
 import { PROBING_CATEGORY } from 'app/constants';
+import { TOUCHPLATE_TYPE_3D_TOUCH } from 'app/lib/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 
@@ -56,6 +58,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         selectedProbeCommand,
         touchplate,
         connectivityTest,
+        centerProbeParams,
     } = state;
     const { probePinStatus } = useTypedSelector((state) => ({
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -136,12 +139,14 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     const probeActive = actions.returnProbeConnectivity();
+    const is3DTouchCenter = touchplateType === TOUCHPLATE_TYPE_3D_TOUCH && probeCommand?.id === 'Center';
 
     return (
         <Dialog open={show} onOpenChange={actions.onOpenChange}>
             <DialogContent
                 className={cx(
-                    'flex flex-col justify-center items-center bg-gray-100 w-[650px] min-h-[450px] p-4',
+                    'flex flex-col justify-center items-center bg-gray-100 min-h-[450px] p-4',
+                    is3DTouchCenter ? 'w-[800px]' : 'w-[650px]',
                     {
                         hidden: !show,
                     },
@@ -150,45 +155,106 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 <DialogHeader className="text-robin-700 flex items-start justify-center">
                     <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
-                    <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug dark:text-white">
-                            <p className="mb-3">
-                                1. Check the tool is positioned correctly
-                                (pictured).
-                            </p>
-                            <p className="mb-3">
-                                2. Lift your touch plate to the tool to check
-                                the circuit is good (indicated by a green
-                                light), then put it back where it was.{'\n'}
-                            </p>
-                            <p className="mb-3">
-                                3. In some cases, holding the touch plate still
-                                while probing will give a more consistent
-                                measurement.
-                            </p>
+                {is3DTouchCenter ? (
+                    <div className="grid grid-cols-[2fr_1fr] gap-4 w-[750px] min-h-[200px]">
+                        <div className="flex flex-col space-y-4">
+                            <div className="text-black leading-snug dark:text-white text-sm">
+                                <p className="mb-2">
+                                    Position the probe needle as close to the workpiece center as possible.
+                                </p>
+                                <p className="mb-2">
+                                    Push the probe needle gently to test that it triggers properly (green light should activate).
+                                </p>
+                                <p className="mb-2">
+                                    Configure probe parameters below.
+                                </p>
+                            </div>
+                            <CenterProbeSettings
+                                centerProbeParams={centerProbeParams}
+                                onParamsChange={actions.updateCenterProbeParams}
+                            />
                         </div>
-                        <Button
-                            variant="primary"
-                            disabled={!connectionMade}
-                            onClick={startProbe}
-                        >
-                            {connectionMade
-                                ? 'Start Probe'
-                                : 'Waiting for probe circuit check...'}
-                        </Button>
+                        <div className="flex flex-col justify-between items-center h-full">
+                            <div className="flex flex-col items-center justify-center flex-1">
+                                <ProbeImage
+                                    probeCommand={probeCommand}
+                                    touchplateType={touchplateType}
+                                    centerProbeParams={centerProbeParams}
+                                />
+                                <ProbeCircuitStatus
+                                    connected={canClick}
+                                    probeActive={probeActive}
+                                />
+                            </div>
+                            <Button
+                                variant="primary"
+                                disabled={!connectionMade}
+                                onClick={startProbe}
+                                className="mt-4"
+                            >
+                                {connectionMade
+                                    ? 'Start Center Probe'
+                                    : 'Waiting for probe circuit check...'}
+                            </Button>
+                        </div>
                     </div>
-                    <div className="flex flex-col sm:m-auto sm:mb-4">
-                        <ProbeImage
-                            probeCommand={probeCommand}
-                            touchplateType={touchplateType}
-                        />
-                        <ProbeCircuitStatus
-                            connected={canClick}
-                            probeActive={probeActive}
-                        />
+                ) : (
+                    <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
+                        <div className="flex flex-col justify-between pb-4">
+                            <div className="text-black leading-snug dark:text-white">
+                                {touchplateType === TOUCHPLATE_TYPE_3D_TOUCH ? (
+                                    <>
+                                        <p className="mb-3">
+                                            Position the probe needle as shown in the image.
+                                        </p>
+                                        <p className="mb-3">
+                                            Push the probe needle gently to test that it triggers properly (green light should activate).
+                                        </p>
+                                        <p className="mb-3">
+                                            Ensure the probe is positioned correctly for the selected axis/axes.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="mb-3">
+                                            1. Check the tool is positioned correctly
+                                            (pictured).
+                                        </p>
+                                        <p className="mb-3">
+                                            2. Lift your touch plate to the tool to check
+                                            the circuit is good (indicated by a green
+                                            light), then put it back where it was.{'\n'}
+                                        </p>
+                                        <p className="mb-3">
+                                            3. In some cases, holding the touch plate still
+                                            while probing will give a more consistent
+                                            measurement.
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                            <Button
+                                variant="primary"
+                                disabled={!connectionMade}
+                                onClick={startProbe}
+                            >
+                                {connectionMade
+                                    ? 'Start Probe'
+                                    : 'Waiting for probe circuit check...'}
+                            </Button>
+                        </div>
+                        <div className="flex flex-col sm:m-auto sm:mb-4">
+                            <ProbeImage
+                                probeCommand={probeCommand}
+                                touchplateType={touchplateType}
+                            />
+                            <ProbeCircuitStatus
+                                connected={canClick}
+                                probeActive={probeActive}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
             </DialogContent>
         </Dialog>
     );
