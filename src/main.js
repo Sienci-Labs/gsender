@@ -176,7 +176,7 @@ const main = () => {
             // resolution used to be 1024x768
             const bounds = {
                 minWidth: 1040,
-                minHeight: 790,
+                minHeight: 796,
                 ...store.get('bounds'),
             };
             const options = {
