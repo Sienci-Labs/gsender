@@ -175,8 +175,8 @@ const main = () => {
             // * `height` Number - The height of the rectangle.
             // resolution used to be 1024x768
             const bounds = {
-                minWidth: 1028,
-                minHeight: 768,
+                minWidth: 1040,
+                minHeight: 790,
                 ...store.get('bounds'),
             };
             const options = {
