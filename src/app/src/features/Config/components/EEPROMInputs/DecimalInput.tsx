@@ -8,7 +8,7 @@ const DecimalInput = ({ info, setting, onChange, disabled }) => {
     value = Number(value);
 
     return (
-        <div className="flex flex-row flex-1 relative items-center">
+        <div className="ring-1 ring-gray-300 flex flex-row flex-1 relative items-center">
             <ControlledInput
                 type="decimal"
                 className={styles.textInput}
