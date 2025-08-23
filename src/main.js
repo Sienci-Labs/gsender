@@ -173,9 +173,10 @@ const main = () => {
             // * `y` Number - The y coordinate of the origin of the rectangle.
             // * `width` Number - The width of the rectangle.
             // * `height` Number - The height of the rectangle.
+            // resolution used to be 1024x768
             const bounds = {
-                minWidth: 1200,
-                minHeight: 900,
+                minWidth: 1028,
+                minHeight: 768,
                 ...store.get('bounds'),
             };
             const options = {
