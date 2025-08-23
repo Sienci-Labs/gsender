@@ -209,7 +209,7 @@ const Workspace = () => {
     useShuttleEvents(shuttleControlEvents);
 
     return (
-        <div className="flex flex-col xl:h-full max-xl:h-auto dark:bg-slate-800">
+        <div className="flex flex-col  h-full xl:h-auto dark:bg-slate-800">
             <TopBar />
             <DataCollection />
             <div className="flex h-full no-scrollbar ">
