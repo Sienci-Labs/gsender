@@ -46,6 +46,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import { Parking } from 'app/features/DRO/component/Parking.tsx';
+import { ToolDisplay } from 'app/features/DRO/component/ToolDisplay.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -388,6 +389,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
+            <ToolDisplay />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (

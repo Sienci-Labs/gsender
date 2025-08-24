@@ -105,9 +105,24 @@ class GrblHalController {
     // Connection
     connection = null;
 
+    parseToolFromStatusReport(data) {
+        const line = data.toString();
+        const toolMatch = line.match(/T:(\d+)/);
+
+        if (toolMatch) {
+            const toolNum = Number(toolMatch[1]);
+            this.state.status = this.state.status || {};
+            this.state.status.currentTool = toolNum;
+            this.emit('controller:state', GRBLHAL, this.state);
+        }
+    }
+
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
+            if (data.toString().includes('T:')) {
+                this.parseToolFromStatusReport(data);
+            }
             this.runner.parse('' + data);
         },
         close: (err) => {

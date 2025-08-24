@@ -62,6 +62,7 @@ const initialState: ControllerState = {
     },
     tool: {
         context: null,
+        currentTool: undefined,
     },
     terminalHistory: [],
     spindles: [],
@@ -230,6 +231,12 @@ const controllerSlice = createSlice({
             state.modal = modal;
             state.wpos = wpos;
             state.mpos = mpos;
+            
+            // Update current tool from status report if available
+            const currentTool = _get(newState, 'status.currentTool');
+            if (currentTool !== undefined) {
+                state.tool.currentTool = currentTool;
+            }
         },
 
         updateFeederStatus: (state, action: PayloadAction<Feeder>) => {
