@@ -59,6 +59,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         touchplate,
         connectivityTest,
         centerProbeParams,
+        units,
     } = state;
     const { probePinStatus } = useTypedSelector((state) => ({
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -175,6 +176,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                             <CenterProbeSettings
                                 centerProbeParams={centerProbeParams}
                                 onParamsChange={actions.updateCenterProbeParams}
+                                units={units}
                             />
                         </div>
                         <div className="flex flex-col justify-between items-center h-full">

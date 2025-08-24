@@ -529,9 +529,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Ball Point Diameter',
                         key: 'workspace.probeProfile.ballDiameter',
                         description:
-                            'Ball point diameter for 3D Touch Probe. (Default 2mm)',
+                            'Ball point diameter for 3D Touch Probe. (Default 2mm / 0.079in)',
                         type: 'number',
-                        unit: 'mm',
+                        unit: 'variable',
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',
@@ -545,9 +545,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Z Plunge Distance',
                         key: 'workspace.probeProfile.zPlungeDistance',
                         description:
-                            'Distance to plunge down into material after Z probing for XY operations. Allows probing thin materials directly. (Default 2mm)',
+                            'Distance to plunge down into material after Z probing for XY operations. Allows probing thin materials directly. (Default 2mm / 0.079in)',
                         type: 'number',
-                        unit: 'mm',
+                        unit: 'variable',
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',

@@ -886,10 +886,14 @@ export const get3DTouchProbeRoutine = (
     probeCommand?: string,
     centerProbeParams?: any,
 ): Array<string> => {
-    const { axes, ballDiameter = 2, zPlungeDistance = 2 } = options;
+    const { axes, ballDiameter = 2, zPlungeDistance = 2, units, $13 } = options;
     const zProbeDistance = 30;
     const code: Array<string> = [];
     const ballRadius = ballDiameter / 2;
+    
+    // Determine user's original units
+    const isImperialUser = units !== METRIC_UNITS || $13 === '1';
+    const originalUnitsCode = isImperialUser ? 'G20' : 'G21';
     
     const processedOptions = {
         ...options,
@@ -903,16 +907,14 @@ export const get3DTouchProbeRoutine = (
     const standardProcessedOptions = updateOptionsForDirection(processedOptions, processedOptions.direction);
 
     if (probeCommand === 'Center') {
+        // Dimensions are always stored in mm, no conversion needed for G21 generation
         const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
         const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
         const probeLocation = centerProbeParams?.probeLocation || 'inner';
         
-        const debugCode = [
-            `; DEBUG: centerProbeParams = ${JSON.stringify(centerProbeParams)}`,
-            `; DEBUG: materialX = ${materialX}, materialY = ${materialY}`,
-            `; DEBUG: probeLocation = ${probeLocation}`,
-        ];
-        code.push(...debugCode);
+        // Add units handling to center probing
+        code.push('; 3D Touch Center Probe - Using G21 internally');
+        code.push('G21 ; Switch to metric for internal calculations');
         
         if (probeLocation === 'outer') {
             const centerCode = generateOuterCenterProbing(materialX, materialY, ballRadius, zPlungeDistance, centerProbeParams);
@@ -922,42 +924,54 @@ export const get3DTouchProbeRoutine = (
             code.push(...centerCode);
         }
         
+        // Reset to user's original units
+        code.push(`${originalUnitsCode} ; Reset to user's original units`);
+        
         return code;
-    } else if (axes.x && axes.y && axes.z) {
-        code.push(
-            `%BALL_RADIUS=${ballRadius}`,
-            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-        );
+    } else {
+        // Standard 3D Touch Probe routines (XYZ, XY, Z, X, Y)
+        code.push('; 3D Touch Probe - Using G21 internally');
+        code.push('G21 ; Switch to metric for internal calculations');
         
-        const customOptions = {
-            ...standardProcessedOptions,
-            zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
-        };
+        if (axes.x && axes.y && axes.z) {
+            code.push(
+                `%BALL_RADIUS=${ballRadius}`,
+                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+            );
+            
+            const customOptions = {
+                ...standardProcessedOptions,
+                zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
+            };
+            
+            code.push(...get3AxisStandardRoutine(customOptions));
+        } else if (axes.x && axes.y) {
+            code.push(
+                `%BALL_RADIUS=${ballRadius}`,
+                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+            );
+            code.push(...get3AxisStandardRoutine(standardProcessedOptions));
+        } else if (axes.z) {
+            code.push(...getPreamble(standardProcessedOptions));
+            code.push(...getSingleAxisStandardRoutine('Z'));
+        } else if (axes.x) {
+            code.push(
+                `%BALL_RADIUS=${ballRadius}`,
+                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+            );
+            code.push(...getPreamble(standardProcessedOptions));
+            code.push(...getSingleAxisStandardRoutine('X'));
+        } else if (axes.y) {
+            code.push(
+                `%BALL_RADIUS=${ballRadius}`,
+                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+            );
+            code.push(...getPreamble(standardProcessedOptions));
+            code.push(...getSingleAxisStandardRoutine('Y'));
+        }
         
-        code.push(...get3AxisStandardRoutine(customOptions));
-    } else if (axes.x && axes.y) {
-        code.push(
-            `%BALL_RADIUS=${ballRadius}`,
-            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-        );
-        code.push(...get3AxisStandardRoutine(standardProcessedOptions));
-    } else if (axes.z) {
-        code.push(...getPreamble(standardProcessedOptions));
-        code.push(...getSingleAxisStandardRoutine('Z'));
-    } else if (axes.x) {
-        code.push(
-            `%BALL_RADIUS=${ballRadius}`,
-            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-        );
-        code.push(...getPreamble(standardProcessedOptions));
-        code.push(...getSingleAxisStandardRoutine('X'));
-    } else if (axes.y) {
-        code.push(
-            `%BALL_RADIUS=${ballRadius}`,
-            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-        );
-        code.push(...getPreamble(standardProcessedOptions));
-        code.push(...getSingleAxisStandardRoutine('Y'));
+        // Reset to user's original units
+        code.push(`${originalUnitsCode} ; Reset to user's original units`);
     }
 
     return code;

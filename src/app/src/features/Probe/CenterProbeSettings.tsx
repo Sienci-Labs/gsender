@@ -23,16 +23,39 @@
 
 import React from 'react';
 import { CenterProbeParameters } from './definitions';
+import { METRIC_UNITS } from '../../constants';
+import { UNITS_EN } from 'app/definitions/general';
+import { mm2in, in2mm } from 'app/lib/units';
 
 interface Props {
     centerProbeParams: CenterProbeParameters;
     onParamsChange: (params: Partial<CenterProbeParameters>) => void;
+    units: UNITS_EN;
 }
 
 const CenterProbeSettings: React.FC<Props> = ({
     centerProbeParams,
     onParamsChange,
+    units,
 }) => {
+    const isImperial = units !== METRIC_UNITS;
+    const unitsLabel = isImperial ? 'in' : 'mm';
+    
+    // Convert stored values (always in mm) to display values
+    const getDisplayValue = (value: number): number => {
+        if (typeof value !== 'number' || isNaN(value)) {
+            return isImperial ? 0.394 : 10; // Default fallback values
+        }
+        return isImperial ? Number(mm2in(value).toFixed(4)) : value;
+    };
+    
+    // Convert display values to stored values (always in mm)
+    const getStoredValue = (displayValue: number): number => {
+        if (typeof displayValue !== 'number' || isNaN(displayValue)) {
+            return 10; // Default fallback in mm
+        }
+        return isImperial ? in2mm(displayValue) : displayValue;
+    };
     const handleLocationChange = (value: 'inner' | 'outer') => {
         onParamsChange({ probeLocation: value });
     };
@@ -45,12 +68,13 @@ const CenterProbeSettings: React.FC<Props> = ({
     const handleDimensionChange = (axis: 'x' | 'y') => (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
-        const value = parseFloat(event.target.value);
-        if (!isNaN(value)) {
+        const displayValue = parseFloat(event.target.value);
+        if (!isNaN(displayValue)) {
+            const storedValue = getStoredValue(displayValue);
             onParamsChange({
                 workpieceDimensions: {
                     ...centerProbeParams.workpieceDimensions,
-                    [axis]: value,
+                    [axis]: storedValue,
                 },
             });
         }
@@ -110,7 +134,7 @@ const CenterProbeSettings: React.FC<Props> = ({
             {/* Workpiece Dimensions */}
             <div className="flex flex-col">
                 <label className="font-medium text-sm mb-2">
-                    {centerProbeParams.probeLocation === 'inner' ? 'Hole Dimensions (mm)' : 'Workpiece Dimensions (mm)'}
+                    {centerProbeParams.probeLocation === 'inner' ? `Hole Dimensions (${unitsLabel})` : `Workpiece Dimensions (${unitsLabel})`}
                 </label>
                 <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-3">
                     <div className="flex items-start">
@@ -129,22 +153,22 @@ const CenterProbeSettings: React.FC<Props> = ({
                         <label className="text-sm mb-1">X Dimension</label>
                         <input
                             type="number"
-                            value={centerProbeParams.workpieceDimensions.x}
+                            value={getDisplayValue(centerProbeParams.workpieceDimensions?.x || 10)}
                             onChange={handleDimensionChange('x')}
                             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                            min="0.1"
-                            step="0.1"
+                            min={isImperial ? "0.004" : "0.1"}
+                            step={isImperial ? "0.001" : "0.1"}
                         />
                     </div>
                     <div className="flex flex-col">
                         <label className="text-sm mb-1">Y Dimension</label>
                         <input
                             type="number"
-                            value={centerProbeParams.workpieceDimensions.y}
+                            value={getDisplayValue(centerProbeParams.workpieceDimensions?.y || 10)}
                             onChange={handleDimensionChange('y')}
                             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                            min="0.1"
-                            step="0.1"
+                            min={isImperial ? "0.004" : "0.1"}
+                            step={isImperial ? "0.001" : "0.1"}
                         />
                     </div>
                 </div>
