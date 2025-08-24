@@ -56,7 +56,7 @@
     "github-release": "github-release",
     "electron-rebuild": "electron-rebuild",
     "package-sync": "node scripts/package-sync.js",
-    "build:macos": "bash -c 'scripts/electron-builder.sh --macos --x64'",
+    "build:macos": "bash -c 'scripts/electron-builder.sh --macos --x64 --arm64'",
     "build:macos-x64": "bash -c 'scripts/electron-builder.sh --macos --x64'",
     "build:macos-arm64": "bash -c 'scripts/electron-builder.sh --macos --arm64'",
     "build:linux-ia32": "bash -c 'scripts/electron-builder.sh --linux --ia32'",
