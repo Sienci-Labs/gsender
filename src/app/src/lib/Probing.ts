@@ -267,7 +267,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -313,7 +313,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
@@ -349,7 +349,7 @@ export const get3AxisAutoRoutine = ({
         code.push(
             '; Probe Z Auto Endmill',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -361,7 +361,7 @@ export const get3AxisAutoRoutine = ({
             '; Probe X Auto Endmill',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
@@ -384,7 +384,7 @@ export const get3AxisAutoRoutine = ({
             '; Probe Y Auto Endmill',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 Y-13',
             'G38.2 Y-30 F150',
@@ -432,7 +432,7 @@ export const get3AxisAutoTipRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -477,7 +477,7 @@ export const get3AxisAutoTipRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
@@ -513,7 +513,7 @@ export const get3AxisAutoTipRoutine = ({
         code.push(
             '; Probe Z Auto Tip',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -526,7 +526,7 @@ export const get3AxisAutoTipRoutine = ({
             '; Probe X Auto Tip',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
@@ -549,7 +549,7 @@ export const get3AxisAutoTipRoutine = ({
             '; Probe Y Auto Tip',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
@@ -595,7 +595,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -626,7 +626,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X13',
             'G38.2 X20 F250',
@@ -651,7 +651,7 @@ export const get3AxisAutoDiameterRoutine = ({
         code.push(
             '; Probe Z AutoZero Specific Diameter',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -664,7 +664,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; Probe Y',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 Y13',
             'G38.2 Y20 F250',
@@ -681,7 +681,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; Probe X',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X13',
             'G38.2 X20 F250',
@@ -726,9 +726,9 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
     if (probeZ) {
         centerCode.push(
             'G90 G0 Z[START_Z + 5]',
-            'G38.2 Z-25 F200',
+            'G91 G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
-            'G38.2 Z-3 F75',
+            'G91 G38.2 Z-3 F75',
             'G4 P0.3',
             'G10 L20 P0 Z0',
             'G0 Z5'
@@ -740,9 +740,9 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
     centerCode.push(
         `G90 G0 X[START_X - ${leftPos}]`,
         `G91 G0 Z${zDown}`,
-        `G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
-        'G0 X-2',
-        `G38.2 X3 F[LATCH_FEED]`,
+        `G91 G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
+        'G91 G0 X-2',
+        `G91 G38.2 X3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_LEFT=[posx - BALL_RADIUS]',
         'G91 G0 X-3',
@@ -751,9 +751,9 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         
         `G90 G0 X[START_X + ${rightPos}]`,
         `G91 G0 Z${zDown}`,
-        `G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
-        'G0 X2',
-        `G38.2 X-3 F[LATCH_FEED]`,
+        `G91 G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
+        'G91 G0 X2',
+        `G91 G38.2 X-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_RIGHT=[posx + BALL_RADIUS]',
         'G91 G0 X3',
@@ -762,9 +762,9 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         
         `G90 G0 Y[START_Y - ${backPos}]`,
         `G91 G0 Z${zDown}`,
-        `G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
-        'G0 Y-2',
-        `G38.2 Y3 F[LATCH_FEED]`,
+        `G91 G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
+        'G91 G0 Y-2',
+        `G91 G38.2 Y3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_BACK=[posy - BALL_RADIUS]',
         'G91 G0 Y-3',
@@ -773,9 +773,9 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         
         `G90 G0 Y[START_Y + ${frontPos}]`,
         `G91 G0 Z${zDown}`,
-        `G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
-        'G0 Y2',
-        `G38.2 Y-3 F[LATCH_FEED]`,
+        `G91 G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
+        'G91 G0 Y2',
+        `G91 G38.2 Y-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_FRONT=[posy + BALL_RADIUS]',
         'G91 G0 Y3',
@@ -813,70 +813,65 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
         'G90',
     ];
     
-    // Left edge probing (inner - probe towards left)
     if (useRapidX) {
         centerCode.push(`G90 G0 X[START_X - ${maxRapidDistanceX}]`);
     }
    
     centerCode.push('G21 G91');
-    centerCode.push(`G38.2 X-25 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 X-30 F[SEARCH_FEED]`);
     
     centerCode.push(
         'G21 G91 G0 X2',
-        `G38.2 X-30 F[LATCH_FEED]`,
+        `G91 G38.2 X-30 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_LEFT=[posx - BALL_RADIUS]',
         'G90 G0 X[START_X] Y[START_Y]'
     );
     
-    // Right edge probing (inner - probe towards right)
     if (useRapidX) {
         centerCode.push(`G90 G0 X[START_X + ${maxRapidDistanceX}]`);
     }
 
     centerCode.push('G21 G91');
-    centerCode.push(`G38.2 X30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 X30 F[SEARCH_FEED]`);
        
     centerCode.push(
         'G21 G91 G0 X-2',
-        `G38.2 X3 F[LATCH_FEED]`,
+        `G91 G38.2 X3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_RIGHT=[posx + BALL_RADIUS]',
         'G90 G0 X[START_X] Y[START_Y]'
     );
     
-    // Back edge probing (inner - probe towards back)
     if (useRapidY) {
         centerCode.push(`G90 G0 Y[START_Y - ${maxRapidDistanceY}]`);
     }
 
     centerCode.push('G21 G91');
-    centerCode.push(`G38.2 Y-30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 Y-30 F[SEARCH_FEED]`);
 
     centerCode.push(
         'G21 G91 G0 Y2',
-        `G38.2 Y-3 F[LATCH_FEED]`,
+        `G91 G38.2 Y-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_BACK=[posy - BALL_RADIUS]',
         'G90 G0 X[START_X] Y[START_Y]'
     );
     
-    // Front edge probing (inner - probe towards front)
     if (useRapidY) {
         centerCode.push(`G90 G0 Y[START_Y + ${maxRapidDistanceY}]`);
     }
 
     centerCode.push('G21 G91');
-    centerCode.push(`G38.2 Y30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 Y30 F[SEARCH_FEED]`);
     
     centerCode.push(
-        'G0 Y-2',
-        `G38.2 Y3 F[LATCH_FEED]`,
+        'G91 G0 Y-2',
+        `G91 G38.2 Y3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_FRONT=[posy + BALL_RADIUS]',
         'G90 G0 X[START_X] Y[START_Y]',
         
-        // Calculate center and move to it
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
         'G0 X[CENTER_X] Y[CENTER_Y]',
@@ -891,7 +886,8 @@ export const get3DTouchProbeRoutine = (
     probeCommand?: string,
     centerProbeParams?: any,
 ): Array<string> => {
-    const { axes, ballDiameter = 2, zPlungeDistance = 2, zProbeDistance } = options;
+    const { axes, ballDiameter = 2, zPlungeDistance = 2 } = options;
+    const zProbeDistance = 30;
     const code: Array<string> = [];
     const ballRadius = ballDiameter / 2;
     

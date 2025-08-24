@@ -569,8 +569,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_3D_TOUCH;
                         },
                     },
                     {
