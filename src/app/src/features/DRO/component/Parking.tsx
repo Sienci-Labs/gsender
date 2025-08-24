@@ -45,6 +45,7 @@ export function Parking({ disabled = false }) {
             disabled={disabled}
             icon={<RiParkingFill />}
             variant="primary"
+            size="sm"
             onClick={goToParkLocation}
         />
     );
