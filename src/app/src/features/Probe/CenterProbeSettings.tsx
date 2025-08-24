@@ -112,6 +112,18 @@ const CenterProbeSettings: React.FC<Props> = ({
                 <label className="font-medium text-sm mb-2">
                     {centerProbeParams.probeLocation === 'inner' ? 'Hole Dimensions (mm)' : 'Workpiece Dimensions (mm)'}
                 </label>
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md mb-3">
+                    <div className="flex items-start">
+                        <span className="text-red-600 dark:text-red-400 mr-2">⚠️</span>
+                        <div className="text-sm text-red-800 dark:text-red-200">
+                            <strong>IMPORTANT:</strong> Incorrect dimensions can cause probe needle damage! 
+                            {centerProbeParams.probeLocation === 'inner' 
+                                ? ' Measure the hole dimensions accurately - values too large will crash the probe into the hole walls.'
+                                : ' Measure the workpiece dimensions accurately - values too small will cause the probe to plunge too early and hit the material surface.'
+                            }
+                        </div>
+                    </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col">
                         <label className="text-sm mb-1">X Dimension</label>
