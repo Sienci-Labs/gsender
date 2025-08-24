@@ -442,13 +442,20 @@ const ProbeWidget = () => {
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = units === METRIC_UNITS ? '21' : '20';
         if (units === METRIC_UNITS) {
-            zThickness = touchplate.zThickness;
+            // Use 3D Touch specific Z offset if it's a 3D Touch Probe
+            zThickness = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+                ? (touchplate.zThickness3DTouch ?? -0.1)
+                : touchplate.zThickness;
             xyThickness = touchplate.xyThickness;
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
         } else {
-            zThickness = convertToImperial(touchplate.zThickness);
+            // Use 3D Touch specific Z offset if it's a 3D Touch Probe
+            const baseZThickness = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+                ? (touchplate.zThickness3DTouch ?? -0.1)
+                : touchplate.zThickness;
+            zThickness = convertToImperial(baseZThickness);
             xyThickness = convertToImperial(touchplate.xyThickness);
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);

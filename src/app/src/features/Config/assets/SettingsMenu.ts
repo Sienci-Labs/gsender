@@ -529,7 +529,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Ball Point Diameter',
                         key: 'workspace.probeProfile.ballDiameter',
                         description:
-                            'Ball point diameter for 3D Touch Probe. (Default 2mm / 0.079in)',
+                            'Ball point diameter for 3D Touch Probe. Can be reduced by 0.1-0.15mm from actual diameter to compensate for probe needle deflection. (Default 2mm / 0.079in)',
                         type: 'number',
                         unit: 'variable',
                         hidden: () => {
@@ -546,6 +546,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.probeProfile.zPlungeDistance',
                         description:
                             'Distance to plunge down into material after Z probing for XY operations. Allows probing thin materials directly. (Default 2mm / 0.079in)',
+                        type: 'number',
+                        unit: 'variable',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Only show for 3D Touch Probe
+                            return probeType !== TOUCHPLATE_TYPE_3D_TOUCH;
+                        },
+                    },
+                    {
+                        label: 'Z Offset',
+                        key: 'workspace.probeProfile.zThickness3DTouch',
+                        description:
+                            'Compensates for 3D Touch Probe tip deflection when contacting material. Negative values account for probe tip bending/compression. (Default -0.1mm / -0.004in)',
                         type: 'number',
                         unit: 'variable',
                         hidden: () => {

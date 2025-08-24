@@ -100,6 +100,7 @@ const defaultState: State = {
             touchplateType: 'Standard Block',
             ballDiameter: 2,
             zPlungeDistance: 2,
+            zThickness3DTouch: -0.1,
         },
         tools: [
             {

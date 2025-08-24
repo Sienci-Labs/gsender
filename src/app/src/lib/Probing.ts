@@ -901,7 +901,7 @@ export const get3DTouchProbeRoutine = (
         direction: options.direction || 0,
         retract: 4,
         xyThickness: 0,
-        zThickness: 0,
+        // Keep the original zThickness from options instead of overriding to 0
     };
     
     const standardProcessedOptions = updateOptionsForDirection(processedOptions, processedOptions.direction);
