@@ -10,7 +10,7 @@ export function ToolLink({ link, label }: ToolLinkProps) {
     return (
         <Link
             to={link}
-            className="text-sm border border-blue-500 bg-white dark:bg-dark shadow hover:bg-gray-100 text-gray-700 p-2 justify-center rounded flex flex-row gap-2 items-center dark:text-white dark:hover:bg-dark-lighter"
+            className="bg-white shadow p-2 rounded border border-blue-500 justify-center flex flex-row gap-2 items-center text-sm text-gray-700 hover:bg-gray-100 dark:bg-dark dark:text-white dark:hover:bg-dark-lighter"
         >
             <FaHatWizard className="text-lg" />
             {label}

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import cx from 'classnames';
 
 import { Button } from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
-import { Label } from 'app/components/shadcn/Label';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import controller from 'app/lib/controller';
@@ -10,88 +11,31 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
-    METRIC_UNITS,
     TOOLBAR_CATEGORY,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import useKeybinding from 'app/lib/useKeybinding';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import store from 'app/store';
 
+import { RotarySurfacingOptions } from './definitions';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
 import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import useKeybinding from 'app/lib/useKeybinding';
-import { useNavigate } from 'react-router';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import cx from 'classnames';
-import store from 'app/store';
-import { Rotary } from './definitions';
-import { convertToImperial, convertToMetric } from 'app/lib/units';
-
-const InputArea = ({
-    children,
-    label,
-}: {
-    children: React.ReactNode;
-    label: string;
-}) => {
-    return (
-        <div className="grid grid-cols-5 items-center gap-4">
-            <Label htmlFor={label} className="col-span-2">
-                {label}
-            </Label>
-            {children}
-        </div>
-    );
-};
-
-// Default values in mm
-const DEFAULT_VALUES_MM = {
-    stockLength: 100,
-    startHeight: 50,
-    finalHeight: 40,
-    stepdown: 20,
-    bitDiameter: 6.35,
-    stepover: 15,
-    spindleRPM: 17000,
-    feedrate: 3000,
-    enableRehoming: false,
-    shouldDwell: false,
-};
+import InputArea from './components/InputArea';
+import { DEFAULT_VALUES_MM } from './constants';
 
 const RotarySurfacing = () => {
     const navigate = useNavigate();
-    const units = store.get('workspace.units', METRIC_UNITS);
+    const { units } = useWorkspaceState();
     const status = useTypedSelector((state) => state?.controller.state?.status);
-    const isDisabled =
-        status &&
-        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
-
-    // Initialize state with appropriate units
-    const getInitialState = () => {
-        const options = store.get(
-            'rotary.stockTurning.options',
-            DEFAULT_VALUES_MM,
-        );
-
-        if (units === IMPERIAL_UNITS) {
-            return {
-                ...options,
-                stockLength: convertToImperial(options.stockLength),
-                startHeight: convertToImperial(options.startHeight),
-                finalHeight: convertToImperial(options.finalHeight),
-                stepdown: convertToImperial(options.stepdown),
-                bitDiameter: convertToImperial(options.bitDiameter),
-                feedrate: convertToImperial(options.feedrate),
-            };
-        }
-        return options;
-    };
-
     const [surfacingState, setSurfacingState] =
-        useState<Rotary['stockTurning']['options']>(getInitialState());
+        useState<RotarySurfacingOptions>(getInitialState());
     const [gcode, setGcode] = useState('');
     const [tabSwitch, setTabSwitch] = useState(false);
 
@@ -115,8 +59,27 @@ const RotarySurfacing = () => {
         return saveState;
     }, [surfacingState]);
 
-    const inputStyle =
-        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
+    // Initialize state with appropriate units
+    function getInitialState(): RotarySurfacingOptions {
+        const options = store.get(
+            'rotary.stockTurning.options',
+            DEFAULT_VALUES_MM,
+        );
+
+        if (units === IMPERIAL_UNITS) {
+            return {
+                ...options,
+                stockLength: convertToImperial(options.stockLength),
+                startHeight: convertToImperial(options.startHeight),
+                finalHeight: convertToImperial(options.finalHeight),
+                stepdown: convertToImperial(options.stepdown),
+                bitDiameter: convertToImperial(options.bitDiameter),
+                feedrate: convertToImperial(options.feedrate),
+            };
+        }
+
+        return options;
+    }
 
     const handleGenerateGcode = () => {
         const generator = new StockTurningGenerator({
@@ -175,6 +138,14 @@ const RotarySurfacing = () => {
             callback: () => navigate('/tools/rotary-surfacing'),
         },
     };
+
+    const isDisabled =
+        status &&
+        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
+
+    const inputStyle =
+        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
     useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
@@ -293,8 +264,8 @@ const RotarySurfacing = () => {
                                 />
                             </div>
                         </InputArea>
-                        <div>
-                            <InputArea label="Enable Rehoming">
+                        <InputArea label="Enable Rehoming">
+                            <div className="flex items-center gap-2 justify-center">
                                 <Switch
                                     checked={surfacingState.enableRehoming}
                                     onChange={(checked) =>
@@ -304,15 +275,11 @@ const RotarySurfacing = () => {
                                         }))
                                     }
                                 />
-                            </InputArea>
-                            <div className="text-xs xl:text-sm text-gray-500 mt-3">
-                                This option creates a more consistent surface
-                                finish as your A axis will spin in only one
-                                direction across the entire length of your
-                                material. You will however need to rehome after
-                                surfacing to reset your A axis coordinates.
+                            </div> 
+                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
+                                Cut faster and cleaner by only rotating one direction, but you will need to rehome your A-axis at the end.
                             </div>
-                        </div>
+                        </InputArea>
                     </div>
                     <div className="flex flex-col border border-gray-200 rounded-md">
                         <Tabs defaultValue="visualizer">

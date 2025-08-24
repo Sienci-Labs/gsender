@@ -88,6 +88,7 @@ export interface ControllerState {
     };
     tool: {
         context: BasicObject;
+        currentTool?: number;
     };
     terminalHistory: Array<string>;
     spindles: Array<Spindle>;

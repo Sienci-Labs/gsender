@@ -46,6 +46,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import { Parking } from 'app/features/DRO/component/Parking.tsx';
+import { ToolDisplay } from 'app/features/DRO/component/ToolDisplay.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -204,7 +205,7 @@ function DRO({
         ZERO_A_AXIS: {
             id: 72,
             title: 'Zero A-axis',
-            keys: ['shift', '0'].join('+'),
+            keys: ['shift', 'y'].join('+'),
             cmd: 'ZERO_A_AXIS',
             preventDefault: true,
             payload: { axis: AXIS_A },
@@ -235,7 +236,7 @@ function DRO({
         GO_TO_A_AXIS_ZERO: {
             id: 73,
             title: 'Go to A zero',
-            keys: ['shift', '1'].join('+'),
+            keys: ['shift', 't'].join('+'),
             cmd: 'GO_TO_A_AXIS_ZERO',
             preventDefault: true,
             payload: { axisList: [AXIS_A] },
@@ -388,6 +389,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge />
+            <ToolDisplay />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (

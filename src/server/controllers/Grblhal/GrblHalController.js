@@ -105,9 +105,24 @@ class GrblHalController {
     // Connection
     connection = null;
 
+    parseToolFromStatusReport(data) {
+        const line = data.toString();
+        const toolMatch = line.match(/T:(\d+)/);
+
+        if (toolMatch) {
+            const toolNum = Number(toolMatch[1]);
+            this.state.status = this.state.status || {};
+            this.state.status.currentTool = toolNum;
+            this.emit('controller:state', GRBLHAL, this.state);
+        }
+    }
+
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
+            if (data.toString().includes('T:')) {
+                this.parseToolFromStatusReport(data);
+            }
             this.runner.parse('' + data);
         },
         close: (err) => {
@@ -164,6 +179,8 @@ class GrblHalController {
         alarmCompleteReport: false, //0x87
         axsReportCount: 0
     };
+
+    parserStateEnabled = false;
 
     actionTime = {
         queryParserState: 0,
@@ -698,7 +715,8 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
-            if (this.actionMask.queryParserState.reply) {
+            // we only query when parser state option in $10 is disabled
+            if (this.actionMask.queryParserState.reply && !this.parserStateEnabled) {
                 if (this.actionMask.replyParserState) {
                     this.actionMask.replyParserState = false;
                     this.emit('serialport:read', res.raw);
@@ -706,6 +724,15 @@ class GrblHalController {
                 this.actionMask.queryParserState.reply = false;
 
                 return;
+                // if parser state is enabled, it does not send an 'ok' when the state auto emits
+                // so only consume the ok if the user entered $G
+            } else if (this.actionMask.queryParserState.reply && this.parserStateEnabled) {
+                if (this.actionMask.replyParserState) {
+                    this.actionMask.replyParserState = false;
+                    this.actionMask.queryParserState.reply = false;
+                    this.emit('serialport:read', res.raw);
+                    return;
+                }
             }
 
             const { hold, sent, received } = this.sender.state;
@@ -926,6 +953,17 @@ class GrblHalController {
                     this.emit('serialport:read', `${res.name}=${res.value}`);
                 }
             }
+
+            // check if parser state option is enabled
+            if (res.name === '$10') {
+                const value = res.value;
+                // eslint-disable-next-line no-bitwise
+                if (value & 512) {
+                    this.parserStateEnabled = true;
+                } else {
+                    this.parserStateEnabled = false;
+                }
+            }
         });
 
         this.runner.on('info', (res) => {
@@ -1026,7 +1064,8 @@ class GrblHalController {
         // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
-            if (!(this.ready)) {
+            // if parser state enabled, we dont need to query the parser state
+            if (!(this.ready) || this.parserStateEnabled) {
                 return;
             }
 
@@ -1335,8 +1374,8 @@ class GrblHalController {
         // We set controller ready if version found
         setTimeout(async () => {
             if (this.connection) {
-                await delay(100);
                 this.connection.writeImmediate(String.fromCharCode(0x87));
+                await delay(100);
                 this.write('$I\n');
             }
             if (!refresh) {
@@ -1604,7 +1643,7 @@ class GrblHalController {
 
                     const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                     let modalWcs = modal.wcs;
-                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                    if (modalWcs !== wcs && modalWcs === 'G54') {
                         modalWcs = wcs;
                     }
                     const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;

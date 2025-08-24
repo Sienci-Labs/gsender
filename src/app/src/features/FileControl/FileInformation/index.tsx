@@ -273,7 +273,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                     <span className="text-gray-500">Size</span>
                 </div>
 
-                <div className="w-full overflow-auto">
+                <div className="w-full overflow-auto self-center">
                     <ToggleOutput />
                 </div>
             </div>

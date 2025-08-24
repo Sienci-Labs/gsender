@@ -319,7 +319,7 @@ const SetShortcut = () => {
 
                         <div className="text-base">
                             <div className="my-8">
-                                <p>Use As Lockout Button</p>
+                                <p>Use as Lockout button</p>
                                 <Switch
                                     checked={isLockoutButton}
                                     onChange={(checked) =>
@@ -333,7 +333,7 @@ const SetShortcut = () => {
                             </div>
 
                             <div>
-                                <p>Use As Enable Second Action Button</p>
+                                <p>Use as 2nd Action button</p>
                                 <Switch
                                     checked={isSecondaryActionButton}
                                     onChange={(checked) =>

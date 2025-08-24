@@ -14,10 +14,10 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
         onChange(newIP);
     }
     return (
-        <div className="flex flex-row gap-2 items-end">
+        <div className="flex flex-row gap-1 items-end justify-center">
             <ControlledInput
                 type="number"
-                className="w-[6ch] p-2 text-center"
+                className="w-[4ch] px-0 text-center ring-1 ring-gray-300 rounded-md"
                 value={ip[0]}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateIPPortion(0, e.target.value)
@@ -26,7 +26,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
             .
             <ControlledInput
                 type="number"
-                className="w-[6ch] p-2 text-center"
+                className="w-[4ch] px-0 text-center ring-1 ring-gray-300 rounded-md"
                 value={ip[1]}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateIPPortion(1, e.target.value)
@@ -35,7 +35,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
             .
             <ControlledInput
                 type="number"
-                className="w-[6ch] p-2 text-center"
+                className="w-[4ch] px-0 text-center ring-1 ring-gray-300 rounded-md"
                 value={ip[2]}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateIPPortion(2, e.target.value)
@@ -44,7 +44,7 @@ export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
             .
             <ControlledInput
                 type="number"
-                className="w-[6ch] p-2 text-center"
+                className="w-[4ch] px-0 text-center ring-1 ring-gray-300 rounded-md"
                 value={ip[3]}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateIPPortion(3, e.target.value)

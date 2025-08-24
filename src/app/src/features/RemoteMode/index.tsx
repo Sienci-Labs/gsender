@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
+import ipLib from 'ip';
+import { useSelector } from 'react-redux';
+
 import {
     Dialog,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
@@ -14,16 +17,22 @@ import {
 } from 'app/components/shadcn/Select.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import Button from 'app/components/Button';
-import ipLib from 'ip';
-//import Select from 'react-select';
 import { Switch } from 'app/components/shadcn/Switch';
-import { useEffect, useState } from 'react';
 import { toast } from 'app/lib/toaster';
-import { actions } from './apiActions.ts';
 import controller from 'app/lib/controller.ts';
-import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+
+import { actions } from './apiActions.ts';
+
+type RemoteModeDialogProps = {
+    showRemote: boolean;
+    onClose: (open: boolean) => void;
+    setHeadlessSettings: (settings: any) => void;
+    remoteIp: string;
+    remotePort: number;
+    remoteOn: boolean;
+};
 
 export function RemoteModeDialog({
     showRemote,
@@ -32,7 +41,7 @@ export function RemoteModeDialog({
     remoteIp,
     remotePort,
     remoteOn,
-}) {
+}: RemoteModeDialogProps) {
     const [port, setPort] = useState(8000);
     const [ip, setIp] = useState('127.0.0.1');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
@@ -55,13 +64,13 @@ export function RemoteModeDialog({
         setRemoteEnabled(!remoteEnabled);
     }
 
-    function updatePort(e) {
+    function updatePort(e: React.ChangeEvent<HTMLInputElement>) {
         setDirty(true);
         e.preventDefault();
-        setPort(e.target.value);
+        setPort(Number(e.target.value));
     }
 
-    function onIPSelect(v) {
+    function onIPSelect(v: string) {
         setDirty(true);
         setIp(v);
     }
@@ -80,7 +89,9 @@ export function RemoteModeDialog({
         }
 
         if (!ipLib.isV4Format(ip)) {
-            toast.error(`Invalid IP Address - ${ip} does not look like a valid V4 IP address`);
+            toast.error(
+                `Invalid IP Address - ${ip} does not look like a valid V4 IP address`,
+            );
             return;
         }
 
@@ -92,7 +103,7 @@ export function RemoteModeDialog({
         });
     }
 
-    function saveRemotePreferences(e) {
+    function saveRemotePreferences(e: React.FormEvent<HTMLButtonElement>) {
         e.preventDefault();
 
         Confirm({
@@ -147,7 +158,7 @@ export function RemoteModeDialog({
                             <div className="flex flex-row w-full justify-start items-center gap-4">
                                 <span className="dark:text-white">Port:</span>
                                 <input
-                                    className="border border-gray-200 rounded p-2 focus:outline-none w-full"
+                                    className="border border-gray-200 rounded p-2 focus:outline-none w-full dark:bg-dark dark:text-white"
                                     type="number"
                                     value={port}
                                     onChange={updatePort}
