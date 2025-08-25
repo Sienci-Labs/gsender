@@ -737,6 +737,7 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         'G91 G0 X-3',
         `G90 G0 Z${safeZHeight}`,
 
+        `G90 G0 X[START_X] Y[START_Y]`,
         `G90 G38.3 X[START_X + ${rightPos}] F${searchFeedRate}`,
         `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
@@ -748,6 +749,7 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         `G90 G0 Z${safeZHeight}`,
         `G90 G38.3 X[START_X] Y[START_Y] F${searchFeedRate}`,
         
+        `G90 G0 X[START_X] Y[START_Y]`,
         `G90 G38.3 Y[START_Y - ${backPos}] F${searchFeedRate}`,
         `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
@@ -758,6 +760,7 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         'G91 G0 Y-3',
         `G90 G0 Z${safeZHeight}`,
         
+        `G90 G0 X[START_X] Y[START_Y]`,
         `G90 G38.3 Y[START_Y + ${frontPos}] F${searchFeedRate}`,
         `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
@@ -767,8 +770,8 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         '%Y_FRONT=[posy + BALL_RADIUS]',
         'G91 G0 Y3',
         `G90 G0 Z${safeZHeight} `,
+
         `G90 G0 X[START_X] Y[START_Y]`,
-        
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
         `G0 X[CENTER_X] Y[CENTER_Y]`,
