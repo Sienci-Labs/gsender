@@ -76,6 +76,7 @@ export interface ProbingOptions {
     probeType: PROBE_TYPES_T;
     ballDiameter?: number;
     zPlungeDistance?: number;
+    searchFeedRate?: number;
 }
 
 export interface ProbeWidgetSettings {
@@ -136,6 +137,7 @@ export interface CenterProbeParameters {
         y: number; // mm
     };
     probeZ: boolean; // Only for outer probing
+    searchFeedRate: number; // mm/min
 }
 
 export interface State {

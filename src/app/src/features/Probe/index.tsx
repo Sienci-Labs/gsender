@@ -484,6 +484,7 @@ const ProbeWidget = () => {
             ballDiameter: touchplate.ballDiameter || 2,
             zPlungeDistance: touchplate.zPlungeDistance || 2,
             zProbeDistance: probeDistances.z,
+            searchFeedRate: centerProbeParams.searchFeedRate || 2000,
         };
 
         const probeCommand = availableProbeCommands[selectedProbeCommand];

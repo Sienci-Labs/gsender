@@ -698,7 +698,7 @@ export const get3AxisAutoDiameterRoutine = ({
     return code;
 };
 
-const generateOuterCenterProbing = (materialX: number, materialY: number, ballRadius: number, zPlungeDistance: number, centerProbeParams?: CenterProbeParameters): string[] => {
+const generateOuterCenterProbing = (materialX: number, materialY: number, ballRadius: number, zPlungeDistance: number, rapidFeedRate?: number, centerProbeParams?: CenterProbeParameters): string[] => {
     const halfX = materialX / 2;
     const halfY = materialY / 2;
     const clearance = 10;
@@ -713,6 +713,8 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
     const zDown = -(zPlungeDistance + 5);
     const safeZHeight = probeZ ? '5' : '[START_Z + 5]';
     
+    const searchFeedRate = rapidFeedRate || 2000;
+    
     const centerCode = [
         '%START_X=posx',
         '%START_Y=posy',
@@ -721,36 +723,22 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         `%SEARCH_FEED=${searchFeed}`,
         `%LATCH_FEED=${latchFeed}`,
         'G90',
+        `G90 G38.3 Z[START_Z + 5] F1000`,
     ];
     
-    if (probeZ) {
-        centerCode.push(
-            'G90 G0 Z[START_Z + 5]',
-            'G91 G38.2 Z-30 F200',
-            'G21 G91 G0 Z2',
-            'G91 G38.2 Z-3 F75',
-            'G4 P0.3',
-            'G10 L20 P0 Z0',
-            'G0 Z5'
-        );
-    } else {
-        centerCode.push('G90 G0 Z[START_Z + 5]');
-    }
-    
     centerCode.push(
-        `G90 G0 X[START_X - ${leftPos}]`,
-        `G91 G0 Z${zDown}`,
-        `G91 G38.2 X${leftPos + 10} F[SEARCH_FEED]`,
+        `G91 G38.3 X-${leftPos} F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F1000`,
+        `G91 G38.2 X30 F[SEARCH_FEED]`,
         'G91 G0 X-2',
         `G91 G38.2 X3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_LEFT=[posx - BALL_RADIUS]',
         'G91 G0 X-3',
         `G90 G0 Z${safeZHeight}`,
-        'G90 G0 X[START_X] Y[START_Y]',
-        
-        `G90 G0 X[START_X + ${rightPos}]`,
-        `G91 G0 Z${zDown}`,
+
+        `G90 G38.3 X[START_X + ${rightPos}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
         'G91 G0 X2',
         `G91 G38.2 X-3 F[LATCH_FEED]`,
@@ -758,10 +746,10 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         '%X_RIGHT=[posx + BALL_RADIUS]',
         'G91 G0 X3',
         `G90 G0 Z${safeZHeight}`,
-        'G90 G0 X[START_X] Y[START_Y]',
+        `G90 G38.3 X[START_X] Y[START_Y] F${searchFeedRate}`,
         
-        `G90 G0 Y[START_Y - ${backPos}]`,
-        `G91 G0 Z${zDown}`,
+        `G90 G38.3 Y[START_Y - ${backPos}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
         'G91 G0 Y-2',
         `G91 G38.2 Y3 F[LATCH_FEED]`,
@@ -769,32 +757,31 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         '%Y_BACK=[posy - BALL_RADIUS]',
         'G91 G0 Y-3',
         `G90 G0 Z${safeZHeight}`,
-        'G90 G0 X[START_X] Y[START_Y]',
         
-        `G90 G0 Y[START_Y + ${frontPos}]`,
-        `G91 G0 Z${zDown}`,
+        `G90 G38.3 Y[START_Y + ${frontPos}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F1000`,
         `G91 G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
         'G91 G0 Y2',
         `G91 G38.2 Y-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_FRONT=[posy + BALL_RADIUS]',
         'G91 G0 Y3',
-        `G90 G0 Z${safeZHeight}`,
-        'G90 G0 X[START_X] Y[START_Y]',
+        `G90 G0 Z${safeZHeight} `,
+        `G90 G0 X[START_X] Y[START_Y]`,
         
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
-        'G0 X[CENTER_X] Y[CENTER_Y]',
+        `G0 X[CENTER_X] Y[CENTER_Y]`,
         'G10 L20 P0 X0 Y0'
     );
     
     return centerCode;
 };
 
-const generateInnerCenterProbing = (materialX: number, materialY: number, ballRadius: number): string[] => {
+const generateInnerCenterProbing = (materialX: number, materialY: number, ballRadius: number, rapidFeedRate?: number): string[] => {
     const halfX = materialX / 2;
     const halfY = materialY / 2;
-    const clearance = 15;
+    const clearance = 10;
     const searchFeed = 150;
     const latchFeed = 75;
     
@@ -803,6 +790,8 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
     const useRapidX = maxRapidDistanceX >= clearance;
     const useRapidY = maxRapidDistanceY >= clearance;
     
+    const searchFeedRate = rapidFeedRate || 2000;
+    
     const centerCode = [
         '%START_X=posx',
         '%START_Y=posy',
@@ -814,67 +803,60 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
     ];
     
     if (useRapidX) {
-        centerCode.push(`G90 G0 X[START_X - ${maxRapidDistanceX}]`);
+        centerCode.push(`G90 G38.3 X[START_X - ${maxRapidDistanceX}] F${searchFeedRate}`);
     }
    
-    centerCode.push('G21 G91');
     centerCode.push(`G91 G38.2 X-30 F[SEARCH_FEED]`);
-    
     centerCode.push(
-        'G21 G91 G0 X2',
+        'G91 G0 X2',
         `G91 G38.2 X-30 F[LATCH_FEED]`,
         'G4 P0.3',
-        '%X_LEFT=[posx - BALL_RADIUS]',
-        'G90 G0 X[START_X] Y[START_Y]'
+        '%X_LEFT=[posx - BALL_RADIUS]'
     );
     
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
     if (useRapidX) {
-        centerCode.push(`G90 G0 X[START_X + ${maxRapidDistanceX}]`);
+        centerCode.push(`G90 G38.3 X[START_X + ${maxRapidDistanceX}] F${searchFeedRate}`);
     }
 
-    centerCode.push('G21 G91');
     centerCode.push(`G91 G38.2 X30 F[SEARCH_FEED]`);
-       
     centerCode.push(
-        'G21 G91 G0 X-2',
+        'G91 G0 X-2',
         `G91 G38.2 X3 F[LATCH_FEED]`,
         'G4 P0.3',
-        '%X_RIGHT=[posx + BALL_RADIUS]',
-        'G90 G0 X[START_X] Y[START_Y]'
+        '%X_RIGHT=[posx + BALL_RADIUS]'
     );
     
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
     if (useRapidY) {
-        centerCode.push(`G90 G0 Y[START_Y - ${maxRapidDistanceY}]`);
+        centerCode.push(`G90 G38.3 Y[START_Y - ${maxRapidDistanceY}] F${searchFeedRate}`);
     }
 
-    centerCode.push('G21 G91');
     centerCode.push(`G91 G38.2 Y-30 F[SEARCH_FEED]`);
-
     centerCode.push(
-        'G21 G91 G0 Y2',
+        'G91 G0 Y2',
         `G91 G38.2 Y-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_BACK=[posy - BALL_RADIUS]',
-        'G90 G0 X[START_X] Y[START_Y]'
+       
     );
-    
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
     if (useRapidY) {
-        centerCode.push(`G90 G0 Y[START_Y + ${maxRapidDistanceY}]`);
+        centerCode.push(`G90 G38.3 Y[START_Y + ${maxRapidDistanceY}] F${searchFeedRate}`);
     }
 
-    centerCode.push('G21 G91');
     centerCode.push(`G91 G38.2 Y30 F[SEARCH_FEED]`);
     
     centerCode.push(
-        'G91 G0 Y-2',
+        `G91 G0 Y-2`,
         `G91 G38.2 Y3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_FRONT=[posy + BALL_RADIUS]',
-        'G90 G0 X[START_X] Y[START_Y]',
+        `G90 G0 X[START_X] Y[START_Y]`,
         
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
-        'G0 X[CENTER_X] Y[CENTER_Y]',
+        `G0 X[CENTER_X] Y[CENTER_Y]`,
         'G10 L20 P0 X0 Y0'
     );
     
@@ -886,12 +868,10 @@ export const get3DTouchProbeRoutine = (
     probeCommand?: string,
     centerProbeParams?: any,
 ): Array<string> => {
-    const { axes, ballDiameter = 2, zPlungeDistance = 2, units, $13 } = options;
-    const zProbeDistance = 30;
+    const { axes, ballDiameter = 2, zPlungeDistance = 2, units, $13, searchFeedRate: rapidFeedRate, zThickness } = options;
     const code: Array<string> = [];
     const ballRadius = ballDiameter / 2;
     
-    // Determine user's original units
     const isImperialUser = units !== METRIC_UNITS || $13 === '1';
     const originalUnitsCode = isImperialUser ? 'G20' : 'G21';
     
@@ -901,80 +881,76 @@ export const get3DTouchProbeRoutine = (
         direction: options.direction || 0,
         retract: 4,
         xyThickness: 0,
-        // Keep the original zThickness from options instead of overriding to 0
     };
     
     const standardProcessedOptions = updateOptionsForDirection(processedOptions, processedOptions.direction);
 
+    const addProbeHeader = (title: string) => {
+        code.push(`; 3D Touch ${title}`);
+        code.push('G21 ; Switch to metric for internal calculations');
+    };
+
+    const addBallParameters = () => {
+        code.push(
+            `%BALL_RADIUS=${ballRadius}`,
+            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+        );
+    };
+
+    const finishProbe = () => {
+        code.push(`${originalUnitsCode} ; Reset to user's original units`);
+        return code;
+    };
+
     if (probeCommand === 'Center') {
-        // Dimensions are always stored in mm, no conversion needed for G21 generation
         const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
         const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
         const probeLocation = centerProbeParams?.probeLocation || 'inner';
         
-        // Add units handling to center probing
-        code.push('; 3D Touch Center Probe - Using G21 internally');
-        code.push('G21 ; Switch to metric for internal calculations');
+        addProbeHeader('Center Probe');
         
         if (probeLocation === 'outer') {
-            const centerCode = generateOuterCenterProbing(materialX, materialY, ballRadius, zPlungeDistance, centerProbeParams);
+            const probeZ = centerProbeParams?.probeZ || false;
+            if (probeZ) {
+                code.push(...getPreamble(standardProcessedOptions));
+                code.push(...getSingleAxisStandardRoutine('Z'));
+            }
+            const centerCode = generateOuterCenterProbing(materialX, materialY, ballRadius, zPlungeDistance, rapidFeedRate, centerProbeParams);
             code.push(...centerCode);
         } else {
-            const centerCode = generateInnerCenterProbing(materialX, materialY, ballRadius);
+            const centerCode = generateInnerCenterProbing(materialX, materialY, ballRadius, rapidFeedRate);
             code.push(...centerCode);
         }
         
-        // Reset to user's original units
-        code.push(`${originalUnitsCode} ; Reset to user's original units`);
-        
-        return code;
-    } else {
-        // Standard 3D Touch Probe routines (XYZ, XY, Z, X, Y)
-        code.push('; 3D Touch Probe - Using G21 internally');
-        code.push('G21 ; Switch to metric for internal calculations');
-        
-        if (axes.x && axes.y && axes.z) {
-            code.push(
-                `%BALL_RADIUS=${ballRadius}`,
-                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-            );
-            
-            const customOptions = {
-                ...standardProcessedOptions,
-                zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
-            };
-            
-            code.push(...get3AxisStandardRoutine(customOptions));
-        } else if (axes.x && axes.y) {
-            code.push(
-                `%BALL_RADIUS=${ballRadius}`,
-                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-            );
-            code.push(...get3AxisStandardRoutine(standardProcessedOptions));
-        } else if (axes.z) {
-            code.push(...getPreamble(standardProcessedOptions));
-            code.push(...getSingleAxisStandardRoutine('Z'));
-        } else if (axes.x) {
-            code.push(
-                `%BALL_RADIUS=${ballRadius}`,
-                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-            );
-            code.push(...getPreamble(standardProcessedOptions));
-            code.push(...getSingleAxisStandardRoutine('X'));
-        } else if (axes.y) {
-            code.push(
-                `%BALL_RADIUS=${ballRadius}`,
-                `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
-            );
-            code.push(...getPreamble(standardProcessedOptions));
-            code.push(...getSingleAxisStandardRoutine('Y'));
-        }
-        
-        // Reset to user's original units
-        code.push(`${originalUnitsCode} ; Reset to user's original units`);
+        return finishProbe();
     }
 
-    return code;
+    addProbeHeader('Probe');
+
+    if (axes.x && axes.y && axes.z) {
+        addBallParameters();
+        const customOptions = {
+            ...standardProcessedOptions,
+            zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
+        };
+        code.push(...get3AxisStandardRoutine(customOptions));
+    } else if (axes.x && axes.y) {
+        addBallParameters();
+        code.push(...get3AxisStandardRoutine(standardProcessedOptions));
+    } else if (axes.z) {
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('Z'));
+    } else if (axes.x) {
+        addBallParameters();
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('X'));
+    } else if (axes.y) {
+        addBallParameters();
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('Y'));
+    }
+
+    return finishProbe();
 };
 
 export const getNextDirection = (

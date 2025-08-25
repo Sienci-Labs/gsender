@@ -356,6 +356,7 @@ const defaultState: State = {
                 y: 10,
             },
             probeZ: false,
+            searchFeedRate: 2000,
         },
         visualizer: {
             minimized: false,
