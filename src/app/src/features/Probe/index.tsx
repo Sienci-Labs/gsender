@@ -438,6 +438,7 @@ const ProbeWidget = () => {
             $13,
             probeDistances,
             probeType,
+            homingEnabled: true,
         };
 
         const code = getProbeCode(options, direction);
