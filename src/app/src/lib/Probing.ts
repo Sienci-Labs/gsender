@@ -699,19 +699,14 @@ export const get3AxisAutoDiameterRoutine = ({
 };
 
 const generateOuterCenterProbing = (materialX: number, materialY: number, ballRadius: number, zPlungeDistance: number, rapidFeedRate?: number, centerProbeParams?: CenterProbeParameters): string[] => {
-    const halfX = materialX / 2;
-    const halfY = materialY / 2;
-    const clearance = 10;
+    
+    const clearance = 10 + ballRadius;
+    const maxSearchLimit = 30;
     const searchFeed = 150;
     const latchFeed = 75;
-    
-    const probeZ = centerProbeParams?.probeZ || false;
-    const leftPos = halfX + clearance;
-    const rightPos = halfX + clearance;
-    const backPos = halfY + clearance;
-    const frontPos = halfY + clearance;
+    const bounce = 2;
     const zDown = -(zPlungeDistance + 5);
-    const safeZHeight = probeZ ? '5' : '[START_Z + 5]';
+    const safeZHeight = centerProbeParams?.probeZ || false ? '5' : '[START_Z + 5]';
     
     const searchFeedRate = rapidFeedRate || 2000;
     
@@ -722,56 +717,53 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
         `%BALL_RADIUS=${ballRadius}`,
         `%SEARCH_FEED=${searchFeed}`,
         `%LATCH_FEED=${latchFeed}`,
+        `%MAX_SERCH_LIMIT=${maxSearchLimit}`,
         'G90',
         `G90 G38.3 Z[START_Z + 5] F1000`,
     ];
     
     centerCode.push(
-        `G91 G38.3 X-${leftPos} F${searchFeedRate}`,
-        `G91 G38.3 Z${zDown} F1000`,
-        `G91 G38.2 X30 F[SEARCH_FEED]`,
-        'G91 G0 X-2',
+        `G91 G38.3 X-${materialX/2 + clearance} F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 X[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 X-${bounce}`,
         `G91 G38.2 X3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_LEFT=[posx - BALL_RADIUS]',
-        'G91 G0 X-3',
+        `G91 G0 X-${bounce}`,
         `G90 G0 Z${safeZHeight}`,
 
-        `G90 G0 X[START_X] Y[START_Y]`,
-        `G90 G38.3 X[START_X + ${rightPos}] F${searchFeedRate}`,
-        `G91 G38.3 Z${zDown} F1000`,
-        `G91 G38.2 X-${rightPos + 10} F[SEARCH_FEED]`,
-        'G91 G0 X2',
+        `G91 G38.3 X[${materialX + clearance + bounce}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 X-[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 X${bounce}`,
         `G91 G38.2 X-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_RIGHT=[posx + BALL_RADIUS]',
-        'G91 G0 X3',
+        `G91 G0 X${bounce}`,
         `G90 G0 Z${safeZHeight}`,
-        `G90 G38.3 X[START_X] Y[START_Y] F${searchFeedRate}`,
         
         `G90 G0 X[START_X] Y[START_Y]`,
-        `G90 G38.3 Y[START_Y - ${backPos}] F${searchFeedRate}`,
-        `G91 G38.3 Z${zDown} F1000`,
-        `G91 G38.2 Y${backPos + 10} F[SEARCH_FEED]`,
-        'G91 G0 Y-2',
+        `G91 G38.3 Y[-${materialY/2 + clearance}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 Y[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 Y-${bounce}`,
         `G91 G38.2 Y3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_BACK=[posy - BALL_RADIUS]',
-        'G91 G0 Y-3',
+        `G91 G0 Y-${bounce}`,
         `G90 G0 Z${safeZHeight}`,
         
-        `G90 G0 X[START_X] Y[START_Y]`,
-        `G90 G38.3 Y[START_Y + ${frontPos}] F${searchFeedRate}`,
-        `G91 G38.3 Z${zDown} F1000`,
-        `G91 G38.2 Y-${frontPos + 10} F[SEARCH_FEED]`,
-        'G91 G0 Y2',
+        `G91 G38.3 Y[${materialY + clearance + bounce}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 Y-[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 Y${bounce}`,
         `G91 G38.2 Y-3 F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_FRONT=[posy + BALL_RADIUS]',
-        'G91 G0 Y3',
+        `G91 G0 Y${bounce}`,
         `G90 G0 Z${safeZHeight} `,
 
-        `G90 G0 X[START_X] Y[START_Y]`,
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
         `G0 X[CENTER_X] Y[CENTER_Y]`,
