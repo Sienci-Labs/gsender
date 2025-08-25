@@ -98,6 +98,9 @@ const defaultState: State = {
                 z: true,
             },
             touchplateType: 'Standard Block',
+            ballDiameter: 2,
+            zPlungeDistance: 2,
+            zThickness3DTouch: -0.1,
         },
         tools: [
             {
@@ -345,6 +348,15 @@ const defaultState: State = {
             shouldDwell: false,
             mist: false,
             flood: false
+        },
+        centerProbe: {
+            probeLocation: 'inner',
+            workpieceDimensions: {
+                x: 10,
+                y: 10,
+            },
+            probeZ: false,
+            searchFeedRate: 2000,
         },
         visualizer: {
             minimized: false,

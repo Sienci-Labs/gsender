@@ -26,6 +26,7 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_ZERO,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from 'app/lib/constants';
 import XProbe from './assets/Block-X.gif';
 import YProbe from './assets/Block-Y.gif';
@@ -35,16 +36,27 @@ import ZProbe from './assets/Block-Z.gif';
 import ZOnlyProbe from './assets/Probe-Z.gif';
 import AutoZProbe from './assets/AutoZero-Z.gif';
 import AutoXYZProbe from './assets/AutoZero-Rem.gif';
-import { ProbeCommand, TOUCHPLATE_TYPES_T } from './definitions';
+import TouchProbeImage from './assets/3D-Touch-Probe.svg';
+// 3D Touch Probe specific images
+import TouchProbeX from './assets/3D-Touch-X.png';
+import TouchProbeY from './assets/3D-Touch-Y.png';
+import TouchProbeZ from './assets/3D-Touch-Z.png';
+import TouchProbeXY from './assets/3D-Touch-XY.png';
+import TouchProbeXYZ from './assets/3D-Touch-XYZ.png';
+import TouchProbeCenterIn from './assets/3D-Touch-Center-In.png';
+import TouchProbeCenterOut from './assets/3D-Touch-Center-Out.png';
+import { ProbeCommand, TOUCHPLATE_TYPES_T, CenterProbeParameters } from './definitions';
 
 interface Props {
     probeCommand: ProbeCommand;
     touchplateType: TOUCHPLATE_TYPES_T;
+    centerProbeParams?: CenterProbeParameters;
 }
 
 const ProbeImage: React.FC<Props> = ({
     probeCommand,
     touchplateType = TOUCHPLATE_TYPE_STANDARD,
+    centerProbeParams,
 }) => {
     const getProbeImage = () => {
         const { id } = probeCommand;
@@ -56,6 +68,26 @@ const ProbeImage: React.FC<Props> = ({
         }
         if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
             return ZOnlyProbe;
+        }
+        if (touchplateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+            // Use specific 3D Touch probe images based on the probe command
+            if (id === 'X Touch') {
+                return TouchProbeX;
+            } else if (id === 'Y Touch') {
+                return TouchProbeY;
+            } else if (id === 'Z Touch') {
+                return TouchProbeZ;
+            } else if (id === 'XY Touch') {
+                return TouchProbeXY;
+            } else if (id === 'XYZ Touch') {
+                return TouchProbeXYZ;
+            } else if (id === 'Center') {
+                return centerProbeParams?.probeLocation === 'outer' 
+                    ? TouchProbeZ 
+                    : TouchProbeCenterIn;
+            }
+            // Fallback to XYZ image for any other 3D Touch probe commands
+            return TouchProbeXYZ;
         }
         if (id === 'X Touch') {
             return XProbe;
@@ -75,7 +107,11 @@ const ProbeImage: React.FC<Props> = ({
             <img
                 alt="Probe Block orientation guide image"
                 src={imgSrc}
-                className="w-[15vh] my-0 mx-auto dark:invert portrait:w-[10vh]"
+                className={
+                    touchplateType === TOUCHPLATE_TYPE_3D_TOUCH
+                        ? "w-[20vh] my-0 mx-auto portrait:w-[15vh]"
+                        : "w-[15vh] my-0 mx-auto dark:invert portrait:w-[10vh]"
+                }
             />
         </div>
     );

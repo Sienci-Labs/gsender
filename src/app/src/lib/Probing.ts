@@ -3,6 +3,7 @@ import {
     PROBE_TYPE_TIP,
     PROBE_TYPES,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
@@ -266,7 +267,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -312,7 +313,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
@@ -348,7 +349,7 @@ export const get3AxisAutoRoutine = ({
         code.push(
             '; Probe Z Auto Endmill',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -360,7 +361,7 @@ export const get3AxisAutoRoutine = ({
             '; Probe X Auto Endmill',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
@@ -383,7 +384,7 @@ export const get3AxisAutoRoutine = ({
             '; Probe Y Auto Endmill',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 Y-13',
             'G38.2 Y-30 F150',
@@ -431,7 +432,7 @@ export const get3AxisAutoTipRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -476,7 +477,7 @@ export const get3AxisAutoTipRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
@@ -512,7 +513,7 @@ export const get3AxisAutoTipRoutine = ({
         code.push(
             '; Probe Z Auto Tip',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -525,7 +526,7 @@ export const get3AxisAutoTipRoutine = ({
             '; Probe X Auto Tip',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
@@ -548,7 +549,7 @@ export const get3AxisAutoTipRoutine = ({
             '; Probe Y Auto Tip',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
@@ -594,7 +595,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -625,7 +626,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X13',
             'G38.2 X20 F250',
@@ -650,7 +651,7 @@ export const get3AxisAutoDiameterRoutine = ({
         code.push(
             '; Probe Z AutoZero Specific Diameter',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -663,7 +664,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; Probe Y',
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 Y13',
             'G38.2 Y20 F250',
@@ -680,7 +681,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; Probe X',
             `%X_OFF = ${xOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            'G38.2 Z-30 F200',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X13',
             'G38.2 X20 F250',
@@ -697,6 +698,256 @@ export const get3AxisAutoDiameterRoutine = ({
     return code;
 };
 
+const generateOuterCenterProbing = (materialX: number, materialY: number, ballRadius: number, zPlungeDistance: number, rapidFeedRate?: number, centerProbeParams?: CenterProbeParameters): string[] => {
+    
+    const clearance = 10 + ballRadius;
+    const maxSearchLimit = 30;
+    const searchFeed = 150;
+    const latchFeed = 75;
+    const bounce = 2;
+    const zDown = -(zPlungeDistance + 5);
+    const safeZHeight = centerProbeParams?.probeZ || false ? '5' : '[START_Z + 5]';
+    
+    const searchFeedRate = rapidFeedRate || 2000;
+    
+    const centerCode = [
+        '%START_X=posx',
+        '%START_Y=posy',
+        '%START_Z=posz',
+        `%BALL_RADIUS=${ballRadius}`,
+        `%SEARCH_FEED=${searchFeed}`,
+        `%LATCH_FEED=${latchFeed}`,
+        `%MAX_SERCH_LIMIT=${maxSearchLimit}`,
+        'G90',
+        `G90 G38.3 Z[START_Z + 5] F1000`,
+    ];
+    
+    centerCode.push(
+        `G91 G38.3 X-${materialX/2 + clearance} F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 X[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 X-${bounce}`,
+        `G91 G38.2 X3 F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%X_LEFT=[posx - BALL_RADIUS]',
+        `G91 G0 X-${bounce}`,
+        `G90 G0 Z${safeZHeight}`,
+
+        `G91 G38.3 X[${materialX + clearance + bounce}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 X-[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 X${bounce}`,
+        `G91 G38.2 X-3 F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%X_RIGHT=[posx + BALL_RADIUS]',
+        `G91 G0 X${bounce}`,
+        `G90 G0 Z${safeZHeight}`,
+        
+        `G90 G0 X[START_X] Y[START_Y]`,
+        `G91 G38.3 Y[-${materialY/2 + clearance}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 Y[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 Y-${bounce}`,
+        `G91 G38.2 Y3 F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%Y_BACK=[posy - BALL_RADIUS]',
+        `G91 G0 Y-${bounce}`,
+        `G90 G0 Z${safeZHeight}`,
+        
+        `G91 G38.3 Y[${materialY + clearance + bounce}] F${searchFeedRate}`,
+        `G91 G38.3 Z${zDown} F500`,
+        `G91 G38.2 Y-[MAX_SERCH_LIMIT] F[SEARCH_FEED]`,
+        `G91 G0 Y${bounce}`,
+        `G91 G38.2 Y-3 F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%Y_FRONT=[posy + BALL_RADIUS]',
+        `G91 G0 Y${bounce}`,
+        `G90 G0 Z${safeZHeight} `,
+
+        '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
+        '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
+        `G0 X[CENTER_X] Y[CENTER_Y]`,
+        'G10 L20 P0 X0 Y0'
+    );
+    
+    return centerCode;
+};
+
+const generateInnerCenterProbing = (materialX: number, materialY: number, ballRadius: number, rapidFeedRate?: number): string[] => {
+    const halfX = materialX / 2;
+    const halfY = materialY / 2;
+    const clearance = 8 + ballRadius;
+    const searchFeed = 150;
+    const latchFeed = 75;
+    const bounce = 2; 
+    const maxSearchLimit = 30;
+    
+    const maxRapidDistanceX = halfX - clearance;
+    const maxRapidDistanceY = halfY - clearance;
+    const useRapidX = maxRapidDistanceX >= clearance;
+    const useRapidY = maxRapidDistanceY >= clearance;
+    
+    const searchFeedRate = rapidFeedRate || 2000;
+    
+    const centerCode = [
+        '%START_X=posx',
+        '%START_Y=posy',
+        '%START_Z=posz',
+        `%BALL_RADIUS=${ballRadius}`,
+        `%SEARCH_FEED=${searchFeed}`,
+        `%LATCH_FEED=${latchFeed}`,
+        'G90',
+    ];
+    
+    if (useRapidX) {
+        centerCode.push(`G90 G38.3 X[START_X - ${maxRapidDistanceX}] F${searchFeedRate}`);
+    }
+   
+    centerCode.push(`G91 G38.2 X-${maxSearchLimit} F[SEARCH_FEED]`);
+    centerCode.push(
+        `G91 G0 X${bounce}`,
+        `G91 G38.2 X-${maxSearchLimit} F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%X_LEFT=[posx - BALL_RADIUS]'
+    );
+    
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
+    if (useRapidX) {
+        centerCode.push(`G90 G38.3 X[START_X + ${maxRapidDistanceX}] F${searchFeedRate}`);
+    }
+
+    centerCode.push(`G91 G38.2 X${maxSearchLimit} F[SEARCH_FEED]`);
+    centerCode.push(
+        `G91 G0 X-${bounce}`,
+        `G91 G38.2 X${maxSearchLimit} F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%X_RIGHT=[posx + BALL_RADIUS]'
+    );
+    
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
+    if (useRapidY) {
+        centerCode.push(`G90 G38.3 Y[START_Y - ${maxRapidDistanceY}] F${searchFeedRate}`);
+    }
+
+    centerCode.push(`G91 G38.2 Y-${maxSearchLimit} F[SEARCH_FEED]`);
+    centerCode.push(
+        `G91 G0 Y${bounce}`,
+        `G91 G38.2 Y-${maxSearchLimit} F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%Y_BACK=[posy - BALL_RADIUS]',
+       
+    );
+    centerCode.push(`G90 G0 X[START_X] Y[START_Y]`);
+    if (useRapidY) {
+        centerCode.push(`G90 G38.3 Y[START_Y + ${maxRapidDistanceY}] F${searchFeedRate}`);
+    }
+
+    centerCode.push(`G91 G38.2 Y${maxSearchLimit} F[SEARCH_FEED]`);
+    
+    centerCode.push(
+        `G91 G0 Y-${bounce}`,
+        `G91 G38.2 Y${maxSearchLimit} F[LATCH_FEED]`,
+        'G4 P0.3',
+        '%Y_FRONT=[posy + BALL_RADIUS]',        
+        '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
+        '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
+        `G90 G0 X[CENTER_X] Y[CENTER_Y]`,
+        'G10 L20 P0 X0 Y0'
+    );
+    
+    return centerCode;
+};
+
+export const get3DTouchProbeRoutine = (
+    options: ProbingOptions,
+    probeCommand?: string,
+    centerProbeParams?: any,
+): Array<string> => {
+    const { axes, ballDiameter = 2, zPlungeDistance = 2, units, $13, searchFeedRate: rapidFeedRate, zThickness } = options;
+    const code: Array<string> = [];
+    const ballRadius = ballDiameter / 2;
+    
+    const isImperialUser = units !== METRIC_UNITS || $13 === '1';
+    const originalUnitsCode = isImperialUser ? 'G20' : 'G21';
+    
+    const processedOptions = {
+        ...options,
+        toolDiameter: ballDiameter,
+        direction: options.direction || 0,
+        retract: 4,
+        xyThickness: 0,
+    };
+    
+    const standardProcessedOptions = updateOptionsForDirection(processedOptions, processedOptions.direction);
+
+    const addProbeHeader = (title: string) => {
+        code.push(`; 3D Touch ${title}`);
+        code.push('G21 ; Switch to metric for internal calculations');
+    };
+
+    const addBallParameters = () => {
+        code.push(
+            `%BALL_RADIUS=${ballRadius}`,
+            `%Z_PLUNGE_DISTANCE=${zPlungeDistance}`,
+        );
+    };
+
+    const finishProbe = () => {
+        code.push(`${originalUnitsCode} ; Reset to user's original units`);
+        return code;
+    };
+
+    if (probeCommand === 'Center') {
+        const materialX = centerProbeParams?.workpieceDimensions?.x || 50;
+        const materialY = centerProbeParams?.workpieceDimensions?.y || 50;
+        const probeLocation = centerProbeParams?.probeLocation || 'inner';
+        
+        addProbeHeader('Center Probe');
+        
+        if (probeLocation === 'outer') {
+            const probeZ = centerProbeParams?.probeZ || false;
+            if (probeZ) {
+                code.push(...getPreamble(standardProcessedOptions));
+                code.push(...getSingleAxisStandardRoutine('Z'));
+            }
+            const centerCode = generateOuterCenterProbing(materialX, materialY, ballRadius, zPlungeDistance, rapidFeedRate, centerProbeParams);
+            code.push(...centerCode);
+        } else {
+            const centerCode = generateInnerCenterProbing(materialX, materialY, ballRadius, rapidFeedRate);
+            code.push(...centerCode);
+        }
+        
+        return finishProbe();
+    }
+
+    addProbeHeader('Probe');
+
+    if (axes.x && axes.y && axes.z) {
+        addBallParameters();
+        const customOptions = {
+            ...standardProcessedOptions,
+            zPositionAdjust: standardProcessedOptions.zRetract + Math.abs(zPlungeDistance)
+        };
+        code.push(...get3AxisStandardRoutine(customOptions));
+    } else if (axes.x && axes.y) {
+        addBallParameters();
+        code.push(...get3AxisStandardRoutine(standardProcessedOptions));
+    } else if (axes.z) {
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('Z'));
+    } else if (axes.x) {
+        addBallParameters();
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('X'));
+    } else if (axes.y) {
+        addBallParameters();
+        code.push(...getPreamble(standardProcessedOptions));
+        code.push(...getSingleAxisStandardRoutine('Y'));
+    }
+
+    return finishProbe();
+};
+
 export const getNextDirection = (
     direction: PROBE_DIRECTIONS,
 ): PROBE_DIRECTIONS => {
@@ -710,6 +961,8 @@ export const getNextDirection = (
 export const getProbeCode = (
     options: ProbingOptions,
     direction: PROBE_DIRECTIONS = 0,
+    probeCommandId?: string,
+    centerProbeParams?: any,
 ): Array<string> => {
     const { plateType, axes, probeType } = options;
 
@@ -729,6 +982,10 @@ export const getProbeCode = (
         } else {
             return get3AxisAutoDiameterRoutine({ ...options, direction });
         }
+    }
+
+    if (plateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+        return get3DTouchProbeRoutine({ ...options, direction }, probeCommandId, centerProbeParams);
     }
 
     // Standard plate, we modify some values for specific directions

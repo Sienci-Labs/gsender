@@ -26,6 +26,9 @@ export interface ProbeProfile {
         z: boolean;
     };
     touchplateType: TOUCHPLATE_TYPES_T;
+    ballDiameter?: number;
+    zPlungeDistance?: number;
+    zThickness3DTouch?: number;
 }
 
 export interface ProbeCommand {
@@ -71,6 +74,9 @@ export interface ProbingOptions {
     $13: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
+    ballDiameter?: number;
+    zPlungeDistance?: number;
+    searchFeedRate?: number;
 }
 
 export interface ProbeWidgetSettings {
@@ -115,12 +121,23 @@ export interface Actions {
     _setToolDiameter: (selection: { value: number }) => void;
     nextProbeDirection: () => void;
     _setProbeType: (value: string) => void;
+    updateCenterProbeParams: (params: Partial<CenterProbeParameters>) => void;
 }
 
 export interface AvailableTool {
     metricDiameter: number;
     imperialDiameter: number;
     type: string;
+}
+
+export interface CenterProbeParameters {
+    probeLocation: 'inner' | 'outer';
+    workpieceDimensions: {
+        x: number; // mm
+        y: number; // mm
+    };
+    probeZ: boolean; // Only for outer probing
+    searchFeedRate: number; // mm/min
 }
 
 export interface State {
@@ -137,4 +154,5 @@ export interface State {
     direction: number;
     probeType: PROBE_TYPES_T;
     connectivityTest: boolean;
+    centerProbeParams: CenterProbeParameters;
 }

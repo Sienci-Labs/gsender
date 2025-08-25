@@ -127,23 +127,27 @@ const Probe = ({ state, actions }: ProbeProps) => {
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
-                    <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
+                    <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px] gap-1">
                         {availableProbeCommands.map((command, index) => (
                             <ShadcnButton
                                 key={command.id}
                                 onClick={() =>
                                     actions.handleProbeCommandChange(index)
                                 }
-                                size="icon"
+                                size="sm"
                                 className={cx(
-                                    'rounded-md relative h-[calc(4vh+3px)]',
+                                    'rounded-md relative h-[calc(4vh+3px)] text-xs px-1 flex-1 min-w-0',
                                     {
                                         'bg-blue-400 bg-opacity-30':
                                             index === selectedProbeCommand,
                                     },
                                 )}
                             >
-                                {command.id.split(' ')[0]}
+                                <span className="text-center leading-tight truncate w-full">
+                                    {command.id === 'Circle Hole' ? 'Circle' : 
+                                     command.id === 'Rect Hole' ? 'Rect' :
+                                     command.id.split(' ')[0]}
+                                </span>
                             </ShadcnButton>
                         ))}
                     </div>

@@ -30,6 +30,7 @@ import {
     PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_ZERO,
     PROBE_TYPE_DIAMETER,
+    TOUCHPLATE_TYPE_3D_TOUCH,
 } from 'app/lib/constants';
 import store from 'app/store';
 import { convertToImperial } from 'app/lib/units';
@@ -46,9 +47,11 @@ import {
 } from '../../constants';
 import { getProbeCode } from 'app/lib/Probing';
 import { getWidgetConfigContext } from '../WidgetConfig/WidgetContextProvider';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import {
     Actions,
     AvailableTool,
+    CenterProbeParameters,
     PROBE_TYPES_T,
     ProbeCommand,
     ProbeProfile,
@@ -58,6 +61,7 @@ import {
 import { BasicObject, UNITS_EN } from 'app/definitions/general';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import defaultState from 'app/store/defaultState';
 
 const ProbeWidget = () => {
     const {
@@ -79,6 +83,8 @@ const ProbeWidget = () => {
     }));
 
     const { actions: config } = getWidgetConfigContext();
+    const centerProbeConfig = new WidgetConfig('centerProbe');
+    const defaultCenterProbeState = get(defaultState, 'widgets.centerProbe', {});
 
     const calcToolDiamater = (
         newTouchplateType?: TOUCHPLATE_TYPES_T,
@@ -161,8 +167,25 @@ const ProbeWidget = () => {
     const [direction, setDirection] = useState<number>(
         config.get('direction', 0),
     );
+    const defaultCenterProbeParams: CenterProbeParameters = {
+        probeLocation: 'inner',
+        workpieceDimensions: {
+            x: 10,
+            y: 10,
+        },
+        probeZ: false,
+    };
+
+    // Initialize state the same way as Surfacing
+    const getInitialCenterProbeState = (): CenterProbeParameters => {
+        const saved = centerProbeConfig.get('', defaultCenterProbeState);
+        return { ...defaultCenterProbeParams, ...saved };
+    };
+
+    const [centerProbeParams, setCenterProbeParams] = useState<CenterProbeParameters>(getInitialCenterProbeState());
 
     const connectionMadeRef = useRef<boolean>(false);
+
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
@@ -262,7 +285,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Z Touch',
                     safe: false,
-                    tool: false,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: false,
                         y: false,
@@ -277,7 +300,7 @@ const ProbeWidget = () => {
                     command = {
                         id: 'XYZ Touch',
                         safe: true,
-                        tool: true,
+                        tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                         axes: {
                             x: true,
                             y: true,
@@ -290,7 +313,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'XY Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: true,
                         y: true,
@@ -302,7 +325,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'X Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: true,
                         y: false,
@@ -314,9 +337,24 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Y Touch',
                     safe: true,
-                    tool: true,
+                    tool: selectedProfile.touchplateType !== TOUCHPLATE_TYPE_3D_TOUCH,
                     axes: {
                         x: false,
+                        y: true,
+                        z: false,
+                    },
+                };
+                commands.push(command);
+            }
+
+            // Add special 3D Touch Probe commands
+            if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH) {
+                command = {
+                    id: 'Center',
+                    safe: true,
+                    tool: false,
+                    axes: {
+                        x: true,
                         y: true,
                         z: false,
                     },
@@ -353,6 +391,10 @@ const ProbeWidget = () => {
                 setDirection(direction + 1);
             }
         },
+        updateCenterProbeParams: (params: Partial<CenterProbeParameters>): void => {
+            const updatedParams = { ...centerProbeParams, ...params };
+            setCenterProbeParams(updatedParams);
+        },
     };
 
     const availableProbeCommands = actions.generatePossibleProbeCommands();
@@ -372,7 +414,9 @@ const ProbeWidget = () => {
         config.set('probeDepth', probeDepth);
         config.set('touchPlateHeight', touchPlateHeight);
         config.set('direction', direction);
-    });
+        
+        centerProbeConfig.set('', centerProbeParams);
+    }, [probeCommand, useTLO, probeDepth, touchPlateHeight, direction, centerProbeParams]);
 
     useEffect(() => {
         connectionMadeRef.current = connectionMade;
@@ -398,18 +442,30 @@ const ProbeWidget = () => {
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = units === METRIC_UNITS ? '21' : '20';
         if (units === METRIC_UNITS) {
-            zThickness = touchplate.zThickness;
+            // Use 3D Touch specific Z offset if it's a 3D Touch Probe
+            zThickness = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+                ? (touchplate.zThickness3DTouch ?? -0.1)
+                : touchplate.zThickness;
             xyThickness = touchplate.xyThickness;
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
         } else {
-            zThickness = convertToImperial(touchplate.zThickness);
+            // Use 3D Touch specific Z offset if it's a 3D Touch Probe
+            const baseZThickness = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+                ? (touchplate.zThickness3DTouch ?? -0.1)
+                : touchplate.zThickness;
+            zThickness = convertToImperial(baseZThickness);
             xyThickness = convertToImperial(touchplate.xyThickness);
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
         }
+
+        // For 3D Touch Probe, use ball diameter instead of tool diameter
+        const effectiveToolDiameter = touchplate.touchplateType === TOUCHPLATE_TYPE_3D_TOUCH 
+            ? (touchplate.ballDiameter || 2) 
+            : toolDiameter;
 
         const options = {
             axes,
@@ -418,16 +474,21 @@ const ProbeWidget = () => {
             probeSlow: feedrate,
             units,
             retract: retractDistance,
-            toolDiameter,
+            toolDiameter: effectiveToolDiameter,
             zThickness,
             xyThickness,
             plateType: touchplate.touchplateType,
             $13,
             probeDistances,
             probeType,
+            ballDiameter: touchplate.ballDiameter || 2,
+            zPlungeDistance: touchplate.zPlungeDistance || 2,
+            zProbeDistance: probeDistances.z,
+            searchFeedRate: centerProbeParams.searchFeedRate || 2000,
         };
 
-        const code = getProbeCode(options, direction);
+        const probeCommand = availableProbeCommands[selectedProbeCommand];
+        const code = getProbeCode(options, direction, probeCommand?.id, centerProbeParams);
         code.push(distance + '\n');
 
         return code;
@@ -497,6 +558,7 @@ const ProbeWidget = () => {
         direction: direction,
         probeType: probeType,
         connectivityTest: connectivityTest,
+        centerProbeParams: centerProbeParams,
     };
 
     return (
