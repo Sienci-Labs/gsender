@@ -776,9 +776,11 @@ const generateOuterCenterProbing = (materialX: number, materialY: number, ballRa
 const generateInnerCenterProbing = (materialX: number, materialY: number, ballRadius: number, rapidFeedRate?: number): string[] => {
     const halfX = materialX / 2;
     const halfY = materialY / 2;
-    const clearance = 10;
+    const clearance = 8 + ballRadius;
     const searchFeed = 150;
     const latchFeed = 75;
+    const bounce = 2; 
+    const maxSearchLimit = 30;
     
     const maxRapidDistanceX = halfX - clearance;
     const maxRapidDistanceY = halfY - clearance;
@@ -801,10 +803,10 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
         centerCode.push(`G90 G38.3 X[START_X - ${maxRapidDistanceX}] F${searchFeedRate}`);
     }
    
-    centerCode.push(`G91 G38.2 X-30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 X-${maxSearchLimit} F[SEARCH_FEED]`);
     centerCode.push(
-        'G91 G0 X2',
-        `G91 G38.2 X-30 F[LATCH_FEED]`,
+        `G91 G0 X${bounce}`,
+        `G91 G38.2 X-${maxSearchLimit} F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_LEFT=[posx - BALL_RADIUS]'
     );
@@ -814,10 +816,10 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
         centerCode.push(`G90 G38.3 X[START_X + ${maxRapidDistanceX}] F${searchFeedRate}`);
     }
 
-    centerCode.push(`G91 G38.2 X30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 X${maxSearchLimit} F[SEARCH_FEED]`);
     centerCode.push(
-        'G91 G0 X-2',
-        `G91 G38.2 X3 F[LATCH_FEED]`,
+        `G91 G0 X-${bounce}`,
+        `G91 G38.2 X${maxSearchLimit} F[LATCH_FEED]`,
         'G4 P0.3',
         '%X_RIGHT=[posx + BALL_RADIUS]'
     );
@@ -827,10 +829,10 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
         centerCode.push(`G90 G38.3 Y[START_Y - ${maxRapidDistanceY}] F${searchFeedRate}`);
     }
 
-    centerCode.push(`G91 G38.2 Y-30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 Y-${maxSearchLimit} F[SEARCH_FEED]`);
     centerCode.push(
-        'G91 G0 Y2',
-        `G91 G38.2 Y-3 F[LATCH_FEED]`,
+        `G91 G0 Y${bounce}`,
+        `G91 G38.2 Y-${maxSearchLimit} F[LATCH_FEED]`,
         'G4 P0.3',
         '%Y_BACK=[posy - BALL_RADIUS]',
        
@@ -840,18 +842,16 @@ const generateInnerCenterProbing = (materialX: number, materialY: number, ballRa
         centerCode.push(`G90 G38.3 Y[START_Y + ${maxRapidDistanceY}] F${searchFeedRate}`);
     }
 
-    centerCode.push(`G91 G38.2 Y30 F[SEARCH_FEED]`);
+    centerCode.push(`G91 G38.2 Y${maxSearchLimit} F[SEARCH_FEED]`);
     
     centerCode.push(
-        `G91 G0 Y-2`,
-        `G91 G38.2 Y3 F[LATCH_FEED]`,
+        `G91 G0 Y-${bounce}`,
+        `G91 G38.2 Y${maxSearchLimit} F[LATCH_FEED]`,
         'G4 P0.3',
-        '%Y_FRONT=[posy + BALL_RADIUS]',
-        `G90 G0 X[START_X] Y[START_Y]`,
-        
+        '%Y_FRONT=[posy + BALL_RADIUS]',        
         '%CENTER_X=[(X_LEFT + X_RIGHT) / 2]',
         '%CENTER_Y=[(Y_BACK + Y_FRONT) / 2]',
-        `G0 X[CENTER_X] Y[CENTER_Y]`,
+        `G90 G0 X[CENTER_X] Y[CENTER_Y]`,
         'G10 L20 P0 X0 Y0'
     );
     
