@@ -865,11 +865,15 @@ class Visualizer extends Component {
 
     recolorGridLabels(units) {
         const { mm, in: inches } = this.machineProfile;
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
+        const axisLengthX =
+            units === IMPERIAL_UNITS
+                ? inches.width * IMPERIAL_GRID_SPACING
+                : mm.depth;
+        const axisLengthY =
+            units === IMPERIAL_UNITS
+                ? inches.depth * IMPERIAL_GRID_SPACING
+                : mm.depth;
         const height = 170;
 
         const { currentTheme } = this.props.state;
@@ -886,7 +890,7 @@ class Visualizer extends Component {
         {
             // Axis Labels
             const axisXLabel = new TextSprite({
-                x: axisLength + 10,
+                x: axisLengthX + 10,
                 y: 0,
                 z: 0,
                 size: 20,
@@ -896,7 +900,7 @@ class Visualizer extends Component {
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
                 x: 0,
-                y: axisLength + 10,
+                y: axisLengthY + 10,
                 z: 0,
                 size: 20,
                 text: 'Y',
@@ -926,15 +930,15 @@ class Visualizer extends Component {
     recolorGridNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
 
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width);
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth);
 
-        const imperialGridCount = Math.round(inchesMax / 4);
-        const metricGridCount = Math.round(mmMax / 9);
-
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
+        const gridCountX =
+            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+        const gridCountY =
+            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
         const gridSpacing =
             units === IMPERIAL_UNITS
                 ? IMPERIAL_GRID_SPACING
@@ -949,7 +953,7 @@ class Visualizer extends Component {
                 ? this.group.getObjectByName('ImperialGridLineNumbers')
                 : this.group.getObjectByName('MetricGridLineNumbers');
 
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountX; i <= gridCountX; ++i) {
             if (i !== 0) {
                 unitGroup.remove(unitGroup.getObjectByName('xtextLabel' + i));
                 const xtextLabel = new TextSprite({
@@ -965,7 +969,10 @@ class Visualizer extends Component {
                 });
                 xtextLabel.name = 'xtextLabel' + i;
                 unitGroup.add(xtextLabel);
-
+            }
+        }
+        for (let i = -gridCountY; i <= gridCountY; ++i) {
+            if (i !== 0) {
                 unitGroup.remove(unitGroup.getObjectByName('ytextLabel' + i));
                 const ytextLabel = new TextSprite({
                     x: -textOffset,
@@ -1414,21 +1421,27 @@ class Visualizer extends Component {
 
     createCoordinateSystem(units) {
         const { mm, in: inches } = this.machineProfile;
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const imperialGridCount = Math.ceil(inchesMax / 4);
-        const metricGridCount = Math.ceil(mmMax / 9);
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width);
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth);
 
-        const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = 170;
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
-        const gridSpacing =
+        const axisLengthX =
             units === IMPERIAL_UNITS
-                ? IMPERIAL_GRID_SPACING
-                : METRIC_GRID_SPACING;
+                ? inches.width * IMPERIAL_GRID_SPACING
+                : mm.width;
+        const axisLengthY =
+            units === IMPERIAL_UNITS
+                ? inches.depth * IMPERIAL_GRID_SPACING
+                : mm.depth;
+        const height = 170;
+        const gridCountX =
+            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+        const gridCountY =
+            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
+        const gridSpacing =
+            units === IMPERIAL_UNITS ? IMPERIAL_GRID_SPACING : 1;
         const group = new THREE.Group();
         const step = units === IMPERIAL_UNITS ? 25.4 : 10;
 
@@ -1437,8 +1450,8 @@ class Visualizer extends Component {
         {
             // Coordinate Grid
             const gridLine = new GridLine(
-                gridCount * gridSpacing * 2,
-                gridCount * gridSpacing * 2,
+                gridCountX * gridSpacing * 2,
+                gridCountY * gridSpacing * 2,
                 step,
                 currentTheme.get(GRID_PART), // grid
             );
@@ -1448,7 +1461,11 @@ class Visualizer extends Component {
 
         {
             // Coordinate JogControl
-            const coordinateAxes = new CoordinateAxes(axisLength, height);
+            const coordinateAxes = new CoordinateAxes(
+                axisLengthX,
+                axisLengthY,
+                height,
+            );
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -1456,7 +1473,7 @@ class Visualizer extends Component {
         {
             // Axis Labels
             const axisXLabel = new TextSprite({
-                x: axisLength + 10,
+                x: axisLengthX + 10,
                 y: 0,
                 z: 0,
                 size: 20,
@@ -1466,7 +1483,7 @@ class Visualizer extends Component {
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
                 x: 0,
-                y: axisLength + 10,
+                y: axisLengthY + 10,
                 z: 0,
                 size: 20,
                 text: 'Y',
@@ -1493,16 +1510,22 @@ class Visualizer extends Component {
 
     createGridLineNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
+        console.log(mm);
+        console.log(inches);
 
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width);
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth);
 
-        const imperialGridCount = Math.round(inchesMax / 4);
-        const metricGridCount = Math.round(mmMax / 9);
-
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
+        const gridCountX =
+            units === IMPERIAL_UNITS
+                ? imperialGridCountX
+                : Math.ceil(metricGridCountX / 10);
+        const gridCountY =
+            units === IMPERIAL_UNITS
+                ? imperialGridCountY
+                : Math.ceil(metricGridCountY / 10);
 
         const gridSpacing =
             units === IMPERIAL_UNITS
@@ -1514,7 +1537,7 @@ class Visualizer extends Component {
 
         const { currentTheme } = this.props.state;
 
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountX; i <= gridCountX; ++i) {
             if (i !== 0) {
                 const textLabel = new TextSprite({
                     x: i * gridSpacing,
@@ -1531,7 +1554,7 @@ class Visualizer extends Component {
                 group.add(textLabel);
             }
         }
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountY; i <= gridCountY; ++i) {
             if (i !== 0) {
                 const textLabel = new TextSprite({
                     x: -textOffset,

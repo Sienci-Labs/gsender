@@ -65,7 +65,7 @@ class CoordinateAxes {
     // Creates an axisHelper with lines of length size.
     // @param {number} size Define the size of the line representing the axes.
     // @see [Drawing the Coordinate JogControl]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
-    constructor(size, height) {
+    constructor(sizeX, sizeY, height) {
         const red = '#df3b3b';
         const green = '#06b881';
         const blue = '#5191cc';
@@ -73,25 +73,25 @@ class CoordinateAxes {
         this.group.add(
             buildAxis(
                 new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(size, 0, 0),
+                new THREE.Vector3(sizeX, 0, 0),
                 red,
                 true,
             ), // +X
             buildAxis(
                 new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(-size, 0, 0),
+                new THREE.Vector3(-sizeX, 0, 0),
                 red,
                 true,
             ), // -X
             buildAxis(
                 new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(0, size, 0),
+                new THREE.Vector3(0, sizeY, 0),
                 green,
                 true,
             ), // +Y
             buildAxis(
                 new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(0, -size, 0),
+                new THREE.Vector3(0, -sizeY, 0),
                 green,
                 true,
             ), // -Y
