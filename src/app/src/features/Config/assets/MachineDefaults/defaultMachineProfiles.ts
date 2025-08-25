@@ -60,9 +60,9 @@ export default [
         type: '',
         version: '',
         mm: {
-            width: 49.6,
-            depth: 49.1,
-            height: 6.6,
+            width: 1259.8,
+            depth: 1247.1,
+            height: 170,
         },
         in: {
             width: 49.6,
@@ -112,9 +112,9 @@ export default [
         type: '',
         version: '',
         mm: {
-            width: 24,
-            depth: 49.1,
-            height: 6.6
+            width: 609.6,
+            depth: 1247.1,
+            height: 167.6
         },
         in: {
             width: 24,
