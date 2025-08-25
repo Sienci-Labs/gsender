@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useLocation } from 'react-router';
+import api from '../../api';
 
 interface TabItem {
     label: string;
@@ -12,9 +13,10 @@ interface TabItem {
 
 interface TabbedProps {
     items: TabItem[];
+    tabSetId?: string;
 }
 
-export const Tabs = ({ items = [] }: TabbedProps) => {
+export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
     const [tabItems, setTabItems] = useState(items);
     const [activeTab, setActiveTab] = useState(items[0]?.label);
     const tabsRef = useRef<HTMLDivElement>(null);
@@ -23,9 +25,79 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const [canScrollRight, setCanScrollRight] = useState(false);
     const location = useLocation();
 
+    const loadTabOrder = async () => {
+        try {
+            // Use the same key format as save
+            const key = `tabOrder_${tabSetId}`;
+            console.log('Loading with key:', key);
+            
+            const response = await api.getState({ key });
+            console.log('Load tab order response:', response.data);
+            
+            // The response.data might be an object with numeric keys or an array
+            if (response.data) {
+                let savedOrder;
+                if (Array.isArray(response.data)) {
+                    savedOrder = response.data;
+                } else if (typeof response.data === 'object') {
+                    // Convert object with numeric keys to array
+                    savedOrder = Object.values(response.data);
+                }
+                
+                console.log('Saved order:', savedOrder);
+                
+                if (savedOrder && Array.isArray(savedOrder)) {
+                    const orderedItems = savedOrder
+                        .map((label: string) => items.find(item => item.label === label))
+                        .filter(Boolean);
+                    
+                    const newItems = items.filter(item => 
+                        !savedOrder.includes(item.label)
+                    );
+                    
+                    const finalOrder = [...orderedItems, ...newItems];
+                    console.log('Final order:', finalOrder.map(item => item.label));
+                    return finalOrder;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load tab order:', error);
+            // If we get a 404, try to save the current order first
+            if (error.response?.status === 404) {
+                console.log('No saved order found, saving current default order');
+                await saveTabOrder(items);
+            }
+        }
+        console.log('Using default order:', items.map(item => item.label));
+        return items;
+    };
+
+    const saveTabOrder = async (newItems: TabItem[]) => {
+        try {
+            const tabOrder = newItems.map(item => item.label);
+            console.log('Saving tab order:', tabOrder, 'for tabSetId:', tabSetId);
+            // Use a simpler key format
+            const key = `tabOrder_${tabSetId}`;
+            console.log('Using key:', key);
+            const response = await api.setState({ [key]: tabOrder });
+            console.log('Save response:', response.data);
+        } catch (error) {
+            console.warn('Failed to save tab order:', error);
+        }
+    };
+
     useEffect(() => {
-        setTabItems(items);
-    }, [items]);
+        const initializeTabs = async () => {
+            console.log('Initializing tabs for tabSetId:', tabSetId, 'with items:', items.map(item => item.label));
+            const orderedItems = await loadTabOrder();
+            console.log('Setting tab items to:', orderedItems.map(item => item.label));
+            setTabItems(orderedItems);
+        };
+        
+        if (items.length > 0) {
+            initializeTabs();
+        }
+    }, [items, tabSetId]);
 
     useEffect(() => {
         const { pathname } = location;
@@ -101,6 +173,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
         reorderedItems.splice(result.destination.index, 0, reorderedItem);
 
         setTabItems(reorderedItems);
+        saveTabOrder(reorderedItems);
     };
 
     return (
