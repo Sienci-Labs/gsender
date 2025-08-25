@@ -930,10 +930,10 @@ class Visualizer extends Component {
     recolorGridNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
 
-        const imperialGridCountX = Math.ceil(inches.width);
-        const metricGridCountX = Math.ceil(mm.width);
-        const imperialGridCountY = Math.ceil(inches.depth);
-        const metricGridCountY = Math.ceil(mm.depth);
+        const imperialGridCountX = Math.ceil(inches.width * 1.5);
+        const metricGridCountX = Math.ceil(mm.width * 1.5);
+        const imperialGridCountY = Math.ceil(inches.depth * 1.5);
+        const metricGridCountY = Math.ceil(mm.depth * 1.5);
 
         const gridCountX =
             units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
@@ -1422,10 +1422,10 @@ class Visualizer extends Component {
     createCoordinateSystem(units) {
         const { mm, in: inches } = this.machineProfile;
 
-        const imperialGridCountX = Math.ceil(inches.width);
-        const metricGridCountX = Math.ceil(mm.width);
-        const imperialGridCountY = Math.ceil(inches.depth);
-        const metricGridCountY = Math.ceil(mm.depth);
+        const imperialGridCountX = Math.ceil(inches.width * 1.5);
+        const metricGridCountX = Math.ceil(mm.width * 1.5);
+        const imperialGridCountY = Math.ceil(inches.depth * 1.5);
+        const metricGridCountY = Math.ceil(mm.depth * 1.5);
 
         const axisLengthX =
             units === IMPERIAL_UNITS
@@ -1513,10 +1513,10 @@ class Visualizer extends Component {
         console.log(mm);
         console.log(inches);
 
-        const imperialGridCountX = Math.ceil(inches.width);
-        const metricGridCountX = Math.ceil(mm.width);
-        const imperialGridCountY = Math.ceil(inches.depth);
-        const metricGridCountY = Math.ceil(mm.depth);
+        const imperialGridCountX = Math.ceil(inches.width * 1.5);
+        const metricGridCountX = Math.ceil(mm.width * 1.5);
+        const imperialGridCountY = Math.ceil(inches.depth * 1.5);
+        const metricGridCountY = Math.ceil(mm.depth * 1.5);
 
         const gridCountX =
             units === IMPERIAL_UNITS
