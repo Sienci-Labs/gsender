@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDragIndicator } from 'react-icons/md';
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useLocation } from 'react-router';
 
 interface TabItem {
@@ -145,7 +145,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                     style={provided.draggableProps.style}
-                                                    className={`flex-shrink-0 min-w-fit pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 flex items-center justify-center gap-2 cursor-pointer ${
+                                                    className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 flex items-center justify-center cursor-pointer ${
                                                         activeTab === item.label
                                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
                                                             : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
@@ -154,7 +154,6 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                                         handleTabClick(item.label, index)
                                                     }
                                                 >
-                                                    <MdDragIndicator className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                                     {item.label}
                                                 </div>
                                             )}
