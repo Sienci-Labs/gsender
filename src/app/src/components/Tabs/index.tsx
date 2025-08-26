@@ -92,6 +92,11 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
             const orderedItems = await loadTabOrder();
             console.log('Setting tab items to:', orderedItems.map(item => item.label));
             setTabItems(orderedItems);
+            
+            // Set active tab to the first tab in the reordered list
+            if (orderedItems.length > 0) {
+                setActiveTab(orderedItems[0].label);
+            }
         };
         
         if (items.length > 0) {
