@@ -11,7 +11,7 @@ export const ToolArea = () => {
             <div className="w-full p-1 max-xl:p-0.5 box-border order-2 portrait:order-1">
                 <JobControl />
             </div>
-            <div className="w-full p-1  max-xl:p-0.5 box-border order-3 portrait:order-3">
+            <div className="w-full h-full p-1  max-xl:p-0.5 box-border order-3 portrait:order-3">
                 <Tools />
             </div>
         </div>

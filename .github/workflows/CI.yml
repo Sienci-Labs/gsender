@@ -1,17 +1,18 @@
 name: CI
 
 on:
+  # push:
+  #   # Sequence of patterns matched against refs/heads
+  #   branches:
+  #     - master
+  #     - dev
+  #     - chris-test
+  # pull_request:
+  #   branches: [ "master" ]
   push:
-    # Sequence of patterns matched against refs/heads
-    branches:
-      - master
-      - dev
-      - chris-test
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build-linux:
