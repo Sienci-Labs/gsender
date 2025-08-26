@@ -2250,13 +2250,21 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
+            (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
+            this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
 
         this.connection.write(data, {
             ...context,
             source: WRITE_SOURCE_CLIENT
         });
+
+        this.emit('serialport:write', data, {
+            ...context,
+            source: WRITE_SOURCE_CLIENT
+        });
+
         log.silly(`> ${data}`);
     }
 
