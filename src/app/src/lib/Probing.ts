@@ -73,7 +73,6 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         }
     });
 
-    console.log('homing enabled: ', homingEnabled);
     // Soft limits handling - how far can we go down
     if (homingEnabled) {
         zProbeDistance = getZDownTravel(Math.abs(zProbeDistance)) * -1;
@@ -270,7 +269,6 @@ export const get3AxisAutoRoutine = ({
         prependUnits = 'G20';
     }
 
-    console.log(homingEnabled);
     let zDistance = 25;
     if (homingEnabled) {
         zDistance = getZDownTravel(zDistance);
@@ -429,6 +427,7 @@ export const get3AxisAutoTipRoutine = ({
     $13,
     direction,
     firmware,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -441,6 +440,10 @@ export const get3AxisAutoTipRoutine = ({
     if ($13 === '1') {
         prependUnits = 'G20';
     }
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+    }
 
     if (axes.x && axes.y && axes.z) {
         code.push(
@@ -449,7 +452,7 @@ export const get3AxisAutoTipRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -530,7 +533,7 @@ export const get3AxisAutoTipRoutine = ({
         code.push(
             '; Probe Z Auto Tip',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -593,6 +596,7 @@ export const get3AxisAutoDiameterRoutine = ({
     axes,
     direction,
     toolDiameter,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -601,6 +605,11 @@ export const get3AxisAutoDiameterRoutine = ({
         direction,
         toolDiameter,
     );
+
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+    }
 
     // const toolRadius = (diameter / 2);
     // const toolCompensatedThickness = ((-1 * toolRadius));
@@ -612,7 +621,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
