@@ -13,6 +13,7 @@ import {
     ProbingOptions,
     PROBE_TYPES_T,
 } from 'app/features/Probe/definitions';
+import { getZDownTravel } from 'app/lib/SoftLimits.js';
 
 export const BL = 0;
 export const TL = 1;
@@ -40,7 +41,7 @@ export const getProbeDirections = (
 
 // Setup variables for probing and
 export const getPreamble = (options: ProbingOptions): Array<string> => {
-    const {
+    let {
         modal,
         xRetractModifier,
         yRetractModifier,
@@ -59,6 +60,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         firmware,
         xyPositionAdjust,
         zPositionAdjust,
+        homingEnabled,
     } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
@@ -70,6 +72,13 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
             initialOffsets += `${axis.toUpperCase()}0`;
         }
     });
+
+    console.log('homing enabled: ', homingEnabled);
+    // Soft limits handling - how far can we go down
+    if (homingEnabled) {
+        zProbeDistance = getZDownTravel(zProbeDistance);
+        console.log('Z distance:', zProbeDistance);
+    }
 
     return [
         '; Initial Probe setup',

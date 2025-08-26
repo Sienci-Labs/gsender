@@ -56,16 +56,12 @@ import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import TrackballControls from 'app/lib/three/oldTrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
-import log from 'app/lib/log';
+
 import _ from 'lodash';
 import store from 'app/store';
-import api from 'app/api';
+
 import { colorsResponse } from 'app/workers/colors.response';
-import {
-    Toaster,
-    TOASTER_DANGER,
-    TOASTER_UNTIL_CLOSE,
-} from '../../lib/toaster/ToasterLib';
+
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
@@ -108,6 +104,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
 import { outlineResponse } from '../../workers/Outline.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -1166,6 +1163,8 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 const vertices = this.props.actions.getHull();
+                console.log('enabled:', this.props.homingEnabled);
+                const zTravel = this.props.homingEnabled ? getZUpTravel(5) : 5;
 
                 try {
                     const outlineWorker = new Worker(
@@ -1189,7 +1188,6 @@ class Visualizer extends Component {
                         'workspace.outlineMode',
                         'Detailed',
                     );
-                    console.log('outlineMode', outlineMode);
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
@@ -1210,6 +1208,7 @@ class Visualizer extends Component {
                         isLaser,
                         parsedData: vertices,
                         mode: outlineMode,
+                        zTravel,
                     });
                 } catch (e) {
                     console.log(e);
@@ -2904,6 +2903,11 @@ export default connect(
         const controllerType = _get(store, 'controller.type');
         const senderStatus = _get(store, 'controller.sender.status');
         const fileName = _get(store, 'file.name');
+        const homingValue = _get(
+            store,
+            'controller.settings.settings.$22',
+            '0',
+        );
 
         return {
             machinePosition,
@@ -2922,6 +2926,7 @@ export default connect(
             controllerType,
             senderStatus,
             fileName,
+            homingEnabled: homingValue !== '0',
         };
     },
     null,

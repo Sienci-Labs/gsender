@@ -71,6 +71,7 @@ export interface ProbingOptions {
     $13: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
+    homingEnabled: booleanl;
 }
 
 export interface ProbeWidgetSettings {
