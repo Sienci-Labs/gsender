@@ -255,6 +255,7 @@ export const get3AxisAutoRoutine = ({
     $13,
     direction,
     firmware,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -268,6 +269,13 @@ export const get3AxisAutoRoutine = ({
         prependUnits = 'G20';
     }
 
+    console.log(homingEnabled);
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+        console.log(zDistance);
+    }
+
     if (axes.x && axes.y && axes.z) {
         code.push(
             `; Probe XYZ Auto Endmill - direction: ${direction}`,
@@ -275,7 +283,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -717,7 +725,22 @@ export const getNextDirection = (
 
 // Master function - given selected routine, determine which probe code to return for a specific direction
 export const getProbeCode = (
-    options: ProbingOptions,
+    options: {
+        axes: { x: boolean; y: boolean; z: boolean };
+        modal: string;
+        probeFast: number;
+        probeSlow: number;
+        units: 'mm' | 'in';
+        retract: number;
+        toolDiameter: number;
+        zThickness: number;
+        xyThickness: number;
+        plateType: string;
+        $13: any;
+        probeDistances: { x: number; y: number; z: number };
+        probeType: string;
+        homingEnabled: boolean;
+    },
     direction: PROBE_DIRECTIONS = 0,
 ): Array<string> => {
     const { plateType, axes, probeType } = options;

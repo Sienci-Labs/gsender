@@ -70,7 +70,7 @@ const ProbeWidget = () => {
         activeState,
         mpos,
         zMaxTravel,
-        homingEnabled,
+        $22,
     } = useTypedSelector((state) => ({
         distance: state.controller.state.parserstate?.modal.distance,
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -431,7 +431,7 @@ const ProbeWidget = () => {
             $13,
             probeDistances,
             probeType,
-            homingEnabled: $13 !== '0',
+            homingEnabled: $22 !== '0',
         };
 
         const code = getProbeCode(options, direction);
