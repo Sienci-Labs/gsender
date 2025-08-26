@@ -76,7 +76,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
     console.log('homing enabled: ', homingEnabled);
     // Soft limits handling - how far can we go down
     if (homingEnabled) {
-        zProbeDistance = getZDownTravel(zProbeDistance);
+        zProbeDistance = getZDownTravel(Math.abs(zProbeDistance)) * -1;
         console.log('Z distance:', zProbeDistance);
     }
 
@@ -166,7 +166,9 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         `G91 G0 ${axis}[${axisRetract}]`,
-        `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
+        `%retractSign=Math.sign(${axisRetract})`,
+        `(sign: [retractSign])`,
+        `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
         `G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
