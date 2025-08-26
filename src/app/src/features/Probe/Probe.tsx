@@ -123,52 +123,54 @@ const Probe = ({ state, actions }: ProbeProps) => {
 
     return (
         <div className="w-full h-full">
-            <div className="grid grid-cols-[5fr_3fr] w-full h-full">
+            <div className="grid grid-cols-[5fr_3fr] w-full h-full items-center">
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
-                    <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px] gap-1">
-                        {availableProbeCommands.map((command, index) => (
-                            <ShadcnButton
-                                key={command.id}
-                                onClick={() =>
-                                    actions.handleProbeCommandChange(index)
-                                }
-                                size="sm"
-                                className={cx(
-                                    'rounded-md relative h-[calc(4vh+3px)] text-xs px-1 flex-1 min-w-0',
-                                    {
-                                        'bg-blue-400 bg-opacity-30':
-                                            index === selectedProbeCommand,
-                                    },
-                                )}
-                            >
-                                <span className="text-center leading-tight truncate w-full">
-                                    {command.id === 'Circle Hole' ? 'Circle' : 
-                                     command.id === 'Rect Hole' ? 'Rect' :
-                                     command.id.split(' ')[0]}
-                                </span>
-                            </ShadcnButton>
-                        ))}
-                    </div>
-                    <div
-                        className={cx('flex items-center', {
-                            hidden: !probeCommand?.tool,
-                        })}
-                    >
-                        <ProbeDiameter
-                            actions={actions}
-                            state={state}
-                            probeCommand={probeCommand}
-                        />
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <Button
-                            onClick={() => actions.onOpenChange(true)}
-                            disabled={!canClick}
+                <div className="flex justify-center">
+                    <div>
+                        <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px] gap-1">
+                            {availableProbeCommands.map((command, index) => (
+                                <ShadcnButton
+                                    key={command.id}
+                                    onClick={() =>
+                                        actions.handleProbeCommandChange(index)
+                                    }
+                                    size="sm"
+                                    className={cx(
+                                        'rounded-md relative h-[calc(4vh+3px)] text-xs px-1 flex-1 min-w-0',
+                                        {
+                                            'bg-blue-400 bg-opacity-30':
+                                                index === selectedProbeCommand,
+                                        },
+                                    )}
+                                >
+                                    <span className="text-center leading-tight truncate w-full">
+                                        {command.id === 'Circle Hole' ? 'Circle' : 
+                                         command.id === 'Rect Hole' ? 'Rect' :
+                                         command.id.split(' ')[0]}
+                                    </span>
+                                </ShadcnButton>
+                            ))}
+                        </div>
+                        <div
+                            className={cx('flex items-center justify-center mt-2', {
+                                'invisible': !probeCommand?.tool,
+                            })}
                         >
-                            Probe
-                        </Button>
+                            <ProbeDiameter
+                                actions={actions}
+                                state={state}
+                                probeCommand={probeCommand}
+                            />
+                        </div>
+                        <div className="flex items-center justify-center mt-2">
+                            <Button
+                                onClick={() => actions.onOpenChange(true)}
+                                disabled={!canClick}
+                            >
+                                Probe
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <div className="flex w-full h-full min-h-full">

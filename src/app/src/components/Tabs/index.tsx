@@ -183,7 +183,7 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
 
     return (
         <DragDropContext onDragEnd={handleOnDragEnd}>
-            <div className="w-full">
+            <div className="w-full h-full flex flex-col">
                 <div className="relative">
                     <div className="flex items-center absolute top-[-41px] left-0 right-0 z-10">
                         <button
