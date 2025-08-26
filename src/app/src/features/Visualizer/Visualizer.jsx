@@ -931,9 +931,9 @@ class Visualizer extends Component {
         const { mm, in: inches } = this.machineProfile;
 
         const imperialGridCountX = Math.ceil(inches.width * 2);
-        const metricGridCountX = Math.ceil(mm.width * 2);
+        const metricGridCountX = Math.ceil((mm.width * 2) / 10) * 10;
         const imperialGridCountY = Math.ceil(inches.depth * 2);
-        const metricGridCountY = Math.ceil(mm.depth * 2);
+        const metricGridCountY = Math.ceil((mm.depth * 2) / 10) * 10;
 
         const gridCountX =
             units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
@@ -1423,9 +1423,9 @@ class Visualizer extends Component {
         const { mm, in: inches } = this.machineProfile;
 
         const imperialGridCountX = Math.ceil(inches.width * 2);
-        const metricGridCountX = Math.ceil(mm.width * 2);
+        const metricGridCountX = Math.ceil((mm.width * 2) / 10) * 10;
         const imperialGridCountY = Math.ceil(inches.depth * 2);
-        const metricGridCountY = Math.ceil(mm.depth * 2);
+        const metricGridCountY = Math.ceil((mm.depth * 2) / 10) * 10;
 
         const axisLengthX =
             units === IMPERIAL_UNITS
@@ -1514,9 +1514,9 @@ class Visualizer extends Component {
         console.log(inches);
 
         const imperialGridCountX = Math.ceil(inches.width * 2);
-        const metricGridCountX = Math.ceil(mm.width * 2);
+        const metricGridCountX = Math.ceil((mm.width * 2) / 10) * 10;
         const imperialGridCountY = Math.ceil(inches.depth * 2);
-        const metricGridCountY = Math.ceil(mm.depth * 2);
+        const metricGridCountY = Math.ceil((mm.depth * 2) / 10) * 10;
 
         const gridCountX =
             units === IMPERIAL_UNITS
