@@ -78,10 +78,10 @@ const ProbeWidget = () => {
         workflow: state.controller.workflow,
         isConnected: state.connection.isConnected,
         $13: state.controller.settings.settings.$13 ?? '0',
+        $22: state.controller.settings.settings.$22 ?? '0',
         activeState: state.controller.state.status?.activeState,
         mpos: state.controller.mpos,
         zMaxTravel: state.controller.settings.settings.$132 ?? '170',
-        homingEnabled: Number(state.controller.settings.settings.$22) > 0,
     }));
 
     const { actions: config } = getWidgetConfigContext();
@@ -417,13 +417,6 @@ const ProbeWidget = () => {
             retractDistance = convertToImperial(retractionDistance);
         }
 
-        if (homingEnabled) {
-            const newZProbeDistance = Number(
-                (Number(zMaxTravel) - Math.abs(mpos.z) - 2).toFixed(3), // subtract an extra mm
-            );
-            probeDistances.z = newZProbeDistance;
-        }
-
         const options = {
             axes,
             modal,
@@ -438,7 +431,7 @@ const ProbeWidget = () => {
             $13,
             probeDistances,
             probeType,
-            homingEnabled: true,
+            homingEnabled: $13 !== '0',
         };
 
         const code = getProbeCode(options, direction);

@@ -13,7 +13,7 @@ import {
     ProbingOptions,
     PROBE_TYPES_T,
 } from 'app/features/Probe/definitions';
-import { getZDownTravel } from 'app/lib/SoftLimits.ts';
+import { getZDownTravel } from 'app/lib/SoftLimits.js';
 
 export const BL = 0;
 export const TL = 1;
@@ -73,9 +73,11 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         }
     });
 
+    console.log('homing enabled: ', homingEnabled);
     // Soft limits handling - how far can we go down
     if (homingEnabled) {
         zProbeDistance = getZDownTravel(zProbeDistance);
+        console.log('Z distance:', zProbeDistance);
     }
 
     return [

@@ -25,8 +25,8 @@ import chunk from 'lodash/chunk';
 import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = [], mode, bbox } = data;
-    console.log(`Received mode: ${mode}`);
+    const { isLaser = false, parsedData = [], mode, bbox, zTravel } = data;
+    console.log('zTravel: ', zTravel);
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
@@ -47,7 +47,7 @@ self.onmessage = ({ data }) => {
             return [
                 '%X0=posx,Y0=posy,Z0=posz',
                 '%MM=modal.distance',
-                'G21 G91 G0 Z5',
+                `G21 G91 G0 Z${zTravel}`,
                 'G90',
                 'G0 X0 Y0',
                 `G0 X[${bbox.min.x}] Y[${bbox.max.y}]`,
