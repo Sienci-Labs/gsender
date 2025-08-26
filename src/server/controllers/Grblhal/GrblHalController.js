@@ -1359,7 +1359,7 @@ class GrblHalController {
         // We set controller ready if version found
         setTimeout(async () => {
             if (this.connection) {
-                this.connection.writeImmediate(String.fromCharCode(0x87));
+                this.connection.writeln('\x87');
                 await delay(100);
                 this.write('$I\n');
             }
