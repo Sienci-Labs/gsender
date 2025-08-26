@@ -167,7 +167,6 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         `G91 G0 ${axis}[${axisRetract}]`,
         `%retractSign=Math.sign(${axisRetract})`,
-        `(sign: [retractSign])`,
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
