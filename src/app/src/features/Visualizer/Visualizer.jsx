@@ -1156,7 +1156,7 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 const vertices = this.props.actions.getHull();
-
+                console.log('enabled:', this.props.homingEnabled);
                 const zTravel = this.props.homingEnabled ? getZUpTravel(5) : 5;
 
                 try {
