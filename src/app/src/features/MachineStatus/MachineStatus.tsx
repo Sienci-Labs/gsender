@@ -24,6 +24,7 @@
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import get from 'lodash/get';
+import store from 'app/store';
 import controller from '../../lib/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import UnlockButton from './UnlockButton';
@@ -46,6 +47,7 @@ interface MachineStatusProps {
     alarmCode: ALARM_CODE;
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
+    doorToPause: boolean;
 }
 
 interface Message {
@@ -61,6 +63,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     activeState,
     alarmCode,
     isConnected,
+    doorToPause,
 }) => {
     const unlock = (): void => {
         if (activeState === GRBL_ACTIVE_STATE_ALARM) {
@@ -98,7 +101,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
             Tool: 'Tool Change',
-            Door: 'Door',
+            Door: doorToPause ? 'Pause' : 'Door',
         };
 
         return (
@@ -184,19 +187,21 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     );
 };
 
-export default connect((store) => {
-    const $22 = get(store, 'controller.settings.settings.$22', '0');
-    const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
+export default connect((reduxStore) => {
+    const $22 = get(reduxStore, 'controller.settings.settings.$22', '0');
+    const alarmCode = get(reduxStore, 'controller.state.status.alarmCode', 0);
     const activeState = get(
-        store,
+        reduxStore,
         'controller.state.status.activeState',
         GRBL_ACTIVE_STATE_IDLE,
     );
-    const isConnected = get(store, 'connection.isConnected', false);
+    const isConnected = get(reduxStore, 'connection.isConnected', false);
+    const doorToPause = store.get('workspace.repurposeDoorAsPause', false);
     return {
         $22,
         alarmCode,
         activeState,
         isConnected,
+        doorToPause,
     };
 })(MachineStatus);

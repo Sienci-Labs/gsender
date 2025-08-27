@@ -11,9 +11,11 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 import {
     CARVING_CATEGORY,
     GRBL,
+    GRBL_ACTIVE_STATE_DOOR,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
@@ -62,9 +64,12 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 }) => {
     function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
         const currentActiveState = reduxActiveState || activeState;
+        const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
+        
         return (
             currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
-            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD ||
+            (repurposeDoorAsPause && currentActiveState === GRBL_ACTIVE_STATE_DOOR)
         );
     }
 
@@ -77,9 +82,8 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         const { state } = currentWorkflow;
 
         return (
-            includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], state) &&
-            (currentActiveState === GRBL_ACTIVE_STATE_RUN ||
-                currentActiveState === GRBL_ACTIVE_STATE_HOLD)
+            state === WORKFLOW_STATE_RUNNING &&
+            currentActiveState === GRBL_ACTIVE_STATE_RUN
         );
     }
 
@@ -207,11 +211,14 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     useShuttleEvents(shuttleControlEvents);
 
     const handleRun = (): void => {
+        const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
+        
         console.assert(
             includes(
                 [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
                 workflow.state,
-            ) || activeState === GRBL_ACTIVE_STATE_HOLD,
+            ) || activeState === GRBL_ACTIVE_STATE_HOLD || 
+            (repurposeDoorAsPause && activeState === GRBL_ACTIVE_STATE_DOOR),
         );
 
         if (workflow.state === WORKFLOW_STATE_IDLE) {
@@ -221,13 +228,21 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 
         if (
             workflow.state === WORKFLOW_STATE_PAUSED ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
+            activeState === GRBL_ACTIVE_STATE_HOLD ||
+            (repurposeDoorAsPause && activeState === GRBL_ACTIVE_STATE_DOOR)
         ) {
             controller.command('gcode:resume');
         }
     };
     const handlePause = (): void => {
-        controller.command('gcode:pause');
+        const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
+        
+        if (repurposeDoorAsPause) {
+            // Send 0x84 hex character for door trigger
+            controller.write('\x84');
+        } else {
+            controller.command('gcode:pause');
+        }
     };
     const handleStop = (): void => {
         onStop();
