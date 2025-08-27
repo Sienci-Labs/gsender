@@ -55,7 +55,6 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
@@ -1708,12 +1707,7 @@ class GrblHalController {
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
-                    let activeState;
-
-                    activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
-                        this.write('!'); // hold
-                    }
+                    this.write('!'); // hold
 
                     await delay(700); // delay 700ms
                     this.write('\x18'); // ^x
