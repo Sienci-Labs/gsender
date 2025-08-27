@@ -17,7 +17,11 @@ export type TOUCHPLATE_TYPES_T =
 
 export interface ProbeProfile {
     xyThickness: number;
-    zThickness: number;
+    zThickness: {
+        standardBlock: number;
+        autoZero: number;
+        zProbe: number;
+    };
     plateWidth: number;
     plateLength: number;
     functions: {
@@ -60,7 +64,11 @@ export interface ProbingOptions {
     probeDistances: BasicPosition;
     probeFast: number;
     probeSlow: number;
-    zThickness: number;
+    zThickness: {
+        standardBlock: number;
+        autoZero: number;
+        zProbe: number;
+    };
     xThickness?: number;
     yThickness?: number;
     xyThickness?: number;
@@ -69,7 +77,6 @@ export interface ProbingOptions {
     zPositionAdjust?: number;
     direction?: PROBE_DIRECTIONS;
     $13: string;
-    $22: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
     homingEnabled: boolean;

@@ -8,14 +8,13 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap, IoMdMove } from 'react-icons/io';
+import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
-    PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -492,20 +491,31 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         ],
                     },
                     {
-                        label: 'Z thickness',
-                        key: 'workspace.probeProfile.zThickness',
+                        label: 'Z thickness - Standard Block',
+                        key: 'workspace.probeProfile.zThickness.standardBlock',
                         description:
-                            'Plate thickness where the bit touches when Z-axis probing. (Default 15)',
+                            'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
-                                'workspace.probeProfile.touchplateType',
-                                '',
-                            );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
-                        },
+                        defaultValue: 15
+                    },
+                    {
+                        label: 'Z thickness - AutoZero',
+                        key: 'workspace.probeProfile.zThickness.autoZero',
+                        description:
+                            'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
+                        type: 'number',
+                        unit: 'mm',
+                        defaultValue: 5
+                    },
+                    {
+                        label: 'Z thickness - Z Probe',
+                        key: 'workspace.probeProfile.zThickness.zProbe',
+                        description:
+                            'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
+                        type: 'number',
+                        unit: 'mm',
+                        defaultValue: 15
                     },
                     {
                         label: 'XY thickness',
