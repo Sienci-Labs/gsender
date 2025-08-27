@@ -56,7 +56,6 @@ import {
 import GrblRunner from './GrblRunner';
 import {
     GRBL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_HOME,
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,
@@ -1605,12 +1604,7 @@ class GrblController {
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
-                    let activeState;
-
-                    activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
-                        this.write('!'); // hold
-                    }
+                    this.write('!'); // hold
 
                     await delay(700); // delay 700ms
                     this.write('\x18'); // ^x
