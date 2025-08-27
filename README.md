@@ -114,9 +114,11 @@ gSender is also designed in a way that it can be run locally on your computer br
 <summary>Expand to see all version notes</summary>
 
 ### 1.5.4 (August 27, 2025)
-- Fix controller not instantiating correctly in some situations
+- Fix controller not instantiating correctly in some situations for grblHAL devices.
 - Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
-- Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't
+- Visualizer grid sizing more accurately matches your machine size at 2X dimensions.
+- Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.
+- Shortcut order adjusted when configurting binds.
 - Precise and Rapid toggle swapped in jog preset selector
 - Start from line modal is now correct based on the file
 - Copy button works on electron versions on Windows in remote mode dialog
