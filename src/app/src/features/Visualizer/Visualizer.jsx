@@ -929,7 +929,7 @@ class Visualizer extends Component {
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
-        const imperialGridCountY = Math.ceil(inches.depth * 2);
+        const imperialGridCountY = Math.ceil(inches.depth);
         const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
         const gridCountX =
@@ -1423,7 +1423,7 @@ class Visualizer extends Component {
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
-        const imperialGridCountY = Math.ceil(inches.depth * 2);
+        const imperialGridCountY = Math.ceil(inches.depth);
         const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
         const axisLengthX =
@@ -1514,7 +1514,7 @@ class Visualizer extends Component {
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
-        const imperialGridCountY = Math.ceil(inches.depth * 2);
+        const imperialGridCountY = Math.ceil(inches.depth);
         const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
         const gridCountX =
