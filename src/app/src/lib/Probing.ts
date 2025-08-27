@@ -3,6 +3,7 @@ import {
     PROBE_TYPE_TIP,
     PROBE_TYPES,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_STANDARD,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
@@ -51,7 +52,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         zProbeDistance,
         probeFast,
         probeSlow,
-        zThickness,
+        zThickness: zThicknesses,
         xThickness,
         yThickness,
         xRetract,
@@ -61,10 +62,13 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         xyPositionAdjust,
         zPositionAdjust,
         homingEnabled,
+        plateType,
     } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
+
+    const zThickness = plateType === TOUCHPLATE_TYPE_STANDARD ? zThicknesses.standardBlock : zThicknesses.zProbe;
 
     // Add axes to initial zeroing
     Object.keys(axes).forEach((axis) => {
@@ -256,6 +260,7 @@ export const get3AxisAutoRoutine = ({
     direction,
     firmware,
     homingEnabled,
+    zThickness
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -280,13 +285,14 @@ export const get3AxisAutoRoutine = ({
             `; Probe XYZ Auto Endmill - direction: ${direction}`,
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
-            'G10 L20 P0 Z5',
+            'G10 L20 P0 Z[Z_THICKNESS]',
             'G21 G91 G0 Z3',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
@@ -363,12 +369,13 @@ export const get3AxisAutoRoutine = ({
     } else if (axes.z) {
         code.push(
             '; Probe Z Auto Endmill',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Z5`,
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G21 G91 G0 Z5',
         );
     } else if (axes.x) {
@@ -428,6 +435,7 @@ export const get3AxisAutoTipRoutine = ({
     direction,
     firmware,
     homingEnabled,
+    zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -450,13 +458,14 @@ export const get3AxisAutoTipRoutine = ({
             '; Probe XYZ Auto Tip',
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
-            `G10 L20 ${p} Z5`,
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
@@ -532,12 +541,13 @@ export const get3AxisAutoTipRoutine = ({
     } else if (axes.z) {
         code.push(
             '; Probe Z Auto Tip',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Z5`,
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P0.15',
             'G21 G91 G0 Z1',
         );
@@ -597,6 +607,7 @@ export const get3AxisAutoDiameterRoutine = ({
     direction,
     toolDiameter,
     homingEnabled,
+    zThickness
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -620,12 +631,13 @@ export const get3AxisAutoDiameterRoutine = ({
             '; Probe XYZ AutoZero Specific Diameter',
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Z5`,
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G21 G91 G0 Z2',
             'G21 G91 G0 X13',
             'G38.2 X20 F250',
@@ -676,12 +688,13 @@ export const get3AxisAutoDiameterRoutine = ({
     } else if (axes.z) {
         code.push(
             '; Probe Z AutoZero Specific Diameter',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} Z5`,
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P0.15',
             'G21 G91 G0 Z2',
         );
@@ -735,22 +748,7 @@ export const getNextDirection = (
 
 // Master function - given selected routine, determine which probe code to return for a specific direction
 export const getProbeCode = (
-    options: {
-        axes: { x: boolean; y: boolean; z: boolean };
-        modal: string;
-        probeFast: number;
-        probeSlow: number;
-        units: 'mm' | 'in';
-        retract: number;
-        toolDiameter: number;
-        zThickness: number;
-        xyThickness: number;
-        plateType: string;
-        $13: any;
-        probeDistances: { x: number; y: number; z: number };
-        probeType: string;
-        homingEnabled: boolean;
-    },
+    options: ProbingOptions,
     direction: PROBE_DIRECTIONS = 0,
 ): Array<string> => {
     const { plateType, axes, probeType } = options;

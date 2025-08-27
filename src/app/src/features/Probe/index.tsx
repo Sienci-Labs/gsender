@@ -68,8 +68,6 @@ const ProbeWidget = () => {
         isConnected,
         $13,
         activeState,
-        mpos,
-        zMaxTravel,
         $22,
     } = useTypedSelector((state) => ({
         distance: state.controller.state.parserstate?.modal.distance,
@@ -410,7 +408,13 @@ const ProbeWidget = () => {
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
         } else {
-            zThickness = convertToImperial(touchplate.zThickness);
+            zThickness = {
+                autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
+                standardBlock: convertToImperial(
+                    touchplate.zThickness.standardBlock,
+                ),
+                zProbe: convertToImperial(touchplate.zThickness.zProbe),
+            };
             xyThickness = convertToImperial(touchplate.xyThickness);
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
