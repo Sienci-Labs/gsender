@@ -491,31 +491,52 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         ],
                     },
                     {
-                        label: 'Z thickness - Standard Block',
+                        label: 'Z thickness Block',
                         key: 'workspace.probeProfile.zThickness.standardBlock',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
                         type: 'number',
                         unit: 'mm',
-                        defaultValue: 15
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero touchplate
+                            return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
                     },
                     {
-                        label: 'Z thickness - AutoZero',
+                        label: 'Z thickness AZ',
                         key: 'workspace.probeProfile.zThickness.autoZero',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
                         type: 'number',
                         unit: 'mm',
-                        defaultValue: 5
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero touchplate
+                            return probeType !== TOUCHPLATE_TYPE_AUTOZERO;
+                        },
                     },
                     {
-                        label: 'Z thickness - Z Probe',
+                        label: 'Z thickness Puck',
                         key: 'workspace.probeProfile.zThickness.zProbe',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
                         type: 'number',
                         unit: 'mm',
-                        defaultValue: 15
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero touchplate
+                            return probeType !== TOUCHPLATE_TYPE_ZERO;
+                        },
                     },
                     {
                         label: 'XY thickness',
