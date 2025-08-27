@@ -101,7 +101,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
             Tool: 'Tool Change',
-            Door: doorToPause ? 'Pause' : 'Door',
+            Door: doorToPause ? 'Hold' : 'Door',
         };
 
         return (
