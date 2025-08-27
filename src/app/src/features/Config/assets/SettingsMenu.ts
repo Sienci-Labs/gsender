@@ -502,7 +502,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
+                            // Hidden if we are not using Block touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
                         },
                     },
@@ -518,7 +518,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
+                            // Hidden if we are not using AutoZero touchplate
                             return probeType !== TOUCHPLATE_TYPE_AUTOZERO;
                         },
                     },
@@ -534,7 +534,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
+                            // Hidden if we are not using Puck touchplate
                             return probeType !== TOUCHPLATE_TYPE_ZERO;
                         },
                     },
