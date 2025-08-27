@@ -409,7 +409,7 @@ const ProbeWidget = () => {
             retractDistance = retractionDistance;
         } else {
             zThickness = {
-                autoZero: convertToImperial(touchplate.zThickness.autoZero),
+                autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
                 standardBlock: convertToImperial(
                     touchplate.zThickness.standardBlock,
                 ),
