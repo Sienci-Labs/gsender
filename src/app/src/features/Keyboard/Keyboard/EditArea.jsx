@@ -23,15 +23,17 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { cn } from 'app/lib/utils';
-import { Button } from 'app/components/Button';
-import shuttleEvents from 'app/lib/shuttleEvents';
-import { formatShortcut } from '../helpers';
 import {
     FaCheckCircle,
     FaExclamationCircle,
     FaInfoCircle,
 } from 'react-icons/fa';
+
+import { cn } from 'app/lib/utils';
+import { Button } from 'app/components/Button';
+import shuttleEvents from 'app/lib/shuttleEvents';
+
+import { formatShortcut, shouldHideShiftForKey } from '../helpers';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
@@ -94,7 +96,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
         if (keys.metaKey.triggered) keyCombo += `${keys.metaKey.label}+`;
         if (keys.altKey.triggered) keyCombo += `${keys.altKey.label}+`;
         if (keys.ctrlKey.triggered) keyCombo += `${keys.ctrlKey.label}+`;
-        if (keys.shiftKey.triggered && !e.code.includes('Digit')) {
+        if (keys.shiftKey.triggered && !shouldHideShiftForKey(key)) {
             keyCombo += `${keys.shiftKey.label}+`;
         }
         keyCombo += key;
@@ -204,7 +206,8 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
         if (state.metaTriggered) keys.push('command');
         if (state.ctrlTriggered) keys.push('ctrl');
         if (state.altTriggered) keys.push('alt');
-        if (state.shiftTriggered) keys.push('shift');
+        if (state.shiftTriggered && !shouldHideShiftForKey(state.singleKey))
+            keys.push('shift');
         if (state.singleKey) keys.push(state.singleKey);
 
         return (

@@ -68,6 +68,9 @@ const ProbeWidget = () => {
         isConnected,
         $13,
         activeState,
+        mpos,
+        zMaxTravel,
+        $22,
     } = useTypedSelector((state) => ({
         distance: state.controller.state.parserstate?.modal.distance,
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -75,7 +78,10 @@ const ProbeWidget = () => {
         workflow: state.controller.workflow,
         isConnected: state.connection.isConnected,
         $13: state.controller.settings.settings.$13 ?? '0',
+        $22: state.controller.settings.settings.$22 ?? '0',
         activeState: state.controller.state.status?.activeState,
+        mpos: state.controller.mpos,
+        zMaxTravel: state.controller.settings.settings.$132 ?? '170',
     }));
 
     const { actions: config } = getWidgetConfigContext();
@@ -425,6 +431,7 @@ const ProbeWidget = () => {
             $13,
             probeDistances,
             probeType,
+            homingEnabled: $22 !== '0',
         };
 
         const code = getProbeCode(options, direction);

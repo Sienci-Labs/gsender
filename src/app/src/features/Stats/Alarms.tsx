@@ -41,16 +41,16 @@ export function Alarms() {
                 <StatCard>
                     <CardHeader>Clear Alarms & Errors</CardHeader>
                     <div className="flex flex-col gap-4 justify-center">
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 text-sm dark:text-white">
                             Clear all prior alarms and errors. This action
                             cannot be undone.
                         </p>
                         <Button
-                            icon={<FaTrash className="text-blue-500 w-4 h-4" />}
+                            icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
                             onClick={deleteAlarms}
                             text="Clear Alarms & Errors"
                             size="lg"
-                            className="text-blue-500"
+                            className="text-gray-600"
                         />
                     </div>
                 </StatCard>

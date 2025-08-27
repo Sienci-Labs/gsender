@@ -287,7 +287,7 @@ const SurfacingTool = () => {
                             </div>
                         </InputArea>
                         <InputArea label="Coolant Control">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <div className="flex items-center gap-2 justify-center col-span-3">
                                 <span className="font-light text-sm max-w-20 dark:text-white">
                                     Mist (M7)
                                 </span>

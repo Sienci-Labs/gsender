@@ -126,7 +126,7 @@ const About = () => {
     };
 
     return (
-        <div className="w-full flex flex-col gap-6 h-full">
+        <div className="w-full flex flex-col gap-6 h-full px-4">
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                     <img
@@ -177,9 +177,9 @@ const About = () => {
                 community, and reliability.
             </p>
 
-            <div className="dark:text-white">
-                <h2 className="text-2xl font-bold mb-2">gSender Team</h2>
-                <div className="text-md md:text-lg">
+            <div>
+                <h2 className="text-2xl text-blue-500 mb-2">gSender Team</h2>
+                <div className="text-md md:text-lg dark:text-white">
                     {team.map((member, index) => (
                         <span key={member.name}>
                             <strong>{member.name}</strong> ({member.title})
@@ -192,7 +192,7 @@ const About = () => {
             {!hasUpdate && (
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
-                        <h2 className="text-2xl font-bold dark:text-white">Release Notes</h2>
+                        <h2 className="text-2xl text-blue-500">Release Notes</h2>
 
                         <a
                             className="text-sm text-blue-500 underline"

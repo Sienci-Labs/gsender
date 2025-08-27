@@ -37,67 +37,67 @@ const Size = () => {
         <table className="border-collapse border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300">
             <thead>
                 <tr>
-                    <th className="border border-gray-300 px-1 py-0.5"></th>
-                    <th className="border border-gray-300 px-1 py-0.5">Size</th>
-                    <th className="border border-gray-300 px-1 py-0.5">Min</th>
-                    <th className="border border-gray-300 px-1 py-0.5">Max</th>
+                    <th className="border border-gray-300 px-1"></th>
+                    <th className="border border-gray-300 px-1">Size</th>
+                    <th className="border border-gray-300 px-1">Min</th>
+                    <th className="border border-gray-300 px-1">Max</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="border border-gray-300 px-1 py-0.5 font-bold">
+                    <td className="border border-gray-300 px-1 font-bold">
                         X
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.x}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.min.x}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.max.x}
                     </td>
                 </tr>
                 <tr>
-                    <td className="border border-gray-300 px-1 py-0.5 font-bold">
+                    <td className="border border-gray-300 px-1 font-bold">
                         Y
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.y}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.min.y}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.max.y}
                     </td>
                 </tr>
                 <tr>
-                    <td className="border border-gray-300 px-1 py-0.5 font-bold">
+                    <td className="border border-gray-300 px-1 font-bold">
                         Z
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.z}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.min.z}
                     </td>
-                    <td className="border border-gray-300 px-1 py-0.5 text-center">
+                    <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.max.z}
                     </td>
                 </tr>
                 {fileContainsA && (
                     <tr>
-                        <td className="border border-gray-300 px-1 py-0.5 font-bold">
+                        <td className="border border-gray-300 px-1 font-bold">
                             A
                         </td>
-                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                        <td className="border border-gray-300 px-1 text-center">
                             {formattedBBox.delta.a}
                         </td>
-                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                        <td className="border border-gray-300 px-1 text-center">
                             {formattedBBox.min.a}
                         </td>
-                        <td className="border border-gray-300 px-1 py-0.5 text-center">
+                        <td className="border border-gray-300 px-1 text-center">
                             {formattedBBox.max.a}
                         </td>
                     </tr>

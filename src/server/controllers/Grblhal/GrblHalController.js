@@ -1430,8 +1430,8 @@ class GrblHalController {
         // We set controller ready if version found
         setTimeout(async () => {
             if (this.connection) {
+                this.connection.writeln('\x87');
                 await delay(100);
-                this.connection.writeImmediate(String.fromCharCode(0x87));
                 this.write('$I\n');
             }
             if (!refresh) {
@@ -1699,7 +1699,7 @@ class GrblHalController {
 
                     const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                     let modalWcs = modal.wcs;
-                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                    if (modalWcs !== wcs && modalWcs === 'G54') {
                         modalWcs = wcs;
                     }
                     const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;

@@ -18,6 +18,7 @@ export interface Rotary {
     };
 }
 
+export type RotarySurfacingOptions = Rotary['stockTurning']['options'];
 export interface RotarySettings {
     $101: string;
     $111: string;

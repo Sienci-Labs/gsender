@@ -890,9 +890,9 @@ function generateSupportFile() {
 
     return (
         <Button
-            icon={<PiFileZipFill className="text-blue-500 w-8 h-8" />}
+            icon={<PiFileZipFill className="text-gray-600 w-8 h-8 dark:text-gray-200" />}
             onClick={submitDiagnosticForm}
-            className="text-blue-500"
+            className=""
             size="lg"
             text="Download Diagnostic File"
         />

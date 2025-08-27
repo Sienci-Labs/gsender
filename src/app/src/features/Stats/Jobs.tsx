@@ -95,12 +95,15 @@ export function Jobs() {
             <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
                 <StatCard>
                     <CardHeader>Job History</CardHeader>
-                    <SortableTable
-                        defaultData={defaultData}
-                        data={jobs}
-                        columns={columnData}
-                        height="h-[calc(100vh-224px)]"
-                    />
+                    <div class="w-full flex flex-col">
+                        <SortableTable
+                            defaultData={defaultData}
+                            data={jobs}
+                            columns={columnData}
+                            searchPlaceholder="Search past jobs..."
+                            height="h-[calc(100vh-260px)]"
+                        />
+                    </div>
                 </StatCard>
             </div>
             <div className="col-span-2 row-span-6 col-start-5 px-8 max-xl:px-0 flex flex-col gap-4 justify-center items-center">

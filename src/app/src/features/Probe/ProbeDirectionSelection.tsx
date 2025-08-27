@@ -12,7 +12,7 @@ const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
             <button
                 type="button"
                 className={cx(
-                    'border-0 outline-none rounded-xl [box-shadow:20px_20px_60px_#bebebe_-20px_-20px_60px_#ffffff] z-[100]',
+                    'border-0 outline-none rounded-xl [box-shadow:20px_20px_60px_#bebebe_-20px_-20px_60px_#ffffff] z-[100] dark:invert dark:hue-rotate-180',
                     {
                         'transition-none [transform:rotate(0deg)]':
                             direction === 0,

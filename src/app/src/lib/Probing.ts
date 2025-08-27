@@ -13,6 +13,7 @@ import {
     ProbingOptions,
     PROBE_TYPES_T,
 } from 'app/features/Probe/definitions';
+import { getZDownTravel } from 'app/lib/SoftLimits.js';
 
 export const BL = 0;
 export const TL = 1;
@@ -40,7 +41,7 @@ export const getProbeDirections = (
 
 // Setup variables for probing and
 export const getPreamble = (options: ProbingOptions): Array<string> => {
-    const {
+    let {
         modal,
         xRetractModifier,
         yRetractModifier,
@@ -59,6 +60,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         firmware,
         xyPositionAdjust,
         zPositionAdjust,
+        homingEnabled,
     } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
@@ -70,6 +72,12 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
             initialOffsets += `${axis.toUpperCase()}0`;
         }
     });
+
+    // Soft limits handling - how far can we go down
+    if (homingEnabled) {
+        zProbeDistance = getZDownTravel(Math.abs(zProbeDistance)) * -1;
+        console.log('Z distance:', zProbeDistance);
+    }
 
     return [
         '; Initial Probe setup',
@@ -157,7 +165,8 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         `G91 G0 ${axis}[${axisRetract}]`,
-        `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
+        `%retractSign=Math.sign(${axisRetract})`,
+        `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
         `G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
@@ -246,6 +255,7 @@ export const get3AxisAutoRoutine = ({
     $13,
     direction,
     firmware,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -259,6 +269,12 @@ export const get3AxisAutoRoutine = ({
         prependUnits = 'G20';
     }
 
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+        console.log(zDistance);
+    }
+
     if (axes.x && axes.y && axes.z) {
         code.push(
             `; Probe XYZ Auto Endmill - direction: ${direction}`,
@@ -266,7 +282,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -411,6 +427,7 @@ export const get3AxisAutoTipRoutine = ({
     $13,
     direction,
     firmware,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -423,6 +440,10 @@ export const get3AxisAutoTipRoutine = ({
     if ($13 === '1') {
         prependUnits = 'G20';
     }
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+    }
 
     if (axes.x && axes.y && axes.z) {
         code.push(
@@ -431,7 +452,7 @@ export const get3AxisAutoTipRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P[PROBE_DELAY]',
@@ -512,7 +533,7 @@ export const get3AxisAutoTipRoutine = ({
         code.push(
             '; Probe Z Auto Tip',
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -575,6 +596,7 @@ export const get3AxisAutoDiameterRoutine = ({
     axes,
     direction,
     toolDiameter,
+    homingEnabled,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -583,6 +605,11 @@ export const get3AxisAutoDiameterRoutine = ({
         direction,
         toolDiameter,
     );
+
+    let zDistance = 25;
+    if (homingEnabled) {
+        zDistance = getZDownTravel(zDistance);
+    }
 
     // const toolRadius = (diameter / 2);
     // const toolCompensatedThickness = ((-1 * toolRadius));
@@ -594,7 +621,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
-            'G38.2 Z-25 F200',
+            `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
             'G4 P0.15',
@@ -708,7 +735,22 @@ export const getNextDirection = (
 
 // Master function - given selected routine, determine which probe code to return for a specific direction
 export const getProbeCode = (
-    options: ProbingOptions,
+    options: {
+        axes: { x: boolean; y: boolean; z: boolean };
+        modal: string;
+        probeFast: number;
+        probeSlow: number;
+        units: 'mm' | 'in';
+        retract: number;
+        toolDiameter: number;
+        zThickness: number;
+        xyThickness: number;
+        plateType: string;
+        $13: any;
+        probeDistances: { x: number; y: number; z: number };
+        probeType: string;
+        homingEnabled: boolean;
+    },
     direction: PROBE_DIRECTIONS = 0,
 ): Array<string> => {
     const { plateType, axes, probeType } = options;

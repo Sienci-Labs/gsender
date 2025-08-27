@@ -1545,7 +1545,7 @@ class GrblController {
 
                     const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                     let modalWcs = modal.wcs;
-                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                    if (modalWcs !== wcs && modalWcs === 'G54') {
                         modalWcs = wcs;
                     }
 
