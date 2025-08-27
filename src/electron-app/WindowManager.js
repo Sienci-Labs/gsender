@@ -104,7 +104,7 @@ class WindowManager {
     const webContents = window.webContents;
     // Enable remote API
     remoteMain.enable(window.webContents);
-    // window.removeMenu();
+    window.removeMenu();
     window.webContents.once("did-finish-load", () => {
       window.setTitle(options.title);
     });
@@ -115,8 +115,8 @@ class WindowManager {
       this.windows.splice(index, 1);
     });
 
-    window.on('maximize', (event) => {
-        window.webContents.send('maximize-window');
+    window.on("maximize", (event) => {
+      window.webContents.send("maximize-window");
     });
 
     // Open every external link in a new window
