@@ -268,6 +268,7 @@
     "cookie-parser": "~1.4.4",
     "core-js": "~3.26.1",
     "cors": "^2.8.5",
+    "crc-full": "^1.1.0",
     "csv": "^6.3.3",
     "cypress-real-events": "^1.11.0",
     "date-fns": "^4.1.0",

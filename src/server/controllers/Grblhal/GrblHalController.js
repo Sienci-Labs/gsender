@@ -84,7 +84,7 @@ import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
 import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
-import { YModem } from 'server/lib/YModem';
+import { YModem } from 'server/lib/YModemUSB';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -1214,7 +1214,7 @@ class GrblHalController {
         }, 250);
 
         // YModem instance
-        this.ymodem = new YModem(this.connection);
+        this.ymodem = new YModem();
         this.ymodem.on('start', () => {
             this.ymodemTransferInProgress = true;
         });
@@ -2315,9 +2315,7 @@ class GrblHalController {
             },
             'ymodem:upload': () => {
                 const [fileData] = args;
-                this.ymodem.upload(fileData);
-                console.log(fileData);
-                console.log('Upload starts');
+                this.ymodem.sendFile(fileData, this.connection.getConnectionObject());
             },
             'ymodem:cancel': () => {
                 console.log('cancel upload');

@@ -285,6 +285,10 @@ class Connection extends EventEmitter {
         this.connection.setWriteFilter(writeFilter);
     }
 
+    getConnectionObject() {
+        return this.connection.port;
+    }
+
     emitToSockets(eventName, ...args) {
         Object.keys(this.sockets).forEach((id) => {
             const socket = this.sockets[id];

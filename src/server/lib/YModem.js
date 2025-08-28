@@ -3,11 +3,12 @@
 /* eslint-disable no-return-assign */
 
 import events from 'events';
+import delay from 'server/lib/delay';
+import { ByteLengthParser } from '@serialport/parser-byte-length';
 
 export class YModem extends events.EventEmitter {
-    constructor(comms) {
+    constructor() {
         super();
-        this.comms = comms;
         this.packetNum = 0;
         this.bytes = 0;
         this.hdr = new Uint8Array(3);
@@ -22,16 +23,29 @@ export class YModem extends events.EventEmitter {
         this.dataTransferredCallback = callback;
     }
 
+    handler(data) {
+        console.log(`data:>> ${data}`);
+    }
+
     /**
      * File should look like {data: blob, name: string, size:string }
      */
-    async upload(file) {
+    async upload(file, comms) {
         let state = 'NAK';
         const fileSize = file.size;
         let bytesRemaining = fileSize;
 
-        const reader = file.data.stream().getReader(); // Time to read the blob
+        this.comms = comms;
+        this.comms.unpipe();
 
+
+        const blob = new Blob([file.data]);
+        const reader = blob.stream().getReader(); // Time to read the blob
+
+        this.emit('start');
+        await delay(1500);
+        this.comms.pipe(new ByteLengthParser({ length: 1 }));
+        this.comms.on('data', this.handler);
         // Turn on other writing, wait to clear - best way to handle for us?
         //this.comms.eventMode = false;
         //this.comms.purgeQueue();
@@ -78,11 +92,14 @@ export class YModem extends events.EventEmitter {
         const nameBytes = new TextEncoder().encode('/' + fileName);
         const sizeBytes = new TextEncoder().encode(fileSize.toString());
 
+        console.log(nameBytes);
+        console.log(sizeBytes);
         let j = 0;
         nameBytes.forEach(b => this.payload[j++] = b);
         j++;
         sizeBytes.forEach(b => this.payload[j++] = b);
 
+        console.log(this.payload);
         this.packetNum = 0;
         return this.transferPacket(128);
     }
@@ -110,12 +127,13 @@ export class YModem extends events.EventEmitter {
 
     async send(length) {
         //this.comms.purgeQueue();
-        this.comms.write(this.hdr);
+        this.comms.write(this.hdr, 'binary');
         this.comms.write(this.payload.slice(0, length));
         this.response = YModem.NAK;
 
         // TODO:  How do we check this, check implementation on ioSender side
-        await this.comms.waitForByte(this.packetNum === 0 ? 8000 : 2000, this.crc);
+        //await this.comms.waitForByte(this.packetNum === 0 ? 8000 : 2000, this.crc);
+        await delay(5000);
 
         switch (this.response) {
         case YModem.ACK: return 'ACK';
