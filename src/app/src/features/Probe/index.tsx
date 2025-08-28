@@ -469,6 +469,13 @@ const ProbeWidget = () => {
             }
         }
 
+        // only update tool diameter if the touchplate actually changed
+        if (touchplateType !== probeProfile.touchplateType) {
+            setToolDiameter(
+                calcToolDiamater(store.get('workspace.probeProfile', {})),
+            );
+        }
+
         setUnits(store.get('workspace.units'));
         setAvailableTools(store.get('workspace.tools', []));
         setTouchplateType(store.get('workspace.probeProfile.touchplateType'));
@@ -482,10 +489,6 @@ const ProbeWidget = () => {
         setRetractionDistance(config.get('retractionDistance') || {});
         setZProbeDistance(config.get('zProbeDistance') || {});
         setConnectivityTest(config.get('connectivityTest'));
-
-        setToolDiameter(
-            calcToolDiamater(store.get('workspace.probeProfile', {})),
-        );
 
         let newZProbeDistance = config.get('zProbeDistance');
         if (newZProbeDistance) {
