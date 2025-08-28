@@ -16,6 +16,7 @@
     "@sienci/avrgirl-arduino": "^5.0.3",
     "axios": "^1.2.4",
     "bcrypt-nodejs": "0.0.3",
+    "buffer-chunks": "^0.1.1",
     "chalk": "~2.4.2",
     "commander": "^10.0.0",
     "compression": "~1.7.4",

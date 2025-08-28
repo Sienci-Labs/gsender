@@ -1228,12 +1228,13 @@ class GrblHalController {
         });
         this.ymodem.on('error', (err) => {
             this.ymodemTransferInProgress = false;
-            this.connection.on('data', this.connectionEventListener.data); // Restore the general data handler
+
+            this.restoreListeners();
             console.log(err);
         });
         this.ymodem.on('complete', () => {
             this.ymodemTransferInProgress = false;
-            this.connection.on('data', this.connectionEventListener.data); // restore the parser data handler
+            this.restoreListeners();
             console.log('job done, messages resume');
         });
     }
@@ -1405,6 +1406,13 @@ class GrblHalController {
                 state: this.workflow.state
             }
         };
+    }
+
+    restoreListeners() {
+        this.connection.restoreListeners();
+        this.connection.on('data', this.connectionEventListener.data);
+        this.connection.on('close', this.connectionEventListener.close);
+        this.connection.on('error', this.connectionEventListener.error);
     }
 
     open(port, baudrate, refresh = false, callback = noop) {
