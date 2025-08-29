@@ -1220,11 +1220,9 @@ class GrblHalController {
             this.ymodemTransferInProgress = true;
         });
         this.ymodem.on('progress', (progress) => {
-            console.log(progress);
             this.emit('ymodem:progress', progress);
         });
         this.ymodem.on('abort', () => {
-            console.log('aborted');
             this.ymodemTransferInProgress = false;
             this.connection.on('data', this.connectionEventListener.data); // restore the general data handler
         });
@@ -1232,13 +1230,14 @@ class GrblHalController {
             this.ymodemTransferInProgress = false;
 
             this.restoreListeners();
-            console.log(err);
         });
         this.ymodem.on('complete', () => {
             this.emit('ymodem:complete');
             this.ymodemTransferInProgress = false;
             this.restoreListeners();
-            console.log('job done, messages resume');
+            setTimeout(() => {
+                this.command('sdcard:list');
+            }, 150);
         });
     }
 
