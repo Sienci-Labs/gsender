@@ -1,7 +1,6 @@
 import { CheckCircle2 } from 'lucide-react';
 import cn from 'classnames';
 import { UploadState } from '../hooks/useSDCard';
-import { useEffect, useState } from 'react';
 
 interface UploadProgressBarProps {
     uploadState: UploadState;
@@ -14,18 +13,6 @@ export function UploadProgressBar({
     uploadProgress,
     className,
 }: UploadProgressBarProps) {
-    const [showComplete, setShowComplete] = useState(false);
-
-    useEffect(() => {
-        if (uploadState === 'complete') {
-            setShowComplete(true);
-            const timer = setTimeout(() => {
-                setShowComplete(false);
-            }, 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [uploadState]);
-
     // Don't render anything for idle state
     if (uploadState === 'idle') {
         return null;
@@ -52,7 +39,7 @@ export function UploadProgressBar({
             )}
 
             {/* Complete state with fade animation */}
-            {showComplete && (
+            {uploadState === 'complete' && (
                 <div className="flex items-center justify-center space-x-2 text-green-600 animate-in fade-in-0 duration-300">
                     <CheckCircle2 className="w-5 h-5" />
                     <span className="font-medium">Upload complete!</span>
