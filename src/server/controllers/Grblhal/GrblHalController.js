@@ -1216,10 +1216,12 @@ class GrblHalController {
         // YModem instance
         this.ymodem = new YModem();
         this.ymodem.on('start', () => {
+            this.emit('ymodem:start');
             this.ymodemTransferInProgress = true;
         });
         this.ymodem.on('progress', (progress) => {
             console.log(progress);
+            this.emit('ymodem:progress', progress);
         });
         this.ymodem.on('abort', () => {
             console.log('aborted');
@@ -1233,6 +1235,7 @@ class GrblHalController {
             console.log(err);
         });
         this.ymodem.on('complete', () => {
+            this.emit('ymodem:complete');
             this.ymodemTransferInProgress = false;
             this.restoreListeners();
             console.log('job done, messages resume');

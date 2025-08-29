@@ -1,7 +1,10 @@
 import { CheckCircle, HardDrive, XCircle } from 'lucide-react';
 import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
+import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
+import { UploadProgressBar } from 'app/features/SDCard/components/UploadProgressBar.tsx';
 
 export function StatusIndicator({ isMounted }) {
+    const { uploadState, uploadProgress } = useSDCard();
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-gray-200">
@@ -29,7 +32,11 @@ export function StatusIndicator({ isMounted }) {
                 </div>
             </div>
             <div className="bg-white flex items-center justify-center px-6 py-4 rounded-lg shadow-sm border border-gray-200">
-                <ActionButtons />
+                {uploadState === 'idle' && <ActionButtons />}
+                <UploadProgressBar
+                    uploadState={uploadState}
+                    uploadProgress={uploadProgress}
+                />
             </div>
         </div>
     );

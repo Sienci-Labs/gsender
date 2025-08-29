@@ -100,7 +100,9 @@ export interface ControllerListeners {
     'flash:progress': Array<Function>;
     'spindle:add': Array<Function>;
     atci: Array<Function>;
-
+    'ymodem:start': Array<Function>;
+    'ymodem:complete': Array<Function>;
+    'ymodem:progress': Array<Function>;
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
@@ -216,6 +218,9 @@ class Controller {
         'sdcard:files': [],
         'sdcard:clear': [],
         atci: [],
+        'ymodem:start': [],
+        'ymodem:complete': [],
+        'ymodem:progress': [],
     };
 
     context = {

@@ -99,7 +99,7 @@ export class YModem extends events.EventEmitter {
         }
 
         let sendType = this.STX;
-        //yp.totalPackets = fileChunks.length;
+        this.totalPackets = fileChunks.length;
 
         for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
             if (this.isLast(fileChunks.length, packetNo)) {
@@ -121,11 +121,9 @@ export class YModem extends events.EventEmitter {
                 50
             );
 
-            /*yp.sentPackets = packetNo;
-            yp.progress = Math.ceil((packetNo / fileChunks.length) * 100);
-            if (progressCallback) {
-                progressCallback(yp);
-            }*/
+            this.sentPackets = packetNo;
+            const progress = Math.ceil((packetNo / fileChunks.length) * 100);
+            this.emit('progress', progress);
         }
 
         this.logger('Finished sending packets');
@@ -148,7 +146,6 @@ export class YModem extends events.EventEmitter {
 
     onControlCharsRead(controlChars, callback) {
         this.comms.on('data', function onCharRead(newData) {
-            console.log('data listener', newData.toString());
             const newChar = newData[0];
             if (controlChars.includes(newChar)) {
                 this.logger(`[<<< ${DebugDict[newChar]}]`);
@@ -174,7 +171,6 @@ export class YModem extends events.EventEmitter {
             const timeout = sleep(sendDelay);
             // eslint-disable-next-line no-await-in-loop
             const result = await Promise.race([waitForCCs, timeout]);
-            this.logger('Result', result);
 
             if (result === this.ACK) {
                 break;
