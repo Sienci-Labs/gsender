@@ -31,12 +31,13 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { findIndex, get } from 'lodash';
 import reduxStore from 'app/store/redux';
+import { SPINDLE_LASER_T } from './definitions';
 
 interface SpindleState {
     minimized: boolean;
     isFullscreen: boolean;
     canClick: boolean;
-    mode: string;
+    mode: SPINDLE_LASER_T;
     spindleSpeed: number;
     laser: {
         duration: number;

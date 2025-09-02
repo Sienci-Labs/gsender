@@ -28,7 +28,7 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES } from 'app/constants';
+import { GRBL, GRBLHAL, IMPERIAL_UNITS, LASER_MODE, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES, SPINDLE_MODE, WORKSPACE_MODE } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -37,8 +37,16 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import pubsub from 'pubsub-js';
-import { EEPROM } from 'app/definitions/firmware';
+import { EEPROM, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { updatePartialControllerSettings } from 'app/store/redux/slices/controller.slice';
+import { findIndex } from 'lodash';
+import { BasicPosition, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
+import { convertToImperial } from 'app/lib/units';
+import { round, roundMetric } from 'app/lib/rounding';
+import { LaserState, Spindle, SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import { updateWorkspaceMode } from 'app/lib/rotary';
 
 export interface SettingsMenuSection {
     label: string;
@@ -86,6 +94,7 @@ export interface gSenderSetting {
     disabled?: () => boolean;
     hidden?: () => boolean;
     onDisable?: () => void;
+    onEnable?: () => void;
     onUpdate?: () => void;
     min?: number;
     max?: number;
@@ -826,10 +835,158 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the Spindle/Laser tab and related functions on the main Carve page.',
                         key: 'workspace.spindleFunctions',
-                        onDisable: () => {
-                            // Disable laser mode if spindle functions turned off. TBD what to do with EEPROM.
-                            store.set('widgets.spindle.mode', 'spindle');
-                        },
+                        onUpdate: () => {
+                            const spindleFunctions = store.get('workspace.spindleFunctions');
+                            const mode: SPINDLE_LASER_T = store.get(
+                                'widgets.spindle.mode',
+                                SPINDLE_MODE,
+                            );
+
+                            // if we are turning off the spindle tab, set to spindle mode
+                            if (!spindleFunctions && mode === LASER_MODE) {
+                                const preferredUnits =
+                                    store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
+                                const active: boolean = get(reduxStore.getState(), 'state.controller.modal.spindle', 'M5') !== 'M5';
+                                const controllerType: FIRMWARE_TYPES_T = get(reduxStore.getState(), 'state.controller.type', 'grbl');
+                                const availableSpindles: Spindle[] = get(reduxStore.getState(), 'state.controller.spindles', []);
+                                const units: UNITS_GCODE = get(reduxStore.getState(), 'state.controller.modal.units');
+                                const spindleMin = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$31', 1000));
+                                const spindleMax = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$30', 30000));
+                                const laser: LaserState = store.get('widgets.spindle.laser', {
+                                    maxPower: 0,
+                                    minPower: 0,
+                                });
+
+                                // get previously saved spindle values
+                                const prevSpindleMin = store.get('widgets.spindle.spindleMin', 0);
+                                const prevSpindleMax = store.get('widgets.spindle.spindleMax', 0);
+
+                                const SLBLaserExists =
+                                    controllerType === GRBLHAL &&
+                                    findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
+
+                                const calculateAdjustedOffsets = (
+                                    xOffset: number,
+                                    yOffset: number,
+                                    units: UNITS_GCODE | UNITS_EN,
+                                ): [number, number] => {
+                                    const $13: string = get(reduxStore.getState(), 'state.controller.settings.settings.$13', '0');
+                                    const wpos: BasicPosition = get(reduxStore.getState(), 'state.controller.wpos', { x: 0, y: 0, z: 0 });
+                                    let { x, y } = wpos;
+
+                                    if ($13 === '1' || units === 'G20') {
+                                        units = 'G20';
+                                        x /= 25.4;
+                                        y /= 25.4;
+                                    }
+                                    return [
+                                        round(Number(x) + Number(xOffset), units),
+                                        round(Number(y) + Number(yOffset), units),
+                                    ];
+                                }
+
+                                const getSpindleOffsetCode = (preferredUnits: UNITS_GCODE | UNITS_EN): string[] => {
+                                    const laserXOffset = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$741', 0));
+                                    const laserYOffset = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$742', 0));
+                                    const wcs: string = get(reduxStore.getState(), 'state.controller.modal.wcs', '');
+                                    const currentWCS: number =
+                                        {
+                                            G54: 1,
+                                            G55: 2,
+                                            G56: 3,
+                                            G57: 4,
+                                            G58: 5,
+                                            G59: 6,
+                                        }[wcs] || 0;
+
+                                    let offsetQuery = [];
+
+                                    let { xOffset, yOffset } = laser;
+
+                                    // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
+                                    if (controllerType === GRBLHAL) {
+                                        xOffset = laserXOffset;
+                                        yOffset = laserYOffset;
+                                    }
+
+                                    xOffset = Number(xOffset) * -1;
+                                    yOffset = Number(yOffset) * -1;
+                                    if (preferredUnits === 'G20') {
+                                        xOffset = convertToImperial(xOffset);
+                                        yOffset = convertToImperial(yOffset);
+                                    } else {
+                                        xOffset = roundMetric(xOffset);
+                                        yOffset = roundMetric(yOffset);
+                                    }
+
+                                    const [xoffsetAdjusted, yOffsetAdjusted] =
+                                        calculateAdjustedOffsets(
+                                            xOffset,
+                                            yOffset,
+                                            preferredUnits,
+                                        );
+                                    if (xOffset === 0 && yOffset !== 0) {
+                                        offsetQuery = [`G10 L20 P${currentWCS} Y${yOffsetAdjusted}`];
+                                    } else if (xOffset !== 0 && yOffset === 0) {
+                                        offsetQuery = [`G10 L20 P${currentWCS} X${xoffsetAdjusted}`];
+                                    } else if (xOffset !== 0 && yOffset !== 0) {
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} X${xoffsetAdjusted} Y${yOffsetAdjusted}`,
+                                        ];
+                                    } else {
+                                        offsetQuery = [''];
+                                    }
+
+                                    return offsetQuery;
+                                }
+
+                                // set mode to spindle
+                                store.set('widgets.spindle.mode', 'spindle');
+
+                                // save current laser values if laser spindle doesnt exist
+                                if (!SLBLaserExists) {
+                                    laser.maxPower = spindleMax;
+                                    laser.minPower = spindleMin;
+                                    store.set('widgets.spindle.laser', laser);
+                                }
+
+                                const powerCommands = SLBLaserExists
+                                    ? []
+                                    : [`$30=${prevSpindleMax}`, `$31=${prevSpindleMin}`];
+
+                                if (active) {
+                                    controller.command('gcode', 'M5');
+                                }
+
+                                const commands = [
+                                    preferredUnits,
+                                    ...getSpindleOffsetCode(preferredUnits),
+                                    ...powerCommands,
+                                    '$32=0',
+                                    units,
+                                ];
+
+                                // only update max/min if slb laser doesnt exist
+                                if (!SLBLaserExists) {
+                                    reduxStore.dispatch(
+                                        updatePartialControllerSettings({
+                                            $30: prevSpindleMax.toString(),
+                                            $31: prevSpindleMin.toString(),
+                                            $32: '0',
+                                        }),
+                                    );
+                                } else {
+                                    // update only laser/spindle mode eeprom if slb laser exists
+                                    reduxStore.dispatch(
+                                        updatePartialControllerSettings({
+                                            $32: '0',
+                                        }),
+                                    );
+                                }
+
+                                controller.command('gcode', commands);
+                            }
+                        }
                     },
                     {
                         type: 'eeprom',
@@ -1106,6 +1263,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the Rotary tab and related functions on the main Carve page.',
                         type: 'boolean',
+                        onUpdate: () => {
+                            // when tab is turned off, turn off rotary mode
+                            const mode = store.get('workspace.mode');
+                            const showTab = store.get('widgets.rotary.tab.show');
+                            if (!showTab && mode === WORKSPACE_MODE.ROTARY) {
+                                updateWorkspaceMode(WORKSPACE_MODE.DEFAULT);
+                            }
+                        }
                     },
                     { type: 'eeprom', eID: '$376' },
                     {
