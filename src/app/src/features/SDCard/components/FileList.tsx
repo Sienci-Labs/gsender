@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Play, Trash2, File } from 'lucide-react';
 import { useSDCard } from '../hooks/useSDCard';
 //import { ConfirmDialog } from './ConfirmDialog';
@@ -14,6 +14,9 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import controller from 'app/lib/controller.ts';
 import reduxStore from 'app/store/redux';
 import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';
+import cn from 'classnames';
+import { toast } from 'app/lib/toaster';
+import { ACCEPTED_EXTENSIONS } from 'app/features/SDCard/components/UploadModal.tsx';
 
 const formatFileSize = (bytes: number): string => {
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -29,7 +32,10 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export const FileList: React.FC = () => {
-    const { files, isLoading, runSDFile } = useSDCard();
+    const { files, isLoading, runSDFile, uploadFileToSDCard } = useSDCard();
+    const [dragOver, setDragOver] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     if (files.length === 0) {
         return (
@@ -54,9 +60,71 @@ export const FileList: React.FC = () => {
         });
     }
 
+    const handleFileSelect = (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
+        const file = files[0]; // Only take the first file
+        const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+
+        if (ACCEPTED_EXTENSIONS.includes(extension)) {
+            console.log('worked');
+            setSelectedFile(file);
+            handleUpload();
+        } else {
+            toast.error('Please select a valid gcode file');
+        }
+    };
+
+    function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+        e.preventDefault();
+        setDragOver(false);
+        handleFileSelect(e.dataTransfer.files);
+    }
+
+    const handleUpload = async () => {
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const text = e.target.result;
+
+                await uploadFileToSDCard({
+                    name: selectedFile.name,
+                    size: selectedFile.size,
+                    data: new Blob([text], { type: 'text/plain' }),
+                });
+            };
+            reader.readAsText(selectedFile);
+            //await uploadFileToSDCard(dt.files);
+            setSelectedFile(null);
+        }
+    };
+
     return (
         <>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div
+                className={cn('rounded-lg shadow-sm border border-gray-200', {
+                    'border-blue-400 bg-blue-50': dragOver,
+                    'border-gray-300 bg-white ': !dragOver,
+                })}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                }}
+                onDragLeave={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                }}
+                onDrop={(e) => {
+                    handleDrop(e);
+                }}
+            >
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".gcode,.nc,.macro"
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                    className="hidden"
+                />
                 <div className="px-6 py-4 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900">
                         Files ({files.length})

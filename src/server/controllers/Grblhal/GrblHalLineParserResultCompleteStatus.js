@@ -11,6 +11,8 @@ class GrblHalLineParserResultCompleteStatus {
             return null;
         }
 
+        console.log(r);
+
         const state = r[1];
         let subState = r[2] || '';
         subState = subState.replace(':', '');
@@ -88,6 +90,13 @@ class GrblHalLineParserResultCompleteStatus {
             payload.hasHomed = Boolean(Number(result.H[0]));
             // handle hasHomed
         }
+
+        // SD Card
+        if (_.has(result, 'SD')) {
+            payload.sdCard = Boolean(Number(result.SD[0]));
+        }
+
+        console.log(payload);
 
         return {
             type: GrblHalLineParserResultCompleteStatus,

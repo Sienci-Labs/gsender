@@ -26,10 +26,13 @@ export function useSDCard() {
         });
     }, []);
     const isMounted = useTypedSelector(
-        (state: RootState) => state.controller.sdcard?.isMounted,
+        (state: RootState) => state.controller.state.status?.sdCard,
     );
     const files = useTypedSelector(
         (state: RootState) => state.controller.sdcard?.files,
+    );
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
     );
 
     const uploadFileToSDCard = (file) => {
@@ -45,7 +48,8 @@ export function useSDCard() {
     };
 
     return {
-        isMounted: true,
+        isConnected,
+        isMounted,
         files,
         isLoading,
         setIsLoading,

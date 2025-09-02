@@ -24,7 +24,7 @@ export interface FileUpload {
 }
 
 // List files on the card recursively. Only CNC related filetypes are listed: .nc, .ncc, .ngc, .cnc, .gcode, .txt, .text, .tap and .macro.
-const ACCEPTED_EXTENSIONS = [
+export const ACCEPTED_EXTENSIONS = [
     '.gcode',
     '.nc',
     '.ncc',
