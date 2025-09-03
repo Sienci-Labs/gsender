@@ -2,9 +2,24 @@ import { CheckCircle, HardDrive, XCircle } from 'lucide-react';
 import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
 import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 import { UploadProgressBar } from 'app/features/SDCard/components/UploadProgressBar.tsx';
+import cn from 'classnames';
 
 export function StatusIndicator({ isMounted }) {
-    const { uploadState, uploadProgress } = useSDCard();
+    const { isConnected, uploadState, uploadProgress } = useSDCard();
+    let status: string;
+    let colourClasses: string;
+
+    if (!isConnected) {
+        status = 'Disconnected';
+        colourClasses = 'bg-gray-50 text-gray-700 border-gray-200';
+    } else if (isMounted) {
+        status = 'Mounted';
+        colourClasses = 'bg-green-50 text-green-700 border-green-200';
+    } else {
+        status = 'Unmounted';
+        colourClasses = 'bg-red-50 text-red-700 border-red-200';
+    }
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-gray-200">
@@ -16,18 +31,17 @@ export function StatusIndicator({ isMounted }) {
                         </span>
                     </div>
                     <div
-                        className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold border-2 ${
-                            isMounted
-                                ? 'bg-green-50 text-green-700 border-green-200'
-                                : 'bg-red-50 text-red-700 border-red-200'
-                        }`}
+                        className={cn(
+                            `inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold border-2`,
+                            colourClasses,
+                        )}
                     >
-                        {isMounted ? (
+                        {isConnected && isMounted ? (
                             <CheckCircle className="w-4 h-4" />
                         ) : (
                             <XCircle className="w-4 h-4" />
                         )}
-                        <span>{isMounted ? 'Mounted' : 'Unmounted'}</span>
+                        <span>{status}</span>
                     </div>
                 </div>
             </div>
