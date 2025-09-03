@@ -61,6 +61,12 @@ export class YModem extends events.EventEmitter {
         this.comms.removeAllListeners('data');
         this.comms.pipe(this.ByteReader);
 
+        // Empty file - add blank buffer
+        console.log(fileData);
+        if (!fileData.data) {
+            fileData.data = Buffer.alloc(0);
+        }
+
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
         this.comms.write(header);
 
@@ -71,7 +77,9 @@ export class YModem extends events.EventEmitter {
         let fileChunks;
         let isLastByteSOH = false;
 
-        if (fileData.length <= SendSize[this.SOH]) {
+        if (fileData.length === 0) {
+            fileChunks = [];
+        } else if (fileData.length <= SendSize[this.SOH]) {
             fileChunks = [
                 this.padRBuffer(
                     fileData,
@@ -201,11 +209,12 @@ export class YModem extends events.EventEmitter {
         console.log(`File: ${fileName} Size: ${fileSize}`);
         const chosenSendSize = SendSize[sendType];
 
+        /*
         // Check if file size exceeds maximum allowed for transmission
         if (0xff - 0x01 * chosenSendSize > fileSize) {
             this.emit('error', 'File size too big');
             throw new Error('Couldn\'t send file. File is too big.');
-        }
+        }*/
 
         const strFileSize = fileSize.toString();
 
@@ -249,6 +258,7 @@ export class YModem extends events.EventEmitter {
 
     splitFileToChunks(buf, chunkSize) {
         const chunks = bufferChunks(buf, chunkSize);
+        console.log('chunk', chunks);
         const lastChunk = chunks[chunks.length - 1];
 
         let isLastByteSOH = false;
