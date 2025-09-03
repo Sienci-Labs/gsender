@@ -39,6 +39,12 @@ export function SettingSection({
                 'onDisable' in curSetting
             ) {
                 curSetting.onDisable();
+            } else if (
+                curSetting.type === 'boolean' &&
+                v &&
+                'onEnable' in curSetting
+            ) {
+                curSetting.onEnable();
             }
 
             return updated;
