@@ -35,7 +35,6 @@ export const FileList: React.FC = () => {
     const { files, isLoading, runSDFile, uploadFileToSDCard } = useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     if (files.length === 0) {
         return (
@@ -62,14 +61,12 @@ export const FileList: React.FC = () => {
 
     const handleFileSelect = (files: FileList | null) => {
         if (!files || files.length === 0) return;
-
+        console.log('starting accepted block');
         const file = files[0]; // Only take the first file
         const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 
         if (ACCEPTED_EXTENSIONS.includes(extension)) {
-            console.log('worked');
-            setSelectedFile(file);
-            handleUpload();
+            handleUpload(file);
         } else {
             toast.error('Please select a valid gcode file');
         }
@@ -81,21 +78,20 @@ export const FileList: React.FC = () => {
         handleFileSelect(e.dataTransfer.files);
     }
 
-    const handleUpload = async () => {
-        if (selectedFile) {
+    const handleUpload = async (file) => {
+        if (file) {
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const text = e.target.result;
 
                 await uploadFileToSDCard({
-                    name: selectedFile.name,
-                    size: selectedFile.size,
+                    name: file.name,
+                    size: file.size,
                     data: new Blob([text], { type: 'text/plain' }),
                 });
+                fileInputRef.current.value = '';
             };
-            reader.readAsText(selectedFile);
-            //await uploadFileToSDCard(dt.files);
-            setSelectedFile(null);
+            reader.readAsText(file);
         }
     };
 
