@@ -6,9 +6,9 @@ const SDCardElement = () => {
     const { isMounted } = useSDCard();
 
     return (
-        <div className="bg-gray-50 h-full">
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                <div className="space-y-8">
+        <div className="bg-gray-50 h-full flex">
+            <div className="w-3/5 mx-auto py-6">
+                <div className="space-y-8 flex flex-col h-full">
                     <StatusIndicator isMounted={isMounted} />
                     <FileList />
                 </div>

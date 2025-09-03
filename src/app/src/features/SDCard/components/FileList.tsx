@@ -32,7 +32,8 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export const FileList: React.FC = () => {
-    const { files, isLoading, runSDFile, uploadFileToSDCard } = useSDCard();
+    const { files, isLoading, runSDFile, uploadFileToSDCard, isConnected } =
+        useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,14 +84,22 @@ export const FileList: React.FC = () => {
         }
     };
 
+    if (!isConnected) {
+        return (
+            <div className="border-gray-300 bg-white text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+                Must be connected to use SD card functionality.
+            </div>
+        );
+    }
+
     if (files.length === 0) {
         return (
             <div
                 className={cn(
-                    'text-center py-12 text-gray-500 rounded-lg shadow-sm border border-gray-200',
+                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 rounded-lg shadow-sm border border-gray-200',
                     {
                         'border-blue-400 bg-blue-50': dragOver,
-                        'border-gray-300 bg-white ': !dragOver,
+                        'border-gray-300 bg-white': !dragOver,
                     },
                 )}
                 onDragOver={(e) => {
@@ -124,10 +133,13 @@ export const FileList: React.FC = () => {
     return (
         <>
             <div
-                className={cn('rounded-lg shadow-sm border border-gray-200', {
-                    'border-blue-400 bg-blue-50': dragOver,
-                    'border-gray-300 bg-white ': !dragOver,
-                })}
+                className={cn(
+                    'flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200',
+                    {
+                        'border-blue-400 bg-blue-50': dragOver,
+                        'border-gray-300 bg-white ': !dragOver,
+                    },
+                )}
                 onDragOver={(e) => {
                     e.preventDefault();
                     setDragOver(true);
