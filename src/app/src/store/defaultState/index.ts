@@ -90,7 +90,11 @@ const defaultState: State = {
         machineProfile: machineProfiles[5] as MachineProfile,
         probeProfile: {
             xyThickness: 10,
-            zThickness: 15,
+            zThickness: {
+                standardBlock: 15,
+                autoZero: 5,
+                zProbe: 15
+            },
             plateWidth: 50,
             plateLength: 50,
             functions: {
@@ -295,6 +299,7 @@ const defaultState: State = {
                     startHeight: 50,
                     finalHeight: 40,
                     enableRehoming: false,
+                    shouldDwell: false
                 },
             },
             tab: {

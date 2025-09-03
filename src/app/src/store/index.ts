@@ -11,7 +11,7 @@ import ImmutableStore from 'app/lib/immutable-store';
 import log from 'app/lib/log';
 import defaultState from './defaultState';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
-import {TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD} from "app/lib/constants.ts";
+import { TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD } from "app/lib/constants.ts";
 
 interface UserData {
     path: string;
@@ -288,6 +288,16 @@ store.on(
 const migrateStore = (): void => {
     if (!cnc.version) {
         return;
+    }
+
+    // zThickness setting now has 3 options - port previous value to them
+    if (semver.lt(cnc.version, '1.5.4')) {
+        const currentZThickness = store.get('workspace.probeProfile.zThickness');
+        if (typeof currentZThickness === 'number' || typeof currentZThickness === 'string') {
+            store.set('workspace.probeProfile.zThickness.standardBlock', currentZThickness);
+            store.set('workspace.probeProfile.zThickness.autoZero', 5);
+            store.set('workspace.probeProfile.zThickness.zProbe', currentZThickness);
+        }
     }
 
     // Set probe type to AutoZero if it was formerly "AutoZero Touchplate"
