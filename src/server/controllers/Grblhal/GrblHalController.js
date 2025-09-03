@@ -1229,9 +1229,10 @@ class GrblHalController {
         });
         this.ymodem.on('error', (err) => {
             this.ymodemTransferInProgress = false;
-
+            this.emit('ymodem:error', err);
             this.restoreListeners();
         });
+
         this.ymodem.on('complete', () => {
             //this.clearActionValues(); // Surely this fixes the extra OKs
             this.emit('ymodem:complete');

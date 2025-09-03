@@ -103,6 +103,7 @@ export interface ControllerListeners {
     'ymodem:start': Array<Function>;
     'ymodem:complete': Array<Function>;
     'ymodem:progress': Array<Function>;
+    'ymodem:error': Array<Function>;
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
@@ -221,6 +222,7 @@ class Controller {
         'ymodem:start': [],
         'ymodem:complete': [],
         'ymodem:progress': [],
+        'ymodem:error': [],
     };
 
     context = {
