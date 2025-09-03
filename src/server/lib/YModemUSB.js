@@ -77,7 +77,7 @@ export class YModem extends events.EventEmitter {
         let fileChunks;
         let isLastByteSOH = false;
 
-        if (fileData.length === 0) {
+        if (fileData.size === 0) {
             fileChunks = [];
         } else if (fileData.length <= SendSize[this.SOH]) {
             fileChunks = [
@@ -188,6 +188,7 @@ export class YModem extends events.EventEmitter {
             }
             if (result === this.CAN) {
                 this.logger(`Throw on data frame ${packetNo + 1}.`);
+                this.emit('error', 'Operation cancelled by remote device.');
                 throw new Error('Operation cancelled by remote device.');
             } else {
                 this.logger(
@@ -196,6 +197,7 @@ export class YModem extends events.EventEmitter {
             }
 
             if (retryCount >= 9) {
+                this.emit('error', 'Packet timed out after 10 retries.');
                 throw new Error(
                     `Packet timed out after ${retryCount} retries.`
                 );
@@ -209,12 +211,12 @@ export class YModem extends events.EventEmitter {
         console.log(`File: ${fileName} Size: ${fileSize}`);
         const chosenSendSize = SendSize[sendType];
 
-        /*
+
         // Check if file size exceeds maximum allowed for transmission
-        if (0xff - 0x01 * chosenSendSize > fileSize) {
+        if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
             this.emit('error', 'File size too big');
             throw new Error('Couldn\'t send file. File is too big.');
-        }*/
+        }
 
         const strFileSize = fileSize.toString();
 
