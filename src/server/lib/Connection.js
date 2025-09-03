@@ -283,9 +283,9 @@ class Connection extends EventEmitter {
 
     restoreListeners() {
         this.connection.addPortListeners();
-        this.connection.on('data', this.connectionEventListener.data);
+        /*this.connection.on('data', this.connectionEventListener.data);
         this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);
+        this.connection.on('error', this.connectionEventListener.error);*/
     }
 
     setWriteFilter(writeFilter) {
