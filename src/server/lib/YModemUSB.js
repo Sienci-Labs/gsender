@@ -203,7 +203,7 @@ export class YModem extends events.EventEmitter {
 
         // Check if file size exceeds maximum allowed for transmission
         if (0xff - 0x01 * chosenSendSize > fileSize) {
-            this.emit('error', 'File size too big.');
+            this.emit('error', 'File size too big');
             throw new Error('Couldn\'t send file. File is too big.');
         }
 
