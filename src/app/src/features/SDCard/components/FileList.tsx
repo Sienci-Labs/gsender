@@ -36,18 +36,6 @@ export const FileList: React.FC = () => {
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    if (files.length === 0) {
-        return (
-            <div className="text-center py-12 text-gray-500">
-                <File className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium">No files found</p>
-                <p className="text-sm">
-                    Upload files or refresh to see SD card contents
-                </p>
-            </div>
-        );
-    }
-
     function handleDelete(fileName: string) {
         Confirm({
             title: 'Delete File',
@@ -94,6 +82,44 @@ export const FileList: React.FC = () => {
             reader.readAsText(file);
         }
     };
+
+    if (files.length === 0) {
+        return (
+            <div
+                className={cn(
+                    'text-center py-12 text-gray-500 rounded-lg shadow-sm border border-gray-200',
+                    {
+                        'border-blue-400 bg-blue-50': dragOver,
+                        'border-gray-300 bg-white ': !dragOver,
+                    },
+                )}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                }}
+                onDragLeave={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                }}
+                onDrop={(e) => {
+                    handleDrop(e);
+                }}
+            >
+                <File className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                <p className="text-lg font-medium">No files found</p>
+                <p className="text-sm">
+                    Upload files or refresh to see SD card contents
+                </p>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".gcode,.nc,.macro"
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                    className="hidden"
+                />
+            </div>
+        );
+    }
 
     return (
         <>
