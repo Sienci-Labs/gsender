@@ -196,8 +196,8 @@ class GCodeVisualizer {
                     ).flat(); // current movement
                     // cant set yet, because grey lines will also be calculated soon
                     this.plannedColorArray = colorArray;
-                    this.plannedV1 = this.frames[this.frameIndex - 1];
                 }
+                this.plannedV1 = this.frames[this.frameIndex - 1];
             }
         }
 

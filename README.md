@@ -127,6 +127,18 @@ gSender is also designed in a way that it can be run locally on your computer br
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.5.4 (August 27, 2025)
+- Fix controller not instantiating correctly in some situations for grblHAL devices.
+- Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
+- Visualizer grid sizing more accurately matches your machine size at 2X dimensions.
+- Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.
+- Shortcut order adjusted when configurting binds.
+- Precise and Rapid toggle swapped in jog preset selector
+- Start from line modal is now correct based on the file
+- Copy button works on electron versions on Windows in remote mode dialog
+- Rotary surfacing gcode generation adjusted to fix some cases of incorrect movements
+- Various styling and copy adjustments.
+
 ### 1.5.3 (August 4, 2025)
 - Outline runs if visualizer disabled in lightweight mode
 - Added new config option for outline - can now run detailed (old routines, travels rough shape of toolpath) or square (the bounding box)

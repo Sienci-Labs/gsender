@@ -72,8 +72,10 @@ export interface ProbingOptions {
     zPositionAdjust?: number;
     direction?: PROBE_DIRECTIONS;
     $13: string;
+    $22: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
+    homingEnabled: boolean;
     ballDiameter?: number;
     zPlungeDistance?: number;
     searchFeedRate?: number;
