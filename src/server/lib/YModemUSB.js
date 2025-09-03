@@ -19,7 +19,7 @@ const DebugDict = {
     0x02: 'STX',
     0x04: 'EOT',
     0x06: 'ACK',
-    0x15: 'NAL',
+    0x15: 'NAK',
     0x18: 'CAN',
     0x43: 'C',
     0x1a: 'PADDING',
@@ -62,7 +62,6 @@ export class YModem extends events.EventEmitter {
         this.comms.pipe(this.ByteReader);
 
         // Empty file - add blank buffer
-        console.log(fileData);
         if (!fileData.data) {
             fileData.data = Buffer.alloc(0);
         }
@@ -76,22 +75,23 @@ export class YModem extends events.EventEmitter {
 
         let fileChunks;
         let isLastByteSOH = false;
+        console.log(fileData);
 
         if (fileData.size === 0) {
             fileChunks = [];
-        } else if (fileData.length <= SendSize[this.SOH]) {
+        } else if (fileData.size <= SendSize[this.SOH]) {
             fileChunks = [
                 this.padRBuffer(
-                    fileData,
+                    fileData.data,
                     SendSize[this.SOH],
                     this.PAD_CHAR
                 ),
             ];
             isLastByteSOH = true;
-        } else if (fileData.length <= SendSize[this.STX]) {
+        } else if (fileData.size <= SendSize[this.STX]) {
             fileChunks = [
                 this.padRBuffer(
-                    fileData,
+                    fileData.data,
                     SendSize[this.STX],
                     this.PAD_CHAR
                 ),
@@ -208,8 +208,8 @@ export class YModem extends events.EventEmitter {
 
     createHeaderPacket(sendType, fileName, fileSize) {
         fileName = `/${fileName}`;
-        console.log(`File: ${fileName} Size: ${fileSize}`);
         const chosenSendSize = SendSize[sendType];
+        console.log(`File: ${fileName} Size: ${fileSize} chosenSendSize: ${chosenSendSize}`);
 
 
         // Check if file size exceeds maximum allowed for transmission
