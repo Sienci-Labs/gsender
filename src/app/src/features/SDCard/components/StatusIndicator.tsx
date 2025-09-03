@@ -1,13 +1,47 @@
 import { CheckCircle, HardDrive, XCircle } from 'lucide-react';
 import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
-import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
+import { UploadState, useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 import { UploadProgressBar } from 'app/features/SDCard/components/UploadProgressBar.tsx';
 import cn from 'classnames';
+import { useEffect, useState } from 'react';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
 
 export function StatusIndicator({ isMounted }) {
-    const { isConnected, uploadState, uploadProgress } = useSDCard();
+    const { isConnected } = useSDCard();
+    const [uploadState, setUploadState] = useState<UploadState>('idle');
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
     let status: string;
     let colourClasses: string;
+
+    useEffect(() => {
+        controller.addListener('ymodem:start', () => {
+            console.log('start event heard');
+            setUploadProgress(0);
+            setUploadState('uploading');
+        });
+        controller.addListener('ymodem:complete', () => {
+            setUploadState('complete');
+            setTimeout(() => {
+                setUploadState('idle');
+            }, 1000);
+        });
+        controller.addListener('ymodem:progress', (prog) => {
+            setUploadProgress(prog);
+        });
+        controller.addListener('ymodem:error', (err) => {
+            setUploadState('idle');
+            toast.error('Error uploading file - ' + err + '.');
+        });
+
+        // Cleanup listeners when component unmounts
+        return () => {
+            controller.removeListener('ymodem:start');
+            controller.removeListener('ymodem:complete');
+            controller.removeListener('ymodem:progress');
+            controller.removeListener('ymodem:error');
+        };
+    }, []);
 
     if (!isConnected) {
         status = 'Disconnected';

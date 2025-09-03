@@ -3,7 +3,7 @@ import { FileList } from 'app/features/SDCard/components/FileList.tsx';
 import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 
 const SDCardElement = () => {
-    const { isMounted } = useSDCard();
+    const { isMounted, setUploadProgress, setUploadState } = useSDCard();
 
     return (
         <div className="bg-gray-50 h-full flex">

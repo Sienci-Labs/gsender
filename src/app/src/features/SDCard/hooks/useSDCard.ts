@@ -2,34 +2,12 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller.ts';
-import { toast } from 'app/lib/toaster';
 
 export type UploadState = 'idle' | 'uploading' | 'complete' | 'error';
 
 export function useSDCard() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [uploadState, setUploadState] = useState<UploadState>('idle');
-    const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-    useEffect(() => {
-        controller.addListener('ymodem:start', () => {
-            setUploadProgress(0);
-            setUploadState('uploading');
-        });
-        controller.addListener('ymodem:complete', () => {
-            setUploadState('complete');
-            setTimeout(() => {
-                setUploadState('idle');
-            }, 1000);
-        });
-        controller.addListener('ymodem:progress', (prog) => {
-            setUploadProgress(prog);
-        });
-        controller.addListener('ymodem:error', (err) => {
-            setUploadState('idle');
-            toast.error('Error uploading file - ' + err + '.');
-        });
-    }, []);
     const isMounted = useTypedSelector(
         (state: RootState) => state.controller.state.status?.sdCard,
     );
@@ -61,7 +39,5 @@ export function useSDCard() {
         uploadFileToSDCard,
         runSDFile,
         deleteSDCard,
-        uploadState,
-        uploadProgress,
     };
 }

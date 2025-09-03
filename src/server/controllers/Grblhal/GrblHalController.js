@@ -1225,7 +1225,8 @@ class GrblHalController {
         });
         this.ymodem.on('abort', () => {
             this.ymodemTransferInProgress = false;
-            this.connection.on('data', this.connectionEventListener.data); // restore the general data handler
+            this.emit('ymodem:error', 'Transfer aborted by device.');
+            this.restoreListeners();
         });
         this.ymodem.on('error', (err) => {
             this.ymodemTransferInProgress = false;
