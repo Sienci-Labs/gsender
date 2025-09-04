@@ -67,10 +67,11 @@ export class YModem extends events.EventEmitter {
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
+        console.log('header returned');
         this.comms.write(header);
 
         // [<<< C]
-        await this.waitForNext([this.C]);
+        await this.waitForNext([this.C, this.ACK]);
 
 
         let fileChunks;
@@ -155,6 +156,7 @@ export class YModem extends events.EventEmitter {
     onControlCharsRead(controlChars, callback) {
         this.comms.on('data', function onCharRead(newData) {
             const newChar = newData[0];
+            console.log('[<<<', newChar);
             if (controlChars.includes(newChar)) {
                 this.logger(`[<<< ${DebugDict[newChar]}]`);
                 this.comms.removeListener('data', onCharRead);
@@ -254,7 +256,7 @@ export class YModem extends events.EventEmitter {
 
         // Write CRC
         headerPacket.writeUInt16BE(dataCrc, bufferSize - 2);
-
+        console.log('headerPacket', headerPacket);
         return headerPacket;
     }
 
