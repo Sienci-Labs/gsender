@@ -16,7 +16,7 @@ type InputProps = ComponentProps<'input'> & {
 };
 
 const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, value, onChange, ...props }, ref) => {
+    ({ className, type, value, onChange, wrapperClassName, ...props }, ref) => {
         const [originalValue, setOriginalValue] = useState(value);
         const [localValue, setLocalValue] = useState(value);
 
@@ -30,10 +30,10 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             if (localValue && localValue !== originalValue) {
                 if (type === 'number') {
                     if (props.min !== null && current < props.min) {
-                        e.target.value = props.min;
+                        e.target.value = String(props.min);
                         setLocalValue(props.min);
                     } else if (props.max !== null && current > props.max) {
-                        e.target.value = props.max;
+                        e.target.value = String(props.max);
                         setLocalValue(props.max);
                     } else {
                         setLocalValue(current);
@@ -80,6 +80,7 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             <ShadcnInput
                 type={type}
                 className={className}
+                wrapperClassName={wrapperClassName}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 onChange={localChange}
