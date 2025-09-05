@@ -26,6 +26,7 @@ const About = () => {
         { name: 'Kevin G.', title: 'Lead Dev' },
         { name: 'Walid K.', title: 'Dev Manager' },
         { name: 'Sophia B.', title: 'Dev' },
+        { name: 'Shilpa G', title: 'QA' },
         { name: 'Stephen C.', title: 'Docs' },
         { name: 'Kelly Z.', title: 'Icon Design' },
     ];
