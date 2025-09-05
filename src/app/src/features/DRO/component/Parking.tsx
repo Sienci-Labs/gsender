@@ -1,10 +1,12 @@
-import { IconButton } from 'app/components/IconButton';
 import { RiParkingFill } from 'react-icons/ri';
+
+import Button from 'app/components/Button';
 import store from 'app/store';
 import controller from 'app/lib/controller.ts';
 import { LOCATION_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import Tooltip from 'app/components/Tooltip';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});
@@ -41,12 +43,14 @@ export function Parking({ disabled = false }) {
     useKeybinding(shuttleControlEvents);
 
     return (
-        <IconButton
-            disabled={disabled}
-            icon={<RiParkingFill />}
-            variant="primary"
-            size="sm"
-            onClick={goToParkLocation}
-        />
+        <Tooltip content="Go to Park Location">
+            <Button
+                disabled={disabled}
+                icon={<RiParkingFill className="w-4 h-4" />}
+                variant="alt"
+                size="sm"
+                onClick={goToParkLocation}
+            />
+        </Tooltip>
     );
 }

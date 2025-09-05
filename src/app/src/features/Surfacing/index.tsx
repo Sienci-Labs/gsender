@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { useNavigate } from 'react-router';
+import cx from 'classnames';
 
 import store from 'app/store';
 import {
@@ -12,25 +13,29 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
-import cx from 'classnames';
 import { Switch } from 'app/components/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ControlledInput } from 'app/components/ControlledInput';
 import defaultState from 'app/store/defaultState';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import controller from 'app/lib/controller';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import InputArea from 'app/components/InputArea';
+import { Button } from 'app/components/Button';
+import VisualizerPreview from './components/VisualizerPreview';
+import Tooltip from 'app/components/Tooltip';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import Generator from './utils/surfacingGcodeGenerator';
 import { GcodeViewer } from './components/GcodeViewer';
-import controller from 'app/lib/controller';
-import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import InputArea from 'app/components/InputArea';
-import { Button } from 'app/components/Button';
-import VisualizerPreview from './components/VisualizerPreview';
 
-const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
+const defaultSurfacingState = get(
+    defaultState,
+    'widgets.surfacing',
+    {},
+) as Surfacing;
 
 const SurfacingTool = () => {
     const navigate = useNavigate();
@@ -46,7 +51,7 @@ const SurfacingTool = () => {
 
     // Initialize state with appropriate units
     const getInitialState = (): Surfacing => {
-        const surfacing = surfacingConfig.get('', defaultSurfacingState);
+        const surfacing = surfacingConfig.get('', defaultSurfacingState.width);
 
         if (units === IMPERIAL_UNITS) {
             return {
@@ -85,9 +90,6 @@ const SurfacingTool = () => {
         return saveState();
     }, [surfacing]);
 
-    const inputStyle =
-        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
-
     const handleGenerateGcode = async () => {
         const generator = new Generator({
             surfacing: surfacing,
@@ -119,6 +121,9 @@ const SurfacingTool = () => {
         navigate('/');
     };
 
+    const inputStyle =
+        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
+
     return (
         <>
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
@@ -145,133 +150,176 @@ const SurfacingTool = () => {
                         </div>
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <ControlledInput
-                                    type="number"
-                                    id="width"
-                                    suffix={units}
-                                    min={1}
-                                    max={50000}
-                                    className={inputStyle}
-                                    value={surfacing.width}
-                                    onChange={(e) =>
-                                        onChange(
-                                            'width',
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                />
+                                <Tooltip
+                                    content={`Default value is ${defaultSurfacingState.width}`}
+                                >
+                                    <ControlledInput
+                                        type="number"
+                                        id="width"
+                                        suffix={units}
+                                        min={1}
+                                        max={50000}
+                                        className={inputStyle}
+                                        wrapperClassName="w-full"
+                                        value={surfacing.width}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'width',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
+                                </Tooltip>
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <ControlledInput
-                                    type="number"
-                                    id="length"
-                                    suffix={units}
-                                    min={1}
-                                    max={50000}
-                                    className={inputStyle}
-                                    value={surfacing.length}
-                                    onChange={(e) =>
-                                        onChange(
-                                            'length',
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                />
+                                <Tooltip
+                                    content={`Default value is ${defaultSurfacingState.length}`}
+                                >
+                                    <ControlledInput
+                                        type="number"
+                                        id="length"
+                                        suffix={units}
+                                        min={1}
+                                        max={50000}
+                                        className={inputStyle}
+                                        wrapperClassName="w-full"
+                                        value={surfacing.length}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'length',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
+                                </Tooltip>
                             </div>
                         </InputArea>
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-                                <ControlledInput
-                                    type="number"
-                                    id="skimDepth"
-                                    suffix={units}
-                                    min={0.00001}
-                                    max={10000}
-                                    className={cx('rounded', inputStyle)}
-                                    value={surfacing.skimDepth}
-                                    onChange={(e) =>
-                                        onChange(
-                                            'skimDepth',
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                />
+                                <Tooltip
+                                    content={`Default value is ${defaultSurfacingState.skimDepth}`}
+                                >
+                                    <ControlledInput
+                                        type="number"
+                                        id="skimDepth"
+                                        suffix={units}
+                                        min={0.00001}
+                                        max={10000}
+                                        className={cx('rounded', inputStyle)}
+                                        wrapperClassName="w-full"
+                                        value={surfacing.skimDepth}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'skimDepth',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
+                                </Tooltip>
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
-                                <ControlledInput
-                                    type="number"
-                                    id="maxDepth"
-                                    suffix={units}
-                                    min={0.00001}
-                                    max={10000}
-                                    className={inputStyle}
-                                    value={surfacing.maxDepth}
-                                    onChange={(e) =>
-                                        onChange(
-                                            'maxDepth',
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                />
+                                <Tooltip
+                                    content={`Default value is ${defaultSurfacingState.maxDepth}`}
+                                >
+                                    <ControlledInput
+                                        type="number"
+                                        id="maxDepth"
+                                        suffix={units}
+                                        min={0.00001}
+                                        max={10000}
+                                        className={inputStyle}
+                                        wrapperClassName="w-full"
+                                        value={surfacing.maxDepth}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'maxDepth',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
+                                </Tooltip>
                             </div>
                         </InputArea>
                         <InputArea label="Bit Diameter">
-                            <ControlledInput
-                                type="number"
-                                suffix={units}
-                                className={inputStyle}
-                                value={surfacing.bitDiameter}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange(
-                                        'bitDiameter',
-                                        Number(e.target.value),
-                                    )
-                                }
-                            />
-                        </InputArea>
-                        <InputArea label="Stepover">
-                            <ControlledInput
-                                type="number"
-                                suffix="%"
-                                className={inputStyle}
-                                value={surfacing.stepover}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('stepover', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-                        <InputArea label="Feed Rate">
-                            <ControlledInput
-                                type="number"
-                                suffix={`${units}/min`}
-                                className={inputStyle}
-                                value={surfacing.feedrate}
-                                wrapperClassName="col-span-3"
-                                onChange={(e) =>
-                                    onChange('feedrate', Number(e.target.value))
-                                }
-                            />
-                        </InputArea>
-                        <InputArea label="Spindle RPM">
-                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                            <Tooltip
+                                content={`Default value is ${defaultSurfacingState.bitDiameter}`}
+                            >
                                 <ControlledInput
                                     type="number"
+                                    suffix={units}
                                     className={inputStyle}
-                                    value={surfacing.spindleRPM}
-                                    suffix={'RPM'}
+                                    value={surfacing.bitDiameter}
+                                    wrapperClassName="col-span-3"
                                     onChange={(e) =>
                                         onChange(
-                                            'spindleRPM',
+                                            'bitDiameter',
                                             Number(e.target.value),
                                         )
                                     }
                                 />
+                            </Tooltip>
+                        </InputArea>
+                        <InputArea label="Stepover">
+                            <Tooltip
+                                content={`Default value is ${defaultSurfacingState.stepover}`}
+                            >
+                                <ControlledInput
+                                    type="number"
+                                    suffix="%"
+                                    className={inputStyle}
+                                    value={surfacing.stepover}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange(
+                                            'stepover',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                            </Tooltip>
+                        </InputArea>
+                        <InputArea label="Feed Rate">
+                            <Tooltip
+                                content={`Default value is ${defaultSurfacingState.feedrate}`}
+                            >
+                                <ControlledInput
+                                    type="number"
+                                    suffix={`${units}/min`}
+                                    className={inputStyle}
+                                    value={surfacing.feedrate}
+                                    wrapperClassName="col-span-3"
+                                    onChange={(e) =>
+                                        onChange(
+                                            'feedrate',
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                />
+                            </Tooltip>
+                        </InputArea>
+                        <InputArea label="Spindle RPM">
+                            <div className="grid grid-cols-2 gap-2 col-span-3">
+                                <Tooltip
+                                    content={`Default value is ${defaultSurfacingState.spindleRPM}`}
+                                >
+                                    <ControlledInput
+                                        type="number"
+                                        className={inputStyle}
+                                        wrapperClassName="w-full"
+                                        value={surfacing.spindleRPM}
+                                        suffix={'RPM'}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'spindleRPM',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
+                                </Tooltip>
                                 <div className="flex items-center gap-2 justify-center">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                    <label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
                                         Delay
                                     </label>
                                     <Switch
