@@ -11,11 +11,10 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover';
 
 const COPY_HISTORY_LIMIT = 50;
 
@@ -136,35 +135,31 @@ const TerminalInput = ({ onClear }: Props) => {
                 Run
             </Button>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <Popover>
+                <PopoverTrigger asChild>
                     <Button variant="secondary">
                         <FaEllipsisH />
                     </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white">
-                    <DropdownMenuItem>
+                </PopoverTrigger>
+                <PopoverContent className="bg-white p-2 w-72">
+                    <div className="flex flex-col gap-2">
                         <Button
                             variant="outline"
-                            className="w-full flex items-center gap-2"
+                            className="w-full flex gap-2"
                             onClick={handleCopyHistory}
-                        >
-                            <LuCopy />
-                            Copy last 50 commands
-                        </Button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                            icon={<LuCopy />}
+                            text="Copy last 50 commands"
+                        />
                         <Button
                             variant="outline"
-                            className="w-full flex items-center gap-2"
+                            className="w-full flex gap-2"
                             onClick={onClear}
-                        >
-                            <LuPaintbrush />
-                            Clear Console
-                        </Button>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                            icon={<LuPaintbrush />}
+                            text="Clear Console"
+                        />
+                    </div>
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };
