@@ -27,6 +27,7 @@ import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
 import cx from 'classnames';
 
 import Button from 'app/components/Button';
+import Tooltip from '../Tooltip';
 
 export interface RangeSliderProps {
     [key: string]: any;
@@ -76,13 +77,15 @@ const RangeSlider = ({
         <div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
             {textComponent}
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 dark:bg-dark shadow-inner">
-                <Button
-                    type="button"
-                    onClick={() => onButtonPress(defaultPercentage)}
-                    disabled={disabled}
-                    size="sm"
-                    icon={<FaUndo />}
-                />
+                <Tooltip content={`Reset ${title} override to default value`}>
+                    <Button
+                        type="button"
+                        onClick={() => onButtonPress(defaultPercentage)}
+                        disabled={disabled}
+                        size="sm"
+                        icon={<FaUndo />}
+                    />
+                </Tooltip>
                 <Slider
                     className="flex relative items-center w-full h-6"
                     trackClassName="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
@@ -104,32 +107,36 @@ const RangeSlider = ({
                     disabled={disabled}
                     {...props}
                 ></Slider>
-                <Button
-                    type="button"
-                    onClick={() => {
-                        if (percentage[0] - step < min) {
-                            return;
-                        }
-                        const newValue = percentage[0] - step;
-                        onButtonPress([newValue]);
-                    }}
-                    disabled={disabled}
-                    size="sm"
-                    icon={<FaMinus />}
-                />
-                <Button
-                    type="button"
-                    onClick={() => {
-                        if (percentage[0] + step > max) {
-                            return;
-                        }
-                        const newValue = percentage[0] + step;
-                        onButtonPress([newValue]);
-                    }}
-                    disabled={disabled}
-                    size="sm"
-                    icon={<FaPlus />}
-                />
+                <Tooltip content={`Decrease ${title} override by ${step}%`}>
+                    <Button
+                        type="button"
+                        onClick={() => {
+                            if (percentage[0] - step < min) {
+                                return;
+                            }
+                            const newValue = percentage[0] - step;
+                            onButtonPress([newValue]);
+                        }}
+                        disabled={disabled}
+                        size="sm"
+                        icon={<FaMinus />}
+                    />
+                </Tooltip>
+                <Tooltip content={`Increase ${title} override by ${step}%`}>
+                    <Button
+                        type="button"
+                        onClick={() => {
+                            if (percentage[0] + step > max) {
+                                return;
+                            }
+                            const newValue = percentage[0] + step;
+                            onButtonPress([newValue]);
+                        }}
+                        disabled={disabled}
+                        size="sm"
+                        icon={<FaPlus />}
+                    />
+                </Tooltip>
             </div>
         </div>
     );
