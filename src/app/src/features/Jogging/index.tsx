@@ -955,10 +955,10 @@ export function Jogging() {
         // }
     };
 
-    // @ts-expect-error
-    useKeybinding(shuttleControlEvents);
-    // @ts-expect-error
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isRotaryMode = mode === 'ROTARY';
     const showA =

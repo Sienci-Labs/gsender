@@ -371,7 +371,9 @@ function DRO({
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isRotaryMode = mode === 'ROTARY';
 

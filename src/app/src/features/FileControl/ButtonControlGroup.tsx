@@ -139,8 +139,10 @@ const ButtonControlGroup = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const handleLoadFile = async (
         event: React.ChangeEvent<HTMLInputElement>,

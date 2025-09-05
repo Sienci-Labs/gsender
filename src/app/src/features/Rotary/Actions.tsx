@@ -18,6 +18,7 @@ import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { get } from 'lodash';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
+import { useEffect } from 'react';
 
 const Actions = () => {
     const navigate = useNavigate();
@@ -93,8 +94,10 @@ const Actions = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
 

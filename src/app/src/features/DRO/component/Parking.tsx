@@ -5,6 +5,7 @@ import controller from 'app/lib/controller.ts';
 import { LOCATION_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useEffect } from 'react';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});
@@ -38,7 +39,9 @@ export function Parking({ disabled = false }) {
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <IconButton

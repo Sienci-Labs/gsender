@@ -157,8 +157,10 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32 max-xl:w-28">

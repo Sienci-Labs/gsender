@@ -203,8 +203,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const handleRun = (): void => {
         console.assert(
