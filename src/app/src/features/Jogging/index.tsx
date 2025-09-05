@@ -914,9 +914,13 @@ export function Jogging() {
         },
         STOP_CONT_JOG: {
             // this one is for other functions to call when continuous jogging
+            title: 'Stop Continuous Jog',
+            keys: '',
             cmd: 'STOP_CONT_JOG',
             payload: { force: true },
             preventDefault: false,
+            isActive: false,
+            category: '',
             callback: (event: Event) => {
                 if (event) {
                     preventDefault(event);
