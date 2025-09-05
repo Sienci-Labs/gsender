@@ -87,7 +87,10 @@ const MacroItem = ({
             position: 'bottom-right',
         });
     };
-    return (
+
+    const hasDescription = macro.description.trim() !== '';
+
+    const content = (
         <div
             className={cx(
                 'flex items-center justify-between rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 border dark:text-white dark:bg-dark',
@@ -98,19 +101,11 @@ const MacroItem = ({
                 },
             )}
         >
-            <Tooltip
-                content={
-                    macro.description.trim() !== ''
-                        ? macro.name + ': ' + macro.description
-                        : macro.name
-                }
-            >
-                <MacroButton
-                    onMacroRun={onMacroRun}
-                    disabled={disabled}
-                    macro={macro}
-                />
-            </Tooltip>
+            <MacroButton
+                onMacroRun={onMacroRun}
+                disabled={disabled}
+                macro={macro}
+            />
 
             <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">
@@ -135,6 +130,16 @@ const MacroItem = ({
             </DropdownMenu>
         </div>
     );
+
+    if (hasDescription) {
+        return (
+            <Tooltip content={`Description: ${macro.description}`}>
+                {content}
+            </Tooltip>
+        );
+    }
+
+    return content;
 };
 
 export default MacroItem;
