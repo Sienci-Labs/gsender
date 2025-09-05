@@ -25,7 +25,6 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
-import Evilscan from 'evilscan';
 import socketIO from 'socket.io';
 import { app } from 'electron';
 import fs from 'fs';
@@ -688,49 +687,6 @@ class CNCEngine {
             socket.on('file:unload', () => {
                 log.debug('Socket unload called');
                 this.unload();
-            });
-
-            socket.on('networkScan', (port, target) => {
-                this.networkDevices = [];
-                const options = {
-                    target: target,
-                    port: port,
-                    banner: true
-                };
-
-                const scan = new Evilscan(options);
-
-                scan.on('result', (device) => {
-                    // fired when item is matching options
-                    // only take open devices
-                    //log.debug(device);
-                    if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
-                        this.networkDevices.push({
-                            ...device,
-                            controllerType: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
-                        });
-                    }
-                });
-
-                scan.on('error', (err) => {
-                    log.error(err);
-                });
-
-                scan.on('done', () => {
-                    // finished !
-                    // this.networkDevices.push({
-                    //     ip: '192.168.1.1',
-                    //     port: 23,
-                    //     banner: GRBL,
-                    //     controllerType: GRBL
-                    // });
-                    log.info('done scan');
-                    socket.emit('networkScan:status', false);
-                });
-
-                log.info('starting network scan');
-                socket.emit('networkScan:status', true);
-                scan.run();
             });
         });
     }
