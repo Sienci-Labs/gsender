@@ -2,14 +2,13 @@ import _ from 'lodash';
 import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
-import { MACRO_CATEGORY } from '../constants';
 import {
     CommandKeys,
     ShuttleControlEvents,
     ShuttleEvent,
 } from './definitions/shortcuts';
 
-const TARGET_NUM_CALLS = 50; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 18; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*
@@ -43,6 +42,7 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
                 'commandKeys',
                 {},
             );
+            // we should only save cmd and user changable properties in store: keys, isActive
             if (
                 _.isEmpty(currentCommandKeys) ||
                 !currentCommandKeys[defaultShuttle.cmd]
@@ -54,7 +54,6 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
                 const key = defaultShuttle.keys || '';
 
                 updatedCommandKeys[defaultShuttle.cmd] = {
-                    ...updatedCommandKeys[defaultShuttle.cmd],
                     cmd: defaultShuttle.cmd,
                     keys: key,
                     isActive: defaultShuttle.isActive,
@@ -103,12 +102,7 @@ export function removeOldKeybindings(): void {
     // Only keep keybindings that exist in the shuttleControlEvents arrays
     Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
-        // if the category doesn't exist, it's not a macro
-        // but if it's an old keybinding that still stores the category info, make sure it's not a macro
-        if (
-            event !== undefined ||
-            (keybinding.category && keybinding.category === MACRO_CATEGORY)
-        ) {
+        if (event !== undefined) {
             updatedCommandKeys[key] = keybinding;
         }
     });
