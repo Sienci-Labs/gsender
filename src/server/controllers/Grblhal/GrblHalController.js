@@ -983,7 +983,7 @@ class GrblHalController {
             await delay(500);
             this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
-            console.log(semver);
+
             if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
                 this.connection.writeln('$spindlesh');
             } else {
