@@ -146,10 +146,19 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state.status.activeState',
+                );
+                const workflow = get(
+                    reduxStore.getState(),
+                    'controller.workflow',
+                );
+
                 if (shortcutIsDisabled()) {
                     return;
                 }
-                handleRun();
+                handleRun(activeState, workflow);
             },
         },
         PAUSE_JOB: {
@@ -208,24 +217,30 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         useKeybinding(shuttleControlEvents);
     }, []);
 
-    const handleRun = (): void => {
+    const handleRun = (
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ): void => {
+        const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
+
         console.assert(
-            includes(
-                [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
-                workflow.state,
-            ) || activeState === GRBL_ACTIVE_STATE_HOLD,
+            includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], state) ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD,
         );
 
-        if (workflow.state === WORKFLOW_STATE_IDLE) {
-            controller.command('gcode:start');
+        if (
+            state === WORKFLOW_STATE_PAUSED ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+        ) {
+            controller.command('gcode:resume');
             return;
         }
 
-        if (
-            workflow.state === WORKFLOW_STATE_PAUSED ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
-        ) {
-            controller.command('gcode:resume');
+        if (state === WORKFLOW_STATE_IDLE) {
+            controller.command('gcode:start');
+            return;
         }
     };
     const handlePause = (): void => {
