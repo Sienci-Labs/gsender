@@ -182,7 +182,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
                     // svg
                     if (shouldIncludeSVG) {
-                        const multiplier = units === 'G21' ? 1 : 25.4 // We need to make path bigger for inches
+                        const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
                         svgInitialization(motion);
                         SVGVertices.push({
                             x1: v1.x * multiplier,
@@ -236,7 +236,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v0: Vector3,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane, units} = modal;
+                    const { motion, plane, units } = modal;
                     const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
@@ -481,6 +481,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const modalChanges = vm.getModalChanges();
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
+    console.log(vm.vmState);
 
     parsedDataToSend = {
         data: [],
@@ -488,7 +489,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         info: fileInfo,
         modalChanges: [],
         feedrateChanges: [],
-        invalidLines: fileInfo.invalidLines
+        invalidLines: fileInfo.invalidLines,
     };
 
     let tFrames = new Uint32Array(frames);
