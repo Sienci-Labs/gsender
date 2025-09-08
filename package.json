@@ -72,6 +72,7 @@
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
     "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
     "dev": "concurrently --kill-others-on-fail --names \"build-dev,tailwind\" \"npm run build-dev && npm run start-dev\" \"npm run tailwind-dev\"",
+    "devw": "concurrently --kill-others-on-fail --names \"build-dev\" \"npm run build-dev && npm run start-dev\"",
     "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
     "lint": "concurrently --kill-others-on-fail --names \"eslint,stylint\"\"yarn run eslint\" \"yarn run stylint\"",
     "eslint": "npm run eslint:build",

@@ -46,6 +46,7 @@ import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLi
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
+import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
 
 class GrblHalLineParser {
     parse(line) {
@@ -133,6 +134,8 @@ class GrblHalLineParser {
             // Grbl X.Xx ['$' for help]
             GrblHalLineParserResultStartup,
 
+            /// {...} json blob
+            GrblHalLineParserResultJSON
         ];
 
         for (let parser of parsers) {
