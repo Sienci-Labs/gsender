@@ -44,7 +44,6 @@ onmessage = function ({ data }) {
     } = data;
     let tcCounter = 0;
     let savedColors = [];
-    console.log(toolchanges);
 
     /**
      * Generates a complementary color from a given Three.js Color instance.
