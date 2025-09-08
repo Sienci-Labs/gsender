@@ -1221,6 +1221,7 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            toolchanges: this.vmState.toolchange,
         };
     }
 
