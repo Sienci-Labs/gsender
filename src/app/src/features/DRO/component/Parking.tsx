@@ -6,6 +6,7 @@ import controller from 'app/lib/controller.ts';
 import { LOCATION_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useEffect } from 'react';
 import Tooltip from 'app/components/Tooltip';
 
 function goToParkLocation() {
@@ -40,7 +41,9 @@ export function Parking({ disabled = false }) {
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <Tooltip content="Go to Park Location">

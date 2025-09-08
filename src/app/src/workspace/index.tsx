@@ -31,7 +31,7 @@ const Workspace = () => {
         if (pathname === '/') {
             setTimeout(() => {
                 window.dispatchEvent(new Event('resize')); // Manual resize dispatch for visualizer on navigating to carve
-            }, 100)
+            }, 100);
         }
 
         document.title = `gSender ${pkg.version}`;
@@ -205,8 +205,10 @@ const Workspace = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <div className="flex flex-col h-full dark:bg-slate-800">

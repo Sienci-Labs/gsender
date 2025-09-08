@@ -16,7 +16,9 @@ import {
     GRBL,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
     MACHINE_CONTROL_BUTTONS,
     PAUSE,
     START,
@@ -146,10 +148,19 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state.status.activeState',
+                );
+                const workflow = get(
+                    reduxStore.getState(),
+                    'controller.workflow',
+                );
+
                 if (shortcutIsDisabled()) {
                     return;
                 }
-                handleRun();
+                handleRun(activeState, workflow);
             },
         },
         PAUSE_JOB: {
@@ -172,7 +183,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             },
         },
         STOP_JOB: {
-            title: 'Stop job',
+            title: 'Global Stop',
             keys: '@',
             gamepadKeys: '3',
             keysName: 'Y',
@@ -181,7 +192,26 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state.status.activeState',
+                );
+                const firmwareType = get(
+                    reduxStore.getState(),
+                    'controller.type',
+                );
+                // if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
                 if (shortcutIsDisabled()) {
+                    if (activeState === GRBL_ACTIVE_STATE_JOG) {
+                        return controller.command('jog:cancel');
+                    }
+                    if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                        return;
+                    }
+                    if (firmwareType === GRBLHAL) {
+                        return controller.command('reset:soft');
+                    }
+                    controller.command('reset');
                     return;
                 }
                 handleStop();
@@ -203,27 +233,35 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
-    const handleRun = (): void => {
+    const handleRun = (
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ): void => {
+        const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
+
         console.assert(
-            includes(
-                [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
-                workflow.state,
-            ) || activeState === GRBL_ACTIVE_STATE_HOLD,
+            includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], state) ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD,
         );
 
-        if (workflow.state === WORKFLOW_STATE_IDLE) {
-            controller.command('gcode:start');
+        if (
+            state === WORKFLOW_STATE_PAUSED ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+        ) {
+            controller.command('gcode:resume');
             return;
         }
 
-        if (
-            workflow.state === WORKFLOW_STATE_PAUSED ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
-        ) {
-            controller.command('gcode:resume');
+        if (state === WORKFLOW_STATE_IDLE) {
+            controller.command('gcode:start');
+            return;
         }
     };
     const handlePause = (): void => {

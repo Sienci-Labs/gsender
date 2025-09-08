@@ -147,8 +147,10 @@ const RotarySurfacing = () => {
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <div>
@@ -275,9 +277,11 @@ const RotarySurfacing = () => {
                                         }))
                                     }
                                 />
-                            </div> 
+                            </div>
                             <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
-                                Cut faster and cleaner by only rotating one direction, but you will need to rehome your A-axis at the end.
+                                Cut faster and cleaner by only rotating one
+                                direction, but you will need to rehome your
+                                A-axis at the end.
                             </div>
                         </InputArea>
                     </div>

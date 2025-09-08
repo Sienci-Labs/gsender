@@ -107,8 +107,10 @@ const Probe = ({ state, actions }: ProbeProps) => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const {
         canClick,

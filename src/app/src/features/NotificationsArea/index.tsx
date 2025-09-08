@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuBell } from 'react-icons/lu';
 
 import {
@@ -42,8 +42,10 @@ const NotificationsArea = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <Popover open={open} onOpenChange={markNotificationsRead}>

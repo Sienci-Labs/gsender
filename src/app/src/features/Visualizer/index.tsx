@@ -92,7 +92,7 @@ import {
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
-import shuttleEvents from '../../lib/shuttleEvents';
+import { CommandKeys } from 'app/lib/definitions/shortcuts';
 
 interface Views {
     type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
@@ -1232,20 +1232,13 @@ class Visualizer extends Component {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
-                const shortcuts = store.get('commandKeys', {});
-                const allShuttleControlEvents =
-                    shuttleEvents.allShuttleControlEvents;
+                const shortcuts: CommandKeys = store.get('commandKeys', {});
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
                 const allDisabled = Object.entries(shortcuts)
-                    .filter(
-                        ([key, shortcut]) =>
-                            (allShuttleControlEvents[key]
-                                ? allShuttleControlEvents[key].title
-                                : shortcut.title) !== 'Toggle Shortcuts',
-                    )
-                    .every(([key, shortcut]) => !shortcut.isActive);
+                    .filter(([key, _shortcut]) => key !== 'TOGGLE_SHORTCUTS')
+                    .every(([_key, shortcut]) => !shortcut.isActive);
                 const keybindings = _.cloneDeep(shortcuts);
                 Object.entries(keybindings).forEach(([key, keybinding]) => {
                     if (key !== 'TOGGLE_SHORTCUTS') {
