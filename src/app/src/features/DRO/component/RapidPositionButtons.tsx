@@ -12,11 +12,7 @@ import {
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
 import Tooltip from 'app/components/Tooltip';
-
-import blVector from '../assets/bl.svg';
-import brVector from '../assets/br.svg';
-import frVector from '../assets/fr.svg';
-import flVector from '../assets/fl.svg';
+import cn from 'classnames';
 
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
@@ -28,6 +24,9 @@ export function RapidPositionButtons({ disabled = false }) {
     const pullOff = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$27', 1);
     });
+
+    const altColourClass = 'stroke-robin-500';
+    const disabledColorClass = 'stroke-gray-400';
 
     function jogToCorner(corner: string) {
         const gcode = getMovementGCode(
@@ -41,74 +40,91 @@ export function RapidPositionButtons({ disabled = false }) {
 
     return (
         <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait">
-            <div className="grid grid-cols-2 text-3xl gap-2 font-bold">
-                <Tooltip content="Go to Back Left Corner">
-                    <button
-                        className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
-                            'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
-                                disabled,
-                        })}
-                        onClick={() => jogToCorner(BACK_LEFT)}
-                        disabled={disabled}
-                    >
-                        <img
-                            src={blVector}
-                            className="border border-gray-300"
-                            alt="Back Left Rapid Position Icon"
+            <div className="grid grid-cols-2 w-16 h-14 portrait:w-20 portrait:h-[68px] font-bold">
+                <svg
+                    viewBox="0 0 37 34"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={cx('h-full w-full', {
+                        'cursor-pointer': !disabled,
+                        'cursor-not-allowed': disabled,
+                    })}
+                    onClick={() => jogToCorner(BACK_LEFT)}
+                >
+                    <Tooltip content="Go to Back Left Corner">
+                        <path
+                            d="M 32 0 H 0 V 32"
+                            stroke-width="20"
+                            className={cn(
+                                disabled ? disabledColorClass : altColourClass,
+                            )}
                         />
-                    </button>
-                </Tooltip>
+                    </Tooltip>
+                </svg>
+                <svg
+                    viewBox="0 0 27 34"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={cx('h-full w-full', {
+                        'cursor-pointer': !disabled,
+                        'cursor-not-allowed': disabled,
+                    })}
+                    onClick={() => jogToCorner(BACK_RIGHT)}
+                >
+                    <Tooltip content="Go to Back Right Corner">
+                        <path
+                            // d="M 74 32 V 0 L 42 0"
+                            d="M 32 32 V 0 L 0 0"
+                            stroke-width="20"
+                            className={cn(
+                                disabled ? disabledColorClass : altColourClass,
+                            )}
+                        />
+                    </Tooltip>
+                </svg>
+                <svg
+                    viewBox="0 0 37 33"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={cx('h-full w-full', {
+                        'cursor-pointer': !disabled,
+                        'cursor-not-allowed': disabled,
+                    })}
+                    onClick={() => jogToCorner(FRONT_LEFT)}
+                >
+                    <Tooltip content="Go to Front Left Corner">
+                        <path
+                            // d="M 0 36 L 0 67 L 32 67"
+                            d="M 0 0 L 0 32 L 32 32"
+                            stroke-width="20"
+                            className={cn(
+                                disabled ? disabledColorClass : altColourClass,
+                            )}
+                        />
+                    </Tooltip>
+                </svg>
 
-                <Tooltip content="Go to Back Right Corner">
-                    <button
-                        className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
-                            'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
-                                disabled,
-                        })}
-                        onClick={() => jogToCorner(BACK_RIGHT)}
-                        disabled={disabled}
-                    >
-                        <img
-                            src={brVector}
-                            className="border border-gray-300"
-                            alt="Back Right Rapid Position Icon"
+                <svg
+                    viewBox="0 0 27 33"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={cx('h-full w-full', {
+                        'cursor-pointer': !disabled,
+                        'cursor-not-allowed': disabled,
+                    })}
+                    onClick={() => jogToCorner(FRONT_RIGHT)}
+                >
+                    <Tooltip content="Go to Front Right Corner">
+                        <path
+                            // d="M 42 67 H 74 V 36"
+                            d="M 0 32 H 32 V 0"
+                            stroke-width="20"
+                            className={cn(
+                                disabled ? disabledColorClass : altColourClass,
+                            )}
                         />
-                    </button>
-                </Tooltip>
-
-                <Tooltip content="Go to Front Left Corner">
-                    <button
-                        className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
-                            'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
-                                disabled,
-                        })}
-                        onClick={() => jogToCorner(FRONT_LEFT)}
-                        disabled={disabled}
-                    >
-                        <img
-                            src={flVector}
-                            className="border border-gray-300"
-                            alt="Front Right Rapid Position Icon"
-                        />
-                    </button>
-                </Tooltip>
-
-                <Tooltip content="Go to Front Right Corner">
-                    <button
-                        className={cx('w-8 h-6 portrait:w-10 portrait:h-8', {
-                            'bg-gray-300 text-gray-500 dark:bg-dark cursor-not-allowed':
-                                disabled,
-                        })}
-                        onClick={() => jogToCorner(FRONT_RIGHT)}
-                        disabled={disabled}
-                    >
-                        <img
-                            src={frVector}
-                            className="border border-gray-300"
-                            alt="Front Left Rapid Position Icon"
-                        />
-                    </button>
-                </Tooltip>
+                    </Tooltip>
+                </svg>
             </div>
         </div>
     );
