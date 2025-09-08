@@ -17,7 +17,9 @@ export const generateList = (shortcuts) => {
     let shortcutsList = [];
 
     Object.keys(shortcuts).forEach((key) => {
-        shortcutsList.push(shortcuts[key]);
+        if (key !== 'STOP_CONT_JOG') {
+            shortcutsList.push(shortcuts[key]);
+        }
     });
 
     shortcutsList.sort((a, b) => {
