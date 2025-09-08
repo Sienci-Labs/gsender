@@ -23,8 +23,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cn } from 'app/lib/utils';
-
 import { LuTrash, LuPencil, LuPlus } from 'react-icons/lu';
 
 import { Switch } from 'app/components/shadcn/Switch';
@@ -52,6 +50,8 @@ import {
     GRBLHAL,
 } from 'app/constants';
 import Button from 'app/components/Button';
+import { Tooltip } from 'app/components/Tooltip';
+import { cn } from 'app/lib/utils';
 
 import { formatShortcut } from './helpers';
 
@@ -82,6 +82,48 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             ? formatShortcut(cleanedShortcut, isActive)
             : formatShortcut(shortcut, isActive);
 
+        const shortcutButton = {
+            edit: (
+                <Tooltip content="Edit this shortcut">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={
+                            <LuPencil className="text-blue-500 hover:text-blue-700 w-6 h-6" />
+                        }
+                        onClick={() => onEdit(row)}
+                        onKeyDown={null}
+                    />
+                </Tooltip>
+            ),
+            delete: (
+                <Tooltip content="Delete this shortcut">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={
+                            <LuTrash className="text-red-500 hover:text-red-700 w-6 h-6" />
+                        }
+                        onClick={() => onDelete(row)}
+                        onKeyDown={null}
+                    />
+                </Tooltip>
+            ),
+            add: (
+                <Tooltip content="Assign an action to this shortcut">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={
+                            <LuPlus className="text-blue-500 hover:text-blue-700 w-6 h-6" />
+                        }
+                        onClick={() => onEdit(row)}
+                        onKeyDown={null}
+                    />
+                </Tooltip>
+            ),
+        };
+
         return (
             <div className="flex justify-between items-center">
                 {hasShortcut || '' ? (
@@ -92,35 +134,11 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 <div className="flex gap-2 items-center">
                     {hasShortcut ? (
                         <>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={
-                                    <LuTrash className="text-red-500 hover:text-red-700 w-6 h-6" />
-                                }
-                                onClick={() => onDelete(row)}
-                                onKeyDown={() => onDelete(row)}
-                            />
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={
-                                    <LuPencil className="text-blue-500 hover:text-blue-700 w-6 h-6" />
-                                }
-                                onClick={() => onEdit(row)}
-                                onKeyDown={null}
-                            />
+                            {shortcutButton.delete}
+                            {shortcutButton.edit}
                         </>
                     ) : (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={
-                                <LuPlus className="text-blue-500 hover:text-blue-700 w-6 h-6" />
-                            }
-                            onClick={() => onEdit(row)}
-                            onKeyDown={null}
-                        />
+                        shortcutButton.add
                     )}
                 </div>
             </div>

@@ -13,7 +13,8 @@ import Switch from 'app/components/Switch';
 import controller from 'app/lib/controller';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import {METRIC_UNITS} from "app/constants";
+import { METRIC_UNITS } from 'app/constants';
+import Tooltip from 'app/components/Tooltip';
 
 interface GotoProps {
     units: string;
@@ -66,7 +67,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     function goToLocation() {
         const code = [];
-        const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+        const unitModal = units === METRIC_UNITS ? 'G21' : 'G20';
         const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
 
         // Build axis commands based on non-zero values
@@ -123,14 +124,16 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover onOpenChange={onPopoverOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    disabled={disabled}
-                    icon={<FaPaperPlane />}
-                    variant="secondary"
-                    size="sm"
-                />
-            </PopoverTrigger>
+            <Tooltip content="Go To Location">
+                <PopoverTrigger asChild>
+                    <Button
+                        disabled={disabled}
+                        icon={<FaPaperPlane />}
+                        variant="secondary"
+                        size="sm"
+                    />
+                </PopoverTrigger>
+            </Tooltip>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
                     <h1>Go To Location</h1>
