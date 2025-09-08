@@ -888,30 +888,6 @@ export function Jogging() {
             category: JOGGING_CATEGORY,
             callback: shuttleControlFunctions.JOG,
         },
-        STOP_JOG: {
-            // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Cancel jog move',
-            keys: '',
-            cmd: 'STOP_JOG',
-            payload: { force: true },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: (event: Event, _: Record<string, number> | null) => {
-                const isConnected = get(
-                    reduxStore.getState(),
-                    'connection.isConnected',
-                );
-                if (!isConnected) {
-                    return;
-                }
-                if (event) {
-                    preventDefault(event);
-                }
-
-                controller.command('jog:stop');
-            },
-        },
         STOP_CONT_JOG: {
             // this one is for other functions to call when continuous jogging
             title: 'Stop Continuous Jog',

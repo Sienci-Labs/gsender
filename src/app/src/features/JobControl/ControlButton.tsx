@@ -16,7 +16,9 @@ import {
     GRBL,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
     MACHINE_CONTROL_BUTTONS,
     PAUSE,
     START,
@@ -181,7 +183,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             },
         },
         STOP_JOB: {
-            title: 'Stop job',
+            title: 'Global Stop',
             keys: '@',
             gamepadKeys: '3',
             keysName: 'Y',
@@ -190,7 +192,26 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state.status.activeState',
+                );
+                const firmwareType = get(
+                    reduxStore.getState(),
+                    'controller.type',
+                );
+                // if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
                 if (shortcutIsDisabled()) {
+                    if (activeState === GRBL_ACTIVE_STATE_JOG) {
+                        return controller.command('jog:cancel');
+                    }
+                    if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                        return;
+                    }
+                    if (firmwareType === GRBLHAL) {
+                        return controller.command('reset:soft');
+                    }
+                    controller.command('reset');
                     return;
                 }
                 handleStop();
