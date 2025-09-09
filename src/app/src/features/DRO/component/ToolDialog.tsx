@@ -8,6 +8,8 @@ import {
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import get from 'lodash/get';
 import { RiToolsFill, RiEjectLine } from 'react-icons/ri';
 import { MdPrecisionManufacturing } from 'react-icons/md';
 
@@ -29,6 +31,9 @@ interface ToolDialogProps {
 
 export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) => {
     const numberOfTools = store.get('workspace.toolChange.numberOfTools', 8);
+    const currentTool = useTypedSelector((state) =>
+        get(state, 'controller.tool.currentTool')
+    );
 
     const handleToolChange = (toolNumber: number) => {
         const gcode = `M6 T${toolNumber}`;
@@ -60,23 +65,41 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
                 </DialogHeader>
                 
                 <div className="grid grid-cols-4 gap-3 mb-8">
-                    {toolNumbers.map((toolNumber) => (
-                        <Button
-                            key={toolNumber}
-                            onClick={() => handleToolChange(toolNumber)}
-                            className="min-w-[90px] h-16 flex flex-col items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-                            variant="primary"
-                        >
-                            <CNCBitIcon className="w-5 h-5" />
-                            <span className="text-sm font-medium">Tool {toolNumber}</span>
-                        </Button>
-                    ))}
+                    {toolNumbers.map((toolNumber) => {
+                        const isCurrentTool = currentTool === toolNumber;
+                        return (
+                            <Button
+                                key={toolNumber}
+                                onClick={() => !isCurrentTool && handleToolChange(toolNumber)}
+                                disabled={isCurrentTool}
+                                className={`min-w-[90px] h-16 flex flex-col items-center justify-center gap-1 rounded-lg shadow-md transition-all duration-200 ${
+                                    isCurrentTool
+                                        ? 'bg-green-600 text-white border-2 border-green-400 shadow-green-200 cursor-not-allowed'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-lg transform hover:scale-105 cursor-pointer'
+                                }`}
+                                variant="primary"
+                            >
+                                <CNCBitIcon className="w-5 h-5" />
+                                <span className="text-sm font-medium">
+                                    Tool {toolNumber}
+                                    {isCurrentTool && (
+                                        <span className="block text-xs opacity-90">Current</span>
+                                    )}
+                                </span>
+                            </Button>
+                        );
+                    })}
                 </div>
                 
                 <div className="flex gap-4 justify-center">
                     <Button
                         onClick={handleUnloadTool}
-                        className="min-w-[140px] h-14 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                        disabled={currentTool === 0 || currentTool === null || currentTool === undefined}
+                        className={`min-w-[140px] h-14 flex items-center justify-center gap-2 rounded-lg shadow-md transition-all duration-200 ${
+                            currentTool === 0 || currentTool === null || currentTool === undefined
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed opacity-60'
+                                : 'bg-orange-500 hover:bg-orange-600 text-white hover:shadow-lg'
+                        }`}
                         variant="secondary"
                     >
                         <RiEjectLine className="w-5 h-5" />
