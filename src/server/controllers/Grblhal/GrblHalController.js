@@ -1636,7 +1636,7 @@ class GrblHalController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom, zMax, safeHeight = 10] = args;
+                const [lineToStartFrom, zMax, safeHeight = 10, atci = true] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
@@ -1683,6 +1683,7 @@ class GrblHalController {
                     });
 
                     const modal = toolpath.getModal();
+                    console.log(modal);
                     const position = toolpath.getPosition();
 
                     const coolant = {
@@ -1724,6 +1725,9 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
+                        if (atci) {
+                            modalGCode.push(`M6 T${modal.tool}`);
+                        }
                         modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
