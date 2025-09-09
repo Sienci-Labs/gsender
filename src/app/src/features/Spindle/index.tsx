@@ -697,8 +697,10 @@ const SpindleWidget = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     // const active = getSpindleActiveState();
 

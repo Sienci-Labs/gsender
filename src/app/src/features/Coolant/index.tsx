@@ -21,7 +21,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import reduxStore from 'app/store/redux';
 
@@ -116,7 +116,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <div className="flex flex-col justify-around items-center h-full">

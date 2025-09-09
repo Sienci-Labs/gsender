@@ -20,6 +20,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
+import { useWidgetState } from 'app/hooks/useWidgetState';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -43,6 +44,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                 ? 10
                 : 0.4,
     });
+    const { delay = 0 } = useWidgetState('spindle');
 
     const lineTotal = useSelector((state: RootState) => state.file.total);
 
@@ -58,7 +60,13 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
 
         const newSafeHeight =
             units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
-        controller.command('gcode:start', startFromLine, zMax, newSafeHeight);
+        controller.command(
+            'gcode:start',
+            startFromLine,
+            zMax,
+            newSafeHeight,
+            delay,
+        );
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
@@ -88,7 +96,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
             </ShadButton>
             <Dialog
                 open={state.showModal}
-                onOpenChange={(open) => {
+                onOpenChange={() => {
                     setState((prev) => ({ ...prev, showModal: false }));
                 }}
             >
