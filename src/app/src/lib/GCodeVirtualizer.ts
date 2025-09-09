@@ -1098,7 +1098,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
-                this.updateSpindleToolEvents('S', code);
+                this.updateSpindleToolEvents('S', Number(code));
             }
         }
 
@@ -1152,16 +1152,16 @@ class GCodeVirtualizer extends EventEmitter {
             } else if (letter === 'M') {
                 cmd = letter + code;
                 args = this.fromPairs(words.slice(1));
-                this.updateSpindleToolEvents('M', code);
+                this.updateSpindleToolEvents('M', Number(code));
             } else if (letter === 'T') {
                 // T1 ; w/o M6
                 cmd = letter;
                 args = code;
-                this.updateSpindleToolEvents('T', code);
+                this.updateSpindleToolEvents('T', Number(code));
             } else if (letter === 'S') {
                 cmd = letter;
                 args = code;
-                this.updateSpindleToolEvents('S', code);
+                this.updateSpindleToolEvents('S', Number(code));
             } else if (
                 letter === 'X' ||
                 letter === 'Y' ||
