@@ -29,13 +29,11 @@ import {
 } from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
-import { convertToImperial } from 'app/lib/units';
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     const state = reduxStore.getState();
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
-    const $13 = get(state, 'controller.settings.settings.$13', '0');
 
     //const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
     const position = store.get('workspace.toolChangePosition');
@@ -45,10 +43,7 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     console.log('max z: ' + maxZTravel);
     console.log('result: ' + (maxZTravel - curZPos - 2).toFixed(3));
 
-    let result =
-        $13 === '1'
-            ? convertToImperial(maxZTravel - curZPos - 2)
-            : (maxZTravel - curZPos - 2).toFixed(3);
+    let result = (maxZTravel - curZPos - 2).toFixed(3);
 
     return result;
 };
