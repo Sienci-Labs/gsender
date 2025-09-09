@@ -38,9 +38,9 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="flex flex-col justify-center items-center bg-gray-100 min-h-[300px] p-6 w-[500px] z-50">
-                <DialogHeader className="text-robin-700 flex items-start justify-center mb-4">
-                    <DialogTitle>Tool Selection</DialogTitle>
+            <DialogContent className="flex flex-col justify-center items-center bg-gray-100 min-h-[300px] p-4 w-[500px] z-50">
+                <DialogHeader className="text-robin-700 flex items-center justify-center mb-4 w-full">
+                    <DialogTitle className="text-center w-full">Tool Selection</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid grid-cols-4 gap-3 mb-6">
@@ -56,7 +56,7 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
                     ))}
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-3 justify-center">
                     <Button
                         onClick={handleUnloadTool}
                         className="min-w-[120px] h-12"
@@ -69,7 +69,7 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
                         className="min-w-[120px] h-12"
                         variant="secondary"
                     >
-                        Load 3D Probe
+                        Manual Tool Load
                     </Button>
                 </div>
             </DialogContent>
