@@ -39,10 +39,6 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     const position = store.get('workspace.toolChangePosition');
     const curZPos = Math.abs(position.z);
 
-    console.log('curr z: ' + curZPos);
-    console.log('max z: ' + maxZTravel);
-    console.log('result: ' + (maxZTravel - curZPos - 2).toFixed(3));
-
     let result = (maxZTravel - curZPos - 2).toFixed(3);
 
     return result;
