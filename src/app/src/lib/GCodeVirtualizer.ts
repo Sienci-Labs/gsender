@@ -33,6 +33,7 @@ interface VMState {
     bbox: BBox;
     usedAxes: Set<string>;
     invalidLines: string[];
+    toolchange: number[];
 }
 
 type Data = Array<{
@@ -233,7 +234,8 @@ class GCodeVirtualizer extends EventEmitter {
             },
         },
         usedAxes: new Set(),
-        invalidLines: []
+        invalidLines: [],
+        toolchange: [],
     };
 
     // data to save so we don't have to reparse
@@ -266,7 +268,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
     //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
-    VALID_GCODE_REGEX = /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi
+    VALID_GCODE_REGEX =
+        /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi;
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -898,6 +901,7 @@ class GCodeVirtualizer extends EventEmitter {
         },
         // M6: Tool Change
         M6: (params: Record<string, any>): void => {
+            this.vmState.toolchange.push(this.totalLines);
             if (params && params.T !== undefined) {
                 this.setModal({ tool: params.T });
                 this.saveModal({ tool: params.T });
@@ -1049,8 +1053,9 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     virtualize(line = ''): void {
-        this.setEstimate = false // Reset on each line
+        this.setEstimate = false; // Reset on each line
         if (!line) {
+            this.totalLines += 1;
             this.fn.callback();
             return;
         }
@@ -1061,13 +1066,9 @@ class GCodeVirtualizer extends EventEmitter {
             .replace(this.re3, '');
 
         if (line === '') {
+            this.totalLines += 1;
             return;
         }
-
-        /*if (line.this.INVALID_GCODE_REGEX.test(line)) {
-            console.log(`Bad line - ${line}`);
-            this.vmState.invalidLines.push(line);
-        }*/
 
         if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
             this.vmState.invalidLines.push(line);
@@ -1220,6 +1221,7 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            toolchanges: this.vmState.toolchange,
         };
     }
 

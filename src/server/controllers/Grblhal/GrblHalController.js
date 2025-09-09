@@ -482,6 +482,7 @@ class GrblHalController {
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
+                    console.log(this.toolChangeContext);
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
@@ -550,7 +551,7 @@ class GrblHalController {
                 /**
                  * End of Rotary Logic
                  */
-
+                console.log('returning line: ', line);
                 return line;
             }
         });
@@ -983,7 +984,7 @@ class GrblHalController {
             await delay(500);
             this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
-            console.log(semver);
+
             if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
                 this.connection.writeln('$spindlesh');
             } else {

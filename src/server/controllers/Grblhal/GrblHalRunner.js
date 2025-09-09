@@ -53,6 +53,7 @@ import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLi
 import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GrblHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
+import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
 
 const log = logger('controller:grblHAL');
 
@@ -251,6 +252,10 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultSpindle) {
             this.emit('spindle', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultJSON) {
+            console.log(payload);
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
