@@ -67,7 +67,6 @@ export class YModem extends events.EventEmitter {
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
-        console.log('header returned');
         this.comms.write(header);
 
         // [<<< C]
@@ -76,7 +75,6 @@ export class YModem extends events.EventEmitter {
 
         let fileChunks;
         let isLastByteSOH = false;
-        console.log(fileData);
 
         if (fileData.size === 0) {
             fileChunks = [];

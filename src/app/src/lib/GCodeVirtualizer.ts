@@ -26,6 +26,15 @@ interface RotationResult {
     a: number;
 }
 
+type SpindleToolEventCode = 'S' | 'T' | 'M' | 'TC';
+
+interface SpindleToolEvent {
+    S?: Number;
+    T?: Number;
+    M?: Number;
+    TC?: boolean;
+}
+
 interface VMState {
     tools: Set<string>;
     spindle: Set<string>;
@@ -34,6 +43,7 @@ interface VMState {
     usedAxes: Set<string>;
     invalidLines: string[];
     toolchange: number[];
+    spindleToolEvents: { [key: number]: SpindleToolEvent };
 }
 
 type Data = Array<{
@@ -236,6 +246,7 @@ class GCodeVirtualizer extends EventEmitter {
         usedAxes: new Set(),
         invalidLines: [],
         toolchange: [],
+        spindleToolEvents: {},
     };
 
     // data to save so we don't have to reparse
@@ -1075,6 +1086,7 @@ class GCodeVirtualizer extends EventEmitter {
         }
 
         const parsedLine = parseLine(line);
+        this.totalLines += 1; // Moved here so M6 and T commands are correctly stored
         // collect spindle and feed rates
         for (let word of parsedLine.words) {
             const letter = word[0];
@@ -1086,6 +1098,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
+                this.updateSpindleToolEvents('S', code);
             }
         }
 
@@ -1139,13 +1152,16 @@ class GCodeVirtualizer extends EventEmitter {
             } else if (letter === 'M') {
                 cmd = letter + code;
                 args = this.fromPairs(words.slice(1));
+                this.updateSpindleToolEvents('M', code);
             } else if (letter === 'T') {
                 // T1 ; w/o M6
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('T', code);
             } else if (letter === 'S') {
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('S', code);
             } else if (
                 letter === 'X' ||
                 letter === 'Y' ||
@@ -1190,7 +1206,7 @@ class GCodeVirtualizer extends EventEmitter {
         this.modalCounter++;
         this.feedrateCounter++;
         */
-        this.totalLines += 1;
+
         this.fn.callback();
         this.emit('data', parsedLine);
     }
@@ -1538,6 +1554,18 @@ class GCodeVirtualizer extends EventEmitter {
             return;
         }
         this.totalTime += time;
+    }
+
+    updateSpindleToolEvents(
+        code: SpindleToolEventCode,
+        value: number | boolean,
+    ) {
+        if (!this.vmState.spindleToolEvents[this.totalLines]) {
+            this.vmState.spindleToolEvents[this.totalLines] = { [code]: value };
+        } else {
+            // @ts-ignore
+            this.vmState.spindleToolEvents[this.totalLines][code] = value;
+        }
     }
 }
 
