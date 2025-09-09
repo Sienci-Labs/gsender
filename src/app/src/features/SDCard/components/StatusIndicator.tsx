@@ -16,7 +16,6 @@ export function StatusIndicator({ isMounted }) {
 
     useEffect(() => {
         controller.addListener('ymodem:start', () => {
-            console.log('start event heard');
             setUploadProgress(0);
             setUploadState('uploading');
         });

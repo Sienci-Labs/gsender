@@ -1,6 +1,6 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import controller from 'app/lib/controller.ts';
 
 export type UploadState = 'idle' | 'uploading' | 'complete' | 'error';

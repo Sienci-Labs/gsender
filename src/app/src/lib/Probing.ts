@@ -68,7 +68,10 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
-    const zThickness = plateType === TOUCHPLATE_TYPE_STANDARD ? zThicknesses.standardBlock : zThicknesses.zProbe;
+    const zThickness =
+        plateType === TOUCHPLATE_TYPE_STANDARD
+            ? zThicknesses.standardBlock
+            : zThicknesses.zProbe;
 
     // Add axes to initial zeroing
     Object.keys(axes).forEach((axis) => {
@@ -80,7 +83,6 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
     // Soft limits handling - how far can we go down
     if (homingEnabled) {
         zProbeDistance = getZDownTravel(Math.abs(zProbeDistance)) * -1;
-        console.log('Z distance:', zProbeDistance);
     }
 
     return [
@@ -261,7 +263,7 @@ export const get3AxisAutoRoutine = ({
     direction,
     firmware,
     homingEnabled,
-    zThickness
+    zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -608,7 +610,7 @@ export const get3AxisAutoDiameterRoutine = ({
     direction,
     toolDiameter,
     homingEnabled,
-    zThickness
+    zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -623,11 +625,10 @@ export const get3AxisAutoDiameterRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
-    const toolRadius = (toolDiameter / 2);
-    const toolCompensatedThickness = ((-1 * toolRadius));
+    const toolRadius = toolDiameter / 2;
+    const toolCompensatedThickness = -1 * toolRadius;
     // Addition because it's already negative
     const compensatedValue = 22.5 + toolCompensatedThickness;
-
 
     if (axes.z && axes.y && axes.z) {
         code.push(

@@ -173,8 +173,6 @@ onmessage = function ({ data }) {
         default: defaultColor,
     };
 
-    console.log(motionColor['G0']);
-
     //this.geometry.setFromPoints(this.vertices);
     const colorArray = getColorTypedArray(colors, motionColor);
 

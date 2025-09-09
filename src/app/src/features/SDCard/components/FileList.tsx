@@ -50,7 +50,6 @@ export const FileList: React.FC = () => {
 
     const handleFileSelect = (files: FileList | null) => {
         if (!files || files.length === 0) return;
-        console.log('starting accepted block');
         const file = files[0]; // Only take the first file
         const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 

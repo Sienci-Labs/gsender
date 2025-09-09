@@ -1162,7 +1162,6 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 const vertices = this.props.actions.getHull();
-                console.log('enabled:', this.props.homingEnabled);
                 const zTravel = this.props.homingEnabled ? getZUpTravel(5) : 5;
 
                 try {
@@ -1508,8 +1507,6 @@ class Visualizer extends Component {
 
     createGridLineNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
-        console.log(mm);
-        console.log(inches);
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;

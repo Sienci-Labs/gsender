@@ -1238,6 +1238,7 @@ class GCodeVirtualizer extends EventEmitter {
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
             toolchanges: this.vmState.toolchange,
+            spindleToolEvents: this.vmState.spindleToolEvents,
         };
     }
 
@@ -1557,14 +1558,14 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     updateSpindleToolEvents(
-        code: SpindleToolEventCode,
-        value: number | boolean,
+        word: SpindleToolEventCode,
+        code: number | boolean,
     ) {
         if (!this.vmState.spindleToolEvents[this.totalLines]) {
-            this.vmState.spindleToolEvents[this.totalLines] = { [code]: value };
+            this.vmState.spindleToolEvents[this.totalLines] = { [word]: code };
         } else {
             // @ts-ignore
-            this.vmState.spindleToolEvents[this.totalLines][code] = value;
+            this.vmState.spindleToolEvents[this.totalLines][word] = code;
         }
     }
 }
