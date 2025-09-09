@@ -64,6 +64,7 @@ const defaultState: State = {
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
+            numberOfTools: 8,
             passthrough: false,
             skipDialog: false,
         },

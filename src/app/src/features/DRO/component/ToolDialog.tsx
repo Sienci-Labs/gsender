@@ -7,6 +7,7 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 
 interface ToolDialogProps {
     isOpen: boolean;
@@ -14,6 +15,8 @@ interface ToolDialogProps {
 }
 
 export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) => {
+    const numberOfTools = store.get('workspace.toolChange.numberOfTools', 8);
+
     const handleToolChange = (toolNumber: number) => {
         const gcode = `M6 T${toolNumber}`;
         controller.command('gcode', [gcode]);
@@ -30,6 +33,9 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
         onOpenChange(false);
     };
 
+    // Generate array of tool numbers based on configuration
+    const toolNumbers = Array.from({length: numberOfTools}, (_, i) => i + 1);
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col justify-center items-center bg-gray-100 min-h-[300px] p-6 w-[500px] z-50">
@@ -38,7 +44,7 @@ export const ToolDialog: React.FC<ToolDialogProps> = ({ isOpen, onOpenChange }) 
                 </DialogHeader>
                 
                 <div className="grid grid-cols-4 gap-3 mb-6">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((toolNumber) => (
+                    {toolNumbers.map((toolNumber) => (
                         <Button
                             key={toolNumber}
                             onClick={() => handleToolChange(toolNumber)}
