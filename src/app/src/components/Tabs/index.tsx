@@ -29,10 +29,8 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
         try {
             // Use the same key format as save
             const key = `tabOrder_${tabSetId}`;
-            console.log('Loading with key:', key);
             
             const response = await api.getState({ key });
-            console.log('Load tab order response:', response.data);
             
             // The response.data might be an object with numeric keys or an array
             if (response.data) {
@@ -44,7 +42,6 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
                     savedOrder = Object.values(response.data);
                 }
                 
-                console.log('Saved order:', savedOrder);
                 
                 if (savedOrder && Array.isArray(savedOrder)) {
                     const orderedItems = savedOrder
@@ -56,7 +53,6 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
                     );
                     
                     const finalOrder = [...orderedItems, ...newItems];
-                    console.log('Final order:', finalOrder.map(item => item.label));
                     return finalOrder;
                 }
             }
@@ -64,23 +60,18 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
             console.warn('Failed to load tab order:', error);
             // If we get a 404, try to save the current order first
             if (error.response?.status === 404) {
-                console.log('No saved order found, saving current default order');
                 await saveTabOrder(items);
             }
         }
-        console.log('Using default order:', items.map(item => item.label));
         return items;
     };
 
     const saveTabOrder = async (newItems: TabItem[]) => {
         try {
             const tabOrder = newItems.map(item => item.label);
-            console.log('Saving tab order:', tabOrder, 'for tabSetId:', tabSetId);
             // Use a simpler key format
             const key = `tabOrder_${tabSetId}`;
-            console.log('Using key:', key);
             const response = await api.setState({ [key]: tabOrder });
-            console.log('Save response:', response.data);
         } catch (error) {
             console.warn('Failed to save tab order:', error);
         }
@@ -88,9 +79,7 @@ export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
 
     useEffect(() => {
         const initializeTabs = async () => {
-            console.log('Initializing tabs for tabSetId:', tabSetId, 'with items:', items.map(item => item.label));
             const orderedItems = await loadTabOrder();
-            console.log('Setting tab items to:', orderedItems.map(item => item.label));
             setTabItems(orderedItems);
             
             // Set active tab to the first tab in the reordered list
