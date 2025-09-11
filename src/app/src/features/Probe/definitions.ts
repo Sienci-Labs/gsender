@@ -21,6 +21,7 @@ export interface ProbeProfile {
         standardBlock: number;
         autoZero: number;
         zProbe: number;
+        probe3D: number;
     };
     plateWidth: number;
     plateLength: number;
@@ -47,6 +48,7 @@ export interface ProbingOptions {
     modal: string;
     units: UNITS_EN;
     toolDiameter: number;
+    tipDiameter3D: number;
     xRetractModifier?: number;
     yRetractModifier?: number;
     xRetract?: number;
@@ -68,6 +70,7 @@ export interface ProbingOptions {
         standardBlock: number;
         autoZero: number;
         zProbe: number;
+        probe3D: number;
     };
     xThickness?: number;
     yThickness?: number;
@@ -104,6 +107,7 @@ export interface Probe {
     probeType: string;
     probeAxis: string;
     direction: number;
+    tipDiameter3D: number;
 }
 
 export interface Actions {

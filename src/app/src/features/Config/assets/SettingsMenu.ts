@@ -15,6 +15,7 @@ import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
+    TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -497,6 +498,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
+                            TOUCHPLATE_TYPE_3D
                         ],
                     },
                     {
@@ -548,6 +550,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Z offset',
+                        key: 'workspace.probeProfile.zThickness.probe3D',
+                        description:
+                            'Adjust to improve the Z zeroing accuracy of your probe. (Default 0)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using Puck touchplate
+                            return probeType !== TOUCHPLATE_TYPE_3D;
+                        },
+                    },
+                    {
                         label: 'XY thickness',
                         key: 'workspace.probeProfile.xyThickness',
                         description:
@@ -561,6 +579,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             );
                             // Hidden if we are using AutoZero or Z-only touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
+                    },
+                    {
+                        label: 'Tip Diameter',
+                        key: 'widgets.probe.tipDiameter3D',
+                        description:
+                            'Diameter of probe tip where it touches off the material. (Default 2)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
                     {
