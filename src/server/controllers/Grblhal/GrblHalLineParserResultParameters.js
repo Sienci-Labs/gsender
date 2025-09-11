@@ -34,9 +34,8 @@ class GrblHalLineParserResultParameters {
             name: name,
             value: ''
         };
-        console.log(r);
+
         // [Gxx:0.000]
-        //const re = /^G\d+$/i;
         const re = /^G\d+(?:\.\d+)?$/i;
         if (re.test(name)) {
             const axes = ['x', 'y', 'z', 'a', 'b', 'c'];

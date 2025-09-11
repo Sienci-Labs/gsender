@@ -1,4 +1,22 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    useEffect,
+} from 'react';
+import controller from 'app/lib/controller.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
+import pick from 'lodash/pick';
+import mapValues from 'lodash/mapValues';
+
+export const defaultPosition = {
+    x: 0,
+    y: 0,
+    z: 0,
+};
 
 export interface Position {
     x: number;
@@ -27,6 +45,9 @@ export interface ConfigState {
     offsetManagement: OffsetManagement;
     toolRack: ToolRack;
     advanced: Advanced;
+    tlsPosition: Position;
+    manualLoadPosition: Position;
+    slot1Position: Position;
 }
 
 const defaultConfig: ConfigState = {
@@ -48,6 +69,9 @@ const defaultConfig: ConfigState = {
         checkPressure: 0,
         checkToolPresence: 0,
     },
+    manualLoadPosition: defaultPosition,
+    tlsPosition: defaultPosition,
+    slot1Position: defaultPosition,
 };
 
 interface ConfigContextValue {
@@ -61,7 +85,7 @@ interface ConfigContextValue {
         position: Position,
     ) => void;
     applyConfig: () => Promise<void>;
-    useCurrent: (path: string) => void;
+    setWorkspacePosition: (workspace: string) => void;
     isApplying: boolean;
     progress: number;
     status: {
@@ -84,6 +108,40 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         type: 'idle' | 'success' | 'error' | 'warning';
         message: string;
     }>({ type: 'idle', message: '' });
+
+    const offsetParameters = useTypedSelector(
+        (state: RootState) => state.controller.settings.parameters,
+    );
+
+    useEffect(() => {
+        if (!offsetParameters) return;
+
+        const pickedParams = mapValues(offsetParameters, (param) =>
+            pick(param, ['x', 'y', 'z']),
+        );
+        const tlsPosition: Position = get(
+            pickedParams,
+            'G59.1',
+            defaultPosition,
+        ) as Position;
+        const manualLoadPosition: Position = get(
+            pickedParams,
+            'G59.2',
+            defaultPosition,
+        ) as Position;
+        const slot1Position: Position = get(
+            pickedParams,
+            'G59.3',
+            defaultPosition,
+        ) as Position;
+
+        setConfig((prev) => ({
+            ...prev,
+            tlsPosition,
+            manualLoadPosition,
+            slot1Position,
+        }));
+    }, [offsetParameters]);
 
     const updateConfig = (updates: Partial<ConfigState>) => {
         setConfig((prev) => ({
@@ -139,23 +197,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         }, 3000);
     };
 
-    const useCurrent = (path: string) => {
-        // Mock current position
-        const mockCurrentPosition: Position = {
-            x: Math.random() * 1000,
-            y: Math.random() * -100,
-            z: Math.random() * -200,
-        };
-
-        updatePosition(path as any, mockCurrentPosition);
-        setStatus({
-            type: 'success',
-            message: `Current position captured for ${path}`,
-        });
-
-        setTimeout(() => {
-            setStatus({ type: 'idle', message: '' });
-        }, 2000);
+    const setWorkspacePosition = (workspace: string) => {
+        controller.command('gcode', [`G10 L20 ${workspace} X0 Y0 Z0`, '$#']);
     };
 
     const value: ConfigContextValue = {
@@ -163,7 +206,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         updateConfig,
         updatePosition,
         applyConfig,
-        useCurrent,
+        setWorkspacePosition,
         isApplying,
         progress,
         status,

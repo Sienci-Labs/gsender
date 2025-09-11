@@ -11,14 +11,11 @@ import { Label } from 'app/components/shadcn/label';
 import { Button } from 'app/components/Button';
 import { Progress } from 'app/components/shadcn/progress';
 import { PositionInput } from './PositionInput';
-import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
+import {
+    defaultPosition,
+    useConfigContext,
+} from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
-
-const defaultPosition = {
-    x: 0,
-    y: 0,
-    z: 0,
-};
 
 export const ConfigTab: React.FC = () => {
     const {
@@ -26,7 +23,7 @@ export const ConfigTab: React.FC = () => {
         updateConfig,
         updatePosition,
         applyConfig,
-        useCurrent,
+        setWorkspacePosition,
         isApplying,
         progress,
         status,
@@ -55,24 +52,20 @@ export const ConfigTab: React.FC = () => {
                 <CardContent>
                     <PositionInput
                         label="Tool Length Sensor Position"
-                        position={defaultPosition}
+                        position={config.tlsPosition}
                         onPositionChange={(position) =>
                             updatePosition('toolLengthSensorPosition', position)
                         }
-                        onUseCurrent={() =>
-                            useCurrent('toolLengthSensorPosition')
-                        }
+                        onUseCurrent={() => setWorkspacePosition('P7')}
                     />
 
                     <PositionInput
                         label="Manual Tool Load Position"
-                        position={defaultPosition}
+                        position={config.manualLoadPosition}
                         onPositionChange={(position) =>
                             updatePosition('manualToolLoadPosition', position)
                         }
-                        onUseCurrent={() =>
-                            useCurrent('manualToolLoadPosition')
-                        }
+                        onUseCurrent={() => setWorkspacePosition('P8')}
                     />
 
                     <div className="space-y-1">
@@ -214,16 +207,14 @@ export const ConfigTab: React.FC = () => {
                         <div className="flex-1">
                             <PositionInput
                                 label="Slot 1 Position"
-                                position={defaultPosition}
+                                position={config.slot1Position}
                                 onPositionChange={(position) =>
                                     updatePosition(
                                         'toolRack.slot1Position',
                                         position,
                                     )
                                 }
-                                onUseCurrent={() =>
-                                    useCurrent('toolRack.slot1Position')
-                                }
+                                onUseCurrent={() => setWorkspacePosition('P9')}
                                 disabled={config.toolRack.enabled !== 1}
                             />
                         </div>
