@@ -252,7 +252,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     };
 
     const message: Message = {
-        START: 'Start',
+        START: 'Cycle',
         PAUSE: 'Pause',
         STOP: 'Stop',
     };
@@ -287,7 +287,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             !disabled && type === STOP,
                     },
                 )}
-                title={type}
+                title={type === START ? 'Cycle' : type}
                 onClick={onClick[type]}
                 disabled={disabled}
             >
