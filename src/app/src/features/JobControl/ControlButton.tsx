@@ -65,12 +65,15 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
         const currentActiveState = reduxActiveState || activeState;
         const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
-        
-        return (
-            currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+
+        if (
             currentActiveState === GRBL_ACTIVE_STATE_HOLD ||
             (repurposeDoorAsPause && currentActiveState === GRBL_ACTIVE_STATE_DOOR)
-        );
+        ) {
+            return true;
+        }
+
+        return fileLoaded && currentActiveState === GRBL_ACTIVE_STATE_IDLE;
     }
 
     function canPause(
@@ -94,15 +97,22 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     }
 
     const isDisabled = (): boolean => {
-        if (!isConnected || !fileLoaded) {
+        if (!isConnected) {
             return true;
-        } else if (
-            (type === START && canRun()) ||
-            (type === PAUSE && canPause()) ||
-            (type === STOP && canStop())
-        ) {
-            return false;
         }
+
+        if (type === START) {
+            return !canRun();
+        }
+
+        if (type === PAUSE) {
+            return !canPause();
+        }
+
+        if (type === STOP) {
+            return !canStop();
+        }
+
         return true;
     };
 
@@ -111,22 +121,28 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             reduxStore.getState(),
             'connection.isConnected',
         );
-        const fileLoaded = get(reduxStore.getState(), 'file.fileLoaded');
         const activeState = get(
             reduxStore.getState(),
             'controller.state.status.activeState',
         );
         const workflow = get(reduxStore.getState(), 'controller.workflow');
 
-        if (!isConnected || !fileLoaded) {
+        if (!isConnected) {
             return true;
-        } else if (
-            (type === START && canRun(activeState)) ||
-            (type === PAUSE && canPause(activeState, workflow)) ||
-            (type === STOP && canStop(workflow))
-        ) {
-            return false;
         }
+
+        if (type === START) {
+            return !canRun(activeState);
+        }
+
+        if (type === PAUSE) {
+            return !canPause(activeState, workflow);
+        }
+
+        if (type === STOP) {
+            return !canStop(workflow);
+        }
+
         return true;
     };
 
@@ -212,14 +228,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 
     const handleRun = (): void => {
         const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
-        
-        console.assert(
-            includes(
-                [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
-                workflow.state,
-            ) || activeState === GRBL_ACTIVE_STATE_HOLD || 
-            (repurposeDoorAsPause && activeState === GRBL_ACTIVE_STATE_DOOR),
-        );
 
         if (
             workflow.state === WORKFLOW_STATE_PAUSED ||
@@ -230,7 +238,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             return;
         }
 
-        if (workflow.state === WORKFLOW_STATE_IDLE) {
+        if (fileLoaded && workflow.state === WORKFLOW_STATE_IDLE) {
             controller.command('gcode:start');
             return;
         }
