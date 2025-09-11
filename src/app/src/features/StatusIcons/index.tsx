@@ -56,7 +56,7 @@ const StatusIcons = () => {
 
     return (
         <div className="flex flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 max-sm:hidden">
-            <Tooltip content="Wireless CNC Controller">
+            <Tooltip content="Wireless Control">
                 <button
                     className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                     onClick={toggleRemoteModeDialog}
@@ -77,7 +77,7 @@ const StatusIcons = () => {
                     <FaRegKeyboard className="text-green-500 w-7 h-7" />
                 </Link>
             </Tooltip>
-            <Tooltip content="Gamepad">
+            <Tooltip content="Gamepad Shortcuts">
                 <Link
                     className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                     to={'/tools/gamepad'}
