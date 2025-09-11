@@ -179,9 +179,9 @@ export const ConfigTab: React.FC = () => {
                             'opacity-50 pointer-events-none',
                     )}
                 >
-                    <div className="space-y-3">
-                        <div className="flex w-full items-center gap-4">
-                            <Label className="flex-shrink-0 text-sm font-medium">
+                    <div className="flex items-end gap-4">
+                        <div className="flex flex-col items-center gap-2 justify-center">
+                            <Label className="text-sm font-medium">
                                 Number of Slots
                             </Label>
                             <Input
@@ -201,18 +201,20 @@ export const ConfigTab: React.FC = () => {
                             />
                         </div>
 
-                        <PositionInput
-                            label="Slot 1 Position"
-                            position={config.slot1Position}
-                            onPositionChange={(position) =>
-                                updatePosition(
-                                    'toolRack.slot1Position',
-                                    position,
-                                )
-                            }
-                            onUseCurrent={() => setWorkspacePosition('P9')}
-                            disabled={config.toolRack.enabled !== 1}
-                        />
+                        <div className="flex-1">
+                            <PositionInput
+                                label="Slot 1 Position"
+                                position={config.slot1Position}
+                                onPositionChange={(position) =>
+                                    updatePosition(
+                                        'toolRack.slot1Position',
+                                        position,
+                                    )
+                                }
+                                onUseCurrent={() => setWorkspacePosition('P9')}
+                                disabled={config.toolRack.enabled !== 1}
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-1">
