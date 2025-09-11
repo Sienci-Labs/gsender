@@ -65,6 +65,7 @@ const defaultState: State = {
         repurposeDoorAsPause: false,
         jobTimes: [],
         toolChange: {
+            numberOfTools: 8,
             passthrough: false,
             skipDialog: false,
         },
