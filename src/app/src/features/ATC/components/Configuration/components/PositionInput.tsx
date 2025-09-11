@@ -72,7 +72,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     className="h-8 text-xs px-3 flex flex-row gap-1 items-center"
                 >
                     <FiTarget className="h-4 w-4" />
-                    Grab Position
+                    Set Position
                 </Button>
             </div>
         </div>

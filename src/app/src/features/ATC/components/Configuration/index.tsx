@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'app/components/Button';
 import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
+import { DebugPanel } from 'app/features/ATC/components/Configuration/components/DebugPanel.tsx';
 
 export function ATCIConfiguration() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -20,6 +21,13 @@ export function ATCIConfiguration() {
             </div>
 
             <ConfigModal open={modalOpen} onOpenChange={setModalOpen} />
+
+            {/* Debug Panel - positioned next to modal when open */}
+            {modalOpen && (
+                <div className="fixed top-1/2 left-1/2 transform translate-x-[400px] -translate-y-1/2 z-[9999]">
+                    <DebugPanel />
+                </div>
+            )}
         </div>
     );
 }

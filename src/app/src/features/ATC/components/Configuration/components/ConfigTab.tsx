@@ -83,7 +83,7 @@ export const ConfigTab: React.FC = () => {
                                         config.offsetManagement
                                             .probeNewOffset === 1
                                     }
-                                    onCheckedChange={(checked) =>
+                                    onChange={(checked) =>
                                         updateConfig({
                                             offsetManagement: {
                                                 ...config.offsetManagement,
@@ -91,7 +91,6 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                             <div className="flex items-center justify-between">
@@ -103,7 +102,7 @@ export const ConfigTab: React.FC = () => {
                                         config.offsetManagement
                                             .useToolOffset === 1
                                     }
-                                    onCheckedChange={(checked) =>
+                                    onChange={(checked) =>
                                         updateConfig({
                                             offsetManagement: {
                                                 ...config.offsetManagement,
@@ -111,7 +110,6 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                             <div className="flex items-center justify-between">
@@ -123,7 +121,7 @@ export const ConfigTab: React.FC = () => {
                                         config.offsetManagement
                                             .verifyToolLength === 1
                                     }
-                                    onCheckedChange={(checked) =>
+                                    onChange={(checked) =>
                                         updateConfig({
                                             offsetManagement: {
                                                 ...config.offsetManagement,
@@ -133,7 +131,6 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                         </div>
@@ -148,7 +145,7 @@ export const ConfigTab: React.FC = () => {
                         Tool Rack
                         <Switch
                             checked={config.toolRack.enabled === 1}
-                            onCheckedChange={(checked) =>
+                            onChange={(checked) =>
                                 updateConfig({
                                     toolRack: {
                                         ...config.toolRack,
@@ -156,7 +153,6 @@ export const ConfigTab: React.FC = () => {
                                     },
                                 })
                             }
-                            className="data-[state=checked]:bg-blue-500"
                         />
                     </CardTitle>
                 </CardHeader>
@@ -215,7 +211,7 @@ export const ConfigTab: React.FC = () => {
                                             config.toolRack.offsetManagement
                                                 .probeNewOffset === 1
                                         }
-                                        onCheckedChange={(checked) =>
+                                        onChange={(checked) =>
                                             updateConfig({
                                                 toolRack: {
                                                     ...config.toolRack,
@@ -229,7 +225,6 @@ export const ConfigTab: React.FC = () => {
                                                 },
                                             })
                                         }
-                                        className="data-[state=checked]:bg-blue-500"
                                     />
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -241,7 +236,7 @@ export const ConfigTab: React.FC = () => {
                                             config.toolRack.offsetManagement
                                                 .useToolOffset === 1
                                         }
-                                        onCheckedChange={(checked) =>
+                                        onChange={(checked) =>
                                             updateConfig({
                                                 toolRack: {
                                                     ...config.toolRack,
@@ -255,7 +250,6 @@ export const ConfigTab: React.FC = () => {
                                                 },
                                             })
                                         }
-                                        className="data-[state=checked]:bg-blue-500"
                                     />
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -267,7 +261,7 @@ export const ConfigTab: React.FC = () => {
                                             config.toolRack.offsetManagement
                                                 .verifyToolLength === 1
                                         }
-                                        onCheckedChange={(checked) =>
+                                        onChange={(checked) =>
                                             updateConfig({
                                                 toolRack: {
                                                     ...config.toolRack,
@@ -280,7 +274,6 @@ export const ConfigTab: React.FC = () => {
                                                 },
                                             })
                                         }
-                                        className="data-[state=checked]:bg-blue-500"
                                     />
                                 </div>
                             </div>
@@ -301,7 +294,7 @@ export const ConfigTab: React.FC = () => {
                         </Label>
                         <Switch
                             checked={config.advanced.checkPressure === 1}
-                            onCheckedChange={(checked) =>
+                            onChange={(checked) =>
                                 updateConfig({
                                     advanced: {
                                         ...config.advanced,
@@ -309,7 +302,6 @@ export const ConfigTab: React.FC = () => {
                                     },
                                 })
                             }
-                            className="data-[state=checked]:bg-blue-500"
                         />
                     </div>
                     <div className="flex items-center justify-between">
@@ -318,7 +310,7 @@ export const ConfigTab: React.FC = () => {
                         </Label>
                         <Switch
                             checked={config.advanced.checkToolPresence === 1}
-                            onCheckedChange={(checked) =>
+                            onChange={(checked) =>
                                 updateConfig({
                                     advanced: {
                                         ...config.advanced,
@@ -326,7 +318,6 @@ export const ConfigTab: React.FC = () => {
                                     },
                                 })
                             }
-                            className="data-[state=checked]:bg-blue-500"
                         />
                     </div>
                 </CardContent>

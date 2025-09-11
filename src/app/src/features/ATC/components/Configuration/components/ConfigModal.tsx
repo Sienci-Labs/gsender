@@ -8,6 +8,7 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
+import { DebugPanel } from 'app/features/ATC/components/Configuration/components/DebugPanel.tsx';
 
 interface ConfigModalProps {
     open: boolean;
@@ -22,22 +23,22 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-2/5 overflow-y-auto">
+            <DialogContent className="w-2/5 overflow-y-auto min-h-[85vh] flex flex-col">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="w-full"
+                    className="w-full flex flex-col flex-1"
                 >
-                    <TabsList className="grid w-full grid-cols-2">
+                    <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
                         <TabsTrigger value="config">ATCI Config</TabsTrigger>
                         <TabsTrigger value="templates">Templates</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="config" className="space-y-0">
+                    <TabsContent value="config" className="flex-1 mt-4">
                         <ConfigTab />
                     </TabsContent>
 
-                    <TabsContent value="templates" className="">
+                    <TabsContent value="templates" className="flex-1 mt-4">
                         <TemplatesTab />
                     </TabsContent>
                 </Tabs>
