@@ -22,7 +22,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-2/5 overflow-y-auto h-[80vh] flex flex-col">
+            <DialogContent className="w-2/5 overflow-y-auto h-[85vh] flex flex-col">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}

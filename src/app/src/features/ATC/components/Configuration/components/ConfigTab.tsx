@@ -97,7 +97,6 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                             <div
@@ -335,6 +334,30 @@ export const ConfigTab: React.FC = () => {
                                         config.toolRack.enabled !== 1 ||
                                         config.toolRack.offsetManagement
                                             .probeNewOffset !== 1
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <Label className="text-sm font-medium">Advanced</Label>
+                        <div className="space-y-1.5 pl-4">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs">
+                                    Retain tool table settings when rack removed
+                                </Label>
+                                <Switch
+                                    checked={
+                                        config.offsetManagement
+                                            .probeNewOffset === 1
+                                    }
+                                    onChange={(checked) =>
+                                        updateConfig({
+                                            offsetManagement: {
+                                                ...config.offsetManagement,
+                                                probeNewOffset: checked ? 1 : 0,
+                                            },
+                                        })
                                     }
                                 />
                             </div>
