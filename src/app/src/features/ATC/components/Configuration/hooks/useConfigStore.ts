@@ -68,6 +68,7 @@ export const useConfigStore = () => {
             ...prev,
             ...updates,
         }));
+        console.log(config);
     };
 
     const updatePosition = (

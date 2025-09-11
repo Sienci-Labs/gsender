@@ -156,130 +156,139 @@ export const ConfigTab: React.FC = () => {
                         />
                     </CardTitle>
                 </CardHeader>
-                {config.toolRack.enabled === 1 && (
-                    <CardContent className="space-y-1">
-                        <div className="flex items-end gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium">
-                                    Number of Racks
+                <CardContent
+                    className={cn(
+                        'space-y-1',
+                        config.toolRack.enabled !== 1 &&
+                            'opacity-50 pointer-events-none',
+                    )}
+                >
+                    <div className="flex items-end gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium">
+                                Number of Racks
+                            </Label>
+                            <Input
+                                type="number"
+                                value={config.toolRack.numberOfRacks}
+                                onChange={(e) =>
+                                    updateConfig({
+                                        toolRack: {
+                                            ...config.toolRack,
+                                            numberOfRacks:
+                                                parseInt(e.target.value) || 0,
+                                        },
+                                    })
+                                }
+                                className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                disabled={config.toolRack.enabled !== 1}
+                            />
+                        </div>
+
+                        <div className="flex-1">
+                            <PositionInput
+                                label="Slot 1 Position"
+                                position={config.toolRack.slot1Position}
+                                onPositionChange={(position) =>
+                                    updatePosition(
+                                        'toolRack.slot1Position',
+                                        position,
+                                    )
+                                }
+                                onUseCurrent={() =>
+                                    useCurrent('toolRack.slot1Position')
+                                }
+                                disabled={config.toolRack.enabled !== 1}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <Label className="text-sm font-medium">
+                            Offset Management
+                        </Label>
+                        <div className="space-y-1.5 pl-4">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs">
+                                    Probe new offset when tool changing
                                 </Label>
-                                <Input
-                                    type="number"
-                                    value={config.toolRack.numberOfRacks}
-                                    onChange={(e) =>
+                                <Switch
+                                    checked={
+                                        config.toolRack.offsetManagement
+                                            .probeNewOffset === 1
+                                    }
+                                    onChange={(checked) =>
                                         updateConfig({
                                             toolRack: {
                                                 ...config.toolRack,
-                                                numberOfRacks:
-                                                    parseInt(e.target.value) ||
-                                                    0,
+                                                offsetManagement: {
+                                                    ...config.toolRack
+                                                        .offsetManagement,
+                                                    probeNewOffset: checked
+                                                        ? 1
+                                                        : 0,
+                                                },
                                             },
                                         })
                                     }
-                                    className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                    disabled={config.toolRack.enabled !== 1}
                                 />
                             </div>
-
-                            <div className="flex-1">
-                                <PositionInput
-                                    label="Slot 1 Position"
-                                    position={config.toolRack.slot1Position}
-                                    onPositionChange={(position) =>
-                                        updatePosition(
-                                            'toolRack.slot1Position',
-                                            position,
-                                        )
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs">
+                                    Use tool table offset
+                                </Label>
+                                <Switch
+                                    checked={
+                                        config.toolRack.offsetManagement
+                                            .useToolOffset === 1
                                     }
-                                    onUseCurrent={() =>
-                                        useCurrent('toolRack.slot1Position')
+                                    onChange={(checked) =>
+                                        updateConfig({
+                                            toolRack: {
+                                                ...config.toolRack,
+                                                offsetManagement: {
+                                                    ...config.toolRack
+                                                        .offsetManagement,
+                                                    useToolOffset: checked
+                                                        ? 1
+                                                        : 0,
+                                                },
+                                            },
+                                        })
                                     }
+                                    disabled={config.toolRack.enabled !== 1}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-xs">
+                                    Verify tool length changes
+                                </Label>
+                                <Switch
+                                    checked={
+                                        config.toolRack.offsetManagement
+                                            .verifyToolLength === 1
+                                    }
+                                    onChange={(checked) =>
+                                        updateConfig({
+                                            toolRack: {
+                                                ...config.toolRack,
+                                                offsetManagement: {
+                                                    ...config.toolRack
+                                                        .offsetManagement,
+                                                    verifyToolLength: checked
+                                                        ? 1
+                                                        : 0,
+                                                },
+                                            },
+                                        })
+                                    }
+                                    disabled={config.toolRack.enabled !== 1}
                                 />
                             </div>
                         </div>
-
-                        <div className="space-y-1">
-                            <Label className="text-sm font-medium">
-                                Offset Management
-                            </Label>
-                            <div className="space-y-1.5 pl-4">
-                                <div className="flex items-center justify-between">
-                                    <Label className="text-xs">
-                                        Probe new offset when tool changing
-                                    </Label>
-                                    <Switch
-                                        checked={
-                                            config.toolRack.offsetManagement
-                                                .probeNewOffset === 1
-                                        }
-                                        onChange={(checked) =>
-                                            updateConfig({
-                                                toolRack: {
-                                                    ...config.toolRack,
-                                                    offsetManagement: {
-                                                        ...config.toolRack
-                                                            .offsetManagement,
-                                                        probeNewOffset: checked
-                                                            ? 1
-                                                            : 0,
-                                                    },
-                                                },
-                                            })
-                                        }
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <Label className="text-xs">
-                                        Use tool table offset
-                                    </Label>
-                                    <Switch
-                                        checked={
-                                            config.toolRack.offsetManagement
-                                                .useToolOffset === 1
-                                        }
-                                        onChange={(checked) =>
-                                            updateConfig({
-                                                toolRack: {
-                                                    ...config.toolRack,
-                                                    offsetManagement: {
-                                                        ...config.toolRack
-                                                            .offsetManagement,
-                                                        useToolOffset: checked
-                                                            ? 1
-                                                            : 0,
-                                                    },
-                                                },
-                                            })
-                                        }
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <Label className="text-xs">
-                                        Verify tool length changes
-                                    </Label>
-                                    <Switch
-                                        checked={
-                                            config.toolRack.offsetManagement
-                                                .verifyToolLength === 1
-                                        }
-                                        onChange={(checked) =>
-                                            updateConfig({
-                                                toolRack: {
-                                                    ...config.toolRack,
-                                                    offsetManagement: {
-                                                        ...config.toolRack
-                                                            .offsetManagement,
-                                                        verifyToolLength:
-                                                            checked ? 1 : 0,
-                                                    },
-                                                },
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                )}
+                    </div>
+                </CardContent>
             </Card>
 
             {/* Advanced Section */}
