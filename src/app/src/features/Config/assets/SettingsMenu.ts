@@ -1221,6 +1221,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
+                        label: 'Number of Tools',
+                        type: 'select',
+                        key: 'workspace.toolChange.numberOfTools',
+                        description:
+                            'Number of tools available for selection in the tool dialog (1-20).',
+                        options: Array.from({length: 20}, (_, i) => i + 1),
+                    },
+                    {
                         label: 'Passthrough',
                         type: 'boolean',
                         key: 'workspace.toolChange.passthrough',
