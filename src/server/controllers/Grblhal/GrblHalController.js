@@ -1748,14 +1748,14 @@ class GrblHalController {
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
                         this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
-                        this.workflow.resume();
-                        this.feederCB = null;
+                        //this.workflow.resume();
+                        //this.feederCB = null;
                     };
                     this.event.trigger(PROGRAM_RESUME);
                 } else {
                     this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
                     await delay(1000);
-                    this.workflow.resume();
+                    //this.workflow.resume();
                 }
             },
             'feeder:feed': () => {

@@ -221,17 +221,18 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             (repurposeDoorAsPause && activeState === GRBL_ACTIVE_STATE_DOOR),
         );
 
-        if (workflow.state === WORKFLOW_STATE_IDLE) {
-            controller.command('gcode:start');
-            return;
-        }
-
         if (
             workflow.state === WORKFLOW_STATE_PAUSED ||
             activeState === GRBL_ACTIVE_STATE_HOLD ||
             (repurposeDoorAsPause && activeState === GRBL_ACTIVE_STATE_DOOR)
         ) {
             controller.command('gcode:resume');
+            return;
+        }
+
+        if (workflow.state === WORKFLOW_STATE_IDLE) {
+            controller.command('gcode:start');
+            return;
         }
     };
     const handlePause = (): void => {
