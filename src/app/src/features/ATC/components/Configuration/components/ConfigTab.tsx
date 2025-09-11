@@ -11,7 +11,7 @@ import { Label } from 'app/components/shadcn/label';
 import { Button } from 'app/components/Button';
 import { Progress } from 'app/components/shadcn/progress';
 import { PositionInput } from './PositionInput';
-import { useConfigStore } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
+import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
 
 export const ConfigTab: React.FC = () => {
@@ -24,7 +24,7 @@ export const ConfigTab: React.FC = () => {
         isApplying,
         progress,
         status,
-    } = useConfigStore();
+    } = useConfigContext();
 
     const getStatusColor = () => {
         switch (status.type) {
@@ -91,6 +91,7 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
+                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                             <div className="flex items-center justify-between">
@@ -110,6 +111,7 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
+                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                             <div className="flex items-center justify-between">
@@ -131,6 +133,7 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
+                                    className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Position {
     x: number;
@@ -6,55 +6,83 @@ export interface Position {
     z: number;
 }
 
+export interface OffsetManagement {
+    probeNewOffset: number;
+    useToolOffset: number;
+    verifyToolLength: number;
+}
+
+export interface ToolRack {
+    enabled: number;
+    numberOfRacks: number;
+    slot1Position: Position;
+    offsetManagement: OffsetManagement;
+}
+
+export interface Advanced {
+    checkPressure: number;
+    checkToolPresence: number;
+}
+
 export interface ConfigState {
     toolLengthSensorPosition: Position;
     manualToolLoadPosition: Position;
-    offsetManagement: {
-        probeNewOffset: number;
-        useToolOffset: number;
-        verifyToolLength: number;
-    };
-    toolRack: {
-        enabled: number;
-        numberOfRacks: number;
-        slot1Position: Position;
-        offsetManagement: {
-            probeNewOffset: number;
-            useToolOffset: number;
-            verifyToolLength: number;
-        };
-    };
-    advanced: {
-        checkPressure: number;
-        checkToolPresence: number;
-    };
+    offsetManagement: OffsetManagement;
+    toolRack: ToolRack;
+    advanced: Advanced;
 }
 
 const defaultConfig: ConfigState = {
-    toolLengthSensorPosition: { x: 625.7, y: -27.4, z: -175.4 },
-    manualToolLoadPosition: { x: 625.7, y: -27.4, z: -175.4 },
+    toolLengthSensorPosition: { x: 0, y: 0, z: 0 },
+    manualToolLoadPosition: { x: 0, y: 0, z: 0 },
     offsetManagement: {
-        probeNewOffset: 1,
+        probeNewOffset: 0,
         useToolOffset: 0,
         verifyToolLength: 0,
     },
     toolRack: {
-        enabled: 1,
-        numberOfRacks: 8,
-        slot1Position: { x: 625.7, y: -27.4, z: -175.4 },
+        enabled: 0,
+        numberOfRacks: 1,
+        slot1Position: { x: 0, y: 0, z: 0 },
         offsetManagement: {
-            probeNewOffset: 1,
-            useToolOffset: 1,
+            probeNewOffset: 0,
+            useToolOffset: 0,
             verifyToolLength: 0,
         },
     },
     advanced: {
-        checkPressure: 1,
-        checkToolPresence: 1,
+        checkPressure: 0,
+        checkToolPresence: 0,
     },
 };
 
-export const useConfigStore = () => {
+interface ConfigContextValue {
+    config: ConfigState;
+    updateConfig: (updates: Partial<ConfigState>) => void;
+    updatePosition: (
+        path:
+            | 'toolLengthSensorPosition'
+            | 'manualToolLoadPosition'
+            | 'toolRack.slot1Position',
+        position: Position,
+    ) => void;
+    applyConfig: () => Promise<void>;
+    useCurrent: (path: string) => void;
+    isApplying: boolean;
+    progress: number;
+    status: {
+        type: 'idle' | 'success' | 'error' | 'warning';
+        message: string;
+    };
+}
+
+const ConfigContext = createContext<ConfigContextValue | undefined>(undefined);
+
+interface ConfigProviderProps {
+    children: ReactNode;
+}
+
+export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const [config, setConfig] = useState<ConfigState>(defaultConfig);
     const [isApplying, setIsApplying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -136,7 +164,7 @@ export const useConfigStore = () => {
         }, 2000);
     };
 
-    return {
+    const value: ConfigContextValue = {
         config,
         updateConfig,
         updatePosition,
@@ -146,4 +174,18 @@ export const useConfigStore = () => {
         progress,
         status,
     };
+
+    return (
+        <ConfigContext.Provider value={value}>
+            {children}
+        </ConfigContext.Provider>
+    );
+};
+
+export const useConfigContext = (): ConfigContextValue => {
+    const context = useContext(ConfigContext);
+    if (context === undefined) {
+        throw new Error('useConfigContext must be used within a ConfigProvider');
+    }
+    return context;
 };

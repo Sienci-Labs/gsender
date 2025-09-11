@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
 } from 'app/components/shadcn/card';
-import { useConfigStore } from '../hooks/useConfigStore';
+import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 
 export const DebugPanel: React.FC = () => {
-    const { config } = useConfigStore();
+    const { config } = useConfigContext();
 
     return (
         <div
