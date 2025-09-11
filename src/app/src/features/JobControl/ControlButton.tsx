@@ -245,8 +245,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         }
     };
     const handleStop = (): void => {
+        const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
         onStop();
-        controller.command('gcode:stop', { force: true });
+        controller.command('gcode:stop', { force: true, repurposeDoorAsPause });
     };
 
     const message: Message = {

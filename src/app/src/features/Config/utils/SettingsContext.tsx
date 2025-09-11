@@ -97,7 +97,11 @@ export function useSettings() {
 }
 
 function fetchStoreValue(key: string) {
-    return store.get(key);
+    const value = store.get(key);
+    if (key === 'workspace.repurposeDoorAsPause') {
+        console.log(`Loading from store: ${key} = ${value}`);
+    }
+    return value;
 }
 
 function fetchDefaultValue(key: string) {

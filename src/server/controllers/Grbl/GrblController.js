@@ -1604,9 +1604,17 @@ class GrblController {
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
-                    this.write('!'); // hold
+                    const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
+                    log.info(`Stop command: repurposeDoorAsPause = ${repurposeDoorAsPause}`);
 
-                    await delay(700); // delay 700ms
+                    if (repurposeDoorAsPause) {
+                        this.write('\x84'); // door trigger
+                        await delay(5000); // delay 5 seconds for door trigger
+                    } else {
+                        this.write('!'); // hold
+                        await delay(700); // delay 700ms for feed hold
+                    }
+
                     this.write('\x18'); // ^x
                     // Handle resetting workspace after stop back to selected one
                     if (wcs !== 'G54') {

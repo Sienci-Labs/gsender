@@ -146,6 +146,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Reconnect to the last machine you used automatically when you open gSender.',
                     },
                     {
+                        label: 'Repurpose Door as Pause',
+                        key: 'workspace.repurposeDoorAsPause',
+                        type: 'boolean',
+                        defaultValue: false,
+                        description:
+                            'When enabled, Door status will be displayed as "Pause" instead of "Door". Useful for woodworking CNCs that don\'t use an enclosure door.',
+                        hidden: () => {
+                            return !controller.portOpen;
+                        },
+                    },
+                    {
                         label: 'Firmware fallback',
                         type: 'select',
                         key: 'workspace.defaultFirmware',
@@ -1428,17 +1439,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$484' },
                     { type: 'eeprom', eID: '$486' },
                     { type: 'eeprom', eID: '$666' },
-                    {
-                        label: 'Repurpose Door as Pause',
-                        key: 'workspace.repurposeDoorAsPause',
-                        type: 'boolean',
-                        defaultValue: false,
-                        description:
-                            'When enabled, Door status will be displayed as "Pause" instead of "Door". Useful for woodworking CNCs that don\'t use an enclosure door.',
-                        hidden: () => {
-                            return !controller.portOpen;
-                        },
-                    },
                 ],
             },
         ],

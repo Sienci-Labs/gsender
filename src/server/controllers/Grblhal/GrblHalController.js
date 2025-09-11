@@ -1703,13 +1703,17 @@ class GrblHalController {
                 clearInterval(this.programResumeTimeout);
 
                 const [options] = args;
-                const { force = false } = { ...options };
+                const { force = false, repurposeDoorAsPause = false } = { ...options };
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
-                    this.write('!'); // hold
-
-                    await delay(700); // delay 700ms
+                    if (repurposeDoorAsPause) {
+                        this.write('\x84');
+                        await delay(2000);
+                    } else {
+                        this.write('!');
+                        await delay(700);
+                    }
                     this.write('\x18'); // ^x
                     // Handle resetting workspace after stop back to selected one
                     if (wcs !== 'G54') {

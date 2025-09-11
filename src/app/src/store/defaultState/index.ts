@@ -62,6 +62,7 @@ const defaultState: State = {
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
         sendUsageData: false,
+        repurposeDoorAsPause: false,
         jobTimes: [],
         toolChange: {
             passthrough: false,
