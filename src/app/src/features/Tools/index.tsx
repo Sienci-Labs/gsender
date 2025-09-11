@@ -12,7 +12,7 @@ import { ATCWidget } from 'app/features/ATC';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 
-interface TabItem {
+export interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
 }

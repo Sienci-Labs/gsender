@@ -4,6 +4,7 @@ import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ATCUnavailable } from 'app/features/ATC/components/ATCUnavailable.tsx';
 import { Disconnected } from 'app/features/ATC/components/Disconnected.tsx';
+import { ATCIConfiguration } from 'app/features/ATC/components/Configuration';
 
 export function ATC() {
     const { atcAvailable, connected } = useToolChange();
@@ -23,6 +24,7 @@ export function ATC() {
                 <div>
                     <ToolDisplay />
                 </div>
+                <ATCIConfiguration />
                 <AdvancedOptions />
             </div>
         </div>
