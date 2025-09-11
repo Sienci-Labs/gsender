@@ -40,7 +40,7 @@ export const ConfigTab: React.FC = () => {
     };
 
     return (
-        <div className="space-y-3 flex flex-col h-full">
+        <div className="space-y-1 flex flex-col h-full">
             {/* General Section */}
             <Card className="border border-border p-0">
                 <CardHeader className="pb-2">
