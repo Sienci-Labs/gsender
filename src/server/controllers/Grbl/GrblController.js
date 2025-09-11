@@ -1605,7 +1605,6 @@ class GrblController {
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
                     const repurposeDoorAsPause = store.get('workspace.repurposeDoorAsPause', false);
-                    log.info(`Stop command: repurposeDoorAsPause = ${repurposeDoorAsPause}`);
 
                     if (repurposeDoorAsPause) {
                         this.write('\x84'); // door trigger
