@@ -15,7 +15,6 @@ export interface OffsetManagement {
 export interface ToolRack {
     enabled: number;
     numberOfRacks: number;
-    slot1Position: Position;
     offsetManagement: OffsetManagement;
 }
 
@@ -25,16 +24,12 @@ export interface Advanced {
 }
 
 export interface ConfigState {
-    toolLengthSensorPosition: Position;
-    manualToolLoadPosition: Position;
     offsetManagement: OffsetManagement;
     toolRack: ToolRack;
     advanced: Advanced;
 }
 
 const defaultConfig: ConfigState = {
-    toolLengthSensorPosition: { x: 0, y: 0, z: 0 },
-    manualToolLoadPosition: { x: 0, y: 0, z: 0 },
     offsetManagement: {
         probeNewOffset: 0,
         useToolOffset: 0,
@@ -43,7 +38,6 @@ const defaultConfig: ConfigState = {
     toolRack: {
         enabled: 0,
         numberOfRacks: 1,
-        slot1Position: { x: 0, y: 0, z: 0 },
         offsetManagement: {
             probeNewOffset: 0,
             useToolOffset: 0,
@@ -185,7 +179,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 export const useConfigContext = (): ConfigContextValue => {
     const context = useContext(ConfigContext);
     if (context === undefined) {
-        throw new Error('useConfigContext must be used within a ConfigProvider');
+        throw new Error(
+            'useConfigContext must be used within a ConfigProvider',
+        );
     }
     return context;
 };

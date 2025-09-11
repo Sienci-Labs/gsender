@@ -14,6 +14,12 @@ import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
 
+const defaultPosition = {
+    x: 0,
+    y: 0,
+    z: 0,
+};
+
 export const ConfigTab: React.FC = () => {
     const {
         config,
@@ -49,7 +55,7 @@ export const ConfigTab: React.FC = () => {
                 <CardContent>
                     <PositionInput
                         label="Tool Length Sensor Position"
-                        position={config.toolLengthSensorPosition}
+                        position={defaultPosition}
                         onPositionChange={(position) =>
                             updatePosition('toolLengthSensorPosition', position)
                         }
@@ -60,7 +66,7 @@ export const ConfigTab: React.FC = () => {
 
                     <PositionInput
                         label="Manual Tool Load Position"
-                        position={config.manualToolLoadPosition}
+                        position={defaultPosition}
                         onPositionChange={(position) =>
                             updatePosition('manualToolLoadPosition', position)
                         }
@@ -94,7 +100,13 @@ export const ConfigTab: React.FC = () => {
                                     className="data-[state=checked]:bg-blue-500"
                                 />
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div
+                                className={cn(
+                                    'flex items-center justify-between',
+                                    config.offsetManagement.probeNewOffset !==
+                                        1 && 'opacity-50',
+                                )}
+                            >
                                 <Label className="text-xs">
                                     Use tool table offset
                                 </Label>
@@ -111,10 +123,19 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
+                                    disabled={
+                                        config.offsetManagement
+                                            .probeNewOffset !== 1
+                                    }
                                 />
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div
+                                className={cn(
+                                    'flex items-center justify-between',
+                                    config.offsetManagement.probeNewOffset !==
+                                        1 && 'opacity-50',
+                                )}
+                            >
                                 <Label className="text-xs">
                                     Verify tool length changes
                                 </Label>
@@ -133,7 +154,10 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    className="data-[state=checked]:bg-blue-500"
+                                    disabled={
+                                        config.offsetManagement
+                                            .probeNewOffset !== 1
+                                    }
                                 />
                             </div>
                         </div>
@@ -191,7 +215,7 @@ export const ConfigTab: React.FC = () => {
                         <div className="flex-1">
                             <PositionInput
                                 label="Slot 1 Position"
-                                position={config.toolRack.slot1Position}
+                                position={defaultPosition}
                                 onPositionChange={(position) =>
                                     updatePosition(
                                         'toolRack.slot1Position',
@@ -237,7 +261,15 @@ export const ConfigTab: React.FC = () => {
                                     disabled={config.toolRack.enabled !== 1}
                                 />
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div
+                                className={cn(
+                                    'flex items-center justify-between',
+                                    (config.toolRack.enabled !== 1 ||
+                                        config.toolRack.offsetManagement
+                                            .probeNewOffset !== 1) &&
+                                        'opacity-50',
+                                )}
+                            >
                                 <Label className="text-xs">
                                     Use tool table offset
                                 </Label>
@@ -260,10 +292,22 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    disabled={config.toolRack.enabled !== 1}
+                                    disabled={
+                                        config.toolRack.enabled !== 1 ||
+                                        config.toolRack.offsetManagement
+                                            .probeNewOffset !== 1
+                                    }
                                 />
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div
+                                className={cn(
+                                    'flex items-center justify-between',
+                                    (config.toolRack.enabled !== 1 ||
+                                        config.toolRack.offsetManagement
+                                            .probeNewOffset !== 1) &&
+                                        'opacity-50',
+                                )}
+                            >
                                 <Label className="text-xs">
                                     Verify tool length changes
                                 </Label>
@@ -286,7 +330,12 @@ export const ConfigTab: React.FC = () => {
                                             },
                                         })
                                     }
-                                    disabled={config.toolRack.enabled !== 1}
+                                    className="data-[state=checked]:bg-blue-500"
+                                    disabled={
+                                        config.toolRack.enabled !== 1 ||
+                                        config.toolRack.offsetManagement
+                                            .probeNewOffset !== 1
+                                    }
                                 />
                             </div>
                         </div>
