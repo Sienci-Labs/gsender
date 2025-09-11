@@ -34,6 +34,7 @@ export interface ToolRack {
     enabled: number;
     numberOfRacks: number;
     offsetManagement: OffsetManagement;
+    retainToolSettings: number;
 }
 
 export interface Advanced {
@@ -64,6 +65,7 @@ const defaultConfig: ConfigState = {
             useToolOffset: 0,
             verifyToolLength: 0,
         },
+        retainToolSettings: 0,
     },
     advanced: {
         checkPressure: 0,

@@ -339,14 +339,15 @@ export const ConfigTab: React.FC = () => {
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.offsetManagement
-                                            .probeNewOffset === 1
+                                        config.toolRack.retainToolSettings === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                probeNewOffset: checked ? 1 : 0,
+                                            toolRack: {
+                                                ...config.toolRack,
+                                                retainToolSettings: checked
+                                                    ? 1
+                                                    : 0,
                                             },
                                         })
                                     }
