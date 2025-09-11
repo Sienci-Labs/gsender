@@ -231,20 +231,13 @@ export const ConfigTab: React.FC = () => {
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.toolRack.offsetManagement
-                                            .probeNewOffset === 1
+                                        config.toolRack.probeNewOffset === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
                                             toolRack: {
                                                 ...config.toolRack,
-                                                offsetManagement: {
-                                                    ...config.toolRack
-                                                        .offsetManagement,
-                                                    probeNewOffset: checked
-                                                        ? 1
-                                                        : 0,
-                                                },
+                                                probeNewOffset: checked ? 1 : 0,
                                             },
                                         })
                                     }
@@ -255,8 +248,7 @@ export const ConfigTab: React.FC = () => {
                                 className={cn(
                                     'flex items-center justify-between',
                                     (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.offsetManagement
-                                            .probeNewOffset !== 1) &&
+                                        config.toolRack.probeNewOffset !== 1) &&
                                         'opacity-50',
                                 )}
                             >
@@ -265,27 +257,19 @@ export const ConfigTab: React.FC = () => {
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.toolRack.offsetManagement
-                                            .useToolOffset === 1
+                                        config.toolRack.useToolOffset === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
                                             toolRack: {
                                                 ...config.toolRack,
-                                                offsetManagement: {
-                                                    ...config.toolRack
-                                                        .offsetManagement,
-                                                    useToolOffset: checked
-                                                        ? 1
-                                                        : 0,
-                                                },
+                                                useToolOffset: checked ? 1 : 0,
                                             },
                                         })
                                     }
                                     disabled={
                                         config.toolRack.enabled !== 1 ||
-                                        config.toolRack.offsetManagement
-                                            .probeNewOffset !== 1
+                                        config.toolRack.probeNewOffset !== 1
                                     }
                                 />
                             </div>
@@ -293,8 +277,7 @@ export const ConfigTab: React.FC = () => {
                                 className={cn(
                                     'flex items-center justify-between',
                                     (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.offsetManagement
-                                            .probeNewOffset !== 1) &&
+                                        config.toolRack.probeNewOffset !== 1) &&
                                         'opacity-50',
                                 )}
                             >
@@ -303,28 +286,22 @@ export const ConfigTab: React.FC = () => {
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.toolRack.offsetManagement
-                                            .verifyToolLength === 1
+                                        config.toolRack.verifyToolLength === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
                                             toolRack: {
                                                 ...config.toolRack,
-                                                offsetManagement: {
-                                                    ...config.toolRack
-                                                        .offsetManagement,
-                                                    verifyToolLength: checked
-                                                        ? 1
-                                                        : 0,
-                                                },
+                                                verifyToolLength: checked
+                                                    ? 1
+                                                    : 0,
                                             },
                                         })
                                     }
                                     className="data-[state=checked]:bg-blue-500"
                                     disabled={
                                         config.toolRack.enabled !== 1 ||
-                                        config.toolRack.offsetManagement
-                                            .probeNewOffset !== 1
+                                        config.toolRack.probeNewOffset !== 1
                                     }
                                 />
                             </div>

@@ -12,7 +12,7 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import mapValues from 'lodash/mapValues';
 
-export const defaultPosition = {
+export const defaultPosition: Position = {
     x: 0,
     y: 0,
     z: 0,
@@ -30,10 +30,9 @@ export interface OffsetManagement {
     verifyToolLength: number;
 }
 
-export interface ToolRack {
+export interface ToolRack extends OffsetManagement {
     enabled: number;
     numberOfRacks: number;
-    offsetManagement: OffsetManagement;
     retainToolSettings: number;
 }
 
@@ -51,20 +50,18 @@ export interface ConfigState {
     slot1Position: Position;
 }
 
-const defaultConfig: ConfigState = {
+export const defaultATCIConfig: ConfigState = {
     offsetManagement: {
         probeNewOffset: 0,
         useToolOffset: 0,
         verifyToolLength: 0,
     },
     toolRack: {
-        enabled: 0,
-        numberOfRacks: 1,
-        offsetManagement: {
-            probeNewOffset: 0,
-            useToolOffset: 0,
-            verifyToolLength: 0,
-        },
+        enabled: 1,
+        numberOfRacks: 8,
+        probeNewOffset: 0,
+        useToolOffset: 0,
+        verifyToolLength: 0,
         retainToolSettings: 0,
     },
     advanced: {
@@ -103,7 +100,7 @@ interface ConfigProviderProps {
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
-    const [config, setConfig] = useState<ConfigState>(defaultConfig);
+    const [config, setConfig] = useState<ConfigState>(defaultATCIConfig);
     const [isApplying, setIsApplying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [status, setStatus] = useState<{
