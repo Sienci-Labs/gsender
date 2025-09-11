@@ -29,18 +29,6 @@ export const DebugPanel: React.FC = () => {
                     </div>
                 </CardContent>
             </Card>
-            <Card className="border border-border">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold">
-                        Generated File
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-xs text-muted-foreground bg-gray-50 p-3 rounded border min-h-32 max-h-96 overflow-y-scroll">
-                        Generated configuration file will appear here...
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 };

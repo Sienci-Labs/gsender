@@ -11,10 +11,7 @@ import { Label } from 'app/components/shadcn/label';
 import { Button } from 'app/components/Button';
 import { Progress } from 'app/components/shadcn/progress';
 import { PositionInput } from './PositionInput';
-import {
-    defaultPosition,
-    useConfigContext,
-} from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
+import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
 
 export const ConfigTab: React.FC = () => {
@@ -182,10 +179,10 @@ export const ConfigTab: React.FC = () => {
                             'opacity-50 pointer-events-none',
                     )}
                 >
-                    <div className="flex items-end gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium">
-                                Number of Racks
+                    <div className="space-y-3">
+                        <div className="flex w-full items-center gap-4">
+                            <Label className="flex-shrink-0 text-sm font-medium">
+                                Number of Slots
                             </Label>
                             <Input
                                 type="number"
@@ -204,20 +201,18 @@ export const ConfigTab: React.FC = () => {
                             />
                         </div>
 
-                        <div className="flex-1">
-                            <PositionInput
-                                label="Slot 1 Position"
-                                position={config.slot1Position}
-                                onPositionChange={(position) =>
-                                    updatePosition(
-                                        'toolRack.slot1Position',
-                                        position,
-                                    )
-                                }
-                                onUseCurrent={() => setWorkspacePosition('P9')}
-                                disabled={config.toolRack.enabled !== 1}
-                            />
-                        </div>
+                        <PositionInput
+                            label="Slot 1 Position"
+                            position={config.slot1Position}
+                            onPositionChange={(position) =>
+                                updatePosition(
+                                    'toolRack.slot1Position',
+                                    position,
+                                )
+                            }
+                            onUseCurrent={() => setWorkspacePosition('P9')}
+                            disabled={config.toolRack.enabled !== 1}
+                        />
                     </div>
 
                     <div className="space-y-1">

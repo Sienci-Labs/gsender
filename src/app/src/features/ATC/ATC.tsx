@@ -17,14 +17,14 @@ export function ATC() {
     }
     return (
         <div className="w-full relative box-border">
-            <div className="flex flex-col justify-end absolute top-2 right-2">
+            <div className="flex flex-row items-center justify-end absolute top-2 right-2">
+                <ATCIConfiguration />
                 <ToolDisplayModal />
             </div>
             <div className="grid grid-cols-[3fr_2fr] gap-0">
                 <div>
                     <ToolDisplay />
                 </div>
-                <ATCIConfiguration />
                 <AdvancedOptions />
             </div>
         </div>

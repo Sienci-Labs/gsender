@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { LuHardHat } from 'react-icons/lu';
 import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { ATCIConfiguration } from 'app/features/ATC/components/Configuration';
 
 export function AdvancedOptions() {
     const {
@@ -33,7 +34,7 @@ export function AdvancedOptions() {
     const loadAndSaveDisabled = !connected || currentTool === 0;
 
     return (
-        <div className="flex w-full pt-10">
+        <div className="flex flex-col w-full pt-10 mt-2">
             <Collapsible
                 open={isOpen}
                 onOpenChange={setIsOpen}
