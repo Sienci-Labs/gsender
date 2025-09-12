@@ -102,6 +102,9 @@ const wizard = {
                             label: 'Probe Initial Tool',
                             cb: () => {
                                 controller.command('gcode', [
+                                    'G91 G21',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
                                     'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
