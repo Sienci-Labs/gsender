@@ -110,7 +110,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 </Tooltip>
             ),
             add: (
-                <Tooltip content="Assign an action to this shortcut">
+                <Tooltip content="Assign a shortcut to this action">
                     <Button
                         variant="ghost"
                         size="sm"

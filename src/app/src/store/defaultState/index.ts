@@ -93,7 +93,8 @@ const defaultState: State = {
             zThickness: {
                 standardBlock: 15,
                 autoZero: 5,
-                zProbe: 15
+                zProbe: 15,
+                probe3D: 0,
             },
             plateWidth: 50,
             plateLength: 50,
@@ -286,6 +287,7 @@ const defaultState: State = {
             probeType: 'Auto',
             direction: 0,
             probeAxis: 'Z',
+            tipDiameter3D: 2,
         },
         rotary: {
             stockTurning: {
