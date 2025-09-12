@@ -32,7 +32,7 @@ export interface OffsetManagement {
 
 export interface ToolRack extends OffsetManagement {
     enabled: number;
-    numberOfRacks: number;
+    numberOfSlots: number;
     retainToolSettings: number;
 }
 
@@ -58,7 +58,7 @@ export const defaultATCIConfig: ConfigState = {
     },
     toolRack: {
         enabled: 1,
-        numberOfRacks: 8,
+        numberOfSlots: 8,
         probeNewOffset: 0,
         useToolOffset: 0,
         verifyToolLength: 0,

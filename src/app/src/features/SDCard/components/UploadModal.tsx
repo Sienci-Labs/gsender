@@ -17,12 +17,6 @@ interface UploadModalProps {
     onClose: () => void;
 }
 
-export interface FileUpload {
-    name: string;
-    size: number;
-    data: blob;
-}
-
 // List files on the card recursively. Only CNC related filetypes are listed: .nc, .ncc, .ngc, .cnc, .gcode, .txt, .text, .tap and .macro.
 export const ACCEPTED_EXTENSIONS = [
     '.gcode',

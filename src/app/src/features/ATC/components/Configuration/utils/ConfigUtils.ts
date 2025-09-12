@@ -8,7 +8,16 @@ export interface Macro {
 }
 
 export function generateP100(config: ConfigState): Macro {
-    const content = [].join('\n');
+    const content = [
+        `#<_tc_slots> = ${config.toolRack.numberOfSlots}`,
+        `#<_tc_rack_enable> = ${config.toolRack.enabled}`,
+        `#<_tc_pres_sense> = ${config.advanced.checkPressure}`,
+        `#<_tc_holder_sense> = ${config.advanced.checkToolPresence}`,
+        `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
+        `#<_ort_offset_mode> = `,
+        `#<_irt_offset_mode> = `,
+        `(msg, atci:rack_size:${config.toolRack.numberOfSlots})`,
+    ].join('\n');
     const data = new Blob([content]);
 
     return {
@@ -20,7 +29,9 @@ export function generateP100(config: ConfigState): Macro {
 }
 
 export function generateAllMacros(config: ConfigState) {
-    return [];
+    const macros: Macro[] = [];
+    macros.push(generateP100(config));
+    return macros;
 }
 
 export function generateATCIJSON(config: ConfigState): object {

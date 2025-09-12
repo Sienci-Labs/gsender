@@ -186,12 +186,12 @@ export const ConfigTab: React.FC = () => {
                             </Label>
                             <Input
                                 type="number"
-                                value={config.toolRack.numberOfRacks}
+                                value={config.toolRack.numberOfSlots}
                                 onChange={(e) =>
                                     updateConfig({
                                         toolRack: {
                                             ...config.toolRack,
-                                            numberOfRacks:
+                                            numberOfSlots:
                                                 parseInt(e.target.value) || 0,
                                         },
                                     })
