@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useLocation } from 'react-router';
+import api from '../../api';
 
 interface TabItem {
     label: string;
@@ -11,9 +13,11 @@ interface TabItem {
 
 interface TabbedProps {
     items: TabItem[];
+    tabSetId?: string;
 }
 
-export const Tabs = ({ items = [] }: TabbedProps) => {
+export const Tabs = ({ items = [], tabSetId = 'default' }: TabbedProps) => {
+    const [tabItems, setTabItems] = useState(items);
     const [activeTab, setActiveTab] = useState(items[0]?.label);
     const tabsRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -21,24 +25,103 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const [canScrollRight, setCanScrollRight] = useState(false);
     const location = useLocation();
 
+    const loadTabOrder = async () => {
+        try {
+            // Use the same key format as save
+            const key = `tabOrder_${tabSetId}`;
+            console.log('Loading with key:', key);
+            
+            const response = await api.getState({ key });
+            console.log('Load tab order response:', response.data);
+            
+            // The response.data might be an object with numeric keys or an array
+            if (response.data) {
+                let savedOrder;
+                if (Array.isArray(response.data)) {
+                    savedOrder = response.data;
+                } else if (typeof response.data === 'object') {
+                    // Convert object with numeric keys to array
+                    savedOrder = Object.values(response.data);
+                }
+                
+                console.log('Saved order:', savedOrder);
+                
+                if (savedOrder && Array.isArray(savedOrder)) {
+                    const orderedItems = savedOrder
+                        .map((label: string) => items.find(item => item.label === label))
+                        .filter(Boolean);
+                    
+                    const newItems = items.filter(item => 
+                        !savedOrder.includes(item.label)
+                    );
+                    
+                    const finalOrder = [...orderedItems, ...newItems];
+                    console.log('Final order:', finalOrder.map(item => item.label));
+                    return finalOrder;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load tab order:', error);
+            // If we get a 404, try to save the current order first
+            if (error.response?.status === 404) {
+                console.log('No saved order found, saving current default order');
+                await saveTabOrder(items);
+            }
+        }
+        console.log('Using default order:', items.map(item => item.label));
+        return items;
+    };
+
+    const saveTabOrder = async (newItems: TabItem[]) => {
+        try {
+            const tabOrder = newItems.map(item => item.label);
+            console.log('Saving tab order:', tabOrder, 'for tabSetId:', tabSetId);
+            // Use a simpler key format
+            const key = `tabOrder_${tabSetId}`;
+            console.log('Using key:', key);
+            const response = await api.setState({ [key]: tabOrder });
+            console.log('Save response:', response.data);
+        } catch (error) {
+            console.warn('Failed to save tab order:', error);
+        }
+    };
+
+    useEffect(() => {
+        const initializeTabs = async () => {
+            console.log('Initializing tabs for tabSetId:', tabSetId, 'with items:', items.map(item => item.label));
+            const orderedItems = await loadTabOrder();
+            console.log('Setting tab items to:', orderedItems.map(item => item.label));
+            setTabItems(orderedItems);
+            
+            // Set active tab to the first tab in the reordered list
+            if (orderedItems.length > 0) {
+                setActiveTab(orderedItems[0].label);
+            }
+        };
+        
+        if (items.length > 0) {
+            initializeTabs();
+        }
+    }, [items, tabSetId]);
+
     useEffect(() => {
         const { pathname } = location;
         if (pathname === '/') {
-            scrollToTab(items.findIndex((value) => value.label === activeTab)); // scroll to correct tab on navigating to carve
+            scrollToTab(tabItems.findIndex((value) => value.label === activeTab)); // scroll to correct tab on navigating to carve
         }
-    }, [location]);
+    }, [location, tabItems, activeTab]);
 
     useEffect(() => {
-        tabRefs.current = tabRefs.current.slice(0, items.length);
+        tabRefs.current = tabRefs.current.slice(0, tabItems.length);
         checkScrollability();
 
         window.addEventListener('resize', checkScrollability);
 
         // if the active tab doesnt exist in the tabs list anymore, default to first tab
-        if (!items.find((value) => value.label === activeTab)) {
-            setActiveTab(items[0].label);
+        if (!tabItems.find((value) => value.label === activeTab)) {
+            setActiveTab(tabItems[0]?.label);
         }
-    }, [items]);
+    }, [tabItems, activeTab]);
 
     const checkScrollability = () => {
         if (tabsRef.current) {
@@ -87,76 +170,106 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
         scrollToTab(index);
     };
 
+    const handleOnDragEnd = (result: DropResult) => {
+        if (!result.destination) return;
+
+        const reorderedItems = Array.from(tabItems);
+        const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
+        reorderedItems.splice(result.destination.index, 0, reorderedItem);
+
+        setTabItems(reorderedItems);
+        saveTabOrder(reorderedItems);
+    };
+
     return (
-        <div className="w-full">
-            <div className="relative">
-                <div className="flex items-center absolute top-[-41px] left-0 right-0 z-10">
-                    <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
-                            canScrollLeft
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
-                        }`}
-                        onClick={() => canScrollLeft && scrollTabs('left')}
-                        disabled={!canScrollLeft}
-                    >
-                        <MdKeyboardArrowLeft className="w-6 h-6" />
-                    </button>
-                    <div
-                        ref={tabsRef}
-                        className="flex overflow-x-auto flex-grow"
-                        style={{
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                        }}
-                        onScroll={checkScrollability}
-                    >
-                        {items &&
-                            items.map((item, index) => (
-                                <button
-                                    key={item.label}
-                                    ref={(el) => (tabRefs.current[index] = el)}
-                                    className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 ${
-                                        activeTab === item.label
-                                            ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
-                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
-                                    }`}
-                                    onClick={() =>
-                                        handleTabClick(item.label, index)
-                                    }
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+            <div className="w-full">
+                <div className="relative">
+                    <div className="flex items-center absolute top-[-41px] left-0 right-0 z-10">
+                        <button
+                            className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
+                                canScrollLeft
+                                    ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
+                                    : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
+                            }`}
+                            onClick={() => canScrollLeft && scrollTabs('left')}
+                            disabled={!canScrollLeft}
+                        >
+                            <MdKeyboardArrowLeft className="w-6 h-6" />
+                        </button>
+                        <Droppable droppableId="tabs" direction="horizontal">
+                            {(provided) => (
+                                <div
+                                    {...provided.droppableProps}
+                                    ref={(el) => {
+                                        provided.innerRef(el);
+                                        tabsRef.current = el;
+                                    }}
+                                    className="flex overflow-x-auto flex-grow"
+                                    style={{
+                                        scrollbarWidth: 'none',
+                                        msOverflowStyle: 'none',
+                                    }}
+                                    onScroll={checkScrollability}
                                 >
-                                    {item.label}
-                                </button>
-                            ))}
+                                    {tabItems.map((item, index) => (
+                                        <Draggable key={item.label} draggableId={item.label} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={(el) => {
+                                                        provided.innerRef(el);
+                                                        tabRefs.current[index] = el;
+                                                    }}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={provided.draggableProps.style}
+                                                    className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 flex items-center justify-center cursor-pointer ${
+                                                        activeTab === item.label
+                                                            ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
+                                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
+                                                    } ${snapshot.isDragging ? 'bg-gray-100 dark:bg-dark-lighter' : ''}`}
+                                                    onClick={() =>
+                                                        handleTabClick(item.label, index)
+                                                    }
+                                                >
+                                                    {item.label}
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                        <button
+                            className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
+                                canScrollRight
+                                    ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
+                                    : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
+                            }`}
+                            onClick={() => canScrollRight && scrollTabs('right')}
+                            disabled={!canScrollRight}
+                        >
+                            <MdKeyboardArrowRight className="w-6 h-6" />
+                        </button>
                     </div>
-                    <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
-                            canScrollRight
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
-                        }`}
-                        onClick={() => canScrollRight && scrollTabs('right')}
-                        disabled={!canScrollRight}
-                    >
-                        <MdKeyboardArrowRight className="w-6 h-6" />
-                    </button>
+                </div>
+                <div className="block w-full h-full">
+                    {tabItems &&
+                        tabItems.map(({ label, content: Content }) => (
+                            <div
+                                key={label}
+                                className={classNames(
+                                    'w-full h-full',
+                                    activeTab === label ? 'block' : 'hidden',
+                                )}
+                            >
+                                <Content isActive={activeTab === label} />
+                            </div>
+                        ))}
                 </div>
             </div>
-            <div className="block w-full h-full">
-                {items &&
-                    items.map(({ label, content: Content }) => (
-                        <div
-                            key={label}
-                            className={classNames(
-                                'w-full h-full',
-                                activeTab === label ? 'block' : 'hidden',
-                            )}
-                        >
-                            <Content isActive={activeTab === label} />
-                        </div>
-                    ))}
-            </div>
-        </div>
+        </DragDropContext>
     );
 };
 
