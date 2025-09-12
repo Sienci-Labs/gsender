@@ -11,6 +11,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';
 import { get } from 'lodash';
+import { useEffect } from 'react';
 
 interface HelperToggleProps {
     minimized: boolean;
@@ -64,8 +65,10 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <button

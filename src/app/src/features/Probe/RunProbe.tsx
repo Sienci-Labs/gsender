@@ -111,8 +111,10 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();

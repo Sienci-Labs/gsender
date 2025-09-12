@@ -37,7 +37,7 @@ export function UnlockButton() {
 
     return (
         <div className="text-4xl absolute top-3 max-xl:top-2 left-72">
-            <Tooltip content="Click to Unlock Machine">
+            <Tooltip content="Unlock Machine">
                 <button
                     className={cx('group text-gray-400', {
                         'text-yellow-600 bg-orange-200 bg-opacity-10 rounded':

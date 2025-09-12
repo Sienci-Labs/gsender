@@ -1465,7 +1465,7 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom, zMax, safeHeight = 10] = args;
+                const [lineToStartFrom, zMax, safeHeight = 10, spindleDelay = 1] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
@@ -1563,7 +1563,7 @@ class GrblController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`${modal.motion}`);
-                    modalGCode.push('G4 P1');
+                    modalGCode.push(`G4 P${spindleDelay}`);
                     modalGCode.push('%_GCODE_START');
 
                     // Fast forward sender to line

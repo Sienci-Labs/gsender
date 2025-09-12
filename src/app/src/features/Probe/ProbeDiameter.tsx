@@ -325,8 +325,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         },
     }).current;
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {

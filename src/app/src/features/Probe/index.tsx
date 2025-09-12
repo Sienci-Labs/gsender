@@ -30,6 +30,7 @@ import {
     PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_ZERO,
     PROBE_TYPE_DIAMETER,
+    TOUCHPLATE_TYPE_3D,
 } from 'app/lib/constants';
 import store from 'app/store';
 import { convertToImperial } from 'app/lib/units';
@@ -149,6 +150,9 @@ const ProbeWidget = () => {
     const [zProbeDistance, setZProbeDistance] = useState<number>(
         config.get('zProbeDistance') || {},
     );
+    const [tipDiameter3D, setTipDiameter3D] = useState<number>(
+        config.get('tipDiameter3D') || 2,
+    );
     const [touchplate, setTouchplate] = useState<ProbeProfile>(
         store.get('workspace.probeProfile', {}),
     );
@@ -253,6 +257,8 @@ const ProbeWidget = () => {
                 x: false,
             };
 
+            const is3D = selectedProfile.touchplateType === TOUCHPLATE_TYPE_3D;
+
             if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
                 functions.z = true;
             } else {
@@ -281,7 +287,7 @@ const ProbeWidget = () => {
                     command = {
                         id: 'XYZ Touch',
                         safe: true,
-                        tool: true,
+                        tool: is3D ? false : true,
                         axes: {
                             x: true,
                             y: true,
@@ -294,7 +300,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'XY Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: true,
                         y: true,
@@ -306,7 +312,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'X Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: true,
                         y: false,
@@ -318,7 +324,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Y Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: false,
                         y: true,
@@ -414,6 +420,7 @@ const ProbeWidget = () => {
                     touchplate.zThickness.standardBlock,
                 ),
                 zProbe: convertToImperial(touchplate.zThickness.zProbe),
+                probe3D: convertToImperial(touchplate.zThickness.probe3D),
             };
             xyThickness = convertToImperial(touchplate.xyThickness);
             feedrate = convertToImperial(probeFeedrate);
@@ -436,6 +443,7 @@ const ProbeWidget = () => {
             probeDistances,
             probeType,
             homingEnabled: $22 !== '0',
+            tipDiameter3D,
         };
 
         const code = getProbeCode(options, direction);
@@ -488,6 +496,7 @@ const ProbeWidget = () => {
         setTouchPlateHeight(config.get('touchPlateHeight') || {});
         setRetractionDistance(config.get('retractionDistance') || {});
         setZProbeDistance(config.get('zProbeDistance') || {});
+        setTipDiameter3D(config.get('tipDiameter3D', 0));
         setConnectivityTest(config.get('connectivityTest'));
 
         let newZProbeDistance = config.get('zProbeDistance');
