@@ -7,6 +7,8 @@ export interface Macro {
     size: number;
 }
 
+function calculateOffsetValue(data: Partial<ConfigState>) {}
+
 export function generateP100(config: ConfigState): Macro {
     const content = [
         `#<_tc_slots> = ${config.toolRack.numberOfSlots}`,
