@@ -87,7 +87,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
 
             <div>
                 <div className="flex items-center gap-4 justify-between">
-                    <Tooltip content="Select Spiral Surfacing Type">
+                    <Tooltip content="Spiral surfacing pattern">
                         <SpiralIcon
                             checked={surfacing.type === SPIRAL_MOVEMENT}
                             className={cx(
@@ -106,7 +106,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                         />
                     </Tooltip>
 
-                    <Tooltip content="Select Zig-Zag Surfacing Type">
+                    <Tooltip content="Zig-Zag surfacing pattern">
                         <ZigZagIcon
                             checked={surfacing.type === ZIG_ZAG_MOVEMENT}
                             className={cx(

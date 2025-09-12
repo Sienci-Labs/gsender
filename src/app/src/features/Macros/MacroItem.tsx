@@ -133,7 +133,7 @@ const MacroItem = ({
 
     if (hasDescription) {
         return (
-            <Tooltip content={`Description: ${macro.description}`}>
+            <Tooltip content={`${macro.description}`}>
                 {content}
             </Tooltip>
         );

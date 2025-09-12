@@ -291,7 +291,8 @@ const migrateStore = (): void => {
     }
 
     // zThickness setting now has 3 options - port previous value to them
-    if (semver.lt(cnc.version, '1.5.4')) {
+    if (semver.lt(cnc.version, '1.5.4') ||
+        semver.lt(cnc.version, '1.5.4-EDGE')) {
         const currentZThickness = store.get('workspace.probeProfile.zThickness');
         if (typeof currentZThickness === 'number' || typeof currentZThickness === 'string') {
             store.set('workspace.probeProfile.zThickness.standardBlock', currentZThickness);

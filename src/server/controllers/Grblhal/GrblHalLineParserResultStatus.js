@@ -187,12 +187,12 @@ class GrblHalLineParserResultStatus {
             payload.accessoryState = _.get(result, 'A[0]', '');
         }
 
+        // Homing status
         if (_.has(result, 'H')) {
             payload.hasHomed = Boolean(Number(result.H[0]));
         }
-
+        // Current tool (if persisted)
         if (_.has(result, 'T')) {
-            // Handle updating current tool
             payload.currentTool = Number(result.T[0]);
         }
 

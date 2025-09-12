@@ -1,9 +1,9 @@
 import {
     PROBE_TYPE_AUTO,
     PROBE_TYPE_TIP,
-    PROBE_TYPES,
+    TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
-    TOUCHPLATE_TYPE_STANDARD,
+    TOUCHPLATE_TYPE_ZERO,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { mm2in } from './units';
@@ -68,10 +68,13 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
-    const zThickness =
-        plateType === TOUCHPLATE_TYPE_STANDARD
-            ? zThicknesses.standardBlock
-            : zThicknesses.zProbe;
+    let zThickness = zThicknesses.standardBlock;
+    if (plateType === TOUCHPLATE_TYPE_ZERO) {
+        zThickness = zThicknesses.zProbe;
+    } else if (plateType === TOUCHPLATE_TYPE_3D) {
+        console.log(zThicknesses.probe3D);
+        zThickness = zThicknesses.probe3D;
+    }
 
     // Add axes to initial zeroing
     Object.keys(axes).forEach((axis) => {
@@ -126,7 +129,9 @@ const updateOptionsForDirection = (
     options: ProbingOptions,
     direction: PROBE_DIRECTIONS,
 ): ProbingOptions => {
-    const { units, toolDiameter } = options;
+    const { units, plateType } = options;
+    const diameter = plateType === TOUCHPLATE_TYPE_3D ? options.tipDiameter3D : options.toolDiameter;
+    const xyThickness = plateType === TOUCHPLATE_TYPE_3D ? 0 : options.xyThickness;
     options.direction = direction;
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
     const xRetractModifier = xProbeDir * -1;
@@ -145,15 +150,15 @@ const updateOptionsForDirection = (
     options.zRetract = options.retract;
 
     // Alter thickness for X and Y by tool diameter
-    const toolRadius = (toolDiameter as number) / 2;
+    const toolRadius = (diameter as number) / 2;
     const toolCompensatedXY = Number(
-        (-1 * toolRadius - options.xyThickness).toFixed(3),
+        (-1 * toolRadius - xyThickness).toFixed(3),
     );
     options.yThickness = toolCompensatedXY * yProbeDir;
     options.xThickness = toolCompensatedXY * xProbeDir;
 
     // Figure out movement distances for getting bit into position
-    let xyMovement = (toolDiameter as number) + 20;
+    let xyMovement = (diameter as number) + 20;
     options.xyPositionAdjust =
         units === METRIC_UNITS
             ? xyMovement
@@ -233,7 +238,7 @@ export const get3AxisStandardRoutine = (
 
 const determineAutoPlateOffsetValues = (
     direction: PROBE_DIRECTIONS,
-    diameter: PROBE_TYPES_T | number = null,
+    _diameter: PROBE_TYPES_T | number = null,
 ): [number, number] => {
     let xOff = 22.5;
     let yOff = 22.5;
@@ -263,7 +268,7 @@ export const get3AxisAutoRoutine = ({
     direction,
     firmware,
     homingEnabled,
-    zThickness,
+    zThickness
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -610,7 +615,7 @@ export const get3AxisAutoDiameterRoutine = ({
     direction,
     toolDiameter,
     homingEnabled,
-    zThickness,
+    zThickness
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -625,10 +630,11 @@ export const get3AxisAutoDiameterRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
-    const toolRadius = toolDiameter / 2;
-    const toolCompensatedThickness = -1 * toolRadius;
+    const toolRadius = (toolDiameter / 2);
+    const toolCompensatedThickness = ((-1 * toolRadius));
     // Addition because it's already negative
     const compensatedValue = 22.5 + toolCompensatedThickness;
+
 
     if (axes.z && axes.y && axes.z) {
         code.push(
