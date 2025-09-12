@@ -132,10 +132,10 @@ function Connection(props: ConnectionProps) {
         if (connectionState !== ConnectionState.DISCONNECTED || !autoReconnect)
             return;
 
-        // TODO: Add autoconnect for ethernet
-        if (ip.isV4Format(port)) return;
+        const isEthernet = ip.isV4Format(port);
+        const connectionType = isEthernet ? ConnectionType.ETHERNET : ConnectionType.USB;
 
-        handleConnect(port, ConnectionType.USB);
+        handleConnect(port, connectionType);
     }
 
     useEffect(() => {
