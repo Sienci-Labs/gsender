@@ -34,6 +34,7 @@ export const ACCEPTED_EXTENSIONS = [
     '.text',
     '.tap',
     '.macro',
+    '.json',
 ];
 
 export const UploadModal: React.FC<UploadModalProps> = ({
