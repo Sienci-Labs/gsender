@@ -21,6 +21,7 @@ interface Modal {
 }
 
 interface RotationResult {
+    x: number;
     y: number;
     z: number;
     a: number;
@@ -88,8 +89,8 @@ export const shouldRotate = (
 };
 
 export const rotateAxis = (
-    axis: 'y' | 'z',
-    { y, z, a }: { y: number; z: number; a: number },
+    axis: 'x' | 'y' | 'z',
+    { x, y, z, a }: { x: number; y: number; z: number; a: number },
 ): RotationResult | null => {
     if (!axis) {
         throw new Error('Axis is required');
@@ -101,19 +102,25 @@ export const rotateAxis = (
     const sinA = Math.sin(angle);
     const cosA = Math.cos(angle);
 
+    // Rotate the vertex around the x-axis
+    if (axis === 'x') {
+        const rotatedY = y * cosA - z * sinA;
+        const rotatedZ = y * sinA + z * cosA;
+        return { x: x, y: rotatedY, z: rotatedZ, a };
+    }
+
     // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        const rotatedZ = z * cosA - y * sinA;
-        const rotatedY = z * sinA + y * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedZ = z * cosA - x * sinA;
+        const rotatedX = z * sinA + x * cosA;
+        return { x: rotatedX, y: y, z: rotatedZ, a };
     }
 
     // Rotate the vertex around the z-axis
-    //This logic is just for testing
     if (axis === 'z') {
-        const rotatedY = y * cosA - z * sinA;
-        const rotatedZ = y * sinA + z * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedX = x * cosA - y * sinA;
+        const rotatedY = x * sinA + y * cosA;
+        return { x: rotatedX, y: rotatedY, z: z, a };
     }
 
     return null;
@@ -972,6 +979,7 @@ class GCodeVirtualizer extends EventEmitter {
             modal: Modal,
             v1: BasicPosition,
             v2: BasicPosition,
+            v0: BasicPosition,
         ) => void;
         callback?: () => void;
         collate?: boolean;
