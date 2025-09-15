@@ -335,17 +335,10 @@ const RotarySurfacing = () => {
                     </div>
                 </div>
                 <div className="flex flex-row gap-4">
-                    <Button
-                        type="submit"
-                        onClick={handleGenerateGcode}
-                        disabled={isDisabled}
-                    >
+                    <Button type="submit" onClick={handleGenerateGcode}>
                         Generate G-Code
                     </Button>
-                    <Button
-                        disabled={!!!gcode || isDisabled}
-                        onClick={handleLoadToMainVisualizer}
-                    >
+                    <Button onClick={handleLoadToMainVisualizer}>
                         Load to Main Visualizer
                     </Button>
                 </div>
