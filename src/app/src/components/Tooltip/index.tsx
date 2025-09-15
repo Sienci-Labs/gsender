@@ -15,7 +15,7 @@ export interface TooltipProps {
 
 export function Tooltip({ children, content, side }: TooltipProps) {
     return (
-        <TooltipProvider>
+        <TooltipProvider delayDuration={1500}>
             <TooltipWrapper>
                 <TooltipTrigger asChild>{children}</TooltipTrigger>
                 <TooltipContent side={side}>{content}</TooltipContent>
