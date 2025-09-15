@@ -151,7 +151,7 @@ const SurfacingTool = () => {
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.width}`}
+                                    content={`Default is ${defaultSurfacingState.width}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -174,7 +174,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.length}`}
+                                    content={`Default is ${defaultSurfacingState.length}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -198,7 +198,7 @@ const SurfacingTool = () => {
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.skimDepth}`}
+                                    content={`Default is ${defaultSurfacingState.skimDepth}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -221,7 +221,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.maxDepth}`}
+                                    content={`Default is ${defaultSurfacingState.maxDepth}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -244,7 +244,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Bit Diameter">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.bitDiameter}`}
+                                content={`Default is ${defaultSurfacingState.bitDiameter}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -263,7 +263,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Stepover">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.stepover}`}
+                                content={`Default is ${defaultSurfacingState.stepover}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -282,7 +282,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Feed Rate">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.feedrate}`}
+                                content={`Default is ${defaultSurfacingState.feedrate}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -302,7 +302,7 @@ const SurfacingTool = () => {
                         <InputArea label="Spindle RPM">
                             <div className="grid grid-cols-2 gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.spindleRPM}`}
+                                    content={`Default is ${defaultSurfacingState.spindleRPM}`}
                                 >
                                     <ControlledInput
                                         type="number"
