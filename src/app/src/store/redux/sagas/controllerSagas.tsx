@@ -566,8 +566,6 @@ export function* initialize(): Generator<any, void, any> {
             context,
             comment,
         };
-        console.log('toolchange request');
-        console.log(payload);
         const skipDialog = store.get('workspace.toolChange.skipDialog', false);
 
         const { option, count } = context;
@@ -589,7 +587,6 @@ export function* initialize(): Generator<any, void, any> {
                         ? semiautoToolchangeSecondRun
                         : semiautoToolChange;
             } else if (option === 'Fixed Tool Sensor') {
-                console.log('THIS ONE');
                 title = 'Fixed Tool Sensor Tool Change';
                 instructions =
                     count > 1
@@ -602,11 +599,9 @@ export function* initialize(): Generator<any, void, any> {
 
             // Run start block on idle if exists
             if (instructions.onStart) {
-                console.log('on start');
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }
-            console.log('loading wizard');
             pubsub.publish('wizard:load', {
                 ...payload,
                 title,
