@@ -8,8 +8,6 @@ import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import controller from 'app/lib/controller';
 import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
     TOOLBAR_CATEGORY,
     VISUALIZER_PRIMARY,
@@ -18,7 +16,6 @@ import {
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
@@ -29,11 +26,11 @@ import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
 import InputArea from './components/InputArea';
 import { DEFAULT_VALUES_MM } from './constants';
+import { Tooltip } from 'app/components/Tooltip';
 
 const RotarySurfacing = () => {
     const navigate = useNavigate();
     const { units } = useWorkspaceState();
-    const status = useTypedSelector((state) => state?.controller.state?.status);
     const [surfacingState, setSurfacingState] =
         useState<RotarySurfacingOptions>(getInitialState());
     const [gcode, setGcode] = useState('');
@@ -139,11 +136,6 @@ const RotarySurfacing = () => {
         },
     };
 
-    const isDisabled =
-        status &&
-        status?.activeState !== GRBL_ACTIVE_STATE_IDLE &&
-        status?.activeState !== GRBL_ACTIVE_STATE_JOG;
-
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
@@ -151,6 +143,19 @@ const RotarySurfacing = () => {
     useEffect(() => {
         useKeybinding(shuttleControlEvents);
     }, []);
+
+    const defaultValue =
+        units === 'mm'
+            ? DEFAULT_VALUES_MM
+            : {
+                  ...DEFAULT_VALUES_MM,
+                  stockLength: convertToImperial(DEFAULT_VALUES_MM.stockLength),
+                  startHeight: convertToImperial(DEFAULT_VALUES_MM.startHeight),
+                  finalHeight: convertToImperial(DEFAULT_VALUES_MM.finalHeight),
+                  stepdown: convertToImperial(DEFAULT_VALUES_MM.stepdown),
+                  bitDiameter: convertToImperial(DEFAULT_VALUES_MM.bitDiameter),
+                  feedrate: convertToImperial(DEFAULT_VALUES_MM.feedrate),
+              };
 
     return (
         <div>
@@ -164,108 +169,147 @@ const RotarySurfacing = () => {
                             zero your Z-axis to the centerline before surfacing.
                         </p>
                         <InputArea label="Length">
-                            <ControlledInput
-                                id="stockLength"
-                                value={surfacingState.stockLength}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix={units}
-                                type="number"
-                            />
-                        </InputArea>
-                        <InputArea label="Start & Final Diameter">
-                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                            <Tooltip
+                                content={`Default is ${defaultValue.stockLength} ${units}`}
+                            >
                                 <ControlledInput
-                                    id="startHeight"
-                                    value={surfacingState.startHeight}
+                                    id="stockLength"
+                                    value={surfacingState.stockLength}
                                     onChange={handleChange}
+                                    wrapperClassName="col-span-3"
                                     className={inputStyle}
                                     suffix={units}
                                     type="number"
                                 />
+                            </Tooltip>
+                        </InputArea>
+
+                        <InputArea label="Start & Final Diameter">
+                            <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+                                <Tooltip
+                                    content={`Default is ${defaultValue.startHeight} ${units}`}
+                                >
+                                    <ControlledInput
+                                        id="startHeight"
+                                        value={surfacingState.startHeight}
+                                        onChange={handleChange}
+                                        className={inputStyle}
+                                        suffix={units}
+                                        type="number"
+                                    />
+                                </Tooltip>
                                 <span className="flex justify-center items-center">
                                     &
                                 </span>
+                                <Tooltip
+                                    content={`Default is ${defaultValue.finalHeight} ${units}`}
+                                >
+                                    <ControlledInput
+                                        id="finalHeight"
+                                        value={surfacingState.finalHeight}
+                                        onChange={handleChange}
+                                        className={inputStyle}
+                                        suffix={units}
+                                        type="number"
+                                    />
+                                </Tooltip>
+                            </div>
+                        </InputArea>
+                        <InputArea label="Stepdown">
+                            <Tooltip
+                                content={`Default is ${defaultValue.stepdown} ${units}`}
+                            >
                                 <ControlledInput
-                                    id="finalHeight"
-                                    value={surfacingState.finalHeight}
+                                    id="stepdown"
+                                    value={surfacingState.stepdown}
                                     onChange={handleChange}
+                                    wrapperClassName="col-span-3"
                                     className={inputStyle}
                                     suffix={units}
                                     type="number"
                                 />
-                            </div>
-                        </InputArea>
-                        <InputArea label="Stepdown">
-                            <ControlledInput
-                                id="stepdown"
-                                value={surfacingState.stepdown}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix={units}
-                                type="number"
-                            />
+                            </Tooltip>
                         </InputArea>
                         <InputArea label="Bit Diameter">
-                            <ControlledInput
-                                id="bitDiameter"
-                                value={surfacingState.bitDiameter}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix={units}
-                                type="number"
-                            />
+                            <Tooltip
+                                content={`Default is ${defaultValue.bitDiameter} ${units}`}
+                            >
+                                <ControlledInput
+                                    id="bitDiameter"
+                                    value={surfacingState.bitDiameter}
+                                    onChange={handleChange}
+                                    wrapperClassName="col-span-3"
+                                    className={inputStyle}
+                                    suffix={units}
+                                    type="number"
+                                />
+                            </Tooltip>
                         </InputArea>
                         <InputArea label="Stepover">
-                            <ControlledInput
-                                id="stepover"
-                                value={surfacingState.stepover}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix="%"
-                                type="number"
-                            />
+                            <Tooltip
+                                content={`Default is ${defaultValue.stepover} ${units}`}
+                            >
+                                <ControlledInput
+                                    id="stepover"
+                                    value={surfacingState.stepover}
+                                    onChange={handleChange}
+                                    wrapperClassName="col-span-3"
+                                    className={inputStyle}
+                                    suffix="%"
+                                    type="number"
+                                />
+                            </Tooltip>
                         </InputArea>
                         <InputArea label="Feed Rate">
-                            <ControlledInput
-                                id="feedrate"
-                                value={surfacingState.feedrate}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-3"
-                                className={inputStyle}
-                                suffix={`${units}/min`}
-                                type="number"
-                            />
+                            <Tooltip
+                                content={`Default is ${defaultValue.feedrate} ${units}/min`}
+                            >
+                                <ControlledInput
+                                    id="feedrate"
+                                    value={surfacingState.feedrate}
+                                    onChange={handleChange}
+                                    wrapperClassName="col-span-3"
+                                    className={inputStyle}
+                                    suffix={`${units}/min`}
+                                    type="number"
+                                />
+                            </Tooltip>
                         </InputArea>
                         <InputArea label="Spindle RPM">
-                            <ControlledInput
-                                id="spindleRPM"
-                                value={surfacingState.spindleRPM}
-                                onChange={handleChange}
-                                wrapperClassName="col-span-2"
-                                className={inputStyle}
-                                suffix="RPM"
-                                type="number"
-                            />
-                            <div className="flex items-center gap-2 justify-center">
-                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-                                    Delay
-                                </label>
-                                <Switch
-                                    checked={surfacingState.shouldDwell}
-                                    onChange={(checked) =>
-                                        setSurfacingState((prev) => ({
-                                            ...prev,
-                                            shouldDwell: checked,
-                                        }))
-                                    }
+                            <Tooltip
+                                content={`Default is ${defaultValue.spindleRPM} RPM`}
+                            >
+                                <ControlledInput
+                                    id="spindleRPM"
+                                    value={surfacingState.spindleRPM}
+                                    onChange={handleChange}
+                                    wrapperClassName="col-span-2"
+                                    className={inputStyle}
+                                    suffix="RPM"
+                                    type="number"
                                 />
-                            </div>
+                            </Tooltip>
+
+                            <Tooltip
+                                content={`Default is ${defaultValue.shouldDwell ? 'on' : 'off'}`}
+                            >
+                                <div className="flex items-center gap-2 justify-center">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                        Delay
+                                    </label>
+                                    <Switch
+                                        checked={surfacingState.shouldDwell}
+                                        onChange={(checked) =>
+                                            setSurfacingState((prev) => ({
+                                                ...prev,
+                                                shouldDwell: checked,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            </Tooltip>
                         </InputArea>
+
                         <InputArea label="Enable Rehoming">
                             <div className="flex items-center gap-2 justify-center">
                                 <Switch
