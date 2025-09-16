@@ -173,8 +173,7 @@ const updateOptionsForDirection = (
         Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
      */
     //let xyMovement = (diameter as number) + 20;
-
-    let xyMovement = xyThickness + options.retract + toolRadius;
+    let xyMovement = (plateType === TOUCHPLATE_TYPE_3D ? options.xyRetract3D : xyThickness) + options.retract + toolRadius;
     console.log('xyMovement', xyMovement);
     options.xyPositionAdjust = xyMovement; // All units already compensated
     /*options.xyPositionAdjust =
