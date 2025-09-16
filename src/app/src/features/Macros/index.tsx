@@ -461,6 +461,7 @@ const MacroWidget = ({
                         className="flex flex-1 justify-center items-center"
                         icon={<FaPlus />}
                         text="Add"
+                        tooltip={{ content: 'Add a new macro' }}
                     />
 
                     <Button
@@ -470,6 +471,7 @@ const MacroWidget = ({
                         className="flex flex-1 justify-center items-center"
                         icon={<FaFileImport />}
                         text="Import"
+                        tooltip={{ content: 'Import macros from a file' }}
                     />
 
                     <Button
@@ -477,6 +479,7 @@ const MacroWidget = ({
                         className="flex flex-1 justify-center items-center"
                         icon={<FaFileExport />}
                         text="Export"
+                        tooltip={{ content: 'Export macros to a file' }}
                     />
                 </div>
             </div>

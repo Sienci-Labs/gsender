@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
     Select,
     SelectContent,
@@ -8,8 +9,8 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select';
 import controller from 'app/lib/controller.ts';
-import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import Tooltip from 'app/components/Tooltip';
 
 const availableWorkspaces = {
     G54: 'P1',
@@ -45,33 +46,37 @@ export function WorkspaceSelector() {
     return (
         <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center justify-end gap-2">
             <span className="text-gray-400 text-normal">Workspace:</span>
-            <Select
-                onValueChange={onWorkspaceSelect}
-                value={workspace}
-                disabled={!isConnected}
-            >
-                <SelectTrigger className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300">
-                    <SelectValue placeholder="G54" />
-                </SelectTrigger>
-                <SelectContent className="flex-1 bg-white">
-                    <SelectGroup className="bg-white">
-                        {Object.entries(availableWorkspaces).map(
-                            (option, _index) => {
-                                const [key, value] = option;
-                                return (
-                                    <SelectItem
-                                        key={key}
-                                        value={key}
-                                        className="bg-white h-8"
-                                    >
-                                        {`${key} (${value})`}
-                                    </SelectItem>
-                                );
-                            },
-                        )}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <Tooltip content="Select a workspace" side="bottom">
+                <div>
+                    <Select
+                        onValueChange={onWorkspaceSelect}
+                        value={workspace}
+                        disabled={!isConnected}
+                    >
+                        <SelectTrigger className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300">
+                            <SelectValue placeholder="G54" />
+                        </SelectTrigger>
+                        <SelectContent className="flex-1 bg-white">
+                            <SelectGroup className="bg-white">
+                                {Object.entries(availableWorkspaces).map(
+                                    (option, _index) => {
+                                        const [key, value] = option;
+                                        return (
+                                            <SelectItem
+                                                key={key}
+                                                value={key}
+                                                className="bg-white h-8"
+                                            >
+                                                {`${key} (${value})`}
+                                            </SelectItem>
+                                        );
+                                    },
+                                )}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </Tooltip>
         </div>
     );
 }

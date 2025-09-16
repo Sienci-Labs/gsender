@@ -25,6 +25,7 @@ import { Slider } from 'app/components/shadcn/Slider';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: {
@@ -58,6 +59,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     size="sm"
                     className="w-full"
                     active={spindleForward}
+                    tooltip={{ content: 'Start spindle moving clockwise' }}
                 />
                 <ActiveStateButton
                     onClick={actions.sendM4}
@@ -67,6 +69,9 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     size="sm"
                     className="w-full"
                     active={spindleReverse}
+                    tooltip={{
+                        content: 'Start spindle moving counterclockwise',
+                    }}
                 />
                 <ActiveStateButton
                     onClick={actions.sendM5}
@@ -75,21 +80,24 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     text="Stop"
                     size="sm"
                     className="w-full"
+                    tooltip={{ content: 'Stop spindle' }}
                 />
             </div>
             <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center my-2 items-center dark:text-white">
                 <span className="text-right">Speed</span>
-                <Slider
-                    value={[state.spindleSpeed]}
-                    min={state.spindleMin}
-                    max={state.spindleMax}
-                    step={10}
-                    className="w-3/5"
-                    onValueChange={(value) =>
-                        actions.handleSpindleSpeedChange(value[0])
-                    }
-                    disabled={!canClick}
-                />
+                <Tooltip content="Adjust spindle speed" side="bottom">
+                    <Slider
+                        value={[state.spindleSpeed]}
+                        min={state.spindleMin}
+                        max={state.spindleMax}
+                        step={10}
+                        className="w-3/5"
+                        onValueChange={(value: number[]) =>
+                            actions.handleSpindleSpeedChange(value[0])
+                        }
+                        disabled={!canClick}
+                    />
+                </Tooltip>
                 <div className={'w-[10ch] text-left flex flex-row'}>
                     {state.spindleSpeed} RPM
                 </div>
