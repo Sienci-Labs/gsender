@@ -138,6 +138,8 @@ const updateOptionsForDirection = (
     const xyThickness =
         plateType === TOUCHPLATE_TYPE_3D ? 0 : options.xyThickness;
     options.direction = direction;
+    const zThickness = plateType === TOUCHPLATE_TYPE_3D ? options.zThickness.probe3D : options.zThickness.standardBlock;
+
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
     const xRetractModifier = xProbeDir * -1;
     const yRetractModifier = yProbeDir * -1;
@@ -168,7 +170,7 @@ const updateOptionsForDirection = (
         Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
      */
     //let xyMovement = (diameter as number) + 20;
-    let xyMovement = options.xyThickness + options.retract + toolRadius;
+    let xyMovement = xyThickness + options.retract + toolRadius;
     console.log('xyMovement', xyMovement);
     options.xyPositionAdjust = xyMovement; // All units already compensated
     /*options.xyPositionAdjust =
@@ -178,7 +180,7 @@ const updateOptionsForDirection = (
     /*
        Via Chris - Z adjust should be block thickness + retraction
      */
-    const zAdjust = options.retract + options.zThickness.standardBlock;
+    const zAdjust = options.retract + zThickness;
     console.log('zadjust:', zAdjust);
     options.zPositionAdjust = zAdjust;
 
