@@ -41,17 +41,17 @@ export function RapidPositionButtons({ disabled = false }) {
     return (
         <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait">
             <div className="grid grid-cols-2 w-16 h-14 portrait:w-20 portrait:h-[68px] font-bold">
-                <svg
-                    viewBox="0 0 37 34"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cx('h-full w-full', {
-                        'cursor-pointer': !disabled,
-                        'cursor-not-allowed': disabled,
-                    })}
-                    onClick={() => jogToCorner(BACK_LEFT)}
-                >
-                    <Tooltip content="Go to Back Left Corner">
+                <Tooltip content="Go to Back Left Corner" side="top">
+                    <svg
+                        viewBox="0 0 37 34"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={cx('h-full w-full', {
+                            'cursor-pointer': !disabled,
+                            'cursor-not-allowed': disabled,
+                        })}
+                        onClick={() => jogToCorner(BACK_LEFT)}
+                    >
                         <path
                             d="M 32 0 H 0 V 32"
                             stroke-width="20"
@@ -59,19 +59,20 @@ export function RapidPositionButtons({ disabled = false }) {
                                 disabled ? disabledColorClass : altColourClass,
                             )}
                         />
-                    </Tooltip>
-                </svg>
-                <svg
-                    viewBox="0 0 27 34"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cx('h-full w-full', {
-                        'cursor-pointer': !disabled,
-                        'cursor-not-allowed': disabled,
-                    })}
-                    onClick={() => jogToCorner(BACK_RIGHT)}
-                >
-                    <Tooltip content="Go to Back Right Corner">
+                    </svg>
+                </Tooltip>
+
+                <Tooltip content="Go to Back Right Corner" side="top">
+                    <svg
+                        viewBox="0 0 27 34"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={cx('h-full w-full', {
+                            'cursor-pointer': !disabled,
+                            'cursor-not-allowed': disabled,
+                        })}
+                        onClick={() => jogToCorner(BACK_RIGHT)}
+                    >
                         <path
                             // d="M 74 32 V 0 L 42 0"
                             d="M 32 32 V 0 L 0 0"
@@ -80,19 +81,20 @@ export function RapidPositionButtons({ disabled = false }) {
                                 disabled ? disabledColorClass : altColourClass,
                             )}
                         />
-                    </Tooltip>
-                </svg>
-                <svg
-                    viewBox="0 0 37 33"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cx('h-full w-full', {
-                        'cursor-pointer': !disabled,
-                        'cursor-not-allowed': disabled,
-                    })}
-                    onClick={() => jogToCorner(FRONT_LEFT)}
-                >
-                    <Tooltip content="Go to Front Left Corner">
+                    </svg>
+                </Tooltip>
+
+                <Tooltip content="Go to Front Left Corner" side="bottom">
+                    <svg
+                        viewBox="0 0 37 33"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={cx('h-full w-full', {
+                            'cursor-pointer': !disabled,
+                            'cursor-not-allowed': disabled,
+                        })}
+                        onClick={() => jogToCorner(FRONT_LEFT)}
+                    >
                         <path
                             // d="M 0 36 L 0 67 L 32 67"
                             d="M 0 0 L 0 32 L 32 32"
@@ -101,20 +103,20 @@ export function RapidPositionButtons({ disabled = false }) {
                                 disabled ? disabledColorClass : altColourClass,
                             )}
                         />
-                    </Tooltip>
-                </svg>
+                    </svg>
+                </Tooltip>
 
-                <svg
-                    viewBox="0 0 27 33"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cx('h-full w-full', {
-                        'cursor-pointer': !disabled,
-                        'cursor-not-allowed': disabled,
-                    })}
-                    onClick={() => jogToCorner(FRONT_RIGHT)}
-                >
-                    <Tooltip content="Go to Front Right Corner">
+                <Tooltip content="Go to Front Right Corner" side="bottom">
+                    <svg
+                        viewBox="0 0 27 33"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={cx('h-full w-full', {
+                            'cursor-pointer': !disabled,
+                            'cursor-not-allowed': disabled,
+                        })}
+                        onClick={() => jogToCorner(FRONT_RIGHT)}
+                    >
                         <path
                             // d="M 42 67 H 74 V 36"
                             d="M 0 32 H 32 V 0"
@@ -123,8 +125,8 @@ export function RapidPositionButtons({ disabled = false }) {
                                 disabled ? disabledColorClass : altColourClass,
                             )}
                         />
-                    </Tooltip>
-                </svg>
+                    </svg>
+                </Tooltip>
             </div>
         </div>
     );
