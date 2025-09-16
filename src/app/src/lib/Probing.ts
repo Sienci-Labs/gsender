@@ -130,9 +130,19 @@ const updateOptionsForDirection = (
     direction: PROBE_DIRECTIONS,
 ): ProbingOptions => {
     const { units, plateType } = options;
-    const diameter = plateType === TOUCHPLATE_TYPE_3D ? options.tipDiameter3D : options.toolDiameter;
-    const xyThickness = plateType === TOUCHPLATE_TYPE_3D ? 0 : options.xyThickness;
+    console.log(options);
+    const diameter =
+        plateType === TOUCHPLATE_TYPE_3D
+            ? options.tipDiameter3D
+            : options.toolDiameter;
+    const xyThickness =
+        plateType === TOUCHPLATE_TYPE_3D ? 0 : options.xyThickness;
     options.direction = direction;
+    const zThickness =
+        plateType === TOUCHPLATE_TYPE_3D
+            ? options.zThickness.probe3D
+            : options.zThickness.standardBlock;
+
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
     const xRetractModifier = xProbeDir * -1;
     const yRetractModifier = yProbeDir * -1;
@@ -158,13 +168,33 @@ const updateOptionsForDirection = (
     options.xThickness = toolCompensatedXY * xProbeDir;
 
     // Figure out movement distances for getting bit into position
-    let xyMovement = (diameter as number) + 20;
-    options.xyPositionAdjust =
+    console.log('diameter', diameter);
+    /*
+        Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
+     */
+    //let xyMovement = (diameter as number) + 20;
+    let xyMovement =
+        (plateType === TOUCHPLATE_TYPE_3D ? options.xyRetract3D : xyThickness) +
+        options.retract +
+        toolRadius;
+    console.log('xyMovement', xyMovement);
+    options.xyPositionAdjust = xyMovement; // All units already compensated
+    /*options.xyPositionAdjust =
         units === METRIC_UNITS
             ? xyMovement
-            : Number(mm2in(xyMovement).toFixed(3));
-    options.zPositionAdjust =
-        units === METRIC_UNITS ? 15 : Number(mm2in(15).toFixed(3));
+            : Number(mm2in(xyMovement).toFixed(3));*/
+    /*
+       Via Chris - Z adjust should be block thickness + retraction
+     */
+    let probe3dOffset = options.plateType === TOUCHPLATE_TYPE_3D ? 5 : 0;
+    probe3dOffset =
+        units === METRIC_UNITS
+            ? probe3dOffset
+            : Number(mm2in(probe3dOffset).toFixed(3));
+
+    const zAdjust = options.retract + zThickness + probe3dOffset;
+    console.log('zadjust:', zAdjust);
+    options.zPositionAdjust = zAdjust;
 
     return options;
 };
@@ -192,18 +222,22 @@ export const get3AxisStandardRoutine = (
     const code: Array<string> = [];
 
     code.push(...getPreamble(options));
-    const { axes } = options;
+    const { axes, units } = options;
 
     // invalid axes, we go next
     if (typeof axes !== 'object') {
         return [];
     }
 
+    // Extra 6mm adjustment based on Chris suggestions
+    let initialPositionAdjustment =
+        units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
+
     if (axes.z) {
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
         code.push(
-            'G91 G0 X[X_ADJUST * X_RETRACT_DIRECTION]',
+            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`, // change via Chris
             'G0 Z-[Z_ADJUST]',
         );
     }
@@ -223,7 +257,7 @@ export const get3AxisStandardRoutine = (
     if (axes.y) {
         // Move into position for Y
         code.push(
-            'G0 X[X_RETRACT_DISTANCE * 2]',
+            'G0 X[X_RETRACT_DISTANCE]',
             'G0 Y[Y_ADJUST * Y_RETRACT_DIRECTION]',
             'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
         );
@@ -268,7 +302,7 @@ export const get3AxisAutoRoutine = ({
     direction,
     firmware,
     homingEnabled,
-    zThickness
+    zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -615,7 +649,7 @@ export const get3AxisAutoDiameterRoutine = ({
     direction,
     toolDiameter,
     homingEnabled,
-    zThickness
+    zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -630,11 +664,10 @@ export const get3AxisAutoDiameterRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
-    const toolRadius = (toolDiameter / 2);
-    const toolCompensatedThickness = ((-1 * toolRadius));
+    const toolRadius = toolDiameter / 2;
+    const toolCompensatedThickness = -1 * toolRadius;
     // Addition because it's already negative
     const compensatedValue = 22.5 + toolCompensatedThickness;
-
 
     if (axes.z && axes.y && axes.z) {
         code.push(

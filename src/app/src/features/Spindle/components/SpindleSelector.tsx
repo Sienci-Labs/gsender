@@ -1,5 +1,8 @@
 import Select from 'react-select';
 import cx from 'classnames';
+
+import Tooltip from 'app/components/Tooltip';
+
 import { Spindle } from '../definitions';
 
 type FormattedSpindle = {
@@ -25,24 +28,26 @@ const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
     const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
     return (
-        <div
-            className={cx(
-                'flex gap-1 justify-center my-2 w-full items-center',
-                {
-                    'cursor-not-allowed': disabled,
-                },
-            )}
-        >
-            <Select<FormattedSpindle>
-                options={formattedSpindles}
-                placeholder="Default Spindle"
-                value={spindleFormatted}
-                onChange={onChange}
-                className="w-full z-10"
-                menuPlacement="top"
-                isDisabled={disabled}
-            />
-        </div>
+        <Tooltip content="Select a spindle">
+            <div
+                className={cx(
+                    'flex gap-1 justify-center my-2 w-full items-center',
+                    {
+                        'cursor-not-allowed': disabled,
+                    },
+                )}
+            >
+                <Select<FormattedSpindle>
+                    options={formattedSpindles}
+                    placeholder="Default Spindle"
+                    value={spindleFormatted}
+                    onChange={onChange}
+                    className="w-full z-10"
+                    menuPlacement="top"
+                    isDisabled={disabled}
+                />
+            </div>
+        </Tooltip>
     );
 };
 

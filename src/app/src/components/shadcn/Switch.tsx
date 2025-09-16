@@ -28,10 +28,10 @@ const Switch = React.forwardRef<
                 className,
                 isVertical ? 'flex-col h-11 w-6 ' : 'items-center h-6 w-11 ',
             )}
-            {...props}
             ref={ref}
             id={id}
             onCheckedChange={(checked) => onChange(checked, id)}
+            {...props}
         >
             <SwitchPrimitives.Thumb
                 className={cx(

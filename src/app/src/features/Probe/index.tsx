@@ -153,6 +153,9 @@ const ProbeWidget = () => {
     const [tipDiameter3D, setTipDiameter3D] = useState<number>(
         config.get('tipDiameter3D') || 2,
     );
+    const [xyRetract3D, setXYRetract3D] = useState<number>(
+        config.get('xyRetract3D') || {},
+    );
     const [touchplate, setTouchplate] = useState<ProbeProfile>(
         store.get('workspace.probeProfile', {}),
     );
@@ -405,7 +408,13 @@ const ProbeWidget = () => {
                 ? PROBE_DISTANCE_METRIC
                 : PROBE_DISTANCE_IMPERIAL;
         // Grab units for correct modal
-        let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
+        let zThickness,
+            xyThickness,
+            feedrate,
+            fastFeedrate,
+            retractDistance,
+            tipDiameter,
+            xyRetract;
         const modal = units === METRIC_UNITS ? '21' : '20';
         if (units === METRIC_UNITS) {
             zThickness = touchplate.zThickness;
@@ -413,6 +422,8 @@ const ProbeWidget = () => {
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
+            tipDiameter = tipDiameter3D;
+            xyRetract = xyRetract3D;
         } else {
             zThickness = {
                 autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
@@ -426,6 +437,8 @@ const ProbeWidget = () => {
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
+            tipDiameter = convertToImperial(tipDiameter3D);
+            xyRetract = convertToImperial(xyRetract3D);
         }
 
         const options = {
@@ -443,7 +456,8 @@ const ProbeWidget = () => {
             probeDistances,
             probeType,
             homingEnabled: $22 !== '0',
-            tipDiameter3D,
+            tipDiameter3D: tipDiameter,
+            xyRetract3D: xyRetract,
         };
 
         const code = getProbeCode(options, direction);
@@ -497,6 +511,7 @@ const ProbeWidget = () => {
         setRetractionDistance(config.get('retractionDistance') || {});
         setZProbeDistance(config.get('zProbeDistance') || {});
         setTipDiameter3D(config.get('tipDiameter3D', 0));
+        setXYRetract3D(config.get('xyRetract3D', 10));
         setConnectivityTest(config.get('connectivityTest'));
 
         let newZProbeDistance = config.get('zProbeDistance');

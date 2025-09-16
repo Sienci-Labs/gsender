@@ -583,6 +583,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'XY retract',
+                        key: 'workspace.probe.xyRetract3D',
+                        description:
+                            '. (Default 10)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero or Z-only touchplate
+                            return probeType !== TOUCHPLATE_TYPE_3D;
+                        },
+                    },
+                    {
                         label: 'Tip Diameter',
                         key: 'widgets.probe.tipDiameter3D',
                         description:

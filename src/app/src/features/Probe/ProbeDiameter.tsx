@@ -63,6 +63,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: Actions;
@@ -416,20 +417,25 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                         </div>
                         <div className="pt-2 border-t">
                             <div className="flex items-center space-x-2">
-                                <Input
-                                    placeholder={`Custom diameter (${units})`}
-                                    onKeyDown={(
-                                        e: KeyboardEvent<HTMLInputElement>,
-                                    ) => {
-                                        if (e.key === 'Enter') {
-                                            handleCreateOption(
-                                                inputRef.current.value,
-                                            );
-                                        }
-                                    }}
-                                    sizing="sm"
-                                    ref={inputRef}
-                                />
+                                <Tooltip
+                                    content="Create and use a custom probe diameter"
+                                    side="bottom"
+                                >
+                                    <Input
+                                        placeholder={`Custom diameter (${units})`}
+                                        onKeyDown={(
+                                            e: KeyboardEvent<HTMLInputElement>,
+                                        ) => {
+                                            if (e.key === 'Enter') {
+                                                handleCreateOption(
+                                                    inputRef.current.value,
+                                                );
+                                            }
+                                        }}
+                                        sizing="sm"
+                                        ref={inputRef}
+                                    />
+                                </Tooltip>
                                 <Button
                                     onClick={() => {
                                         if (inputRef.current.value) {

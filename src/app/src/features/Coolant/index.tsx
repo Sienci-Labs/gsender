@@ -132,6 +132,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={mistActive}
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn on mist coolant' }}
                 />
                 <ActiveStateButton
                     text="Flood"
@@ -141,6 +142,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={floodActive}
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn on flood coolant' }}
                 />
                 <ActiveStateButton
                     text="Off"
@@ -149,6 +151,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="lg"
                     className="w-full h-16"
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn off coolant' }}
                 />
             </div>
         </div>
