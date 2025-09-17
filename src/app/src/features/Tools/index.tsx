@@ -64,7 +64,7 @@ const Tools = () => {
     return (
         <Widget>
             <Widget.Content>
-                <Tabs items={filteredTabs as TabItem[]} />
+                <Tabs items={filteredTabs as TabItem[]} tabSetId="tools" />
             </Widget.Content>
         </Widget>
     );
