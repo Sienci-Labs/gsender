@@ -130,6 +130,7 @@ export interface Actions {
     _setToolDiameter: (selection: { value: number }) => void;
     nextProbeDirection: () => void;
     _setProbeType: (value: string) => void;
+    _setCurrentTool: (tool: AvailableTool) => void;
 }
 
 export interface AvailableTool {
