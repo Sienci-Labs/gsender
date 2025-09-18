@@ -46,7 +46,7 @@ export function WorkspaceSelector() {
     return (
         <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center justify-end gap-2">
             <span className="text-gray-400 text-normal">Workspace:</span>
-            <Tooltip content="Select a workspace" side="bottom">
+            <Tooltip content="Select a workspace" side="left">
                 <div>
                     <Select
                         onValueChange={onWorkspaceSelect}
