@@ -28,6 +28,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: LaserActions;
@@ -68,6 +69,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     active={laserIsOn}
                     size={'sm'}
                     disabled={!canClick}
+                    tooltip={{ content: 'Turn laser on' }}
                 />
                 <ActiveStateButton
                     onClick={actions.runLaserTest}
@@ -75,6 +77,10 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     text="Laser Test"
                     size={'sm'}
                     disabled={!canClick}
+                    tooltip={{
+                        content:
+                            'Test laser by turning on for specified duration',
+                    }}
                 />
                 <ActiveStateButton
                     onClick={actions.sendM5}
@@ -82,32 +88,37 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     text="Laser Off"
                     size={'sm'}
                     disabled={!canClick}
+                    tooltip={{ content: 'Turn laser off' }}
                 />
             </div>
             <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
                 <span className="text-right">Power</span>
-                <Slider
-                    value={[laser.power]}
-                    max={100}
-                    step={1}
-                    onValueChange={(value) =>
-                        actions.handleLaserPowerChange(value[0])
-                    }
-                    disabled={!canClick}
-                />
+                <Tooltip content="Adjust laser power">
+                    <Slider
+                        value={[laser.power]}
+                        max={100}
+                        step={1}
+                        onValueChange={(value: number[]) =>
+                            actions.handleLaserPowerChange(value[0])
+                        }
+                        disabled={!canClick}
+                    />
+                </Tooltip>
                 <span>{laser.power}%</span>
             </div>
             <div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
                 <label>Test Duration:</label>
                 <div className="flex gap-2">
-                    <ControlledInput
-                        value={laser.duration}
-                        onChange={actions.handleLaserDurationChange}
-                        className="z-0 text-center text-blue-500 text-xl"
-                        suffix="sec"
-                        type="number"
-                        sizing="xs"
-                    />
+                    <Tooltip content="Adjust laser test duration">
+                        <ControlledInput
+                            value={laser.duration}
+                            onChange={actions.handleLaserDurationChange}
+                            className="z-0 text-center text-blue-500 text-xl"
+                            suffix="sec"
+                            type="number"
+                            sizing="xs"
+                        />
+                    </Tooltip>
                 </div>
             </div>
         </div>

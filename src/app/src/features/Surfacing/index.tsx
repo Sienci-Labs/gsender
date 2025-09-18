@@ -124,6 +124,21 @@ const SurfacingTool = () => {
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
+    const convertedDefaultSurfacingState =
+        units === 'mm'
+            ? defaultSurfacingState
+            : {
+                  ...defaultSurfacingState,
+                  bitDiameter: convertToImperial(
+                      defaultSurfacingState.bitDiameter,
+                  ),
+                  feedrate: convertToImperial(defaultSurfacingState.feedrate),
+                  length: convertToImperial(defaultSurfacingState.length),
+                  width: convertToImperial(defaultSurfacingState.width),
+                  skimDepth: convertToImperial(defaultSurfacingState.skimDepth),
+                  maxDepth: convertToImperial(defaultSurfacingState.maxDepth),
+              };
+
     return (
         <>
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
@@ -151,7 +166,7 @@ const SurfacingTool = () => {
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default is ${defaultSurfacingState.width}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.width}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -174,7 +189,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default is ${defaultSurfacingState.length}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.length}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -198,7 +213,7 @@ const SurfacingTool = () => {
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default is ${defaultSurfacingState.skimDepth}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.skimDepth}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -221,7 +236,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default is ${defaultSurfacingState.maxDepth}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.maxDepth}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -244,7 +259,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Bit Diameter">
                             <Tooltip
-                                content={`Default is ${defaultSurfacingState.bitDiameter}`}
+                                content={`Default is ${convertedDefaultSurfacingState.bitDiameter}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -263,7 +278,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Stepover">
                             <Tooltip
-                                content={`Default is ${defaultSurfacingState.stepover}`}
+                                content={`Default is ${convertedDefaultSurfacingState.stepover}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -282,7 +297,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Feed Rate">
                             <Tooltip
-                                content={`Default is ${defaultSurfacingState.feedrate}`}
+                                content={`Default is ${convertedDefaultSurfacingState.feedrate}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -302,7 +317,7 @@ const SurfacingTool = () => {
                         <InputArea label="Spindle RPM">
                             <div className="grid grid-cols-2 gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default is ${defaultSurfacingState.spindleRPM}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.spindleRPM}`}
                                 >
                                     <ControlledInput
                                         type="number"

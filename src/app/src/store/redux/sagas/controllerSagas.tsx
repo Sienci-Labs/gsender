@@ -602,7 +602,6 @@ export function* initialize(): Generator<any, void, any> {
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }
-
             pubsub.publish('wizard:load', {
                 ...payload,
                 title,

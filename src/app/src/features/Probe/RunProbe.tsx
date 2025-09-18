@@ -133,8 +133,8 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     }, []);
 
     const { touchplateType } = touchplate;
-    const probeCommands = actions.generateProbeCommands();
-    console.log(probeCommands.length);
+    //const probeCommands = actions.generateProbeCommands();
+    //console.log(probeCommands.length);
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     const probeActive = actions.returnProbeConnectivity();

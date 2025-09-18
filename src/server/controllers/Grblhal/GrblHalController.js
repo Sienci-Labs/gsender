@@ -478,6 +478,8 @@ class GrblHalController {
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
+                    console.log(toolChangeOption);
+                    console.log(this.toolChangeContext);
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {

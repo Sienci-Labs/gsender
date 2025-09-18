@@ -442,7 +442,7 @@ function DRO({
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
                 {!shouldWarnZero ? (
                     <Button
                         tooltip={{ content: 'Zero all axes', side: 'left' }}
