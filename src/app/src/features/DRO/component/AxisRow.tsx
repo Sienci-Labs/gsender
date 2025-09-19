@@ -116,7 +116,7 @@ export function AxisRow({
                 variant="alt"
                 size="sm"
                 tooltip={{
-                    content: `Go to ${label}-axis zero position`,
+                    content: `Go to ${label}-axis zero`,
                 }}
             >
                 <span className="text-lg font-mono">{label}</span>
