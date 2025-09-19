@@ -502,7 +502,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         ],
                     },
                     {
-                        label: 'Z thickness Block',
+                        label: 'Tip diameter',
+                        key: 'widgets.probe.tipDiameter3D',
+                        description:
+                            'Diameter of probe tip where it touches off the material. (Default 2)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using 3D probe
+                            return probeType !== TOUCHPLATE_TYPE_3D;
+                        },
+                    },
+                    {
+                        label: 'Block thickness',
                         key: 'workspace.probeProfile.zThickness.standardBlock',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
@@ -518,7 +534,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z thickness AZ',
+                        label: 'AutoZero thickness',
                         key: 'workspace.probeProfile.zThickness.autoZero',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
@@ -534,7 +550,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z thickness Puck',
+                        label: 'Puck thickness',
                         key: 'workspace.probeProfile.zThickness.zProbe',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
@@ -561,7 +577,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are not using Puck touchplate
+                            // Hidden if we are not using 3D probe
                             return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
@@ -577,7 +593,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero or Z-only touchplate
+                            // Hidden if we are not using Block touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
                         },
                     },
@@ -585,7 +601,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'XY retract',
                         key: 'workspace.probe.xyRetract3D',
                         description:
-                            '. (Default 10)',
+                            'How much extra to move off the surface when probing. (Default 0)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -593,22 +609,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero or Z-only touchplate
-                            return probeType !== TOUCHPLATE_TYPE_3D;
-                        },
-                    },
-                    {
-                        label: 'Tip Diameter',
-                        key: 'widgets.probe.tipDiameter3D',
-                        description:
-                            'Diameter of probe tip where it touches off the material. (Default 2)',
-                        type: 'number',
-                        unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
-                                'workspace.probeProfile.touchplateType',
-                                '',
-                            );
+                            // Hidden if we are not using 3D probe
                             return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
