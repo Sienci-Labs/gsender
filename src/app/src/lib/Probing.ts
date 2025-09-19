@@ -210,7 +210,7 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
-        `G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
+        `G91 G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
     ];
 
     return code;
@@ -229,7 +229,8 @@ export const get3AxisStandardRoutine = (
         return [];
     }
 
-    // Extra 6mm adjustment based on Chris suggestions
+    // Extra movement to compensate for variation in bit placement informed by starting circle diameter
+    // Adjustment based on Chris' suggestions
     let initialPositionAdjustment =
         units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
 
@@ -237,8 +238,8 @@ export const get3AxisStandardRoutine = (
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
         code.push(
-            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`, // change via Chris
-            'G0 Z-[Z_ADJUST]',
+            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
+            'G91 G0 Z-[Z_ADJUST]',
         );
     }
     if (axes.x) {
@@ -246,8 +247,8 @@ export const get3AxisStandardRoutine = (
         // We start at different location for
         if (!axes.z) {
             code.push(
-                'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
-                'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
+                'G91 G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
+                'G91 G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
             );
         }
 
@@ -257,16 +258,15 @@ export const get3AxisStandardRoutine = (
     if (axes.y) {
         // Move into position for Y
         code.push(
-            'G0 X[X_RETRACT_DISTANCE]',
-            'G0 Y[Y_ADJUST * Y_RETRACT_DIRECTION]',
-            'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
+            `G91 G0 Y[(Y_ADJUST + ${initialPositionAdjustment}) * Y_RETRACT_DIRECTION]`,
+            'G91 G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
         );
 
         // Probe Y
         code.push(...getSingleAxisStandardRoutine('Y'));
     }
     // Move back to original position
-    code.push('G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
+    code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
     return code;
 };
 
