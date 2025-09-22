@@ -23,6 +23,7 @@ import store from 'app/store';
 import { FaMicrochip } from 'react-icons/fa6';
 import { GRBLHAL } from 'app/constants';
 import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
+import Tooltip from 'app/components/Tooltip';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -235,28 +236,34 @@ export function SettingRow({
             </span>
             <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                 {!isDefault && (
-                    <button
-                        className="text-3xl"
-                        title="Reset Setting"
-                        onClick={() => {
-                            Confirm({
-                                title: 'Reset setting',
-                                content:
-                                    'Are you sure you want to reset this value to default?',
-                                confirmLabel: 'Yes',
-                                onConfirm: () => {
-                                    handleProgramSettingReset(populatedValue);
-                                },
-                            });
-                        }}
-                    >
-                        <BiReset />
-                    </button>
+                    <Tooltip content="Reset to the default value">
+                        <button
+                            className="text-3xl"
+                            title=""
+                            onClick={() => {
+                                Confirm({
+                                    title: 'Reset setting',
+                                    content:
+                                        'Are you sure you want to reset this value to default?',
+                                    confirmLabel: 'Yes',
+                                    onConfirm: () => {
+                                        handleProgramSettingReset(
+                                            populatedValue,
+                                        );
+                                    },
+                                });
+                            }}
+                        >
+                            <BiReset />
+                        </button>
+                    </Tooltip>
                 )}
                 {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
-                    <span className="text-robin-500 text-4xl">
-                        <FaMicrochip />
-                    </span>
+                    <Tooltip content="Machine setting">
+                        <span className="text-robin-500 text-4xl">
+                            <FaMicrochip />
+                        </span>
+                    </Tooltip>
                 ) : (
                     <span className="text-robin-500 min-w-9" />
                 )}
