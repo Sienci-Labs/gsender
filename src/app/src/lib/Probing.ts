@@ -263,8 +263,10 @@ export const get3AxisStandardRoutine = (
         // Probe Y
         code.push(...getSingleAxisStandardRoutine('Y'));
     }
-    // Move back to original position
-    code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
+    if (axes.z) {
+        // Move back to original XYZ position
+        code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
+    }
     return code;
 };
 
@@ -315,7 +317,7 @@ export const get3AxisAutoRoutine = ({
         prependUnits = 'G20';
     }
 
-    let zDistance = 18;
+    let zDistance = 25;
     if (homingEnabled) {
         zDistance = getZDownTravel(zDistance);
         //console.log(zDistance);
@@ -498,7 +500,7 @@ export const get3AxisAutoTipRoutine = ({
     if ($13 === '1') {
         prependUnits = 'G20';
     }
-    let zDistance = 18;
+    let zDistance = 25;
     if (homingEnabled) {
         zDistance = getZDownTravel(zDistance);
     }
@@ -679,7 +681,7 @@ export const get3AxisAutoDiameterRoutine = ({
         toolDiameter,
     );
 
-    let zDistance = 18;
+    let zDistance = 25;
     if (homingEnabled) {
         zDistance = getZDownTravel(zDistance);
     }
