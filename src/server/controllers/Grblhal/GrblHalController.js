@@ -489,7 +489,8 @@ class GrblHalController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption !== 'Ignore') {
+                    // If toolchange is at very beginning of file, ignore it
+                    if (toolChangeOption !== 'Ignore' && sent > 20) {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
                         }
