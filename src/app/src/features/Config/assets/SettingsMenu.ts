@@ -572,6 +572,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Adjust to improve the Z zeroing accuracy of your probe. (Default 0)',
                         type: 'number',
                         unit: 'mm',
+                        defaultValue: 0,
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',
@@ -604,6 +605,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'How much extra to move off the surface when probing. (Default 0)',
                         type: 'number',
                         unit: 'mm',
+                        defaultValue: 10,
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',
