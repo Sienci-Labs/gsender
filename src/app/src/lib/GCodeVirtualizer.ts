@@ -96,7 +96,11 @@ export const rotateAxis = (
         throw new Error('Axis is required');
     }
 
-    const angle = toRadians(a);
+    // Invert the A-axis angle to match the expected rotation direction convention
+    // This fixes the issue where G-code uses negative A values for clockwise rotation
+    // but the visualization expects the opposite convention
+    const angle = toRadians(-a);
+    // const angle = toRadians(a);
 
     // Calculate the sine and cosine of the angle
     const sinA = Math.sin(angle);
