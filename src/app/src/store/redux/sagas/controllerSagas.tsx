@@ -922,10 +922,6 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:start', () => {
         errors = [];
-        const revertWorkspace = store.get('workspace.revertWorkspace');
-        if (!revertWorkspace) {
-            controller.command('gcode', '%global.state.workspace=modal.wcs');
-        }
     });
 
     controller.addListener('job:stop', () => {
