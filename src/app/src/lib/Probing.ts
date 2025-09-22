@@ -91,7 +91,6 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
     return [
         '; Initial Probe setup',
         '%UNITS=modal.units',
-        '%DWELL=0.3',
         `%Z_ADJUST=${zPositionAdjust}`,
         `%X_ADJUST=${xyPositionAdjust}`,
         `%Y_ADJUST=${xyPositionAdjust}`,
@@ -176,13 +175,13 @@ const updateOptionsForDirection = (
         options.retract +
         toolRadius;
     //console.log('xyMovement', xyMovement);
-    
+
     options.xyPositionAdjust = xyMovement; // All units already compensated
     /*options.xyPositionAdjust =
         units === METRIC_UNITS
             ? xyMovement
             : Number(mm2in(xyMovement).toFixed(3));*/
-    
+
     // Via Chris - Z adjust should be block thickness + retraction
     let probe3dOffset = options.plateType === TOUCHPLATE_TYPE_3D ? 5 : 0;
     probe3dOffset =
@@ -207,7 +206,7 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G91 G0 ${axis}[${axisRetract}]`,
         `%retractSign=Math.sign(${axisRetract})`,
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
-        'G4 P[DWELL]',
+        'G4 P[PROBE_DELAY]',
         `G10 L20 ${p} ${axis}[${axis}_THICKNESS]`,
         `G91 G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
     ];
@@ -659,11 +658,13 @@ export const get3AxisAutoDiameterRoutine = ({
     axes,
     direction,
     toolDiameter,
+    firmware,
     homingEnabled,
     zThickness,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
+    const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
     const [xOff, yOff] = determineAutoPlateOffsetValues(
         direction,
