@@ -493,7 +493,7 @@ function DRO({
                     onClick={goXYAxes}
                     disabled={!canClick}
                     size="sm"
-                    tooltip={{ content: 'Go to XY axis', side: 'bottom' }}
+                    tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                 >
                     <span className="font-mono text-lg">
                         {isRotaryMode ? 'XA' : 'XY'}
