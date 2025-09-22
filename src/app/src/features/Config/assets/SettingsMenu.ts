@@ -196,6 +196,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: OUTLINE_MODES
                     },
                     {
+                        label: 'Revert workspace',
+                        key: 'workspace.revertWorkspace',
+                        type: 'boolean',
+                        defaultValue: false,
+                        description: 'Allow g-code \'job finishing\' commands like M2 and M30 to reset your CNC\'s workspace back to G54 at the end of each job.',
+                        options: OUTLINE_MODES
+                    },
+                    {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:
