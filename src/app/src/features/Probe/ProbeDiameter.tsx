@@ -399,6 +399,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                             role="combobox"
                             className="w-full justify-between bg-white dark:bg-gray-800"
                             disabled={!probeCommand.tool}
+                            tooltip={{
+                                content: 'Select tool diameter',
+                                side: 'left',
+                            }}
                         >
                             {value ? (
                                 <span>

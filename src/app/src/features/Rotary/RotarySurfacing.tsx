@@ -247,7 +247,7 @@ const RotarySurfacing = () => {
                         </InputArea>
                         <InputArea label="Stepover">
                             <Tooltip
-                                content={`Default is ${defaultValue.stepover} ${units}`}
+                                content={`Default is ${defaultValue.stepover}%`}
                             >
                                 <ControlledInput
                                     id="stepover"
@@ -311,17 +311,21 @@ const RotarySurfacing = () => {
                         </InputArea>
 
                         <InputArea label="Enable Rehoming">
-                            <div className="flex items-center gap-2 justify-center">
-                                <Switch
-                                    checked={surfacingState.enableRehoming}
-                                    onChange={(checked) =>
-                                        setSurfacingState((prev) => ({
-                                            ...prev,
-                                            enableRehoming: checked,
-                                        }))
-                                    }
-                                />
-                            </div>
+                            <Tooltip
+                                content={`Default is ${defaultValue.enableRehoming ? 'on' : 'off'}`}
+                            >
+                                <div className="flex items-center gap-2 justify-center">
+                                    <Switch
+                                        checked={surfacingState.enableRehoming}
+                                        onChange={(checked) =>
+                                            setSurfacingState((prev) => ({
+                                                ...prev,
+                                                enableRehoming: checked,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            </Tooltip>
                             <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
                                 Cut faster and cleaner by only rotating one
                                 direction, but you will need to rehome your

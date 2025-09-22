@@ -10,10 +10,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import { Input } from 'app/components/shadcn/Input';
+import Tooltip from 'app/components/Tooltip';
 
 import { MACRO_VARIABLES } from './constants';
 import insertAtCaret from './insertAtCaret';
-import { Input } from 'app/components/shadcn/Input';
 
 const MAX_CHARACTERS = 128;
 
@@ -190,15 +191,18 @@ const MacroForm = ({
                                 }}
                             />
                         </div>
-                        <textarea
-                            ref={contentRef}
-                            rows={10}
-                            className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
-                            name="content"
-                            value={macroState.content}
-                            onChange={handleInputChange}
-                            required
-                        />
+
+                        <Tooltip content="Enter macro commands here. You can use macro variables to insert values into the commands.">
+                            <textarea
+                                ref={contentRef}
+                                rows={10}
+                                className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
+                                name="content"
+                                value={macroState.content}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Tooltip>
                     </div>
                     <div className="flex flex-col gap-2 mb-4">
                         <label>Macro Description</label>
