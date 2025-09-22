@@ -9,9 +9,7 @@ import { NumberSettingInput } from 'app/features/Config/components/SettingInputs
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
-import {
-    useSettings,
-} from 'app/features/Config/utils/SettingsContext.tsx';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
@@ -138,7 +136,7 @@ export function SettingRow({
         firmwareType,
         connected,
         isSettingDefault,
-        getEEPROMDefaultValue
+        getEEPROMDefaultValue,
     } = useSettings();
 
     const displaySetting = { ...setting };
@@ -169,7 +167,7 @@ export function SettingRow({
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
             const defaultVal = getEEPROMDefaultValue(setting.eID);
             if (defaultVal !== '-') {
-                handleSingleSettingReset(setting.eID, defaultVal)
+                handleSingleSettingReset(setting.eID, defaultVal);
             } else {
                 toast.error(`No default found for $${setting.eID}.`);
             }
