@@ -1603,6 +1603,8 @@ class GrblController {
                 const [options] = args;
                 const { force = false } = { ...options };
 
+                this.emit('job:stop');
+
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
                     let activeState;

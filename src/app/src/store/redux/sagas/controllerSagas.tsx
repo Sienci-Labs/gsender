@@ -105,7 +105,7 @@ import {
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
-import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
+import { getEstimateData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
@@ -265,7 +265,7 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 // await getParsedData().then((value) => {
-                const parsedData = null;
+                const parsedData: null = null;
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
@@ -318,7 +318,7 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         // await getParsedData().then((value) => {
-        const parsedData = null;
+        const parsedData: null = null;
         visualizeWorker.postMessage({
             content,
             visualizer,
@@ -922,6 +922,17 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:start', () => {
         errors = [];
+        const revertWorkspace = store.get('workspace.revertWorkspace');
+        if (revertWorkspace) {
+            controller.command('gcode', '%global.state.workspace=modal.wcs');
+        }
+    });
+
+    controller.addListener('job:stop', () => {
+        const revertWorkspace = store.get('workspace.revertWorkspace');
+        if (revertWorkspace) {
+            controller.command('gcode', '[global.state.workspace]');
+        }
     });
 
     yield null;
