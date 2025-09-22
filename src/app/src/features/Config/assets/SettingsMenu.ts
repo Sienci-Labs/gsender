@@ -1356,14 +1356,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Force soft limits',
                         key: 'workspace.rotaryAxis.firmwareSettings.$20',
                         description:
-                            'Enable soft limits when toggling into rotary mode. (Grbl only)',
+                            'Enable soft limits when toggling into rotary mode (grbl only).',
                         type: 'boolean',
                     },
                     {
                         label: 'Force hard limits',
                         key: 'workspace.rotaryAxis.firmwareSettings.$21',
                         description:
-                            'Enable hard limits when toggling into rotary mode. (Grbl only)',
+                            'Enable hard limits when toggling into rotary mode (grbl only).',
                         type: 'boolean',
                     },
                 ],
