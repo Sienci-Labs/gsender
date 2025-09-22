@@ -169,23 +169,21 @@ const updateOptionsForDirection = (
 
     // Figure out movement distances for getting bit into position
     console.log('diameter', diameter);
-    /*
-        Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
-     */
-    //let xyMovement = (diameter as number) + 20;
+
+    //Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
     let xyMovement =
         (plateType === TOUCHPLATE_TYPE_3D ? options.xyRetract3D : xyThickness) +
         options.retract +
         toolRadius;
-    console.log('xyMovement', xyMovement);
+    //console.log('xyMovement', xyMovement);
+    
     options.xyPositionAdjust = xyMovement; // All units already compensated
     /*options.xyPositionAdjust =
         units === METRIC_UNITS
             ? xyMovement
             : Number(mm2in(xyMovement).toFixed(3));*/
-    /*
-       Via Chris - Z adjust should be block thickness + retraction
-     */
+    
+    // Via Chris - Z adjust should be block thickness + retraction
     let probe3dOffset = options.plateType === TOUCHPLATE_TYPE_3D ? 5 : 0;
     probe3dOffset =
         units === METRIC_UNITS
@@ -193,7 +191,7 @@ const updateOptionsForDirection = (
             : Number(mm2in(probe3dOffset).toFixed(3));
 
     const zAdjust = options.retract + zThickness + probe3dOffset;
-    console.log('zadjust:', zAdjust);
+    //console.log('zadjust:', zAdjust);
     options.zPositionAdjust = zAdjust;
 
     return options;
@@ -244,10 +242,10 @@ export const get3AxisStandardRoutine = (
     }
     if (axes.x) {
         // Move into position for X
-        // We start at different location for
+        // We start at different location for XY probing
         if (!axes.z) {
             code.push(
-                'G91 G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
+                'G91 G0 X[X_RETRACT_DISTANCE]',
                 'G91 G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
             );
         }
