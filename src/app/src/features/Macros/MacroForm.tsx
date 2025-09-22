@@ -201,6 +201,7 @@ const MacroForm = ({
                                 value={macroState.content}
                                 onChange={handleInputChange}
                                 required
+                                title=""
                             />
                         </Tooltip>
                     </div>
@@ -214,6 +215,7 @@ const MacroForm = ({
                             name="description"
                             value={macroState.description}
                             onChange={handleInputChange}
+                            title=""
                         />
                     </div>
                     <DialogFooter>
