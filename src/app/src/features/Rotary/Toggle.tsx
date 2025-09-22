@@ -20,8 +20,8 @@ const Toggle = () => {
 
     const tooltipContent =
         controllerType === 'grblHAL'
-            ? 'Toggle between 4-axis and rotary mode'
-            : 'Toggle rotary mode';
+            ? 'Enable 4-axis or Rotary mode'
+            : 'Toggle Rotary mode';
 
     return (
         <div className="flex items-center gap-2 dark:text-white">
