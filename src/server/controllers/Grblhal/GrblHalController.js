@@ -1557,6 +1557,8 @@ class GrblHalController {
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
 
+                this.command('gcode', '%global.state.workspace=modal.wcs');
+
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
