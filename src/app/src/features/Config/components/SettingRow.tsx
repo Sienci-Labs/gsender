@@ -236,7 +236,7 @@ export function SettingRow({
             </span>
             <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                 {!isDefault && (
-                    <Tooltip content="Reset to the default value">
+                    <Tooltip content="Reset to default value">
                         <button
                             className="text-3xl"
                             title=""
