@@ -117,7 +117,7 @@ const MacroForm = ({
                         more efficient.
                     </DialogDescription>
                     <div className="flex flex-col gap-2 my-4">
-                        <label>Macro Name</label>
+                        <label>Name</label>
                         <Input
                             ref={nameRef}
                             maxLength={MAX_CHARACTERS}
@@ -130,7 +130,7 @@ const MacroForm = ({
                     </div>
                     <div className="flex flex-col gap-2 mb-4">
                         <div className="flex flex-row gap-2 items-center justify-between">
-                            <label>Macro Commands</label>
+                            <label>G-code</label>
                             <Select<OptionType>
                                 options={options}
                                 onChange={(selectedOption: OptionType) => {
@@ -147,7 +147,7 @@ const MacroForm = ({
                                     }
                                 }}
                                 className="w-1/2"
-                                placeholder="Macro Variables"
+                                placeholder="Variables"
                                 value={null}
                                 styles={{
                                     option: (provided: any, state: any) => ({
@@ -192,7 +192,7 @@ const MacroForm = ({
                             />
                         </div>
 
-                        <Tooltip content="Enter macro commands here. You can use macro variables to insert values into the commands.">
+                        <Tooltip content="Add your g-code here. Use the variables or JavaScript logic to create more complex commands.">
                             <textarea
                                 ref={contentRef}
                                 rows={10}
