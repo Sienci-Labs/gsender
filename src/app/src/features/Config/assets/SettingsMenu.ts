@@ -600,9 +600,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         label: 'XY retract',
-                        key: 'workspace.probe.xyRetract3D',
+                        key: 'widgets.probe.xyRetract3D',
                         description:
-                            'How much extra to move off the surface when probing. (Default 0)',
+                            'How much extra to move off the surface when probing. (Default 10)',
                         type: 'number',
                         unit: 'mm',
                         defaultValue: 10,
