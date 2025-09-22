@@ -419,7 +419,7 @@ export const get3AxisAutoRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z15',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.x) {
         code.push(
@@ -444,6 +444,8 @@ export const get3AxisAutoRoutine = ({
             'G21 G90 G0 X0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.y) {
         code.push(
@@ -468,6 +470,8 @@ export const get3AxisAutoRoutine = ({
             'G21 G90 G0 Y0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     }
 
@@ -598,7 +602,7 @@ export const get3AxisAutoTipRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z15',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.x) {
         code.push(
@@ -623,6 +627,8 @@ export const get3AxisAutoTipRoutine = ({
             'G21 G90 G0 X0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.y) {
         code.push(
@@ -647,6 +653,8 @@ export const get3AxisAutoTipRoutine = ({
             'G21 G90 G0 Y0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     }
 
@@ -755,7 +763,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z15',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.y) {
         code.push(
@@ -774,6 +782,8 @@ export const get3AxisAutoDiameterRoutine = ({
             'G21 G90 G0 Y0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     } else if (axes.x) {
         code.push(
@@ -792,6 +802,8 @@ export const get3AxisAutoDiameterRoutine = ({
             'G21 G90 G0 X0',
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z10',
         );
     }
 
