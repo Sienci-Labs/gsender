@@ -169,23 +169,21 @@ const updateOptionsForDirection = (
 
     // Figure out movement distances for getting bit into position
     console.log('diameter', diameter);
-    /*
-        Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
-     */
-    //let xyMovement = (diameter as number) + 20;
+
+    //Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
     let xyMovement =
         (plateType === TOUCHPLATE_TYPE_3D ? options.xyRetract3D : xyThickness) +
         options.retract +
         toolRadius;
-    console.log('xyMovement', xyMovement);
+    //console.log('xyMovement', xyMovement);
+    
     options.xyPositionAdjust = xyMovement; // All units already compensated
     /*options.xyPositionAdjust =
         units === METRIC_UNITS
             ? xyMovement
             : Number(mm2in(xyMovement).toFixed(3));*/
-    /*
-       Via Chris - Z adjust should be block thickness + retraction
-     */
+    
+    // Via Chris - Z adjust should be block thickness + retraction
     let probe3dOffset = options.plateType === TOUCHPLATE_TYPE_3D ? 5 : 0;
     probe3dOffset =
         units === METRIC_UNITS
@@ -193,7 +191,7 @@ const updateOptionsForDirection = (
             : Number(mm2in(probe3dOffset).toFixed(3));
 
     const zAdjust = options.retract + zThickness + probe3dOffset;
-    console.log('zadjust:', zAdjust);
+    //console.log('zadjust:', zAdjust);
     options.zPositionAdjust = zAdjust;
 
     return options;
@@ -210,7 +208,7 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
-        `G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
+        `G91 G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
     ];
 
     return code;
@@ -229,7 +227,8 @@ export const get3AxisStandardRoutine = (
         return [];
     }
 
-    // Extra 6mm adjustment based on Chris suggestions
+    // Extra movement to compensate for variation in bit placement informed by starting circle diameter
+    // Adjustment based on Chris' suggestions
     let initialPositionAdjustment =
         units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
 
@@ -237,17 +236,17 @@ export const get3AxisStandardRoutine = (
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
         code.push(
-            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`, // change via Chris
-            'G0 Z-[Z_ADJUST]',
+            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
+            'G91 G0 Z-[Z_ADJUST]',
         );
     }
     if (axes.x) {
         // Move into position for X
-        // We start at different location for
+        // We start at different location for XY probing
         if (!axes.z) {
             code.push(
-                'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
-                'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
+                'G91 G0 X[X_RETRACT_DISTANCE]',
+                'G91 G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
             );
         }
 
@@ -257,16 +256,15 @@ export const get3AxisStandardRoutine = (
     if (axes.y) {
         // Move into position for Y
         code.push(
-            'G0 X[X_RETRACT_DISTANCE]',
-            'G0 Y[Y_ADJUST * Y_RETRACT_DIRECTION]',
-            'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
+            `G91 G0 Y[(Y_ADJUST + ${initialPositionAdjustment}) * Y_RETRACT_DIRECTION]`,
+            'G91 G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]',
         );
 
         // Probe Y
         code.push(...getSingleAxisStandardRoutine('Y'));
     }
     // Move back to original position
-    code.push('G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
+    code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
     return code;
 };
 

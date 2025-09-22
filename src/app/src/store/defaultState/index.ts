@@ -61,6 +61,7 @@ const defaultState: State = {
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
+        revertWorkspace: false,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {

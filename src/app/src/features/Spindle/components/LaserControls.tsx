@@ -69,7 +69,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     active={laserIsOn}
                     size={'sm'}
                     disabled={!canClick}
-                    tooltip={{ content: 'Turn laser on' }}
+                    tooltip={{ content: 'Turn on laser' }}
                 />
                 <ActiveStateButton
                     onClick={actions.runLaserTest}
@@ -79,7 +79,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     disabled={!canClick}
                     tooltip={{
                         content:
-                            'Test laser by turning on for specified duration',
+                            'Turn on laser for Test Duration',
                     }}
                 />
                 <ActiveStateButton
@@ -88,7 +88,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     text="Laser Off"
                     size={'sm'}
                     disabled={!canClick}
-                    tooltip={{ content: 'Turn laser off' }}
+                    tooltip={{ content: 'Turn off laser' }}
                 />
             </div>
             <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
@@ -109,7 +109,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
             <div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
                 <label>Test Duration:</label>
                 <div className="flex gap-2">
-                    <Tooltip content="Adjust laser test duration">
+                    <Tooltip content="Laser test duration">
                         <ControlledInput
                             value={laser.duration}
                             onChange={actions.handleLaserDurationChange}
