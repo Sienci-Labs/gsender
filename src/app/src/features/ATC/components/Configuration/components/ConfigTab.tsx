@@ -179,8 +179,8 @@ export const ConfigTab: React.FC = () => {
                             'opacity-50 pointer-events-none',
                     )}
                 >
-                    <div className="flex items-end gap-4">
-                        <div className="flex flex-col items-center gap-2 justify-center">
+                    <div className="flex gap-4 w-full space-between">
+                        <div className="flex flex-row items-center gap-2 justify-center">
                             <Label className="text-sm font-medium">
                                 Number of Slots
                             </Label>
@@ -200,7 +200,28 @@ export const ConfigTab: React.FC = () => {
                                 disabled={config.toolRack.enabled !== 1}
                             />
                         </div>
-
+                        <div className="flex flex-row items-center gap-2 justify-center">
+                            <Label className="text-sm font-medium">
+                                Slot Offset
+                            </Label>
+                            <Input
+                                type="number"
+                                value={config.toolRack.slotOffset}
+                                onChange={(e) =>
+                                    updateConfig({
+                                        toolRack: {
+                                            ...config.toolRack,
+                                            slotOffset:
+                                                parseInt(e.target.value) || 0,
+                                        },
+                                    })
+                                }
+                                className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                disabled={config.toolRack.enabled !== 1}
+                            />
+                        </div>
+                    </div>
+                    <div>
                         <div className="flex-1">
                             <PositionInput
                                 label="Slot 1 Position"

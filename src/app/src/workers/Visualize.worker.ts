@@ -524,6 +524,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         parsedData: parsedDataToSend,
     };
 
+    console.log(colors);
+    console.log(vertices);
+
     if (isLaser) {
         message.spindleSpeeds = spindleSpeeds;
         message.isLaser = isLaser;
