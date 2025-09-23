@@ -2337,6 +2337,10 @@ class GrblHalController {
                 const [fileData] = args;
                 this.ymodem.sendFile(fileData, this.connection.getConnectionObject());
             },
+            'ymodem:uploadFiles': () => {
+                const [files] = args;
+                this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+            },
             'ymodem:cancel': () => {
                 console.log('cancel upload');
             }
