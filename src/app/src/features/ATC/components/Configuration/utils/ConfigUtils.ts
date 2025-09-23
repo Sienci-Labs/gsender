@@ -1,10 +1,11 @@
 import { ConfigState } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import store from 'app/store';
 
 export interface Macro {
     name: string;
-    raw: string;
     data: Blob;
     size: number;
+    content?: string;
 }
 
 function calculateOffsetValue(data: Partial<ConfigState>) {}
@@ -24,15 +25,35 @@ export function generateP100(config: ConfigState): Macro {
 
     return {
         name: 'P100.macro',
-        raw: content,
         data,
+        content,
         size: data.size,
     };
+}
+
+export function getTemplateMacros(): Macro[] {
+    const macros = store.get('widgets.atc.templates.macros', []);
+    const blobs: Macro[] = [];
+    macros.forEach((macro: Macro) => {
+        let data: Macro = {
+            name: '',
+            data: new Blob([]),
+            size: 0,
+        };
+
+        data.name = macro.name;
+        data.data = new Blob([macro.content]);
+        data.size = data.data.size;
+        blobs.push(data);
+    });
+    return blobs;
 }
 
 export function generateAllMacros(config: ConfigState) {
     const macros: Macro[] = [];
     macros.push(generateP100(config));
+    macros.push(...getTemplateMacros());
+    console.log(macros);
     return macros;
 }
 
