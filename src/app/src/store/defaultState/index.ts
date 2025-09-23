@@ -32,7 +32,8 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
-    GRBLHAL, OUTLINE_MODE_DETAILED,
+    GRBLHAL,
+    OUTLINE_MODE_DETAILED,
 } from '../../constants';
 
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
@@ -40,6 +41,7 @@ import { profiles } from './gamepad';
 import { State } from '../definitions';
 import { MachineProfile } from 'app/definitions/firmware';
 import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
+import { defaultATCIMacros } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -147,7 +149,7 @@ const defaultState: State = {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
             forceHardLimits: false,
-            forceSoftLimits: false
+            forceSoftLimits: false,
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -162,6 +164,7 @@ const defaultState: State = {
     widgets: {
         atc: {
             toolMap: {},
+            templates: defaultATCIMacros,
         },
         axes: {
             minimized: false,
@@ -195,7 +198,7 @@ const defaultState: State = {
                 },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                 distances: [],
-                threshold: 250
+                threshold: 250,
             },
             mdi: {
                 disabled: false,
@@ -303,7 +306,7 @@ const defaultState: State = {
                     startHeight: 50,
                     finalHeight: 40,
                     enableRehoming: false,
-                    shouldDwell: false
+                    shouldDwell: false,
                 },
             },
             tab: {

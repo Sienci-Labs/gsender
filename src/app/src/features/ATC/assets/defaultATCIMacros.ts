@@ -769,7 +769,19 @@ const defaultMacros: Macro[] = [
     },
 ];
 
-export const defaultATCIMacros = {
+export interface ATCIMacroConfig {
+    version: number;
+    variables: {
+        [key: string]: {
+            default: number;
+            value: number;
+        };
+    };
+    variableFile: string;
+    macros: Macro[];
+}
+
+export const defaultATCIMacros: ATCIMacroConfig = {
     version: 20250909,
     variables: {
         _ort_offset_mode: {
