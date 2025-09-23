@@ -57,7 +57,7 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 variant="ghost"
                 size="custom"
             >
-                <span className="w-[14ch] text-left truncate text-overflow-clip whitespace-nowrap max-w-[14ch]">
+                <span className="w-[14ch] text-left text-overflow-clip overflow-hidden whitespace-nowrap max-w-[14ch]">
                     {running ? 'Running...' : macro.name}
                 </span>
             </Button>
