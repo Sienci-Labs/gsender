@@ -278,7 +278,7 @@ const defaultState: State = {
             probeDepth: 10,
             probeFeedrate: 75,
             probeFastFeedrate: 150,
-            retractionDistance: 4,
+            retractionDistance: 2,
             zProbeDistance: 30,
             touchPlateHeight: 10,
             probeType: 'Auto',
