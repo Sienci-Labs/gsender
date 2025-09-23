@@ -11,6 +11,8 @@ import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import mapValues from 'lodash/mapValues';
+import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
+import store from 'app/store';
 
 export const defaultPosition: Position = {
     x: 0,
@@ -93,6 +95,7 @@ interface ConfigContextValue {
         type: 'idle' | 'success' | 'error' | 'warning';
         message: string;
     };
+    templates: ATCIMacroConfig;
 }
 
 const ConfigContext = createContext<ConfigContextValue | undefined>(undefined);
@@ -103,6 +106,7 @@ interface ConfigProviderProps {
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const [config, setConfig] = useState<ConfigState>(defaultATCIConfig);
+    const [templates, setTemplates] = useState<ATCIMacroConfig>();
     const [isApplying, setIsApplying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [status, setStatus] = useState<{
@@ -113,6 +117,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const offsetParameters = useTypedSelector(
         (state: RootState) => state.controller.settings.parameters,
     );
+
+    useEffect(() => {
+        setTemplates(store.get('widgets.atc.templates', {}));
+    }, []);
 
     useEffect(() => {
         if (!offsetParameters) return;
@@ -211,6 +219,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         isApplying,
         progress,
         status,
+        templates,
     };
 
     return (
