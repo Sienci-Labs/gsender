@@ -140,7 +140,7 @@ export const TemplatesTab: React.FC = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-1 min-h-0 h-0">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1 min-h-0 h-0">
                 {/* Macro Listing */}
                 <div className="border border-border md:col-span-2 flex flex-col h-full">
                     <h1 className="text-sm font-semibold text-blue-500 p-2">
@@ -173,7 +173,7 @@ export const TemplatesTab: React.FC = () => {
                 </div>
 
                 {/* Contents */}
-                <div className="border border-border md:col-span-3 flex flex-col h-full">
+                <div className="border border-border md:col-span-4 flex flex-col h-full">
                     <h1 className="text-sm font-semibold p-2 text-blue-500">
                         {selectedTemplate ? selectedTemplate.name : 'Content'}
                     </h1>
