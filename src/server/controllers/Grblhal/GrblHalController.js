@@ -482,7 +482,6 @@ class GrblHalController {
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
-                    console.log(this.toolChangeContext);
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
@@ -492,7 +491,8 @@ class GrblHalController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption !== 'Ignore') {
+                    // If toolchange is at very beginning of file, ignore it
+                    if (toolChangeOption !== 'Ignore' && sent > 20) {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
                         }
@@ -551,7 +551,7 @@ class GrblHalController {
                 /**
                  * End of Rotary Logic
                  */
-                console.log('returning line: ', line);
+
                 return line;
             }
         });
@@ -1641,6 +1641,8 @@ class GrblHalController {
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
 
+                this.command('gcode', '%global.state.workspace=modal.wcs');
+
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
@@ -1777,6 +1779,8 @@ class GrblHalController {
 
                 const [options] = args;
                 const { force = false } = { ...options };
+
+                this.emit('job:stop');
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {

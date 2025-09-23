@@ -54,6 +54,7 @@ export interface ProbingOptions {
     xRetract?: number;
     yRetract?: number;
     zRetract?: number;
+    xyRetract3D?: number;
     retract: number;
     axes: {
         x: boolean;
@@ -108,6 +109,7 @@ export interface Probe {
     probeAxis: string;
     direction: number;
     tipDiameter3D: number;
+    xyRetract3D: number;
 }
 
 export interface Actions {
@@ -128,6 +130,7 @@ export interface Actions {
     _setToolDiameter: (selection: { value: number }) => void;
     nextProbeDirection: () => void;
     _setProbeType: (value: string) => void;
+    _setCurrentTool: (tool: AvailableTool) => void;
 }
 
 export interface AvailableTool {

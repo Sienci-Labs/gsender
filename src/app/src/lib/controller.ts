@@ -111,6 +111,7 @@ export interface ControllerListeners {
 
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
+    'job:stop': Array<Function>;
     'sdcard:files': Array<Function>;
     'sdcard:clear': Array<Function>;
 }
@@ -125,7 +126,7 @@ const ensureArray = (...args: Array<any>) => {
     return ([] as any).concat(args);
 };
 
-const noop = () => {};
+const noop = () => { };
 
 class Controller {
     io: Function = noop;
@@ -223,6 +224,7 @@ class Controller {
         'ymodem:complete': [],
         'ymodem:progress': [],
         'ymodem:error': [],
+        'job:stop': [],
     };
 
     context = {

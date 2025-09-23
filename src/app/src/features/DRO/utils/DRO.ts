@@ -90,7 +90,7 @@ export function goXYAxes() {
         commands.push('G90');
     }
 
-    controller.command('gcode:safe', commands);
+    controller.command('gcode:safe', commands, 'G21'); // we want to run these commands in metric so set prefUnits to G21
 }
 
 export function gotoZero(axis: string) {
@@ -122,7 +122,7 @@ export function gotoZero(axis: string) {
         commands.push('G90');
     }
 
-    controller.command('gcode:safe', commands);
+    controller.command('gcode:safe', commands, 'G21');
 }
 
 export function GoTo(pos: DROPosition, isG91: boolean) {

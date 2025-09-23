@@ -124,6 +124,21 @@ const SurfacingTool = () => {
     const inputStyle =
         'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
+    const convertedDefaultSurfacingState =
+        units === 'mm'
+            ? defaultSurfacingState
+            : {
+                  ...defaultSurfacingState,
+                  bitDiameter: convertToImperial(
+                      defaultSurfacingState.bitDiameter,
+                  ),
+                  feedrate: convertToImperial(defaultSurfacingState.feedrate),
+                  length: convertToImperial(defaultSurfacingState.length),
+                  width: convertToImperial(defaultSurfacingState.width),
+                  skimDepth: convertToImperial(defaultSurfacingState.skimDepth),
+                  maxDepth: convertToImperial(defaultSurfacingState.maxDepth),
+              };
+
     return (
         <>
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
@@ -151,7 +166,7 @@ const SurfacingTool = () => {
                         <InputArea label="X & Y">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.width}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.width} ${units}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -174,7 +189,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.length}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.length} ${units}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -198,7 +213,7 @@ const SurfacingTool = () => {
                         <InputArea label="Cut Depth & Max">
                             <div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.skimDepth}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.skimDepth} ${units}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -221,7 +236,7 @@ const SurfacingTool = () => {
                                     &
                                 </span>
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.maxDepth}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.maxDepth} ${units}`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -244,7 +259,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Bit Diameter">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.bitDiameter}`}
+                                content={`Default is ${convertedDefaultSurfacingState.bitDiameter} ${units}`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -263,7 +278,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Stepover">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.stepover}`}
+                                content={`Default is ${convertedDefaultSurfacingState.stepover}%`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -282,7 +297,7 @@ const SurfacingTool = () => {
                         </InputArea>
                         <InputArea label="Feed Rate">
                             <Tooltip
-                                content={`Default value is ${defaultSurfacingState.feedrate}`}
+                                content={`Default is ${convertedDefaultSurfacingState.feedrate} ${units}/min`}
                             >
                                 <ControlledInput
                                     type="number"
@@ -302,7 +317,7 @@ const SurfacingTool = () => {
                         <InputArea label="Spindle RPM">
                             <div className="grid grid-cols-2 gap-2 col-span-3">
                                 <Tooltip
-                                    content={`Default value is ${defaultSurfacingState.spindleRPM}`}
+                                    content={`Default is ${convertedDefaultSurfacingState.spindleRPM} RPM`}
                                 >
                                     <ControlledInput
                                         type="number"
@@ -318,50 +333,67 @@ const SurfacingTool = () => {
                                         }
                                     />
                                 </Tooltip>
-                                <div className="flex items-center gap-2 justify-center">
-                                    <label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-                                        Delay
-                                    </label>
-                                    <Switch
-                                        checked={surfacing.shouldDwell}
-                                        onChange={(checked) => {
-                                            setSurfacing({
-                                                ...surfacing,
-                                                shouldDwell: checked as boolean,
-                                            });
-                                        }}
-                                    />
-                                </div>
+                                <Tooltip
+                                    content={`Default is ${convertedDefaultSurfacingState.shouldDwell ? 'on' : 'off'}`}
+                                >
+                                    <div className="flex items-center gap-2 justify-center">
+                                        <label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+                                            Delay
+                                        </label>
+                                        <Switch
+                                            checked={surfacing.shouldDwell}
+                                            onChange={(checked) => {
+                                                setSurfacing({
+                                                    ...surfacing,
+                                                    shouldDwell:
+                                                        checked as boolean,
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                </Tooltip>
                             </div>
                         </InputArea>
                         <InputArea label="Coolant Control">
                             <div className="flex items-center gap-2 justify-center col-span-3">
-                                <span className="font-light text-sm max-w-20 dark:text-white">
-                                    Mist (M7)
-                                </span>
-                                <Switch
-                                    onChange={(value) =>
-                                        setSurfacing({
-                                            ...surfacing,
-                                            mist: value,
-                                        })
-                                    }
-                                    checked={surfacing.mist ?? false}
-                                    className="h-20"
-                                />
-                                <span className="font-light text-sm max-w-20 dark:text-white">
-                                    Flood (M8)
-                                </span>
-                                <Switch
-                                    onChange={(value) =>
-                                        setSurfacing({
-                                            ...surfacing,
-                                            flood: value,
-                                        })
-                                    }
-                                    checked={surfacing.flood ?? false}
-                                    className="h-20"
-                                />
+                                <Tooltip
+                                    content={`Default is ${convertedDefaultSurfacingState.mist ? 'on' : 'off'}`}
+                                >
+                                    <div className="flex items-center gap-2 justify-center">
+                                        <span className="font-light text-sm max-w-20 dark:text-white">
+                                            Mist (M7)
+                                        </span>
+                                        <Switch
+                                            onChange={(value) =>
+                                                setSurfacing({
+                                                    ...surfacing,
+                                                    mist: value,
+                                                })
+                                            }
+                                            checked={surfacing.mist ?? false}
+                                            className="h-20"
+                                        />
+                                    </div>
+                                </Tooltip>
+                                <Tooltip
+                                    content={`Default is ${convertedDefaultSurfacingState.flood ? 'on' : 'off'}`}
+                                >
+                                    <div className="flex items-center gap-2 justify-center">
+                                        <span className="font-light text-sm max-w-20 dark:text-white">
+                                            Flood (M8)
+                                        </span>
+                                        <Switch
+                                            onChange={(value) =>
+                                                setSurfacing({
+                                                    ...surfacing,
+                                                    flood: value,
+                                                })
+                                            }
+                                            checked={surfacing.flood ?? false}
+                                            className="h-20"
+                                        />
+                                    </div>
+                                </Tooltip>
                             </div>
                         </InputArea>
                     </div>

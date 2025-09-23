@@ -197,6 +197,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: OUTLINE_MODES
                     },
                     {
+                        label: 'Revert workspace',
+                        key: 'workspace.revertWorkspace',
+                        type: 'boolean',
+                        defaultValue: false,
+                        description: 'Allow g-code \'job finishing\' commands like M2 and M30 to reset your CNC\'s workspace back to G54 at the end of each job.',
+                        options: OUTLINE_MODES
+                    },
+                    {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:
@@ -503,7 +511,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         ],
                     },
                     {
-                        label: 'Z thickness Block',
+                        label: 'Tip diameter',
+                        key: 'widgets.probe.tipDiameter3D',
+                        description:
+                            'Diameter of probe tip where it touches off the material. (Default 2)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using 3D probe
+                            return probeType !== TOUCHPLATE_TYPE_3D;
+                        },
+                    },
+                    {
+                        label: 'Block thickness',
                         key: 'workspace.probeProfile.zThickness.standardBlock',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
@@ -519,7 +543,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z thickness AZ',
+                        label: 'AutoZero thickness',
                         key: 'workspace.probeProfile.zThickness.autoZero',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
@@ -535,7 +559,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z thickness Puck',
+                        label: 'Puck thickness',
                         key: 'workspace.probeProfile.zThickness.zProbe',
                         description:
                             'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
@@ -557,12 +581,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Adjust to improve the Z zeroing accuracy of your probe. (Default 0)',
                         type: 'number',
                         unit: 'mm',
+                        defaultValue: 0,
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are not using Puck touchplate
+                            // Hidden if we are not using 3D probe
                             return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
@@ -578,22 +603,24 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero or Z-only touchplate
+                            // Hidden if we are not using Block touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
                         },
                     },
                     {
-                        label: 'Tip Diameter',
-                        key: 'widgets.probe.tipDiameter3D',
+                        label: 'XY retract',
+                        key: 'widgets.probe.xyRetract3D',
                         description:
-                            'Diameter of probe tip where it touches off the material. (Default 2)',
+                            'How much extra to move off the surface when probing. (Default 10)',
                         type: 'number',
                         unit: 'mm',
+                        defaultValue: 10,
                         hidden: () => {
                             const probeType = store.get(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
+                            // Hidden if we are not using 3D probe
                             return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
@@ -1327,18 +1354,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     { type: 'eeprom', eID: '$123' },
                     {
-                        label: 'Force hard limits',
-                        key: 'workspace.rotaryAxis.firmwareSettings.$21',
-                        description:
-                            'Updates hard limits to this value when toggling into rotary mode.',
-                        type: 'number',
-                    },
-                    {
                         label: 'Force soft limits',
                         key: 'workspace.rotaryAxis.firmwareSettings.$20',
                         description:
-                            'Updates soft limits to this value when toggling into rotary mode.',
-                        type: 'number',
+                            'Enable soft limits when toggling into rotary mode (grbl only).',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Force hard limits',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$21',
+                        description:
+                            'Enable hard limits when toggling into rotary mode (grbl only).',
+                        type: 'boolean',
                     },
                 ],
             },

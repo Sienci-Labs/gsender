@@ -1,5 +1,6 @@
 import Button from 'app/components/Button';
 import cn from 'classnames';
+import { TooltipProps } from 'app/components/Tooltip';
 
 interface ActiveStateButtonProps {
     icon: JSX.Element;
@@ -9,13 +10,14 @@ interface ActiveStateButtonProps {
     className?: string;
     text?: string;
     disabled?: boolean;
+    tooltip?: TooltipProps;
 }
 
 export function ActiveStateButton({
     icon,
     active = false,
     text = '',
-    onClick = (e) => {},
+    onClick = () => {},
     size = 'md',
     className = '',
     ...rest

@@ -83,7 +83,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
             <Label className="min-w-[2ch] text-right whitespace-nowrap">
                 {label}
             </Label>
-            <div className="grid grid-cols-[1fr_5fr_1fr] max-w-28 items-center gap-0 rounded-full bg-gray-200 shadow-inner">
+            <div className="grid grid-cols-[1fr_5fr_1fr] max-w-28 items-center gap-0 rounded-full dark:bg-dark shadow-inner">
                 <Button
                     type="button"
                     onClick={(e) => {

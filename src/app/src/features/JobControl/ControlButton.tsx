@@ -308,7 +308,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             !disabled && type === STOP,
                     },
                 )}
-                title={type}
                 onClick={onClick[type]}
                 disabled={disabled}
             >

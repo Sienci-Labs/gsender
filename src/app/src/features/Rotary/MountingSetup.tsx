@@ -217,6 +217,9 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                     size="sm"
                     onClick={() => setOpen(true)}
                     disabled={isDisabled}
+                    tooltip={{
+                        content: 'Open mounting setup tool',
+                    }}
                 >
                     Mounting Setup
                 </Button>

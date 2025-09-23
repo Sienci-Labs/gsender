@@ -95,6 +95,7 @@ const TerminalInput = ({ onClear }: Props) => {
     return (
         <div className="flex gap-2 w-full flex-grow">
             <Input
+                className="h-8 text-sm"
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
@@ -129,13 +130,15 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Button
                 variant="primary"
-                className="w-24"
+                className="h-8 w-24 text-sm"
                 onClick={handleCommandExecute}
             >
                 Run
             </Button>
 
-            <Popover>
+            <Popover
+                className="h-8 text-sm"
+            >
                 <PopoverTrigger asChild>
                     <Button variant="secondary">
                         <FaEllipsisH />

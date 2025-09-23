@@ -62,6 +62,7 @@ const defaultState: State = {
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
+        revertWorkspace: false,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
@@ -288,6 +289,7 @@ const defaultState: State = {
             direction: 0,
             probeAxis: 'Z',
             tipDiameter3D: 2,
+            xyRetract3D: 10,
         },
         rotary: {
             stockTurning: {
