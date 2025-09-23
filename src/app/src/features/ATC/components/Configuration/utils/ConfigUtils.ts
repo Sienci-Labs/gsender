@@ -57,13 +57,44 @@ export function generateAllMacros(config: ConfigState) {
     const macros: Macro[] = [];
 
     const atciContent = generateATCIJSON(config);
-    console.log(atciContent);
 
     macros.push(generateP100(config));
     macros.push(...getTemplateMacros());
+    macros.push(writeableATCIConfig(atciContent));
 
     console.log(macros);
     return macros;
+}
+
+export function writeableATCIConfig(json: ATCIJSON): Macro {
+    const data = new Blob([JSON.stringify(json) + '\n']);
+    return {
+        name: 'ATCI.json',
+        data,
+        size: data.size,
+    };
+}
+
+export function populateATCIVariables(variables, config: ConfigState) {
+    const populatedVariables = { ...variables };
+    // Grab values from config
+    populatedVariables._tc_slots.value = config.toolRack.numberOfSlots;
+    populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
+    populatedVariables._tc_pres_sense.value = config.advanced.checkPressure;
+    populatedVariables._tc_holder_sense.value =
+        config.advanced.checkToolPresence;
+    populatedVariables._tc_slot_offset.value = config.toolRack.slotOffset;
+    populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
+    populatedVariables._passthrough_offset_setting.value =
+        config.toolRack.retainToolSettings;
+
+    populatedVariables._irt_offset_mode.value = calculateOffsetValue(
+        config.toolRack,
+    );
+    populatedVariables._ort_offset_mode.value = calculateOffsetValue(
+        config.offsetManagement,
+    );
+    return populatedVariables;
 }
 
 export function generateATCIJSON(config: ConfigState): ATCIJSON {
@@ -72,12 +103,14 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         {},
     );
 
+    let variables = populateATCIVariables(templateConfig.variables, config);
+
     const files = templateConfig.macros.map((macro) => macro.name);
 
     return {
         version: templateConfig.version,
         variableFile: 'P100.macro',
-        variables: templateConfig.variables,
+        variables,
         files,
     };
 }
