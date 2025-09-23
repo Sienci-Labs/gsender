@@ -13,6 +13,7 @@ import pick from 'lodash/pick';
 import mapValues from 'lodash/mapValues';
 import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 import store from 'app/store';
+import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 
 export const defaultPosition: Position = {
     x: 0,
@@ -188,6 +189,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         setIsApplying(true);
         setProgress(0);
         setStatus({ type: 'idle', message: 'Applying configuration...' });
+
+        const content = generateAllMacros(config);
+        console.log(content);
+        // todo: upload the whole block of content to the controller
 
         // Simulate progress
         for (let i = 0; i <= 100; i += 10) {

@@ -1,5 +1,9 @@
 import { ConfigState } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import store from 'app/store';
+import {
+    ATCIJSON,
+    ATCIMacroConfig,
+} from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 export interface Macro {
     name: string;
@@ -51,12 +55,29 @@ export function getTemplateMacros(): Macro[] {
 
 export function generateAllMacros(config: ConfigState) {
     const macros: Macro[] = [];
+
+    const atciContent = generateATCIJSON(config);
+    console.log(atciContent);
+
     macros.push(generateP100(config));
     macros.push(...getTemplateMacros());
+
     console.log(macros);
     return macros;
 }
 
-export function generateATCIJSON(config: ConfigState): object {
-    return {};
+export function generateATCIJSON(config: ConfigState): ATCIJSON {
+    const templateConfig: ATCIMacroConfig = store.get(
+        'widgets.atc.templates',
+        {},
+    );
+
+    const files = templateConfig.macros.map((macro) => macro.name);
+
+    return {
+        version: templateConfig.version,
+        variableFile: 'P100.macro',
+        variables: templateConfig.variables,
+        files,
+    };
 }

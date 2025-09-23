@@ -781,6 +781,18 @@ export interface ATCIMacroConfig {
     macros: Macro[];
 }
 
+export interface ATCIJSON {
+    version: number;
+    variables: {
+        [key: string]: {
+            default: number;
+            value: number;
+        };
+    };
+    variableFile: string;
+    files: string[];
+}
+
 export const defaultATCIMacros: ATCIMacroConfig = {
     version: 20250909,
     variables: {

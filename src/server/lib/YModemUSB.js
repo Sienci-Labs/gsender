@@ -145,6 +145,105 @@ export class YModem extends events.EventEmitter {
         this.emit('complete');
     }
 
+    async sendFiles(files, comms) {
+        this.comms = comms;
+        this.emit('start');
+        await sleep(500);
+        // Drop line reader, use byte reader
+        this.comms.unpipe();
+        this.comms.removeAllListeners('data');
+        this.comms.pipe(this.ByteReader);
+
+
+        for (const fileData of files) {
+            // Empty file - add blank buffer
+            if (!fileData.data) {
+                fileData.data = Buffer.alloc(0);
+            }
+
+            const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
+            this.comms.write(header);
+
+            // [<<< C]
+            // eslint-disable-next-line no-await-in-loop
+            await this.waitForNext([this.C, this.ACK]);
+
+
+            let fileChunks;
+            let isLastByteSOH = false;
+
+            if (fileData.size === 0) {
+                fileChunks = [];
+            } else if (fileData.size <= SendSize[this.SOH]) {
+                fileChunks = [
+                    this.padRBuffer(
+                        fileData.data,
+                        SendSize[this.SOH],
+                        this.PAD_CHAR
+                    ),
+                ];
+                isLastByteSOH = true;
+            } else if (fileData.size <= SendSize[this.STX]) {
+                fileChunks = [
+                    this.padRBuffer(
+                        fileData.data,
+                        SendSize[this.STX],
+                        this.PAD_CHAR
+                    ),
+                ];
+                isLastByteSOH = false;
+            } else {
+                const fileSplit = this.splitFileToChunks(
+                    fileData.data,
+                    SendSize[this.STX]
+                );
+                fileChunks = fileSplit.chunks;
+                isLastByteSOH = fileSplit.isLastByteSOH;
+            }
+
+            let sendType = this.STX;
+            this.totalPackets = fileChunks.length;
+
+            for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
+                if (this.isLast(fileChunks.length, packetNo)) {
+                    sendType = isLastByteSOH ? this.SOH : this.STX;
+                }
+
+                const fileChunk = fileChunks[packetNo - 1];
+
+                const dataPacket = this.createDataPacket(
+                    sendType,
+                    packetNo % 256,
+                    fileChunk
+                );
+
+                // eslint-disable-next-line no-await-in-loop
+                await this.sendDataPacket(
+                    packetNo,
+                    dataPacket,
+                    50
+                );
+
+                this.sentPackets = packetNo;
+                const progress = Math.ceil((packetNo / fileChunks.length) * 100);
+                this.emit('progress', progress);
+            }
+
+            // [>>> EOT]
+            this.comms.write([this.EOT]);
+            this.logger('[>>> EOT]');
+        }
+
+        this.logger('Finished sending packets');
+
+
+        this.comms.removeAllListeners('data');
+        await sleep(100);
+        this.comms.unpipe();
+        this.comms.pipe(new ReadlineParser({ delimiter: '\n' }));
+        this.emit('complete');
+    }
+
     waitForNext(controlChars) {
         return new Promise((resolve) => {
             this.onControlCharsRead(controlChars, resolve);
