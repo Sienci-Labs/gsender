@@ -123,7 +123,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 
     return (
         <div className="flex flex-col justify-around items-center h-full">
-            <div className="flex flex-row justify-around w-full gap-4">
+            <div className="flex flex-row justify-around w-full gap-2">
                 <ActiveStateButton
                     text="Mist"
                     icon={<FaShower />}
