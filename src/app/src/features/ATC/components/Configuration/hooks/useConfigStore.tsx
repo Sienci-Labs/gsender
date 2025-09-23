@@ -191,8 +191,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         setStatus({ type: 'idle', message: 'Applying configuration...' });
 
         const content = generateAllMacros(config);
+
         console.log(content);
         // todo: upload the whole block of content to the controller
+        controller.command('ymodem:uploadFiles', content);
 
         // Simulate progress
         for (let i = 0; i <= 100; i += 10) {
