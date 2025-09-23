@@ -196,13 +196,13 @@ const ProbeWidget = () => {
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
-        x: 50,
-        y: 50,
+        x: 30,
+        y: 30,
         z: zProbeDistance ? zProbeDistance : 30,
     };
     const PROBE_DISTANCE_IMPERIAL = {
-        x: 2,
-        y: 2,
+        x: 1.2,
+        y: 1.2,
         z: zProbeDistance ? convertToImperial(zProbeDistance) : 1.2,
     };
 
