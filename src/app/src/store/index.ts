@@ -323,6 +323,7 @@ const migrateStore = (): void => {
                 'workspace.probeProfile.zThickness.zProbe',
                 currentZThickness,
             );
+            store.set('workspace.probeProfile.zThickness.probe3D', 0);
         }
     }
 
