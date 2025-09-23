@@ -54,6 +54,7 @@ import {
     PROBE_TYPES_T,
     ProbeCommand,
     ProbeProfile,
+    ProbingOptions,
     State,
     TOUCHPLATE_TYPES_T,
 } from './definitions';
@@ -465,7 +466,7 @@ const ProbeWidget = () => {
             xyRetract = convertToImperial(xyRetract3D);
         }
 
-        const options = {
+        const options: ProbingOptions = {
             axes,
             modal,
             probeFast: fastFeedrate,
@@ -482,6 +483,7 @@ const ProbeWidget = () => {
             homingEnabled: $22 !== '0',
             tipDiameter3D: tipDiameter,
             xyRetract3D: xyRetract,
+            firmware: type,
         };
 
         const code = getProbeCode(options, direction);
