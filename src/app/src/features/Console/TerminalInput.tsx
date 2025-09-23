@@ -136,11 +136,12 @@ const TerminalInput = ({ onClear }: Props) => {
                 Run
             </Button>
 
-            <Popover
-                className="h-8 text-sm"
-            >
+            <Popover>
                 <PopoverTrigger asChild>
-                    <Button variant="secondary">
+                    <Button 
+                        variant="secondary"
+                        className="h-8 text-sm"
+                    >
                         <FaEllipsisH />
                     </Button>
                 </PopoverTrigger>
