@@ -509,7 +509,10 @@ const ProbeWidget = () => {
     };
 
     const onStoreChange = useCallback(
-        ({ workspace }: { workspace: Workspace }) => {
+        (data: { workspace: Workspace }) => {
+            if (!data) return;
+            const { workspace } = data;
+
             const probeProfile: ProbeProfile = get(
                 workspace,
                 'probeProfile',
