@@ -114,17 +114,22 @@ gSender is also designed in a way that it can be run locally on your computer br
 <summary>Expand to see all version notes</summary>
 
 ### 1.5.5 (September 24, 2025)
-- Numerous styling and UX adjustments
-- Auto Zero probe routine fixes for unit conversion
-- Added new 3D probe routine, with customizable tip diameter in Config.
-- Probe blocks now have individually customizable Z thicknesses
-- Various general probe improvements
-- Rapid position buttons correctly disable when not available
-- Fixed toolchange wizard always goes back to probe position before probing to allow movement for bit changes ahead of probing.
-- Spindle delay config option applies to tool change wizards and start from line.
-- Various shortcut issues fixed.  Some shortcuts reordered based on usage.
-- Added new config option to restore workspace when job finishes if M30 or M2 sent in file.
-- Numerous tooltips added and updates across the UI.
+- New probe type '3D Probe' added, with future plans to support more than standard XYZ probing
+- All probing cycles now sped up with reduced delays and reduced default retracts to 2mm
+- Each probe block now has an individually customizable Z thickness
+- AutoZero touch plate can now have it's thickness set
+- All AutoZero probing now moves out of the way at the end to make removing the plate easier
+- Longstanding excess probing movements now removed for speed, safety, and accuracy
+- AutoZero bit diameter probing now offsetting correctly like in 1.4.11
+- Tooltips re-added across the app for more hover information
+- Spindle delay Config option for grbl machines now applies to Tool Change wizards and Start from line
+- New behaviour where gSender will ignore M2 or M30 workspace reversion on job completion unless new Config option is toggled on. This should remove the need for using Automations to preserve workspaces.
+- Machine state now handled if in Laser or Rotary mode and the tab is disabled
+- Fixed safe height movements sometimes using the wrong units
+- Fixed shortcuts that weren't acting as expected or weren't triggering
+- Fixed toolchange wizard always going back to probe position before probing to allow movement for bit changes ahead of probing
+- Fixed Config handling of Rotary forcing hard and soft limits for grbl machines
+- UI styling tweaks, and adjustments to better accomodate smaller screens
 
 ### 1.5.4 (August 27, 2025)
 - Fix controller not instantiating correctly in some situations for grblHAL devices.
