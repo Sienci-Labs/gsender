@@ -113,6 +113,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.5.5 (September 24, 2025)
+- Numerous styling and UX adjustments
+- Auto Zero probe routine fixes for unit conversion
+- Added new 3D probe routine, with customizable tip diameter in Config.
+- Probe blocks now have individually customizable Z thicknesses
+- Various general probe improvements
+- Rapid position buttons correctly disable when not available
+- Fixed toolchange wizard always goes back to probe position before probing to allow movement for bit changes ahead of probing.
+- Spindle delay config option applies to tool change wizards and start from line.
+- Various shortcut issues fixed.  Some shortcuts reordered based on usage.
+- Added new config option to restore workspace when job finishes if M30 or M2 sent in file.
+- Numerous tooltips added and updates across the UI.
+
 ### 1.5.4 (August 27, 2025)
 - Fix controller not instantiating correctly in some situations for grblHAL devices.
 - Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
