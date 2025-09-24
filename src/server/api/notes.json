@@ -1,5 +1,22 @@
 [
   {
+    "version": "1.5.5",
+    "date": "September 24, 2025",
+    "notes": [
+      "Numerous styling and UX adjustments",
+      "Auto Zero probe routine fixes for unit conversion",
+      "Added new 3D probe routine, with customizable tip diameter in Config.",
+      "Probe blocks now have individually customizable Z thicknesses",
+      "Various general probe improvements",
+      "Rapid position buttons correctly disable when not available",
+      "Fixed toolchange wizard always goes back to probe position before probing to allow movement for bit changes ahead of probing.",
+      "Spindle delay config option applies to tool change wizards and start from line.",
+      "Various shortcut issues fixed.  Some shortcuts reordered based on usage.",
+      "Added new config option to restore workspace when job finishes if M30 or M2 sent in file.",
+      "Numerous tooltips added and updates across the UI."
+    ]
+  },
+  {
     "version": "1.5.4",
     "date": "August 27, 2025",
     "notes": [
@@ -49,33 +66,6 @@
       "Plus and Minus buttons behaviour tweaks on jog feeds and distances",
       "Force Hard and Soft Limits config options type updated and no longer crash the application.",
       "Various look and feel and text changes."
-    ]
-  },
-  {
-    "version": "1.5.2",
-    "date": "July 15, 2025",
-    "notes": [
-      "Fix issues with remote mode disconnecting main client and jobs stopping when connecting from remote mode",
-      "Significantly sped up file loading and rendering on larger files",
-      "Job end notifications will no longer appear if toggled off",
-      "SVG visualization no longer teeny-tiny on inches postprocessor files",
-      "Plus and Minus buttons returned to jog speeds with the prior existing logic",
-      "AutoZero touchplate renamed to just AutoZero",
-      "Added new Config option for Jog Delay, which configures how long a keypress/UI press/gamepad press before swapping to continuous jogging",
-      "Commands sent later in connection cycle to reduce situations where Error 1 occurs when unlocking and resetting the board",
-      "Generating a surfacing file no longer causes issues on main visualizer if not sent there",
-      "Motors sections again will disappear from config when empty",
-      "Restore defaults and default highlight works correctly in Config on settings considered hybrid between grbl/grblHAL",
-      "Prevented situations where alarm list was not populating correctly",
-      "Continuous jog without soft limits now sends more sane values when jogging in Inches across both controllers",
-      "Load bar now appears correctly in surfacing and rotary surfacing tools",
-      "Stopping a file that has an early M0 already sent will no longer pop up the pause modal",
-      "Stock turning and Probe Rotary Z disabled for grbl controllers when in non-Rotary mode",
-      "Config look and Feel tweaks",
-      "Shortcuts rearranged so more commonly set ones are higher up",
-      "File stat feed rates now convert correctly",
-      "Zero All on grblHAL no longer sends Zero on A if A Axis not reported",
-      "Various look and feel changes"
     ]
   }
 ]
