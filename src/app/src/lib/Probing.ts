@@ -6,7 +6,7 @@ import {
     TOUCHPLATE_TYPE_ZERO,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
-import { mm2in } from './units';
+import { convertToMetric, mm2in } from './units';
 import { UNITS_GCODE } from 'app/definitions/general';
 import { AXES_T } from 'app/features/Axes/definitions';
 import {
@@ -671,6 +671,7 @@ export const get3AxisAutoDiameterRoutine = ({
     firmware,
     homingEnabled,
     zThickness,
+    units,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -686,10 +687,10 @@ export const get3AxisAutoDiameterRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
-    const toolRadius = toolDiameter / 2;
+    const toolRadius = (units === METRIC_UNITS ? toolDiameter : convertToMetric(toolDiameter)) / 2;
     const toolCompensatedThickness = -1 * toolRadius;
     // Addition because it's already negative
-    const compensatedValue = 22.5 + toolCompensatedThickness;
+    const compensatedValue = Number((22.5 + toolCompensatedThickness).toFixed(3));
 
     if (axes.z && axes.y && axes.z) {
         code.push(
