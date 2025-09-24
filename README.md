@@ -114,7 +114,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 <summary>Expand to see all version notes</summary>
 
 ### 1.5.5 (September 24, 2025)
-- New probe type '3D Probe' added, with future plans to support more than standard XYZ probing
+- New probe type, 3D Probe added, with future plans to support more than standard XYZ probing
 - All probing cycles now sped up with reduced delays and reduced default retracts to 2mm
 - Each probe block now has an individually customizable Z thickness
 - AutoZero touch plate can now have it's thickness set
@@ -129,14 +129,14 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Fixed shortcuts that weren't acting as expected or weren't triggering
 - Fixed toolchange wizard always going back to probe position before probing to allow movement for bit changes ahead of probing
 - Fixed Config handling of Rotary forcing hard and soft limits for grbl machines
-- UI styling tweaks, and adjustments to better accomodate smaller screens
+- UI styling tweaks, and adjustments to better accommodate smaller screens
 
 ### 1.5.4 (August 27, 2025)
 - Fix controller not instantiating correctly in some situations for grblHAL devices.
 - Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
 - Visualizer grid sizing more accurately matches your machine size at 2X dimensions.
 - Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.
-- Shortcut order adjusted when configurting binds.
+- Shortcut order adjusted when configuring binds.
 - Precise and Rapid toggle swapped in jog preset selector
 - Start from line modal is now correct based on the file
 - Copy button works on electron versions on Windows in remote mode dialog

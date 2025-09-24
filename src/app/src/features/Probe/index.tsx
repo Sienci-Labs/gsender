@@ -525,6 +525,7 @@ const ProbeWidget = () => {
 
             // if we are switching from auto zero to another plate, make sure the probe type changes to diameter
             if (
+                probeProfile &&
                 touchplateType !== probeProfile.touchplateType &&
                 touchplateType === TOUCHPLATE_TYPE_AUTOZERO &&
                 toolDiameter === 0
