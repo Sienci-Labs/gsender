@@ -15,7 +15,6 @@
     "@sienci/avrgirl-arduino": "^5.0.3",
     "axios": "^1.2.4",
     "bcrypt-nodejs": "0.0.3",
-    "buffer-chunks": "^0.1.1",
     "chalk": "~2.4.2",
     "commander": "^10.0.0",
     "compression": "~1.7.4",
@@ -24,7 +23,6 @@
     "cookie-parser": "~1.4.4",
     "core-js": "~3.26.1",
     "cors": "^2.8.5",
-    "crc-full": "^1.1.0",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "electron-log": "^4.3.5",
@@ -111,5 +109,5 @@
     "type": "git",
     "url": "https://github.com/Sienci-Labs/gsender"
   },
-  "version": "1.6.0-Edge1"
+  "version": "1.5.5"
 }

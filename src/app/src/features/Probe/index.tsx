@@ -509,7 +509,10 @@ const ProbeWidget = () => {
     };
 
     const onStoreChange = useCallback(
-        ({ workspace }: { workspace: Workspace }) => {
+        (data: { workspace: Workspace }) => {
+            if (!data) return;
+            const { workspace } = data;
+
             const probeProfile: ProbeProfile = get(
                 workspace,
                 'probeProfile',
@@ -525,6 +528,7 @@ const ProbeWidget = () => {
 
             // if we are switching from auto zero to another plate, make sure the probe type changes to diameter
             if (
+                probeProfile &&
                 touchplateType !== probeProfile.touchplateType &&
                 touchplateType === TOUCHPLATE_TYPE_AUTOZERO &&
                 toolDiameter === 0
