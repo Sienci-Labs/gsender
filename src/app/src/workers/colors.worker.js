@@ -147,6 +147,7 @@ onmessage = function ({ data }) {
         colors.forEach((colorTag, index) => {
             if (toolchanges.includes(index) && index > 20) {
                 const newColor = generateComplementaryColor(motionColor.G1);
+                console.log('newColor', newColor.toArray());
                 motionColor.G1 = newColor;
                 motionColor.G2 = newColor;
                 motionColor.G3 = newColor;
