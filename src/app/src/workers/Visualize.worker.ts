@@ -25,6 +25,7 @@ import { ArcCurve } from 'three';
 
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 import { BasicPosition } from 'app/definitions/general';
+import { t } from 'react-router/dist/production/index-react-server-client-BKpa2trA';
 
 interface WorkerData {
     content: string;
@@ -80,6 +81,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     let vertices: number[] = [];
     const colors: [string, number][] = [];
     const frames: number[] = [];
+    let currentTool = 0;
+    const toolchanges = [];
 
     // Laser specific state variables
     const spindleSpeeds = new Set<number>();
@@ -107,6 +110,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             spindleSpeed = Number(spindleValue);
             spindleOn = Number(spindleValue) > 0;
         }
+    };
+
+    const isNewTool = (t) => {
+        if (currentTool !== t) {
+            currentTool = t;
+            return true;
+        }
+        return false;
     };
 
     // create path for the vertices of the last motion
@@ -165,46 +176,60 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         normal: {
             addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
                 if (needsVisualization) {
-                    const { motion, units } = modal;
+                    const { motion, units, tool } = modal;
+
+                    if (isNewTool(tool)) {
+                        toolchanges.push(colors.length);
+                    }
 
                     // Check if A-axis rotation is involved
-                    const hasARotation = Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
-                    
+                    const hasARotation =
+                        Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
+
                     if (hasARotation) {
                         // Create helical motion with intermediate points
-                        const segments = Math.max(8, Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5)); // At least 8 segments, or one per 5 degrees
+                        const segments = Math.max(
+                            8,
+                            Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
+                        ); // At least 8 segments, or one per 5 degrees
                         const opacity = motion === 'G0' ? 0.5 : 1;
                         const color: [string, number] = [motion, opacity];
-                        
+
                         let previousRotated: any = null;
                         for (let i = 0; i <= segments; i++) {
                             const t = i / segments;
-                            const interpolatedA = (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
-                            
+                            const interpolatedA =
+                                (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
+
                             // Interpolate position
                             const interpolatedX = v1.x + (v2.x - v1.x) * t;
                             const interpolatedY = v1.y + (v2.y - v1.y) * t;
                             const interpolatedZ = v1.z + (v2.z - v1.z) * t;
-                            
+
                             // Apply A-axis rotation around X-axis
                             const rotated = rotateAxis('x', {
                                 x: interpolatedX,
                                 y: interpolatedY,
                                 z: interpolatedZ,
-                                a: interpolatedA
+                                a: interpolatedA,
                             });
-                            
+
                             if (i > 0) {
                                 // Add line segment from previous point to current point
                                 colors.push(color, color);
                                 vertices.push(
-                                    previousRotated.x, previousRotated.y, previousRotated.z,
-                                    rotated.x, rotated.y, rotated.z
+                                    previousRotated.x,
+                                    previousRotated.y,
+                                    previousRotated.z,
+                                    rotated.x,
+                                    rotated.y,
+                                    rotated.z,
                                 );
-                                
+
                                 // SVG
                                 if (shouldIncludeSVG) {
-                                    const multiplier = units === 'G21' ? 1 : 25.4;
+                                    const multiplier =
+                                        units === 'G21' ? 1 : 25.4;
                                     svgInitialization(motion);
                                     SVGVertices.push({
                                         x1: previousRotated.x * multiplier,
@@ -214,18 +239,28 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                                     });
                                 }
                             }
-                            
+
                             // Store current point for next iteration
                             previousRotated = rotated;
                         }
                     } else {
                         // No A-axis rotation, use simple linear interpolation
-                        const newV1 = rotateAxis('x', { x: v1.x, y: v1.y, z: v1.z, a: v1.a || 0 });
+                        const newV1 = rotateAxis('x', {
+                            x: v1.x,
+                            y: v1.y,
+                            z: v1.z,
+                            a: v1.a || 0,
+                        });
                         v1.x = newV1.x;
                         v1.y = newV1.y;
                         v1.z = newV1.z;
 
-                        const newV2 = rotateAxis('x', { x: v2.x, y: v2.y, z: v2.z, a: v2.a || 0 });
+                        const newV2 = rotateAxis('x', {
+                            x: v2.x,
+                            y: v2.y,
+                            z: v2.z,
+                            a: v2.a || 0,
+                        });
                         v2.x = newV2.x;
                         v2.y = newV2.y;
                         v2.z = newV2.z;
@@ -238,7 +273,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
                         // svg
                         if (shouldIncludeSVG) {
-                            const multiplier = units === 'G21' ? 1 : 25.4 // We need to make path bigger for inches
+                            const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
                             svgInitialization(motion);
                             SVGVertices.push({
                                 x1: v1.x * multiplier,
@@ -252,49 +287,70 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             },
             // For rotary visualization
             addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                const { motion } = modal;
-
+                const { motion, tool } = modal;
+                if (isNewTool(tool)) {
+                    toolchanges.push(colors.length);
+                }
                 // Check if A-axis rotation is involved
-                const hasARotation = Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
-                
+                const hasARotation =
+                    Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
+
                 if (hasARotation) {
                     // Create helical curve with A-axis rotation
-                    const segments = Math.max(8, Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5));
+                    const segments = Math.max(
+                        8,
+                        Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
+                    );
                     const color: [string, number] = [motion, 1];
-                    
+
                     let previousRotated: any = null;
                     for (let i = 0; i <= segments; i++) {
                         const t = i / segments;
-                        const interpolatedA = (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
-                        
+                        const interpolatedA =
+                            (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
+
                         // Interpolate position
                         const interpolatedX = v1.x + (v2.x - v1.x) * t;
                         const interpolatedY = v1.y + (v2.y - v1.y) * t;
                         const interpolatedZ = v1.z + (v2.z - v1.z) * t;
-                        
+
                         // Apply A-axis rotation around X-axis
                         const rotated = rotateAxis('x', {
                             x: interpolatedX,
                             y: interpolatedY,
                             z: interpolatedZ,
-                            a: interpolatedA
+                            a: interpolatedA,
                         });
-                        
+
                         if (i > 0) {
                             // Add line segment from previous point to current point
                             colors.push(color, color);
                             vertices.push(
-                                previousRotated.x, previousRotated.y, previousRotated.z,
-                                rotated.x, rotated.y, rotated.z
+                                previousRotated.x,
+                                previousRotated.y,
+                                previousRotated.z,
+                                rotated.x,
+                                rotated.y,
+                                rotated.z,
                             );
                         }
-                        
+
                         previousRotated = rotated;
                     }
                 } else {
                     // Original curve logic for non-A-axis rotation
-                    const updatedV1 = rotateAxis('x', { x: v1.x, y: v1.y, z: v1.z, a: v1.a || 0 });
-                    const updatedV2 = rotateAxis('x', { x: v2.x, y: v2.y, z: v2.z, a: v2.a || 0 });
+                    const updatedV1 = rotateAxis('x', {
+                        x: v1.x,
+                        y: v1.y,
+                        z: v1.z,
+                        a: v1.a || 0,
+                    });
+                    const updatedV2 = rotateAxis('x', {
+                        x: v2.x,
+                        y: v2.y,
+                        z: v2.z,
+                        a: v2.a || 0,
+                    });
 
                     const radius = v2.z;
                     let startAngle = Math.atan2(updatedV1.z, updatedV1.y);
@@ -333,7 +389,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v0: BasicPosition,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane, units } = modal;
+                    const { motion, plane, units, tool } = modal;
+                    if (isNewTool(tool)) {
+                        toolchanges.push(colors.length);
+                    }
+
                     const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
@@ -578,7 +638,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const modalChanges = vm.getModalChanges();
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
-    console.log(vm.vmState);
+    fileInfo.toolchanges = toolchanges;
+    console.log(fileInfo);
 
     parsedDataToSend = {
         data: [],
