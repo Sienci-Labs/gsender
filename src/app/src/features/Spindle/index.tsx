@@ -163,6 +163,17 @@ const SpindleWidget = () => {
             config.set('speed', newSpindleSpeed);
             updateSpindleSpeed(newSpindleSpeed);
         }
+
+        if (
+            spindleMax !== state.spindleMax ||
+            spindleMin !== state.spindleMin
+        ) {
+            setState((prev) => ({
+                ...prev,
+                spindleMax,
+                spindleMin,
+            }));
+        }
     }, [state, laserAsSpindle, spindleMax, spindleMin]);
 
     useEffect(() => {

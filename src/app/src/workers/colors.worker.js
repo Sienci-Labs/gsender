@@ -44,6 +44,7 @@ onmessage = function ({ data }) {
     } = data;
     let tcCounter = 0;
     let savedColors = [];
+    console.log('changes', toolchanges);
 
     /**
      * Generates a complementary color from a given Three.js Color instance.
@@ -144,14 +145,16 @@ onmessage = function ({ data }) {
     const getColorTypedArray = (colors, motionColor) => {
         const colorArray = [];
         colors.forEach((colorTag, index) => {
-            if (toolchanges.includes(index) && index > 20) {
+            if (toolchanges.includes(index + 1) && index > 20) {
+                console.log('toolchange on:', index + 1);
                 const newColor = generateComplementaryColor(motionColor.G1);
+                console.log('newColor', newColor);
                 motionColor.G1 = newColor;
                 motionColor.G2 = newColor;
                 motionColor.G3 = newColor;
             }
             const [motion, opacity] = colorTag;
-            const color = motionColor[motion] || motionColor.default;
+            const color = motionColor[motion];
             colorArray.push(...color.toArray(), opacity);
         });
         savedColors = colorArray;

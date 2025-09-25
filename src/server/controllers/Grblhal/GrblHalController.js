@@ -491,7 +491,8 @@ class GrblHalController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption !== 'Ignore') {
+                    // If toolchange is at very beginning of file, ignore it
+                    if (toolChangeOption !== 'Ignore' && sent > 20) {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
                         }
@@ -1640,6 +1641,8 @@ class GrblHalController {
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
 
+                this.command('gcode', '%global.state.workspace=modal.wcs');
+
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
@@ -1776,6 +1779,8 @@ class GrblHalController {
 
                 const [options] = args;
                 const { force = false } = { ...options };
+
+                this.emit('job:stop');
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
@@ -2331,6 +2336,10 @@ class GrblHalController {
             'ymodem:upload': () => {
                 const [fileData] = args;
                 this.ymodem.sendFile(fileData, this.connection.getConnectionObject());
+            },
+            'ymodem:uploadFiles': () => {
+                const [files] = args;
+                this.ymodem.sendFiles(files, this.connection.getConnectionObject());
             },
             'ymodem:cancel': () => {
                 console.log('cancel upload');

@@ -59,7 +59,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     size="sm"
                     className="w-full"
                     active={spindleForward}
-                    tooltip={{ content: 'Start spindle moving clockwise' }}
+                    tooltip={{ content: 'Run spindle clockwise' }}
                 />
                 <ActiveStateButton
                     onClick={actions.sendM4}
@@ -70,7 +70,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     className="w-full"
                     active={spindleReverse}
                     tooltip={{
-                        content: 'Start spindle moving counterclockwise',
+                        content: 'Run spindle counterclockwise',
                     }}
                 />
                 <ActiveStateButton

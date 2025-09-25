@@ -458,7 +458,7 @@ const MacroWidget = ({
                 <div className="flex justify-center gap-2 mt-2 w-full min-h-8">
                     <Button
                         onClick={actions.openAddMacroModal}
-                        className="flex flex-1 justify-center items-center"
+                        className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaPlus />}
                         text="Add"
                         tooltip={{ content: 'Add a new macro' }}
@@ -468,7 +468,7 @@ const MacroWidget = ({
                         onClick={() => {
                             inputRef.current?.click();
                         }}
-                        className="flex flex-1 justify-center items-center"
+                        className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaFileImport />}
                         text="Import"
                         tooltip={{ content: 'Import macros from a file' }}
@@ -476,7 +476,7 @@ const MacroWidget = ({
 
                     <Button
                         onClick={exportMacros}
-                        className="flex flex-1 justify-center items-center"
+                        className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaFileExport />}
                         text="Export"
                         tooltip={{ content: 'Export macros to a file' }}

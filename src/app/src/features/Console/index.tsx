@@ -133,7 +133,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                     </h2>
                 </div>
             </div>
-            <div className="grid grid-rows-[1fr_auto] absolute gap-2 top-0 left-0 w-full h-full p-1">
+            <div className="grid grid-rows-[1fr_auto] absolute gap-1 top-0 left-0 w-full h-full p-1">
                 <Terminal ref={terminalRef} isActive={isActive} />
                 <TerminalInput onClear={handleTerminalClear} />
                 <ConsolePopout />

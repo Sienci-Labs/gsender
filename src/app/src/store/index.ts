@@ -294,6 +294,14 @@ const migrateStore = (): void => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.5.5')) {
+        // if user has default retraction distance (4), change it to the new default (2)
+        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        if (currentRetractDistance === 4) {
+            store.set('widgets.probe.retractionDistance', 2);
+        }
+    }
+
     // zThickness setting now has 3 options - port previous value to them
     if (
         semver.lt(cnc.version, '1.5.5') ||
@@ -315,6 +323,7 @@ const migrateStore = (): void => {
                 'workspace.probeProfile.zThickness.zProbe',
                 currentZThickness,
             );
+            store.set('workspace.probeProfile.zThickness.probe3D', 0);
         }
     }
 

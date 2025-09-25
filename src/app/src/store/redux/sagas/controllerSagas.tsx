@@ -268,7 +268,7 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 // await getParsedData().then((value) => {
-                const parsedData = null;
+                const parsedData: null = null;
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
@@ -321,7 +321,7 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         // await getParsedData().then((value) => {
-        const parsedData = null;
+        const parsedData: null = null;
         visualizeWorker.postMessage({
             content,
             visualizer,
@@ -974,6 +974,14 @@ export function* initialize(): Generator<any, void, any> {
                 confirmLabel: 'Continue',
                 cancelLabel: 'Reset',
             });
+        }
+    });
+
+    controller.addListener('job:stop', () => {
+        const revertWorkspace = store.get('workspace.revertWorkspace');
+        // if revert workspace is off, set the current workspace back to what it was when the job started
+        if (!revertWorkspace) {
+            controller.command('gcode', '[global.state.workspace]');
         }
     });
 
