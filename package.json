@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.5.5",
+  "version": "1.6.0-Edge1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -248,6 +248,7 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
     "bootstrap": "~3.3.7",
+    "buffer-chunks": "^0.1.1",
     "chained-function": "~0.5.0",
     "chalk": "~2.4.2",
     "chart.js": "^4.4.7",
@@ -266,6 +267,7 @@
     "cookie-parser": "~1.4.4",
     "core-js": "~3.26.1",
     "cors": "^2.8.5",
+    "crc-full": "^1.1.0",
     "csv": "^6.3.3",
     "cypress-real-events": "^1.11.0",
     "date-fns": "^4.1.0",
