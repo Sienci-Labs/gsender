@@ -272,18 +272,17 @@ export const get3AxisStandardRoutine = (
 
 const determineAutoPlateOffsetValues = (
     direction: PROBE_DIRECTIONS,
-    _diameter: PROBE_TYPES_T | number = null,
+    diameter: PROBE_TYPES_T | number = null,
 ): [number, number] => {
     let xOff = 22.5;
     let yOff = 22.5;
 
-    // we already compensate for the tool in another place, so we don't need this
-    // if (diameter && !(diameter in PROBE_TYPES)) {
-    //     // math to compensate for tool
-    //     const toolRadius = (diameter as number) / 2;
-    //     xOff -= toolRadius;
-    //     yOff -= toolRadius;
-    // }
+    if (diameter && typeof diameter === 'number') {
+        // math to compensate for tool radius
+        const toolRadius = diameter / 2;
+        xOff -= toolRadius;
+        yOff -= toolRadius;
+    }
 
     if (direction === BR) {
         return [xOff * -1, yOff];
