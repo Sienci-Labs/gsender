@@ -1,4 +1,7 @@
-import { ConfigState } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import {
+    ConfigState,
+    OffsetManagement,
+} from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import store from 'app/store';
 import {
     ATCIJSON,
@@ -12,7 +15,16 @@ export interface Macro {
     content?: string;
 }
 
-function calculateOffsetValue(data: Partial<ConfigState>) {}
+function calculateOffsetValue(data: OffsetManagement): number {
+    let count = 0;
+    if (data.probeNewOffset) {
+        count++;
+    }
+    if (data.verifyToolLength) {
+        count++;
+    }
+    return count;
+}
 
 export function generateP100(config: ConfigState): Macro {
     const content = [
@@ -21,8 +33,8 @@ export function generateP100(config: ConfigState): Macro {
         `#<_tc_pres_sense> = ${config.advanced.checkPressure}`,
         `#<_tc_holder_sense> = ${config.advanced.checkToolPresence}`,
         `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
-        `#<_ort_offset_mode> = `,
-        `#<_irt_offset_mode> = `,
+        `#<_ort_offset_mode> = ${calculateOffsetValue(config.offsetManagement)}`,
+        `#<_irt_offset_mode> = ${calculateOffsetValue(config.toolRack)}`,
         `(msg, atci:rack_size:${config.toolRack.numberOfSlots})`,
     ].join('\n');
     const data = new Blob([content]);
@@ -62,7 +74,6 @@ export function generateAllMacros(config: ConfigState) {
     macros.push(...getTemplateMacros());
     macros.push(writeableATCIConfig(atciContent));
 
-    console.log(macros);
     return macros;
 }
 
