@@ -222,6 +222,7 @@ const JobControl: React.FC<JobControlProps> = ({
                                 <StartFromLine
                                     disabled={disabled}
                                     lastLine={lastLine}
+                                    atcValidator={validateFileForATC}
                                 />
                             </div>
                         )}

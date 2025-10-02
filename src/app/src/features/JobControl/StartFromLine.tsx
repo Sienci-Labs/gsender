@@ -27,7 +27,11 @@ type StartFromLineProps = {
     lastLine: number;
 };
 
-const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
+const StartFromLine = ({
+    disabled,
+    lastLine,
+    atcValidator,
+}: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const [state, setState] = useState({
         showModal: false,
