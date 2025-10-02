@@ -21,6 +21,7 @@ import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
 import { useWidgetState } from 'app/hooks/useWidgetState';
+import pubsub from 'pubsub-js';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -92,9 +93,19 @@ const StartFromLine = ({
                             disabled,
                     },
                 )}
-                onClick={() =>
-                    setState((prev) => ({ ...prev, showModal: true }))
-                }
+                onClick={() => {
+                    const [invalidATC, payload] = atcValidator();
+                    if (invalidATC) {
+                        if (payload.type === 'error') {
+                            pubsub.publish('atc_validator', payload);
+                            return;
+                        } else {
+                            console.log('we warn but open the regular dialog');
+                        }
+                    }
+
+                    setState((prev) => ({ ...prev, showModal: true }));
+                }}
             >
                 <MdFormatListNumbered className="text-2xl mr-1" /> Start From
             </ShadButton>

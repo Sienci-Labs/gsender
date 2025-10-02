@@ -97,7 +97,6 @@ const JobControl: React.FC<JobControlProps> = ({
     function validateFileForATC() {
         let hasTC = false;
         let toolEvent = null;
-        console.log(atcEnabled);
 
         // No ATC, always return a fine validation
         if (!atcEnabled) {
@@ -132,7 +131,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     true,
                     {
                         type: 'alert',
-                        title: `Using Current Tool`,
+                        title: `Using Current Tool (T${currentTool})`,
                         body: (
                             <>
                                 <p>
