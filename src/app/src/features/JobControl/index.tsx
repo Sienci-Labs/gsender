@@ -123,7 +123,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
         // Tool selected with offsets
         if (currentTool > 0) {
-            const offsets = toolOffsets[toolEvent.T];
+            const offsets = toolOffsets[Number(currentTool)];
             const zOffset = get(offsets, 'toolOffsets.z', 0);
 
             // Tool selected with Offsets
@@ -132,7 +132,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     true,
                     {
                         type: 'alert',
-                        title: `Using Current Tool (T${toolEvent.T}`,
+                        title: `Using Current Tool`,
                         body: (
                             <>
                                 <p>
