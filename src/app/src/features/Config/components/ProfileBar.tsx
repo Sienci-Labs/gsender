@@ -16,19 +16,16 @@ import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
 import controller from 'app/lib/controller.ts';
+import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 
-interface ProfileBarProps {
-    setShowFlashDialog: () => void;
-}
-
-export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
+export function ProfileBar() {
     const {
         rawEEPROM,
-        setEEPROM,
         settingsAreDirty,
         setSettingsAreDirty,
         EEPROM,
         settingsValues,
+        machineProfile,
     } = useSettings();
     const inputRef = useRef(null);
     const [flashOpen, setFlashOpen] = useState(false);
@@ -46,14 +43,37 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         setFlashOpen(!flashOpen);
     }
 
-    function importEEPROMSettings(e) {
+    function importEEPROMSettings(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files[0];
         try {
             importFirmwareSettings(file, (e) => {
-                const uploadedSettings = JSON.parse(e.target.result);
+                const uploadedSettings: EEPROMSettings = JSON.parse(
+                    e.target.result as string,
+                );
                 const code = [];
+                let formattedSettings: EEPROMSettings = {};
 
-                for (const [key, value] of Object.entries(uploadedSettings)) {
+                if (machineProfile.orderedSettings) {
+                    // get the ordered settings in first
+                    machineProfile.orderedSettings.forEach((_value, key) => {
+                        if (uploadedSettings[key as EEPROM]) {
+                            formattedSettings[key as EEPROM] =
+                                uploadedSettings[key as EEPROM];
+                        }
+                    });
+                    // then get the rest
+                    for (const [key, value] of Object.entries(
+                        uploadedSettings,
+                    )) {
+                        if (!formattedSettings[key as EEPROM]) {
+                            formattedSettings[key as EEPROM] = value;
+                        }
+                    }
+                } else {
+                    formattedSettings = uploadedSettings;
+                }
+
+                for (const [key, value] of Object.entries(formattedSettings)) {
                     code.push(`${key}=${value}`);
                 }
                 code.push('$$');
