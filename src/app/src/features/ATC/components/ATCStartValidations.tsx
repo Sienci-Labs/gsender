@@ -4,6 +4,9 @@ import {
     DialogDescription,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
+import Button from 'app/components/Button';
+import controller from 'app/lib/controller.ts';
+import { FaPlay } from 'react-icons/fa';
 
 export function ATCStartValidations({
     show = true,
@@ -20,6 +23,16 @@ export function ATCStartValidations({
                 <DialogTitle>ATCI - {payload.title}</DialogTitle>
                 <DialogDescription className="flex flex-col gap-4 text-gray-400">
                     {payload.body}
+                    {payload.type === 'alert' && (
+                        <Button
+                            variant="success"
+                            onClick={() => {
+                                controller.command('gcode:start');
+                            }}
+                        >
+                            <FaPlay /> Run job
+                        </Button>
+                    )}
                 </DialogDescription>
             </DialogContent>
         </Dialog>

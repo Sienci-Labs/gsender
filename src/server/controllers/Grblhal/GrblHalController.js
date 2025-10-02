@@ -1467,7 +1467,7 @@ class GrblHalController {
                         this.ready = true;
 
                         // Rewind any files in the sender
-                        this.workflow.stop();
+                        this.workflow && this.workflow.stop();
 
                         if (!this.initialized) {
                             this.initialized = true;
