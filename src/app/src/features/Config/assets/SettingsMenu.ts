@@ -676,7 +676,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Retraction',
                         key: 'widgets.probe.retractionDistance',
                         description:
-                            'How far the bit moves away after a successful touch. (Default 4)',
+                            'How far the bit moves away after a successful touch. (Default 2)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {

@@ -26,7 +26,7 @@ gSender is available for the following systems and does not yet support headless
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Universal)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)                | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                                   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -113,12 +113,30 @@ gSender is also designed in a way that it can be run locally on your computer br
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.5.5 (September 24, 2025)
+- New probe type, 3D Probe added, with future plans to support more than standard XYZ probing
+- All probing cycles now sped up with reduced delays and reduced default retracts to 2mm
+- Each probe block now has an individually customizable Z thickness
+- AutoZero touch plate can now have it's thickness set
+- All AutoZero probing now moves out of the way at the end to make removing the plate easier
+- Longstanding excess probing movements now removed for speed, safety, and accuracy
+- AutoZero bit diameter probing now offsetting correctly like in 1.4.11
+- Tooltips re-added across the app for more hover information
+- Spindle delay Config option for grbl machines now applies to Tool Change wizards and Start from line
+- New behaviour where gSender will ignore M2 or M30 workspace reversion on job completion unless new Config option is toggled on. This should remove the need for using Automations to preserve workspaces.
+- Machine state now handled if in Laser or Rotary mode and the tab is disabled
+- Fixed safe height movements sometimes using the wrong units
+- Fixed shortcuts that weren't acting as expected or weren't triggering
+- Fixed toolchange wizard always going back to probe position before probing to allow movement for bit changes ahead of probing
+- Fixed Config handling of Rotary forcing hard and soft limits for grbl machines
+- UI styling tweaks, and adjustments to better accommodate smaller screens
+
 ### 1.5.4 (August 27, 2025)
 - Fix controller not instantiating correctly in some situations for grblHAL devices.
 - Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
 - Visualizer grid sizing more accurately matches your machine size at 2X dimensions.
 - Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.
-- Shortcut order adjusted when configurting binds.
+- Shortcut order adjusted when configuring binds.
 - Precise and Rapid toggle swapped in jog preset selector
 - Start from line modal is now correct based on the file
 - Copy button works on electron versions on Windows in remote mode dialog

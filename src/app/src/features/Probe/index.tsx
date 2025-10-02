@@ -54,6 +54,7 @@ import {
     PROBE_TYPES_T,
     ProbeCommand,
     ProbeProfile,
+    ProbingOptions,
     State,
     TOUCHPLATE_TYPES_T,
 } from './definitions';
@@ -195,13 +196,13 @@ const ProbeWidget = () => {
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
-        x: 50,
-        y: 50,
+        x: 30,
+        y: 30,
         z: zProbeDistance ? zProbeDistance : 30,
     };
     const PROBE_DISTANCE_IMPERIAL = {
-        x: 2,
-        y: 2,
+        x: 1.2,
+        y: 1.2,
         z: zProbeDistance ? convertToImperial(zProbeDistance) : 1.2,
     };
 
@@ -465,7 +466,7 @@ const ProbeWidget = () => {
             xyRetract = convertToImperial(xyRetract3D);
         }
 
-        const options = {
+        const options: ProbingOptions = {
             axes,
             modal,
             probeFast: fastFeedrate,
@@ -482,6 +483,7 @@ const ProbeWidget = () => {
             homingEnabled: $22 !== '0',
             tipDiameter3D: tipDiameter,
             xyRetract3D: xyRetract,
+            firmware: type,
         };
 
         const code = getProbeCode(options, direction);
@@ -507,7 +509,10 @@ const ProbeWidget = () => {
     };
 
     const onStoreChange = useCallback(
-        ({ workspace }: { workspace: Workspace }) => {
+        (data: { workspace: Workspace }) => {
+            if (!data) return;
+            const { workspace } = data;
+
             const probeProfile: ProbeProfile = get(
                 workspace,
                 'probeProfile',
@@ -523,6 +528,7 @@ const ProbeWidget = () => {
 
             // if we are switching from auto zero to another plate, make sure the probe type changes to diameter
             if (
+                probeProfile &&
                 touchplateType !== probeProfile.touchplateType &&
                 touchplateType === TOUCHPLATE_TYPE_AUTOZERO &&
                 toolDiameter === 0
