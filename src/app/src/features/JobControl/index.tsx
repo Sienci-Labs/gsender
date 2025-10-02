@@ -48,6 +48,7 @@ const JobControl: React.FC<JobControlProps> = ({
     currentTool,
     spindleToolEvents,
     toolOffsets,
+    atcEnabled,
 }) => {
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
@@ -96,6 +97,13 @@ const JobControl: React.FC<JobControlProps> = ({
     function validateFileForATC() {
         let hasTC = false;
         let toolEvent = null;
+        console.log(atcEnabled);
+
+        // No ATC, always return a fine validation
+        if (!atcEnabled) {
+            return [false, null];
+        }
+
         if (!spindleToolEvents) {
             return;
         }
@@ -107,6 +115,7 @@ const JobControl: React.FC<JobControlProps> = ({
                 break;
             }
         }
+
         // No tool change in file - prompt based on current tool and offsets
         if (!hasTC) {
             // Tool selected with offsets
@@ -281,6 +290,8 @@ export default connect((store) => {
     const spindleToolEvents = get(store, 'file.spindleToolEvents', {});
     const toolOffsets = get(store, 'controller.settings.toolTable', {});
     const currentTool = get(store, 'controller.state.status.currentTool', -1);
+    const atcFlag = get(store, 'controller.settings.info.NEWOPT.ATC', '0');
+    const atcEnabled = atcFlag === '1';
 
     return {
         fileLoaded,
@@ -297,5 +308,6 @@ export default connect((store) => {
         spindleToolEvents,
         toolOffsets,
         currentTool,
+        atcEnabled,
     };
 })(JobControl);

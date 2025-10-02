@@ -37,7 +37,7 @@ export function ATC() {
                 show={showValidator}
                 setShow={setShowValidator}
                 payload={validationPayload}
-            />{' '}
+            />
             <div className="flex flex-row items-center justify-end absolute top-2 right-2">
                 <ATCIConfiguration />
                 <ToolDisplayModal />
