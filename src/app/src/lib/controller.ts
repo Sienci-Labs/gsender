@@ -522,6 +522,13 @@ class Controller {
     //   controller.command('watchdir:load', '/path/to/file', callback)
     command(cmd: string, ...args: Array<any>): void {
         const { port } = this;
+
+        // Handle camera commands specially (they don't need a port)
+        if (cmd.startsWith('camera:')) {
+            this.socket && this.socket.emit(cmd, ...args);
+            return;
+        }
+
         if (!port) {
             return;
         }

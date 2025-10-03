@@ -9,6 +9,7 @@ import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
+import { initializeGlobalCameraService } from 'app/lib/camera/globalCameraService';
 
 import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
@@ -28,6 +29,21 @@ function App() {
                     query: 'token=' + token,
                 };
                 controller.connect(host, options);
+                
+                // Initialize camera service after controller connection (only on main client)
+                controller.addListener('connect', () => {
+                    // Only initialize camera service on the main client (localhost)
+                    const isMainClient = window.location.hostname === 'localhost' || 
+                                        window.location.hostname === '127.0.0.1' ||
+                                        window.location.hostname === '0.0.0.0';
+                    
+                    if (isMainClient) {
+                        initializeGlobalCameraService().catch((error) => {
+                            console.error('Failed to initialize camera service:', error);
+                        });
+                    }
+                });
+                
                 return;
             } else {
                 console.log('no auth');

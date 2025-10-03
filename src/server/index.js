@@ -145,9 +145,12 @@ const createServer = (options, callback) => {
     const setPort = get(remoteSettings, 'port', null);
     const setIP = get(remoteSettings, 'ip', null);
 
+    // When remote access is enabled, use the configured port but ALWAYS bind to 0.0.0.0
+    // This allows the server to listen on all network interfaces (localhost + LAN)
     if (remoteSettings.headlessStatus && !isInDevelopmentMode && setIP && setPort && setIP !== '0.0.0.0' && remoteSettings.ip.length > 0) {
         port = setPort;
-        host = setIP;
+        host = '0.0.0.0'; // Bind to all interfaces so remote clients can connect
+        // The setIP is only used for display purposes (see callback below)
     }
 
     const mountPoints = uniqWith([
@@ -274,8 +277,14 @@ const createServer = (options, callback) => {
             // cncengine service
             cncengine.start(server, options.controller || config.get('controller', ''));
 
-            const address = server.address().address;
+            let address = server.address().address;
             const port = server.address().port;
+
+            // If we're bound to 0.0.0.0 and remote access is enabled, use the configured display IP
+            // This ensures the UI shows the correct remote access URL
+            if (address === '0.0.0.0' && remoteSettings.headlessStatus && setIP) {
+                address = setIP;
+            }
 
             callback && callback(null, {
                 address,
