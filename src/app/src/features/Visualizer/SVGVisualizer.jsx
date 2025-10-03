@@ -102,6 +102,43 @@ class SVGVisualizer extends Component {
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
 
+                const showWarningsOnLoad = store.get(
+                    'widgets.visualizer.showWarning',
+                    false,
+                );
+                if (showWarningsOnLoad) {
+                    const invalidLines = _get(
+                        data,
+                        'parsedData.invalidLines',
+                        [],
+                    );
+                    if (invalidLines.length > 0) {
+                        // Put it in the modal somehow
+                        const lineSample = invalidLines.slice(0, 5);
+                        const description = (
+                            <div className={'flex flex-col gap-2'}>
+                                <p>
+                                    Detected {invalidLines.length} invalid lines
+                                    on file load. Your job may not run
+                                    correctly.
+                                </p>
+                                <p>Sample invalid lines found include:</p>
+                                <ol>
+                                    {lineSample.map((line) => (
+                                        <li className="text-xs">
+                                            -<b> {line}</b>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </div>
+                        );
+                        pubsub.publish('helper:info', {
+                            title: 'Invalid Lines Detected',
+                            description,
+                        });
+                    }
+                }
+
                 const isPrimaryVisualizer =
                     !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
                 const isSecondaryVisualizer =
@@ -168,7 +205,7 @@ class SVGVisualizer extends Component {
         );
         if (group && svg) {
             const reduxBBox = this.props.bbox;
-            let stroke= 1;
+            let stroke = 1;
             let bbox = JSON.parse(JSON.stringify(reduxBBox)); // make shallow copy
             // convert from inches to mm
             const { content } = this.props;
@@ -252,7 +289,6 @@ class SVGVisualizer extends Component {
                 node.setAttribute('stroke', stroke);
 
                 return group.appendChild(node);
-
             });
 
             svg.appendChild(group);
