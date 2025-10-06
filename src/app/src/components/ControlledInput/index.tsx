@@ -13,10 +13,22 @@ type InputProps = ComponentProps<'input'> & {
     sizing?: 'xs' | 'sm' | 'md' | 'lg';
     wrapperClassName?: string;
     clearOnEnter?: boolean;
+    immediateOnChange?: boolean; // New prop to enable immediate onChange calls
 };
 
 const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, value, onChange, wrapperClassName, ...props }, ref) => {
+    (
+        {
+            className,
+            type,
+            value,
+            onChange,
+            wrapperClassName,
+            immediateOnChange = false,
+            ...props
+        },
+        ref,
+    ) => {
         const [originalValue, setOriginalValue] = useState(value);
         const [localValue, setLocalValue] = useState(value);
 
@@ -74,6 +86,11 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
         const localChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setLocalValue(e.target.value);
+
+            // If immediateOnChange is enabled, call onChange immediately
+            if (immediateOnChange && onChange) {
+                onChange(e);
+            }
         };
 
         return (

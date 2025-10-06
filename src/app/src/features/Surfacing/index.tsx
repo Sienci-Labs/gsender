@@ -91,10 +91,7 @@ const SurfacingTool = () => {
     }, [surfacing]);
 
     const handleGenerateGcode = async () => {
-        const generator = new Generator({
-            surfacing: surfacing,
-            units: units,
-        });
+        const generator = new Generator({ surfacing, units });
 
         const gcode = generator.generate();
         setGcode(gcode);
@@ -177,6 +174,7 @@ const SurfacingTool = () => {
                                         className={inputStyle}
                                         wrapperClassName="w-full"
                                         value={surfacing.width}
+                                        immediateOnChange
                                         onChange={(e) =>
                                             onChange(
                                                 'width',
@@ -200,6 +198,7 @@ const SurfacingTool = () => {
                                         className={inputStyle}
                                         wrapperClassName="w-full"
                                         value={surfacing.length}
+                                        immediateOnChange
                                         onChange={(e) =>
                                             onChange(
                                                 'length',
@@ -224,6 +223,7 @@ const SurfacingTool = () => {
                                         className={cx('rounded', inputStyle)}
                                         wrapperClassName="w-full"
                                         value={surfacing.skimDepth}
+                                        immediateOnChange
                                         onChange={(e) =>
                                             onChange(
                                                 'skimDepth',
@@ -247,6 +247,7 @@ const SurfacingTool = () => {
                                         className={inputStyle}
                                         wrapperClassName="w-full"
                                         value={surfacing.maxDepth}
+                                        immediateOnChange
                                         onChange={(e) =>
                                             onChange(
                                                 'maxDepth',
@@ -267,6 +268,7 @@ const SurfacingTool = () => {
                                     className={inputStyle}
                                     value={surfacing.bitDiameter}
                                     wrapperClassName="col-span-3"
+                                    immediateOnChange
                                     onChange={(e) =>
                                         onChange(
                                             'bitDiameter',
@@ -286,6 +288,7 @@ const SurfacingTool = () => {
                                     className={inputStyle}
                                     value={surfacing.stepover}
                                     wrapperClassName="col-span-3"
+                                    immediateOnChange
                                     onChange={(e) =>
                                         onChange(
                                             'stepover',
@@ -305,6 +308,7 @@ const SurfacingTool = () => {
                                     className={inputStyle}
                                     value={surfacing.feedrate}
                                     wrapperClassName="col-span-3"
+                                    immediateOnChange
                                     onChange={(e) =>
                                         onChange(
                                             'feedrate',
@@ -325,6 +329,7 @@ const SurfacingTool = () => {
                                         wrapperClassName="w-full"
                                         value={surfacing.spindleRPM}
                                         suffix={'RPM'}
+                                        immediateOnChange
                                         onChange={(e) =>
                                             onChange(
                                                 'spindleRPM',
