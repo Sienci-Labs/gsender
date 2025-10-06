@@ -12,37 +12,57 @@ export function ToolTimelineItem({
     tool,
     isActive,
     isLast,
-    progress,
 }: ToolTimelineItemProps) {
     return (
         <div className="relative">
             <div
                 className={cn(
-                    'relative rounded-lg p-3 transition-all duration-300 border backdrop-blur-xl',
+                    'relative rounded-lg transition-all duration-300 backdrop-blur-xl overflow-hidden',
                     isActive
-                        ? 'bg-white/90 dark:bg-gray-800/90 shadow-2xl scale-[1.02] border-white/30 dark:border-gray-700/30'
-                        : 'bg-white/60 dark:bg-gray-800/60 shadow-lg border-white/20 dark:border-gray-700/20',
+                        ? 'bg-white/90 dark:bg-gray-800/90 shadow-2xl scale-[1.02] border-2 p-3'
+                        : 'bg-white/30 dark:bg-gray-800/30 shadow-lg border border-white/20 dark:border-gray-700/20 opacity-60 p-2',
                 )}
                 style={{
                     borderLeftWidth: isActive ? '4px' : '2px',
                     borderLeftColor: isActive ? tool.color : 'transparent',
+                    borderColor: isActive ? tool.color : undefined,
+                    borderWidth: isActive ? '2px' : undefined,
                 }}
             >
+                {isActive && (
+                    <div
+                        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+                        style={{
+                            backgroundImage: `repeating-linear-gradient(
+                45deg,
+                ${tool.color},
+                ${tool.color} 10px,
+                transparent 10px,
+                transparent 20px
+              )`,
+                        }}
+                    />
+                )}
                 <div className="flex items-center gap-3">
                     <div className="flex flex-col items-center flex-shrink-0">
                         <div
                             className={cn(
-                                'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-3 transition-all duration-300',
+                                'relative z-10 flex items-center justify-center rounded-full border-3 transition-all duration-300',
                                 isActive
-                                    ? 'scale-110 border-white shadow-lg'
-                                    : 'border-white/80 dark:border-gray-600',
+                                    ? 'h-10 w-10 scale-110 border-white shadow-lg'
+                                    : 'h-7 w-7 border-white/80 dark:border-gray-600',
                             )}
                             style={{
                                 backgroundColor: tool.color,
-                                borderWidth: '3px',
+                                borderWidth: isActive ? '3px' : '2px',
                             }}
                         >
-                            <span className="text-sm font-bold text-white">
+                            <span
+                                className={cn(
+                                    'font-bold text-white',
+                                    isActive ? 'text-sm' : 'text-xs',
+                                )}
+                            >
                                 T{tool.toolNumber}
                             </span>
                         </div>
@@ -52,10 +72,10 @@ export function ToolTimelineItem({
                         <div className="flex items-center justify-between gap-2">
                             <span
                                 className={cn(
-                                    'text-sm font-semibold transition-colors',
+                                    'font-semibold transition-colors',
                                     isActive
-                                        ? 'text-gray-900 dark:text-white'
-                                        : 'text-gray-700 dark:text-gray-300',
+                                        ? 'text-sm text-gray-900 dark:text-white'
+                                        : 'text-xs text-gray-700 dark:text-gray-300',
                                 )}
                             >
                                 {tool.label || `Tool ${tool.toolNumber}`}
@@ -63,10 +83,10 @@ export function ToolTimelineItem({
                             {tool.startLine && (
                                 <span
                                     className={cn(
-                                        'text-xs transition-colors whitespace-nowrap',
+                                        'transition-colors whitespace-nowrap',
                                         isActive
-                                            ? 'text-gray-600 dark:text-gray-400'
-                                            : 'text-gray-500 dark:text-gray-500',
+                                            ? 'text-xs text-gray-600 dark:text-gray-400'
+                                            : 'text-[10px] text-gray-500 dark:text-gray-500',
                                     )}
                                 >
                                     Line {tool.startLine}
@@ -76,18 +96,6 @@ export function ToolTimelineItem({
                         </div>
                     </div>
                 </div>
-
-                {isActive && (
-                    <div className="mt-2 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                            className="h-full rounded-full transition-all duration-300"
-                            style={{
-                                width: `${progress}%`,
-                                backgroundColor: tool.color,
-                            }}
-                        />
-                    </div>
-                )}
             </div>
 
             {!isLast && (

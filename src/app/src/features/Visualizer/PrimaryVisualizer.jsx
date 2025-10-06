@@ -37,6 +37,7 @@ const PrimaryVisualizer = ({
     visualizerRef,
     workflowRef,
     widgetContentRef,
+    timeline,
 }) => {
     const {
         liteMode,
@@ -120,6 +121,7 @@ const PrimaryVisualizer = ({
                     />
                     <Helper />
                     <WorkspaceSelector />
+                    {timeline}
                 </div>
             </Widget.Content>
         </Widget>

@@ -1,11 +1,27 @@
 import { ToolTimeline } from 'app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx';
 import { ToolChange } from 'app/features/ATC/components/ToolTimeline/components/types.ts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import pubsub from 'pubsub-js';
 
 export function ToolTimelineWrapper() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [activeToolIndex, setActiveToolIndex] = useState(0);
     const [progress, setProgress] = useState(0);
+    const [show, setShow] = useState(true);
+
+    useEffect(() => {
+        pubsub.subscribe('file:toolchanges', (k, payload) => {
+            // Turns events into usable data, reset active tool
+            setActiveToolIndex(0);
+            setProgress(0);
+            setShow(true);
+        });
+
+        return () => {
+            setShow(false);
+            pubsub.unsubscribe('file:toolchanges');
+        };
+    }, []);
 
     const sampleTools: ToolChange[] = [
         {
@@ -34,8 +50,12 @@ export function ToolTimelineWrapper() {
         },
     ];
 
+    if (!show) {
+        return <div></div>;
+    }
+
     return (
-        <div className="absolute top-2 left-2">
+        <div className="absolute top-4 left-4 z-50">
             <ToolTimeline
                 tools={sampleTools}
                 activeToolIndex={activeToolIndex}
