@@ -32,6 +32,72 @@ import {
     LASER_PART,
 } from 'app/features/Visualizer/constants';
 
+/**
+ * Generates a complementary color from a given Three.js Color instance.
+ * Each call produces a different variation of the complementary color.
+ * @param {THREE.Color} color - The input Three.js Color instance
+ * @returns {THREE.Color} - A new Three.js Color instance with complementary color
+ */
+export const generateComplementaryColor = (color, tcCounter) => {
+    // Convert to HSL for easier manipulation
+    const hsl = { h: 0, s: 0, l: 0 };
+    color.getHSL(hsl);
+
+    // Base complementary hue (opposite on color wheel)
+    let complementaryHue = (hsl.h + 0.5) % 1;
+
+    // Add variation based on counter to generate different complementary colors
+    const variations = [
+        0, // Direct complement
+        0.1, // Split complement 1
+        -0.1, // Split complement 2
+        0.15, // Triadic 1
+        -0.15, // Triadic 2
+        0.05, // Slight variation 1
+        -0.05, // Slight variation 2
+        0.2, // Wider split 1
+        -0.2, // Wider split 2
+    ];
+
+    const variation = variations[tcCounter % variations.length];
+    complementaryHue = (complementaryHue + variation + 1) % 1; // +1 ensures positive value
+
+    // Adjust saturation and lightness for better contrast
+    let newSaturation = hsl.s;
+    let newLightness = hsl.l;
+
+    // Apply different saturation/lightness adjustments based on counter
+    const adjustmentIndex = Math.floor(tcCounter / variations.length) % 4;
+
+    switch (adjustmentIndex) {
+        case 0: // Keep original saturation, adjust lightness for contrast
+            newLightness = hsl.l > 0.5 ? hsl.l - 0.3 : hsl.l + 0.3;
+            break;
+        case 1: // Boost saturation, moderate lightness
+            newSaturation = Math.min(hsl.s + 0.2, 1);
+            newLightness = hsl.l > 0.5 ? hsl.l - 0.2 : hsl.l + 0.2;
+            break;
+        case 2: // Reduce saturation, strong lightness contrast
+            newSaturation = Math.max(hsl.s - 0.1, 0.1);
+            newLightness = hsl.l > 0.5 ? hsl.l - 0.4 : hsl.l + 0.4;
+            break;
+        case 3: // High saturation, opposite lightness
+            newSaturation = Math.min(hsl.s + 0.3, 1);
+            newLightness = 1 - hsl.l;
+            break;
+    }
+
+    // Clamp values to valid range
+    newLightness = Math.max(0.1, Math.min(0.9, newLightness));
+    newSaturation = Math.max(0.1, Math.min(1, newSaturation));
+
+    // Create and return new Color with complementary values
+    const complementaryColor = new THREE.Color();
+    complementaryColor.setHSL(complementaryHue, newSaturation, newLightness);
+
+    return complementaryColor;
+};
+
 onmessage = function ({ data }) {
     const {
         colors,
@@ -44,79 +110,6 @@ onmessage = function ({ data }) {
     } = data;
     let tcCounter = 0;
     let savedColors = [];
-
-    /**
-     * Generates a complementary color from a given Three.js Color instance.
-     * Each call produces a different variation of the complementary color.
-     * @param {THREE.Color} color - The input Three.js Color instance
-     * @returns {THREE.Color} - A new Three.js Color instance with complementary color
-     */
-    const generateComplementaryColor = (color) => {
-        // Convert to HSL for easier manipulation
-        const hsl = { h: 0, s: 0, l: 0 };
-        color.getHSL(hsl);
-
-        // Base complementary hue (opposite on color wheel)
-        let complementaryHue = (hsl.h + 0.5) % 1;
-
-        // Add variation based on counter to generate different complementary colors
-        const variations = [
-            0, // Direct complement
-            0.1, // Split complement 1
-            -0.1, // Split complement 2
-            0.15, // Triadic 1
-            -0.15, // Triadic 2
-            0.05, // Slight variation 1
-            -0.05, // Slight variation 2
-            0.2, // Wider split 1
-            -0.2, // Wider split 2
-        ];
-
-        const variation = variations[tcCounter % variations.length];
-        complementaryHue = (complementaryHue + variation + 1) % 1; // +1 ensures positive value
-
-        // Adjust saturation and lightness for better contrast
-        let newSaturation = hsl.s;
-        let newLightness = hsl.l;
-
-        // Apply different saturation/lightness adjustments based on counter
-        const adjustmentIndex = Math.floor(tcCounter / variations.length) % 4;
-
-        switch (adjustmentIndex) {
-            case 0: // Keep original saturation, adjust lightness for contrast
-                newLightness = hsl.l > 0.5 ? hsl.l - 0.3 : hsl.l + 0.3;
-                break;
-            case 1: // Boost saturation, moderate lightness
-                newSaturation = Math.min(hsl.s + 0.2, 1);
-                newLightness = hsl.l > 0.5 ? hsl.l - 0.2 : hsl.l + 0.2;
-                break;
-            case 2: // Reduce saturation, strong lightness contrast
-                newSaturation = Math.max(hsl.s - 0.1, 0.1);
-                newLightness = hsl.l > 0.5 ? hsl.l - 0.4 : hsl.l + 0.4;
-                break;
-            case 3: // High saturation, opposite lightness
-                newSaturation = Math.min(hsl.s + 0.3, 1);
-                newLightness = 1 - hsl.l;
-                break;
-        }
-
-        // Clamp values to valid range
-        newLightness = Math.max(0.1, Math.min(0.9, newLightness));
-        newSaturation = Math.max(0.1, Math.min(1, newSaturation));
-
-        // Increment counter for next call
-        tcCounter++;
-
-        // Create and return new Color with complementary values
-        const complementaryColor = new THREE.Color();
-        complementaryColor.setHSL(
-            complementaryHue,
-            newSaturation,
-            newLightness,
-        );
-
-        return complementaryColor;
-    };
 
     const updateLaserModeColors = () => {
         const defaultColor = new THREE.Color(theme.get(LASER_PART));
@@ -145,13 +138,19 @@ onmessage = function ({ data }) {
         const colorArray = [];
         colors.forEach((colorTag, index) => {
             if (toolchanges.includes(index) && index > 20) {
-                const newColor = generateComplementaryColor(motionColor.G1);
+                const newColor = generateComplementaryColor(
+                    motionColor.G1,
+                    tcCounter,
+                );
+                // Increment counter for next call
+                tcCounter++;
+
                 motionColor.G1 = newColor;
                 motionColor.G2 = newColor;
                 motionColor.G3 = newColor;
             }
             const [motion, opacity] = colorTag;
-            const color = motionColor[motion] || motionColor.default;
+            const color = motionColor[motion];
             colorArray.push(...color.toArray(), opacity);
         });
         savedColors = colorArray;
@@ -163,14 +162,13 @@ onmessage = function ({ data }) {
         return new Float32Array(colorArray);
     };
 
-    const defaultColor = new THREE.Color(theme.get(CUTTING_PART));
     // Get line colors for current theme
     const motionColor = {
         G0: new THREE.Color(theme.get(G0_PART)),
         G1: new THREE.Color(theme.get(G1_PART)),
         G2: new THREE.Color(theme.get(G2_PART)),
         G3: new THREE.Color(theme.get(G3_PART)),
-        default: defaultColor,
+        default: new THREE.Color('#FFF'),
     };
 
     //this.geometry.setFromPoints(this.vertices);

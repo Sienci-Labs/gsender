@@ -4,6 +4,7 @@ import {
     THEMES,
     VISUALIZER_TYPES,
 } from '../../constants';
+import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 // Types
 
@@ -18,6 +19,7 @@ export type LIGHTWEIGHT_OPTIONS_T =
 
 export interface ATC {
     toolMap: object;
+    templates: ATCIMacroConfig;
 }
 
 export interface Visualizer {

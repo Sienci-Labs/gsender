@@ -107,6 +107,9 @@ const Actions = () => {
                 size="sm"
                 onClick={() => navigate('/tools/rotary-surfacing')}
                 disabled={firmwareType === GRBL && !isInRotaryMode}
+                tooltip={{
+                    content: 'Open rotary surfacing tool',
+                }}
             >
                 Rotary Surfacing
             </Button>
@@ -118,6 +121,10 @@ const Actions = () => {
                 disabled={
                     !isConnected || (firmwareType === GRBL && !isInRotaryMode)
                 }
+                tooltip={{
+                    content: 'Run rotary Z-axis probing',
+                    side: 'left',
+                }}
             >
                 Probe Rotary Z-Axis
             </Button>
@@ -128,6 +135,10 @@ const Actions = () => {
                     runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
                 }
                 disabled={!isConnected || isInRotaryMode}
+                tooltip={{
+                    content: 'Run rotary Y-axis alignment',
+                    side: 'left',
+                }}
             >
                 Y-Axis Alignment
             </Button>

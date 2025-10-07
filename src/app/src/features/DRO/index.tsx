@@ -442,9 +442,10 @@ function DRO({
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
                 {!shouldWarnZero ? (
                     <Button
+                        tooltip={{ content: 'Zero all axes', side: 'left' }}
                         text="Zero"
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
@@ -492,6 +493,7 @@ function DRO({
                     onClick={goXYAxes}
                     disabled={!canClick}
                     size="sm"
+                    tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                 >
                     <span className="font-mono text-lg">
                         {isRotaryMode ? 'XA' : 'XY'}

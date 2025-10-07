@@ -95,6 +95,7 @@ const TerminalInput = ({ onClear }: Props) => {
     return (
         <div className="flex gap-2 w-full flex-grow">
             <Input
+                className="h-8 text-sm"
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
@@ -129,7 +130,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Button
                 variant="primary"
-                className="w-24"
+                className="h-8 w-24 text-sm"
                 onClick={handleCommandExecute}
             >
                 Run
@@ -137,22 +138,25 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button variant="secondary">
+                    <Button 
+                        variant="secondary"
+                        className="h-8 text-sm"
+                    >
                         <FaEllipsisH />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="bg-white p-2 w-72">
+                <PopoverContent className="bg-white px-2 py-2 w-65">
                     <div className="flex flex-col gap-2">
                         <Button
                             variant="outline"
-                            className="w-full flex gap-2"
+                            className="w-full flex gap-2 h-8 text-sm"
                             onClick={handleCopyHistory}
                             icon={<LuCopy />}
-                            text="Copy last 50 commands"
+                            text="Copy last 50 lines"
                         />
                         <Button
                             variant="outline"
-                            className="w-full flex gap-2"
+                            className="w-full flex gap-2 h-8 text-sm"
                             onClick={onClear}
                             icon={<LuPaintbrush />}
                             text="Clear Console"

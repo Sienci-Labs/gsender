@@ -57,7 +57,7 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 variant="ghost"
                 size="custom"
             >
-                <span className="w-[12ch] text-left truncate whitespace-nowrap text-overflow-ellipsis max-w-[12ch]">
+                <span className="w-[14ch] text-left text-overflow-clip overflow-hidden whitespace-nowrap max-w-[14ch]">
                     {running ? 'Running...' : macro.name}
                 </span>
             </Button>
@@ -93,7 +93,7 @@ const MacroItem = ({
     const content = (
         <div
             className={cx(
-                'flex items-center justify-between rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-2 border dark:text-white dark:bg-dark',
+                'flex items-center justify-between rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-1 border dark:text-white dark:bg-dark',
                 {
                     'bg-gray-300 border-gray-400 cursor-not-allowed': disabled,
                     'bg-white border-gray-200 dark:border-dark-lighter':
@@ -105,10 +105,11 @@ const MacroItem = ({
                 onMacroRun={onMacroRun}
                 disabled={disabled}
                 macro={macro}
+                className="h-8 text-sm"
             />
 
             <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">
+                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-8 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter">
                     <FaEllipsisH className="text-xl" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white p-2 z-40">
@@ -132,11 +133,7 @@ const MacroItem = ({
     );
 
     if (hasDescription) {
-        return (
-            <Tooltip content={`Description: ${macro.description}`}>
-                {content}
-            </Tooltip>
-        );
+        return <Tooltip content={`${macro.description}`}>{content}</Tooltip>;
     }
 
     return content;

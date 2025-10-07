@@ -7,6 +7,7 @@ import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
+import Tooltip from 'app/components/Tooltip';
 
 interface EEPROMSettingRowProps {
     eID: string;
@@ -55,7 +56,10 @@ export function EEPROMSettingRow({
         const detailString = (
             <span>
                 {filterNewlines(EEPROMData.details)}
-                <span> ({EEPROMData.setting}, Default {inputDefault})</span>
+                <span>
+                    {' '}
+                    ({EEPROMData.setting}, Default {inputDefault})
+                </span>
             </span>
         );
 
@@ -90,30 +94,33 @@ export function EEPROMSettingRow({
                 </div>
                 <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                     {!isDefault && (
-                        <button
-                            className="text-3xl"
-                            title="Reset Default"
-                            onClick={() => {
-                                Confirm({
-                                    title: 'Reset Single EEPROM Value',
-                                    content:
-                                        'Are you sure you want to reset this value to default?',
-                                    confirmLabel: 'Yes',
-                                    onConfirm: () => {
-                                        resetHandler(
-                                            EEPROMData.setting,
-                                            inputDefault,
-                                        );
-                                    },
-                                });
-                            }}
-                        >
-                            <BiReset />
-                        </button>
+                        <Tooltip content="Reset to default value">
+                            <button
+                                className="text-3xl"
+                                onClick={() => {
+                                    Confirm({
+                                        title: 'Reset Single EEPROM Value',
+                                        content:
+                                            'Are you sure you want to reset this value to default?',
+                                        confirmLabel: 'Yes',
+                                        onConfirm: () => {
+                                            resetHandler(
+                                                EEPROMData.setting,
+                                                inputDefault,
+                                            );
+                                        },
+                                    });
+                                }}
+                            >
+                                <BiReset />
+                            </button>
+                        </Tooltip>
                     )}
-                    <span className="text-robin-500 text-4xl">
-                        <FaMicrochip />
-                    </span>
+                    <Tooltip content="Machine setting">
+                        <span className="text-robin-500 text-4xl">
+                            <FaMicrochip />
+                        </span>
+                    </Tooltip>
                 </span>
                 <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5">
                     {detailString}

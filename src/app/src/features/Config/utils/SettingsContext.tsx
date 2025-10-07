@@ -32,7 +32,7 @@ interface iSettingsContext {
     EEPROM?: object;
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
-    machineProfile: object;
+    machineProfile: MachineProfile;
     rawEEPROM: object;
     firmwareType: FIRMWARE_TYPES_T;
     setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
@@ -69,7 +69,7 @@ const defaultState: iSettingsContext = {
         return false;
     },
     rawEEPROM: {},
-    machineProfile: {},
+    machineProfile: {} as MachineProfile,
     firmwareType: 'Grbl',
     connected: false,
     settingsAreDirty: false,

@@ -33,11 +33,13 @@ const storeValuesThatNeedRounding = new Set([
     'workspace.probeProfile.zThickness.standardBlock',
     'workspace.probeProfile.zThickness.autoZero',
     'workspace.probeProfile.zThickness.zProbe',
+    'workspace.probeProfile.zThickness.probe3D',
     'workspace.probeProfile.plateWidth',
     'workspace[probeProfile].xyThickness',
     'workspace[probeProfile].zThickness.standardBlock',
     'workspace[probeProfile].zThickness.autoZero',
     'workspace[probeProfile].zThickness.zProbe',
+    'workspace[probeProfile].zThickness.probe3D',
     'workspace[probeProfile].plateWidth',
     'widgets.rotary.stockTurning.options.stockLength',
     'widgets.rotary.stockTurning.options.stepdown',
@@ -70,6 +72,7 @@ const storeValuesThatNeedRounding = new Set([
     'widgets.probe.probeFastFeedrate',
     'widgets.probe.retractionDistance',
     'widgets.probe.zProbeDistance',
+    'widgets.probe.xyRetract3D',
     'widgets["rotary"].stockTurning.options.stockLength',
     'widgets["rotary"].stockTurning.options.stepdown',
     'widgets["rotary"].stockTurning.options.bitDiameter',
@@ -101,6 +104,7 @@ const storeValuesThatNeedRounding = new Set([
     'widgets["probe"].probeFastFeedrate',
     'widgets["probe"].retractionDistance',
     'widgets["probe"].zProbeDistance',
+    'widgets["probe"].xyRetract3D',
 ]);
 
 export const roundImperial = (val: number | string): number => {

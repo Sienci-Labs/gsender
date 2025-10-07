@@ -997,10 +997,14 @@ export function Jogging() {
                     })}
                 >
                     <div
-                        className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3': showA,
-                            'grid-cols-1 gap-y-1 xl:gap-y-2': !showA,
-                        })}
+                        className={cx(
+                            'grid gap-x-1 portrait:gap-x-2 items-center',
+                            {
+                                'grid-cols-2 gap-y-3 portrait:gap-y-6': showA,
+                                'grid-cols-1 gap-y-1 xl:gap-y-2 portrait:gap-y-4':
+                                    !showA,
+                            },
+                        )}
                     >
                         <JogInput
                             label="XY"

@@ -1,7 +1,7 @@
 G21         ; Set units to mm
 G90         ; Absolute positioning
 G1 Z1 F2540      ; Move to clearance level
-
+M6 T2
 ;
 ; Operation:    0
 ; Name:
@@ -1245,7 +1245,7 @@ G1 X57.1970 Y-28.8996
 ; Retract
 G1 Z1.0000 F2540
 
-M6 T20
+M6 T5
 ; Path 2
 ; Rapid to initial position
 G1 X62.8414 Y-33.4904 F2540

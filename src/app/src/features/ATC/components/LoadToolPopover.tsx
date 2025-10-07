@@ -160,7 +160,7 @@ const ToolChangerPopover: React.FC = ({
                                         </div>
                                     </SelectValue>
                                 </SelectTrigger>
-                                <SelectContent className="w-full flex-1 bg-white">
+                                <SelectContent className="w-full flex-1 bg-white z-[10000]">
                                     {tools.map((tool) => (
                                         <SelectItem
                                             key={tool.id}

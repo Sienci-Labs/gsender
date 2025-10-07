@@ -76,8 +76,8 @@ const RangeSlider = ({
     return (
         <div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
             {textComponent}
-            <div className="flex flex-row items-center gap-2 justify-center w-full rounded-full bg-gray-200 dark:bg-dark shadow-inner">
-                <Tooltip content={`Reset ${title} override to default value`}>
+            <div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-dark shadow-inner">
+                <Tooltip content={`Reset override to 100%`}>
                     <Button
                         type="button"
                         onClick={() => onButtonPress(defaultPercentage)}

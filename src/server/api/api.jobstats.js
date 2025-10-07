@@ -21,9 +21,21 @@ export const fetch = (req, res) => {
 };
 
 export const update = (req, res) => {
-    const jobStats = req.body;
+    const reqJobStats = req.body;
+    const jobStats = getJobStats();
+
+    let newJobStats = jobStats;
+    if (reqJobStats.finishTime) {
+        newJobStats.jobsCompleted += 1;
+    } else {
+        newJobStats.jobsCancelled += 1;
+    }
+    newJobStats.totalJobs += 1;
+    newJobStats.totalRuntime += reqJobStats.timeRunning;
+    newJobStats.jobs.push(reqJobStats.job);
+
     try {
-        config.set(CONFIG_KEY, jobStats);
+        config.set(CONFIG_KEY, newJobStats);
         res.send({ message: 'job stats saved' });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({

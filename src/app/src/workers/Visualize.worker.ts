@@ -21,9 +21,11 @@
  *
  */
 
-import { ArcCurve, Vector3 } from 'three';
+import { ArcCurve } from 'three';
 
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
+import { BasicPosition } from 'app/definitions/general';
+import { t } from 'react-router/dist/production/index-react-server-client-BKpa2trA';
 
 interface WorkerData {
     content: string;
@@ -79,6 +81,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     let vertices: number[] = [];
     const colors: [string, number][] = [];
     const frames: number[] = [];
+    let currentTool = 0;
+    const toolchanges = [];
 
     // Laser specific state variables
     const spindleSpeeds = new Set<number>();
@@ -106,6 +110,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             spindleSpeed = Number(spindleValue);
             spindleOn = Number(spindleValue) > 0;
         }
+    };
+
+    const isNewTool = (t) => {
+        if (currentTool !== t) {
+            currentTool = t;
+            return true;
+        }
+        return false;
     };
 
     // create path for the vertices of the last motion
@@ -162,81 +174,226 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     // Each handle Line and Arc Curves differently
     const handlers = {
         normal: {
-            addLine: (modal: Modal, v1: Vector3, v2: Vector3) => {
+            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
                 if (needsVisualization) {
-                    const { motion, units } = modal;
+                    const { motion, units, tool } = modal;
 
-                    const newV1 = rotateAxis('y', v1);
-                    v1.y = newV1.y;
-                    v1.z = newV1.z;
+                    if (isNewTool(tool)) {
+                        toolchanges.push(colors.length);
+                    }
 
-                    const newV2 = rotateAxis('y', v2);
-                    v2.y = newV2.y;
-                    v2.z = newV2.z;
+                    // Check if A-axis rotation is involved
+                    const hasARotation =
+                        Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
 
-                    // normal
-                    const opacity = motion === 'G0' ? 0.5 : 1;
-                    const color: [string, number] = [motion, opacity];
-                    colors.push(color, color);
-                    vertices.push(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+                    if (hasARotation) {
+                        // Create helical motion with intermediate points
+                        const segments = Math.max(
+                            8,
+                            Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
+                        ); // At least 8 segments, or one per 5 degrees
+                        const opacity = motion === 'G0' ? 0.5 : 1;
+                        const color: [string, number] = [motion, opacity];
 
-                    // svg
-                    if (shouldIncludeSVG) {
-                        const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
-                        svgInitialization(motion);
-                        SVGVertices.push({
-                            x1: v1.x * multiplier,
-                            y1: v1.y * multiplier,
-                            x2: v2.x * multiplier,
-                            y2: v2.y * multiplier,
+                        let previousRotated: any = null;
+                        for (let i = 0; i <= segments; i++) {
+                            const t = i / segments;
+                            const interpolatedA =
+                                (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
+
+                            // Interpolate position
+                            const interpolatedX = v1.x + (v2.x - v1.x) * t;
+                            const interpolatedY = v1.y + (v2.y - v1.y) * t;
+                            const interpolatedZ = v1.z + (v2.z - v1.z) * t;
+
+                            // Apply A-axis rotation around X-axis
+                            const rotated = rotateAxis('x', {
+                                x: interpolatedX,
+                                y: interpolatedY,
+                                z: interpolatedZ,
+                                a: interpolatedA,
+                            });
+
+                            if (i > 0) {
+                                // Add line segment from previous point to current point
+                                colors.push(color, color);
+                                vertices.push(
+                                    previousRotated.x,
+                                    previousRotated.y,
+                                    previousRotated.z,
+                                    rotated.x,
+                                    rotated.y,
+                                    rotated.z,
+                                );
+
+                                // SVG
+                                if (shouldIncludeSVG) {
+                                    const multiplier =
+                                        units === 'G21' ? 1 : 25.4;
+                                    svgInitialization(motion);
+                                    SVGVertices.push({
+                                        x1: previousRotated.x * multiplier,
+                                        y1: previousRotated.y * multiplier,
+                                        x2: rotated.x * multiplier,
+                                        y2: rotated.y * multiplier,
+                                    });
+                                }
+                            }
+
+                            // Store current point for next iteration
+                            previousRotated = rotated;
+                        }
+                    } else {
+                        // No A-axis rotation, use simple linear interpolation
+                        const newV1 = rotateAxis('x', {
+                            x: v1.x,
+                            y: v1.y,
+                            z: v1.z,
+                            a: v1.a || 0,
                         });
+                        v1.x = newV1.x;
+                        v1.y = newV1.y;
+                        v1.z = newV1.z;
+
+                        const newV2 = rotateAxis('x', {
+                            x: v2.x,
+                            y: v2.y,
+                            z: v2.z,
+                            a: v2.a || 0,
+                        });
+                        v2.x = newV2.x;
+                        v2.y = newV2.y;
+                        v2.z = newV2.z;
+
+                        // normal
+                        const opacity = motion === 'G0' ? 0.5 : 1;
+                        const color: [string, number] = [motion, opacity];
+                        colors.push(color, color);
+                        vertices.push(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+
+                        // svg
+                        if (shouldIncludeSVG) {
+                            const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
+                            svgInitialization(motion);
+                            SVGVertices.push({
+                                x1: v1.x * multiplier,
+                                y1: v1.y * multiplier,
+                                x2: v2.x * multiplier,
+                                y2: v2.y * multiplier,
+                            });
+                        }
                     }
                 }
             },
             // For rotary visualization
-            addCurve: (modal: Modal, v1: Vector3, v2: Vector3) => {
-                const { motion, units } = modal;
+            addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
+                const { motion, tool } = modal;
+                if (isNewTool(tool)) {
+                    toolchanges.push(colors.length);
+                }
+                // Check if A-axis rotation is involved
+                const hasARotation =
+                    Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
 
-                const updatedV1 = rotateAxis('y', v1);
-                const updatedV2 = rotateAxis('y', v2);
+                if (hasARotation) {
+                    // Create helical curve with A-axis rotation
+                    const segments = Math.max(
+                        8,
+                        Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
+                    );
+                    const color: [string, number] = [motion, 1];
 
-                const radius = v2.z;
-                let startAngle = Math.atan2(updatedV1.z, updatedV1.y);
-                let endAngle = Math.atan2(updatedV2.z, updatedV2.y);
-                const isClockwise = v2.z > v1.z;
+                    let previousRotated: any = null;
+                    for (let i = 0; i <= segments; i++) {
+                        const t = i / segments;
+                        const interpolatedA =
+                            (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
 
-                const arcCurve = new ArcCurve(
-                    0,
-                    0,
-                    radius,
-                    startAngle,
-                    endAngle,
-                    isClockwise,
-                );
+                        // Interpolate position
+                        const interpolatedX = v1.x + (v2.x - v1.x) * t;
+                        const interpolatedY = v1.y + (v2.y - v1.y) * t;
+                        const interpolatedZ = v1.z + (v2.z - v1.z) * t;
 
-                const DEGREES_PER_LINE_SEGMENT = 5;
+                        // Apply A-axis rotation around X-axis
+                        const rotated = rotateAxis('x', {
+                            x: interpolatedX,
+                            y: interpolatedY,
+                            z: interpolatedZ,
+                            a: interpolatedA,
+                        });
 
-                const angleDiff = Math.abs(v2.z - v1.z);
-                const divisions = Math.ceil(
-                    angleDiff / DEGREES_PER_LINE_SEGMENT,
-                );
-                const points = arcCurve.getPoints(divisions);
-                const color: [string, number] = [motion, 1];
+                        if (i > 0) {
+                            // Add line segment from previous point to current point
+                            colors.push(color, color);
+                            vertices.push(
+                                previousRotated.x,
+                                previousRotated.y,
+                                previousRotated.z,
+                                rotated.x,
+                                rotated.y,
+                                rotated.z,
+                            );
+                        }
 
-                for (let i = 0; i < points.length; ++i) {
-                    const point = points[i];
-                    vertices.push(v2.x, point.x, point.y);
-                    colors.push(color);
+                        previousRotated = rotated;
+                    }
+                } else {
+                    // Original curve logic for non-A-axis rotation
+                    const updatedV1 = rotateAxis('x', {
+                        x: v1.x,
+                        y: v1.y,
+                        z: v1.z,
+                        a: v1.a || 0,
+                    });
+                    const updatedV2 = rotateAxis('x', {
+                        x: v2.x,
+                        y: v2.y,
+                        z: v2.z,
+                        a: v2.a || 0,
+                    });
+
+                    const radius = v2.z;
+                    let startAngle = Math.atan2(updatedV1.z, updatedV1.y);
+                    let endAngle = Math.atan2(updatedV2.z, updatedV2.y);
+                    const isClockwise = v2.z > v1.z;
+
+                    const arcCurve = new ArcCurve(
+                        0,
+                        0,
+                        radius,
+                        startAngle,
+                        endAngle,
+                        isClockwise,
+                    );
+
+                    const DEGREES_PER_LINE_SEGMENT = 5;
+
+                    const angleDiff = Math.abs(v2.z - v1.z);
+                    const divisions = Math.ceil(
+                        angleDiff / DEGREES_PER_LINE_SEGMENT,
+                    );
+                    const points = arcCurve.getPoints(divisions);
+                    const color: [string, number] = [motion, 1];
+
+                    for (let i = 0; i < points.length; ++i) {
+                        const point = points[i];
+                        vertices.push(v2.x, point.x, point.y);
+                        colors.push(color);
+                    }
                 }
             },
             addArcCurve: (
                 modal: Modal,
-                v1: Vector3,
-                v2: Vector3,
-                v0: Vector3,
+                v1: BasicPosition,
+                v2: BasicPosition,
+                v0: BasicPosition,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane, units } = modal;
+                    const { motion, plane, units, tool } = modal;
+                    if (isNewTool(tool)) {
+                        toolchanges.push(colors.length);
+                    }
+
                     const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
@@ -316,22 +473,22 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             },
         },
         laser: {
-            addLine: (modal: Modal, v1: Vector3, v2: Vector3) => {
+            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
                 const { addLine: dAddLine } = handlers.normal;
                 dAddLine(modal, v1, v2);
             },
             addArcCurve: (
                 modal: Modal,
-                v1: Vector3,
-                v2: Vector3,
-                v0: Vector3,
+                v1: BasicPosition,
+                v2: BasicPosition,
+                v0: BasicPosition,
             ) => {
                 const { addArcCurve: dAddArcCurve } = handlers.normal;
                 dAddArcCurve(modal, v1, v2, v0);
             },
         },
         svg: {
-            addLine: (modal: Modal, v1: Vector3, v2: Vector3) => {
+            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
                 const { motion, units } = modal;
                 const multiplier = units === 'G21' ? 1 : 25.4;
                 // initialize
@@ -356,9 +513,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
             },
             addArcCurve: (
                 modal: Modal,
-                v1: Vector3,
-                v2: Vector3,
-                v0: Vector3,
+                v1: BasicPosition,
+                v2: BasicPosition,
+                v0: BasicPosition,
             ) => {
                 const { motion, plane, units } = modal;
                 const multiplier = units === 'G21' ? 1 : 25.4;
@@ -481,7 +638,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const modalChanges = vm.getModalChanges();
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
-    console.log(vm.vmState);
+    fileInfo.toolchanges = toolchanges;
+    console.log(fileInfo);
 
     parsedDataToSend = {
         data: [],

@@ -37,6 +37,7 @@ const PrimaryVisualizer = ({
     visualizerRef,
     workflowRef,
     widgetContentRef,
+    timeline,
 }) => {
     const {
         liteMode,
@@ -100,7 +101,7 @@ const PrimaryVisualizer = ({
                     )}
 
                     <div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
-                        <Tooltip content="Toggle Lite Mode">
+                        <Tooltip content="Toggle lightweight mode">
                             <button>
                                 <FaFeatherAlt
                                     className={cx('cursor-pointer', {
@@ -120,6 +121,7 @@ const PrimaryVisualizer = ({
                     />
                     <Helper />
                     <WorkspaceSelector />
+                    {timeline}
                 </div>
             </Widget.Content>
         </Widget>

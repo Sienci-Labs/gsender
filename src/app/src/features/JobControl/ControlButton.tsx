@@ -39,6 +39,7 @@ interface ControlButtonProps {
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
     fileLoaded: boolean;
+    validateATC?: () => [boolean, object];
     onStop: () => void;
 }
 
@@ -61,6 +62,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     isConnected,
     fileLoaded,
     onStop,
+    validateATC,
 }) => {
     function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
         const currentActiveState = reduxActiveState || activeState;
@@ -260,6 +262,12 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         }
 
         if (state === WORKFLOW_STATE_IDLE) {
+            const [atcInvalid, payload] = validateATC();
+            if (atcInvalid) {
+                pubsub.publish('atc_validator', payload);
+                console.log(payload);
+                return;
+            }
             controller.command('gcode:start');
             return;
         }
@@ -308,7 +316,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             !disabled && type === STOP,
                     },
                 )}
-                title={type}
                 onClick={onClick[type]}
                 disabled={disabled}
             >

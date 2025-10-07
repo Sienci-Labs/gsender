@@ -1,0 +1,50 @@
+{
+  "version": 20250909,
+  "variables": {
+    "_tc_rack_enable": {
+      "value": 0,
+      "default": 0
+    },
+    "_tc_slots": {
+      "value": 0,
+      "default": 0
+    },
+    "_tc_slot_offset": {
+      "value": 0,
+      "default": 0
+    },
+    "_irt_offset_mode": {
+      "value": 0,
+      "default": 0
+    },
+    "_ort_offset_mode": {
+      "value": 0,
+      "default": 0
+    },
+    "_passthrough_offset_setting": {
+      "value": 0,
+      "default": 0
+    },
+    "_holder_sense": {
+      "value": 0,
+      "default": 0
+    },
+    "_pres_sense": {
+      "value": 0,
+      "default": 0
+    }
+  },
+  "variableFile": "P100.macro",
+  "files": [
+    "TC.macro",
+    "P900.macro",
+    "P901.macro",
+    "P200.macro",
+    "P300.macro",
+    "P301.macro",
+    "P500.macro",
+    "P501.macro",
+    "P502.macro",
+    "P503.macro"
+  ]
+}
