@@ -44,9 +44,7 @@ function buildToolArray(toolEvents, fileLength) {
 
     if (toolArray.length === 0) {
         return [];
-    }
-
-    if (toolArray.length === 1) {
+    } else if (toolArray.length === 1) {
         toolArray[0].endLine = fileLength;
     } else {
         toolArray[toolArray.length - 1].endLine = fileLength;
@@ -91,7 +89,7 @@ export function ToolTimelineWrapper() {
     }
 
     return (
-        <div className="absolute top-4 left-4 z-50">
+        <div className="absolute top-4 left-4 z-10">
             <ToolTimeline
                 tools={tools}
                 activeToolIndex={activeToolIndex}

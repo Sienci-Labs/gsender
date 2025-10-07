@@ -161,7 +161,7 @@ onmessage = function ({ data }) {
 
         return new Float32Array(colorArray);
     };
-
+    console.log(theme);
     const defaultColor = new THREE.Color(theme.get(CUTTING_PART));
     // Get line colors for current theme
     const motionColor = {
