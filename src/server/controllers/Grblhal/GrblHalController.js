@@ -1636,10 +1636,13 @@ class GrblHalController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom, zMax, safeHeight = 10, atci = true] = args;
+                const [lineToStartFrom, zMax, safeHeight = 10] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
+
+                const atci = _.get(this.settings, 'info.NEWOPT.ATC', '0') === '1';
+                console.log('ATC=1', atci);
 
                 this.command('gcode', '%global.state.workspace=modal.wcs');
 
@@ -1685,7 +1688,7 @@ class GrblHalController {
                     });
 
                     const modal = toolpath.getModal();
-                    console.log(modal);
+
                     const position = toolpath.getPosition();
 
                     const coolant = {
