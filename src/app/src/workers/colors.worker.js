@@ -162,14 +162,14 @@ onmessage = function ({ data }) {
         return new Float32Array(colorArray);
     };
     console.log(theme);
-    const defaultColor = new THREE.Color(theme.get(CUTTING_PART));
+
     // Get line colors for current theme
     const motionColor = {
         G0: new THREE.Color(theme.get(G0_PART)),
         G1: new THREE.Color(theme.get(G1_PART)),
         G2: new THREE.Color(theme.get(G2_PART)),
         G3: new THREE.Color(theme.get(G3_PART)),
-        default: defaultColor,
+        default: new THREE.Color('#FFF'),
     };
 
     //this.geometry.setFromPoints(this.vertices);

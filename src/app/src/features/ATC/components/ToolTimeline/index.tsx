@@ -10,6 +10,8 @@ import {
 } from 'app/features/Visualizer/constants';
 import store from 'app/store';
 import { generateComplementaryColor } from 'app/workers/colors.worker';
+import { RootState } from 'app/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 function getThemeCuttingColour() {
     const visualizerTheme = store.get('widgets.visualizer.theme', 'Dark');
@@ -63,6 +65,10 @@ export function ToolTimelineWrapper() {
     const [show, setShow] = useState(false);
     const [tools, setTools] = useState<ToolChange[]>([]);
 
+    const fileLoaded = useTypedSelector(
+        (state: RootState) => state.file.fileLoaded,
+    );
+
     useEffect(() => {
         pubsub.subscribe('file:toolchanges', (k, { toolEvents, total }) => {
             const toolArray = buildToolArray(toolEvents, total);
@@ -83,6 +89,15 @@ export function ToolTimelineWrapper() {
             pubsub.unsubscribe('file:toolchanges');
         };
     }, []);
+
+    useEffect(() => {
+        console.log(fileLoaded);
+        if (!fileLoaded) {
+            setShow(false);
+            setTools([]);
+            setActiveToolIndex(0);
+        }
+    }, [fileLoaded]);
 
     if (!show) {
         return <div></div>;
