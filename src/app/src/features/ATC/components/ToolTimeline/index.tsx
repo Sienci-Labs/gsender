@@ -12,6 +12,8 @@ import store from 'app/store';
 import { generateComplementaryColor } from 'app/workers/colors.worker';
 import { RootState } from 'app/store/redux';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import get from 'lodash/get';
+import controller from 'app/lib/controller.ts';
 
 function getThemeCuttingColour() {
     const visualizerTheme = store.get('widgets.visualizer.theme', 'Dark');
@@ -69,10 +71,23 @@ export function ToolTimelineWrapper() {
         (state: RootState) => state.file.fileLoaded,
     );
 
+    const linesReceived = useTypedSelector((state: RootState) => {
+        return get(state, 'controller.sender.status.received', 0);
+    });
+
+    useEffect(() => {
+        if (tools.length === 0) {
+            return;
+        }
+        if (linesReceived > tools[activeToolIndex].endLine) {
+            setActiveToolIndex(activeToolIndex + 1);
+        }
+    }, [linesReceived]);
+
     useEffect(() => {
         pubsub.subscribe('file:toolchanges', (k, { toolEvents, total }) => {
             const toolArray = buildToolArray(toolEvents, total);
-            console.log(toolArray);
+
             if (toolArray.length === 0) {
                 setShow(false);
                 setTools([]);
@@ -82,6 +97,10 @@ export function ToolTimelineWrapper() {
             setActiveToolIndex(0);
             setProgress(0);
             setShow(true);
+        });
+
+        controller.addListener('job:stop', () => {
+            setActiveToolIndex(0);
         });
 
         return () => {

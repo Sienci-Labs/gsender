@@ -161,7 +161,6 @@ onmessage = function ({ data }) {
 
         return new Float32Array(colorArray);
     };
-    console.log(theme);
 
     // Get line colors for current theme
     const motionColor = {
