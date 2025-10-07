@@ -3,15 +3,51 @@ import { ToolChange } from 'app/features/ATC/components/ToolTimeline/components/
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 
+function buildToolArray(toolEvents, fileLength) {
+    let start = 1;
+    let count = 1;
+    const toolArray = [];
+
+    Object.entries(toolEvents).forEach(([line, value]) => {
+        if (Object.hasOwn(value, 'M') && Object.hasOwn(value, 'T')) {
+            let newTool = {};
+            newTool.toolNumber = value.T;
+            newTool.startLine = line;
+            newTool.label = `T${value.T}`;
+            toolArray.push(newTool);
+        }
+    });
+
+    if (toolArray.length === 1) {
+        toolArray[0].endLine = fileLength;
+    } else {
+        toolArray[toolArray.length - 1].endLine = fileLength;
+        for (let i = toolArray.length - 2; i >= 0; i--) {
+            toolArray[i].endLine = toolArray[i + 1].startLine - 1;
+        }
+    }
+
+    console.log(toolArray);
+    return toolArray;
+}
+
 export function ToolTimelineWrapper() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [activeToolIndex, setActiveToolIndex] = useState(0);
     const [progress, setProgress] = useState(0);
     const [show, setShow] = useState(true);
+    const [tools, setTools] = useState<ToolChange[]>([]);
 
     useEffect(() => {
-        pubsub.subscribe('file:toolchanges', (k, payload) => {
-            // Turns events into usable data, reset active tool
+        pubsub.subscribe('file:toolchanges', (k, { toolEvents, total }) => {
+            const toolArray = buildToolArray(toolEvents, total);
+            console.log(total);
+            if (toolArray.length === 0) {
+                setShow(false);
+                setTools([]);
+                return;
+            }
+            setTools(toolArray);
             setActiveToolIndex(0);
             setProgress(0);
             setShow(true);
