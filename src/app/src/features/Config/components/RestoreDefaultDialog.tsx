@@ -18,7 +18,7 @@ import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultM
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 
-function getMachineProfile(id) {
+function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);
     if (!profile) {
         return null;
@@ -27,7 +27,7 @@ function getMachineProfile(id) {
 }
 
 function restoreEEPROMDefaults(type = '') {
-    let eepromSettings = [];
+    let eepromSettings = {};
 
     const selectedMachineProfile = store.get('workspace.machineProfile');
     const profile = getMachineProfile(selectedMachineProfile.id);
@@ -64,7 +64,7 @@ function restoreEEPROMDefaults(type = '') {
     });
 }
 
-export function RestoreDefaultDialog({ fileLoaded, handleFileReload }) {
+export function RestoreDefaultDialog() {
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );

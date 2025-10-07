@@ -10,7 +10,7 @@ import DecimalInput from 'app/features/Config/components/EEPROMInputs/DecimalInp
 import StringInput from 'app/features/Config/components/EEPROMInputs/StringInput.tsx';
 import PasswordInput from 'app/features/Config/components/EEPROMInputs/PasswordInput.tsx';
 import Ipv4Input from 'app/features/Config/components/EEPROMInputs/Ipv4Input.tsx';
-import { EEPROM, EEPROMDescriptions, EEPROMSettings, FilteredEEPROM } from 'app/definitions/firmware';
+import { EEPROM, EEPROMDescriptions, EEPROMSettings, FilteredEEPROM, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { BasicObject } from 'app/definitions/general';
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
@@ -22,6 +22,10 @@ export const DECIMAL_ID = 6;
 export const STRING_ID = 7;
 export const PASSWORD_ID = 8;
 export const IPV4_ID = 9;
+
+interface HalDataTypeMap {
+    [key: number]: any;
+}
 
 export function getFilteredEEPROMSettings(
     settings: typeof GRBL_HAL_SETTINGS | typeof GRBL_SETTINGS,
@@ -61,14 +65,14 @@ export function getFilteredEEPROMSettings(
     });
 }
 
-export const importFirmwareSettings = (file, callback) => {
+export const importFirmwareSettings = (file: File, callback: (this: FileReader, ev: ProgressEvent<FileReader>) => any) => {
     const reader = new FileReader();
 
     reader.onload = callback;
     reader.readAsText(file);
 };
 
-export const halDatatypeMap = {
+export const halDatatypeMap: HalDataTypeMap = {
     [BOOLEAN_ID]: BooleanInput,
     [BITFIELD_ID]: BitfieldInput,
     [EXCLUSIVE_BITFIELD_ID]: ExclusiveBitfieldInput,
@@ -81,7 +85,7 @@ export const halDatatypeMap = {
     [IPV4_ID]: Ipv4Input,
 };
 
-export const getDatatypeInput = (type, firmware) => {
+export const getDatatypeInput = (type: string | number, _firmware: FIRMWARE_TYPES_T) => {
     // Translate the old values to new
     type = Number(type);
     return halDatatypeMap[type] || String;

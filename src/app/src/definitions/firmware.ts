@@ -82,4 +82,6 @@ export interface MachineProfile {
     laserOnOutline?: boolean;
     eepromSettings?: EEPROMSettings;
     grblHALeepromSettings?: EEPROMSettings;
+    orderedSettings?: Map<EEPROM | string, any>;
+    isHal?: boolean;
 }

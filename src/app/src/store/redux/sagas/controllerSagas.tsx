@@ -115,6 +115,7 @@ import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
+import { AlarmsErrors } from 'app/definitions/alarms_errors';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -140,14 +141,7 @@ export function* initialize(): Generator<any, void, any> {
         try {
             let res = await api.jobStats.fetch();
             const jobStats = res.data;
-            let newJobStats = jobStats;
 
-            if (status.finishTime) {
-                newJobStats.jobsFinished += 1;
-            } else {
-                newJobStats.jobsCancelled += 1;
-            }
-            newJobStats.totalRuntime += status.timeRunning;
             const job: Job = {
                 id:
                     jobStats.jobs.length > 0
@@ -169,7 +163,13 @@ export function* initialize(): Generator<any, void, any> {
                     ? JOB_STATUS.COMPLETE
                     : JOB_STATUS.STOPPED,
             };
-            newJobStats.jobs.push(job);
+
+            const newJobStats = {
+                finishTime: status.finishTime,
+                timeRunning: status.timeRunning,
+                job: job,
+            };
+
             api.jobStats.update(newJobStats);
             pubsub.publish('lastJob', job);
         } catch (error) {
@@ -341,7 +341,7 @@ export function* initialize(): Generator<any, void, any> {
             let res = await api.alarmList.fetch();
             const alarmList = res.data;
 
-            const alarmError = {
+            const alarmError: AlarmsErrors = {
                 id:
                     alarmList.list.length > 0
                         ? alarmList.list.length.toString()
@@ -355,8 +355,7 @@ export function* initialize(): Generator<any, void, any> {
                 line: error.line,
                 controller: error.controller,
             };
-            alarmList.list.push(alarmError);
-            api.alarmList.update(alarmList);
+            api.alarmList.update(alarmError);
         } catch (error) {
             console.error(error);
         }
