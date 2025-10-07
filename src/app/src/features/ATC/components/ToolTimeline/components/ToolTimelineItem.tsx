@@ -31,7 +31,7 @@ export function ToolTimelineItem({
             >
                 {isActive && (
                     <div
-                        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+                        className="absolute inset-0 opacity-[0.1] dark:opacity-[0.05] pointer-events-none"
                         style={{
                             backgroundImage: `repeating-linear-gradient(
                 45deg,
