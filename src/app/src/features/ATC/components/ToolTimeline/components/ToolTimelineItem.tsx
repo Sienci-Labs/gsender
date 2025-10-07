@@ -20,7 +20,7 @@ export function ToolTimelineItem({
                     'relative rounded-lg transition-all duration-300 backdrop-blur-xl overflow-hidden',
                     isActive
                         ? 'bg-white/90 dark:bg-gray-800/90 shadow-2xl scale-[1.02] border-2 p-3'
-                        : 'bg-white/30 dark:bg-gray-800/30 shadow-lg border border-white/20 dark:border-gray-700/20 opacity-60 p-2',
+                        : 'bg-white/40 dark:bg-gray-800/30 shadow-lg border border-white/20 dark:border-gray-700/20 opacity-60 p-2',
                 )}
                 style={{
                     borderLeftWidth: isActive ? '4px' : '2px',
@@ -83,11 +83,9 @@ export function ToolTimelineItem({
                             {tool.startLine && (
                                 <span
                                     className={cn(
-                                        'transition-colors whitespace-nowrap',
-                                        isActive
-                                            ? 'text-xs text-gray-600 dark:text-gray-400'
-                                            : 'text-[10px] text-gray-500 dark:text-gray-500',
+                                        'transition-colors whitespace-nowrap text-xs font-medium opacity-100',
                                     )}
+                                    style={{ color: '#000' }}
                                 >
                                     Line {tool.startLine}
                                     {tool.endLine && ` - ${tool.endLine}`}
