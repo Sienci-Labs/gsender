@@ -1,5 +1,5 @@
 export interface ToolChange {
-    id: string;
+    index: number;
     toolNumber: number;
     color: string;
     label?: string;

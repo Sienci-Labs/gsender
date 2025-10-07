@@ -63,7 +63,7 @@ export function ToolTimelineItem({
                                     isActive ? 'text-sm' : 'text-xs',
                                 )}
                             >
-                                T{tool.toolNumber}
+                                {tool.index}
                             </span>
                         </div>
                     </div>

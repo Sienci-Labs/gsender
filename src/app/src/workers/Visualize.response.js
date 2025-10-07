@@ -22,7 +22,7 @@ export const visualizeResponse = async ({ data }) => {
         pubsub.publish('toolpath:progress', data);
     } else {
         const { needsVisualization, parsedData } = data;
-        console.log('HERE', parsedData.info.total);
+
         pubsub.publish('file:toolchanges', {
             toolEvents: parsedData.info.spindleToolEvents,
             total: parsedData.info.total,

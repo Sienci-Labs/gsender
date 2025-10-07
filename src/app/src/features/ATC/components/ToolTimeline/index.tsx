@@ -1,22 +1,50 @@
 import { ToolTimeline } from 'app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx';
 import { ToolChange } from 'app/features/ATC/components/ToolTimeline/components/types.ts';
 import { useEffect, useState } from 'react';
+import * as Three from 'three';
 import pubsub from 'pubsub-js';
+import {
+    DARK_THEME_VALUES,
+    G1_PART,
+    LIGHT_THEME_VALUES,
+} from 'app/features/Visualizer/constants';
+import store from 'app/store';
+import { generateComplementaryColor } from 'app/workers/colors.worker';
+
+function getThemeCuttingColour() {
+    const visualizerTheme = store.get('widgets.visualizer.theme', 'Dark');
+    if (visualizerTheme === 'Dark') {
+        return DARK_THEME_VALUES.get(G1_PART);
+    } else {
+        return LIGHT_THEME_VALUES.get(G1_PART);
+    }
+}
 
 function buildToolArray(toolEvents, fileLength) {
-    let start = 1;
-    let count = 1;
-    const toolArray = [];
+    let count = 0;
+    const toolArray: ToolChange[] = [];
+    let originalColor = getThemeCuttingColour();
+    let legendColor = new Three.Color(originalColor);
 
     Object.entries(toolEvents).forEach(([line, value]) => {
         if (Object.hasOwn(value, 'M') && Object.hasOwn(value, 'T')) {
-            let newTool = {};
+            let newTool: ToolChange = {};
             newTool.toolNumber = value.T;
-            newTool.startLine = line;
+            newTool.startLine = Number(line);
             newTool.label = `T${value.T}`;
+            newTool.color = `#${legendColor.getHexString()}`;
+            newTool.index = count + 1;
             toolArray.push(newTool);
+
+            // Prime next colour in sequence
+            legendColor = generateComplementaryColor(legendColor, count);
+            count++;
         }
     });
+
+    if (toolArray.length === 0) {
+        return [];
+    }
 
     if (toolArray.length === 1) {
         toolArray[0].endLine = fileLength;
@@ -27,7 +55,6 @@ function buildToolArray(toolEvents, fileLength) {
         }
     }
 
-    console.log(toolArray);
     return toolArray;
 }
 
@@ -35,13 +62,13 @@ export function ToolTimelineWrapper() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [activeToolIndex, setActiveToolIndex] = useState(0);
     const [progress, setProgress] = useState(0);
-    const [show, setShow] = useState(true);
+    const [show, setShow] = useState(false);
     const [tools, setTools] = useState<ToolChange[]>([]);
 
     useEffect(() => {
         pubsub.subscribe('file:toolchanges', (k, { toolEvents, total }) => {
             const toolArray = buildToolArray(toolEvents, total);
-            console.log(total);
+            console.log(toolArray);
             if (toolArray.length === 0) {
                 setShow(false);
                 setTools([]);
@@ -59,33 +86,6 @@ export function ToolTimelineWrapper() {
         };
     }, []);
 
-    const sampleTools: ToolChange[] = [
-        {
-            id: '1',
-            toolNumber: 1,
-            color: '#3b82f6',
-            label: 'End Mill 6mm',
-            startLine: 1,
-            endLine: 450,
-        },
-        {
-            id: '2',
-            toolNumber: 2,
-            color: '#ef4444',
-            label: 'Ball Nose 3mm',
-            startLine: 451,
-            endLine: 890,
-        },
-        {
-            id: '3',
-            toolNumber: 3,
-            color: '#10b981',
-            label: 'V-Bit 90°',
-            startLine: 891,
-            endLine: 1200,
-        },
-    ];
-
     if (!show) {
         return <div></div>;
     }
@@ -93,7 +93,7 @@ export function ToolTimelineWrapper() {
     return (
         <div className="absolute top-4 left-4 z-50">
             <ToolTimeline
-                tools={sampleTools}
+                tools={tools}
                 activeToolIndex={activeToolIndex}
                 progress={progress}
                 isCollapsed={isCollapsed}
