@@ -1730,7 +1730,7 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
-                        if (atci) {
+                        if (atci && modal.tool !== 0) {
                             modalGCode.push(`M6 T${modal.tool}`);
                         }
                         modalGCode.push(`${modal.spindle} S${spindleRate}`);
