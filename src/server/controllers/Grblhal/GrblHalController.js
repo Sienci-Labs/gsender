@@ -1729,10 +1729,12 @@ class GrblHalController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
+                    // ATCI - add M6 before spindles turned on to get correc tool to spin up
+                    if (atci && modal.tool !== 0) {
+                        modalGCode.push(`M6 T${modal.tool}`);
+                    }
+
                     if (hasSpindle) {
-                        if (atci && modal.tool !== 0) {
-                            modalGCode.push(`M6 T${modal.tool}`);
-                        }
                         modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
