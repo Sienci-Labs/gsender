@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button } from 'app/components/Button';
-import { Badge } from 'app/components/shadcn/badge';
+import { Badge } from 'app/components/shadcn/Badge';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import cn from 'classnames';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
