@@ -990,6 +990,12 @@ class GrblHalController {
             this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
 
+            const hasSD = true;
+            if (hasSD && !this.actionMask.accessoryState.SD) {
+                this.connection.writeImmediate('$FM\n$F\n');
+                this.actionMask.accessoryState.SD = true;
+            }
+
             if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
                 this.connection.writeln('$spindlesh');
             } else {
@@ -1075,15 +1081,8 @@ class GrblHalController {
                     this.actionMask.alarmCompleteReport = false;
                 } else {
                     // Every 20 status reports, request a full one
-                    if (this.actionMask.queryStatusCount === 20) {
-                        //this.connection.writeln(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
-                        //this.connection.writeln('\x87');
-                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
-                        this.actionMask.queryStatusCount = 0;
-                    } else {
-                        this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
-                        this.actionMask.queryStatusCount += 1;
-                    }
+                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+
 
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
@@ -1092,7 +1091,6 @@ class GrblHalController {
             }
         };
 
-        // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             // if parser state enabled, we dont need to query the parser state
