@@ -69,8 +69,8 @@ interface DROProps {
     workflowState: string;
     isConnected: boolean;
     activeState: string;
-    preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
+    isRemote?: boolean;
 }
 
 function DRO({
@@ -82,6 +82,7 @@ function DRO({
     activeState,
     homingEnabled,
     singleAxisHoming,
+    isRemote,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { units: preferredUnits } = useWorkspaceState();
@@ -389,7 +390,7 @@ function DRO({
 
     return (
         <div className="relative">
-            <UnitBadge />
+            <UnitBadge isRemote={isRemote} />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (

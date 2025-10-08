@@ -245,7 +245,7 @@ export const ReactRoutes = () => {
                     element={
                         <>
                             <WorkspaceSelector />
-                            <DRO />
+                            <DRO isRemote />
                             <Jogging />
                         </>
                     }
