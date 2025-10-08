@@ -26,8 +26,8 @@ import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
+
 import GcodeToolpath from '../../lib/GcodeToolpath';
-// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
@@ -55,12 +55,15 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_HAL_ACTIVE_STATE_HOME,
+    GRBL_HAL_ACTIVE_STATE_HOLD,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_CHECK,
+    GRBL_HAL_ACTIVE_STATE_RUN
 } from './constants';
 import {
     METRIC_UNITS,
@@ -82,8 +85,8 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
+
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -478,8 +481,6 @@ class GrblHalController {
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
                     const { toolChangeOption } = this.toolChangeContext;
-                    console.log(toolChangeOption);
-                    console.log(this.toolChangeContext);
 
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
@@ -577,7 +578,7 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
@@ -650,13 +651,13 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
-            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE) {
                 this.initialized = true;
                 this.initController();
             }
 
             // Make sure we also have axs parsed - at most two times or we get endless loop
-            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
+            if (!this.runner.hasAXS() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
                 this.writeln('$I');
                 this.actionMask.axsReportCount++;
             }
@@ -861,7 +862,7 @@ class GrblHalController {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
-            } else if (this.state?.status?.activeState === GRBL_ACTIVE_STATE_HOME) {
+            } else if (this.state?.status?.activeState === GRBL_HAL_ACTIVE_STATE_HOME) {
                 errorOrigin = 'Console';
                 line = '$H';
             } else if (outstanding > 0) {
@@ -903,7 +904,7 @@ class GrblHalController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
                 setTimeout(() => {
@@ -1703,7 +1704,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1805,7 +1806,7 @@ class GrblHalController {
                 } else {
                     this.writeln('$H');
                 }
-                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -2242,8 +2243,14 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
+        this.actionMask.replyStatusReport =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
+            (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
+            this.actionMask.replyStatusReport;
+
+        this.actionMask.replyParserState =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) ||
+            this.actionMask.replyParserState;
 
         this.connection.write(data, {
             ...context,
