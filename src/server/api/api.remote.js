@@ -17,7 +17,6 @@ export const fetch = (req, res) => {
 
 export const update = (req, res) => {
     const headlessSettings = req.body;
-    console.log(headlessSettings);
     try {
         config.set(CONFIG_KEY, headlessSettings);
         res.send({ message: 'headless settings saved' });
