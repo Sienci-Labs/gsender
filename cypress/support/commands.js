@@ -1,25 +1,63 @@
 // ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
+// cypress/support/commands.js
+// Custom commands for CNC machine
 // ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+// ----------------------
+// Connect to CNC machine
+// ----------------------
+Cypress.Commands.add('connectMachine', () => {
+    cy.wait(5000); // wait 5 secs for UI to load 
+
+    // Log all page text (for debugging)
+    cy.get('body').then(($body) => {
+      cy.log('Page Text: ', $body.text());
+    });
+
+    // Find the Connect button (case-insensitive)
+    cy.contains(/^connect to CNC$/i, { timeout: 20000 })
+      .should('exist')
+      .scrollIntoView()
+      .should('be.visible')
+      .trigger('mouseover');
+
+    // Click the first COM port (e.g., COM5)
+    cy.get('div.absolute', { timeout: 20000 })
+      .should('be.visible')
+      .find('button')
+      .first()
+      .should('contain.text', 'COM')
+      .click({ force: true });
+
+    cy.log(' Successfully selected the first COM port and connected to CNC');
+});
+
+// $$--------------------$$
+// Disconnect if Idle
+//$$---------------------$$
+Cypress.Commands.add('disconnectIfIdle', () => {
+    cy.wait(5000); // wait 5 secs for UI to load 
+
+    // Check if status is Idle
+    cy.contains(/^Idle$/i, { timeout: 20000 })
+      .then((status) => {
+        const machineStatus = status.text().trim();
+        cy.log(`Machine status: "${machineStatus}"`);
+
+        if (machineStatus.toLowerCase() === 'idle') {
+          cy.log('Machine is Idle — disconnecting...');
+
+          // Click the hidden Disconnect button
+          cy.get('button.bg-red-600.text-white')
+            .contains(/^disconnect$/i)
+            .click({ force: true });
+
+          // Verify disconnect succeeded
+          cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
+            .should('be.visible')
+            .then(() => cy.log(' Machine disconnect verified successfully.'));
+        } else {
+          cy.log('Machine is not Idle — skipping disconnect.');
+        }
+      });
+});
