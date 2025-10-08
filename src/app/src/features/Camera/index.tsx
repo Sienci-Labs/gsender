@@ -533,8 +533,7 @@ const Camera: React.FC = () => {
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a camera..." />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="">Select a camera...</SelectItem>
+                                <SelectContent className="bg-white dark:bg-gray-800">
                                     {deviceOptions.map((option) => (
                                         <SelectItem key={option.value} value={option.value}>
                                             {option.label}
@@ -552,7 +551,7 @@ const Camera: React.FC = () => {
                                 <SelectTrigger className="w-full">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white dark:bg-gray-800">
                                     {RESOLUTION_OPTIONS.map((option) => (
                                         <SelectItem key={option.value} value={option.value}>
                                             {option.label}
@@ -567,7 +566,7 @@ const Camera: React.FC = () => {
                                 <SelectTrigger className="w-full">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white dark:bg-gray-800">
                                     {FRAME_RATE_OPTIONS.map((option) => (
                                         <SelectItem key={option.value} value={String(option.value)}>
                                             {option.label}
