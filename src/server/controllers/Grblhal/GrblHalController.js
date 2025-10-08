@@ -163,7 +163,12 @@ class GrblHalController {
         replyParserState: false, // $G
         replyStatusReport: false, // ?
         alarmCompleteReport: false, //0x87
-        axsReportCount: 0
+        axsReportCount: 0,
+        // Extra function queries
+        accessoryState: {
+            SD: false,
+            ATCI: false
+        }
     };
 
     parserStateEnabled = false;
@@ -1351,11 +1356,17 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+
+        // Accessory queries
+        this.actionMask.accessoryState.SD = false;
+        this.actionMask.ATCI = false;
+
         this.actionMask.axsReportCount = 0;
         this.actionMask.queryStatusCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
+
     }
 
     destroy() {
