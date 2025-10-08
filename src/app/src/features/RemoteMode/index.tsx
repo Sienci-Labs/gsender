@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import ipLib from 'ip';
 import { useSelector } from 'react-redux';
 
 import {
@@ -22,6 +21,7 @@ import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { isIPv4 } from 'app/lib/utils';
 
 import { actions } from './apiActions.ts';
 
@@ -88,7 +88,7 @@ export function RemoteModeDialog({
             return;
         }
 
-        if (!ipLib.isV4Format(ip)) {
+        if (!isIPv4(ip)) {
             toast.error(
                 `Invalid IP Address - ${ip} does not look like a valid V4 IP address`,
             );
