@@ -102,7 +102,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.jsx?$/,
+                test: /\.(jsx?|tsx?)$/,
                 loader: 'babel-loader',
                 options: babelConfig,
                 exclude: /node_modules/
