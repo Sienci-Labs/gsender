@@ -992,7 +992,7 @@ class GrblHalController {
 
             const hasSD = true;
             if (hasSD && !this.actionMask.accessoryState.SD) {
-                this.connection.writeImmediate('$FM\n$F\n');
+                this.connection.write('$FM\n$F\n');
                 this.actionMask.accessoryState.SD = true;
             }
 
@@ -1364,7 +1364,6 @@ class GrblHalController {
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
-
     }
 
     destroy() {

@@ -812,6 +812,10 @@ export const defaultATCIMacros: ATCIMacroConfig = {
             default: 0,
             value: 0,
         },
+        _tc_slot_offset: {
+            default: 0,
+            value: 0,
+        },
         _passthrough_offset_setting: {
             default: 0,
             value: 0,

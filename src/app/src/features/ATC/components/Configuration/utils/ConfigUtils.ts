@@ -30,8 +30,9 @@ export function generateP100(config: ConfigState): Macro {
     const content = [
         `#<_tc_slots> = ${config.toolRack.numberOfSlots}`,
         `#<_tc_rack_enable> = ${config.toolRack.enabled}`,
-        `#<_tc_pres_sense> = ${config.advanced.checkPressure}`,
-        `#<_tc_holder_sense> = ${config.advanced.checkToolPresence}`,
+        `#<_pres_sense> = ${config.advanced.checkPressure}`,
+        `#<_holder_sense> = ${config.advanced.checkToolPresence}`,
+        `#<_tc_slot_offset> = ${config.toolRack.slotOffset}`,
         `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
         `#<_ort_offset_mode> = ${calculateOffsetValue(config.offsetManagement)}`,
         `#<_irt_offset_mode> = ${calculateOffsetValue(config.toolRack)}`,
@@ -88,12 +89,13 @@ export function writeableATCIConfig(json: ATCIJSON): Macro {
 
 export function populateATCIVariables(variables, config: ConfigState) {
     const populatedVariables = { ...variables };
+
+    console.log(populatedVariables);
     // Grab values from config
     populatedVariables._tc_slots.value = config.toolRack.numberOfSlots;
     populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
-    populatedVariables._tc_pres_sense.value = config.advanced.checkPressure;
-    populatedVariables._tc_holder_sense.value =
-        config.advanced.checkToolPresence;
+    populatedVariables._pres_sense.value = config.advanced.checkPressure;
+    populatedVariables._holder_sense.value = config.advanced.checkToolPresence;
     populatedVariables._tc_slot_offset.value = config.toolRack.slotOffset;
     populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
     populatedVariables._passthrough_offset_setting.value =
@@ -113,6 +115,8 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         'widgets.atc.templates',
         {},
     );
+
+    console.log('OG', templateConfig);
 
     let variables = populateATCIVariables(templateConfig.variables, config);
 
