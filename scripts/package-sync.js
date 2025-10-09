@@ -11,10 +11,10 @@ const { parseLatestReadmeNotes } = require('./readme_sync');
 // Copy necessary properties from 'package.json' to 'src/app/package.json'
 const pkg = require("../package.json");
 const pkgApp = require("../src/app/package.json");
-const { urPK } = require("@mui/material/locale");
 
 const files = [
   "src/app/*.{js,jsx,ts,tsx}",
+  "src/app/src/**/*.{js,jsx,ts,tsx}",
   "src/server/**/*.{js,jsx,ts,tsx}",
   "src/main.js",
 ];
