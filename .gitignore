@@ -27,19 +27,3 @@ cypress.env.json
 src/app/src/routeTree.gen.ts
 src/app/src/application.css
 .env
-
-# Debug and build files
-*.log
-build-*.sh
-Dockerfile.windows*
-*DEBUG*.md
-*_DEBUG_*.md
-*SPLASHSCREEN*.md
-BUILD_SUCCESS.md
-FINAL_BUILD_SUCCESS.md
-DOCKER_BUILD_ISSUE_AND_SOLUTIONS.md
-REMOTE_ACCESS_BUG_EXPLANATION.md
-WINDOWS_BUILD_SOLUTION.md
-WINDOWS_NATIVE_MODULE_FIX.md
-BUILD_WINDOWS_README.md
-CAMERA_BUG_FIX_SUMMARY.md
