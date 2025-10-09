@@ -53,7 +53,7 @@ export const ConfigTab: React.FC = () => {
                         onPositionChange={(position) =>
                             updatePosition('toolLengthSensorPosition', position)
                         }
-                        onUseCurrent={() => setWorkspacePosition('P7')}
+                        onUseCurrent={() => setWorkspacePosition('P9')}
                     />
 
                     <PositionInput
@@ -232,7 +232,7 @@ export const ConfigTab: React.FC = () => {
                                         position,
                                     )
                                 }
-                                onUseCurrent={() => setWorkspacePosition('P9')}
+                                onUseCurrent={() => setWorkspacePosition('P7')}
                                 disabled={config.toolRack.enabled !== 1}
                             />
                         </div>
