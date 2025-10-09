@@ -36,7 +36,7 @@ export function generateP100(config: ConfigState): Macro {
         `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
         `#<_ort_offset_mode> = ${calculateOffsetValue(config.offsetManagement)}`,
         `#<_irt_offset_mode> = ${calculateOffsetValue(config.toolRack)}`,
-        `(msg, atci:rack_size:${config.toolRack.numberOfSlots})`,
+        `(msg, ATCI:rack_size:${config.toolRack.numberOfSlots})`,
     ].join('\n');
     const data = new Blob([content]);
 
