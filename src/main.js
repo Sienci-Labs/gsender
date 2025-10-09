@@ -205,18 +205,9 @@ const main = () => {
             //autoUpdater.fullChangelog = true;
 
             autoUpdater.on('update-available', (info) => {
-                log.info(JSON.stringify(info));
                 setTimeout(() => {
                     window.webContents.send('update_available', info);
                 }, 8000);
-            });
-
-            autoUpdater.on('checking-for-update', (info) => {
-                log.info(info);
-            });
-
-            autoUpdater.on('update-not-available', (info) => {
-                log.info(info);
             });
 
             autoUpdater.on('error', (err) => {
