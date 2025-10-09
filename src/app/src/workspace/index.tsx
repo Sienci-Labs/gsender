@@ -14,6 +14,7 @@ import {
     LOCATION_CATEGORY,
     SPINDLE_LASER_CATEGORY,
     TOOLBAR_CATEGORY,
+    WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -237,11 +238,21 @@ const Workspace = () => {
                     reduxStore.getState(),
                     'controller.type',
                 );
+                const workflow = get(
+                    reduxStore.getState(),
+                    'controller.workflow',
+                );
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state',
+                )?.status?.activeState;
                 const workspaceMode = store.get('workspace.mode');
                 const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
                 if (
                     !isConnected ||
-                    (firmwareType === GRBL && !isInRotaryMode)
+                    (firmwareType === GRBL && !isInRotaryMode) ||
+                    workflow.state === WORKFLOW_STATE_RUNNING ||
+                    activeState !== GRBL_ACTIVE_STATE_IDLE
                 ) {
                     return;
                 }
@@ -260,9 +271,22 @@ const Workspace = () => {
                     reduxStore.getState(),
                     'connection.isConnected',
                 );
+                const workflow = get(
+                    reduxStore.getState(),
+                    'controller.workflow',
+                );
+                const activeState = get(
+                    reduxStore.getState(),
+                    'controller.state',
+                )?.status?.activeState;
                 const workspaceMode = store.get('workspace.mode');
                 const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
-                if (!isConnected || isInRotaryMode) {
+                if (
+                    !isConnected ||
+                    isInRotaryMode ||
+                    workflow.state === WORKFLOW_STATE_RUNNING ||
+                    activeState !== GRBL_ACTIVE_STATE_IDLE
+                ) {
                     return;
                 }
                 runProbing('Rotary Y-Axis', getYAxisAlignmentProbing());
