@@ -202,7 +202,7 @@ const main = () => {
             });
 
             // Include release notes
-            autoUpdater.fullChangelog = true;
+            //autoUpdater.fullChangelog = true;
 
             autoUpdater.on('update-available', (info) => {
                 log.info(JSON.stringify(info));
@@ -211,8 +211,17 @@ const main = () => {
                 }, 8000);
             });
 
+            autoUpdater.on('checking-for-update', (info) => {
+                log.info(info);
+            });
+
+            autoUpdater.on('update-not-available', (info) => {
+                log.info(info);
+            });
+
             autoUpdater.on('error', (err) => {
                 window.webContents.send('updated_error', err);
+                log.error((err));
             });
 
             autoUpdater.on('download-progress', (info) => {
@@ -408,14 +417,11 @@ const main = () => {
         //Check for available updates at end to avoid try-catch failing to load events
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
-            if (pkg.version.includes('EDGE') || pkg.version.includes('BETA')) {
-                autoUpdater.allowPrerelease = true;
-            }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
             // This sets a 4 second timeout on the await.
             try {
-                asyncCallWithTimeout(autoUpdater.checkForUpdates(), 10000);
+                asyncCallWithTimeout(autoUpdater.checkForUpdates(), 5000);
             } catch (e) {
                 log.info(
                     'Unable to check for app updates, likely no internet connection.',
