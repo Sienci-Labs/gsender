@@ -3,7 +3,6 @@ const path = require('path');
 const boolean = require('boolean');
 const dotenv = require('dotenv');
 const TerserPlugin = require('terser-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
@@ -56,10 +55,6 @@ module.exports = {
         'global.PUBLIC_PATH': JSON.stringify(publicPath),
         'global.BUILD_VERSION': JSON.stringify(buildVersion),
         'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT),
-    }), new HtmlWebpackPlugin({
-        filename: 'index.html',
-        template: path.resolve(__dirname, 'index.html'),
-        chunksSortMode: 'dependency' // Sort chunks by dependency
     }), sentryWebpackPlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
         org: process.env.SENTRY_ORG,
