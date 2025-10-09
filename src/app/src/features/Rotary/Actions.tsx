@@ -15,7 +15,7 @@ import { GRBL, TOOLBAR_CATEGORY, WORKSPACE_MODE } from 'app/constants';
 import { useNavigate } from 'react-router';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { useEffect } from 'react';

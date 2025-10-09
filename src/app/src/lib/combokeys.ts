@@ -23,7 +23,8 @@
 
 import events from 'events';
 import Mousetrap from 'mousetrap';
-import { get, cloneDeep } from 'lodash';
+import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
 
 import reduxStore from '../store/redux';
 import api from '../api';

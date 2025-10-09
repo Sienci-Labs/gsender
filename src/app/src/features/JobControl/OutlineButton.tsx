@@ -7,7 +7,7 @@ import { LASER_MODE } from 'app/constants';
 import { outlineResponse } from 'app/workers/Outline.response';
 import { toast } from 'app/lib/toaster';
 import { store as reduxStore } from 'app/store/redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 interface OutlineButtonProps {
     disabled: boolean;

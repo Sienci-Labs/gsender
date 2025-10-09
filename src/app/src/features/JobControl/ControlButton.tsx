@@ -27,7 +27,7 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 
 type MACHINE_CONTROL_BUTTONS_T =

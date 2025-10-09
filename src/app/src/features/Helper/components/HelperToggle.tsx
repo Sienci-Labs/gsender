@@ -10,7 +10,7 @@ import reduxStore from 'app/store/redux';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { useEffect } from 'react';
 
 interface HelperToggleProps {
