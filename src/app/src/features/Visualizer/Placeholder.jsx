@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import PlaceholderImage from '../../../assets/placeholder.png';
+import PlaceholderImage from './images/placeholder.png';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import _get from 'lodash/get';

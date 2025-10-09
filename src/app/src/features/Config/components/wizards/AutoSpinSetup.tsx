@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import controller from 'app/lib/controller.ts';
 import { Button } from 'app/components/Button';
 import autoSpinIcon from '../../assets/images/autospin.svg';
-import { delay } from 'lodash';
+import delay from 'lodash/delay';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { GRBLHAL } from 'app/constants';
 

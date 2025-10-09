@@ -43,7 +43,7 @@ export function IconUpdater() {
     }, []);
 
     return (
-        <div className="w-[40px] h-[40px] max-sm:hidden relative">
+        <div className="w-[40px] h-[40px] max-sm:hidden relative z-[10000]">
             <img alt="gSender Logo" src={gSenderIcon} />
             <UpdateBadge hidden={showUpdater} />
         </div>

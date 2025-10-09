@@ -29,10 +29,8 @@ import socketIO from 'socket.io';
 import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
-//import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
-//import settings from '../../config/settings';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
@@ -43,10 +41,7 @@ import {
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
-import {
-    authorizeIPAddress,
-    //validateUser
-} from '../../access-control';
+import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
 import SerialConnection from 'server/lib/SerialConnection';
@@ -235,7 +230,6 @@ class CNCEngine {
 
                     // Load file to controller if it exists
                     if (this.hasFileLoaded()) {
-                        console.log('Load file firing on reconnect');
                         controller.loadFile(this.gcode, this.meta, refresh);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
@@ -603,7 +597,6 @@ class CNCEngine {
 
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                         delay(1500).then(() => {
-                            console.log('Flash started for HAL');
                             try {
                                 halFlasher.flash(data);
                             } catch (err) {

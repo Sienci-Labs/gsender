@@ -22,18 +22,13 @@
  */
 
 import classNames from 'classnames';
-import Anchor from '../Anchor';
 import { WidgetProps } from './definitions';
 
-const Button: React.FC<WidgetProps> = ({
-    className,
-    inverted,
-    disabled,
-    ...props
-}) => {
+const Button = ({ className, inverted, disabled, ...props }: WidgetProps) => {
     return (
-        <Anchor
+        <button
             {...props}
+            disabled={disabled}
             className={classNames(
                 className,
                 'min-w-8 h-8 float-left relative text-sm font-[$font-family-arial] m-0 text-center first:pl-0',

@@ -29,7 +29,8 @@ import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { findIndex, get } from 'lodash';
+import findIndex from 'lodash/findIndex';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 import { SPINDLE_LASER_T } from './definitions';
 
