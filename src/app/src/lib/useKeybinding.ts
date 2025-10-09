@@ -8,7 +8,7 @@ import {
     ShuttleEvent,
 } from './definitions/shortcuts';
 
-const TARGET_NUM_CALLS = 18; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 15; // this is the current number of times that useKeybinding is called throughout the program
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*

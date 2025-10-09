@@ -5,11 +5,16 @@ import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import {
+    COOLANT_CATEGORY,
     GENERAL_CATEGORY,
+    GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,
     GRBLHAL,
     LOCATION_CATEGORY,
+    SPINDLE_LASER_CATEGORY,
+    TOOLBAR_CATEGORY,
+    WORKSPACE_MODE,
 } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -22,6 +27,19 @@ import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
 import pkg from '../../package.json';
+import store from 'app/store';
+import {
+    getYAxisAlignmentProbing,
+    getZAxisProbing,
+    runProbing,
+} from 'app/features/Rotary/utils/probeCommands';
+import {
+    canRunShortcut,
+    startFlood,
+    startMist,
+    stopCoolant,
+} from 'app/features/Coolant/utils/actions';
+import pubsub from 'pubsub-js';
 
 const Workspace = () => {
     const location = useLocation();
@@ -201,6 +219,139 @@ const Workspace = () => {
             category: GENERAL_CATEGORY,
             callback: () => {
                 document.execCommand('undo');
+            },
+        },
+        PROBE_ROTARY_Z_AXIS: {
+            title: 'Rotary Probe Z-axis',
+            keys: '',
+            cmd: 'PROBE_ROTARY_Z_AXIS',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => {
+                const isConnected = get(
+                    reduxStore.getState(),
+                    'connection.isConnected',
+                );
+                const firmwareType = get(
+                    reduxStore.getState(),
+                    'controller.type',
+                );
+                const workspaceMode = store.get('workspace.mode');
+                const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+                if (
+                    !isConnected ||
+                    (firmwareType === GRBL && !isInRotaryMode)
+                ) {
+                    return;
+                }
+                runProbing('Rotary Z-Axis', getZAxisProbing());
+            },
+        },
+        PROBE_ROTARY_Y_AXIS: {
+            title: 'Rotary Y-axis Alignment',
+            keys: '',
+            cmd: 'PROBE_ROTARY_Y_AXIS',
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: () => {
+                const isConnected = get(
+                    reduxStore.getState(),
+                    'connection.isConnected',
+                );
+                const workspaceMode = store.get('workspace.mode');
+                const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+                if (!isConnected || isInRotaryMode) {
+                    return;
+                }
+                runProbing('Rotary Y-Axis', getYAxisAlignmentProbing());
+            },
+        },
+        MIST_COOLANT: {
+            title: 'Mist coolant (M7)',
+            keys: '',
+            cmd: 'MIST_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                startMist();
+            },
+        },
+        FLOOD_COOLANT: {
+            title: 'Flood coolant (M8)',
+            keys: '',
+            cmd: 'FLOOD_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                startFlood();
+            },
+        },
+        STOP_COOLANT: {
+            title: 'Stop coolant (M9)',
+            keys: '',
+            cmd: 'STOP_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+            callback: () => {
+                if (!canRunShortcut()) {
+                    return;
+                }
+                stopCoolant();
+            },
+        },
+        TOGGLE_SPINDLE_LASER_MODE: {
+            title: 'Toggle Between Spindle and Laser Mode',
+            keys: '',
+            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                pubsub.publish('shortcut:TOGGLE_SPINDLE_LASER_MODE');
+            },
+        },
+        CW_LASER_ON: {
+            title: 'CW / Laser On',
+            keys: '',
+            cmd: 'CW_LASER_ON',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                pubsub.publish('shortcut:CW_LASER_ON');
+            },
+        },
+        CCW_LASER_TEST: {
+            title: 'CCW / Laser Test',
+            keys: '',
+            cmd: 'CCW_LASER_TEST',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                pubsub.publish('shortcut:CCW_LASER_TEST');
+            },
+        },
+        STOP_LASER_OFF: {
+            title: 'Stop / Laser Off',
+            keys: '',
+            cmd: 'STOP_LASER_OFF',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                pubsub.publish('shortcut:STOP_LASER_OFF');
             },
         },
     };
