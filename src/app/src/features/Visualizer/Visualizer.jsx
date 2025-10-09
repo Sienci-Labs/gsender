@@ -1509,8 +1509,6 @@ class Visualizer extends Component {
 
     createGridLineNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
-        console.log(mm);
-        console.log(inches);
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1601,10 +1599,6 @@ class Visualizer extends Component {
                 width = Math.max(width, 360);
                 height = Math.max(height, 360);
             }
-
-            console.log(
-                `Visualizer: Creating scene with dimensions ${width}x${height}`,
-            );
 
             // WebGLRenderer
             this.renderer = new THREE.WebGLRenderer({
