@@ -32,8 +32,6 @@ const activePeerConnections = new Map<string, RTCPeerConnection>();
 
 // WebRTC handlers that need to persist globally
 const handleStreamRequest = async (data: { requesterId: string }) => {
-  console.log('[MainCamera] Received stream request from:', data.requesterId);
-
   if (!cameraService) {
     console.warn('[MainCamera] No camera service available for stream request');
     return;
@@ -42,15 +40,8 @@ const handleStreamRequest = async (data: { requesterId: string }) => {
   // Check if we already have an active connection for this client
   const existingPeer = activePeerConnections.get(data.requesterId);
   if (existingPeer) {
-    const state = existingPeer.signalingState;
-    const iceState = existingPeer.iceConnectionState;
-
-    // If connection is active or being established, ignore duplicate request
-    if (state !== 'closed' && iceState !== 'failed' && iceState !== 'closed') {
-      return;
-    }
-
-    // Clean up failed/closed connection
+    // Always close and recreate connection for new requests
+    // This ensures reconnections work as fast as first load
     existingPeer.close();
     activePeerConnections.delete(data.requesterId);
   }
@@ -83,7 +74,6 @@ const handleStreamRequest = async (data: { requesterId: string }) => {
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
 
-    console.log('[MainCamera] Sending offer to client:', data.requesterId);
     if (controller.socket?.connected) {
       controller.socket.emit('camera:offer', {
         sdp: offer.sdp,
@@ -148,6 +138,15 @@ const handleCameraIce = async (data: { candidate: RTCIceCandidateInit; clientId:
   }
 };
 
+// Handle viewer disconnect - clean up peer connections for that viewer
+const handleViewerDisconnect = (data: { viewerId: string }) => {
+  const peerConnection = activePeerConnections.get(data.viewerId);
+  if (peerConnection) {
+    peerConnection.close();
+    activePeerConnections.delete(data.viewerId);
+  }
+};
+
 // Initialize global camera WebRTC handlers
 export const initializeCameraWebRTC = (cameraServiceInstance: CameraService) => {
   cameraService = cameraServiceInstance;
@@ -171,11 +170,13 @@ const registerHandlers = () => {
   controller.socket.off('camera:streamRequest', handleStreamRequest);
   controller.socket.off('camera:answer', handleCameraAnswer);
   controller.socket.off('camera:ice', handleCameraIce);
+  controller.socket.off('camera:viewerDisconnected', handleViewerDisconnect);
 
   // Register the handlers
   controller.socket.on('camera:streamRequest', handleStreamRequest);
   controller.socket.on('camera:answer', handleCameraAnswer);
   controller.socket.on('camera:ice', handleCameraIce);
+  controller.socket.on('camera:viewerDisconnected', handleViewerDisconnect);
 };
 
 // Cleanup function (optional, for completeness)

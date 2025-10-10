@@ -24,6 +24,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaCamera, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
+import isElectron from 'is-electron';
 
 import { Switch } from 'app/components/shadcn/Switch';
 import {
@@ -61,15 +62,16 @@ const Camera: React.FC = () => {
         // We need to detect if this app is connecting to an EXTERNAL server, not if it's SERVING to remote clients
         const checkHeadlessMode = async () => {
             try {
-                // Check if we're running our own server or connecting to an external one
-                // If window.location is NOT localhost/127.0.0.1, we're a remote client
-                const isLocalhost = window.location.hostname === 'localhost' || 
-                                   window.location.hostname === '127.0.0.1' ||
-                                   window.location.hostname === '0.0.0.0';
+                // Main client = Electron app OR localhost browser
+                // Remote client = browser accessing external server (non-localhost)
+                const isMainClient = isElectron() || 
+                                    window.location.hostname === 'localhost' || 
+                                    window.location.hostname === '127.0.0.1' ||
+                                    window.location.hostname === '0.0.0.0';
                 
-                // Only consider it headless mode if we're NOT on localhost
-                // (i.e., we're accessing a remote server from another device)
-                setIsHeadlessMode(!isLocalhost);
+                // Only consider it headless mode if we're NOT the main client
+                // (i.e., we're a browser accessing a remote server from another device)
+                setIsHeadlessMode(!isMainClient);
             } catch (error) {
                 console.error('[Camera] Failed to check headless mode:', error);
                 setIsHeadlessMode(false);

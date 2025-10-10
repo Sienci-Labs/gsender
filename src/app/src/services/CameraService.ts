@@ -205,7 +205,6 @@ class CameraService extends EventEmitter {
    */
   async startStream(): Promise<void> {
     if (this.status.streaming) {
-      console.log('[CameraService] Stream already running, skipping startStream');
       return;
     }
 
@@ -215,13 +214,6 @@ class CameraService extends EventEmitter {
       if (!this.settings.deviceId) {
         throw new Error('No camera device selected');
       }
-
-      console.log('[CameraService] Starting stream with constraints:', {
-        deviceId: this.settings.deviceId,
-        width: this.settings.constraints.width,
-        height: this.settings.constraints.height,
-        frameRate: this.settings.constraints.frameRate,
-      });
 
       const constraints: MediaStreamConstraints = {
         video: {
@@ -235,7 +227,6 @@ class CameraService extends EventEmitter {
 
       try {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-        console.log('[CameraService] Stream acquired successfully, tracks:', this.stream.getTracks().length);
       } catch (constraintError: any) {
         // Try fallback device if specific device constraint fails
         this.stream = await this.tryFallbackDevice(constraintError);
@@ -247,8 +238,6 @@ class CameraService extends EventEmitter {
       this.startMetricsCollection();
       this.emit('streamStarted', this.stream);
       this.emit('statusChanged', this.status);
-
-      console.log('[CameraService] Stream started and events emitted');
     } catch (error) {
       // Better error message extraction with user-friendly messages
       let message = 'Unknown error';
@@ -533,7 +522,6 @@ class CameraService extends EventEmitter {
     if (videoTrack) {
       const actualDeviceId = videoTrack.getSettings().deviceId;
       if (actualDeviceId && actualDeviceId !== this.settings.deviceId) {
-        console.log('[CameraService] Updated deviceId from', this.settings.deviceId, 'to', actualDeviceId);
         this.settings.deviceId = actualDeviceId;
       }
     }

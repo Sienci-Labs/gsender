@@ -114,23 +114,35 @@ const RemoteCameraPanel: React.FC = () => {
 
         // Set up periodic auto-connect check
         const autoConnectInterval = setInterval(() => {
-            if (connectionState.state === 'disconnected' && cameraStatus?.available && controller.socket?.connected) {
-                connectToCamera();
+            // Check connection state using refs to avoid stale closures
+            const currentPeer = peerConnectionRef.current;
+            const shouldConnect = !currentPeer || currentPeer.connectionState === 'closed' || currentPeer.connectionState === 'failed';
+            
+            // Try to connect if we don't have an active connection and camera is available
+            if (shouldConnect && controller.socket?.connected) {
+                // Check camera status first
+                checkCameraStatus();
             }
-        }, 2000);
+        }, 2000); // Check every 2 seconds
 
         // Set up socket listeners
         const handleCameraAvailability = (data: { available: boolean; transport: string }) => {
             setCameraStatus(prev => prev ? { ...prev, available: data.available } : null);
-            if (data.available && connectionState.state === 'disconnected' && controller.socket?.connected) {
-                connectToCamera();
+            
+            if (data.available && controller.socket?.connected) {
+                const currentPeer = peerConnectionRef.current;
+                const shouldConnect = !currentPeer || currentPeer.connectionState === 'closed' || currentPeer.connectionState === 'failed';
+                if (shouldConnect) {
+                    connectToCamera();
+                }
             } else if (!data.available) {
                 disconnectFromCamera();
             }
         };
 
             const handleCameraOffer = async (data: { sdp: string; clientId: string }) => {
-                console.log('[RemoteCamera] Received offer from main client:', data.clientId);
+                // data.clientId is the MAIN client's socket ID (who we send answer/ICE candidates to)
+                const mainClientId = data.clientId;
                 
                 // If we already have a peer connection, check its state
                 const currentPeer = peerConnectionRef.current;
@@ -183,7 +195,7 @@ const RemoteCameraPanel: React.FC = () => {
                         if (event.candidate && controller.socket) {
                             controller.socket.emit('camera:ice', {
                                 candidate: event.candidate.toJSON(),
-                                clientId: data.clientId
+                                clientId: mainClientId  // Send to MAIN client
                             });
                         }
                     };
@@ -209,7 +221,7 @@ const RemoteCameraPanel: React.FC = () => {
 
                     controller.socket.emit('camera:answer', {
                         sdp: answer.sdp,
-                        clientId: data.clientId
+                        clientId: mainClientId  // Send to MAIN client
                     });
                 } catch (error) {
                     console.error('RemoteCameraPanel: Failed to handle camera offer:', error);
@@ -258,13 +270,11 @@ const RemoteCameraPanel: React.FC = () => {
         };
 
         const handleSocketConnect = () => {
-            // If camera is available and we're disconnected, auto-connect
-            if (cameraStatus?.available && connectionState.state === 'disconnected') {
-                connectToCamera();
-            } else if (!cameraStatus) {
-                // If camera status is not known yet, check it
-                checkCameraStatus();
-            }
+            // Reset connection state when socket reconnects
+            setConnectionState({ state: 'disconnected' });
+            
+            // Check camera status after reconnection
+            checkCameraStatus();
         };
 
         controller.socket.on('camera:availability', handleCameraAvailability);
@@ -284,11 +294,25 @@ const RemoteCameraPanel: React.FC = () => {
             controller.socket.off('camera:error', handleCameraError);
             controller.socket.off('connect', handleSocketConnect);
             
-            if (peerConnection) {
-                peerConnection.close();
+            // Clean up peer connection on unmount
+            const currentPeer = peerConnectionRef.current;
+            if (currentPeer && currentPeer.connectionState !== 'closed') {
+                currentPeer.close();
+                setPeerConnection(null);
+                
+                // Notify server that we're disconnecting
+                if (controller.socket?.connected) {
+                    controller.socket.emit('camera:viewerDisconnect');
+                }
             }
+            
+            // Clean up video element
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+            streamRef.current = null;
         };
-        }, [peerConnection]);
+        }, []);
 
     const checkCameraStatus = async () => {
         try {
@@ -297,8 +321,14 @@ const RemoteCameraPanel: React.FC = () => {
                 const status = await response.json();
                 setCameraStatus(status);
                 
-                if (status.available && controller.socket?.connected && connectionState.state === 'disconnected') {
-                    connectToCamera();
+                // Check if we should initiate connection
+                if (status.available && controller.socket?.connected) {
+                    const currentPeer = peerConnectionRef.current;
+                    const shouldConnect = !currentPeer || currentPeer.connectionState === 'closed' || currentPeer.connectionState === 'failed';
+                    
+                    if (shouldConnect) {
+                        connectToCamera();
+                    }
                 }
             } else {
                 console.warn('RemoteCameraPanel: Failed to fetch camera status:', response.status);
@@ -308,92 +338,42 @@ const RemoteCameraPanel: React.FC = () => {
         }
     };
 
-    const connectToCamera = async () => {
-        if (connectionState.state === 'connecting' || connectionState.state === 'connected') {
+    const connectToCamera = async () => {        
+        // Use refs to check current state instead of closure values
+        const currentPeer = peerConnectionRef.current;
+        
+        // Prevent multiple simultaneous connection attempts
+        if (currentPeer && currentPeer.connectionState !== 'closed' && currentPeer.connectionState !== 'failed') {
             return;
         }
         
-        if (peerConnection) {
+        // Check socket connection first
+        if (!controller.socket?.connected) {
+            console.error('[RemoteCamera] Cannot request stream - socket not connected');
+            setConnectionState({ state: 'failed', error: 'Socket not connected' });
             return;
         }
         
         setConnectionState({ state: 'connecting' });
 
         try {
-            // Create peer connection with LAN-only ICE servers (empty array)
-            const pc = new RTCPeerConnection({
-                iceServers: []
-            });
-            
-
-            pc.ontrack = (event) => {
-                if (!videoRef.current || !event.streams[0]) {
-                    console.warn('RemoteCameraPanel: ontrack event but no video ref or stream');
-                    return;
-                }
-
-                const stream = event.streams[0];
-                streamRef.current = stream;
-
-                // Set up unmute handling for initially muted tracks
-                setupUnmuteHandlers(stream);
-                
-                // Set video element properties and stream
-                videoRef.current.muted = true;
-                videoRef.current.volume = 1.0;
-                videoRef.current.srcObject = stream;
-                
-                // Set connected state and attempt auto-play
-                setConnectionState({ state: 'connected' });
-                
-                // Attempt to auto-play the video (should work since it's muted)
-                videoRef.current.play().catch((error) => {
-                    console.debug('RemoteCameraPanel: Auto-play prevented:', error.message);
-                });
-            };
-
-            pc.onicecandidate = (event) => {
-                if (event.candidate) {
-                    controller.socket.emit('camera:ice', {
-                        candidate: event.candidate.toJSON(),
-                        clientId: controller.socket.id
-                    });
-                }
-            };
-
-            pc.oniceconnectionstatechange = () => {
-                const state = pc.iceConnectionState;
-                if (state === 'connected' || state === 'completed') {
-                    setConnectionState({ state: 'connected' });
-                } else if (state === 'failed' || state === 'disconnected') {
-                    setConnectionState({ state: 'failed', error: 'Connection failed' });
-                }
-            };
-
-            setPeerConnection(pc);
-
             // Remote client requests to join the stream
-            if (!controller.socket?.connected) {
-                console.error('[RemoteCamera] Cannot request stream - socket not connected');
-                setConnectionState({ state: 'failed', error: 'Socket not connected' });
-                return;
-            }
-            
-            console.log('[RemoteCamera] Requesting stream with clientId:', controller.socket.id);
+            // The peer connection will be created when we receive the offer from the main client
             controller.socket.emit('camera:requestStream', {
                 clientId: controller.socket.id
             });
 
         } catch (error) {
-            console.error('Failed to connect to camera:', error);
+            console.error('[RemoteCamera] Error in connectToCamera:', error);
             setConnectionState({ state: 'failed', error: error instanceof Error ? error.message : 'Unknown error' });
         }
     };
 
     const disconnectFromCamera = () => {
+        const currentPeer = peerConnectionRef.current;
         
-        if (peerConnection) {
-            peerConnection.close();
+        if (currentPeer && currentPeer.connectionState !== 'closed') {
+            currentPeer.close();
             setPeerConnection(null);
         }
         

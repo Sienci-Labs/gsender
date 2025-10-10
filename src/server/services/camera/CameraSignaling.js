@@ -57,9 +57,6 @@ class CameraSignaling {
 
         /** @type {Map<string, import('socket.io').Socket>} clientId -> socket */
         this.activeConnections = new Map();
-
-        /** @type {string | null} Only one viewer supported in v1 */
-        this.currentViewer = null;
     }
 
     /**
@@ -101,7 +98,6 @@ class CameraSignaling {
             return;
         }
 
-        log.debug(`Camera client connected: ${socket.id} from ${clientIP}`);
         this.activeConnections.set(socket.id, socket);
 
         // Set up camera-specific event handlers
@@ -110,6 +106,7 @@ class CameraSignaling {
         socket.on('camera:ice', (data) => this.handleIceCandidate(socket, data));
         socket.on('camera:requestStream', (data) => this.handleStreamRequest(socket, data));
         socket.on('camera:requestStatus', () => this.handleStatusRequest(socket));
+        socket.on('camera:viewerDisconnect', () => this.handleViewerDisconnect(socket));
 
         socket.on('disconnect', () => {
             this.handleDisconnection(socket);
@@ -120,18 +117,25 @@ class CameraSignaling {
     }
 
     /**
-     * Handles client disconnection and cleans up viewer state.
+     * Handles explicit viewer disconnect event.
+     * Notifies main client to clean up peer connection.
+     * @param {import('socket.io').Socket} socket - Disconnecting socket
+     * @private
+     */
+    handleViewerDisconnect(socket) {
+        // Broadcast to all clients (especially main client) that this viewer disconnected
+        this.io.emit('camera:viewerDisconnected', {
+            viewerId: socket.id
+        });
+    }
+
+    /**
+     * Handles client disconnection and cleans up connection tracking.
      * @param {import('socket.io').Socket} socket - Disconnected socket
      * @private
      */
     handleDisconnection(socket) {
-        log.debug(`Camera client disconnected: ${socket.id}`);
         this.activeConnections.delete(socket.id);
-
-        if (this.currentViewer === socket.id) {
-            this.currentViewer = null;
-            this.updateViewerCount(0);
-        }
     }
 
     /**
@@ -144,25 +148,11 @@ class CameraSignaling {
     handleOffer(socket, data) {
         const { sdp, clientId } = data;
 
-        // Only allow one viewer in v1
-        if (this.currentViewer && this.currentViewer !== clientId) {
-            socket.emit('camera:error', {
-                message: 'Another viewer is already connected. Only one viewer is supported.'
-            });
-            return;
-        }
-
-        log.debug(`Received camera offer from main client ${socket.id} for remote client ${clientId}`);
-
         // Forward offer to the specific remote client that requested the stream
         const targetSocket = this.activeConnections.get(clientId);
         if (targetSocket) {
-            log.debug(`Forwarding offer to remote client ${clientId}`);
             targetSocket.emit('camera:offer', { sdp, clientId: socket.id });
-            this.currentViewer = clientId;
-            this.updateViewerCount(1);
         } else {
-            log.error(`Target client ${clientId} not found in active connections`);
             socket.emit('camera:error', { message: 'Target client not found' });
         }
     }
@@ -226,8 +216,6 @@ class CameraSignaling {
      * @private
      */
     handleStreamRequest(socket, data) {
-        log.debug(`Stream request from ${socket.id}`);
-
         // Check if camera is available
         const status = getCameraState();
         if (!status.available) {
@@ -237,8 +225,6 @@ class CameraSignaling {
 
         // Send the request to all clients (including the sender)
         // The main client (with camera) should respond with an offer
-        const connectedClients = this.io.sockets.sockets.size;
-        log.debug(`Broadcasting stream request to ${connectedClients} connected clients`);
         this.io.emit('camera:streamRequest', {
             requesterId: socket.id
         });

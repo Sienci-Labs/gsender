@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { HashRouter } from 'react-router';
+import isElectron from 'is-electron';
 
 import { store as reduxStore } from 'app/store/redux';
 import rootSaga from 'app/store/redux/sagas';
@@ -32,12 +33,15 @@ function App() {
                 
                 // Initialize camera service after controller connection (only on main client)
                 controller.addListener('connect', () => {
-                    // Only initialize camera service on the main client (localhost)
-                    const isMainClient = window.location.hostname === 'localhost' || 
+                    // Main client check: Either Electron app OR localhost browser
+                    // Remote clients are browser-based connections to external servers
+                    const isMainClient = isElectron() || 
+                                        window.location.hostname === 'localhost' || 
                                         window.location.hostname === '127.0.0.1' ||
                                         window.location.hostname === '0.0.0.0';
                     
                     if (isMainClient) {
+                        console.log('[App] Initializing camera service on main client');
                         initializeGlobalCameraService().catch((error) => {
                             console.error('Failed to initialize camera service:', error);
                         });
