@@ -129,3 +129,19 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         files,
     };
 }
+
+export function repopulateFromSDCard(config) {
+    const storedValues = store.get('widgets.atc.templates', {});
+    const retrievedConfig = JSON.parse(config);
+
+    // Update config with retrieved values
+    const updatedConfig = {
+        ...storedValues,
+        sdVersion: retrievedConfig.version,
+    };
+    Object.entries(retrievedConfig.variables).forEach(([key, value]) => {
+        updatedConfig.variables[key].value = value.value; // Update the local value with the SD card value
+    });
+    console.log('updated');
+    console.log(updatedConfig);
+}

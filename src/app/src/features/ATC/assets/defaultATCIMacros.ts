@@ -1143,6 +1143,7 @@ const defaultMacros: Macro[] = [
 
 export interface ATCIMacroConfig {
     version: number;
+    sdVersion: number;
     variables: {
         [key: string]: {
             default: number;
@@ -1167,6 +1168,7 @@ export interface ATCIJSON {
 
 export const defaultATCIMacros: ATCIMacroConfig = {
     version: 20251009,
+    sdVersion: 20251009,
     variables: {
         _ort_offset_mode: {
             default: 0,

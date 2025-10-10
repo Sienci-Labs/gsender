@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import {
     Tabs,
@@ -8,6 +8,8 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
+import controller from 'app/lib/controller.ts';
+import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 
 interface ConfigModalProps {
     open: boolean;
@@ -19,6 +21,15 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     onOpenChange,
 }) => {
     const [activeTab, setActiveTab] = useState('config');
+
+    useEffect(() => {
+        controller.addListener('sdcard:json', (payload) => {
+            repopulateFromSDCard(payload.code);
+        });
+        return () => {
+            controller.removeListener('sdcard:json');
+        };
+    }, []);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

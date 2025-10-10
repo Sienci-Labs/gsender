@@ -656,6 +656,10 @@ class GrblHalController {
             this.emit('serialport:read', spindle.raw);
         });
 
+        this.runner.on('json', (json) => {
+            this.emit('sdcard:json', json);
+        });
+
         this.runner.on('status', (res) => {
             if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
                 this.initialized = true;

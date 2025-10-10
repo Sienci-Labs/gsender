@@ -257,7 +257,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultJSON) {
-            console.log(payload);
+            this.emit('json', payload);
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
