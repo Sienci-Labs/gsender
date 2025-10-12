@@ -23,8 +23,6 @@
 
 import { useState, useEffect } from 'react';
 import isElectron from 'is-electron';
-import FileControl from 'app/features/FileControl';
-import JobControl from 'app/features/JobControl';
 import RemoteCameraPanel from 'app/features/RemoteCameraPanel';
 
 /**
@@ -33,7 +31,7 @@ import RemoteCameraPanel from 'app/features/RemoteCameraPanel';
  * 1. This is a remote client
  * 2. Camera streaming is enabled on the server
  */
-const ConditionalRemoteCameraPanel = () => {
+export const ConditionalRemoteCameraPanel = () => {
     const [cameraAvailable, setCameraAvailable] = useState(false);
     const [isRemoteClient, setIsRemoteClient] = useState(false);
     const [isCheckingInitialStatus, setIsCheckingInitialStatus] = useState(true);
@@ -123,18 +121,4 @@ const ConditionalRemoteCameraPanel = () => {
 
     return null;
 };
-
-/**
- * Remote Workflow page component.
- * Displays file control, job control, and conditionally shows camera panel for remote clients.
- */
-export default function RemoteWorkflow() {
-    return (
-        <div className="flex flex-col gap-6 mt-6">
-            <FileControl />
-            <ConditionalRemoteCameraPanel />
-            <JobControl />
-        </div>
-    );
-}
 

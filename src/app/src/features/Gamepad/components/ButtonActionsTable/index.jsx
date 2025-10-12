@@ -13,7 +13,7 @@ import {
 } from '../../utils/actions';
 import { GAMEPAD_MODAL } from '../../utils/constants';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 import classNames from 'classnames';
 import { Input } from 'app/components/shadcn/Input';
 

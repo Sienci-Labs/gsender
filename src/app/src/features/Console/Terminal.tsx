@@ -5,13 +5,11 @@ import {
     useImperativeHandle,
     forwardRef,
 } from 'react';
-import { Terminal as XtermTerminal } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';
-import { v4 as uuidv4 } from 'uuid';
 import { useDispatch } from 'react-redux';
+import uuidv4 from 'uuid/v4';
 
 import controller, {
     addControllerEvents,
@@ -27,6 +25,10 @@ import { addToHistory } from 'app/store/redux/slices/console.slice';
 import store from 'app/store';
 
 import '@xterm/xterm/css/xterm.css';
+
+// These will be loaded dynamically
+let XtermTerminal: any;
+let FitAddon: any;
 
 type TerminalRef = {
     clear: () => void;
@@ -55,48 +57,72 @@ const Terminal = (
     }));
 
     useEffect(() => {
-        const newTerminal = new XtermTerminal({
-            scrollback: 1000,
-            scrollSensitivity: 0.5,
-            smoothScrollDuration: 100,
-            tabStopWidth: 4,
-            fontFamily:
-                'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif',
-            fontSize: 14,
-            cursorStyle: 'underline',
-        });
+        // Only load xterm in the browser
+        if (typeof window === 'undefined') {
+            return;
+        }
 
-        const newFitAddon = new FitAddon();
-        newTerminal.loadAddon(newFitAddon);
+        let mounted = true;
+        let debouncedRefitTerminal: (() => void) | null = null;
 
-        newTerminal.open(terminalRef.current);
+        const initTerminal = async () => {
+            // Dynamically import xterm modules (browser only)
+            const XtermPkg = await import('@xterm/xterm');
+            const FitAddonPkg = await import('@xterm/addon-fit');
 
-        newFitAddon.fit();
+            XtermTerminal = XtermPkg.Terminal;
+            FitAddon = FitAddonPkg.FitAddon;
 
-        terminalInstance.current = newTerminal;
-        fitAddonInstance.current = newFitAddon;
+            if (!mounted) return;
 
-        addControllerEvents(controllerEvents);
+            const newTerminal = new XtermTerminal({
+                scrollback: 1000,
+                scrollSensitivity: 0.5,
+                smoothScrollDuration: 100,
+                tabStopWidth: 4,
+                fontFamily:
+                    'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif',
+                fontSize: 14,
+                cursorStyle: 'underline',
+            });
 
-        const debouncedRefitTerminal = debounce(() => {
-            if (fitAddonInstance.current) {
-                fitAddonInstance.current.fit();
-            }
-        }, 50);
+            const newFitAddon = new FitAddon();
+            newTerminal.loadAddon(newFitAddon);
 
-        window.addEventListener('resize', debouncedRefitTerminal);
+            newTerminal.open(terminalRef.current);
+
+            newFitAddon.fit();
+
+            terminalInstance.current = newTerminal;
+            fitAddonInstance.current = newFitAddon;
+
+            addControllerEvents(controllerEvents);
+
+            debouncedRefitTerminal = debounce(() => {
+                if (fitAddonInstance.current) {
+                    fitAddonInstance.current.fit();
+                }
+            }, 50);
+
+            window.addEventListener('resize', debouncedRefitTerminal);
+        };
+
+        initTerminal();
 
         return () => {
+            mounted = false;
             removeControllerEvents(controllerEvents);
             if (terminalInstance.current) {
                 terminalInstance.current.dispose();
             }
-            window.removeEventListener('resize', debouncedRefitTerminal);
+            if (debouncedRefitTerminal) {
+                window.removeEventListener('resize', debouncedRefitTerminal);
+            }
         };
     }, []);
 
     useEffect(() => {
-        if (isActive) {
+        if (isActive && fitAddonInstance.current) {
             fitAddonInstance.current.fit();
         }
     }, [isActive]);

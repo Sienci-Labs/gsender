@@ -1,4 +1,7 @@
 import { Routes, Route, Outlet } from 'react-router';
+import noop from 'lodash/noop';
+import { BiSolidCylinder } from 'react-icons/bi';
+
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
@@ -30,15 +33,15 @@ import Rotary from './features/Rotary';
 import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
-import { noop } from 'lodash';
 import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
-import { BiSolidCylinder } from 'react-icons/bi';
 import Camera from './features/Camera';
-import RemoteWorkflow from './routes/remote/workflow';
+import FileControl from './features/FileControl';
+import JobControl from './features/JobControl';
+import { ConditionalRemoteCameraPanel } from './features/RemoteMode/ConditionalRemoteCameraPanel';
 
 export const ReactRoutes = () => {
     return (
@@ -265,7 +268,7 @@ export const ReactRoutes = () => {
                     element={
                         <>
                             <WorkspaceSelector />
-                            <DRO preferredUnits="mm" />
+                            <DRO isRemote />
                             <Jogging />
                         </>
                     }
@@ -309,7 +312,16 @@ export const ReactRoutes = () => {
                         </>
                     }
                 />
-                <Route path="workflow" element={<RemoteWorkflow />} />
+                <Route
+                    path="workflow"
+                    element={
+                        <div className="flex flex-col gap-6 mt-6">
+                            <FileControl />
+                            <ConditionalRemoteCameraPanel />
+                            <JobControl />
+                        </div>
+                    }
+                />
             </Route>
         </Routes>
     );

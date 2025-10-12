@@ -9,7 +9,7 @@ import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts'
 import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import store from 'app/store';
-import { find } from 'lodash';
+import find from 'lodash/find';
 
 export function MachineProfileSelector() {
     const { setMachineProfile, machineProfile } = useSettings();
