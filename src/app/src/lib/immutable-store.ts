@@ -43,7 +43,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 
     get(): T;
     get<V = any>(key: string): V | undefined;
-    get<V = any>(key: string, defaultValue: V): V;
+    get<V = any>(key: string, defaultValue: V): any;
     get<V = any>(key?: string, defaultValue?: V): T | V | undefined {
         if (key === undefined) return this.state;
 
