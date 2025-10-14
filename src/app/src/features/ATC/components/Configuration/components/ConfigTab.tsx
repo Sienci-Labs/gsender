@@ -13,6 +13,7 @@ import { Progress } from 'app/components/shadcn/progress';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
+import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
 
 export const ConfigTab: React.FC = () => {
     const {
@@ -69,87 +70,7 @@ export const ConfigTab: React.FC = () => {
                         <Label className="text-sm font-medium">
                             Offset Management
                         </Label>
-                        <div className="space-y-1.5 pl-4">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-xs">
-                                    Probe new offset when tool changing
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .probeNewOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                probeNewOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    config.offsetManagement.probeNewOffset !==
-                                        1 && 'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Use tool table offset
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .useToolOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                useToolOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.offsetManagement
-                                            .probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    config.offsetManagement.probeNewOffset !==
-                                        1 && 'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Verify tool length changes
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .verifyToolLength === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                verifyToolLength: checked
-                                                    ? 1
-                                                    : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.offsetManagement
-                                            .probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                        </div>
+                        <OffsetManagementWidget />
                     </div>
                 </CardContent>
             </Card>
@@ -239,91 +160,8 @@ export const ConfigTab: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                            Offset Management
-                        </Label>
-                        <div className="space-y-1.5 pl-4">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-xs">
-                                    Probe new offset when tool changing
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.probeNewOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                probeNewOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={config.toolRack.enabled !== 1}
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1) &&
-                                        'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Use tool table offset
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.useToolOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                useToolOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1) &&
-                                        'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Verify tool length changes
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.verifyToolLength === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                verifyToolLength: checked
-                                                    ? 1
-                                                    : 0,
-                                            },
-                                        })
-                                    }
-                                    className="data-[state=checked]:bg-blue-500"
-                                    disabled={
-                                        config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                        </div>
+                        <Label>Offset Management</Label>
+                        <OffsetManagementWidget />
                     </div>
                     <div className="space-y-1">
                         <Label className="text-sm font-medium">Advanced</Label>
