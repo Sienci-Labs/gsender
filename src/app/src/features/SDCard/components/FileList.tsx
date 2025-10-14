@@ -17,6 +17,7 @@ import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';
 import cn from 'classnames';
 import { toast } from 'app/lib/toaster';
 import { ACCEPTED_EXTENSIONS } from 'app/features/SDCard/components/UploadModal.tsx';
+import store from 'app/store';
 
 const formatFileSize = (bytes: number): string => {
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -31,11 +32,20 @@ const formatFileSize = (bytes: number): string => {
     return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 };
 
+export function isFileATCIRelated(filename, atciMacros) {
+    const filtered = Object.entries(atciMacros).filter(
+        ([_, v]) => v['name'] === filename,
+    );
+    return filtered.length > 0;
+}
+
 export const FileList: React.FC = () => {
     const { files, isLoading, runSDFile, uploadFileToSDCard, isConnected } =
         useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const ATCIFiles = store.get('widgets.atc.templates.macros', {});
 
     function handleDelete(fileName: string) {
         Confirm({
@@ -169,52 +179,71 @@ export const FileList: React.FC = () => {
                         <TableRow>
                             <TableHead>File Name</TableHead>
                             <TableHead>Size</TableHead>
+                            <TableHead></TableHead>
                             <TableHead className="text-right">
                                 Actions
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {files.map((file) => (
-                            <TableRow key={file.name}>
-                                <TableCell>
-                                    <div className="flex items-center space-x-3">
-                                        <File className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                                        <span className="text-sm font-medium text-gray-900 truncate">
-                                            {file.name}
-                                        </span>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <span className="text-sm text-gray-500">
-                                        {formatFileSize(file.size)}
-                                    </span>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex items-center justify-end space-x-2">
-                                        <button
-                                            onClick={() => runSDFile(file.name)}
-                                            disabled={isLoading}
-                                            className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                        >
-                                            <Play className="w-3.5 h-3.5" />
-                                            <span>Run</span>
-                                        </button>
+                        {files.map((file) => {
+                            const isATCI = isFileATCIRelated(
+                                file.name,
+                                ATCIFiles,
+                            );
 
-                                        <button
-                                            onClick={() =>
-                                                handleDelete(file.name)
-                                            }
-                                            disabled={isLoading}
-                                            className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                            <span>Delete</span>
-                                        </button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                            return (
+                                <TableRow
+                                    key={file.name}
+                                    className={cn({
+                                        'bg-[repeating-linear-gradient(45deg,rgb(254_252_232)_0,rgb(254_252_232)_10px,transparent_5px,transparent_20px)]':
+                                            isATCI,
+                                    })}
+                                >
+                                    <TableCell>
+                                        <div className="flex items-center space-x-3">
+                                            <File className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                            <span className="text-sm font-medium text-gray-900 truncate">
+                                                {file.name}
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-sm text-gray-500">
+                                            {formatFileSize(file.size)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        {isATCI && <span>ATCi Macro</span>}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex items-center justify-end space-x-2">
+                                            <button
+                                                onClick={() =>
+                                                    runSDFile(file.name)
+                                                }
+                                                disabled={isLoading}
+                                                className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                            >
+                                                <Play className="w-3.5 h-3.5" />
+                                                <span>Run</span>
+                                            </button>
+
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(file.name)
+                                                }
+                                                disabled={isLoading}
+                                                className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                                <span>Delete</span>
+                                            </button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </div>

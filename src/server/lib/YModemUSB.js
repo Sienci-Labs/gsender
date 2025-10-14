@@ -67,6 +67,7 @@ export class YModem extends events.EventEmitter {
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
+        console.log(header.length);
         this.comms.write(header);
 
         // [<<< C]
@@ -319,10 +320,10 @@ export class YModem extends events.EventEmitter {
 
 
         // Check if file size exceeds maximum allowed for transmission
-        if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
+        /*if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
             this.emit('error', 'File size too big');
             throw new Error('Couldn\'t send file. File is too big.');
-        }
+        }*/
 
         const strFileSize = fileSize.toString();
 
