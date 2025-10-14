@@ -133,7 +133,6 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
 export function repopulateFromSDCard(config) {
     const storedValues = store.get('widgets.atc.templates', {});
     const retrievedConfig = JSON.parse(config);
-
     // Update config with retrieved values
     const updatedConfig = {
         ...storedValues,
@@ -144,4 +143,5 @@ export function repopulateFromSDCard(config) {
     });
     console.log('updated');
     console.log(updatedConfig);
+    store.replace('widgets.atc.templates', updatedConfig);
 }
