@@ -18,7 +18,6 @@ export default function OffsetManagementWidget({
     const currentValue = onChange ? value : internalValue;
     const isDefault = currentValue === defaultValue;
 
-    const isProbeNewOffset = currentValue === 0 || currentValue === 2;
     const isUseToolTable = currentValue === 1 || currentValue === 2;
     const isVerifyEnabled = currentValue === 2;
 
