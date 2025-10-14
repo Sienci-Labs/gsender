@@ -72,6 +72,7 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
+            sdFiles: [],
             alarmCode: '',
             subState: '',
             probeActive: false,
@@ -95,12 +96,15 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
-
         },
         axes: {
             count: 0,
             axes: []
         },
+        sdcard: {
+            mounted: false,
+            files: []
+        }
     };
 
     settings = {
@@ -451,6 +455,20 @@ class GrblHalRunner extends events.EventEmitter {
 
         if (type === GrblHalLineParserResultSDCard) {
             this.emit('sdcard', payload);
+            delete payload.raw;
+            const files = [...this.state.sdcard.files].filter(file => file.name !== payload.name);
+            files.push(payload);
+            const nextState = {
+                ...this.state,
+                sdcard: {
+                    ...this.state.sdcard,
+                    files
+                }
+            };
+            if (!_.isEqual(this.state.sdcard, nextState.sdcard)) {
+                this.state = nextState;
+            }
+
             return;
         }
 

@@ -1035,7 +1035,6 @@ class GrblHalController {
 
         this.runner.on('sdcard', (payload) => {
             this.emit('serialport:read', payload.raw);
-            delete payload.raw;
             this.emit('sdcard:files', payload);
         });
 
@@ -2342,6 +2341,16 @@ class GrblHalController {
                 if (type === 'all') {
                     this.writeln('$F+');
                     return;
+                }
+            },
+            'sdcard:read': () => {
+                const [fileName] = args;
+
+                const availableFiles = _.get(this.state, 'sdcard.files', []);
+                const hasFile = _.find(availableFiles, (file) => file.name === fileName);
+
+                if (hasFile) {
+                    this.command('gcode', `$F<=${fileName}`);
                 }
             },
             'sdcard:run': () => {
