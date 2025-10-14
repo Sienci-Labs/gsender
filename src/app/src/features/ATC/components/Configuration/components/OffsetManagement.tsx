@@ -85,7 +85,7 @@ export default function OffsetManagementWidget({
                                 </span>
                                 <Switch
                                     checked={isVerifyEnabled}
-                                    onCheckedChange={handleVerifyToggle}
+                                    onChange={handleVerifyToggle}
                                     disabled={!isUseToolTable}
                                 />
                             </label>
