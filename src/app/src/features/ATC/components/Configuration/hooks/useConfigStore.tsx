@@ -131,7 +131,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         );
         const tlsPosition: Position = get(
             pickedParams,
-            'G59.1',
+            'G59.3',
             defaultPosition,
         ) as Position;
         const manualLoadPosition: Position = get(
@@ -141,7 +141,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         ) as Position;
         const slot1Position: Position = get(
             pickedParams,
-            'G59.3',
+            'G59.1',
             defaultPosition,
         ) as Position;
 

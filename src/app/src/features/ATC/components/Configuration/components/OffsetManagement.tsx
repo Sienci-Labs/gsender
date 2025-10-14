@@ -56,7 +56,7 @@ export default function OffsetManagementWidget({
                             className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-sm text-gray-700">
-                            Probe new offset when tool changing
+                            Probe New Offset when Tool Changing
                         </span>
                     </label>
 
