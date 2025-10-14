@@ -222,7 +222,7 @@ export const FileList: React.FC = () => {
                                                 onClick={() =>
                                                     runSDFile(file.name)
                                                 }
-                                                disabled={isLoading}
+                                                disabled={isLoading || isATCI}
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
