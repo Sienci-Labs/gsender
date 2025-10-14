@@ -5,6 +5,7 @@ import { Upload, FileText, AlertCircle } from 'lucide-react';
 import cn from 'classnames';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import GcodeViewer from 'app/components/GcodeViewer';
+import store from 'app/store';
 
 interface Template {
     name: string;
@@ -24,8 +25,9 @@ export const TemplatesTab: React.FC = () => {
     const [uploadError, setUploadError] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const defaultVersion = 20250909;
-    const versionMismatch = templates && templates?.version !== defaultVersion;
+    const defaultVersion = store.get('widgets.atc.templates.version', 20250909);
+    const versionMismatch =
+        templates && templates?.sdVersion !== defaultVersion;
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
