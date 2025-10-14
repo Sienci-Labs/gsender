@@ -81,7 +81,7 @@ export function generateAllMacros(config: ConfigState) {
 export function writeableATCIConfig(json: ATCIJSON): Macro {
     const data = new Blob([JSON.stringify(json) + '\n']);
     return {
-        name: 'ATCI.json',
+        name: 'ATCI.macro',
         data,
         size: data.size,
     };

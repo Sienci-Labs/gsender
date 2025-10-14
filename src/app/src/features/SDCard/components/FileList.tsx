@@ -33,6 +33,9 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export function isFileATCIRelated(filename, atciMacros) {
+    if (filename === 'ATCI.macro') {
+        return true;
+    }
     const filtered = Object.entries(atciMacros).filter(
         ([_, v]) => v['name'] === filename,
     );
@@ -214,7 +217,11 @@ export const FileList: React.FC = () => {
                                         </span>
                                     </TableCell>
                                     <TableCell>
-                                        {isATCI && <span>ATCi Macro</span>}
+                                        {isATCI && (
+                                            <span className="italic">
+                                                ATCi Macro
+                                            </span>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end space-x-2">
