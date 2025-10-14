@@ -51,7 +51,7 @@ const SurfacingTool = () => {
 
     // Initialize state with appropriate units
     const getInitialState = (): Surfacing => {
-        const surfacing = surfacingConfig.get('', defaultSurfacingState.width);
+        const surfacing = surfacingConfig.get('', defaultSurfacingState);
 
         if (units === IMPERIAL_UNITS) {
             return {
