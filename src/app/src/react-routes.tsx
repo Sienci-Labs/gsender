@@ -12,7 +12,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaMicrochip, FaVideo } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
@@ -26,8 +26,6 @@ import { WorkspaceSelector } from './features/WorkspaceSelector';
 import DRO from './features/DRO';
 import { RemoteWidget } from './components/RemoteWidget';
 import Coolant from './features/Coolant';
-import FileControl from './features/FileControl';
-import JobControl from './features/JobControl';
 import { Jogging } from './features/Jogging';
 import Macros from './features/Macros';
 import Probe from './features/Probe';
@@ -40,6 +38,10 @@ import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import Camera from './features/Camera';
+import FileControl from './features/FileControl';
+import JobControl from './features/JobControl';
+import { ConditionalRemoteCameraPanel } from './features/RemoteMode/ConditionalRemoteCameraPanel';
 
 export const ReactRoutes = () => {
     return (
@@ -111,6 +113,13 @@ export const ReactRoutes = () => {
                                         description="Easy hand-held CNC control using pre-made or custom profiles"
                                         icon={FaGamepad}
                                         link="/tools/gamepad"
+                                    />
+
+                                    <ToolCard
+                                        title="Camera"
+                                        description="Configure camera streaming for remote monitoring"
+                                        icon={FaVideo}
+                                        link="/tools/camera"
                                     />
 
                                     <ToolCard
@@ -198,8 +207,21 @@ export const ReactRoutes = () => {
                         }
                     />
                     <Route
+                        path="camera"
+                        element={
+                            <Page
+                                title="Camera Streaming"
+                                description="Configure camera streaming for remote monitoring"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <Camera />
+                            </Page>
+                        }
+                    />
+                    <Route
                         path="gamepad/:gamepadProfileId"
-                        element={<Profile />}
+                        element={<Profile data={{} as any} />}
                     />
                     <Route
                         path="firmware"
@@ -210,7 +232,7 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
-                                    <Firmware />
+                                    <Firmware modalClose={() => {}} />
                                 </div>
                             </Page>
                         }
@@ -293,8 +315,9 @@ export const ReactRoutes = () => {
                 <Route
                     path="workflow"
                     element={
-                        <div className="flex flex-col gap-48 mt-6">
+                        <div className="flex flex-col gap-6 mt-6">
                             <FileControl />
+                            <ConditionalRemoteCameraPanel />
                             <JobControl />
                         </div>
                     }
