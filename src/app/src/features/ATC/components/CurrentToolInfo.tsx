@@ -10,6 +10,7 @@ import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { AlertTriangle, CheckCircle, Package, Wrench } from 'lucide-react';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
     const { rackSize } = useToolChange();
@@ -24,9 +25,12 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         status: 'unprobed',
         toolRadius: 0,
     });
+
     const currentTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
     );
+
+    //const currentTool = 0;
 
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -52,55 +56,107 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         }
     }, [currentTool]);
 
+    const getWidgetState = () => {
+        if (currentTool === 0) {
+            return {
+                label: 'Empty',
+                bgColor: 'bg-gray-200',
+                borderColor: 'border-gray-300',
+                textColor: 'text-gray-600',
+                showProbe: false,
+            };
+        }
+
+        if (selectedTool.toolOffsets.z === 0) {
+            return {
+                label: `T${currentTool}`,
+                bgColor: 'bg-yellow-100',
+                borderColor: 'border-yellow-400',
+                textColor: 'text-yellow-800',
+                showProbe: true,
+                badge: 'Unprobed',
+                badgeColor: 'bg-yellow-500',
+                badgeIcon: AlertTriangle,
+            };
+        }
+
+        if (currentTool > rackSize) {
+            return {
+                label: `T${currentTool}`,
+                bgColor: 'bg-orange-100',
+                borderColor: 'border-orange-400',
+                textColor: 'text-orange-800',
+                showProbe: true,
+                badge: 'Off-Rack',
+                badgeColor: 'bg-orange-500',
+                badgeIcon: Package,
+            };
+        }
+
+        return {
+            label: `T${currentTool}`,
+            bgColor: 'bg-green-100',
+            borderColor: 'border-green-400',
+            textColor: 'text-green-800',
+            showProbe: true,
+            badge: 'Ready',
+            badgeColor: 'bg-green-500',
+            badgeIcon: CheckCircle,
+        };
+    };
+
+    const state = getWidgetState();
+    const formattedOffset =
+        currentTool === 0 ? '-' : selectedTool.toolOffsets.z.toFixed(3);
+    const BadgeIcon = state.badgeIcon;
+
     return (
-        <div className={'w-3/5'}>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-bold text-gray-900">
-                        {currentTool ? `T${currentTool}` : 'Empty'}
-                    </h1>
-                </div>
-            </div>
-
-            {/* Table-style Information */}
-            <div className="space-y-2">
-                {/* Nickname Row */}
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 w-20">
-                        Name:
-                    </span>
-                    <ToolNameInput
-                        id={selectedTool?.id}
-                        nickname={selectedTool?.nickname}
-                    />
-                </div>
-
-                {/* Z Offset Row */}
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 w-20">
-                        Offset:
-                    </span>
-                    <div className="flex-1 flex-row flex gap-7">
-                        <div className="flex items-center gap-3">
-                            <span className="text-robin-900 font-medium border-2 rounded-lg px-3 py-2 font-mono border-robin-300 bg-robin-100">
-                                {currentTool === 0
-                                    ? '0.000'
-                                    : selectedTool?.toolOffsets?.z?.toFixed(3)}
+        <div className={'w-4/5'}>
+            <div
+                className={`${state.bgColor} ${state.borderColor} border-2 rounded-lg p-4 shadow-md transition-all duration-200`}
+            >
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                        <Wrench className={`${state.textColor} w-5 h-5`} />
+                        <div className="flex flex-col">
+                            <span
+                                className={`${state.textColor} font-semibold text-lg`}
+                            >
+                                {state.label}
                             </span>
+                            {selectedTool.nickname && currentTool > 0 && (
+                                <span className="text-gray-600 text-xs">
+                                    {selectedTool.nickname}
+                                </span>
+                            )}
                         </div>
-                        <Button
-                            className={`ml-auto     rounded text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                status === 'Probed'
-                                    ? 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
-                                    : 'bg-orange-500 hover:bg-orange-600 text-white focus:ring-orange-500'
-                            }`}
-                            size="sm"
-                            disabled={disabled || currentTool < 1}
-                            onClick={() => probeTool(currentTool)}
+                    </div>
+                    {state.badge && BadgeIcon && (
+                        <span
+                            className={`${state.badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}
+                        >
+                            <BadgeIcon className="w-3 h-3" />
+                            {state.badge}
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                    <div className="w-32 bg-white rounded-lg px-2 py-1 shadow-inner border border-gray-200 pointer-events-none select-none">
+                        <div
+                            className={`${state.textColor} font-mono text-xl font-bold text-center`}
+                        >
+                            {formattedOffset}
+                        </div>
+                    </div>
+                    {state.showProbe && (
+                        <button
+                            onClick={probeTool}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-150"
                         >
                             Probe
-                        </Button>
-                    </div>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
