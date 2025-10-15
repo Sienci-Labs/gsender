@@ -10,6 +10,7 @@ import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
 import controller from 'app/lib/controller.ts';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 
 interface ConfigModalProps {
     open: boolean;
@@ -23,6 +24,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     const [activeTab, setActiveTab] = useState('config');
 
     useEffect(() => {
+        // Set all config values to default, and then repopulate again from SD card.
         controller.addListener('sdcard:json', (payload) => {
             repopulateFromSDCard(payload.code);
         });

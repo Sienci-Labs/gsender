@@ -38,6 +38,7 @@ export function generateP100(config: ConfigState): Macro {
         `#<_irt_offset_mode> = ${config.variables._irt_offset_mode.value}`,
         `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
+    console.log(config.variables);
     console.log('OBJECT: ', content);
     const data = new Blob([content]);
 
@@ -91,7 +92,6 @@ export function writeableATCIConfig(json: ATCIJSON): Macro {
 export function populateATCIVariables(variables, config: ConfigState) {
     const populatedVariables = { ...variables };
 
-    console.log(populatedVariables);
     // Grab values from config
     populatedVariables._tc_slots.value = config.toolRack.numberOfSlots;
     populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
