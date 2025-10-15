@@ -28,16 +28,17 @@ function calculateOffsetValue(data: OffsetManagement): number {
 
 export function generateP100(config: ConfigState): Macro {
     const content = [
-        `#<_tc_slots> = ${config.toolRack.numberOfSlots}`,
-        `#<_tc_rack_enable> = ${config.toolRack.enabled}`,
-        `#<_pres_sense> = ${config.advanced.checkPressure}`,
-        `#<_holder_sense> = ${config.advanced.checkToolPresence}`,
-        `#<_tc_slot_offset> = ${config.toolRack.slotOffset}`,
-        `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
-        `#<_ort_offset_mode> = ${calculateOffsetValue(config.offsetManagement)}`,
-        `#<_irt_offset_mode> = ${calculateOffsetValue(config.toolRack)}`,
-        `(msg, ATCI|rack_size:${config.toolRack.numberOfSlots})`,
+        `#<_tc_slots> = ${config.variables._tc_slots.value}`,
+        `#<_tc_rack_enable> = ${config.variables._tc_rack_enable.value}`,
+        `#<_pres_sense> = ${config.variables._pres_sense.value}`,
+        `#<_holder_sense> = ${config.variables._holder_sense.value}`,
+        `#<_tc_slot_offset> = ${config.variables._tc_slot_offset.value}`,
+        `#<_passthrough_offset_setting> = ${config.variables._passthrough_offset_setting.value}`,
+        `#<_ort_offset_mode> = ${config.variables._ort_offset_mode.value}`,
+        `#<_irt_offset_mode> = ${config.variables._irt_offset_mode.value}`,
+        `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
+    console.log('OBJECT: ', content);
     const data = new Blob([content]);
 
     return {
@@ -118,7 +119,7 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
 
     console.log('OG', templateConfig);
 
-    let variables = populateATCIVariables(templateConfig.variables, config);
+    let variables = { ...config.variables };
 
     const files = templateConfig.macros.map((macro) => macro.name);
 
