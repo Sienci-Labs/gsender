@@ -27,6 +27,8 @@ export const ConfigTab: React.FC = () => {
         status,
     } = useConfigContext();
 
+    const nonDefaultStyling = 'bg-yellow-50';
+
     const getStatusColor = () => {
         switch (status.type) {
             case 'success':
@@ -47,7 +49,7 @@ export const ConfigTab: React.FC = () => {
                 <CardHeader className="pb-2">
                     <CardTitle>General</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <div className="p-2">
                     <PositionInput
                         label="Tool Length Sensor Position"
                         position={config.tlsPosition}
@@ -89,7 +91,7 @@ export const ConfigTab: React.FC = () => {
                             }
                         />
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Tool Rack Section */}
@@ -98,6 +100,11 @@ export const ConfigTab: React.FC = () => {
                     <CardTitle className="flex items-center gap-4">
                         Tool Rack
                         <Switch
+                            className={cn({
+                                [nonDefaultStyling]:
+                                    config.variables._tc_rack_enable.value !==
+                                    config.variables._tc_rack_enable.default,
+                            })}
                             checked={
                                 config.variables._tc_rack_enable.value === 1
                             }
@@ -115,15 +122,24 @@ export const ConfigTab: React.FC = () => {
                         />
                     </CardTitle>
                 </CardHeader>
-                <CardContent
+                <div
                     className={cn(
-                        'space-y-1',
+                        'p-2',
                         config.variables._tc_rack_enable.value !== 1 &&
                             'opacity-50 pointer-events-none',
                     )}
                 >
                     <div className="flex gap-4 w-full space-between">
-                        <div className="flex flex-row items-center gap-2 justify-center">
+                        <div
+                            className={cn(
+                                'flex flex-row items-center gap-2 justify-center',
+                                {
+                                    [nonDefaultStyling]:
+                                        config.variables._tc_slots.value !==
+                                        config.variables._tc_slots.default,
+                                },
+                            )}
+                        >
                             <Label className="text-sm font-medium">
                                 Number of Slots
                             </Label>
@@ -149,7 +165,18 @@ export const ConfigTab: React.FC = () => {
                                 }
                             />
                         </div>
-                        <div className="flex flex-row items-center gap-2 justify-center">
+                        <div
+                            className={cn(
+                                'flex flex-row items-center gap-2 justify-center',
+                                {
+                                    [nonDefaultStyling]:
+                                        config.variables._tc_slot_offset
+                                            .value !==
+                                        config.variables._tc_slot_offset
+                                            .default,
+                                },
+                            )}
+                        >
                             <Label className="text-sm font-medium">
                                 Slot Offset
                             </Label>
@@ -219,7 +246,15 @@ export const ConfigTab: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                         <Label className="text-sm font-medium">Advanced</Label>
-                        <div className="space-y-1.5 pl-4">
+                        <div
+                            className={cn('space-y-1.5 pl-4', {
+                                [nonDefaultStyling]:
+                                    config.variables._passthrough_offset_setting
+                                        .value !==
+                                    config.variables._passthrough_offset_setting
+                                        .default,
+                            })}
+                        >
                             <div className="flex items-center justify-between">
                                 <Label className="text-xs">
                                     Retain tool table settings when rack removed
@@ -246,7 +281,7 @@ export const ConfigTab: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Advanced Section */}
@@ -254,8 +289,14 @@ export const ConfigTab: React.FC = () => {
                 <CardHeader className="pb-2">
                     <CardTitle>Advanced</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-1">
-                    <div className="flex items-center justify-between">
+                <div className="p-2">
+                    <div
+                        className={cn('flex items-center justify-between', {
+                            [nonDefaultStyling]:
+                                config.variables._pres_sense.value !==
+                                config.variables._pres_sense.default,
+                        })}
+                    >
                         <Label className="text-xs">
                             Check pressure with pressure sensor
                         </Label>
@@ -274,7 +315,13 @@ export const ConfigTab: React.FC = () => {
                             }
                         />
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div
+                        className={cn('flex items-center justify-between', {
+                            [nonDefaultStyling]:
+                                config.variables._holder_sense.value !==
+                                config.variables._holder_sense.default,
+                        })}
+                    >
                         <Label className="text-xs">
                             Check tool presence in rack to prevent collision
                         </Label>
@@ -293,7 +340,7 @@ export const ConfigTab: React.FC = () => {
                             }
                         />
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Apply Section */}
