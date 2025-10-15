@@ -226,7 +226,7 @@ export class YModem extends events.EventEmitter {
                 await this.sendDataPacket(
                     packetNo,
                     dataPacket,
-                    50
+                    150
                 );
 
                 this.sentPackets = packetNo;
