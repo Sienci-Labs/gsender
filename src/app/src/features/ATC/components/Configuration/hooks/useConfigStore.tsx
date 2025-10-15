@@ -230,8 +230,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
         const content = generateAllMacros(config);
 
-        // todo: upload the whole block of content to the controller
-        //controller.command('ymodem:uploadFiles', content);
+        controller.command('ymodem:uploadFiles', content);
 
         // Simulate progress
         for (let i = 0; i <= 100; i += 10) {

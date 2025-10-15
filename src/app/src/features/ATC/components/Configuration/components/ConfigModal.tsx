@@ -11,6 +11,7 @@ import { TemplatesTab } from './TemplatesTab';
 import controller from 'app/lib/controller.ts';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { toast } from 'app/lib/toaster';
 
 interface ConfigModalProps {
     open: boolean;
@@ -33,8 +34,12 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                 variables: { ...updatedConfig.variables },
             });
         });
+        controller.addListener('ymodem:error', (error) => {
+            toast.error('Error uploaded new config');
+        });
         return () => {
             controller.removeListener('sdcard:json');
+            controller.removeListener('ymodem:error');
         };
     }, []);
 
