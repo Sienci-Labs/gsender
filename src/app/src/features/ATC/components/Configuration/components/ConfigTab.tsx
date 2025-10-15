@@ -1,15 +1,10 @@
 import React from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from 'app/components/shadcn/card';
-import { Switch } from 'app/components/shadcn/switch';
-import { Input } from 'app/components/shadcn/input';
-import { Label } from 'app/components/shadcn/label';
+import { Card, CardHeader, CardTitle } from 'app/components/shadcn/Card';
+import { Switch } from 'app/components/shadcn/Switch';
+import { Input } from 'app/components/shadcn/Input';
+import { Label } from 'app/components/shadcn/Label';
 import { Button } from 'app/components/Button';
-import { Progress } from 'app/components/shadcn/progress';
+import { Progress } from 'app/components/shadcn/Progress';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
