@@ -145,4 +145,5 @@ export function repopulateFromSDCard(config) {
     console.log('updated');
     console.log(updatedConfig);
     store.replace('widgets.atc.templates', updatedConfig);
+    return updatedConfig;
 }

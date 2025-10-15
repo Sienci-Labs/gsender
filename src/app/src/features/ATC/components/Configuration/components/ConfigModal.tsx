@@ -22,11 +22,16 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     onOpenChange,
 }) => {
     const [activeTab, setActiveTab] = useState('config');
+    const { updateConfig } = useConfigContext();
 
     useEffect(() => {
         // Set all config values to default, and then repopulate again from SD card.
         controller.addListener('sdcard:json', (payload) => {
-            repopulateFromSDCard(payload.code);
+            const updatedConfig = repopulateFromSDCard(payload.code);
+            console.log('returned via SD:', updatedConfig);
+            updateConfig({
+                variables: { ...updatedConfig.variables },
+            });
         });
         return () => {
             controller.removeListener('sdcard:json');
