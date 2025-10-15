@@ -1,4 +1,7 @@
 import { Routes, Route, Outlet } from 'react-router';
+import noop from 'lodash/noop';
+import { BiSolidCylinder } from 'react-icons/bi';
+
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
@@ -9,7 +12,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip, FaSdCard } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
@@ -32,7 +35,6 @@ import Rotary from './features/Rotary';
 import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
-import { noop } from 'lodash';
 import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
@@ -267,7 +269,7 @@ export const ReactRoutes = () => {
                     element={
                         <>
                             <WorkspaceSelector />
-                            <DRO />
+                            <DRO isRemote />
                             <Jogging />
                         </>
                     }

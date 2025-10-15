@@ -96,6 +96,7 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
+
         },
         axes: {
             count: 0,
@@ -199,13 +200,12 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
+            this.emit('startup', payload);
             //this.emit('startup', payload, this.settings.version.semver);
             return;
         }
         if (type === GrblHalLineParserResultCompleteStatus) {
             delete payload.raw;
-
-            console.log(payload);
 
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
@@ -242,7 +242,6 @@ class GrblHalRunner extends events.EventEmitter {
             if (!_.isEqual(this.state.status, nextState.status)) {
                 this.state = nextState; // enforce change
             }
-
             this.emit('status', payload);
             return;
         }

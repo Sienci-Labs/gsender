@@ -8,6 +8,8 @@ import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import controller from 'app/lib/controller';
 import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
     IMPERIAL_UNITS,
     TOOLBAR_CATEGORY,
     VISUALIZER_PRIMARY,
@@ -19,6 +21,8 @@ import useKeybinding from 'app/lib/useKeybinding';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
+import { Tooltip } from 'app/components/Tooltip';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import { RotarySurfacingOptions } from './definitions';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
@@ -26,7 +30,6 @@ import VisualizerPreview from './components/VisualizerPreview';
 import { StockTurningGenerator } from './utils/Generator';
 import InputArea from './components/InputArea';
 import { DEFAULT_VALUES_MM } from './constants';
-import { Tooltip } from 'app/components/Tooltip';
 
 const RotarySurfacing = () => {
     const navigate = useNavigate();
@@ -136,13 +139,13 @@ const RotarySurfacing = () => {
         },
     };
 
-    const inputStyle =
-        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
-
     useShuttleEvents(shuttleControlEvents);
     useEffect(() => {
         useKeybinding(shuttleControlEvents);
     }, []);
+
+    const inputStyle =
+        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
     const defaultValue =
         units === 'mm'
@@ -156,6 +159,12 @@ const RotarySurfacing = () => {
                   bitDiameter: convertToImperial(DEFAULT_VALUES_MM.bitDiameter),
                   feedrate: convertToImperial(DEFAULT_VALUES_MM.feedrate),
               };
+
+    const status = useTypedSelector((state) => state?.controller.state?.status);
+    const isDisabled =
+        status &&
+        status.activeState !== GRBL_ACTIVE_STATE_IDLE &&
+        status.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     return (
         <div>
@@ -180,6 +189,7 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix={units}
                                     type="number"
+                                    immediateOnChange
                                 />
                             </Tooltip>
                         </InputArea>
@@ -196,6 +206,7 @@ const RotarySurfacing = () => {
                                         className={inputStyle}
                                         suffix={units}
                                         type="number"
+                                        immediateOnChange
                                     />
                                 </Tooltip>
                                 <span className="flex justify-center items-center">
@@ -211,6 +222,7 @@ const RotarySurfacing = () => {
                                         className={inputStyle}
                                         suffix={units}
                                         type="number"
+                                        immediateOnChange
                                     />
                                 </Tooltip>
                             </div>
@@ -227,6 +239,7 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix={units}
                                     type="number"
+                                    immediateOnChange
                                 />
                             </Tooltip>
                         </InputArea>
@@ -242,6 +255,7 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix={units}
                                     type="number"
+                                    immediateOnChange
                                 />
                             </Tooltip>
                         </InputArea>
@@ -257,6 +271,7 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix="%"
                                     type="number"
+                                    immediateOnChange
                                 />
                             </Tooltip>
                         </InputArea>
@@ -287,6 +302,7 @@ const RotarySurfacing = () => {
                                     className={inputStyle}
                                     suffix="RPM"
                                     type="number"
+                                    immediateOnChange
                                 />
                             </Tooltip>
 
@@ -383,10 +399,17 @@ const RotarySurfacing = () => {
                     </div>
                 </div>
                 <div className="flex flex-row gap-4">
-                    <Button type="submit" onClick={handleGenerateGcode}>
+                    <Button
+                        type="submit"
+                        onClick={handleGenerateGcode}
+                        disabled={isDisabled}
+                    >
                         Generate G-Code
                     </Button>
-                    <Button onClick={handleLoadToMainVisualizer}>
+                    <Button
+                        onClick={handleLoadToMainVisualizer}
+                        disabled={!!!gcode || isDisabled}
+                    >
                         Load to Main Visualizer
                     </Button>
                 </div>

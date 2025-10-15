@@ -24,6 +24,7 @@ import { FaMicrochip } from 'react-icons/fa6';
 import { GRBLHAL } from 'app/constants';
 import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
 import Tooltip from 'app/components/Tooltip';
+import pubsub from 'pubsub-js';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -184,6 +185,7 @@ export function SettingRow({
                 });
             }
         }
+        pubsub.publish('programSettingReset', setting.key);
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};

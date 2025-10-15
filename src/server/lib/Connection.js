@@ -13,12 +13,19 @@ const log = logger('connection');
 
 class Connection extends EventEmitter {
     sockets = {};
+
     controller = null;
+
     controllerType = null;
+
     options = {};
+
     connection = null;
+
     engine = null;
+
     timeout = null;
+
     count = 0;
 
     connectionEventListener = {
@@ -316,8 +323,7 @@ class Connection extends EventEmitter {
             this.controllerType,
             this.options,
             this.callback,
-            true
-        );
+            true);
     }
 
     destroy() {

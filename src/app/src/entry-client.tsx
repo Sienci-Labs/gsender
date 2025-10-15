@@ -6,8 +6,9 @@ import App from './App';
 
 import './sentry-config';
 
-ReactDOM.hydrateRoot(
-    document.getElementById('app') as HTMLElement,
+// Use createRoot instead of hydrateRoot since we don't need full SSR for Electron app
+const root = ReactDOM.createRoot(document.getElementById('app') as HTMLElement);
+root.render(
     <>
         <App />
     </>,

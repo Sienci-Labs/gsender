@@ -70,7 +70,6 @@ class Workflow extends events.EventEmitter {
     }
 
     pause(...args) {
-        console.log('Pause called on workflow');
         if (this.state === WORKFLOW_STATE_RUNNING) {
             this.state = WORKFLOW_STATE_PAUSED;
         }

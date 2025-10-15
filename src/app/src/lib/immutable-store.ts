@@ -21,28 +21,38 @@
  *
  */
 
-import _ from 'lodash';
+import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
+import merge from 'lodash/merge';
+import set from 'lodash/set';
+import extend from 'lodash/extend';
+import unset from 'lodash/unset';
+import noop from 'lodash/noop';
 import events from 'events';
+
 import { determineRoundedValue } from './rounding';
 
-class ImmutableStore extends events.EventEmitter {
-    state = {};
+class ImmutableStore<T extends object = object> extends events.EventEmitter {
+    state: T;
 
-    constructor(state = {}) {
+    constructor(state = {} as T) {
         super();
 
         this.state = state;
     }
 
-    get(key: string, defaultValue?: any): any {
-        return key === undefined
-            ? this.state
-            : _.get(this.state, key, defaultValue);
+    get(): T;
+    get<V = any>(key: string): V | undefined;
+    get<V = any>(key: string, defaultValue: V): any;
+    get<V = any>(key?: string, defaultValue?: V): T | V | undefined {
+        if (key === undefined) return this.state;
+
+        return get(this.state, key, defaultValue) as V | undefined;
     }
 
-    set(key: string, value: any): any {
+    set(key: string, value: any): T {
         const prevValue = this.get(key);
-        if (typeof value === 'object' && _.isEqual(value, prevValue)) {
+        if (typeof value === 'object' && isEqual(value, prevValue)) {
             return this.state;
         }
         if (value === prevValue) {
@@ -52,22 +62,22 @@ class ImmutableStore extends events.EventEmitter {
         // round values that need to be rounded before storing
         value = determineRoundedValue(key, value);
 
-        this.state = _.merge({}, this.state, _.set({}, key, value));
+        this.state = merge({}, this.state, set({}, key, value));
         this.emit('change', this.state);
         return this.state;
     }
 
-    unset(key: string): object {
-        let state = _.extend({}, this.state);
-        _.unset(state, key);
+    unset(key: string): T {
+        let state = extend({}, this.state);
+        unset(state, key);
         this.state = state;
         //this.emit('change', this.state);
         return this.state;
     }
 
-    replace(key: string, value: any): object {
+    replace(key: string, value: any): T {
         const prevValue = this.get(key);
-        if (typeof value === 'object' && _.isEqual(value, prevValue)) {
+        if (typeof value === 'object' && isEqual(value, prevValue)) {
             return this.state;
         }
         if (value === prevValue) {
@@ -80,7 +90,7 @@ class ImmutableStore extends events.EventEmitter {
         return this.state;
     }
 
-    restoreState(state: object, cb: () => void = null): void {
+    restoreState(state: T, cb: () => void = null): void {
         this.clear();
         this.state = state;
 
@@ -90,14 +100,14 @@ class ImmutableStore extends events.EventEmitter {
         this.emit('change');
     }
 
-    clear(): object {
-        this.state = {};
+    clear(): T {
+        this.state = {} as T;
         this.emit('change', this.state);
         return this.state;
     }
 
-    persist = _.noop;
-    getConfig = _.noop;
+    persist = noop;
+    getConfig = noop;
 }
 
 export default ImmutableStore;

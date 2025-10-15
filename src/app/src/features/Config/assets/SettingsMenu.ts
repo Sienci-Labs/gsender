@@ -29,7 +29,16 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { GRBL, GRBLHAL, IMPERIAL_UNITS, LASER_MODE, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES, SPINDLE_MODE, WORKSPACE_MODE } from 'app/constants';
+import {
+    GRBL,
+    GRBLHAL,
+    IMPERIAL_UNITS,
+    LASER_MODE,
+    LIGHTWEIGHT_OPTIONS,
+    OUTLINE_MODES,
+    SPINDLE_MODE,
+    WORKSPACE_MODE,
+} from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import { ATCIWizard } from "app/features/Config/components/wizards/ATCiWizard.tsx";
 import {
@@ -43,11 +52,15 @@ import reduxStore from 'app/store/redux';
 import pubsub from 'pubsub-js';
 import { EEPROM, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { updatePartialControllerSettings } from 'app/store/redux/slices/controller.slice';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 import { BasicPosition, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
 import { convertToImperial } from 'app/lib/units';
 import { round, roundMetric } from 'app/lib/rounding';
-import { LaserState, Spindle, SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import {
+    LaserState,
+    Spindle,
+    SPINDLE_LASER_T,
+} from 'app/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 
 export interface SettingsMenuSection {
@@ -193,16 +206,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Outline style',
                         key: 'workspace.outlineMode',
                         type: 'select',
-                        description: 'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
-                        options: OUTLINE_MODES
+                        description:
+                            'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
+                        options: OUTLINE_MODES,
                     },
                     {
                         label: 'Revert workspace',
                         key: 'workspace.revertWorkspace',
                         type: 'boolean',
                         defaultValue: false,
-                        description: 'Allow g-code \'job finishing\' commands like M2 and M30 to reset your CNC\'s workspace back to G54 at the end of each job.',
-                        options: OUTLINE_MODES
+                        description:
+                            "Allow g-code 'job finishing' commands like M2 and M30 to reset your CNC's workspace back to G54 at the end of each job.",
+                        options: OUTLINE_MODES,
                     },
                     {
                         label: 'Send usage data',
@@ -285,8 +300,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
                         key: 'widgets.axes.jog.threshold',
-                        min: 50
-                    }
+                        min: 50,
+                    },
                 ],
             },
             {
@@ -389,9 +404,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
                         hidden: () => {
-                            const connected = controller.portOpen
+                            const connected = controller.portOpen;
                             return !connected;
-                        }
+                        },
                     },
                     {
                         type: 'eeprom',
@@ -507,7 +522,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
-                            TOUCHPLATE_TYPE_3D
+                            TOUCHPLATE_TYPE_3D,
                         ],
                     },
                     {
@@ -897,7 +912,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show the Spindle/Laser tab and related functions on the main Carve page.',
                         key: 'workspace.spindleFunctions',
                         onUpdate: () => {
-                            const spindleFunctions = store.get('workspace.spindleFunctions');
+                            const spindleFunctions = store.get(
+                                'workspace.spindleFunctions',
+                            );
                             const mode: SPINDLE_LASER_T = store.get(
                                 'widgets.spindle.mode',
                                 SPINDLE_MODE,
@@ -906,33 +923,84 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             // if we are turning off the spindle tab, set to spindle mode
                             if (!spindleFunctions && mode === LASER_MODE) {
                                 const preferredUnits =
-                                    store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
-                                const active: boolean = get(reduxStore.getState(), 'state.controller.modal.spindle', 'M5') !== 'M5';
-                                const controllerType: FIRMWARE_TYPES_T = get(reduxStore.getState(), 'state.controller.type', 'grbl');
-                                const availableSpindles: Spindle[] = get(reduxStore.getState(), 'state.controller.spindles', []);
-                                const units: UNITS_GCODE = get(reduxStore.getState(), 'state.controller.modal.units');
-                                const spindleMin = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$31', 1000));
-                                const spindleMax = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$30', 30000));
-                                const laser: LaserState = store.get('widgets.spindle.laser', {
-                                    maxPower: 0,
-                                    minPower: 0,
-                                });
+                                    store.get('workspace.units') ===
+                                    IMPERIAL_UNITS
+                                        ? 'G20'
+                                        : 'G21';
+                                const active: boolean =
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.modal.spindle',
+                                        'M5',
+                                    ) !== 'M5';
+                                const controllerType: FIRMWARE_TYPES_T = get(
+                                    reduxStore.getState(),
+                                    'state.controller.type',
+                                    'grbl',
+                                );
+                                const availableSpindles: Spindle[] = get(
+                                    reduxStore.getState(),
+                                    'state.controller.spindles',
+                                    [],
+                                );
+                                const units: UNITS_GCODE = get(
+                                    reduxStore.getState(),
+                                    'state.controller.modal.units',
+                                );
+                                const spindleMin = Number(
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$31',
+                                        1000,
+                                    ),
+                                );
+                                const spindleMax = Number(
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$30',
+                                        30000,
+                                    ),
+                                );
+                                const laser: LaserState = store.get(
+                                    'widgets.spindle.laser',
+                                    {
+                                        maxPower: 0,
+                                        minPower: 0,
+                                    },
+                                );
 
                                 // get previously saved spindle values
-                                const prevSpindleMin = store.get('widgets.spindle.spindleMin', 0);
-                                const prevSpindleMax = store.get('widgets.spindle.spindleMax', 0);
+                                const prevSpindleMin = store.get(
+                                    'widgets.spindle.spindleMin',
+                                    0,
+                                );
+                                const prevSpindleMax = store.get(
+                                    'widgets.spindle.spindleMax',
+                                    0,
+                                );
 
                                 const SLBLaserExists =
                                     controllerType === GRBLHAL &&
-                                    findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
+                                    findIndex(
+                                        availableSpindles,
+                                        (o) => o.label === 'SLB_LASER',
+                                    ) !== -1;
 
                                 const calculateAdjustedOffsets = (
                                     xOffset: number,
                                     yOffset: number,
                                     units: UNITS_GCODE | UNITS_EN,
                                 ): [number, number] => {
-                                    const $13: string = get(reduxStore.getState(), 'state.controller.settings.settings.$13', '0');
-                                    const wpos: BasicPosition = get(reduxStore.getState(), 'state.controller.wpos', { x: 0, y: 0, z: 0 });
+                                    const $13: string = get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$13',
+                                        '0',
+                                    );
+                                    const wpos: BasicPosition = get(
+                                        reduxStore.getState(),
+                                        'state.controller.wpos',
+                                        { x: 0, y: 0, z: 0 },
+                                    );
                                     let { x, y } = wpos;
 
                                     if ($13 === '1' || units === 'G20') {
@@ -941,15 +1009,39 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                         y /= 25.4;
                                     }
                                     return [
-                                        round(Number(x) + Number(xOffset), units),
-                                        round(Number(y) + Number(yOffset), units),
+                                        round(
+                                            Number(x) + Number(xOffset),
+                                            units,
+                                        ),
+                                        round(
+                                            Number(y) + Number(yOffset),
+                                            units,
+                                        ),
                                     ];
-                                }
+                                };
 
-                                const getSpindleOffsetCode = (preferredUnits: UNITS_GCODE | UNITS_EN): string[] => {
-                                    const laserXOffset = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$741', 0));
-                                    const laserYOffset = Number(get(reduxStore.getState(), 'state.controller.settings.settings.$742', 0));
-                                    const wcs: string = get(reduxStore.getState(), 'state.controller.modal.wcs', '');
+                                const getSpindleOffsetCode = (
+                                    preferredUnits: UNITS_GCODE | UNITS_EN,
+                                ): string[] => {
+                                    const laserXOffset = Number(
+                                        get(
+                                            reduxStore.getState(),
+                                            'state.controller.settings.settings.$741',
+                                            0,
+                                        ),
+                                    );
+                                    const laserYOffset = Number(
+                                        get(
+                                            reduxStore.getState(),
+                                            'state.controller.settings.settings.$742',
+                                            0,
+                                        ),
+                                    );
+                                    const wcs: string = get(
+                                        reduxStore.getState(),
+                                        'state.controller.modal.wcs',
+                                        '',
+                                    );
                                     const currentWCS: number =
                                         {
                                             G54: 1,
@@ -987,9 +1079,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                             preferredUnits,
                                         );
                                     if (xOffset === 0 && yOffset !== 0) {
-                                        offsetQuery = [`G10 L20 P${currentWCS} Y${yOffsetAdjusted}`];
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} Y${yOffsetAdjusted}`,
+                                        ];
                                     } else if (xOffset !== 0 && yOffset === 0) {
-                                        offsetQuery = [`G10 L20 P${currentWCS} X${xoffsetAdjusted}`];
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} X${xoffsetAdjusted}`,
+                                        ];
                                     } else if (xOffset !== 0 && yOffset !== 0) {
                                         offsetQuery = [
                                             `G10 L20 P${currentWCS} X${xoffsetAdjusted} Y${yOffsetAdjusted}`,
@@ -999,7 +1095,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                     }
 
                                     return offsetQuery;
-                                }
+                                };
 
                                 // set mode to spindle
                                 store.set('widgets.spindle.mode', 'spindle');
@@ -1013,7 +1109,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
                                 const powerCommands = SLBLaserExists
                                     ? []
-                                    : [`$30=${prevSpindleMax}`, `$31=${prevSpindleMin}`];
+                                    : [
+                                          `$30=${prevSpindleMax}`,
+                                          `$31=${prevSpindleMin}`,
+                                      ];
 
                                 if (active) {
                                     controller.command('gcode', 'M5');
@@ -1047,7 +1146,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
                                 controller.command('gcode', commands);
                             }
-                        }
+                        },
                     },
                     {
                         type: 'eeprom',
@@ -1327,11 +1426,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         onUpdate: () => {
                             // when tab is turned off, turn off rotary mode
                             const mode = store.get('workspace.mode');
-                            const showTab = store.get('widgets.rotary.tab.show');
+                            const showTab = store.get(
+                                'widgets.rotary.tab.show',
+                            );
                             if (!showTab && mode === WORKSPACE_MODE.ROTARY) {
                                 updateWorkspaceMode(WORKSPACE_MODE.DEFAULT);
                             }
-                        }
+                        },
                     },
                     { type: 'eeprom', eID: '$376' },
                     {

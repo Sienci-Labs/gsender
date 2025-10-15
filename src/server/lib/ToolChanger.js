@@ -47,7 +47,6 @@ class ToolChanger {
         }
 
         if (typeof cb !== 'function') {
-            console.log('CB not a valid function');
             return;
         }
 
