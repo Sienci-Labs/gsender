@@ -1,16 +1,12 @@
-import {
-    ToolInstance,
-    ToolStatus,
-} from 'app/features/ATC/components/ToolTable.tsx';
+import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
-import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
-import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { AlertTriangle, CheckCircle, Package, Wrench } from 'lucide-react';
+import Button from 'app/components/Button';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
     const { rackSize } = useToolChange();
@@ -20,7 +16,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         toolOffsets: {
             x: 0,
             y: 0,
-            z: 0,
+            z: -2,
         },
         status: 'unprobed',
         toolRadius: 0,
@@ -30,7 +26,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         (state: RootState) => state.controller.state.status?.currentTool,
     );
 
-    //const currentTool = 0;
+    //const currentTool = 1;
 
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -63,19 +59,19 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 bgColor: 'bg-gray-200',
                 borderColor: 'border-gray-300',
                 textColor: 'text-gray-600',
-                showProbe: false,
+                showProbe: true,
             };
         }
 
         if (selectedTool.toolOffsets.z === 0) {
             return {
                 label: `T${currentTool}`,
-                bgColor: 'bg-yellow-100',
-                borderColor: 'border-yellow-400',
-                textColor: 'text-yellow-800',
+                bgColor: 'bg-orange-100',
+                borderColor: 'border-orange-400',
+                textColor: 'text-orange-800',
+                badgeColor: 'bg-orange-500',
                 showProbe: true,
                 badge: 'Unprobed',
-                badgeColor: 'bg-yellow-500',
                 badgeIcon: AlertTriangle,
             };
         }
@@ -83,12 +79,13 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         if (currentTool > rackSize) {
             return {
                 label: `T${currentTool}`,
-                bgColor: 'bg-orange-100',
-                borderColor: 'border-orange-400',
-                textColor: 'text-orange-800',
+
                 showProbe: true,
                 badge: 'Off-Rack',
-                badgeColor: 'bg-orange-500',
+                bgColor: 'bg-yellow-100',
+                borderColor: 'border-yellow-400',
+                textColor: 'text-yellow-800',
+                badgeColor: 'bg-yellow-500',
                 badgeIcon: Package,
             };
         }
@@ -113,7 +110,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
     return (
         <div className={'w-4/5'}>
             <div
-                className={`${state.bgColor} ${state.borderColor} border-2 rounded-lg p-4 shadow-md transition-all duration-200`}
+                className={`${state.bgColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 shadow-md transition-all duration-200`}
             >
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -127,6 +124,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                             {selectedTool.nickname && currentTool > 0 && (
                                 <span className="text-gray-600 text-xs">
                                     {selectedTool.nickname}
+                                    {currentTool === 0 && '-'}
                                 </span>
                             )}
                         </div>
@@ -150,12 +148,13 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                         </div>
                     </div>
                     {state.showProbe && (
-                        <button
-                            onClick={probeTool}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-150"
+                        <Button
+                            onClick={() => probeTool(currentTool)}
+                            disabled={currentTool === 0}
+                            variant="primary"
                         >
                             Probe
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
