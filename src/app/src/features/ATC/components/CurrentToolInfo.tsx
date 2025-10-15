@@ -7,6 +7,7 @@ import controller from 'app/lib/controller.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { AlertTriangle, CheckCircle, Package, Wrench } from 'lucide-react';
 import Button from 'app/components/Button';
+import { PiEmpty } from 'react-icons/pi';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
     const { rackSize } = useToolChange();
@@ -26,7 +27,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         (state: RootState) => state.controller.state.status?.currentTool,
     );
 
-    //const currentTool = 1;
+    //const currentTool = 0;
 
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -59,7 +60,10 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 bgColor: 'bg-gray-200',
                 borderColor: 'border-gray-300',
                 textColor: 'text-gray-600',
+                badgeColor: 'bg-gray-200',
                 showProbe: true,
+                badge: ' ',
+                badgeIcon: PiEmpty,
             };
         }
 
@@ -79,7 +83,6 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         if (currentTool > rackSize) {
             return {
                 label: `T${currentTool}`,
-
                 showProbe: true,
                 badge: 'Off-Rack',
                 bgColor: 'bg-yellow-100',
@@ -110,7 +113,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
     return (
         <div className={'w-4/5'}>
             <div
-                className={`${state.bgColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 shadow-md transition-all duration-200`}
+                className={`${state.bgColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 transition-all duration-200`}
             >
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -131,7 +134,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                     </div>
                     {state.badge && BadgeIcon && (
                         <span
-                            className={`${state.badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}
+                            className={`${state.badgeColor} min-w-20 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}
                         >
                             <BadgeIcon className="w-3 h-3" />
                             {state.badge}

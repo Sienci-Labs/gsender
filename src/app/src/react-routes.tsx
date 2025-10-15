@@ -1,7 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router';
 import noop from 'lodash/noop';
-import { BiSolidCylinder } from 'react-icons/bi';
-
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
@@ -42,6 +40,7 @@ import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
 import { BiSolidCylinder } from 'react-icons/bi';
 import SDCard from 'app/features/SDCard';
+import { FaSdCard } from 'react-icons/fa';
 
 export const ReactRoutes = () => {
     return (
