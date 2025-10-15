@@ -1,3 +1,5 @@
+import { ATCIVariable } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+
 export type Macro = {
     name: string;
     content: string;
@@ -1145,10 +1147,7 @@ export interface ATCIMacroConfig {
     version: number;
     sdVersion: number;
     variables: {
-        [key: string]: {
-            default: number;
-            value: number;
-        };
+        [key: string]: ATCIVariable;
     };
     variableFile: string;
     macros: Macro[];

@@ -45,33 +45,60 @@ export interface Advanced {
     checkToolPresence: number;
 }
 
+export interface ATCIVariable {
+    default: number;
+    value: number;
+}
+
 export interface ConfigState {
+    variables: {
+        [key: string]: {
+            default: number;
+            value: number;
+        };
+    };
+    tlsPosition: Position;
+    manualLoadPosition: Position;
+    slot1Position: Position;
+}
+
+/*export interface ConfigState {
     offsetManagement: OffsetManagement;
     toolRack: ToolRack;
     advanced: Advanced;
     tlsPosition: Position;
     manualLoadPosition: Position;
     slot1Position: Position;
-}
+}*/
 
 export const defaultATCIConfig: ConfigState = {
-    offsetManagement: {
-        probeNewOffset: 0,
-        useToolOffset: 0,
-        verifyToolLength: 0,
-    },
-    toolRack: {
-        enabled: 1,
-        numberOfSlots: 8,
-        probeNewOffset: 0,
-        useToolOffset: 0,
-        verifyToolLength: 0,
-        slotOffset: 0,
-        retainToolSettings: 0,
-    },
-    advanced: {
-        checkPressure: 0,
-        checkToolPresence: 0,
+    variables: {
+        _ort_offset_mode: {
+            default: 0,
+            value: 0,
+        },
+        _irt_offset_mode: {
+            default: 2,
+            value: 0,
+        },
+        _tc_rack_enable: {
+            default: 0,
+            value: 0,
+        },
+        _tc_slots: {
+            default: 6,
+            value: 0,
+        },
+        _tc_slot_offset: {
+            default: 92,
+            value: 0,
+        },
+        _passthrough_offset_setting: {
+            default: 0,
+            value: 0,
+        },
+        _pres_sense: { default: 0, value: 0 },
+        _holder_sense: { default: 1, value: 0 },
     },
     manualLoadPosition: defaultPosition,
     tlsPosition: defaultPosition,
