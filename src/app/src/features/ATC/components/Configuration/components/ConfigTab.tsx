@@ -70,7 +70,24 @@ export const ConfigTab: React.FC = () => {
                         <Label className="text-sm font-medium">
                             Offset Management
                         </Label>
-                        <OffsetManagementWidget />
+                        <OffsetManagementWidget
+                            value={config.variables._ort_offset_mode.value}
+                            defaultValue={
+                                config.variables._ort_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _ort_offset_mode: {
+                                            ...config.variables
+                                                ._ort_offset_mode,
+                                            value,
+                                        },
+                                    },
+                                })
+                            }
+                        />
                     </div>
                 </CardContent>
             </Card>
@@ -181,7 +198,24 @@ export const ConfigTab: React.FC = () => {
 
                     <div className="space-y-1">
                         <Label>Offset Management</Label>
-                        <OffsetManagementWidget />
+                        <OffsetManagementWidget
+                            value={config.variables._irt_offset_mode.value}
+                            defaultValue={
+                                config.variables._irt_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _irt_offset_mode: {
+                                            ...config.variables
+                                                ._irt_offset_mode,
+                                            value,
+                                        },
+                                    },
+                                })
+                            }
+                        />
                     </div>
                     <div className="space-y-1">
                         <Label className="text-sm font-medium">Advanced</Label>
