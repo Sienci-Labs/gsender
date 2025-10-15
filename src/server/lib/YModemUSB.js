@@ -239,7 +239,7 @@ export class YModem extends events.EventEmitter {
             this.logger('[>>> EOT]');
 
             // eslint-disable-next-line no-await-in-loop
-            await sleep(100);
+            await sleep(150);
         }
 
         this.logger('Finished sending packets');
