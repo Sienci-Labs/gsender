@@ -115,10 +115,14 @@ export const ConfigTab: React.FC = () => {
                                 value={config.variables._tc_slots.value}
                                 onChange={(e) =>
                                     updateConfig({
-                                        toolRack: {
-                                            ...config.toolRack,
-                                            numberOfSlots:
-                                                parseInt(e.target.value) || 0,
+                                        variables: {
+                                            ...config.variables,
+                                            _tc_slots: {
+                                                ...config.variables._tc_slots,
+                                                value:
+                                                    parseInt(e.target.value) ||
+                                                    0,
+                                            },
                                         },
                                     })
                                 }
@@ -137,10 +141,15 @@ export const ConfigTab: React.FC = () => {
                                 value={config.variables._tc_slot_offset.value}
                                 onChange={(e) =>
                                     updateConfig({
-                                        toolRack: {
-                                            ...config.toolRack,
-                                            slotOffset:
-                                                parseInt(e.target.value) || 0,
+                                        variables: {
+                                            ...config.variables,
+                                            _tc_slot_offset: {
+                                                ...config.variables
+                                                    ._tc_slot_offset,
+                                                value:
+                                                    parseInt(e.target.value) ||
+                                                    0,
+                                            },
                                         },
                                     })
                                 }
@@ -189,11 +198,13 @@ export const ConfigTab: React.FC = () => {
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                retainToolSettings: checked
-                                                    ? 1
-                                                    : 0,
+                                            variables: {
+                                                ...config.variables,
+                                                _passthrough_offset_setting: {
+                                                    ...config.variables
+                                                        ._passthrough_offset_setting,
+                                                    value: checked ? 1 : 0,
+                                                },
                                             },
                                         })
                                     }
@@ -218,9 +229,12 @@ export const ConfigTab: React.FC = () => {
                             checked={config.variables._pres_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
-                                    advanced: {
-                                        ...config.advanced,
-                                        checkPressure: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _pres_sense: {
+                                            ...config.variables._pres_sense,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
@@ -234,9 +248,12 @@ export const ConfigTab: React.FC = () => {
                             checked={config.variables._holder_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
-                                    advanced: {
-                                        ...config.advanced,
-                                        checkToolPresence: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _holder_sense: {
+                                            ...config.variables._holder_sense,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
