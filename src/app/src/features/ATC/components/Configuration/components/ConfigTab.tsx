@@ -81,12 +81,17 @@ export const ConfigTab: React.FC = () => {
                     <CardTitle className="flex items-center gap-4">
                         Tool Rack
                         <Switch
-                            checked={config.toolRack.enabled === 1}
+                            checked={
+                                config.variables._tc_rack_enable.value === 1
+                            }
                             onChange={(checked) =>
                                 updateConfig({
-                                    toolRack: {
-                                        ...config.toolRack,
-                                        enabled: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _tc_rack_enable: {
+                                            ...config.variables._tc_rack_enable,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
@@ -96,7 +101,7 @@ export const ConfigTab: React.FC = () => {
                 <CardContent
                     className={cn(
                         'space-y-1',
-                        config.toolRack.enabled !== 1 &&
+                        config.variables._tc_rack_enable.value !== 1 &&
                             'opacity-50 pointer-events-none',
                     )}
                 >
@@ -107,7 +112,7 @@ export const ConfigTab: React.FC = () => {
                             </Label>
                             <Input
                                 type="number"
-                                value={config.toolRack.numberOfSlots}
+                                value={config.variables._tc_slots.value}
                                 onChange={(e) =>
                                     updateConfig({
                                         toolRack: {
@@ -118,7 +123,9 @@ export const ConfigTab: React.FC = () => {
                                     })
                                 }
                                 className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={config.toolRack.enabled !== 1}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
                         <div className="flex flex-row items-center gap-2 justify-center">
@@ -127,7 +134,7 @@ export const ConfigTab: React.FC = () => {
                             </Label>
                             <Input
                                 type="number"
-                                value={config.toolRack.slotOffset}
+                                value={config.variables._tc_slot_offset.value}
                                 onChange={(e) =>
                                     updateConfig({
                                         toolRack: {
@@ -138,7 +145,9 @@ export const ConfigTab: React.FC = () => {
                                     })
                                 }
                                 className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={config.toolRack.enabled !== 1}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
                     </div>
@@ -154,7 +163,9 @@ export const ConfigTab: React.FC = () => {
                                     )
                                 }
                                 onUseCurrent={() => setWorkspacePosition('P7')}
-                                disabled={config.toolRack.enabled !== 1}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
                     </div>
@@ -172,7 +183,9 @@ export const ConfigTab: React.FC = () => {
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.toolRack.retainToolSettings === 1
+                                        config.variables
+                                            ._passthrough_offset_setting
+                                            .value === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
@@ -202,7 +215,7 @@ export const ConfigTab: React.FC = () => {
                             Check pressure with pressure sensor
                         </Label>
                         <Switch
-                            checked={config.advanced.checkPressure === 1}
+                            checked={config.variables._pres_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
                                     advanced: {
@@ -218,7 +231,7 @@ export const ConfigTab: React.FC = () => {
                             Check tool presence in rack to prevent collision
                         </Label>
                         <Switch
-                            checked={config.advanced.checkToolPresence === 1}
+                            checked={config.variables._holder_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
                                     advanced: {

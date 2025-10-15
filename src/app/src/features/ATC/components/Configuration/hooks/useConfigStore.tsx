@@ -185,7 +185,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
             ...prev,
             ...updates,
         }));
-        console.log(config);
+        console.log('changes', config);
     };
 
     const updatePosition = (
