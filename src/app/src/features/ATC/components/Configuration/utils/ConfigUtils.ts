@@ -38,8 +38,7 @@ export function generateP100(config: ConfigState): Macro {
         `#<_irt_offset_mode> = ${config.variables._irt_offset_mode.value}`,
         `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
-    console.log(config.variables);
-    console.log('OBJECT: ', content);
+
     const data = new Blob([content]);
 
     return {
@@ -116,8 +115,6 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         'widgets.atc.templates',
         {},
     );
-
-    console.log('OG', templateConfig);
 
     let variables = { ...config.variables };
 

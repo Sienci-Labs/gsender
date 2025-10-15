@@ -28,7 +28,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
         // Set all config values to default, and then repopulate again from SD card.
         controller.addListener('sdcard:json', (payload) => {
             const updatedConfig = repopulateFromSDCard(payload.code);
-            console.log('returned via SD:', updatedConfig);
+
             updateConfig({
                 variables: { ...updatedConfig.variables },
             });

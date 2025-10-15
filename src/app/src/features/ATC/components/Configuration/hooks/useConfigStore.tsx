@@ -137,7 +137,7 @@ export function mapDefaultsToValues(variables) {
     Object.entries(variables).forEach(([key, value]) => {
         variables[key].value = value.default;
     });
-    console.log(variables);
+
     return variables;
 }
 
@@ -230,7 +230,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
         const content = generateAllMacros(config);
 
-        console.log(content);
         // todo: upload the whole block of content to the controller
         //controller.command('ymodem:uploadFiles', content);
 

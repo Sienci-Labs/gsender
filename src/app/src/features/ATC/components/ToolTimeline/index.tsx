@@ -110,7 +110,6 @@ export function ToolTimelineWrapper() {
     }, []);
 
     useEffect(() => {
-        console.log(fileLoaded);
         if (!fileLoaded) {
             setShow(false);
             setTools([]);
