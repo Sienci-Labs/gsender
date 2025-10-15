@@ -62,7 +62,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 textColor: 'text-gray-600',
                 badgeColor: 'bg-gray-200',
                 showProbe: true,
-                badge: ' ',
+                badge: 'Empty',
                 badgeIcon: PiEmpty,
             };
         }

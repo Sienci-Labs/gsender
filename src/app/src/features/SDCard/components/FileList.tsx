@@ -33,7 +33,7 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export function isFileATCIRelated(filename, atciMacros) {
-    if (filename === 'ATCI.macro') {
+    if (filename === 'ATCI.macro' || filename === 'P100.macro') {
         return true;
     }
     const filtered = Object.entries(atciMacros).filter(
