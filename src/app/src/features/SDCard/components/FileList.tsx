@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Play, Trash2, File } from 'lucide-react';
 import { useSDCard } from '../hooks/useSDCard';
-//import { ConfirmDialog } from './ConfirmDialog';
 import {
     Table,
     TableBody,
