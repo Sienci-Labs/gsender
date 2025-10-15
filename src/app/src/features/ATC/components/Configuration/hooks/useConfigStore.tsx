@@ -14,6 +14,7 @@ import mapValues from 'lodash/mapValues';
 import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 import store from 'app/store';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import delay from '../../../../../../../server/lib/delay';
 
 export const defaultPosition: Position = {
     x: 0,
@@ -185,7 +186,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
             ...prev,
             ...updates,
         }));
-        console.log('changes', config);
     };
 
     const updatePosition = (
