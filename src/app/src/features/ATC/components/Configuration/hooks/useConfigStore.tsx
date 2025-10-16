@@ -14,6 +14,7 @@ import mapValues from 'lodash/mapValues';
 import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 import store from 'app/store';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import delay from '../../../../../../../server/lib/delay';
 
 export const defaultPosition: Position = {
     x: 0,
@@ -45,33 +46,60 @@ export interface Advanced {
     checkToolPresence: number;
 }
 
+export interface ATCIVariable {
+    default: number;
+    value: number;
+}
+
 export interface ConfigState {
+    variables: {
+        [key: string]: {
+            default: number;
+            value: number;
+        };
+    };
+    tlsPosition: Position;
+    manualLoadPosition: Position;
+    slot1Position: Position;
+}
+
+/*export interface ConfigState {
     offsetManagement: OffsetManagement;
     toolRack: ToolRack;
     advanced: Advanced;
     tlsPosition: Position;
     manualLoadPosition: Position;
     slot1Position: Position;
-}
+}*/
 
 export const defaultATCIConfig: ConfigState = {
-    offsetManagement: {
-        probeNewOffset: 0,
-        useToolOffset: 0,
-        verifyToolLength: 0,
-    },
-    toolRack: {
-        enabled: 1,
-        numberOfSlots: 8,
-        probeNewOffset: 0,
-        useToolOffset: 0,
-        verifyToolLength: 0,
-        slotOffset: 0,
-        retainToolSettings: 0,
-    },
-    advanced: {
-        checkPressure: 0,
-        checkToolPresence: 0,
+    variables: {
+        _ort_offset_mode: {
+            default: 0,
+            value: 0,
+        },
+        _irt_offset_mode: {
+            default: 2,
+            value: 0,
+        },
+        _tc_rack_enable: {
+            default: 0,
+            value: 0,
+        },
+        _tc_slots: {
+            default: 6,
+            value: 0,
+        },
+        _tc_slot_offset: {
+            default: 92,
+            value: 0,
+        },
+        _passthrough_offset_setting: {
+            default: 0,
+            value: 0,
+        },
+        _pres_sense: { default: 0, value: 0 },
+        _holder_sense: { default: 1, value: 0 },
     },
     manualLoadPosition: defaultPosition,
     tlsPosition: defaultPosition,
@@ -105,6 +133,14 @@ interface ConfigProviderProps {
     children: ReactNode;
 }
 
+export function mapDefaultsToValues(variables) {
+    Object.entries(variables).forEach(([key, value]) => {
+        variables[key].value = value.default;
+    });
+
+    return variables;
+}
+
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const [config, setConfig] = useState<ConfigState>(defaultATCIConfig);
     const [templates, setTemplates] = useState<ATCIMacroConfig>();
@@ -120,6 +156,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     );
 
     useEffect(() => {
+        const storedValues = store.get('widgets.atc.templates.variables', {});
+        const mappedVariables = mapDefaultsToValues(storedValues);
+        updateConfig({ variables: mappedVariables });
         setTemplates(store.get('widgets.atc.templates', {}));
     }, []);
 
@@ -131,7 +170,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         );
         const tlsPosition: Position = get(
             pickedParams,
-            'G59.1',
+            'G59.3',
             defaultPosition,
         ) as Position;
         const manualLoadPosition: Position = get(
@@ -141,7 +180,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         ) as Position;
         const slot1Position: Position = get(
             pickedParams,
-            'G59.3',
+            'G59.1',
             defaultPosition,
         ) as Position;
 
@@ -158,7 +197,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
             ...prev,
             ...updates,
         }));
-        console.log(config);
     };
 
     const updatePosition = (
@@ -192,8 +230,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
         const content = generateAllMacros(config);
 
-        console.log(content);
-        // todo: upload the whole block of content to the controller
         controller.command('ymodem:uploadFiles', content);
 
         // Simulate progress

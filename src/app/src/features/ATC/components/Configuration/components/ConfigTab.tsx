@@ -1,18 +1,14 @@
 import React from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from 'app/components/shadcn/card';
-import { Switch } from 'app/components/shadcn/switch';
-import { Input } from 'app/components/shadcn/input';
-import { Label } from 'app/components/shadcn/label';
+import { Card, CardHeader, CardTitle } from 'app/components/shadcn/Card';
+import { Switch } from 'app/components/shadcn/Switch';
+import { Input } from 'app/components/shadcn/Input';
+import { Label } from 'app/components/shadcn/Label';
 import { Button } from 'app/components/Button';
-import { Progress } from 'app/components/shadcn/progress';
+import { Progress } from 'app/components/shadcn/Progress';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
+import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
 
 export const ConfigTab: React.FC = () => {
     const {
@@ -25,6 +21,8 @@ export const ConfigTab: React.FC = () => {
         progress,
         status,
     } = useConfigContext();
+
+    const nonDefaultStyling = 'bg-yellow-50';
 
     const getStatusColor = () => {
         switch (status.type) {
@@ -46,14 +44,14 @@ export const ConfigTab: React.FC = () => {
                 <CardHeader className="pb-2">
                     <CardTitle>General</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <div className="p-2">
                     <PositionInput
                         label="Tool Length Sensor Position"
                         position={config.tlsPosition}
                         onPositionChange={(position) =>
                             updatePosition('toolLengthSensorPosition', position)
                         }
-                        onUseCurrent={() => setWorkspacePosition('P7')}
+                        onUseCurrent={() => setWorkspacePosition('P9')}
                     />
 
                     <PositionInput
@@ -69,89 +67,26 @@ export const ConfigTab: React.FC = () => {
                         <Label className="text-sm font-medium">
                             Offset Management
                         </Label>
-                        <div className="space-y-1.5 pl-4">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-xs">
-                                    Probe new offset when tool changing
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .probeNewOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                probeNewOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    config.offsetManagement.probeNewOffset !==
-                                        1 && 'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Use tool table offset
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .useToolOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                useToolOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.offsetManagement
-                                            .probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    config.offsetManagement.probeNewOffset !==
-                                        1 && 'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Verify tool length changes
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.offsetManagement
-                                            .verifyToolLength === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            offsetManagement: {
-                                                ...config.offsetManagement,
-                                                verifyToolLength: checked
-                                                    ? 1
-                                                    : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.offsetManagement
-                                            .probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                        </div>
+                        <OffsetManagementWidget
+                            value={config.variables._ort_offset_mode.value}
+                            defaultValue={
+                                config.variables._ort_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _ort_offset_mode: {
+                                            ...config.variables
+                                                ._ort_offset_mode,
+                                            value,
+                                        },
+                                    },
+                                })
+                            }
+                        />
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Tool Rack Section */}
@@ -160,64 +95,107 @@ export const ConfigTab: React.FC = () => {
                     <CardTitle className="flex items-center gap-4">
                         Tool Rack
                         <Switch
-                            checked={config.toolRack.enabled === 1}
+                            className={cn({
+                                [nonDefaultStyling]:
+                                    config.variables._tc_rack_enable.value !==
+                                    config.variables._tc_rack_enable.default,
+                            })}
+                            checked={
+                                config.variables._tc_rack_enable.value === 1
+                            }
                             onChange={(checked) =>
                                 updateConfig({
-                                    toolRack: {
-                                        ...config.toolRack,
-                                        enabled: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _tc_rack_enable: {
+                                            ...config.variables._tc_rack_enable,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
                         />
                     </CardTitle>
                 </CardHeader>
-                <CardContent
+                <div
                     className={cn(
-                        'space-y-1',
-                        config.toolRack.enabled !== 1 &&
+                        'p-2',
+                        config.variables._tc_rack_enable.value !== 1 &&
                             'opacity-50 pointer-events-none',
                     )}
                 >
                     <div className="flex gap-4 w-full space-between">
-                        <div className="flex flex-row items-center gap-2 justify-center">
+                        <div
+                            className={cn(
+                                'flex flex-row items-center gap-2 justify-center',
+                                {
+                                    [nonDefaultStyling]:
+                                        config.variables._tc_slots.value !==
+                                        config.variables._tc_slots.default,
+                                },
+                            )}
+                        >
                             <Label className="text-sm font-medium">
                                 Number of Slots
                             </Label>
                             <Input
                                 type="number"
-                                value={config.toolRack.numberOfSlots}
+                                value={config.variables._tc_slots.value}
                                 onChange={(e) =>
                                     updateConfig({
-                                        toolRack: {
-                                            ...config.toolRack,
-                                            numberOfSlots:
-                                                parseInt(e.target.value) || 0,
+                                        variables: {
+                                            ...config.variables,
+                                            _tc_slots: {
+                                                ...config.variables._tc_slots,
+                                                value:
+                                                    parseInt(e.target.value) ||
+                                                    0,
+                                            },
                                         },
                                     })
                                 }
                                 className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={config.toolRack.enabled !== 1}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
-                        <div className="flex flex-row items-center gap-2 justify-center">
+                        <div
+                            className={cn(
+                                'flex flex-row items-center gap-2 justify-center',
+                                {
+                                    [nonDefaultStyling]:
+                                        config.variables._tc_slot_offset
+                                            .value !==
+                                        config.variables._tc_slot_offset
+                                            .default,
+                                },
+                            )}
+                        >
                             <Label className="text-sm font-medium">
                                 Slot Offset
                             </Label>
                             <Input
                                 type="number"
-                                value={config.toolRack.slotOffset}
+                                value={config.variables._tc_slot_offset.value}
                                 onChange={(e) =>
                                     updateConfig({
-                                        toolRack: {
-                                            ...config.toolRack,
-                                            slotOffset:
-                                                parseInt(e.target.value) || 0,
+                                        variables: {
+                                            ...config.variables,
+                                            _tc_slot_offset: {
+                                                ...config.variables
+                                                    ._tc_slot_offset,
+                                                value:
+                                                    parseInt(e.target.value) ||
+                                                    0,
+                                            },
                                         },
                                     })
                                 }
                                 className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={config.toolRack.enabled !== 1}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
                     </div>
@@ -232,117 +210,65 @@ export const ConfigTab: React.FC = () => {
                                         position,
                                     )
                                 }
-                                onUseCurrent={() => setWorkspacePosition('P9')}
-                                disabled={config.toolRack.enabled !== 1}
+                                onUseCurrent={() => setWorkspacePosition('P7')}
+                                disabled={
+                                    config.variables._tc_rack_enable.value !== 1
+                                }
                             />
                         </div>
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                            Offset Management
-                        </Label>
-                        <div className="space-y-1.5 pl-4">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-xs">
-                                    Probe new offset when tool changing
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.probeNewOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                probeNewOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={config.toolRack.enabled !== 1}
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1) &&
-                                        'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Use tool table offset
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.useToolOffset === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                useToolOffset: checked ? 1 : 0,
-                                            },
-                                        })
-                                    }
-                                    disabled={
-                                        config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                            <div
-                                className={cn(
-                                    'flex items-center justify-between',
-                                    (config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1) &&
-                                        'opacity-50',
-                                )}
-                            >
-                                <Label className="text-xs">
-                                    Verify tool length changes
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.toolRack.verifyToolLength === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                verifyToolLength: checked
-                                                    ? 1
-                                                    : 0,
-                                            },
-                                        })
-                                    }
-                                    className="data-[state=checked]:bg-blue-500"
-                                    disabled={
-                                        config.toolRack.enabled !== 1 ||
-                                        config.toolRack.probeNewOffset !== 1
-                                    }
-                                />
-                            </div>
-                        </div>
+                        <Label>Offset Management</Label>
+                        <OffsetManagementWidget
+                            value={config.variables._irt_offset_mode.value}
+                            defaultValue={
+                                config.variables._irt_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _irt_offset_mode: {
+                                            ...config.variables
+                                                ._irt_offset_mode,
+                                            value,
+                                        },
+                                    },
+                                })
+                            }
+                        />
                     </div>
                     <div className="space-y-1">
                         <Label className="text-sm font-medium">Advanced</Label>
-                        <div className="space-y-1.5 pl-4">
+                        <div
+                            className={cn('space-y-1.5 pl-4', {
+                                [nonDefaultStyling]:
+                                    config.variables._passthrough_offset_setting
+                                        .value !==
+                                    config.variables._passthrough_offset_setting
+                                        .default,
+                            })}
+                        >
                             <div className="flex items-center justify-between">
                                 <Label className="text-xs">
                                     Retain tool table settings when rack removed
                                 </Label>
                                 <Switch
                                     checked={
-                                        config.toolRack.retainToolSettings === 1
+                                        config.variables
+                                            ._passthrough_offset_setting
+                                            .value === 1
                                     }
                                     onChange={(checked) =>
                                         updateConfig({
-                                            toolRack: {
-                                                ...config.toolRack,
-                                                retainToolSettings: checked
-                                                    ? 1
-                                                    : 0,
+                                            variables: {
+                                                ...config.variables,
+                                                _passthrough_offset_setting: {
+                                                    ...config.variables
+                                                        ._passthrough_offset_setting,
+                                                    value: checked ? 1 : 0,
+                                                },
                                             },
                                         })
                                     }
@@ -350,7 +276,7 @@ export const ConfigTab: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Advanced Section */}
@@ -358,40 +284,58 @@ export const ConfigTab: React.FC = () => {
                 <CardHeader className="pb-2">
                     <CardTitle>Advanced</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-1">
-                    <div className="flex items-center justify-between">
+                <div className="p-2">
+                    <div
+                        className={cn('flex items-center justify-between', {
+                            [nonDefaultStyling]:
+                                config.variables._pres_sense.value !==
+                                config.variables._pres_sense.default,
+                        })}
+                    >
                         <Label className="text-xs">
                             Check pressure with pressure sensor
                         </Label>
                         <Switch
-                            checked={config.advanced.checkPressure === 1}
+                            checked={config.variables._pres_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
-                                    advanced: {
-                                        ...config.advanced,
-                                        checkPressure: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _pres_sense: {
+                                            ...config.variables._pres_sense,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
                         />
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div
+                        className={cn('flex items-center justify-between', {
+                            [nonDefaultStyling]:
+                                config.variables._holder_sense.value !==
+                                config.variables._holder_sense.default,
+                        })}
+                    >
                         <Label className="text-xs">
                             Check tool presence in rack to prevent collision
                         </Label>
                         <Switch
-                            checked={config.advanced.checkToolPresence === 1}
+                            checked={config.variables._holder_sense.value === 1}
                             onChange={(checked) =>
                                 updateConfig({
-                                    advanced: {
-                                        ...config.advanced,
-                                        checkToolPresence: checked ? 1 : 0,
+                                    variables: {
+                                        ...config.variables,
+                                        _holder_sense: {
+                                            ...config.variables._holder_sense,
+                                            value: checked ? 1 : 0,
+                                        },
                                     },
                                 })
                             }
                         />
                     </div>
-                </CardContent>
+                </div>
             </Card>
 
             {/* Apply Section */}

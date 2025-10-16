@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/shadcn/input';
-import { Label } from 'app/components/shadcn/label';
+import { Input } from 'app/components/shadcn/Input';
+import { Label } from 'app/components/shadcn/Label';
 import { Position } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import { FiTarget } from 'react-icons/fi';
 

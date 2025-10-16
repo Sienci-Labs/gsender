@@ -47,7 +47,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {

@@ -31,6 +31,9 @@ class GrblHalLineParserResultCompleteStatus {
             payload.subState = subState || '';
         }
 
+        console.log(r);
+        console.log(result);
+
         // Machine Position (v0.9, v1.1)
         if (_.has(result, 'MPos')) {
             const axes = ['x', 'y', 'z', 'a', 'b', 'c'];

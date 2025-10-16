@@ -65,7 +65,7 @@ module.exports = {
                 exclude: /node_modules/
             },
             {
-                test: /\.jsx?$/,
+                test: /\.(jsx?|tsx?)$/,
                 loader: 'babel-loader',
                 options: babelConfig,
                 exclude: /node_modules/

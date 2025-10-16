@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import {
     Tabs,
@@ -8,6 +8,10 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
+import controller from 'app/lib/controller.ts';
+import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { toast } from 'app/lib/toaster';
 
 interface ConfigModalProps {
     open: boolean;
@@ -19,6 +23,25 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     onOpenChange,
 }) => {
     const [activeTab, setActiveTab] = useState('config');
+    const { updateConfig } = useConfigContext();
+
+    useEffect(() => {
+        // Set all config values to default, and then repopulate again from SD card.
+        controller.addListener('sdcard:json', (payload) => {
+            const updatedConfig = repopulateFromSDCard(payload.code);
+
+            updateConfig({
+                variables: { ...updatedConfig.variables },
+            });
+        });
+        controller.addListener('ymodem:error', (error) => {
+            toast.error('Error uploaded new config');
+        });
+        return () => {
+            controller.removeListener('sdcard:json');
+            controller.removeListener('ymodem:error');
+        };
+    }, []);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

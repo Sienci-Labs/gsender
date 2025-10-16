@@ -4,6 +4,8 @@ import { Badge } from 'app/components/shadcn/Badge';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import cn from 'classnames';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import GcodeViewer from 'app/components/GcodeViewer';
+import store from 'app/store';
 
 interface Template {
     name: string;
@@ -23,8 +25,9 @@ export const TemplatesTab: React.FC = () => {
     const [uploadError, setUploadError] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const defaultVersion = 20250909;
-    const versionMismatch = templates && templates?.version !== defaultVersion;
+    const defaultVersion = store.get('widgets.atc.templates.version', 20250909);
+    const versionMismatch =
+        templates && templates?.sdVersion !== defaultVersion;
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -181,11 +184,7 @@ export const TemplatesTab: React.FC = () => {
                     <div className="flex-1">
                         <div className="bg-gray-50 border rounded m-2 h-full overflow-auto">
                             {selectedTemplate ? (
-                                <div className="font-mono text-xs space-y-0 whitespace-nowrap p-3">
-                                    {renderLineNumbers(
-                                        selectedTemplate.content,
-                                    )}
-                                </div>
+                                <GcodeViewer gcode={selectedTemplate.content} />
                             ) : (
                                 <div className="text-center text-muted-foreground text-sm py-8">
                                     Select a macro to view its contents

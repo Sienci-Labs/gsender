@@ -10,7 +10,7 @@ import cx from 'classnames';
 
 interface RadioGroupProps
     extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> {
-    size: string;
+    size?: string;
 }
 
 const RadioGroup = React.forwardRef<

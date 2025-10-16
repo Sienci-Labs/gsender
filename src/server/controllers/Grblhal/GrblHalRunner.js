@@ -72,6 +72,7 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
+            sdFiles: [],
             alarmCode: '',
             subState: '',
             probeActive: false,
@@ -101,6 +102,10 @@ class GrblHalRunner extends events.EventEmitter {
             count: 0,
             axes: []
         },
+        sdcard: {
+            mounted: false,
+            files: []
+        }
     };
 
     settings = {
@@ -195,6 +200,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultStartup) {
+            this.emit('startup', payload);
             //this.emit('startup', payload, this.settings.version.semver);
             return;
         }
@@ -236,7 +242,6 @@ class GrblHalRunner extends events.EventEmitter {
             if (!_.isEqual(this.state.status, nextState.status)) {
                 this.state = nextState; // enforce change
             }
-
             this.emit('status', payload);
             return;
         }
@@ -255,7 +260,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultJSON) {
-            console.log(payload);
+            this.emit('json', payload);
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
@@ -449,6 +454,20 @@ class GrblHalRunner extends events.EventEmitter {
 
         if (type === GrblHalLineParserResultSDCard) {
             this.emit('sdcard', payload);
+            delete payload.raw;
+            const files = [...this.state.sdcard.files].filter(file => file.name !== payload.name);
+            files.push(payload);
+            const nextState = {
+                ...this.state,
+                sdcard: {
+                    ...this.state.sdcard,
+                    files
+                }
+            };
+            if (!_.isEqual(this.state.sdcard, nextState.sdcard)) {
+                this.state = nextState;
+            }
+
             return;
         }
 

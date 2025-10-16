@@ -114,6 +114,7 @@ export interface ControllerListeners {
     'job:stop': Array<Function>;
     'sdcard:files': Array<Function>;
     'sdcard:clear': Array<Function>;
+    'sdcard:json': Array<Function>
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -219,6 +220,7 @@ class Controller {
         'job:start': [],
         'sdcard:files': [],
         'sdcard:clear': [],
+        'sdcard:json': [],
         atci: [],
         'ymodem:start': [],
         'ymodem:complete': [],

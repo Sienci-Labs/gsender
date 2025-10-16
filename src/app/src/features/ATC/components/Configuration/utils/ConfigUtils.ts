@@ -28,15 +28,17 @@ function calculateOffsetValue(data: OffsetManagement): number {
 
 export function generateP100(config: ConfigState): Macro {
     const content = [
-        `#<_tc_slots> = ${config.toolRack.numberOfSlots}`,
-        `#<_tc_rack_enable> = ${config.toolRack.enabled}`,
-        `#<_tc_pres_sense> = ${config.advanced.checkPressure}`,
-        `#<_tc_holder_sense> = ${config.advanced.checkToolPresence}`,
-        `#<_passthrough_offset_setting> = ${config.toolRack.retainToolSettings}`,
-        `#<_ort_offset_mode> = ${calculateOffsetValue(config.offsetManagement)}`,
-        `#<_irt_offset_mode> = ${calculateOffsetValue(config.toolRack)}`,
-        `(msg, atci:rack_size:${config.toolRack.numberOfSlots})`,
+        `#<_tc_slots> = ${config.variables._tc_slots.value}`,
+        `#<_tc_rack_enable> = ${config.variables._tc_rack_enable.value}`,
+        `#<_pres_sense> = ${config.variables._pres_sense.value}`,
+        `#<_holder_sense> = ${config.variables._holder_sense.value}`,
+        `#<_tc_slot_offset> = ${config.variables._tc_slot_offset.value}`,
+        `#<_passthrough_offset_setting> = ${config.variables._passthrough_offset_setting.value}`,
+        `#<_ort_offset_mode> = ${config.variables._ort_offset_mode.value}`,
+        `#<_irt_offset_mode> = ${config.variables._irt_offset_mode.value}`,
+        `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
+
     const data = new Blob([content]);
 
     return {
@@ -80,7 +82,7 @@ export function generateAllMacros(config: ConfigState) {
 export function writeableATCIConfig(json: ATCIJSON): Macro {
     const data = new Blob([JSON.stringify(json) + '\n']);
     return {
-        name: 'ATCI.json',
+        name: 'ATCI.macro',
         data,
         size: data.size,
     };
@@ -88,12 +90,12 @@ export function writeableATCIConfig(json: ATCIJSON): Macro {
 
 export function populateATCIVariables(variables, config: ConfigState) {
     const populatedVariables = { ...variables };
+
     // Grab values from config
     populatedVariables._tc_slots.value = config.toolRack.numberOfSlots;
     populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
-    populatedVariables._tc_pres_sense.value = config.advanced.checkPressure;
-    populatedVariables._tc_holder_sense.value =
-        config.advanced.checkToolPresence;
+    populatedVariables._pres_sense.value = config.advanced.checkPressure;
+    populatedVariables._holder_sense.value = config.advanced.checkToolPresence;
     populatedVariables._tc_slot_offset.value = config.toolRack.slotOffset;
     populatedVariables._tc_rack_enable.value = config.toolRack.enabled;
     populatedVariables._passthrough_offset_setting.value =
@@ -114,7 +116,7 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         {},
     );
 
-    let variables = populateATCIVariables(templateConfig.variables, config);
+    let variables = { ...config.variables };
 
     const files = templateConfig.macros.map((macro) => macro.name);
 
@@ -124,4 +126,21 @@ export function generateATCIJSON(config: ConfigState): ATCIJSON {
         variables,
         files,
     };
+}
+
+export function repopulateFromSDCard(config) {
+    const storedValues = store.get('widgets.atc.templates', {});
+    const retrievedConfig = JSON.parse(config);
+    // Update config with retrieved values
+    const updatedConfig = {
+        ...storedValues,
+        sdVersion: retrievedConfig.version,
+    };
+    Object.entries(retrievedConfig.variables).forEach(([key, value]) => {
+        updatedConfig.variables[key].value = value.value; // Update the local value with the SD card value
+    });
+    console.log('updated');
+    console.log(updatedConfig);
+    store.replace('widgets.atc.templates', updatedConfig);
+    return updatedConfig;
 }

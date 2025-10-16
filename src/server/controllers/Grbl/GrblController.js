@@ -27,7 +27,6 @@ import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
 import GcodeToolpath from '../../lib/GcodeToolpath';
-// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import ToolChanger from '../../lib/ToolChanger';
@@ -82,7 +81,7 @@ import {
     FILE_TYPE,
     ALARM,
     ERROR
-} from '../../../app_old/constants';
+} from '../../../app/src/constants';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
@@ -778,7 +777,6 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                console.log(preferences);
 
                 this.emit('serialport:read', `error:${code} (${error?.message})`);
 
@@ -790,7 +788,6 @@ class GrblController {
                     }
 
                     if (preferences.showLineWarnings) {
-                        console.log('Pause branch');
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }

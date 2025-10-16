@@ -132,7 +132,10 @@ const Probe = ({ state, actions }: ProbeProps) => {
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
-                            <Tooltip content={`Probe using ${command.id}`}>
+                            <Tooltip
+                                content={`Probe using ${command.id}`}
+                                key={command.id}
+                            >
                                 <ShadcnButton
                                     key={command.id}
                                     onClick={() =>

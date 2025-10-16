@@ -3,16 +3,25 @@ import Button from 'app/components/Button';
 import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
 import { ConfigProvider } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { setConfig } from 'react-hot-loader';
+import controller from 'app/lib/controller.ts';
 
 export function ATCIConfiguration() {
     const [modalOpen, setModalOpen] = useState(false);
+
+    function onConfigOpen(isOpen) {
+        if (isOpen) {
+            controller.command('sdcard:read', 'ATCI.macro');
+        }
+        setModalOpen(isOpen);
+    }
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <ConfigProvider>
                 <div className="flex justify-center">
                     <Button
-                        onClick={() => setModalOpen(true)}
+                        onClick={() => onConfigOpen(true)}
                         className="flex items-center gap-2 text-black text-4xl"
                         variant="ghost"
                         size="lg"
@@ -21,7 +30,10 @@ export function ATCIConfiguration() {
                     </Button>
                 </div>
 
-                <ConfigModal open={modalOpen} onOpenChange={setModalOpen} />
+                <ConfigModal
+                    open={modalOpen}
+                    onOpenChange={(state) => onConfigOpen(state)}
+                />
             </ConfigProvider>
         </div>
     );
