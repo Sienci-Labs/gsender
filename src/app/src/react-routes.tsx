@@ -40,6 +40,7 @@ import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDialog';
 
 export const ReactRoutes = () => {
     return (
@@ -233,6 +234,7 @@ export const ReactRoutes = () => {
                 element={
                     <div className="flex flex-col gap-2">
                         <TopBar />
+                        <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
                         </div>

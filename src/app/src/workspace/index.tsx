@@ -41,6 +41,7 @@ import {
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
 import pubsub from 'pubsub-js';
+import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 
 const Workspace = () => {
     const location = useLocation();
@@ -388,6 +389,7 @@ const Workspace = () => {
     return (
         <div className="flex flex-col h-full dark:bg-slate-800">
             <TopBar />
+            <ConfirmationDialog />
             <DataCollection />
             <div className="flex h-full no-scrollbar ">
                 <Sidebar />
