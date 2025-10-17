@@ -5,6 +5,10 @@ import { ToolTimelineItem } from './ToolTimelineItem';
 import { ToolMapping, ToolTimelineProps } from './types';
 import { useEffect, useRef, useState } from 'react';
 import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
+import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 
 export function ToolTimeline({
     tools,
@@ -29,7 +33,30 @@ export function ToolTimeline({
         tools[0].toolNumber,
     );
 
+    // Tool Table
+    const [toolTable, setToolTable] = useState<ToolInstance[]>([]);
+    const [rackSize, setRackSize] = useState<number>(4);
+    const toolTableData = useTypedSelector(
+        (state: RootState) => state.controller.settings.toolTable,
+    );
+    useEffect(() => {
+        setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
+    }, [toolTableData, rackSize]);
+
+    // File tools
+    const [fileTools, setFileTools] = useState<Number[]>([]);
+    const fileToolSet = useTypedSelector(
+        (state: RootState) => state.file.toolSet,
+    );
+    useEffect(() => {
+        const fileToolNumbers = fileToolSet.map((tool) => {
+            return Number(tool.replace('T', ''));
+        });
+        setFileTools(fileToolNumbers);
+    }, [fileToolSet]);
+
     const handleRemapClick = (toolNumber: number) => {
+        console.log('setting tool:', toolNumber);
         setSelectedTool(toolNumber);
         setDialogOpen(true);
     };
@@ -133,13 +160,19 @@ export function ToolTimeline({
                                 open={dialogOpen}
                                 onOpenChange={setDialogOpen}
                                 originalTool={selectedTool}
-                                allTools={visibleTools}
-                                passedTools={visibleTools}
+                                allTools={toolTable}
+                                passedTools={fileTools}
                                 existingMappings={mappings}
                                 onConfirm={handleConfirmRemap}
                             />
                             {visibleTools.map((tool, index) => {
                                 const actualIndex = scrollIndex + index;
+                                const isRemapped = mappings.has(
+                                    tool.toolNumber,
+                                );
+                                const remapValue = mappings.get(
+                                    tool.toolNumber,
+                                );
                                 return (
                                     <ToolTimelineItem
                                         key={tool.id}
@@ -158,6 +191,8 @@ export function ToolTimeline({
                                         handleRemap={() =>
                                             handleRemapClick(tool.toolNumber)
                                         }
+                                        isRemapped={isRemapped}
+                                        remapValue={remapValue}
                                     />
                                 );
                             })}

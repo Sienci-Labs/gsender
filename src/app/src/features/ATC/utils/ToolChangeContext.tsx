@@ -53,7 +53,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     const [showTable, setShowTable] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
     const [currentTool, setCurrentTool] = useState<number>(-1);
-    const [rackSize, setRackSize] = useState<number>(0); // TODO:  This might appear in the firmware in the future, for now use reported macro value
+    const [rackSize, setRackSize] = useState<number>(0);
 
     const toolTableData = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -26,12 +26,13 @@ import {
 } from 'lucide-react';
 import cn from 'classnames';
 import type { Tool } from './types';
+import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 
 interface ToolRemapDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    originalTool: Tool;
-    allTools: Tool[];
+    originalTool: Number;
+    allTools: ToolInstance[];
     passedTools: number[];
     existingMappings: Map<number, number>;
     onConfirm: (fromTool: number, toTool: number) => void;
@@ -48,7 +49,7 @@ const statusConfig = {
         className:
             'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30',
     },
-    'off-rack': {
+    offrack: {
         label: 'Off-Rack',
         className:
             'bg-slate-500/20 text-slate-700 dark:text-slate-400 border-slate-500/30',
@@ -68,7 +69,7 @@ const toolStateStyles = {
         border: 'border-red-600',
         icon: XCircle,
     },
-    'off-rack': {
+    offrack: {
         bg: 'bg-yellow-100',
         text: 'text-yellow-700',
         border: 'border-yellow-500',
@@ -92,7 +93,7 @@ export function ToolRemapDialog({
     onConfirm,
 }: ToolRemapDialogProps) {
     const [selectedTool, setSelectedTool] = useState<string>('');
-    console.log(originalTool);
+    const [currentTool, setCurrentTool] = useState<Tool | null>(null);
 
     const handleConfirm = () => {
         if (selectedTool) {
@@ -121,11 +122,16 @@ export function ToolRemapDialog({
     };
 
     const getToolInfo = (toolNumber: number): Tool | undefined => {
-        return allTools.find((t) => t.number === toolNumber);
+        return allTools.find((t) => t.id === toolNumber);
     };
 
-    //  TODO: add logic to determine tool status
-    const originalStatus = statusConfig.probed;
+    useEffect(() => {
+        const tool = getToolInfo(originalTool);
+        setCurrentTool(tool);
+    }, [originalTool]);
+
+    const originalStatus = statusConfig[currentTool?.status] || 'unprobed';
+    console.log(originalStatus);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -148,17 +154,16 @@ export function ToolRemapDialog({
                             <SelectTrigger id="tool-select">
                                 <SelectValue placeholder="Select a tool" />
                             </SelectTrigger>
-                            <SelectContent className="z-[10000]">
+                            <SelectContent className="z-[10000] bg-white">
                                 {allTools.map((tool) => {
-                                    const available = isToolAvailable(
-                                        tool.toolNumber,
-                                    );
+                                    console.log(tool);
+                                    const available = isToolAvailable(tool.id);
 
                                     const isMapped = Array.from(
                                         existingMappings.values(),
-                                    ).includes(tool.toolNumber);
+                                    ).includes(tool.id);
                                     const isPassedTool = passedTools.includes(
-                                        tool.toolNumber,
+                                        tool.id,
                                     );
                                     const isUsed = isMapped || isPassedTool;
 
@@ -168,26 +173,37 @@ export function ToolRemapDialog({
                                               className:
                                                   'text-gray-600 border-gray-300',
                                           }
-                                        : statusConfig.probed;
-                                    /*const stateStyle = available
+                                        : statusConfig[tool.status];
+                                    if (tool.id === originalTool) {
+                                        status.label = 'Original';
+                                    }
+                                    if (isMapped) {
+                                        if (
+                                            tool.id ===
+                                            existingMappings.get(originalTool)
+                                        ) {
+                                            status.label == 'Current';
+                                        }
+                                    }
+
+                                    const stateStyle = available
                                         ? toolStateStyles[tool.status]
-                                        : toolStateStyles.disabled;*/
-                                    const stateStyle = toolStateStyles.disabled;
+                                        : toolStateStyles.disabled;
+                                    //const stateStyle = toolStateStyles[status];
+
                                     const IconComponent = stateStyle.icon;
 
                                     return (
                                         <SelectPrimitive.Item
-                                            key={tool.toolNumber}
-                                            value={tool.toolNumber.toString()}
+                                            key={tool.id}
+                                            value={tool.id.toString()}
                                             disabled={!available}
                                             className={cn(
-                                                'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                                                'relative flex w-full bg-white cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                                                 'border-l-4',
-                                                stateStyle.bg,
-                                                stateStyle.text,
                                                 stateStyle.border,
                                                 !available &&
-                                                    'opacity-60 cursor-not-allowed',
+                                                    'cursor-not-allowed',
                                             )}
                                             style={
                                                 !available
@@ -195,13 +211,13 @@ export function ToolRemapDialog({
                                                           backgroundImage:
                                                               'repeating-linear-gradient(45deg, rgb(249 250 251) 0, rgb(249 250 251) 6px, transparent 6px, transparent 12px)',
                                                       }
-                                                    : undefined
+                                                    : ''
                                             }
                                         >
                                             <SelectPrimitive.ItemText>
                                                 <div className="flex items-center justify-between gap-3 w-full pr-6">
                                                     <span className="font-mono font-medium">
-                                                        T{tool.number}
+                                                        T{tool.id}
                                                     </span>
                                                     <Badge
                                                         variant="outline"
@@ -215,11 +231,11 @@ export function ToolRemapDialog({
                                                     </Badge>
                                                 </div>
                                             </SelectPrimitive.ItemText>
-                                            <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-                                                <SelectPrimitive.ItemIndicator>
-                                                    <CheckCircle className="h-4 w-4" />
-                                                </SelectPrimitive.ItemIndicator>
-                                            </span>
+                                            {/*<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+                                                    <SelectPrimitive.ItemIndicator>
+                                                        <CheckCircle className="h-4 w-4" />
+                                                    </SelectPrimitive.ItemIndicator>
+                                                </span>*/}
                                         </SelectPrimitive.Item>
                                     );
                                 })}
@@ -249,7 +265,7 @@ export function ToolRemapDialog({
 
                         <div className="flex items-center gap-2">
                             <span className="font-mono font-semibold text-lg text-primary">
-                                T{selectedTool}
+                                {selectedTool && `T${selectedTool}`}
                             </span>
                             {getToolInfo(parseInt(selectedTool)) && (
                                 <Badge

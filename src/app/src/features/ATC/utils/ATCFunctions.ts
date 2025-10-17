@@ -6,7 +6,6 @@ import {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
-import { FIXED_RACK_SIZE } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');

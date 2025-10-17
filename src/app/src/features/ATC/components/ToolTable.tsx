@@ -20,7 +20,6 @@ import {
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import Button from 'app/components/Button';
-import { FIXED_RACK_SIZE } from 'app/features/ATC/utils/ATCiConstants.ts';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 
