@@ -2,8 +2,9 @@ import { ChevronDown, ChevronsDown, ChevronsUp, ChevronUp } from 'lucide-react';
 import cn from 'classnames';
 import { Button } from 'app/components/Button';
 import { ToolTimelineItem } from './ToolTimelineItem';
-import { ToolTimelineProps } from './types';
+import { ToolMapping, ToolTimelineProps } from './types';
 import { useEffect, useRef, useState } from 'react';
+import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
 
 export function ToolTimeline({
     tools,
@@ -20,6 +21,28 @@ export function ToolTimeline({
     const hasMoreTools = tools.length > maxVisibleTools;
     const canScrollUp = scrollIndex > 0;
     const canScrollDown = scrollIndex < tools.length - maxVisibleTools;
+
+    // Tool Remapping
+    const [mappings, setMappings] = useState<ToolMapping>(new Map());
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedTool, setSelectedTool] = useState<number>(0);
+
+    const handleRemapClick = (toolNumber: number) => {
+        setSelectedTool(toolNumber);
+        setDialogOpen(true);
+    };
+
+    const handleConfirmRemap = (fromTool: number, toTool: number) => {
+        setMappings((prev) => {
+            const newMappings = new Map(prev);
+            if (fromTool === toTool) {
+                newMappings.delete(fromTool);
+            } else {
+                newMappings.set(fromTool, toTool);
+            }
+            return newMappings;
+        });
+    };
 
     useEffect(() => {
         if (activeToolIndex < scrollIndex) {
@@ -104,6 +127,15 @@ export function ToolTimeline({
                                 cursor: hasMoreTools ? 'ns-resize' : 'default',
                             }}
                         >
+                            <ToolRemapDialog
+                                open={dialogOpen}
+                                onOpenChange={setDialogOpen}
+                                originalTool={selectedTool}
+                                allTools={visibleTools}
+                                passedTools={visibleTools}
+                                existingMappings={mappings}
+                                onConfirm={handleConfirmRemap}
+                            />
                             {visibleTools.map((tool, index) => {
                                 const actualIndex = scrollIndex + index;
                                 return (

@@ -1,11 +1,13 @@
 import cn from 'classnames';
 import { ToolChange } from './types';
+import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
     isActive: boolean;
     isLast: boolean;
     progress: number;
+    remapper?: JSX.Element;
 }
 
 export function ToolTimelineItem({
@@ -80,7 +82,7 @@ export function ToolTimelineItem({
                             >
                                 {tool.label || `Tool ${tool.toolNumber}`}
                             </span>
-                            {tool.startLine && (
+                            <div className="flex flex-col gap-2">
                                 <span
                                     className={cn(
                                         'transition-colors whitespace-nowrap text-xs font-medium opacity-100',
@@ -90,7 +92,7 @@ export function ToolTimelineItem({
                                     Line {tool.startLine}
                                     {tool.endLine && ` - ${tool.endLine}`}
                                 </span>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
