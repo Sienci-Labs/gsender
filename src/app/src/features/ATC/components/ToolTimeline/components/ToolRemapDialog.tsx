@@ -92,11 +92,12 @@ export function ToolRemapDialog({
     onConfirm,
 }: ToolRemapDialogProps) {
     const [selectedTool, setSelectedTool] = useState<string>('');
+    console.log(originalTool);
 
     const handleConfirm = () => {
         if (selectedTool) {
             const toTool = parseInt(selectedTool);
-            onConfirm(originalTool.number, toTool);
+            onConfirm(originalTool, toTool);
             setSelectedTool('');
             onOpenChange(false);
         }
@@ -108,7 +109,7 @@ export function ToolRemapDialog({
     };
 
     const isToolAvailable = (toolNumber: number): boolean => {
-        if (toolNumber === originalTool.toolNumber) return true;
+        if (toolNumber === originalTool) return true;
 
         const mappedTo = Array.from(existingMappings.values());
         if (mappedTo.includes(toolNumber)) return false;
@@ -128,12 +129,12 @@ export function ToolRemapDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] gap-2">
                 <DialogHeader>
-                    <DialogTitle>Remap Tool T{originalTool.number}</DialogTitle>
+                    <DialogTitle>Remap Tool T{originalTool}</DialogTitle>
                     <DialogDescription>
-                        Select a new tool number to remap T{originalTool.number}
-                        . Unavailable tools are shown but disabled.
+                        Select a new tool number to remap T{originalTool}.
+                        Unavailable tools are shown but disabled.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -147,13 +148,11 @@ export function ToolRemapDialog({
                             <SelectTrigger id="tool-select">
                                 <SelectValue placeholder="Select a tool" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[10000]">
                                 {allTools.map((tool) => {
                                     const available = isToolAvailable(
                                         tool.toolNumber,
                                     );
-
-                                    console.log(available);
 
                                     const isMapped = Array.from(
                                         existingMappings.values(),
@@ -233,7 +232,7 @@ export function ToolRemapDialog({
                     <div className="flex items-center justify-center gap-4">
                         <div className="flex items-center gap-2">
                             <span className="font-mono font-semibold text-lg">
-                                T{originalTool.number}
+                                T{originalTool}
                             </span>
                             <Badge
                                 variant="outline"

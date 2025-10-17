@@ -1,19 +1,22 @@
 import cn from 'classnames';
 import { ToolChange } from './types';
 import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
+import Button from 'app/components/Button';
+import { TbSwitch3 } from 'react-icons/tb';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
     isActive: boolean;
     isLast: boolean;
     progress: number;
-    remapper?: JSX.Element;
+    handleRemap?: (number) => void;
 }
 
 export function ToolTimelineItem({
     tool,
     isActive,
     isLast,
+    handleRemap,
 }: ToolTimelineItemProps) {
     return (
         <div className="relative">
@@ -92,6 +95,9 @@ export function ToolTimelineItem({
                                     Line {tool.startLine}
                                     {tool.endLine && ` - ${tool.endLine}`}
                                 </span>
+                                <Button onClick={handleRemap} size="xs">
+                                    <TbSwitch3 />
+                                </Button>
                             </div>
                         </div>
                     </div>

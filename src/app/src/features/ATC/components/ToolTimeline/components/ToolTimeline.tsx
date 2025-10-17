@@ -25,7 +25,9 @@ export function ToolTimeline({
     // Tool Remapping
     const [mappings, setMappings] = useState<ToolMapping>(new Map());
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedTool, setSelectedTool] = useState<number>(0);
+    const [selectedTool, setSelectedTool] = useState<number>(
+        tools[0].toolNumber,
+    );
 
     const handleRemapClick = (toolNumber: number) => {
         setSelectedTool(toolNumber);
@@ -152,6 +154,9 @@ export function ToolTimeline({
                                             actualIndex === activeToolIndex
                                                 ? progress
                                                 : 0
+                                        }
+                                        handleRemap={() =>
+                                            handleRemapClick(tool.toolNumber)
                                         }
                                     />
                                 );
