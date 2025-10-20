@@ -66,8 +66,14 @@
     "start": "cross-env ./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "node esbuild.config.js --watch",
+    "watch-electron-app": "node scripts/dev-hot-reload.js",
     "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
+    "start-dev:nodemon": "nodemon --exec 'cross-env NODE_ENV=development ./bin/gsender -vv -p 8000'",
     "dev": "concurrently --kill-others-on-fail --names \"build-dev,tailwind\" \"npm run build-dev && npm run start-dev\" \"npm run tailwind-dev\"",
+    "dev:hot": "npm run prebuild-dev && concurrently --kill-others-on-fail --names \"esbuild,server,tailwind,electron-app\" \"npm run watch-dev\" \"npm run start-dev:nodemon\" \"npm run tailwind-dev\" \"npm run watch-electron-app\"",
+    "vite:dev": "cd src/app && vite --port 5173 --host",
+    "electron:dev": "npm run build-dev && cross-env NODE_ENV=development electron ./output/main",
+    "electron:hot": "npm run build-dev && concurrently --kill-others-on-fail --names \"esbuild,electron,vite,electron-app\" \"npm run watch-dev\" \"cross-env NODE_ENV=development electron ./output/main\" \"npm run vite:dev\" \"npm run watch-electron-app\"",
     "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
     "lint": "concurrently --kill-others-on-fail --names \"eslint,stylint\"\"yarn run eslint\" \"yarn run stylint\"",
     "eslint": "npm run eslint:build",
@@ -94,6 +100,14 @@
     "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
+    "compression": "maximum",
+    "removePackageScripts": true,
+    "buildDependenciesFromSource": false,
+    "files": [
+      "**/*",
+      "electron-app/**/*",
+      "!**/*.map"
+    ],
     "extraResources": [
       "./node_modules/@electron/remote/**"
     ],
@@ -120,13 +134,17 @@
       "target": [
         "dmg"
       ],
-      "icon": "electron-build/icon.icns"
+      "icon": "electron-build/icon.icns",
+      "electronUpdaterCompatibility": ">=2.16",
+      "darkModeSupport": true,
+      "mergeASARs": false
     },
     "dmg": {
       "background": "electron-build/background.png",
       "icon": "electron-build/icon.icns",
       "iconSize": 80,
       "iconTextSize": 12,
+      "writeUpdateInfo": false,
       "contents": [
         {
           "x": 448,
@@ -410,6 +428,7 @@
     "babel-plugin-lodash": "~3.3.4",
     "boolean": "~1.0.0",
     "bundle-loader": "~0.5.6",
+    "chokidar": "^4.0.3",
     "concurrently": "~4.1.0",
     "coveralls": "~3.0.3",
     "cross-env": "^5.2.1",
@@ -419,6 +438,7 @@
     "dotenv": "~7.0.0",
     "electron": "^33.2.0",
     "electron-builder": "~23.6.0",
+    "electron-reloader": "^1.2.3",
     "esbuild": "^0.25.10",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
@@ -440,6 +460,7 @@
     "mini-css-extract-plugin": "~0.6.0",
     "nib": "~1.1.2",
     "node-gyp": "^9.3.1",
+    "nodemon": "^3.1.10",
     "optimize-css-assets-webpack-plugin": "~5.0.1",
     "progress": "~2.0.3",
     "raw-loader": "^4.0.2",
