@@ -118,6 +118,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Job stats update function altered to prevent situations where jobs would get lost when the array becomes too large
 - Reverted removing early M6 commands
 - Start job shortcut fixed to work on controllers for grblHAL devices
+- Probe diameter cycle shortcut working again
 - Updating values does not remove custom jog values on carve page  
 - Added way to change default units on remote view
 - Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode
