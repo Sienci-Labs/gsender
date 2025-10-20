@@ -15,7 +15,6 @@ export const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const blocker = new Blocker();
-    console.log(settingsAreDirty);
 
     const proceed = () => {
         blocker.proceed();
