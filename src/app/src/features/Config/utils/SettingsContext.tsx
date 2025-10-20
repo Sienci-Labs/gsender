@@ -20,7 +20,6 @@ import isEqual from 'lodash/isEqual';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import {
     EEPROM,
-    EEPROMSettings,
     FilteredEEPROM,
     FIRMWARE_TYPES_T,
     MachineProfile,
@@ -36,7 +35,7 @@ interface iSettingsContext {
     rawEEPROM: object;
     firmwareType: FIRMWARE_TYPES_T;
     setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
-    setEEPROM?: React.Dispatch<React.SetStateAction<EEPROMSettings>>;
+    setEEPROM?: React.Dispatch<React.SetStateAction<FilteredEEPROM[]>>;
     connected: boolean;
     settingsAreDirty: boolean;
     setSettingsAreDirty?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,8 +47,8 @@ interface iSettingsContext {
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
-    eepromIsDefault: (v: object) => boolean;
-    isSettingDefault: (v: object) => boolean;
+    eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
+    isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
 }
 
@@ -65,7 +64,7 @@ const defaultState: iSettingsContext = {
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
-    isSettingDefault(v: object): boolean {
+    isSettingDefault(_v: object): boolean {
         return false;
     },
     rawEEPROM: {},
