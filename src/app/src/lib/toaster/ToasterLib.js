@@ -34,6 +34,7 @@ export const TOASTER_SHORT = 2000;
 export const TOASTER_DEFAULT = 5000;
 export const TOASTER_LONG = 10000;
 export const TOASTER_UNTIL_CLOSE = -1;
+export const TOASTER_DISABLED = -2;
 
 export const Toaster = {
     pop: (options) => {
