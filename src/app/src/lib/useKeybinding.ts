@@ -7,6 +7,8 @@ import {
     ShuttleControlEvents,
     ShuttleEvent,
 } from './definitions/shortcuts';
+import reduxStore from 'app/store/redux';
+import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
 
 const TARGET_NUM_CALLS = 15; // this is the current number of times that useKeybinding is called throughout the program
 let numCalls = 0; // number of useKeybinding hooks that have been called
@@ -91,6 +93,9 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
 function checkNumCalls(): void {
     if (numCalls === TARGET_NUM_CALLS) {
         removeOldKeybindings();
+        reduxStore.dispatch(
+            updateShuttleStatus({ isFinished: true })
+        );
     }
 }
 

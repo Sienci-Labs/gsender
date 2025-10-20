@@ -233,3 +233,7 @@ export interface ConsoleState {
     history: string[];
     inputHistory: string[];
 }
+
+export interface ShortcutSliceState {
+    isFinished: boolean
+}
