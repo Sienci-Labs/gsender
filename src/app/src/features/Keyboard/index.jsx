@@ -1,12 +1,11 @@
-import React, { useRef } from 'react';
-import ReactToPrint from 'react-to-print';
-import { Button } from 'react-bootstrap';
-
-import PrintableShortcuts from './printableShortcuts';
+import { useEffect, useState } from 'react';
 import KeyboardShortcuts from './Keyboard';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import pubsub from 'pubsub-js';
 
 const Shortcuts = () => {
-    const componentRef = useRef();
+    const { isFinished } = useTypedSelector((state) => state.shortcuts);
+    // const componentRef = useRef();
 
     return (
         <>
@@ -22,7 +21,7 @@ const Shortcuts = () => {
                     <PrintableShortcuts ref={componentRef} />
                 </div> */}
 
-            <KeyboardShortcuts />
+            {isFinished && <KeyboardShortcuts />}
         </>
     );
 };
