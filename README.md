@@ -124,6 +124,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Various portrait mode look and feel changes
 - Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off
 - Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)
+- Future updates should again be appearing in-app when they become available.
 
 
 ### 1.5.5 (September 24, 2025)
