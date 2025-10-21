@@ -1,17 +1,27 @@
 import cn from 'classnames';
 import { ToolChange } from './types';
+import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
+import Button from 'app/components/Button';
+import { TbSwitch3 } from 'react-icons/tb';
+import { ArrowRight } from 'lucide-react';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
     isActive: boolean;
     isLast: boolean;
     progress: number;
+    isRemapped: boolean;
+    remapValue?: number;
+    handleRemap?: (number) => void;
 }
 
 export function ToolTimelineItem({
     tool,
     isActive,
     isLast,
+    handleRemap,
+    isRemapped,
+    remapValue,
 }: ToolTimelineItemProps) {
     return (
         <div className="relative">
@@ -70,17 +80,29 @@ export function ToolTimelineItem({
 
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                            <span
+                            <div
                                 className={cn(
-                                    'font-semibold transition-colors',
+                                    'font-semibold transition-colors flex flex-row gap-1 items-center',
                                     isActive
                                         ? 'text-sm text-gray-900 dark:text-white'
                                         : 'text-xs text-gray-700 dark:text-gray-300',
                                 )}
                             >
-                                {tool.label || `Tool ${tool.toolNumber}`}
-                            </span>
-                            {tool.startLine && (
+                                <span
+                                    className={cn(isRemapped && 'line-through')}
+                                >
+                                    {tool.label || `Tool ${tool.toolNumber}`}
+                                </span>
+                                {isRemapped && (
+                                    <>
+                                        <ArrowRight />
+                                        <span className="no-underline">
+                                            T{remapValue}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                            <div className="flex flex-col gap-2">
                                 <span
                                     className={cn(
                                         'transition-colors whitespace-nowrap text-xs font-medium opacity-100',
@@ -90,7 +112,10 @@ export function ToolTimelineItem({
                                     Line {tool.startLine}
                                     {tool.endLine && ` - ${tool.endLine}`}
                                 </span>
-                            )}
+                                <Button onClick={handleRemap} size="xs">
+                                    <TbSwitch3 />
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

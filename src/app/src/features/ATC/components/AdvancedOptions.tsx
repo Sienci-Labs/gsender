@@ -21,11 +21,6 @@ export function AdvancedOptions() {
     } = useToolChange();
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleLoadAndSave = () => {
-        setLoadToolMode('loadAndSave');
-        setLoadToolOpen(true);
-    };
-
     const handleSaveToRack = () => {
         setLoadToolMode('save');
         setLoadToolOpen(true);
@@ -62,10 +57,10 @@ export function AdvancedOptions() {
                         <Button
                             onClick={releaseToolFromSpindle}
                             size="sm"
-                            disabled={disabled}
+                            disabled={disabled || currentTool === 0}
                             variant="primary"
                         >
-                            Release from Spindle
+                            Unload Tool Manually
                         </Button>
 
                         <Button
@@ -74,16 +69,7 @@ export function AdvancedOptions() {
                             disabled={disabled}
                             variant="primary"
                         >
-                            Save to Rack
-                        </Button>
-
-                        <Button
-                            onClick={handleLoadAndSave}
-                            size="sm"
-                            disabled={loadAndSaveDisabled}
-                            variant="primary"
-                        >
-                            Load and Save to Rack
+                            Load Tool Manually
                         </Button>
                     </div>
                 </CollapsibleContent>

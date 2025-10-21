@@ -14,3 +14,12 @@ export interface ToolTimelineProps {
     onToggle?: () => void;
     isCollapsed?: boolean;
 }
+
+export type ToolStatus = 'probed' | 'unprobed' | 'off-rack';
+
+export interface Tool {
+    number: number;
+    status: ToolStatus;
+}
+
+export type ToolMapping = Map<number, number>;

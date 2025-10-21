@@ -6,7 +6,6 @@ import {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
-import { FIXED_RACK_SIZE } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');
@@ -104,7 +103,7 @@ export function loadAndSaveToRack(toolID) {
 }
 
 export function saveToRack(toolID) {
-    controller.command('gcode', [`G65 P902 Q${toolID}`, '$#']);
+    controller.command('gcode', [`G65 P901 Q${toolID}`, '$#']);
 }
 
 export type LoadToolMode = 'load' | 'save' | 'loadAndSave';
