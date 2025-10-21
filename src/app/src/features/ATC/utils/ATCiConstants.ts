@@ -24,7 +24,7 @@ export interface ToolStateThemes {
 }
 
 import { FaCheckCircle, FaExclamationCircle, FaBan } from 'react-icons/fa';
-import { PiHandTap } from 'react-icons/pi';
+import { PiEmpty, PiHandTap } from 'react-icons/pi';
 import { MdRefresh } from 'react-icons/md';
 import { IoFlash } from 'react-icons/io5';
 
@@ -68,12 +68,12 @@ export const toolStateThemes: ToolStateThemes = {
     },
 
     empty: {
-        label: 'Used',
-        backgroundColor: 'bg-gray-600/20',
-        borderColor: 'border-gray-800',
-        textColor: 'text-black',
+        label: 'Empty',
+        backgroundColor: 'bg-gray-400/20',
+        borderColor: 'border-gray-600',
+        textColor: 'text-gray-600',
         backgroundStyle: 'solid',
-        icon: MdRefresh,
+        icon: PiEmpty,
     },
 
     current: {
