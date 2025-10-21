@@ -3,16 +3,18 @@ import { ToolDisplay } from 'app/features/ATC/components/ToolDisplay.tsx';
 import { AdvancedOptions } from 'app/features/ATC/components/AdvancedOptions.tsx';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ATCUnavailable } from 'app/features/ATC/components/ATCUnavailable.tsx';
-import { Disconnected } from 'app/features/ATC/components/Disconnected.tsx';
 import { ATCIConfiguration } from 'app/features/ATC/components/Configuration';
 import { useEffect, useState } from 'react';
 import { ATCStartValidations } from 'app/features/ATC/components/ATCStartValidations.tsx';
 import pubsub from 'pubsub-js';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { getATCUnavailablePayload } from 'app/features/ATC/utils';
 
 export function ATC() {
     const { atcAvailable, connected } = useToolChange();
     const [showValidator, setShowValidator] = useState(false);
     const [validationPayload, setValidationPayload] = useState({});
+    const isHomed = useTypedSelector((state) => state.controller.homingFlag);
 
     useEffect(() => {
         pubsub.subscribe('atc_validator', (k, payload) => {
@@ -24,11 +26,14 @@ export function ATC() {
         };
     }, []);
 
-    if (!connected) {
-        return <Disconnected />;
-    }
-    if (!atcAvailable) {
-        return <ATCUnavailable />;
+    const unavailableATCPayload = getATCUnavailablePayload({
+        isConnected: connected,
+        isATCAvailable: atcAvailable,
+        isHomed: isHomed,
+    });
+
+    if (unavailableATCPayload !== null) {
+        return <ATCUnavailable payload={unavailableATCPayload} />;
     }
 
     return (
