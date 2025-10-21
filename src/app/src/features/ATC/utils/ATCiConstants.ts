@@ -101,5 +101,5 @@ export const stripePatterns = {
 // Helper function to get combined class names
 export const getToolStateClasses = (state: keyof ToolStateThemes): string => {
     const theme = toolStateThemes[state];
-    return `${theme.backgroundColor} ${theme.borderColor} ${theme.textColor} border-2`;
+    return `${theme.backgroundColor} ${theme.borderColor} ${theme.textColor}`;
 };

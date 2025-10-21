@@ -27,6 +27,11 @@ import {
 import cn from 'classnames';
 import type { Tool } from './types';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
+import {
+    getToolStateClasses,
+    toolStateThemes,
+} from 'app/features/ATC/utils/ATCiConstants.ts';
+import { undefined } from 'zod';
 
 interface ToolRemapDialogProps {
     open: boolean;
@@ -38,51 +43,6 @@ interface ToolRemapDialogProps {
     onConfirm: (fromTool: number, toTool: number) => void;
 }
 
-const statusConfig = {
-    probed: {
-        label: 'Probed',
-        className:
-            'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
-    },
-    unprobed: {
-        label: 'Unprobed',
-        className:
-            'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30',
-    },
-    offrack: {
-        label: 'Off-Rack',
-        className:
-            'bg-slate-500/20 text-slate-700 dark:text-slate-400 border-slate-500/30',
-    },
-};
-
-const toolStateStyles = {
-    probed: {
-        bg: 'bg-green-100',
-        text: 'text-green-700',
-        border: 'border-green-600',
-        icon: CheckCircle,
-    },
-    unprobed: {
-        bg: 'bg-red-100',
-        text: 'text-red-700',
-        border: 'border-red-600',
-        icon: XCircle,
-    },
-    offrack: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-700',
-        border: 'border-yellow-500',
-        icon: AlertTriangle,
-    },
-    disabled: {
-        bg: 'bg-gray-100',
-        text: 'text-gray-500',
-        border: 'border-gray-400',
-        icon: Ban,
-    },
-};
-
 export function ToolRemapDialog({
     open,
     onOpenChange,
@@ -93,7 +53,10 @@ export function ToolRemapDialog({
     onConfirm,
 }: ToolRemapDialogProps) {
     const [selectedTool, setSelectedTool] = useState<string>('');
-    const [currentTool, setCurrentTool] = useState<Tool | null>(null);
+    const [currentTool, setCurrentTool] = useState<Tool>({
+        number: 0,
+        status: 'current',
+    });
 
     const handleConfirm = () => {
         if (selectedTool) {
@@ -130,7 +93,8 @@ export function ToolRemapDialog({
         setCurrentTool(tool);
     }, [originalTool]);
 
-    const originalStatus = statusConfig[currentTool?.status] || 'unprobed';
+    const originalStatus =
+        toolStateThemes[currentTool?.status] || toolStateThemes['error'];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -155,6 +119,7 @@ export function ToolRemapDialog({
                             </SelectTrigger>
                             <SelectContent className="z-[10000] bg-white">
                                 {allTools.map((tool) => {
+                                    tool = { ...tool };
                                     const available = isToolAvailable(tool.id);
 
                                     const isMapped = Array.from(
@@ -165,29 +130,15 @@ export function ToolRemapDialog({
                                     );
                                     const isUsed = isMapped || isPassedTool;
 
-                                    const status = isUsed
-                                        ? {
-                                              label: 'Used',
-                                              className:
-                                                  'text-gray-600 border-gray-300',
-                                          }
-                                        : statusConfig[tool.status];
-                                    if (tool.id === originalTool) {
-                                        status.label = 'Original';
-                                    }
-                                    if (isMapped) {
-                                        if (
-                                            tool.id ===
-                                            existingMappings.get(originalTool)
-                                        ) {
-                                            status.label == 'Current';
-                                        }
+                                    if (isUsed) {
+                                        tool.status = 'used';
                                     }
 
+                                    //const status = toolStateThemes[tool.status];
+
                                     const stateStyle = available
-                                        ? toolStateStyles[tool.status]
-                                        : toolStateStyles.disabled;
-                                    //const stateStyle = toolStateStyles[status];
+                                        ? toolStateThemes[tool.status]
+                                        : toolStateThemes.used;
 
                                     const IconComponent = stateStyle.icon;
 
@@ -221,11 +172,13 @@ export function ToolRemapDialog({
                                                         variant="outline"
                                                         className={cn(
                                                             'text-xs font-medium flex items-center gap-1.5 shrink-0 w-24 justify-center',
-                                                            status.className,
+                                                            getToolStateClasses(
+                                                                tool.status,
+                                                            ),
                                                         )}
                                                     >
-                                                        <IconComponent className="h-3.5 w-3.5" />
-                                                        {status.label}
+                                                        <IconComponent className="h-4 w-4" />
+                                                        {stateStyle.label}
                                                     </Badge>
                                                 </div>
                                             </SelectPrimitive.ItemText>
@@ -250,10 +203,7 @@ export function ToolRemapDialog({
                             </span>
                             <Badge
                                 variant="outline"
-                                className={cn(
-                                    'text-xs font-medium',
-                                    originalStatus.className,
-                                )}
+                                className={cn('text-xs font-medium')}
                             >
                                 {originalStatus.label}
                             </Badge>
@@ -270,14 +220,14 @@ export function ToolRemapDialog({
                                     variant="outline"
                                     className={cn(
                                         'text-xs font-medium',
-                                        statusConfig[
+                                        getToolStateClasses(
                                             getToolInfo(parseInt(selectedTool))!
-                                                .status
-                                        ].className,
+                                                .status,
+                                        ),
                                     )}
                                 >
                                     {
-                                        statusConfig[
+                                        toolStateThemes[
                                             getToolInfo(parseInt(selectedTool))!
                                                 .status
                                         ].label

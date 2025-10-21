@@ -45,15 +45,15 @@ export function updateToolchangeContext(mappings = null) {
     };
 
     if (mappings) {
-        console.log('I am mappings');
-        const plainObject = Array.from(mappings).reduce((obj, [key, value]) => {
-            obj[key] = value;
-            return obj;
-        }, {} as Record<number, number>);
+        const plainObject = Array.from(mappings).reduce(
+            (obj, [key, value]) => {
+                obj[key] = value;
+                return obj;
+            },
+            {} as Record<number, number>,
+        );
 
         context.mappings = plainObject;
-        console.log(mappings);
-        console.log(context);
     }
 
     controller.command('toolchange:context', context);
