@@ -22,6 +22,7 @@ import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import Button from 'app/components/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { getToolStateClasses } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export type ToolStatus = 'probed' | 'unprobed' | 'offrack';
 
@@ -131,6 +132,9 @@ const ToolSection = ({
                                     <TableCell>
                                         <ProbeButton
                                             status={tool.status}
+                                            className={getToolStateClasses(
+                                                tool.status,
+                                            )}
                                             onProbe={() =>
                                                 probeRackTool(tool.id)
                                             }
