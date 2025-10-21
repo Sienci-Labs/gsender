@@ -9,6 +9,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
+import {updateToolchangeContext} from "app/features/Helper/Wizard.tsx";
 
 export function ToolTimeline({
     tools,
@@ -56,7 +57,6 @@ export function ToolTimeline({
     }, [fileToolSet]);
 
     const handleRemapClick = (toolNumber: number) => {
-        console.log('setting tool:', toolNumber);
         setSelectedTool(toolNumber);
         setDialogOpen(true);
     };
@@ -69,6 +69,8 @@ export function ToolTimeline({
             } else {
                 newMappings.set(fromTool, toTool);
             }
+            console.log('New mappings:', newMappings);
+            updateToolchangeContext(newMappings)
             return newMappings;
         });
     };

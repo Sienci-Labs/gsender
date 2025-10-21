@@ -131,7 +131,6 @@ export function ToolRemapDialog({
     }, [originalTool]);
 
     const originalStatus = statusConfig[currentTool?.status] || 'unprobed';
-    console.log(originalStatus);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -156,7 +155,6 @@ export function ToolRemapDialog({
                             </SelectTrigger>
                             <SelectContent className="z-[10000] bg-white">
                                 {allTools.map((tool) => {
-                                    console.log(tool);
                                     const available = isToolAvailable(tool.id);
 
                                     const isMapped = Array.from(

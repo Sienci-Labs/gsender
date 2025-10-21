@@ -265,7 +265,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             const [atcInvalid, payload] = validateATC();
             if (atcInvalid) {
                 pubsub.publish('atc_validator', payload);
-                console.log(payload);
                 return;
             }
             controller.command('gcode:start');

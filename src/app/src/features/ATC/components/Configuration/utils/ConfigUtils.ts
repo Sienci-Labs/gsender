@@ -139,8 +139,6 @@ export function repopulateFromSDCard(config) {
     Object.entries(retrievedConfig.variables).forEach(([key, value]) => {
         updatedConfig.variables[key].value = value.value; // Update the local value with the SD card value
     });
-    console.log('updated');
-    console.log(updatedConfig);
     store.replace('widgets.atc.templates', updatedConfig);
     return updatedConfig;
 }

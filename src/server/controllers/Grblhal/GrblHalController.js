@@ -497,6 +497,15 @@ class GrblHalController {
                     }
 
                     let tool = line.match(toolCommand);
+                    console.log('found tool:', tool);
+                    if (tool && this.toolChangeContext.mappings) {
+                        const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
+                        if (remap) {
+                            console.log('found remap:', remap);
+                            line = line.replace(tool[0], `T${remap}`);
+                            console.log('remapped line', line);
+                        }
+                    }
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
@@ -1617,6 +1626,9 @@ class GrblHalController {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }
 
+                // Reset mappings on file load
+                this.toolChangeContext.mappings = {};
+
                 const ok = this.sender.load(name, gcode + '\n', context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
@@ -2275,7 +2287,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                this.toolChangeContext = context;
+                this.toolChangeContext = { ...this.toolChangeContext, context };
             },
             'toolchange:pre': () => {
                 log.debug('Starting pre hook');
