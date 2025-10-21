@@ -89,12 +89,15 @@ export function ToolRemapDialog({
     };
 
     useEffect(() => {
+        console.log('OT', originalTool);
         const tool = getToolInfo(originalTool);
+        console.log(tool);
         setCurrentTool(tool);
     }, [originalTool]);
 
     const originalStatus =
-        toolStateThemes[currentTool?.status] || toolStateThemes['error'];
+        toolStateThemes[currentTool.status] || toolStateThemes['current'];
+    console.log(originalStatus);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
