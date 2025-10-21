@@ -43,14 +43,11 @@ export const TemplatesTab: React.FC = () => {
             try {
                 const content = e.target?.result as string;
                 const data = JSON.parse(content) as TemplateData;
-                console.log(data);
 
                 // Validate the structure
                 if (!data.version || !Array.isArray(data.macros)) {
                     throw new Error('Invalid template file structure');
                 }
-
-                console.log('templates', templates);
 
                 data.sdVersion = templates.sdVersion;
                 setTemplates(data);
@@ -59,7 +56,6 @@ export const TemplatesTab: React.FC = () => {
                 setUploadError('');
             } catch (error) {
                 setUploadError('Invalid JSON file or incorrect structure');
-                console.error('Template upload error:', error);
             }
         };
         reader.readAsText(file);
