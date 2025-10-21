@@ -60,6 +60,7 @@ export function ToolTimeline({
     useEffect(() => {
         pubsub.subscribe('file:load', () => {
             setMappings(new Map());
+            updateToolchangeContext(new Map())
         })
         return () => {
             pubsub.unsubscribe('file:loaded');
