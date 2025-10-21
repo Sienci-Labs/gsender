@@ -94,8 +94,7 @@ export function ToolRemapDialog({
     }, [originalTool]);
 
     const originalStatus =
-        toolStateThemes[currentTool.status] || toolStateThemes['current'];
-    console.log(originalStatus);
+        toolStateThemes[currentTool?.status] || toolStateThemes['current'];
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -206,7 +205,7 @@ export function ToolRemapDialog({
                                 variant="outline"
                                 className={cn(
                                     'text-xs font-medium',
-                                    getToolStateClasses(currentTool.status),
+                                    getToolStateClasses(currentTool?.status),
                                 )}
                             >
                                 {originalStatus.label}
