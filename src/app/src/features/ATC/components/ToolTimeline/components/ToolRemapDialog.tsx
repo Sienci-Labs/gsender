@@ -89,9 +89,7 @@ export function ToolRemapDialog({
     };
 
     useEffect(() => {
-        console.log('OT', originalTool);
         const tool = getToolInfo(originalTool);
-        console.log(tool);
         setCurrentTool(tool);
     }, [originalTool]);
 
@@ -206,7 +204,10 @@ export function ToolRemapDialog({
                             </span>
                             <Badge
                                 variant="outline"
-                                className={cn('text-xs font-medium')}
+                                className={cn(
+                                    'text-xs font-medium',
+                                    getToolStateClasses(currentTool.status),
+                                )}
                             >
                                 {originalStatus.label}
                             </Badge>
