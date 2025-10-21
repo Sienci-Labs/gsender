@@ -62,6 +62,7 @@ import {
     SPINDLE_LASER_T,
 } from 'app/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import { TOASTER_DISABLED, TOASTER_LONG, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 
 export interface SettingsMenuSection {
     label: string;
@@ -361,6 +362,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show upcoming maintenance tasks at the end of each job.',
                         type: 'boolean',
+                    },
+                    {
+                        label: 'Pop-up notification duration',
+                        key: 'workspace.toastDuration',
+                        description:
+                            `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
+                        type: 'number',
+                        defaultValue: 0,
+                        min: TOASTER_DISABLED,
+                        max: TOASTER_LONG,
                     },
                 ],
             },

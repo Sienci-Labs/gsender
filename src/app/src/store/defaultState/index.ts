@@ -159,6 +159,7 @@ const defaultState: State = {
         },
         park: { x: 0, y: 0, z: 0 },
         notifications: [],
+        toastDuration: 0,
         enableDarkMode: false,
     },
     widgets: {

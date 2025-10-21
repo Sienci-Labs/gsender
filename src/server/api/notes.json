@@ -1,5 +1,22 @@
 [
   {
+    "version": "1.5.6",
+    "date": "October 20th, 2025",
+    "notes": [
+      "Fixed issue with surfacing tool inputs not using latest input values when generating gcode",
+      "Job stats update function altered to prevent situations where jobs would get lost when the array becomes too large",
+      "Reverted removing early M6 commands",
+      "Start job shortcut fixed to work on controllers for grblHAL devices",
+      "Updating values does not remove custom jog values on carve page",
+      "Added way to change default units on remote view",
+      "Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode",
+      "Various portrait mode look and feel changes",
+      "Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off",
+      "Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)",
+      "Future updates should again be appearing in-app when they become available."
+    ]
+  },
+  {
     "version": "1.5.5",
     "date": "September 24, 2025",
     "notes": [
@@ -35,42 +52,6 @@
       "Copy button works on electron versions on Windows in remote mode dialog",
       "Rotary surfacing gcode generation adjusted to fix some cases of incorrect movements",
       "Various styling and copy adjustments."
-    ]
-  },
-  {
-    "version": "1.5.3",
-    "date": "August 4, 2025",
-    "notes": [
-      "Outline runs if visualizer disabled in lightweight mode",
-      "Added new config option for outline - can now run detailed (old routines, travels rough shape of toolpath) or square (the bounding box)",
-      "Alterations to connection to make grbl detection more robust.  FluidNC should now catch as grbl.",
-      "Fixed unit miscalculation on file stats",
-      "Remote mode configuration made more robust to reduce situations where the app fails to start.",
-      "Unit conversion fixes in squaring and calibration tools",
-      "Stock turning and Probe rotary properly disable when in non-rotary mode",
-      "Jog presets in config now reflect selected Carve screen units.",
-      "Units again appear in config when connected to grbl board.",
-      "Fixed load state issue when previous file was paused",
-      "Corner selection in probing now persists between gSender sessions.",
-      "Re-added the bad file and bad line detection with some improvements.  They should now appear in the Helper.",
-      "Rename rotary install track length to appropriate value",
-      "Stats connection summary formatted correctly for ethernet connection.",
-      "Firmware settings imports now apply immediately on import.",
-      "Gamepad profiles now represent the button name if known instead of just numbers.",
-      "Visualizer grid now respects carve screen units.",
-      "Visualizer colours now correct with Light visualizer theme.",
-      "Spindle dropdown again reflects the current firmware spindle.",
-      "AXS parsing should be more robust on grblHAL devices.",
-      "Fixed edge cases in surfacing generation that could miss strip in center.",
-      "Spindle/Laser toggle behaviour more closely matches 1.4.12 implementation.",
-      "Z jogging popup re-added to calibration tools.",
-      "Various config sorting and filtering changes.",
-      "Load File area looks a little better in dark mode.",
-      "Fixed cases where visualizer could go blank and not re-appear until toggling camera.",
-      "Added spindle delay option to rotary surfacing tool.",
-      "Plus and Minus buttons behaviour tweaks on jog feeds and distances",
-      "Force Hard and Soft Limits config options type updated and no longer crash the application.",
-      "Various look and feel and text changes."
     ]
   }
 ]

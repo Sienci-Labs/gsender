@@ -113,6 +113,21 @@ gSender is also designed in a way that it can be run locally on your computer br
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.5.6 (October 20th, 2025)
+- Fixed issue with surfacing tool inputs not using latest input values when generating gcode
+- Job stats update function altered to prevent situations where jobs would get lost when the array becomes too large
+- Reverted removing early M6 commands
+- Start job shortcut fixed to work on controllers for grblHAL devices
+- Probe diameter cycle shortcut working again
+- Updating values does not remove custom jog values on carve page  
+- Added way to change default units on remote view
+- Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode
+- Various portrait mode look and feel changes
+- Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off
+- Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)
+- Future updates should again be appearing in-app when they become available.
+
+
 ### 1.5.5 (September 24, 2025)
 - New probe type, 3D Probe added, with future plans to support more than standard XYZ probing
 - All probing cycles now sped up with reduced delays and reduced default retracts to 2mm

@@ -38,6 +38,7 @@ import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDialog';
 import { BiSolidCylinder } from 'react-icons/bi';
 import SDCard from 'app/features/SDCard';
 import { FaSdCard } from 'react-icons/fa';
@@ -255,6 +256,7 @@ export const ReactRoutes = () => {
                 element={
                     <div className="flex flex-col gap-2">
                         <TopBar />
+                        <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
                         </div>
