@@ -17,6 +17,7 @@ export interface ToolStateThemes {
     offrack: ToolStateTheme;
 
     // Support Statuses
+    empty: ToolStateTheme;
     used: ToolStateTheme;
     current: ToolStateTheme;
     error: ToolStateTheme;
@@ -63,6 +64,15 @@ export const toolStateThemes: ToolStateThemes = {
         borderColor: 'border-gray-800',
         textColor: 'text-black',
         backgroundStyle: 'striped-diagonal',
+        icon: MdRefresh,
+    },
+
+    empty: {
+        label: 'Used',
+        backgroundColor: 'bg-gray-600/20',
+        borderColor: 'border-gray-800',
+        textColor: 'text-black',
+        backgroundStyle: 'solid',
         icon: MdRefresh,
     },
 
