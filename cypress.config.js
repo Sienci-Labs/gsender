@@ -7,6 +7,9 @@ module.exports = defineConfig({
     },
     baseUrl: 'http://localhost:8000',
     experimentalStudio: true,
+    video: true,
+    screenshotOnRunFailure: true, //for screenshots and videos
+    supportFile: 'cypress/support/e2e.js', // Support file
     pageLoadTimeout: 200000,
     env: {
       file:'cypress/fixtures/sample.gcode'
