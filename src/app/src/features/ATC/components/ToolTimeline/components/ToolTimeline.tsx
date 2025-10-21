@@ -10,6 +10,7 @@ import { RootState } from 'app/store/redux';
 import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import {updateToolchangeContext} from "app/features/Helper/Wizard.tsx";
+import pubsub from "pubsub-js";
 
 export function ToolTimeline({
     tools,
@@ -55,6 +56,15 @@ export function ToolTimeline({
         });
         setFileTools(fileToolNumbers);
     }, [fileToolSet]);
+
+    useEffect(() => {
+        pubsub.subscribe('file:load', () => {
+            setMappings(new Map());
+        })
+        return () => {
+            pubsub.unsubscribe('file:loaded');
+        }
+    }, []);
 
     const handleRemapClick = (toolNumber: number) => {
         setSelectedTool(toolNumber);
