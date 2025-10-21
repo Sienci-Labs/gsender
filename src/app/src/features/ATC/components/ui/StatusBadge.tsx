@@ -13,6 +13,7 @@ export const StatusBadge = ({ status }: { status: ToolStatus }) => {
         <Badge
             className={cn(
                 'gap-1 min-w-[110px] justify-center',
+                `hover:${config.backgroundColor}`,
                 getToolStateClasses(status),
             )}
         >

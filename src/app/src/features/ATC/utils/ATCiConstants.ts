@@ -49,9 +49,9 @@ export const toolStateThemes: ToolStateThemes = {
 
     offrack: {
         label: 'Manual',
-        backgroundColor: 'bg-orange-500/20',
-        borderColor: 'border-orange-700',
-        textColor: 'text-orange-700',
+        backgroundColor: 'bg-yellow-200/20',
+        borderColor: 'border-yellow-500',
+        textColor: 'text-yellow-600',
         backgroundStyle: 'solid',
         icon: PiHandTap,
     },
