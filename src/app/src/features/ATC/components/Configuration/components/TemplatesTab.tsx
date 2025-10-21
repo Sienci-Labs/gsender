@@ -114,7 +114,7 @@ export const TemplatesTab: React.FC = () => {
                                             : 'border-gray-300 text-gray-600',
                                     )}
                                 >
-                                    {defaultVersion}
+                                    {templates?.sdVersion}
                                 </Badge>
                             </div>
                         </div>
