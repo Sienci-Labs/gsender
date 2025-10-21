@@ -172,19 +172,19 @@ export class YModem extends events.EventEmitter {
 
             let fileChunks;
             let isLastByteSOH = false;
-
+            /*else if (fileData.size <= SendSize[this.SOH]) {
+                            console.log('Sending using SOH');
+                            fileChunks = [
+                                this.padRBuffer(
+                                    fileData.data,
+                                    SendSize[this.SOH],
+                                    this.PAD_CHAR
+                                ),
+                            ];
+                            isLastByteSOH = true;
+                        } */
             if (fileData.size === 0) {
                 fileChunks = [];
-            } else if (fileData.size <= SendSize[this.SOH]) {
-                console.log('Sending using SOH');
-                fileChunks = [
-                    this.padRBuffer(
-                        fileData.data,
-                        SendSize[this.SOH],
-                        this.PAD_CHAR
-                    ),
-                ];
-                isLastByteSOH = true;
             } else if (fileData.size <= SendSize[this.STX]) {
                 console.log('Sending using STX');
                 fileChunks = [
@@ -261,7 +261,6 @@ export class YModem extends events.EventEmitter {
     onControlCharsRead(controlChars, callback) {
         this.comms.on('data', function onCharRead(newData) {
             const newChar = newData[0];
-            console.log('[<<<', newChar);
             if (controlChars.includes(newChar)) {
                 this.logger(`[<<< ${DebugDict[newChar]}]`);
                 this.comms.removeListener('data', onCharRead);
@@ -286,7 +285,7 @@ export class YModem extends events.EventEmitter {
             const timeout = sleep(sendDelay);
             // eslint-disable-next-line no-await-in-loop
             const result = await Promise.race([waitForCCs, timeout]);
-
+            console.log('result', result);
             if (result === this.ACK) {
                 break;
             }
