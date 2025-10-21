@@ -14,11 +14,11 @@ interface Template {
 
 interface TemplateData {
     version: string;
-    templates: Template[];
+    macros: Template[];
 }
 
 export const TemplatesTab: React.FC = () => {
-    const { templates } = useConfigContext();
+    const { templates, setTemplates } = useConfigContext();
     const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
         templates?.macros[0] || null,
     );
@@ -43,14 +43,19 @@ export const TemplatesTab: React.FC = () => {
             try {
                 const content = e.target?.result as string;
                 const data = JSON.parse(content) as TemplateData;
+                console.log(data);
 
                 // Validate the structure
-                if (!data.version || !Array.isArray(data.templates)) {
+                if (!data.version || !Array.isArray(data.macros)) {
                     throw new Error('Invalid template file structure');
                 }
 
-                setTemplateData(data);
-                setSelectedTemplate(data.templates[0] || null);
+                console.log('templates', templates);
+
+                data.sdVersion = templates.sdVersion;
+                setTemplates(data);
+                store.replace('widgets.atc.templates', data);
+                setSelectedTemplate(data.macros[0] || null);
                 setUploadError('');
             } catch (error) {
                 setUploadError('Invalid JSON file or incorrect structure');
