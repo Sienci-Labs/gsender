@@ -209,6 +209,17 @@ class GrblHalLineParserResultStatus {
             };
         }
 
+
+        // Probe protection status
+        // P:0 -> default probe selected, no protection
+        // P:0,P -> default probe selected, protection enabled
+        if (_.has(result, 'P')) {
+            payload.probe = {
+                type: Number(result.P[0]),
+                protected: result.P[1] === 'P'
+            };
+        }
+
         return {
             type: GrblHalLineParserResultStatus,
             payload: payload
