@@ -24,11 +24,11 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         toolRadius: 0,
     });
 
-    /*const currentTool = useTypedSelector(
+    const currentTool = useTypedSelector(
         (state: RootState) => state.controller.state.status?.currentTool,
-    );*/
+    );
 
-    const currentTool = 1;
+    //const currentTool = 1;
 
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
