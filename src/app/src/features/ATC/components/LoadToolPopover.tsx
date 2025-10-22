@@ -31,6 +31,7 @@ import {
     LoadToolMode,
     saveToRack,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 const ToolChangerPopover: React.FC = ({
     isOpen,
@@ -72,36 +73,25 @@ const ToolChangerPopover: React.FC = ({
     };
 
     const getStatusConfig = (status: ToolStatus) => {
+        const styling = toolStateThemes[status];
         switch (status) {
             case 'probed':
                 return {
-                    icon: CheckCircle,
+                    ...styling,
                     title: 'Probed',
                     description: 'Offset found for selected tool.',
-                    bgColor: 'bg-green-50/50',
-                    iconColor: 'text-green-600',
-                    titleColor: 'text-green-800',
-                    borderColor: 'border-green-200',
                 };
             case 'unprobed':
                 return {
-                    icon: AlertTriangle,
+                    ...styling,
                     title: 'Offset not found',
                     description: 'Ensure tool is in rack before proceeding.',
-                    bgColor: 'bg-amber-100',
-                    iconColor: 'text-amber-600',
-                    titleColor: 'text-amber-800',
-                    borderColor: 'border-amber-200',
                 };
             case 'offrack':
                 return {
-                    icon: AlertCircle,
+                    ...styling,
                     title: 'Off Rack',
                     description: 'Tool not in tool changer.',
-                    bgColor: 'bg-orange-50',
-                    iconColor: 'text-orange-600',
-                    titleColor: 'text-orange-800',
-                    borderColor: 'border-orange-200',
                 };
         }
     };
@@ -109,9 +99,9 @@ const ToolChangerPopover: React.FC = ({
     const getModeTitle = (tcMode: LoadToolMode) => {
         switch (tcMode) {
             case 'load':
-                return 'Load Tool';
+                return 'Load Tool Manually';
             case 'save':
-                return 'Save Tool';
+                return 'Unload Tool Manually';
             case 'loadAndSave':
                 return 'Load and Save Tool';
         }
@@ -177,16 +167,9 @@ const ToolChangerPopover: React.FC = ({
                                                 )}
                                             </div>
                                             <div className="flex-none">
-                                                {tool?.status === 'probed' && (
-                                                    <CheckCircle className="w-4 h-4 text-green-600" />
-                                                )}
-                                                {tool?.status ===
-                                                    'unprobed' && (
-                                                    <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                                )}
-                                                {tool?.status === 'offrack' && (
-                                                    <AlertCircle className="w-4 h-4 text-orange-600" />
-                                                )}
+                                                <statusConfig.icon
+                                                    className={`h-4 w-4 ${statusConfig.textColor}`}
+                                                />
                                             </div>
                                         </SelectItem>
                                     ))}
@@ -210,15 +193,15 @@ const ToolChangerPopover: React.FC = ({
                         </Button>
                     </div>
                     <div
-                        className={`rounded-lg p-4 border ${statusConfig.bgColor} ${statusConfig.borderColor}`}
+                        className={`rounded-lg p-4 border ${statusConfig.backgroundColor} ${statusConfig.borderColor}`}
                     >
                         <div className="flex items-start gap-3">
                             <StatusIcon
-                                className={`w-5 h-5 ${statusConfig.iconColor} mt-0.5 flex-shrink-0`}
+                                className={`w-5 h-5 ${statusConfig.textColor} mt-0.5 flex-shrink-0`}
                             />
                             <div className="flex-1 min-w-0">
                                 <h4
-                                    className={`font-semibold ${statusConfig.titleColor} text-sm`}
+                                    className={`font-semibold ${statusConfig.textColor} text-sm`}
                                 >
                                     {statusConfig.title}
                                 </h4>

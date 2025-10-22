@@ -263,6 +263,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         progress,
         status,
         templates,
+        setTemplates,
     };
 
     return (

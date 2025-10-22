@@ -8,18 +8,19 @@ import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { AlertTriangle, CheckCircle, Package, Wrench } from 'lucide-react';
 import Button from 'app/components/Button';
 import { PiEmpty } from 'react-icons/pi';
+import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
     const { rackSize } = useToolChange();
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
-        id: 0,
+        id: 1,
         nickname: '-',
         toolOffsets: {
             x: 0,
             y: 0,
             z: -2,
         },
-        status: 'unprobed',
+        status: 'probed',
         toolRadius: 0,
     });
 
@@ -27,7 +28,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
         (state: RootState) => state.controller.state.status?.currentTool,
     );
 
-    //const currentTool = 0;
+    //const currentTool = 1;
 
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
@@ -55,65 +56,24 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
 
     const getWidgetState = () => {
         if (currentTool === 0) {
-            return {
-                label: 'Empty',
-                bgColor: 'bg-gray-200',
-                borderColor: 'border-gray-300',
-                textColor: 'text-gray-600',
-                badgeColor: 'bg-gray-200',
-                showProbe: true,
-                badge: 'Empty',
-                badgeIcon: PiEmpty,
-            };
+            return toolStateThemes.empty;
         }
-
-        if (selectedTool.toolOffsets.z === 0) {
-            return {
-                label: `T${currentTool}`,
-                bgColor: 'bg-orange-100',
-                borderColor: 'border-orange-400',
-                textColor: 'text-orange-800',
-                badgeColor: 'bg-orange-500',
-                showProbe: true,
-                badge: 'Unprobed',
-                badgeIcon: AlertTriangle,
-            };
+        const state = toolStateThemes[selectedTool.status];
+        if (state) {
+            return state;
         }
-
-        if (currentTool > rackSize) {
-            return {
-                label: `T${currentTool}`,
-                showProbe: true,
-                badge: 'Off-Rack',
-                bgColor: 'bg-yellow-100',
-                borderColor: 'border-yellow-400',
-                textColor: 'text-yellow-800',
-                badgeColor: 'bg-yellow-500',
-                badgeIcon: Package,
-            };
-        }
-
-        return {
-            label: `T${currentTool}`,
-            bgColor: 'bg-green-100',
-            borderColor: 'border-green-400',
-            textColor: 'text-green-800',
-            showProbe: true,
-            badge: 'Ready',
-            badgeColor: 'bg-green-500',
-            badgeIcon: CheckCircle,
-        };
+        return toolStateThemes.error;
     };
 
     const state = getWidgetState();
     const formattedOffset =
         currentTool === 0 ? '-' : selectedTool.toolOffsets.z.toFixed(3);
-    const BadgeIcon = state.badgeIcon;
+    const BadgeIcon = state.icon;
 
     return (
         <div className={'w-4/5'}>
             <div
-                className={`${state.bgColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 transition-all duration-200`}
+                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 transition-all duration-200`}
             >
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -122,24 +82,24 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                             <span
                                 className={`${state.textColor} font-semibold text-lg`}
                             >
-                                {state.label}
+                                {currentTool === 0
+                                    ? 'Empty'
+                                    : `T${selectedTool.id}`}
                             </span>
-                            {selectedTool.nickname && currentTool > 0 && (
+                            {selectedTool.nickname && (
                                 <span className="text-gray-600 text-xs">
                                     {selectedTool.nickname}
-                                    {currentTool === 0 && '-'}
                                 </span>
                             )}
                         </div>
                     </div>
-                    {state.badge && BadgeIcon && (
-                        <span
-                            className={`${state.badgeColor} min-w-20 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}
-                        >
-                            <BadgeIcon className="w-3 h-3" />
-                            {state.badge}
-                        </span>
-                    )}
+
+                    <span
+                        className={`${state.backgroundColor} ${state.borderColor} border-2 min-w-20 ${state.textColor} text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1`}
+                    >
+                        <BadgeIcon className="w-3 h-3" />
+                        {state.label}
+                    </span>
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
@@ -150,15 +110,13 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                             {formattedOffset}
                         </div>
                     </div>
-                    {state.showProbe && (
-                        <Button
-                            onClick={() => probeTool(currentTool)}
-                            disabled={currentTool === 0}
-                            variant="primary"
-                        >
-                            Probe
-                        </Button>
-                    )}
+                    <Button
+                        onClick={() => probeTool(currentTool)}
+                        disabled={currentTool === 0}
+                        variant="primary"
+                    >
+                        Probe
+                    </Button>
                 </div>
             </div>
         </div>

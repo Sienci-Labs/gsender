@@ -32,9 +32,9 @@ export function ATC() {
         isHomed: isHomed,
     });
 
-    if (unavailableATCPayload !== null) {
+    /*if (unavailableATCPayload !== null) {
         return <ATCUnavailable payload={unavailableATCPayload} />;
-    }
+    }*/
 
     return (
         <div className="w-full relative box-border">

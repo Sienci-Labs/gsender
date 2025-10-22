@@ -40,7 +40,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
-import { ATCIWizard } from "app/features/Config/components/wizards/ATCiWizard.tsx";
+import { ATCIWizard } from 'app/features/Config/components/wizards/ATCiWizard.tsx';
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -62,7 +62,11 @@ import {
     SPINDLE_LASER_T,
 } from 'app/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
-import { TOASTER_DISABLED, TOASTER_LONG, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
+import {
+    TOASTER_DISABLED,
+    TOASTER_LONG,
+    TOASTER_UNTIL_CLOSE,
+} from 'app/lib/toaster/ToasterLib';
 
 export interface SettingsMenuSection {
     label: string;
@@ -366,8 +370,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Pop-up notification duration',
                         key: 'workspace.toastDuration',
-                        description:
-                            `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
+                        description: `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
                         type: 'number',
                         defaultValue: 0,
                         min: TOASTER_DISABLED,
@@ -1608,6 +1611,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             return strategy !== 'Code';
                         },
                     },
+                ],
+            },
+            {
+                label: 'Keepout',
+                settings: [
+                    { type: 'eeprom', eID: '$450' },
+                    { type: 'eeprom', eID: '$451' },
+                    { type: 'eeprom', eID: '$452' },
+                    { type: 'eeprom', eID: '$453' },
+                    { type: 'eeprom', eID: '$454' },
+                    { type: 'eeprom', eID: '$455' },
+                    { type: 'eeprom', eID: '$456' },
                 ],
             },
         ],

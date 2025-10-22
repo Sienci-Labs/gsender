@@ -2287,7 +2287,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                this.toolChangeContext = { ...this.toolChangeContext, context };
+                this.toolChangeContext = { ...this.toolChangeContext, ...context };
             },
             'toolchange:pre': () => {
                 log.debug('Starting pre hook');

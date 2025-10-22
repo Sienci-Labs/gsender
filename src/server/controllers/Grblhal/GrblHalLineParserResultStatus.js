@@ -196,6 +196,19 @@ class GrblHalLineParserResultStatus {
             payload.currentTool = Number(result.T[0]);
         }
 
+        // Sko Keepout area
+        if (_.has(result, 'Sko')) {
+            console.log(result.Sko);
+            const values = result.sko[1];
+            payload.sko = {
+                xMin: values[1],
+                xMax: values[0],
+                yMin: values[3],
+                yMax: values[2],
+                flags: values[4].split('') || [],
+            };
+        }
+
         return {
             type: GrblHalLineParserResultStatus,
             payload: payload

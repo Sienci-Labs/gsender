@@ -14,11 +14,11 @@ interface Template {
 
 interface TemplateData {
     version: string;
-    templates: Template[];
+    macros: Template[];
 }
 
 export const TemplatesTab: React.FC = () => {
-    const { templates } = useConfigContext();
+    const { templates, setTemplates } = useConfigContext();
     const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
         templates?.macros[0] || null,
     );
@@ -45,16 +45,17 @@ export const TemplatesTab: React.FC = () => {
                 const data = JSON.parse(content) as TemplateData;
 
                 // Validate the structure
-                if (!data.version || !Array.isArray(data.templates)) {
+                if (!data.version || !Array.isArray(data.macros)) {
                     throw new Error('Invalid template file structure');
                 }
 
-                setTemplateData(data);
-                setSelectedTemplate(data.templates[0] || null);
+                data.sdVersion = templates.sdVersion;
+                setTemplates(data);
+                store.replace('widgets.atc.templates', data);
+                setSelectedTemplate(data.macros[0] || null);
                 setUploadError('');
             } catch (error) {
                 setUploadError('Invalid JSON file or incorrect structure');
-                console.error('Template upload error:', error);
             }
         };
         reader.readAsText(file);
@@ -78,9 +79,7 @@ export const TemplatesTab: React.FC = () => {
 
     return (
         <div className="space-y-4 flex flex-col h-full">
-            {/* Upload Area and Version Row */}
             <div className="grid grid-cols-2 gap-2">
-                {/* Version Info - Left Half */}
                 <div className="border border-border">
                     <div className="py-2 flex items-center justify-center h-full">
                         <div className="space-y-2">
@@ -91,10 +90,7 @@ export const TemplatesTab: React.FC = () => {
                                 <Badge
                                     variant="secondary"
                                     className={cn(
-                                        'text-sm font-bold px-3 py-1',
-                                        versionMismatch
-                                            ? 'bg-red-500 text-white'
-                                            : 'bg-blue-100 text-blue-800',
+                                        'text-sm font-bold border px-3 py-1 bg-white text-blue-800',
                                     )}
                                 >
                                     {templates.version || defaultVersion}
@@ -107,13 +103,13 @@ export const TemplatesTab: React.FC = () => {
                                 <Badge
                                     variant="secondary"
                                     className={cn(
-                                        'text-sm font-bold px-3 py-1',
+                                        'text-sm border-2 border font-bold px-3 py-1',
                                         versionMismatch
-                                            ? 'bg-red-500 text-white'
-                                            : 'border-gray-300 text-gray-600',
+                                            ? 'border-red-600 bg-red-600/20 text-red-600'
+                                            : '',
                                     )}
                                 >
-                                    {defaultVersion}
+                                    {templates?.sdVersion}
                                 </Badge>
                             </div>
                         </div>
