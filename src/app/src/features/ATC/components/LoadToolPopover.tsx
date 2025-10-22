@@ -151,28 +151,32 @@ const ToolChangerPopover: React.FC = ({
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="w-full flex-1 bg-white z-[10000]">
-                                    {tools.map((tool) => (
-                                        <SelectItem
-                                            key={tool.id}
-                                            value={tool.id}
-                                        >
-                                            <div className="flex items-center gap-1 min-w-0">
-                                                <span className="font-mono font-semibold text-slate-800 shrink-0">
-                                                    {tool?.id}
-                                                </span>
-                                                {tool?.nickname && (
-                                                    <span className="text-slate-600 text-sm truncate">
-                                                        {tool.nickname}
+                                    {tools.map((tool) => {
+                                        const styling =
+                                            toolStateThemes[tool.status];
+                                        return (
+                                            <SelectItem
+                                                key={tool.id}
+                                                value={tool.id}
+                                            >
+                                                <div className="flex items-center gap-1 min-w-0">
+                                                    <span className="font-mono font-semibold text-slate-800 shrink-0">
+                                                        {tool?.id}
                                                     </span>
-                                                )}
-                                            </div>
-                                            <div className="flex-none">
-                                                <statusConfig.icon
-                                                    className={`h-4 w-4 ${statusConfig.textColor}`}
-                                                />
-                                            </div>
-                                        </SelectItem>
-                                    ))}
+                                                    {tool?.nickname && (
+                                                        <span className="text-slate-600 text-sm truncate">
+                                                            {tool.nickname}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex-none">
+                                                    <styling.icon
+                                                        className={`h-4 w-4 ${styling.textColor}`}
+                                                    />
+                                                </div>
+                                            </SelectItem>
+                                        );
+                                    })}
                                 </SelectContent>
                             </Select>
                         </div>
