@@ -432,7 +432,8 @@ class Sender extends events.EventEmitter {
             this.state.elapsedTime = 0;
             this.state.timePaused = 0;
             this.state.timeRunning = 0;
-            this.state.remainingTime = this.state.estimatedTime;
+            // make sure time is up to date will current ovF
+            this.state.remainingTime = this.state.estimatedTime / (this.state.ovF / 100);
             this.state.countdownQueue = [];
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
