@@ -28,6 +28,7 @@ export function ATCStartValidations({
                             variant="success"
                             onClick={() => {
                                 controller.command('gcode:start');
+                                setShow(false);
                             }}
                         >
                             <FaPlay /> Run job
