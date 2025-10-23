@@ -6,6 +6,7 @@ import store from 'app/store';
 import { Switch } from 'app/components/shadcn/Switch';
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 
 interface MachineInfoDisplayProps {
     pinned: boolean;
@@ -16,13 +17,14 @@ export function MachineInfoDisplay({
     pinned,
     setPinned,
 }: MachineInfoDisplayProps) {
-    const { pins, modals, isConnected, settings, currentTool } =
+    const { pins, keepoutFlags, modals, isConnected, settings, currentTool } =
         useTypedSelector((state) => ({
             pins: state.controller.state.status?.pinState,
             modals: state.controller.modal,
             isConnected: state.connection.isConnected,
             settings: state.controller.settings,
             currentTool: state.controller.state.status?.currentTool,
+            keepoutFlags: state.controller.state.status?.keepout?.flags,
         }));
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');
@@ -71,9 +73,7 @@ export function MachineInfoDisplay({
             </div>
             <div className="grid grid-cols-[3fr_2fr]">
                 <div className="flex flex-col pr-4">
-                    <span className="underline float-left">
-                        CNC Modals
-                    </span>
+                    <span className="underline float-left">CNC Modals</span>
                     <div className="flex flex-col justify-between items-center">
                         <ModalRow
                             label="Probe style"
@@ -124,6 +124,7 @@ export function MachineInfoDisplay({
                     </div>
                 </div>
             </div>
+            {keepoutFlags && <KeepoutToggle initialFlags={keepoutFlags} />}
             {currentTool >= 0 && (
                 <div className="text-gray-500 flex w-full gap-4">
                     <span>Current tool: </span>

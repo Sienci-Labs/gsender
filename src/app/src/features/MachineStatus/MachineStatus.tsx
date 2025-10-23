@@ -187,6 +187,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 export default connect((store) => {
     const $22 = get(store, 'controller.settings.settings.$22', '0');
     const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
+
     const activeState = get(
         store,
         'controller.state.status.activeState',
