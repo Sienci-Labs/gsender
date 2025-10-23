@@ -124,7 +124,6 @@ export function MachineInfoDisplay({
                     </div>
                 </div>
             </div>
-            {keepoutFlags && <KeepoutToggle initialFlags={keepoutFlags} />}
             {currentTool >= 0 && (
                 <div className="text-gray-500 flex w-full gap-4">
                     <span>Current tool: </span>
@@ -141,6 +140,15 @@ export function MachineInfoDisplay({
                     disabled={!isConnected}
                 />
             </div>
+
+            {keepoutFlags && (
+                <div className="flex flex-row gap-2 items-center mt-2">
+                    <span className="text-gray-500 dark:text-white">
+                        Keepout:
+                    </span>
+                    <KeepoutToggle initialFlags={keepoutFlags} />
+                </div>
+            )}
         </>
     );
 }

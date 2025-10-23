@@ -32,7 +32,7 @@ export function KeepoutToggle({ initialFlags = [] }: KeepoutToggleProps) {
         <button
             onClick={handleToggle}
             className={`
-        relative w-20 h-10 rounded-full
+        relative w-20 h-8 rounded-full
         transition-all duration-300 ease-in-out
         ${
             isEnabled
@@ -45,7 +45,7 @@ export function KeepoutToggle({ initialFlags = [] }: KeepoutToggleProps) {
             <div
                 className={`
           absolute top-1 flex items-center justify-center
-          w-8 h-8 bg-white rounded-full
+          w-6 h-6 bg-white rounded-full
           transition-all duration-300 ease-in-out
           ${isEnabled ? 'left-11 text-yellow-600' : 'left-1 text-gray-600'}
         `}
