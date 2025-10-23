@@ -197,10 +197,11 @@ class GrblHalLineParserResultStatus {
         }
 
         // Sko Keepout area
-        if (_.has(result, 'Sko')) {
-            const values = result.sko[1];
+        if (_.has(result, 'ATCI')) {
+            console.log(result.ATCI);
+            const values = result.ATCI[1];
             const flags = values[4] || '';
-            payload.sko = {
+            payload.atci = {
                 xMin: values[1],
                 xMax: values[0],
                 yMin: values[3],
