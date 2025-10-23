@@ -45,7 +45,7 @@ export function KeepoutToggle({ initialFlags = [] }: KeepoutToggleProps) {
             <div
                 className={`
           absolute top-1 flex items-center justify-center
-          w-6 h-6 bg-white rounded-full
+          w-6 h-6 bg-white rounded-k
           transition-all duration-300 ease-in-out
           ${isEnabled ? 'left-11 text-yellow-600' : 'left-1 text-gray-600'}
         `}
