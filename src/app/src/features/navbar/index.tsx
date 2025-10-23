@@ -9,9 +9,10 @@ import { useLocation, useNavigate } from 'react-router';
 import { useSettings } from '../Config/utils/SettingsContext.tsx';
 import Blocker from './components/Blocker.tsx';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import pubsub from 'pubsub-js';
 
 export const NavBar = () => {
-    const { settingsAreDirty } = useSettings();
+    const { settingsAreDirty, setSettingsAreDirty } = useSettings();
     const location = useLocation();
     const navigate = useNavigate();
     const blocker = new Blocker();
@@ -30,7 +31,12 @@ export const NavBar = () => {
     ) => {
         e.preventDefault();
         if (location.pathname.includes('configuration') && settingsAreDirty) {
-            blocker.block(() => navigate(href));
+            blocker.block(() => {
+                pubsub.publish('repopulate');
+                pubsub.publish('eeprom:repopulate');
+                setSettingsAreDirty(false);
+                navigate(href);
+            });
             Confirm({
                 title: 'Unsaved Changes',
                 content: 'Are you sure you want to leave without saving?',

@@ -12,7 +12,8 @@
       "Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode",
       "Various portrait mode look and feel changes",
       "Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off",
-      "Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)"
+      "Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)",
+      "Future updates should again be appearing in-app when they become available."
     ]
   },
   {

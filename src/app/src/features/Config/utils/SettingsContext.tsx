@@ -207,10 +207,24 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSettingsValues([...globalValues]);
     }
 
+    function repopulateEEPROM() {
+        setEEPROM(
+            getFilteredEEPROMSettings(
+                BASE_SETTINGS,
+                detectedEEPROM,
+                detectedEEPROMDescriptions,
+                detectedEEPROMGroups,
+            ),
+        );
+    }
+
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
             return repopulateSettings();
+        });
+        pubsub.subscribe('eeprom:repopulate', () => {
+            return repopulateEEPROM();
         });
     }, []);
 
