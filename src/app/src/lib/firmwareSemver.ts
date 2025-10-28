@@ -10,6 +10,10 @@ export function firmwareSemver(reported: number, required: number): boolean {
 }
 
 export function firmwarePastVersion(required: number): boolean {
+    if (Number.isNaN(required)) {
+        return false;
+    }
+
     const reduxState = reduxStore.getState();
     console.log(reduxState);
     const reportedFirmwareVersion = get(

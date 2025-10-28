@@ -28,6 +28,7 @@ import {
 import pubsub from 'pubsub-js';
 import { firmwarePastVersion, firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -160,6 +161,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [settingsValues, setSettingsValues] = useState<gSenderSetting[]>([]);
     const [filterNonDefault, setFilterNonDefault] = useState(false);
+    const [isFirmwareCurrent, setIsFirmwareCurrent] = useState(false);
+
+    const firmwareVersion = useTypedSelector(
+        (state: RootState) => state.controller.settings.version.semver,
+    );
+
+    useEffect(() => {
+        console.log('fw', firmwareVersion);
+        setIsFirmwareCurrent(firmwarePastVersion(firmwareVersion));
+    }, [firmwareVersion]);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
