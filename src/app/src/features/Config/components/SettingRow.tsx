@@ -199,6 +199,9 @@ export function SettingRow({
 
     if (connected && setting.type === 'eeprom') {
         const idToUse = setting.remap ? setting.remap : setting.eID;
+        if (setting.remapped) {
+            console.log('remapped to ', idToUse);
+        }
         return (
             <EEPROMSettingRow
                 eID={idToUse}

@@ -36,7 +36,12 @@ export function EEPROMSettingRow({
     if (!EEPROM) {
         return;
     }
+
     const EEPROMData = EEPROM.find((s) => s.setting === eID);
+
+    if (eID === '$450') {
+        console.log(EEPROMData);
+    }
     if (EEPROMData) {
         const isDefault = eepromIsDefault(EEPROMData);
         const profileDefaults =
@@ -48,6 +53,10 @@ export function EEPROMSettingRow({
             EEPROMData.dataType,
             firmwareType,
         );
+
+        if (eID === '$450') {
+            console.log(EEPROMData);
+        }
 
         const inputDefault = get(profileDefaults, eID, '-');
 

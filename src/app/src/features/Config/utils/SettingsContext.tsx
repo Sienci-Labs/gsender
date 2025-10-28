@@ -369,6 +369,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         }
 
         const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
+        console.log('isCurrent', firmwareCurrent);
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
