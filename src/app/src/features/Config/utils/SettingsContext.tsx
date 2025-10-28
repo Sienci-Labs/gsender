@@ -275,7 +275,9 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
-            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+
+            const idToUse = isFirmwareCurrent ? v.remap : v.eID;
+            const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
 
             // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
             if (!EEPROMData) {
