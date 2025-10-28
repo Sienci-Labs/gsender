@@ -119,6 +119,7 @@ export interface gSenderSetting {
     min?: number;
     max?: number;
     remap?: EEPROM;
+    remapped?: boolean;
 }
 
 export interface gSenderSubSection {

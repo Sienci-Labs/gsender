@@ -26,6 +26,8 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from 'pubsub-js';
+import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -365,6 +367,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         if (!settings.length) {
             return;
         }
+
+        const firmwareCurrent = firmwareSemver(
+            ATCI_SUPPORTED_VERSION,
+            ATCI_SUPPORTED_VERSION,
+        );
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
@@ -372,7 +379,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             ss.settings.map((s) => {
                 s.settings.map((o) => {
                     if (o.type == 'eeprom') {
-                        const eID = get(o, 'eID', null);
+                        let eID = get(o, 'eID', null);
+                        // if remap and version match
+                        if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
+                            console.log('REMAPPING', o);
+                            eID = get(o, 'remap', null);
+                            o.remapped = true;
+                        }
+                        // set eID to remap, maybe some sort of remapped flag?
                         if (eID) {
                             let oKey = Number(eID.replace('$', ''));
                             let oEEPROM = get(
@@ -384,6 +398,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                                 o.description = get(oEEPROM, 'details', '');
                                 o.label = get(oEEPROM, 'description', '');
                             }
+                            console.log(o);
                         }
                     }
                 });
