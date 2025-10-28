@@ -1338,6 +1338,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$743',
+                        remap: '$716',
                     },
                     {
                         label: 'Minimum laser power',
@@ -1666,10 +1667,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$664',
+                        remap: '$536',
                     },
                     {
                         type: 'eeprom',
                         eID: '$665',
+                        remap: '$537',
                     },
                 ],
             },
