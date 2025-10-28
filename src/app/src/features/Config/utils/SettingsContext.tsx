@@ -398,7 +398,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                                 o.description = get(oEEPROM, 'details', '');
                                 o.label = get(oEEPROM, 'description', '');
                             }
-                            console.log(o);
                         }
                     }
                 });
