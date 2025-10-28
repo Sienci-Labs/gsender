@@ -17,5 +17,6 @@ export function firmwarePastVersion(required: number): boolean {
         'controller.settings.version.semver',
         0,
     );
+    console.log(reportedFirmwareVersion, required);
     return Number(reportedFirmwareVersion) >= Number(required);
 }
