@@ -276,7 +276,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 return false;
             }
 
-            const idToUse = isFirmwareCurrent ? v.remap : v.eID;
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
             const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
 
             // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
