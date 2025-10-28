@@ -26,7 +26,7 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from 'pubsub-js';
-import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
+import { firmwarePastVersion, firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 interface iSettingsContext {
@@ -368,10 +368,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return;
         }
 
-        const firmwareCurrent = firmwareSemver(
-            ATCI_SUPPORTED_VERSION,
-            ATCI_SUPPORTED_VERSION,
-        );
+        const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
