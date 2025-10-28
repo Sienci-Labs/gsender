@@ -26,7 +26,7 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from 'pubsub-js';
-import { firmwarePastVersion, firmwareSemver } from 'app/lib/firmwareSemver.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
@@ -164,7 +164,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [isFirmwareCurrent, setIsFirmwareCurrent] = useState(false);
 
     const firmwareVersion = useTypedSelector(
-        (state: RootState) => state.controller.settings.version.semver,
+        (state: RootState) => state.controller.settings.version?.semver,
     );
 
     useEffect(() => {
