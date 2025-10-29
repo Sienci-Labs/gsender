@@ -11,16 +11,16 @@ import { PiEmpty } from 'react-icons/pi';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
-    const { rackSize } = useToolChange();
+    const { rackSize, connected } = useToolChange();
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
-        id: 1,
+        id: 0,
         nickname: '-',
         toolOffsets: {
             x: 0,
             y: 0,
-            z: -2,
+            z: 0,
         },
-        status: 'probed',
+        status: 'unprobed',
         toolRadius: 0,
     });
 
@@ -52,7 +52,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 setSelectedTool(populatedTool);
             }
         }
-    }, [currentTool]);
+    }, [currentTool, connected]);
 
     const getWidgetState = () => {
         if (currentTool === 0) {
