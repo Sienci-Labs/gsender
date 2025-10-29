@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
 import controller from 'app/lib/controller.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import { AlertTriangle, CheckCircle, Package, Wrench } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 import Button from 'app/components/Button';
-import { PiEmpty } from 'react-icons/pi';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
