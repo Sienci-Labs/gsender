@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-export const ATCI_SUPPORTED_VERSION = 250627;
+export const ATCI_SUPPORTED_VERSION = 20250627;
 
 export interface ToolStateTheme {
     label: string;

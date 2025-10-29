@@ -73,7 +73,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
     return (
         <div className={'w-4/5'}>
             <div
-                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-30 border rounded-lg p-2 transition-all duration-200`}
+                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-10 border rounded-lg p-2 transition-all duration-200`}
             >
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">

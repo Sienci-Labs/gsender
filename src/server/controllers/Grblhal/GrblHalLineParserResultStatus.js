@@ -40,7 +40,8 @@ class GrblHalLineParserResultStatus {
 
         const payload = {};
         //const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
-        const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
+        //const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
+        const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a-zA-Z]+){0,5})?/g;
         const params = r[1].match(pattern);
         const result = {};
 
@@ -197,15 +198,15 @@ class GrblHalLineParserResultStatus {
         }
 
         // Sko Keepout area
-        if (_.has(result, 'Sko')) {
-            console.log(result.Sko);
-            const values = result.sko[1];
-            payload.sko = {
+        if (_.has(result, 'ATCI')) {
+            const values = result.ATCI;
+            const flags = values[4] || '';
+            payload.keepout = {
                 xMin: values[1],
                 xMax: values[0],
                 yMin: values[3],
                 yMax: values[2],
-                flags: values[4].split('') || [],
+                flags: flags.split('')
             };
         }
 

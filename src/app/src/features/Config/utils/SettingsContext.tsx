@@ -26,6 +26,9 @@ import {
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from 'pubsub-js';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -158,6 +161,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [settingsValues, setSettingsValues] = useState<gSenderSetting[]>([]);
     const [filterNonDefault, setFilterNonDefault] = useState(false);
+    const [isFirmwareCurrent, setIsFirmwareCurrent] = useState(false);
+
+    const firmwareVersion = useTypedSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
+
+    useEffect(() => {
+        console.log('fw', firmwareVersion);
+        setIsFirmwareCurrent(firmwarePastVersion(firmwareVersion));
+    }, [firmwareVersion]);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -262,7 +275,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
-            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
 
             // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
             if (!EEPROMData) {
@@ -365,6 +383,9 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         if (!settings.length) {
             return;
         }
+
+        const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
+        console.log('isCurrent', firmwareCurrent);
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
@@ -372,7 +393,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             ss.settings.map((s) => {
                 s.settings.map((o) => {
                     if (o.type == 'eeprom') {
-                        const eID = get(o, 'eID', null);
+                        let eID = get(o, 'eID', null);
+                        // if remap and version match
+                        if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
+                            console.log('REMAPPING', o);
+                            eID = get(o, 'remap', null);
+                            o.remapped = true;
+                        }
+                        // set eID to remap, maybe some sort of remapped flag?
                         if (eID) {
                             let oKey = Number(eID.replace('$', ''));
                             let oEEPROM = get(

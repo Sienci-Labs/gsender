@@ -118,6 +118,8 @@ export interface gSenderSetting {
     onUpdate?: () => void;
     min?: number;
     max?: number;
+    remap?: EEPROM;
+    remapped?: boolean;
 }
 
 export interface gSenderSubSection {
@@ -735,12 +737,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
-                    { type: 'eeprom', eID: '$450' },
-                    { type: 'eeprom', eID: '$451' },
-                    { type: 'eeprom', eID: '$452' },
-                    { type: 'eeprom', eID: '$453' },
-                    { type: 'eeprom', eID: '$454' },
-                    { type: 'eeprom', eID: '$455' },
+                    { type: 'eeprom', eID: '$450', remap: '$590' },
+                    { type: 'eeprom', eID: '$451', remap: '$591' },
+                    { type: 'eeprom', eID: '$452', remap: '$592' },
+                    { type: 'eeprom', eID: '$453', remap: '$490' },
+                    { type: 'eeprom', eID: '$454', remap: '$491' },
+                    { type: 'eeprom', eID: '$455', remap: '$492' },
                 ],
             },
         ],
@@ -1336,6 +1338,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$743',
+                        remap: '$716',
                     },
                     {
                         label: 'Minimum laser power',
@@ -1415,10 +1418,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
-                    { type: 'eeprom', eID: '$456' },
-                    { type: 'eeprom', eID: '$457' },
-                    { type: 'eeprom', eID: '$458' },
-                    { type: 'eeprom', eID: '$459' },
+                    { type: 'eeprom', eID: '$456', remap: '$750' },
+                    { type: 'eeprom', eID: '$457', remap: '$751' },
+                    { type: 'eeprom', eID: '$458', remap: '$752' },
+                    { type: 'eeprom', eID: '$459', remap: '$753' },
                 ],
             },
         ],
@@ -1664,10 +1667,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$664',
+                        remap: '$536',
                     },
                     {
                         type: 'eeprom',
                         eID: '$665',
+                        remap: '$537',
                     },
                 ],
             },
