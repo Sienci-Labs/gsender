@@ -9,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import blob from 'axios/unsafe/platform/browser/classes/Blob';
 import { toast } from 'app/lib/toaster';
 
 interface UploadModalProps {
@@ -85,6 +84,18 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         }
     };
 
+    const formatFileSize = (size: number): string => {
+        if (size < 1024) {
+            return `${size} B`;
+        }
+
+        if (size < 1024 * 1024) {
+            return `${(size / 1024).toFixed(1)} KB`;
+        }
+
+        return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-md">
@@ -143,7 +154,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                                     {selectedFile.name}
                                 </span>
                                 <span className="text-xs text-gray-500 flex-shrink-0">
-                                    ({(selectedFile.size / 1024).toFixed(1)} KB)
+                                    {formatFileSize(selectedFile.size)}
                                 </span>
                             </div>
                         </div>
