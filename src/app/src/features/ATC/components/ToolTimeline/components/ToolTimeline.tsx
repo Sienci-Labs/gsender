@@ -119,10 +119,12 @@ export function ToolTimeline({
         };
 
         const handleTouchStart = (e: TouchEvent) => {
+            e.preventDefault();
             touchStartY = e.touches[0].clientY;
         };
 
         const handleTouchEnd = (e: TouchEvent) => {
+            e.preventDefault();
             const touchEndY = e.changedTouches[0].clientY;
             const deltaY = touchStartY - touchEndY;
 
