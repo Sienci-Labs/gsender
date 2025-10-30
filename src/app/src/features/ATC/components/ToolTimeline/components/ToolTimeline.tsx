@@ -121,12 +121,28 @@ export function ToolTimeline({
         };
 
         const handleTouchStart = (e: TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target.closest('button') ||
+                target.closest('a') ||
+                target.closest('[role="button"]')
+            ) {
+                return;
+            }
             e.preventDefault();
             touchStartY = e.touches[0].clientY;
             lastScrollY = touchStartY;
         };
 
         const handleTouchMove = (e: TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target.closest('button') ||
+                target.closest('a') ||
+                target.closest('[role="button"]')
+            ) {
+                return;
+            }
             e.preventDefault();
             const currentY = e.touches[0].clientY;
             const deltaY = lastScrollY - currentY;
