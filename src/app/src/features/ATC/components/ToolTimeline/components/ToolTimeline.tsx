@@ -102,6 +102,7 @@ export function ToolTimeline({
         if (!container) return;
 
         let touchStartY = 0;
+        let lastScrollY = 0;
 
         const handleScroll = (deltaY: number) => {
             if (deltaY > 0 && canScrollDown) {
@@ -121,26 +122,32 @@ export function ToolTimeline({
         const handleTouchStart = (e: TouchEvent) => {
             e.preventDefault();
             touchStartY = e.touches[0].clientY;
+            lastScrollY = touchStartY;
         };
 
-        const handleTouchEnd = (e: TouchEvent) => {
+        const handleTouchMove = (e: TouchEvent) => {
             e.preventDefault();
-            const touchEndY = e.changedTouches[0].clientY;
-            const deltaY = touchStartY - touchEndY;
+            const currentY = e.touches[0].clientY;
+            const deltaY = lastScrollY - currentY;
 
-            if (Math.abs(deltaY) > 30) {
+            if (Math.abs(deltaY) > 50) {
                 handleScroll(deltaY);
+                lastScrollY = currentY;
             }
         };
 
         container.addEventListener('wheel', handleWheel, { passive: false });
-        container.addEventListener('touchstart', handleTouchStart);
-        container.addEventListener('touchend', handleTouchEnd);
+        container.addEventListener('touchstart', handleTouchStart, {
+            passive: false,
+        });
+        container.addEventListener('touchmove', handleTouchMove, {
+            passive: false,
+        });
 
         return () => {
             container.removeEventListener('wheel', handleWheel);
             container.removeEventListener('touchstart', handleTouchStart);
-            container.removeEventListener('touchend', handleTouchEnd);
+            container.removeEventListener('touchmove', handleTouchMove);
         };
     }, [canScrollUp, canScrollDown, tools.length, isCollapsed]);
 
