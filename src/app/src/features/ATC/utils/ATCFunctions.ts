@@ -130,5 +130,7 @@ export function sendATCHomingDialog() {
             },
             confirmLabel: 'Home',
         });
+    } else {
+        controller.command('homing');
     }
 }
