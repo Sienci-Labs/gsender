@@ -86,6 +86,8 @@ export function ToolTimeline({
     };
 
     useEffect(() => {
+        if (isCollapsed) return;
+
         if (activeToolIndex < scrollIndex) {
             setScrollIndex(activeToolIndex);
         } else if (activeToolIndex >= scrollIndex + maxVisibleTools) {
@@ -94,6 +96,8 @@ export function ToolTimeline({
     }, [activeToolIndex, isCollapsed]);
 
     useEffect(() => {
+        if (isCollapsed) return;
+
         const container = scrollContainerRef.current;
         if (!container) return;
 
@@ -110,39 +114,26 @@ export function ToolTimeline({
         };
 
         let touchStartY = 0;
-        let touchStartTime = 0;
 
         const handleTouchStart = (e: TouchEvent) => {
             touchStartY = e.touches[0].clientY;
-            touchStartTime = Date.now();
         };
 
         const handleTouchMove = (e: TouchEvent) => {
             e.preventDefault();
-
-            const touchCurrentY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchCurrentY;
-            const deltaTime = Date.now() - touchStartTime;
-
-            // Threshold to prevent accidental scrolls
-            const threshold = 30;
-
-            // Prevent too fast repeated triggers
-            if (deltaTime < 150) return;
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+            const threshold = 50;
 
             if (Math.abs(deltaY) > threshold) {
                 if (deltaY > 0 && canScrollDown) {
-                    // Swipe up - scroll down
                     setScrollIndex((prev) =>
                         Math.min(prev + 1, tools.length - maxVisibleTools),
                     );
-                    touchStartY = touchCurrentY;
-                    touchStartTime = Date.now();
+                    touchStartY = touchY;
                 } else if (deltaY < 0 && canScrollUp) {
-                    // Swipe down - scroll up
                     setScrollIndex((prev) => Math.max(prev - 1, 0));
-                    touchStartY = touchCurrentY;
-                    touchStartTime = Date.now();
+                    touchStartY = touchY;
                 }
             }
         };
@@ -160,7 +151,7 @@ export function ToolTimeline({
             container.removeEventListener('touchstart', handleTouchStart);
             container.removeEventListener('touchmove', handleTouchMove);
         };
-    }, [canScrollUp, canScrollDown, tools.length, isCollapsed]);
+    }, [canScrollUp, canScrollDown, tools.length, isCollapsed, scrollIndex]);
 
     const visibleTools = tools.slice(
         scrollIndex,
