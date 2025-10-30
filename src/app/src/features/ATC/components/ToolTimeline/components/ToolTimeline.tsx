@@ -105,13 +105,14 @@ export function ToolTimeline({
         let lastScrollY = 0;
 
         const handleScroll = (deltaY: number) => {
-            if (deltaY > 0 && canScrollDown) {
-                setScrollIndex((prev) =>
-                    Math.min(prev + 1, tools.length - maxVisibleTools),
-                );
-            } else if (deltaY < 0 && canScrollUp) {
-                setScrollIndex((prev) => Math.max(prev - 1, 0));
-            }
+            setScrollIndex((prev) => {
+                if (deltaY > 0) {
+                    return Math.min(prev + 1, tools.length - maxVisibleTools);
+                } else if (deltaY < 0) {
+                    return Math.max(prev - 1, 0);
+                }
+                return prev;
+            });
         };
 
         const handleWheel = (e: WheelEvent) => {
@@ -149,7 +150,7 @@ export function ToolTimeline({
             container.removeEventListener('touchstart', handleTouchStart);
             container.removeEventListener('touchmove', handleTouchMove);
         };
-    }, [canScrollUp, canScrollDown, tools.length, isCollapsed]);
+    }, [tools.length, isCollapsed]);
 
     const visibleTools = tools.slice(
         scrollIndex,
