@@ -109,8 +109,57 @@ export function ToolTimeline({
             }
         };
 
+        let touchStartY = 0;
+        let touchStartTime = 0;
+
+        const handleTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            e.preventDefault();
+
+            const touchCurrentY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchCurrentY;
+            const deltaTime = Date.now() - touchStartTime;
+
+            // Threshold to prevent accidental scrolls
+            const threshold = 30;
+
+            // Prevent too fast repeated triggers
+            if (deltaTime < 150) return;
+
+            if (Math.abs(deltaY) > threshold) {
+                if (deltaY > 0 && canScrollDown) {
+                    // Swipe up - scroll down
+                    setScrollIndex((prev) =>
+                        Math.min(prev + 1, tools.length - maxVisibleTools),
+                    );
+                    touchStartY = touchCurrentY;
+                    touchStartTime = Date.now();
+                } else if (deltaY < 0 && canScrollUp) {
+                    // Swipe down - scroll up
+                    setScrollIndex((prev) => Math.max(prev - 1, 0));
+                    touchStartY = touchCurrentY;
+                    touchStartTime = Date.now();
+                }
+            }
+        };
+
         container.addEventListener('wheel', handleWheel, { passive: false });
-        return () => container.removeEventListener('wheel', handleWheel);
+        container.addEventListener('touchstart', handleTouchStart, {
+            passive: false,
+        });
+        container.addEventListener('touchmove', handleTouchMove, {
+            passive: false,
+        });
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+            container.removeEventListener('touchstart', handleTouchStart);
+            container.removeEventListener('touchmove', handleTouchMove);
+        };
     }, [canScrollUp, canScrollDown, tools.length, isCollapsed]);
 
     const visibleTools = tools.slice(
