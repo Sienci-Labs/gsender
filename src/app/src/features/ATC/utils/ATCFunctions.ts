@@ -1,11 +1,13 @@
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import controller from 'app/lib/controller.ts';
 import {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');
@@ -107,3 +109,26 @@ export function saveToRack(toolID) {
 }
 
 export type LoadToolMode = 'load' | 'save' | 'loadAndSave';
+
+export function isATCAvailable() {
+    const reduxState = reduxStore.getState();
+    const atcFlag = get(reduxState, 'controller.settings.info.NEWOPT.ATC', '0');
+    console.log('ATC Flag', atcFlag);
+    return atcFlag === '1';
+}
+
+export function sendATCHomingDialog() {
+    const hasATC = isATCAvailable();
+    const warningEnabled = store.get('widgets.atc.warnOnHome', false);
+    if (hasATC && warningEnabled) {
+        Confirm({
+            title: 'Homing Collision Warning',
+            content:
+                'Keepout Disabled. Ensure that your homing cycle will not collide with the ATC rack before homing.',
+            onConfirm: () => {
+                controller.command('homing');
+            },
+            confirmLabel: 'Home',
+        });
+    }
+}

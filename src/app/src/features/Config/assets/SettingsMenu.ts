@@ -1619,6 +1619,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: 'Keepout',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Warn on Home',
+                        description:
+                            'Warn when homing that Keepout is disabled and collisions are possible depending on homing cycle.',
+                        key: 'widgets.atc.warnOnHome',
+                    },
                     { type: 'eeprom', eID: '$450' },
                     { type: 'eeprom', eID: '$451' },
                     { type: 'eeprom', eID: '$452' },
