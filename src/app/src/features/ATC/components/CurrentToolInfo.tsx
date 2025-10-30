@@ -59,7 +59,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 setSelectedTool(populatedTool);
             }
         }
-    }, [spindleTool, toolTable, connected]);
+    }, [spindleTool, toolTable, connected, rackSize]);
 
     const getWidgetState = () => {
         if (currentTool === 0) {
