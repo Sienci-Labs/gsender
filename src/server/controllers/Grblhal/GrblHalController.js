@@ -497,7 +497,6 @@ class GrblHalController {
                     }
 
                     let tool = line.match(toolCommand);
-                    console.log('found tool:', tool);
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
                         if (remap) {
@@ -1749,9 +1748,18 @@ class GrblHalController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
-                    // ATCI - add M6 before spindles turned on to get correc tool to spin up
+                    // ATCI - add M6 before spindles turned on to get correct tool to spin up
                     if (atci && modal.tool !== 0) {
-                        modalGCode.push(`M6 T${modal.tool}`);
+                        if (this.toolChangeContext.mappings) {
+                            const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
+                            if (remap) {
+                                console.log('found SFL remap:', remap);
+                                modalGCode.push(`M6 T${remap}`);
+                            }
+                        } else {
+                            console.log('no remap, using found T value');
+                            modalGCode.push(`M6 T${modal.tool}`);
+                        }
                     }
 
                     if (hasSpindle) {
