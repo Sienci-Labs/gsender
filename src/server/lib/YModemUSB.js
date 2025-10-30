@@ -106,7 +106,7 @@ export class YModem extends events.EventEmitter {
             isLastByteSOH = fileSplit.isLastByteSOH;
         }
 
-        let sendType = this.STX;
+        let sendType = fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
         this.totalPackets = fileChunks.length;
 
         for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
@@ -172,19 +172,18 @@ export class YModem extends events.EventEmitter {
 
             let fileChunks;
             let isLastByteSOH = false;
-            /*else if (fileData.size <= SendSize[this.SOH]) {
-                            console.log('Sending using SOH');
-                            fileChunks = [
-                                this.padRBuffer(
-                                    fileData.data,
-                                    SendSize[this.SOH],
-                                    this.PAD_CHAR
-                                ),
-                            ];
-                            isLastByteSOH = true;
-                        } */
             if (fileData.size === 0) {
                 fileChunks = [];
+            } else if (fileData.size <= SendSize[this.SOH]) {
+                console.log('Sending using SOH');
+                fileChunks = [
+                    this.padRBuffer(
+                        fileData.data,
+                        SendSize[this.SOH],
+                        this.PAD_CHAR
+                    ),
+                ];
+                isLastByteSOH = true;
             } else if (fileData.size <= SendSize[this.STX]) {
                 console.log('Sending using STX');
                 fileChunks = [
@@ -206,7 +205,7 @@ export class YModem extends events.EventEmitter {
                 isLastByteSOH = fileSplit.isLastByteSOH;
             }
 
-            let sendType = this.STX;
+            let sendType = fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
             this.totalPackets = fileChunks.length;
 
             for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
