@@ -3,7 +3,6 @@ import Button from 'app/components/Button';
 import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
 import { ConfigProvider } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
-import { setConfig } from 'react-hot-loader';
 import controller from 'app/lib/controller.ts';
 
 export function ATCIConfiguration() {
@@ -17,7 +16,7 @@ export function ATCIConfiguration() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl portrait:w-4/5 mx-auto space-y-8">
             <ConfigProvider>
                 <div className="flex justify-center">
                     <Button

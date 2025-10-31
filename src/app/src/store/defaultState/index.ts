@@ -166,6 +166,7 @@ const defaultState: State = {
         atc: {
             toolMap: {},
             templates: defaultATCIMacros,
+            warnOnHome: true,
         },
         axes: {
             minimized: false,

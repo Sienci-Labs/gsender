@@ -75,8 +75,9 @@ export function ToolRemapDialog({
     const isToolAvailable = (toolNumber: number): boolean => {
         if (toolNumber === originalTool) return true;
 
-        const mappedTo = Array.from(existingMappings.values());
+        /*const mappedTo = Array.from(existingMappings.values());
         if (mappedTo.includes(toolNumber)) return false;
+        */
 
         const isPassedTool = passedTools.includes(toolNumber);
         const toolIsRemapped = existingMappings.has(toolNumber);

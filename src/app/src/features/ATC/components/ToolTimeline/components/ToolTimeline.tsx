@@ -86,6 +86,8 @@ export function ToolTimeline({
     };
 
     useEffect(() => {
+        if (isCollapsed) return;
+
         if (activeToolIndex < scrollIndex) {
             setScrollIndex(activeToolIndex);
         } else if (activeToolIndex >= scrollIndex + maxVisibleTools) {
@@ -94,24 +96,77 @@ export function ToolTimeline({
     }, [activeToolIndex, isCollapsed]);
 
     useEffect(() => {
+        if (isCollapsed) return;
+
         const container = scrollContainerRef.current;
         if (!container) return;
 
+        let touchStartY = 0;
+        let lastScrollY = 0;
+
+        const handleScroll = (deltaY: number) => {
+            setScrollIndex((prev) => {
+                if (deltaY > 0) {
+                    return Math.min(prev + 1, tools.length - maxVisibleTools);
+                } else if (deltaY < 0) {
+                    return Math.max(prev - 1, 0);
+                }
+                return prev;
+            });
+        };
+
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
+            handleScroll(e.deltaY);
+        };
 
-            if (e.deltaY > 0 && canScrollDown) {
-                setScrollIndex((prev) =>
-                    Math.min(prev + 1, tools.length - maxVisibleTools),
-                );
-            } else if (e.deltaY < 0 && canScrollUp) {
-                setScrollIndex((prev) => Math.max(prev - 1, 0));
+        const handleTouchStart = (e: TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target.closest('button') ||
+                target.closest('a') ||
+                target.closest('[role="button"]')
+            ) {
+                return;
+            }
+            e.preventDefault();
+            touchStartY = e.touches[0].clientY;
+            lastScrollY = touchStartY;
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target.closest('button') ||
+                target.closest('a') ||
+                target.closest('[role="button"]')
+            ) {
+                return;
+            }
+            e.preventDefault();
+            const currentY = e.touches[0].clientY;
+            const deltaY = lastScrollY - currentY;
+
+            if (Math.abs(deltaY) > 50) {
+                handleScroll(deltaY);
+                lastScrollY = currentY;
             }
         };
 
         container.addEventListener('wheel', handleWheel, { passive: false });
-        return () => container.removeEventListener('wheel', handleWheel);
-    }, [canScrollUp, canScrollDown, tools.length, isCollapsed]);
+        container.addEventListener('touchstart', handleTouchStart, {
+            passive: false,
+        });
+        container.addEventListener('touchmove', handleTouchMove, {
+            passive: false,
+        });
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+            container.removeEventListener('touchstart', handleTouchStart);
+            container.removeEventListener('touchmove', handleTouchMove);
+        };
+    }, [tools.length, isCollapsed]);
 
     const visibleTools = tools.slice(
         scrollIndex,

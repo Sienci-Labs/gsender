@@ -168,7 +168,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     );
 
     useEffect(() => {
-        console.log('fw', firmwareVersion);
         setIsFirmwareCurrent(firmwarePastVersion(firmwareVersion));
     }, [firmwareVersion]);
 

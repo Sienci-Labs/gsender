@@ -5,6 +5,8 @@ import { TbSwitch3 } from 'react-icons/tb';
 import { ArrowRight } from 'lucide-react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
+import { useEffect, useState } from 'react';
+import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
@@ -24,9 +26,16 @@ export function ToolTimelineItem({
     isRemapped,
     remapValue,
 }: ToolTimelineItemProps) {
+    const [label, setLabel] = useState('');
+
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
+
+    useEffect(() => {
+        const toolLookup = isRemapped ? remapValue : tool.toolNumber;
+        setLabel(lookupToolName(toolLookup));
+    }, [tool, isRemapped, remapValue]);
 
     return (
         <div className="relative">
@@ -87,25 +96,37 @@ export function ToolTimelineItem({
                         <div className="flex items-center justify-between gap-2">
                             <div
                                 className={cn(
-                                    'font-semibold transition-colors flex flex-row gap-1 items-center',
+                                    'font-semibold transition-colors flex flex-row gap-1 items-center flex flex-col',
                                     isActive
                                         ? 'text-sm text-gray-900 dark:text-white'
                                         : 'text-xs text-gray-700 dark:text-gray-300',
                                 )}
                             >
-                                <span
-                                    className={cn(isRemapped && 'line-through')}
-                                >
-                                    {tool.label || `Tool ${tool.toolNumber}`}
-                                </span>
-                                {isRemapped && (
-                                    <>
-                                        <ArrowRight />
-                                        <span className="no-underline">
-                                            T{remapValue}
+                                <div className="flex flex-row gap-2 items-center justify-start">
+                                    <span
+                                        className={cn(
+                                            isRemapped && 'line-through',
+                                            'flex flex-col',
+                                        )}
+                                    >
+                                        {tool.label || `T${tool.toolNumber}`}
+                                    </span>
+                                    {isRemapped && (
+                                        <>
+                                            <ArrowRight />
+                                            <span className="no-underline">
+                                                T{remapValue}
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
+                                <div>
+                                    {label !== '-' && (
+                                        <span className="text-xs text-gray-500">
+                                            {label}
                                         </span>
-                                    </>
-                                )}
+                                    )}
+                                </div>
                             </div>
                             <div className="flex flex-col items-end">
                                 <span

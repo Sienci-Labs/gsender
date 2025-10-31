@@ -11,6 +11,7 @@ import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function CurrentToolInfo({ status = 'probed', disabled }) {
     const { rackSize, connected } = useToolChange();
+    const [spindleTool, setSpindleTool] = useState(0);
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
         id: 0,
         nickname: '-',
@@ -29,6 +30,12 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
 
     //const currentTool = 1;
 
+    useEffect(() => {
+        if (currentTool) {
+            setSpindleTool(currentTool);
+        }
+    }, [currentTool]);
+
     const toolTable = useTypedSelector(
         (state: RootState) => state.controller.settings.toolTable,
     );
@@ -43,7 +50,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
     useEffect(() => {
         if (currentTool) {
             let populatedTool = lookupSpecificTool(
-                currentTool,
+                spindleTool,
                 toolTable,
                 rackSize,
             );
@@ -51,7 +58,7 @@ export function CurrentToolInfo({ status = 'probed', disabled }) {
                 setSelectedTool(populatedTool);
             }
         }
-    }, [currentTool, connected]);
+    }, [spindleTool, toolTable, connected, rackSize]);
 
     const getWidgetState = () => {
         if (currentTool === 0) {

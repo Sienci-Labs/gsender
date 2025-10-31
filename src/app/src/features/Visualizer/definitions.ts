@@ -20,6 +20,7 @@ export type LIGHTWEIGHT_OPTIONS_T =
 export interface ATC {
     toolMap: object;
     templates: ATCIMacroConfig;
+    warnOnHome: boolean;
 }
 
 export interface Visualizer {

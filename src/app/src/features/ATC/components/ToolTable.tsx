@@ -83,9 +83,11 @@ const ToolSection = ({
                 <div className="mt-2">
                     <Table>
                         <TableHeader>
-                            <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr]">
+                            <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr]">
                                 <TableHead>Tool</TableHead>
-                                <TableHead>Z Offset</TableHead>
+                                <TableHead className={'portrait:hidden'}>
+                                    Z Offset
+                                </TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>
                                     {defaultOpen ? (
@@ -108,7 +110,7 @@ const ToolSection = ({
                             {tools.map((tool) => (
                                 <TableRow
                                     key={tool.id}
-                                    className="grid grid-cols-[2fr_1fr_1fr_1fr]"
+                                    className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr]"
                                 >
                                     <TableCell className="font-mono">
                                         <div className="flex flex-col">
@@ -121,12 +123,15 @@ const ToolSection = ({
                                             />
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="portrait:flex portrait:flex-col portrait:gap-2 portrait:items-center">
+                                        <div className="portrait:block hidden">
+                                            <StatusBadge status={tool.status} />
+                                        </div>
                                         <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-center rounded-md font-mono font-semibold text-sm text-blue-500">
                                             {tool.toolOffsets.z.toFixed(3)}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="portrait:hidden">
                                         <StatusBadge status={tool.status} />
                                     </TableCell>
                                     <TableCell>
