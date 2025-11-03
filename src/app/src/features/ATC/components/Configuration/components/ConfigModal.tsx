@@ -49,7 +49,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="w-full flex flex-col flex-1"
+                    className="w-full flex flex-col flex-1 gap-2"
                 >
                     <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
                         <TabsTrigger value="config">ATCI Config</TabsTrigger>
