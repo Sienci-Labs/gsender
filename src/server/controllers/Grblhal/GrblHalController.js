@@ -500,9 +500,7 @@ class GrblHalController {
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
                         if (remap) {
-                            console.log('found remap:', remap);
                             line = line.replace(tool[0], `T${remap}`);
-                            console.log('remapped line', line);
                         }
                     }
 
