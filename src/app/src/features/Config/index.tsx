@@ -81,9 +81,6 @@ export function Config() {
         _e: MouseEventHandler<HTMLButtonElement>,
         index: number,
     ) {
-        if (activeTab === 'eeprom') {
-            return;
-        }
         document
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
@@ -96,11 +93,15 @@ export function Config() {
     return (
         <SettingsProvider>
             <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
-                <Menu
-                    menu={settings}
-                    onClick={navigateToSection}
-                    activeSection={visibleSection}
-                />
+                {activeTab === 'config' ? (
+                    <Menu
+                        menu={settings}
+                        onClick={navigateToSection}
+                        activeSection={visibleSection}
+                    />
+                ) : (
+                    <div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white" />
+                )}
                 <div className="flex flex-col fixed-content-area w-4/5">
                     <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
                         <Search />
