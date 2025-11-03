@@ -278,7 +278,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         if ('key' in v) {
             if ('defaultValue' in v) {
-                console.log(v);
                 return !isEqual(
                     settingsValues[v.globalIndex]?.value,
                     v.defaultValue,
