@@ -33,6 +33,7 @@ export function Config() {
         (state: RootState) => state.connection.isConnected,
     );
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
+    const [activeTab, setActiveTab] = React.useState('config');
 
     function setInView(inView: any, entry: any) {
         if (inView) {
@@ -80,6 +81,9 @@ export function Config() {
         _e: MouseEventHandler<HTMLButtonElement>,
         index: number,
     ) {
+        if (activeTab === 'eeprom') {
+            return;
+        }
         document
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
@@ -105,10 +109,18 @@ export function Config() {
                     </div>
                     <Tabs defaultValue="config">
                         <TabsList className="w-full pb-0 border-b rounded-b-none">
-                            <TabsTrigger value="config" className="w-full">
+                            <TabsTrigger
+                                value="config"
+                                className="w-full"
+                                onClick={() => setActiveTab('config')}
+                            >
                                 All Config
                             </TabsTrigger>
-                            <TabsTrigger value="eeprom" className="w-full">
+                            <TabsTrigger
+                                value="eeprom"
+                                className="w-full"
+                                onClick={() => setActiveTab('eeprom')}
+                            >
                                 EEPROM
                             </TabsTrigger>
                         </TabsList>
