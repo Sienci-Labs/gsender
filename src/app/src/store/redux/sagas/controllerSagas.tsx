@@ -80,7 +80,6 @@ import {
     updateSenderStatus,
     updateControllerType,
     addSDCardFileToList,
-    clearSDCardFiles,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
@@ -99,7 +98,7 @@ import {
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-import { connectToLastDevice } from 'app/features/Firmware/utils/index';
+import { connectToLastDevice } from 'app/lib/connection';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -108,7 +107,7 @@ import {
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
-import { getEstimateData, getParsedData } from 'app/lib/indexedDB';
+import { getEstimateData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
@@ -931,50 +930,57 @@ export function* initialize(): Generator<any, void, any> {
         reduxStore.dispatch(addSDCardFileToList({ file }));
     });
 
-    controller.addListener('atci', (payload) => {
-        if (payload.subtype === '0') {
-            Confirm({
-                title: payload.message,
-                content: payload.description,
-                confirmLabel: 'Continue',
-                cancelLabel: 'Reset',
-                onConfirm: () => {
-                    controller.command('cyclestart');
-                },
-                onClose: () => {
-                    controller.command('reset');
-                },
-            });
-        } else if (payload.subtype === '1') {
-            Confirm({
-                title: payload.message,
-                content: payload.description,
-                confirmLabel: 'OK',
-                cancelLabel: 'Reset',
-                onConfirm: () => {
-                    controller.command('cyclestart');
-                },
-                hideClose: true,
-            });
-        } else if (payload.subtype === '2') {
-            Confirm({
-                title: payload.message,
-                content: payload.description,
-                confirmLabel: 'Reset',
-                onConfirm: () => {
-                    controller.command('reset');
-                },
-                hideClose: true,
-            });
-        } else {
-            Confirm({
-                title: 'ATCi requested a dialog.',
-                content: 'Continue to unhold, Reset to stop action.',
-                confirmLabel: 'Continue',
-                cancelLabel: 'Reset',
-            });
-        }
-    });
+    controller.addListener(
+        'atci',
+        (payload: {
+            subtype: string;
+            message: string;
+            description: string;
+        }) => {
+            if (payload.subtype === '0') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    onClose: () => {
+                        controller.command('reset');
+                    },
+                });
+            } else if (payload.subtype === '1') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'OK',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    hideClose: true,
+                });
+            } else if (payload.subtype === '2') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('reset');
+                    },
+                    hideClose: true,
+                });
+            } else {
+                Confirm({
+                    title: 'ATCi requested a dialog.',
+                    content: 'Continue to unhold, Reset to stop action.',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                });
+            }
+        },
+    );
 
     controller.addListener('job:stop', () => {
         const revertWorkspace = store.get('workspace.revertWorkspace');
