@@ -32,7 +32,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
-    EEPROM?: object;
+    EEPROM?: FilteredEEPROM[];
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
     machineProfile: MachineProfile;
@@ -48,6 +48,7 @@ interface iSettingsContext {
     settingsValues: gSenderSetting[];
     setSettingsValues?: React.Dispatch<React.SetStateAction<gSenderSetting[]>>;
     settingsFilter: (v: gSenderSetting) => boolean;
+    eepromFilter: (v: gSenderSetting) => boolean;
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -64,7 +65,16 @@ const defaultState: iSettingsContext = {
     settings: SettingsMenu,
     settingsToUpdate: {},
     EEPROMToUpdate: {},
-    EEPROM: {},
+    EEPROM: [
+        {
+            unit: '',
+            setting: '$',
+            globalIndex: 0,
+            value: '',
+            group: '',
+            groupID: 0,
+        },
+    ],
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
@@ -83,6 +93,7 @@ const defaultState: iSettingsContext = {
         },
     ],
     settingsFilter: () => true,
+    eepromFilter: () => true,
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
@@ -326,6 +337,40 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 .includes(searchTerm.toLowerCase());
     }
 
+    function eepromFilter(v: gSenderSetting) {
+        // Always exclude eeprom/hybrids when not connected
+        if (!connectionState) {
+            return false;
+        }
+
+        let idToUse = v.eID;
+        if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+            idToUse = v.remap;
+        }
+        const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
+
+        // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
+        if (!EEPROMData) {
+            return false;
+        }
+        // If filterNonDefault is enabled, make sure the current value equals the default value
+        if (filterNonDefault) {
+            if (EEPROMData) {
+                return !eepromIsDefault(EEPROMData);
+            }
+            return false; // We don't know, default to hide
+        }
+
+        if (searchTerm.length === 0 || !searchTerm) {
+            return true;
+        }
+
+        if (v)
+            return JSON.stringify(EEPROMData)
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
+    }
+
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
             controllerType === 'Grbl'
@@ -434,6 +479,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsValues,
         setSettingsValues,
         settingsFilter,
+        eepromFilter,
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,

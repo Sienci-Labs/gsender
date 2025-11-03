@@ -3,7 +3,6 @@ import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
 import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
-import { gSenderSubSection, SettingsMenu } from './assets/SettingsMenu';
 import {
     SettingsProvider,
     useSettings,
@@ -14,11 +13,19 @@ import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROM
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from 'app/components/shadcn/Tabs';
+import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
+import { convertEIDToNumber } from 'app/lib/numeral';
 
 export function Config() {
-    const [activeSection, setActiveSection] = React.useState<number>(0);
-    const [showFlashDialog, setShowFlashDialog] = React.useState(false);
-    const { inViewRef, inView } = useInView({
+    // const [activeSection, setActiveSection] = React.useState<number>(0);
+    // const [showFlashDialog, setShowFlashDialog] = React.useState(false);
+    const { ref: inViewRef } = useInView({
         threshold: 0.2,
     });
 
@@ -27,13 +34,36 @@ export function Config() {
     );
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
 
-    function setInView(inView, entry) {
+    function setInView(inView: any, entry: any) {
         if (inView) {
             setVisibleSection(entry.target.getAttribute('id'));
         }
     }
 
     const { settings } = useSettings();
+
+    // lets extract all the eeprom settings
+    let allEEPROM: gSenderSetting[] = settings
+        .flatMap((section) => section.settings)
+        .flatMap((subSection) => subSection.settings)
+        .filter((setting) => setting.eID);
+    // sort so they are in order of EEPROM
+    allEEPROM.sort(
+        (a, b) => convertEIDToNumber(a.eID) - convertEIDToNumber(b.eID),
+    );
+    const eepromSettings: SettingsMenuSection[] = [
+        {
+            label: '',
+            icon: null,
+            settings: [
+                {
+                    label: '',
+                    settings: allEEPROM,
+                },
+            ],
+        },
+    ];
+
     /*
     const filteredSettings = settings.map((section) => {
         const newSection = { ...section };
@@ -47,13 +77,13 @@ export function Config() {
     console.log(filteredSettings);
     */
     function navigateToSection(
-        e: MouseEventHandler<HTMLButtonElement>,
+        _e: MouseEventHandler<HTMLButtonElement>,
         index: number,
     ) {
         document
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
-        setActiveSection(index);
+        // setActiveSection(index);
         setTimeout(() => {
             setVisibleSection(`h-section-${index}`);
         }, 50);
@@ -73,44 +103,86 @@ export function Config() {
                         <FilterDefaultToggle />
                         <ApplicationPreferences />
                     </div>
-                    <div
-                        className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-                        ref={inViewRef}
-                    >
-                        <EEPROMNotConnectedWarning connected={connected} />
-                        {settings.map((item, index) => {
-                            return (
-                                <InView
-                                    key={`IV-section-${index}`}
-                                    onChange={setInView}
-                                    threshold={0}
-                                    rootMargin="0px 0px -75% 0px"
-                                    className={'bg-red-500'}
-                                >
-                                    {({ ref }) => {
-                                        return (
-                                            <Section
-                                                title={item.label}
-                                                key={`section-${index}`}
-                                                id={`section-${index}`}
-                                                index={index}
-                                                settings={item.settings}
-                                                eeprom={item.eeprom}
-                                                ref={ref}
-                                                connected={connected}
-                                                wizard={item.wizard}
-                                            />
-                                        );
-                                    }}
-                                </InView>
-                            );
-                        })}
-                        <ProfileBar
-                            setShowFlashDialog={() => {
-                                setShowFlashDialog(!showFlashDialog);
-                            }}
-                        />
-                    </div>
+                    <Tabs defaultValue="config">
+                        <TabsList className="w-full pb-0 border-b rounded-b-none">
+                            <TabsTrigger value="config" className="w-full">
+                                All Config
+                            </TabsTrigger>
+                            <TabsTrigger value="eeprom" className="w-full">
+                                EEPROM
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent
+                            value="config"
+                            className="flex flex-col fixed-config-area"
+                        >
+                            <div
+                                className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
+                                ref={inViewRef}
+                            >
+                                <EEPROMNotConnectedWarning
+                                    connected={connected}
+                                />
+                                {settings.map((item, index) => {
+                                    return (
+                                        <InView
+                                            key={`IV-section-${index}`}
+                                            onChange={setInView}
+                                            threshold={0}
+                                            rootMargin="0px 0px -75% 0px"
+                                            className={'bg-red-500'}
+                                        >
+                                            {({ ref }) => {
+                                                return (
+                                                    <Section
+                                                        title={item.label}
+                                                        key={`section-${index}`}
+                                                        id={`section-${index}`}
+                                                        index={index}
+                                                        settings={item.settings}
+                                                        eeprom={item.eeprom}
+                                                        ref={ref}
+                                                        connected={connected}
+                                                        wizard={item.wizard}
+                                                    />
+                                                );
+                                            }}
+                                        </InView>
+                                    );
+                                })}
+                            </div>
+                        </TabsContent>
+                        <TabsContent
+                            value="eeprom"
+                            className="flex flex-col fixed-config-area"
+                        >
+                            <div className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative">
+                                <EEPROMNotConnectedWarning
+                                    connected={connected}
+                                />
+                                {eepromSettings.map((item, index) => {
+                                    return (
+                                        <Section
+                                            title={item.label}
+                                            key={`section-${index}`}
+                                            id={`section-${index}`}
+                                            index={index}
+                                            settings={item.settings}
+                                            eeprom={item.eeprom}
+                                            connected={connected}
+                                            wizard={item.wizard}
+                                            showEEPROMOnly={true}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                    <ProfileBar
+                    // setShowFlashDialog={() => {
+                    //     setShowFlashDialog(!showFlashDialog);
+                    // }}
+                    />
                 </div>
             </div>
         </SettingsProvider>
