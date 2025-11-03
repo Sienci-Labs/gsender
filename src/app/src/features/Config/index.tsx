@@ -49,9 +49,11 @@ export function Config() {
         .flatMap((subSection) => subSection.settings)
         .filter((setting) => setting.eID);
     // sort so they are in order of EEPROM
-    allEEPROM.sort(
-        (a, b) => convertEIDToNumber(a.eID) - convertEIDToNumber(b.eID),
-    );
+    allEEPROM.sort((a, b) => {
+        const aID = a.remap ? a.remap : a.eID;
+        const bID = b.remap ? b.remap : b.eID;
+        return convertEIDToNumber(aID) - convertEIDToNumber(bID);
+    });
     const eepromSettings: SettingsMenuSection[] = [
         {
             label: '',
