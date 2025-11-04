@@ -34,6 +34,11 @@ class GrblHalLineParserResultATCI {
             values
         };
 
+        //  Keepout specific logic - how to handle
+        if (r[0].includes('inside the keepout zone')) {
+            payload.subtype = 10;
+            payload.description = r[3].trim();
+        }
         console.log(payload);
 
         return {

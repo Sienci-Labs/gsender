@@ -64,9 +64,12 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
             >
                 <div
                     id="wizContent"
-                    className="flex p-4 justify-stretch items-stretch flex-grow"
+                    className="flex p-4 justify-stretch items-stretch flex-grow flex-col"
                 >
                     <span>{description}</span>
+                    {payload.content && (
+                        <div className="mt-2 p-2">{payload.content}</div>
+                    )}
                 </div>
             </CSSTransition>
         </div>

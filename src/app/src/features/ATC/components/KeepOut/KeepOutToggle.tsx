@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Shield, ShieldOff } from 'lucide-react';
 import controller from 'app/lib/controller.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
 
 interface KeepoutToggleProps {
     initialFlags?: string[];
 }
 
-export function KeepoutToggle({ initialFlags = [] }: KeepoutToggleProps) {
-    const [flags, setFlags] = useState<string[]>(initialFlags);
+export function KeepoutToggle(): KeepoutToggleProps {
+    const [flags, setFlags] = useState<string[]>([]);
     const isEnabled = flags.includes('E');
+
+    const initialFlags = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.keepout?.flags,
+    );
 
     useEffect(() => {
         setFlags(initialFlags);
