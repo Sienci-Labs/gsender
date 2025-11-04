@@ -48,8 +48,8 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
                 <h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-orange-600 font-bold text-xl">
                     <FaInfoCircle className="text-2xl" /> {title}
                 </h1>
-                <div className="flex cursor-pointer bg-amber-200 shadow">
-                    <FaTimes onClick={() => onClose()} />
+                <div className="flex cursor-pointer bg-amber-200/20 p-1 border-orange-500 border">
+                    <FaTimes onClick={() => onClose()} className="w-5 h-5" />
                 </div>
             </div>
             <CSSTransition
