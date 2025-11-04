@@ -281,7 +281,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         if ('key' in v) {
             if ('defaultValue' in v) {
-                console.log(v);
                 return !isEqual(
                     settingsValues[v.globalIndex]?.value,
                     v.defaultValue,
@@ -418,7 +417,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         }
 
         const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-        console.log('isCurrent', firmwareCurrent);
+
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
@@ -429,7 +428,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                         let eID = get(o, 'eID', null);
                         // if remap and version match
                         if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
-                            console.log('REMAPPING', o);
                             eID = get(o, 'remap', null);
                             o.remapped = true;
                         }
