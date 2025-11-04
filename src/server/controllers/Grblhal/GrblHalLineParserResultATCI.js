@@ -1,6 +1,7 @@
 class GrblHalLineParserResultATCI {
     static parse(line) {
-        const r = line.match(/\[(MSG:(?:Error: )?ATCI):?(\d*)?\|(.*)]$/);
+        //const r = line.match(/\[(MSG:(?:Error: )?ATCI):?(\d*)?\|(.*)]$/);
+        const r = line.match(/\[(MSG:(?:(?:Error:|Warning:)\s)?ATCI):?(\d*)?\|?(.*)]$/);
         if (!r) {
             return null;
         }
@@ -32,6 +33,8 @@ class GrblHalLineParserResultATCI {
             description,
             values
         };
+
+        console.log(payload);
 
         return {
             type: GrblHalLineParserResultATCI,
