@@ -294,7 +294,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     function checkSearchTerm(v: gSenderSetting) {
         let searchChecker: any = v;
         if (v.type === 'eeprom') {
-            searchChecker = EEPROM.find((s) => s.setting === v.eID);
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            searchChecker = EEPROM.find((s) => s.setting === idToUse);
         }
 
         return JSON.stringify(searchChecker)
