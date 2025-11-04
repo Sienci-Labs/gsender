@@ -970,7 +970,12 @@ export function* initialize(): Generator<any, void, any> {
         } else if ((payload.subtype = '10')) {
             pubsub.publish('helper:info', {
                 title: 'Jogging Inside Keepout Area',
-                content: <KeepoutToggle />,
+                content: (
+                    <div className="flex flex-row gap-4 items-centerx`">
+                        <span>Keepout:</span>
+                        <KeepoutToggle />
+                    </div>
+                ),
                 description:
                     'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
             });
