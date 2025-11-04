@@ -4,11 +4,7 @@ import controller from 'app/lib/controller.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 
-interface KeepoutToggleProps {
-    initialFlags?: string[];
-}
-
-export function KeepoutToggle(): KeepoutToggleProps {
+export function KeepoutToggle() {
     const [flags, setFlags] = useState<string[]>([]);
     const isEnabled = flags.includes('E');
 
@@ -17,6 +13,10 @@ export function KeepoutToggle(): KeepoutToggleProps {
     );
 
     useEffect(() => {
+        if (!initialFlags) {
+            setFlags([]);
+            return;
+        }
         setFlags(initialFlags);
     }, [initialFlags]);
 
