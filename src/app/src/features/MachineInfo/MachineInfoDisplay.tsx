@@ -24,6 +24,7 @@ export function MachineInfoDisplay({
             isConnected: state.connection.isConnected,
             settings: state.controller.settings,
             currentTool: state.controller.state.status?.currentTool,
+            keepoutFlags: state.controller.state.status?.keepout?.flags,
         }));
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');

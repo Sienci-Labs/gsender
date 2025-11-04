@@ -12,6 +12,8 @@ export function KeepoutToggle() {
         (state: RootState) => state.controller.state.status?.keepout?.flags,
     );
 
+    console.log('initialFlags', initialFlags);
+
     useEffect(() => {
         if (!initialFlags) {
             setFlags([]);
@@ -30,7 +32,7 @@ export function KeepoutToggle() {
         }
     };
 
-    if (!initialFlags) return <div></div>;
+    if (!flags) return <div>OK</div>;
 
     return (
         <button
