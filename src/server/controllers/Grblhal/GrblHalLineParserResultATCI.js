@@ -5,8 +5,6 @@ class GrblHalLineParserResultATCI {
             return null;
         }
 
-        console.log(r);
-
         let message = null;
         let description = null;
         const subtype = r[2] || null;
