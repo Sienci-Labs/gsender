@@ -51,10 +51,6 @@ export function EEPROMSettingRow({
             firmwareType,
         );
 
-        if (eID === '$450') {
-            console.log(EEPROMData);
-        }
-
         const inputDefault = get(profileDefaults, eID, '-');
 
         //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);

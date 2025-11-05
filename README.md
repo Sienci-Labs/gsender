@@ -11,7 +11,7 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 * **Works on as wide a range in computing systems as possible** (low-end PC to RasPi, leveraging [Electron](https://www.electronjs.org/))
 * Used to be based on the popular [CNCjs controller interface](https://github.com/cncjs/cncjs) but has since been mostly re-written
 
-**Our core principals during development have been to:**
+### Our core principals during development have been to:
 1. Make any CNC feel easy to use no matter your previous experience
 2. Substitute CNC jargon with simple language when possible
 3. Keep the interface flexible to accommodate any common CNC machine
@@ -21,7 +21,7 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
-gSender is available for the following systems and does not yet support headless Pi operation
+gSender is available for the systems below and does not yet support headless Pi operation
 
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Universal)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)                | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                                   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
@@ -32,10 +32,9 @@ gSender is available for the following systems and does not yet support headless
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 
-## 📦 Current Features
+## 📦 Feature Highlights
 
-* [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported
-* Full imperial/metric compatibility
+* [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported with full imperial/metric compatibility
 * Smart machine connection
 * 4-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
@@ -70,28 +69,27 @@ gSender is available for the following systems and does not yet support headless
 * Generic support for other machines, including:
     - Shapeoko
     - X-Carve
+    - SainSmart/Genmitsu
+    - FoxAlien
+    - 3018 CNC & PROVer
     - OpenBuilds CNCs
     - Ooznest WorkBee
     - Nomad
     - Carvey
     - RatRig
-    - 3018 CNC & PROVer
     - Bulk-Man 3D
-    - FoxAlien
-    - SainSmart/Genmitsu
     - YoraHome
     - Two Trees
     - BobsCNC
     - CNC4Newbie
     - MillRight
-    - Onefinity (running grbl-based controller)
-    - Mill One, and more...
+    - Onefinity (running grbl-based controller), and more...
 
 ## 🎓 Documentation
 
-All up-to-date documentation on gSender can be found here: [https://sienci.com/gsender-documentation/](https://sienci.com/gsender-documentation/)
+All up-to-date documentation can be found here: [https://sienci.com/gsender-documentation/](https://sienci.com/gsender-documentation/)
 
-If you encounter issues or would like to recommend improvements for gSender, there's a link for feedback submission on the documentation page. We also have a place for discussion on our forum: [https://forum.sienci.com/c/gsender/](https://forum.sienci.com/c/gsender/)
+If you run into issues or have ideas on how to improve gSender, [let us know on GitHub](https://github.com/Sienci-Labs/gsender/issues) or [on our User Forum](https://forum.sienci.com/c/gsender/).
 
 
 ## 📃 Example Files
@@ -104,10 +102,11 @@ If you'd like to test gSender's capabilities, there are several gcode files in t
 gSender is free software, provided as-is and available under the [GNU GPLv3 license](https://github.com/Sienci-Labs/sender/blob/master/LICENSE).
 
 
-## 👓 Further Use
+## 🥽 Compiling Yourself
 
-gSender is also designed in a way that it can be run locally on your computer browser or otherwise compiled for use on other systems which aren't listed in the downloads. We'd appreciate user input and contributions so we can compile documentation on how you can set this up yourself.
+You can both run gSender locally using the public code-base as well as compile it for use on other systems which aren't listed in the downloads. This can come in handy whether you're aiming to customize the application for your specific needs, test experimental features, or contribute to open source development of the gSender project. Read more on the process here: [https://resources.sienci.com/view/gs-compile/](https://resources.sienci.com/view/gs-compile/).
 
+**Note:** This guide is intended for users with some familiarity with command-line interfaces and software development environments. If you are looking to simply install gSender, please refer to the [gSender Installation Guide](https://resources.sienci.com/view/gs-installation/).
 
 ## 🕣 Development History
 <details>

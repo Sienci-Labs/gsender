@@ -116,6 +116,7 @@ import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -965,6 +966,18 @@ export function* initialize(): Generator<any, void, any> {
                     controller.command('reset');
                 },
                 hideClose: true,
+            });
+        } else if ((payload.subtype = '10')) {
+            pubsub.publish('helper:info', {
+                title: 'Jogging Inside Keepout Area',
+                content: (
+                    <div className="flex flex-row gap-4 items-centerx`">
+                        <span>Keepout:</span>
+                        <KeepoutToggle />
+                    </div>
+                ),
+                description:
+                    'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
             });
         } else {
             Confirm({

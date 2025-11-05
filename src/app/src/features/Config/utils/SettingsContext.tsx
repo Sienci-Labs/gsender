@@ -39,7 +39,7 @@ interface iSettingsContext {
     rawEEPROM: object;
     firmwareType: FIRMWARE_TYPES_T;
     setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
-    setEEPROM?: React.Dispatch<React.SetStateAction<EEPROMSettings>>;
+    setEEPROM?: React.Dispatch<React.SetStateAction<FilteredEEPROM[]>>;
     connected: boolean;
     settingsAreDirty: boolean;
     setSettingsAreDirty?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,8 +51,8 @@ interface iSettingsContext {
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
-    eepromIsDefault: (v: object) => boolean;
-    isSettingDefault: (v: object) => boolean;
+    eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
+    isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
 }
 
@@ -68,7 +68,7 @@ const defaultState: iSettingsContext = {
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
-    isSettingDefault(v: object): boolean {
+    isSettingDefault(_v: object): boolean {
         return false;
     },
     rawEEPROM: {},
@@ -220,10 +220,24 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSettingsValues([...globalValues]);
     }
 
+    function repopulateEEPROM() {
+        setEEPROM(
+            getFilteredEEPROMSettings(
+                BASE_SETTINGS,
+                detectedEEPROM,
+                detectedEEPROMDescriptions,
+                detectedEEPROMGroups,
+            ),
+        );
+    }
+
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
             return repopulateSettings();
+        });
+        pubsub.subscribe('eeprom:repopulate', () => {
+            return repopulateEEPROM();
         });
     }, []);
 
@@ -246,6 +260,51 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         );
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
+    function checkIfModified(v: gSenderSetting) {
+        if (v.type === 'wizard' || v.type === 'event') {
+            // we don't have defaults for these
+            return false;
+        }
+
+        if (v.type === 'eeprom') {
+            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+            // If filterNonDefault is enabled, make sure the current value equals the default value
+            if (EEPROMData) {
+                return !eepromIsDefault(EEPROMData);
+            }
+        }
+
+        if (v.type === 'hybrid') {
+            // If filterNonDefault is enabled, make sure the current value equals the default value
+            return !eepromIsDefault(v);
+        }
+
+        if ('key' in v) {
+            if ('defaultValue' in v) {
+                return !isEqual(
+                    settingsValues[v.globalIndex]?.value,
+                    v.defaultValue,
+                );
+            }
+            return false;
+        }
+    }
+
+    function checkSearchTerm(v: gSenderSetting) {
+        let searchChecker: any = v;
+        if (v.type === 'eeprom') {
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            searchChecker = EEPROM.find((s) => s.setting === idToUse);
+        }
+
+        return JSON.stringify(searchChecker)
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+    }
+
     /**
      * Filter for general settings.
      * Filter EEPROM if not connected
@@ -254,12 +313,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * @param v - The setting to filter
      */
     function settingsFilter(v: gSenderSetting) {
-        if (filterNonDefault) {
-            if (v.type === 'wizard' || v.type === 'event') {
-                // we don't have defaults for these
-                return false;
-            }
-        }
+        // ***first, check conditions that are always applicable
 
         // Hide hidden when filtering
         if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
@@ -268,9 +322,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 return false;
             }
         }
-
-        if (v.type === 'eeprom') {
-            // Always exclude eeprom/hybrids when not connected
+        // Always exclude eeprom/hybrids when not connected
+        if (v.type === 'eeprom' || v.type === 'hybrid') {
             if (!connectionState) {
                 return false;
             }
@@ -279,51 +332,31 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
                 idToUse = v.remap;
             }
-            const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
-
-            // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
-            if (!EEPROMData) {
-                return false;
-            }
-            // If filterNonDefault is enabled, make sure the current value equals the default value
-            if (filterNonDefault) {
-                if (EEPROMData) {
-                    return !eepromIsDefault(EEPROMData);
+            if (v.type === 'eeprom') {
+                const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
+                if (!EEPROMData) {
+                    return false;
                 }
-                return false; // We don't know, default to hide
             }
         }
 
-        if (v.type === 'hybrid') {
-            // Always exclude eeprom/hybrids when not connected
-            if (!connectionState) {
-                return false;
-            }
-            // If filterNonDefault is enabled, make sure the current value equals the default value
-            if (filterNonDefault) {
-                return !eepromIsDefault(v);
-            }
-        }
-
-        // Filter non-default gSender settings if they are store values (have a key)
-        if (filterNonDefault && 'key' in v) {
-            if ('defaultValue' in v) {
-                return !isEqual(
-                    settingsValues[v.globalIndex].value,
-                    v.defaultValue,
-                );
-            }
-            return false;
-        }
+        // ***then, consider defaults and searching
+        const modified = checkIfModified(v);
+        const searched = checkSearchTerm(v);
 
         if (searchTerm.length === 0 || !searchTerm) {
+            // if no search, check modified
+            if (filterNonDefault) {
+                return modified;
+            }
             return true;
+        } else {
+            // if search, consider both
+            if (filterNonDefault) {
+                return modified && searched;
+            }
+            return searched;
         }
-
-        if (v)
-            return JSON.stringify(v)
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase());
     }
 
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
@@ -384,7 +417,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         }
 
         const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-        console.log('isCurrent', firmwareCurrent);
+
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
@@ -395,7 +428,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                         let eID = get(o, 'eID', null);
                         // if remap and version match
                         if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
-                            console.log('REMAPPING', o);
                             eID = get(o, 'remap', null);
                             o.remapped = true;
                         }

@@ -79,7 +79,8 @@ export function ToolRemapDialog({
         if (mappedTo.includes(toolNumber)) return false;
         */
 
-        const isPassedTool = passedTools.includes(toolNumber);
+        //const isPassedTool = passedTools.includes(toolNumber);
+        const isPassedTool = false;
         const toolIsRemapped = existingMappings.has(toolNumber);
 
         return !(isPassedTool && !toolIsRemapped);
