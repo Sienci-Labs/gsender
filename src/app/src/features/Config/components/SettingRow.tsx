@@ -223,10 +223,49 @@ export function SettingRow({
                 },
             )}
         >
-            <span className="w-1/5 font-xl max-xl:w-full max-xl:mb-2 dark:text-gray-400">
-                {setting.label}
+            <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-gray-400 flex items-center justify-between sm:block">
+                <span>{setting.label}</span>
+                <span className="sm:hidden flex flex-row gap-2">
+                    {!isDefault && (
+                        <Tooltip content="Reset to default value">
+                            <button
+                                className="text-3xl"
+                                title=""
+                                onClick={() => {
+                                    Confirm({
+                                        title: 'Reset setting',
+                                        content:
+                                            'Are you sure you want to reset this value to default?',
+                                        confirmLabel: 'Yes',
+                                        onConfirm: () => {
+                                            handleProgramSettingReset(
+                                                populatedValue,
+                                            );
+                                        },
+                                    });
+                                }}
+                            >
+                                <BiReset />
+                            </button>
+                        </Tooltip>
+                    )}
+                    {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
+                        <Tooltip content="Machine setting">
+                            <span className="text-robin-500 text-4xl">
+                                <FaMicrochip />
+                            </span>
+                        </Tooltip>
+                    ) : (
+                        <span className="text-robin-500 min-w-9" />
+                    )}
+                </span>
             </span>
-            <span className="w-1/5 max-xl:w-2/5 text-xs px-4 dark:text-gray-200">
+            <span className="w-full sm:w-2/5 sm:order-none order-2 text-gray-500 text-sm flex flex-col gap-2 sm:mb-0 mb-2">
+                {setting.description.split('\n').map((line, index) => (
+                    <p key={index}>{line}</p>
+                ))}
+            </span>
+            <span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-gray-200 sm:mb-0 mb-0">
                 {returnSettingControl(
                     connected,
                     displaySetting,
@@ -235,7 +274,7 @@ export function SettingRow({
                     changeHandler(populatedValue.globalIndex),
                 )}
             </span>
-            <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+            <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 justify-end">
                 {!isDefault && (
                     <Tooltip content="Reset to default value">
                         <button
@@ -268,11 +307,6 @@ export function SettingRow({
                 ) : (
                     <span className="text-robin-500 min-w-9" />
                 )}
-            </span>
-            <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5 flex flex-col gap-2">
-                {setting.description.split('\n').map((line, index) => (
-                    <p>{line}</p>
-                ))}
             </span>
         </div>
     );
