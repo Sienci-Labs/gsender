@@ -212,7 +212,6 @@ export function SettingRow({
 
     const isDefault = isSettingDefault(populatedValue);
 
-    //const newLineDesc = setting.description.replace(/\n/g, '<br />')
     return (
         <div
             className={cn(
