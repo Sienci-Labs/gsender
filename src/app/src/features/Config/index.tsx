@@ -34,18 +34,7 @@ export function Config() {
     }
 
     const { settings } = useSettings();
-    /*
-    const filteredSettings = settings.map((section) => {
-        const newSection = { ...section };
-        newSection.settings = section.settings.map((ss) => {
-            const fs = { ...ss };
-            fs.settings = fs.settings.filter((o) => settingsFilter(o));
-            return fs;
-        });
-        return newSection;
-    });
-    console.log(filteredSettings);
-    */
+
     function navigateToSection(
         e: MouseEventHandler<HTMLButtonElement>,
         index: number,
@@ -66,7 +55,7 @@ export function Config() {
                 onClick={navigateToSection}
                 activeSection={visibleSection}
             />
-            <div className="flex flex-col fixed-content-area w-4/5">
+            <div className="flex flex-col fixed-content-area w-4/5 max-sm:w-full">
                 <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
                     <Search />
                     <FilterDefaultToggle />
