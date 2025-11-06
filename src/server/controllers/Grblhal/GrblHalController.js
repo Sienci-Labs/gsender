@@ -283,7 +283,7 @@ class GrblHalController {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.

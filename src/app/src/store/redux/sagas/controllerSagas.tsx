@@ -742,6 +742,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
@@ -750,6 +751,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('sender:M0M1', (opts: { comment: string }) => {
         const { comment = '' } = opts;
+        console.log('CALLED:', opts);
         const msg =
             'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
