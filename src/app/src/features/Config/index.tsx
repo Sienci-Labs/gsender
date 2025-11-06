@@ -3,10 +3,7 @@ import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
 import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
-import {
-    SettingsProvider,
-    useSettings,
-} from 'app/features/Config/utils/SettingsContext';
+import { useSettings } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
 import { useInView, InView } from 'react-intersection-observer';
 import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
@@ -23,8 +20,6 @@ import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
 
 export function Config() {
-    // const [activeSection, setActiveSection] = React.useState<number>(0);
-    // const [showFlashDialog, setShowFlashDialog] = React.useState(false);
     const { ref: inViewRef } = useInView({
         threshold: 0.2,
     });
@@ -67,18 +62,6 @@ export function Config() {
         },
     ];
 
-    /*
-    const filteredSettings = settings.map((section) => {
-        const newSection = { ...section };
-        newSection.settings = section.settings.map((ss) => {
-            const fs = { ...ss };
-            fs.settings = fs.settings.filter((o) => settingsFilter(o));
-            return fs;
-        });
-        return newSection;
-    });
-    console.log(filteredSettings);
-    */
     function navigateToSection(
         _e: MouseEventHandler<HTMLButtonElement>,
         index: number,
@@ -86,7 +69,6 @@ export function Config() {
         document
             .getElementById(`section-${index}`)
             .scrollIntoView({ behavior: 'instant' });
-        // setActiveSection(index);
         setTimeout(() => {
             setVisibleSection(`h-section-${index}`);
         }, 50);
@@ -188,11 +170,7 @@ export function Config() {
                         </div>
                     </TabsContent>
                 </Tabs>
-                <ProfileBar
-                // setShowFlashDialog={() => {
-                //     setShowFlashDialog(!showFlashDialog);
-                // }}
-                />
+                <ProfileBar />
             </div>
         </div>
     );
