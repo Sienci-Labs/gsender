@@ -260,12 +260,12 @@ export function SettingRow({
                     )}
                 </span>
             </span>
-            <span className="w-full sm:w-2/5 sm:order-none order-2 text-gray-500 text-sm flex flex-col gap-2 sm:mb-0 mb-2">
+            <span className="w-full sm:w-2/5 sm:order-none order-2 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
                 {setting.description.split('\n').map((line, index) => (
                     <p key={index}>{line}</p>
                 ))}
             </span>
-            <span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-gray-200 sm:mb-0 mb-0">
+            <span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-gray-200 sm:mb-0  max-sm:mb-2 mb-0">
                 {returnSettingControl(
                     connected,
                     displaySetting,
