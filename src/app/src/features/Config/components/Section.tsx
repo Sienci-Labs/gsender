@@ -34,12 +34,11 @@ export const Section = React.forwardRef(
         }: SectionProps,
         ref,
     ) => {
-        const { settingsFilter, eepromFilter } = useSettings();
+        const { settingsFilter } = useSettings();
 
-        const filterToUse = showEEPROMOnly ? eepromFilter : settingsFilter;
         const filteredSettings = settings.map((s: gSenderSubSection) => {
             const fs = { ...s };
-            fs.settings = fs.settings.filter((o) => filterToUse(o));
+            fs.settings = fs.settings.filter((o) => settingsFilter(o));
             return fs;
         });
 
