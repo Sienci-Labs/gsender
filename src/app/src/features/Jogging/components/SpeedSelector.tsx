@@ -97,10 +97,43 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         // get speed, convert units, update UI
         updateCurrentJogValues();
 
-        const token = pubsub.subscribe('config:saved', updateCurrentJogValues);
+        const tokens = [
+            pubsub.subscribe('config:saved', (_, settingsToUpdate) => {
+                // check to see if the presets were updated
+                const reg = new RegExp(Object.keys(settingsToUpdate).join('|'));
+                const rapidCheck = reg.test('widgets.axes.jog.rapid');
+                const normalCheck = reg.test('widgets.axes.jog.normal');
+                const preciseCheck = reg.test('widgets.axes.jog.precise');
+                // only update if its the current selected speed
+                if (
+                    (rapidActive && rapidCheck) ||
+                    (normalActive && normalCheck) ||
+                    (preciseActive && preciseCheck)
+                ) {
+                    updateCurrentJogValues();
+                }
+            }),
+            pubsub.subscribe('programSettingReset', (_, setting: string) => {
+                // check to see if the presets were updated
+                const reg = new RegExp(setting);
+                const rapidCheck = reg.test('widgets.axes.jog.rapid');
+                const normalCheck = reg.test('widgets.axes.jog.normal');
+                const preciseCheck = reg.test('widgets.axes.jog.precise');
+                // only update if its the current selected speed
+                if (
+                    (rapidActive && rapidCheck) ||
+                    (normalActive && normalCheck) ||
+                    (preciseActive && preciseCheck)
+                ) {
+                    updateCurrentJogValues();
+                }
+            }),
+        ];
 
         return () => {
-            pubsub.unsubscribe(token);
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
         };
     }, [selectedSpeed, units]);
 

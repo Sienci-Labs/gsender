@@ -60,59 +60,57 @@ export function Config() {
     }
 
     return (
-        <SettingsProvider>
-            <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
-                <Menu
-                    menu={settings}
-                    onClick={navigateToSection}
-                    activeSection={visibleSection}
-                />
-                <div className="flex flex-col fixed-content-area w-4/5">
-                    <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
-                        <Search />
-                        <FilterDefaultToggle />
-                        <ApplicationPreferences />
-                    </div>
-                    <div
-                        className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-                        ref={inViewRef}
-                    >
-                        <EEPROMNotConnectedWarning connected={connected} />
-                        {settings.map((item, index) => {
-                            return (
-                                <InView
-                                    key={`IV-section-${index}`}
-                                    onChange={setInView}
-                                    threshold={0}
-                                    rootMargin="0px 0px -75% 0px"
-                                    className={'bg-red-500'}
-                                >
-                                    {({ ref }) => {
-                                        return (
-                                            <Section
-                                                title={item.label}
-                                                key={`section-${index}`}
-                                                id={`section-${index}`}
-                                                index={index}
-                                                settings={item.settings}
-                                                eeprom={item.eeprom}
-                                                ref={ref}
-                                                connected={connected}
-                                                wizard={item.wizard}
-                                            />
-                                        );
-                                    }}
-                                </InView>
-                            );
-                        })}
-                        <ProfileBar
-                            setShowFlashDialog={() => {
-                                setShowFlashDialog(!showFlashDialog);
-                            }}
-                        />
-                    </div>
+        <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
+            <Menu
+                menu={settings}
+                onClick={navigateToSection}
+                activeSection={visibleSection}
+            />
+            <div className="flex flex-col fixed-content-area w-4/5">
+                <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
+                    <Search />
+                    <FilterDefaultToggle />
+                    <ApplicationPreferences />
+                </div>
+                <div
+                    className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
+                    ref={inViewRef}
+                >
+                    <EEPROMNotConnectedWarning connected={connected} />
+                    {settings.map((item, index) => {
+                        return (
+                            <InView
+                                key={`IV-section-${index}`}
+                                onChange={setInView}
+                                threshold={0}
+                                rootMargin="0px 0px -75% 0px"
+                                className={'bg-red-500'}
+                            >
+                                {({ ref }) => {
+                                    return (
+                                        <Section
+                                            title={item.label}
+                                            key={`section-${index}`}
+                                            id={`section-${index}`}
+                                            index={index}
+                                            settings={item.settings}
+                                            eeprom={item.eeprom}
+                                            ref={ref}
+                                            connected={connected}
+                                            wizard={item.wizard}
+                                        />
+                                    );
+                                }}
+                            </InView>
+                        );
+                    })}
+                    <ProfileBar
+                        setShowFlashDialog={() => {
+                            setShowFlashDialog(!showFlashDialog);
+                        }}
+                    />
                 </div>
             </div>
-        </SettingsProvider>
+        </div>
     );
 }

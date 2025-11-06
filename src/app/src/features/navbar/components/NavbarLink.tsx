@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router';
 import cn from 'classnames';
 import { IconType } from 'react-icons';
+import { noop } from 'lodash';
 
 interface NavbarLinkProps {
     href: string;
@@ -8,11 +9,14 @@ interface NavbarLinkProps {
     svg?: string;
     label: string;
     minimized?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 }
 
 export function NavbarLink(props: NavbarLinkProps) {
+    const onClick = props.onClick || noop;
     return (
         <NavLink
+            onClick={(e) => onClick(e)}
             to={props.href}
             className={({ isActive }: { isActive: boolean }) =>
                 cn(

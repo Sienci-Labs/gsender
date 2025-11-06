@@ -42,6 +42,7 @@ import Camera from './features/Camera';
 import FileControl from './features/FileControl';
 import JobControl from './features/JobControl';
 import { ConditionalRemoteCameraPanel } from './features/RemoteMode/ConditionalRemoteCameraPanel';
+import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDialog';
 
 export const ReactRoutes = () => {
     return (
@@ -255,6 +256,7 @@ export const ReactRoutes = () => {
                 element={
                     <div className="flex flex-col gap-2">
                         <TopBar />
+                        <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
                         </div>
