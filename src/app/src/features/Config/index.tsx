@@ -56,7 +56,7 @@ export function Config() {
                 activeSection={visibleSection}
             />
             <div className="flex flex-col fixed-content-area w-4/5 max-sm:w-full">
-                <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
+                <div className="min-h-1/5 bg-white border max-sm:border-0 border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-sm:pl-0 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
                     <Search />
                     <FilterDefaultToggle />
                     <ApplicationPreferences />
