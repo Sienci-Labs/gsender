@@ -25,6 +25,8 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             onChange,
             wrapperClassName,
             immediateOnChange = false,
+            min,
+            max,
             ...props
         },
         ref,
@@ -41,12 +43,12 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             const current = e.target.value;
             if (localValue && localValue !== originalValue) {
                 if (type === 'number') {
-                    if (props.min !== null && current < props.min) {
-                        e.target.value = String(props.min);
-                        setLocalValue(props.min);
-                    } else if (props.max !== null && current > props.max) {
-                        e.target.value = String(props.max);
-                        setLocalValue(props.max);
+                    if (min !== null && current < min) {
+                        e.target.value = String(min);
+                        setLocalValue(min);
+                    } else if (max !== null && current > max) {
+                        e.target.value = String(max);
+                        setLocalValue(max);
                     } else {
                         setLocalValue(current);
                     }

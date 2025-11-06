@@ -38,18 +38,18 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
     return (
         <div
             className={cx(
-                'absolute top-1/3 left-4 w-1/2 -translate-y-2/3 bg-amber-100 rounded flex flex-col content-end overflow-hidden z-50 border-2 border-orange-600',
+                'absolute top-1/3 left-4 w-1/2 -translate-y-2/3 bg-white rounded flex flex-col content-end overflow-hidden z-50 border-2 border-orange-600',
                 {
                     hidden: !visible,
                 },
             )}
         >
-            <div className="border-b border-b-orange-600 p-2 flex flex-row justify-between items-center">
+            <div className="border-b border-b-orange-600 p-2 flex flex-row justify-between items-center bg-amber-100/70">
                 <h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-orange-600 font-bold text-xl">
                     <FaInfoCircle className="text-2xl" /> {title}
                 </h1>
-                <div className="flex cursor-pointer bg-orange-100">
-                    <FaTimes onClick={() => onClose()} />
+                <div className="flex cursor-pointer bg-amber-200/20 p-1 border-orange-500 border">
+                    <FaTimes onClick={() => onClose()} className="w-5 h-5" />
                 </div>
             </div>
             <CSSTransition
@@ -64,9 +64,12 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
             >
                 <div
                     id="wizContent"
-                    className="flex p-4 justify-stretch items-stretch flex-grow"
+                    className="flex p-4 justify-stretch items-stretch flex-grow flex-col"
                 >
                     <span>{description}</span>
+                    {payload.content && (
+                        <div className="mt-2 p-2">{payload.content}</div>
+                    )}
                 </div>
             </CSSTransition>
         </div>

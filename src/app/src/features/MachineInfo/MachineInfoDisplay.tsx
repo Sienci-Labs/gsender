@@ -146,7 +146,7 @@ export function MachineInfoDisplay({
                     <span className="text-gray-500 dark:text-white">
                         Keepout:
                     </span>
-                    <KeepoutToggle initialFlags={keepoutFlags} />
+                    <KeepoutToggle />
                 </div>
             )}
         </>

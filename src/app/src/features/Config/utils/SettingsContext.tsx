@@ -39,7 +39,7 @@ interface iSettingsContext {
     rawEEPROM: object;
     firmwareType: FIRMWARE_TYPES_T;
     setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
-    setEEPROM?: React.Dispatch<React.SetStateAction<EEPROMSettings>>;
+    setEEPROM?: React.Dispatch<React.SetStateAction<FilteredEEPROM[]>>;
     connected: boolean;
     settingsAreDirty: boolean;
     setSettingsAreDirty?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,8 +51,8 @@ interface iSettingsContext {
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
-    eepromIsDefault: (v: object) => boolean;
-    isSettingDefault: (v: object) => boolean;
+    eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
+    isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
 }
 
@@ -77,7 +77,7 @@ const defaultState: iSettingsContext = {
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
-    isSettingDefault(v: object): boolean {
+    isSettingDefault(_v: object): boolean {
         return false;
     },
     rawEEPROM: {},
@@ -229,10 +229,24 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setSettingsValues([...globalValues]);
     }
 
+    function repopulateEEPROM() {
+        setEEPROM(
+            getFilteredEEPROMSettings(
+                BASE_SETTINGS,
+                detectedEEPROM,
+                detectedEEPROMDescriptions,
+                detectedEEPROMGroups,
+            ),
+        );
+    }
+
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
             return repopulateSettings();
+        });
+        pubsub.subscribe('eeprom:repopulate', () => {
+            return repopulateEEPROM();
         });
     }, []);
 
@@ -287,7 +301,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     function checkSearchTerm(v: gSenderSetting) {
         let searchChecker: any = v;
         if (v.type === 'eeprom') {
-            searchChecker = EEPROM.find((s) => s.setting === v.eID);
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            searchChecker = EEPROM.find((s) => s.setting === idToUse);
         }
 
         return JSON.stringify(searchChecker)
@@ -317,12 +335,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (!connectionState) {
                 return false;
             }
-        }
-        // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
-        if (v.type === 'eeprom') {
-            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
-            if (!EEPROMData) {
-                return false;
+
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            if (v.type === 'eeprom') {
+                const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
+                if (!EEPROMData) {
+                    return false;
+                }
             }
         }
 
@@ -403,7 +425,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         }
 
         const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-        console.log('isCurrent', firmwareCurrent);
+
         settings.map((ss) => {
             if (!ss || !ss.settings) {
                 return;
@@ -414,7 +436,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                         let eID = get(o, 'eID', null);
                         // if remap and version match
                         if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
-                            console.log('REMAPPING', o);
                             eID = get(o, 'remap', null);
                             o.remapped = true;
                         }

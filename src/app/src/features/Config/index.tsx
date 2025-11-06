@@ -93,113 +93,107 @@ export function Config() {
     }
 
     return (
-        <SettingsProvider>
-            <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
-                {activeTab === 'config' ? (
-                    <Menu
-                        menu={settings}
-                        onClick={navigateToSection}
-                        activeSection={visibleSection}
-                    />
-                ) : (
-                    <div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white" />
-                )}
-                <div className="flex flex-col fixed-content-area w-4/5">
-                    <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
-                        <Search />
-                        <FilterDefaultToggle />
-                        <ApplicationPreferences />
-                    </div>
-                    <Tabs defaultValue="config">
-                        <TabsList className="w-full pb-0 border-b rounded-b-none">
-                            <TabsTrigger
-                                value="config"
-                                className="w-full"
-                                onClick={() => setActiveTab('config')}
-                            >
-                                All Config
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="eeprom"
-                                className="w-full"
-                                onClick={() => setActiveTab('eeprom')}
-                            >
-                                EEPROM
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                            value="config"
-                            className="flex flex-col fixed-config-area"
-                        >
-                            <div
-                                className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-                                ref={inViewRef}
-                            >
-                                <EEPROMNotConnectedWarning
-                                    connected={connected}
-                                />
-                                {settings.map((item, index) => {
-                                    return (
-                                        <InView
-                                            key={`IV-section-${index}`}
-                                            onChange={setInView}
-                                            threshold={0}
-                                            rootMargin="0px 0px -75% 0px"
-                                            className={'bg-red-500'}
-                                        >
-                                            {({ ref }) => {
-                                                return (
-                                                    <Section
-                                                        title={item.label}
-                                                        key={`section-${index}`}
-                                                        id={`section-${index}`}
-                                                        index={index}
-                                                        settings={item.settings}
-                                                        eeprom={item.eeprom}
-                                                        ref={ref}
-                                                        connected={connected}
-                                                        wizard={item.wizard}
-                                                    />
-                                                );
-                                            }}
-                                        </InView>
-                                    );
-                                })}
-                            </div>
-                        </TabsContent>
-                        <TabsContent
-                            value="eeprom"
-                            className="flex flex-col fixed-config-area"
-                        >
-                            <div className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative">
-                                <EEPROMNotConnectedWarning
-                                    connected={connected}
-                                />
-                                {eepromSettings.map((item, index) => {
-                                    return (
-                                        <Section
-                                            title={item.label}
-                                            key={`section-${index}`}
-                                            id={`section-${index}`}
-                                            index={index}
-                                            settings={item.settings}
-                                            eeprom={item.eeprom}
-                                            connected={connected}
-                                            wizard={item.wizard}
-                                            showEEPROMOnly={true}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                    <ProfileBar
-                    // setShowFlashDialog={() => {
-                    //     setShowFlashDialog(!showFlashDialog);
-                    // }}
-                    />
+        <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
+            {activeTab === 'config' ? (
+                <Menu
+                    menu={settings}
+                    onClick={navigateToSection}
+                    activeSection={visibleSection}
+                />
+            ) : (
+                <div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white" />
+            )}
+            <div className="flex flex-col fixed-content-area w-4/5">
+                <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
+                    <Search />
+                    <FilterDefaultToggle />
+                    <ApplicationPreferences />
                 </div>
+                <Tabs defaultValue="config">
+                    <TabsList className="w-full pb-0 border-b rounded-b-none">
+                        <TabsTrigger
+                            value="config"
+                            className="w-full"
+                            onClick={() => setActiveTab('config')}
+                        >
+                            All Config
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="eeprom"
+                            className="w-full"
+                            onClick={() => setActiveTab('eeprom')}
+                        >
+                            EEPROM
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent
+                        value="config"
+                        className="flex flex-col fixed-config-area"
+                    >
+                        <div
+                            className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
+                            ref={inViewRef}
+                        >
+                            <EEPROMNotConnectedWarning connected={connected} />
+                            {settings.map((item, index) => {
+                                return (
+                                    <InView
+                                        key={`IV-section-${index}`}
+                                        onChange={setInView}
+                                        threshold={0}
+                                        rootMargin="0px 0px -75% 0px"
+                                        className={'bg-red-500'}
+                                    >
+                                        {({ ref }) => {
+                                            return (
+                                                <Section
+                                                    title={item.label}
+                                                    key={`section-${index}`}
+                                                    id={`section-${index}`}
+                                                    index={index}
+                                                    settings={item.settings}
+                                                    eeprom={item.eeprom}
+                                                    ref={ref}
+                                                    connected={connected}
+                                                    wizard={item.wizard}
+                                                />
+                                            );
+                                        }}
+                                    </InView>
+                                );
+                            })}
+                        </div>
+                    </TabsContent>
+                    <TabsContent
+                        value="eeprom"
+                        className="flex flex-col fixed-config-area"
+                    >
+                        <div className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative">
+                            <EEPROMNotConnectedWarning connected={connected} />
+                            {eepromSettings.map((item, index) => {
+                                return (
+                                    <Section
+                                        title={item.label}
+                                        key={`section-${index}`}
+                                        id={`section-${index}`}
+                                        index={index}
+                                        settings={item.settings}
+                                        eeprom={item.eeprom}
+                                        connected={connected}
+                                        wizard={item.wizard}
+                                        showEEPROMOnly={true}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+                <ProfileBar
+                // setShowFlashDialog={() => {
+                //     setShowFlashDialog(!showFlashDialog);
+                // }}
+                />
             </div>
-        </SettingsProvider>
+        </div>
     );
 }
