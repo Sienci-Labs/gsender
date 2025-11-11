@@ -1003,7 +1003,8 @@ class GrblHalController {
             this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
 
-            const hasSD = true;
+            const hasSD = _.get(this.state, 'status.sdCard', null);
+
             if (hasSD && !this.actionMask.accessoryState.SD) {
                 this.connection.write('$FM\n$F\n');
                 this.actionMask.accessoryState.SD = true;

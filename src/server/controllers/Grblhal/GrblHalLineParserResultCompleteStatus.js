@@ -95,6 +95,8 @@ class GrblHalLineParserResultCompleteStatus {
         // SD Card
         if (_.has(result, 'SD')) {
             payload.sdCard = Boolean(Number(result.SD[0]));
+        } else {
+            payload.sdCard = false;
         }
 
 
