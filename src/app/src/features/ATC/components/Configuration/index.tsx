@@ -4,13 +4,30 @@ import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
 import { ConfigProvider } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
 
 export function ATCIConfiguration() {
     const [modalOpen, setModalOpen] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     function onConfigOpen(isOpen) {
         if (isOpen) {
             controller.command('sdcard:read', 'ATCI.macro');
+            controller.addListener('ymodem:error', () => {
+                toast.error('Error uploaded new config');
+            });
+            controller.addListener('ymodem:complete', () => {
+                setUploading(false);
+            });
+            controller.addListener('ymodem:start', () => {
+                console.log('uploading');
+                setUploading(true);
+            });
+        } else {
+            console.log('closing time');
+            controller.removeListener('ymodem:error');
+            controller.removeListener('ymodem:complete');
+            controller.removeListener('ymodem:start');
         }
         setModalOpen(isOpen);
     }
@@ -32,6 +49,7 @@ export function ATCIConfiguration() {
                 <ConfigModal
                     open={modalOpen}
                     onOpenChange={(state) => onConfigOpen(state)}
+                    uploading={uploading}
                 />
             </ConfigProvider>
         </div>

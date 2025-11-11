@@ -9,8 +9,13 @@ import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
 import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
+import { Spinner } from 'app/components/shadcn/Spinner';
 
-export const ConfigTab: React.FC = () => {
+export interface ConfigTabProps {
+    uploading: boolean;
+}
+
+export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
     const {
         config,
         updateConfig,
@@ -342,16 +347,14 @@ export const ConfigTab: React.FC = () => {
             <div className="flex items-center gap-3 pt-1 flex-1 min-h-0">
                 {/* Status/Progress Section - 60% */}
                 <div className="flex-1 space-y-1 flex flex-col justify-center">
-                    {isApplying && (
-                        <>
-                            <Progress value={progress} className="h-2" />
-                            <div className="text-xs text-muted-foreground">
-                                {progress}% complete
-                            </div>
-                        </>
+                    {uploading && (
+                        <div className="flex flex-row gap-2 items-center">
+                            <Spinner className="h-4 w-4" />
+                            <span>{status.message}</span>
+                        </div>
                     )}
 
-                    {status.message && !isApplying && (
+                    {status.message && !uploading && (
                         <div className={cn('text-xs', getStatusColor())}>
                             {status.message}
                         </div>
@@ -360,8 +363,8 @@ export const ConfigTab: React.FC = () => {
 
                 {/* Apply Button - 40% */}
                 <div className="w-2/5 flex items-center justify-end">
-                    <Button onClick={applyConfig} disabled={isApplying}>
-                        {isApplying ? 'Applying...' : 'Apply'}
+                    <Button onClick={applyConfig} disabled={uploading}>
+                        {uploading ? 'Applying...' : 'Apply'}
                     </Button>
                 </div>
             </div>
