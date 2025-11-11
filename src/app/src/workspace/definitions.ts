@@ -26,6 +26,7 @@ export interface Workspace {
     reverseWidgets: boolean;
     spindleFunctions: boolean;
     coolantFunctions: boolean;
+    atcEnabled: boolean;
     sendUsageData: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;
@@ -35,6 +36,7 @@ export interface Workspace {
     longestTimeRun: number;
     defaultFirmware: string;
     outlineMode: string;
+    revertWorkspace: boolean;
     park: object;
     jobTimes: number[];
     toolChange: {
@@ -42,12 +44,12 @@ export interface Workspace {
         skipDialog: boolean;
     };
     toolChangeOption:
-        | 'Ignore'
-        | 'Pause'
-        | 'Standard Re-zero'
-        | 'Flexible Re-zero'
-        | 'Fixed Tool Sensor'
-        | 'Code';
+    | 'Ignore'
+    | 'Pause'
+    | 'Standard Re-zero'
+    | 'Flexible Re-zero'
+    | 'Fixed Tool Sensor'
+    | 'Code';
     toolChangePosition: BasicPosition;
     toolChangeHooks: {
         preHook: string;
@@ -84,5 +86,6 @@ export interface Workspace {
         };
     };
     notifications: Notification[];
+    toastDuration: number;
     enableDarkMode: boolean;
 }

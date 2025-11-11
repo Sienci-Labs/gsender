@@ -30,7 +30,7 @@ import logger from '../lib/logger';
 import config from '../services/configstore';
 import pkg from '../../package.json';
 import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from '../constants';
-import { USER_DATA_COLLECTION } from '../../app_old/constants';
+import { USER_DATA_COLLECTION } from '../../app/src/constants';
 
 const CONFIG_KEY = 'metrics';
 

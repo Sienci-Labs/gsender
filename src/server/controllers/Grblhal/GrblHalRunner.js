@@ -50,6 +50,10 @@ import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
+import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
+import GrblHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
+import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
+import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
 
 const log = logger('controller:grblHAL');
 
@@ -68,10 +72,13 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
+            sdFiles: [],
             alarmCode: '',
             subState: '',
             probeActive: false,
             pinState: {},
+            currentTool: -1,
+            hasHomed: false
         },
         parserstate: {
             modal: {
@@ -95,10 +102,17 @@ class GrblHalRunner extends events.EventEmitter {
             count: 0,
             axes: []
         },
+        sdcard: {
+            mounted: false,
+            files: []
+        }
     };
 
     settings = {
-        version: '',
+        version: {
+            version: '',
+            semver: -1
+        },
         parameters: {
         },
         settings: {
@@ -109,7 +123,9 @@ class GrblHalRunner extends events.EventEmitter {
         },
         descriptions: {
         },
-        alarms: {}
+        alarms: {},
+        toolTable: {},
+        atci: {}
     };
 
     parser = new GrblHalLineParser();
@@ -168,13 +184,29 @@ class GrblHalRunner extends events.EventEmitter {
             this.emit('status', payload);
             return;
         }
+        if (type === GrblHalLineParserResultATCI) {
+            const nextSettings = {
+                ...this.settings,
+                atci: {
+                    ...this.settings.atci,
+                    ...payload.values
+                }
+            };
+            if (!_.isEqual(this.settings.atci, nextSettings.atci)) {
+                this.settings = nextSettings;
+            }
+
+            this.emit('atci', payload);
+            return;
+        }
         if (type === GrblHalLineParserResultStartup) {
-            console.log('Startup/restart message - rewind sender');
             this.emit('startup', payload);
+            //this.emit('startup', payload, this.settings.version.semver);
             return;
         }
         if (type === GrblHalLineParserResultCompleteStatus) {
             delete payload.raw;
+
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
             // A current work coordinate offset is now sent to easily convert
@@ -227,6 +259,10 @@ class GrblHalRunner extends events.EventEmitter {
             this.emit('spindle', payload);
             return;
         }
+        if (type === GrblHalLineParserResultJSON) {
+            this.emit('json', payload);
+            return;
+        }
         if (type === GrblHalLineParserResultAlarm) {
             const nextState = {
                 ...this.state,
@@ -266,6 +302,20 @@ class GrblHalRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('parserstate', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultTool) {
+            delete payload.raw;
+            const nextSettings = {
+                ...this.settings,
+                toolTable: {
+                    ...this.settings.toolTable,
+                    [payload.id]: payload
+                }
+            };
+            if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
+                this.settings = nextSettings;
+            }
             return;
         }
         if (type === GrblHalLineParserResultParameters) {
@@ -326,15 +376,24 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultVersion) {
             const { version } = payload;
+
+            const parts = version.split('.');
+            const last = parts[parts.length - 1].replace(':', '');
+            const semver = Number(last);
+
             const nextSettings = { // enforce change
                 ...this.settings,
-                version: version
+                version: {
+                    ...this.settings.version,
+                    version,
+                    semver
+                }
             };
             if (!_.isEqual(this.settings.version, nextSettings.version)) {
                 this.settings = nextSettings; // enforce change
             }
             // Should no longer need to do this here for redundancy
-            //this.emit('startup', payload);
+            this.emit('startup', payload, semver);
             return;
         }
         if (type === GrblHalLineParserResultCode) {
@@ -392,6 +451,26 @@ class GrblHalRunner extends events.EventEmitter {
             this.emit('description');
             return;
         }
+
+        if (type === GrblHalLineParserResultSDCard) {
+            this.emit('sdcard', payload);
+            delete payload.raw;
+            const files = [...this.state.sdcard.files].filter(file => file.name !== payload.name);
+            files.push(payload);
+            const nextState = {
+                ...this.state,
+                sdcard: {
+                    ...this.state.sdcard,
+                    files
+                }
+            };
+            if (!_.isEqual(this.state.sdcard, nextState.sdcard)) {
+                this.state = nextState;
+            }
+
+            return;
+        }
+
         if (data.length > 0) {
             this.emit('others', payload);
             return;
@@ -416,6 +495,10 @@ class GrblHalRunner extends events.EventEmitter {
 
     setTool(tool) {
         this.state.parserstate.modal.tool = tool;
+    }
+
+    getToolTable(settings = this.settings) {
+        return _.get(settings, 'toolTable', {});
     }
 
     getParameters() {

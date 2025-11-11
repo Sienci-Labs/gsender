@@ -1,4 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router';
+import noop from 'lodash/noop';
 import Workspace from './workspace';
 import { Config } from './features/Config';
 import Firmware from './features/Firmware';
@@ -32,13 +33,15 @@ import Rotary from './features/Rotary';
 import Spindle from './features/Spindle';
 import About from './features/Stats/About';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
-import { noop } from 'lodash';
 import Gamepad from './features/Gamepad';
 import { TopBar } from 'app/workspace/TopBar';
 import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDialog';
 import { BiSolidCylinder } from 'react-icons/bi';
+import SDCard from 'app/features/SDCard';
+import { FaSdCard } from 'react-icons/fa';
 
 export const ReactRoutes = () => {
     return (
@@ -110,6 +113,15 @@ export const ReactRoutes = () => {
                                         description="Easy hand-held CNC control using pre-made or custom profiles"
                                         icon={FaGamepad}
                                         link="/tools/gamepad"
+                                    />
+
+                                    <ToolCard
+                                        title={'SD Card Manager'}
+                                        description={
+                                            'Manage and view files on your SD card'
+                                        }
+                                        icon={FaSdCard}
+                                        link={'/tools/sd'}
                                     />
 
                                     <ToolCard
@@ -201,6 +213,18 @@ export const ReactRoutes = () => {
                         element={<Profile />}
                     />
                     <Route
+                        path={'sd'}
+                        element={
+                            <Page
+                                title="SD Card Manager"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <SDCard />
+                            </Page>
+                        }
+                    />
+                    <Route
                         path="firmware"
                         element={
                             <Page
@@ -232,6 +256,7 @@ export const ReactRoutes = () => {
                 element={
                     <div className="flex flex-col gap-2">
                         <TopBar />
+                        <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
                         </div>
@@ -245,7 +270,7 @@ export const ReactRoutes = () => {
                     element={
                         <>
                             <WorkspaceSelector />
-                            <DRO />
+                            <DRO isRemote />
                             <Jogging />
                         </>
                     }

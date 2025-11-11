@@ -136,7 +136,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                         }}
                     >
                         <span className="font-bold text-2xl">
-                            {percentageValue.toFixed(0)}
+                            {Math.floor(percentageValue)}
                         </span>
                         <span>%</span>
                     </div>

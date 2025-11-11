@@ -69,8 +69,8 @@ interface DROProps {
     workflowState: string;
     isConnected: boolean;
     activeState: string;
-    preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
+    isRemote?: boolean;
 }
 
 function DRO({
@@ -82,6 +82,7 @@ function DRO({
     activeState,
     homingEnabled,
     singleAxisHoming,
+    isRemote,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { units: preferredUnits } = useWorkspaceState();
@@ -371,7 +372,9 @@ function DRO({
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isRotaryMode = mode === 'ROTARY';
 
@@ -387,7 +390,7 @@ function DRO({
 
     return (
         <div className="relative">
-            <UnitBadge />
+            <UnitBadge isRemote={isRemote} />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (
@@ -440,9 +443,10 @@ function DRO({
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
                 {!shouldWarnZero ? (
                     <Button
+                        tooltip={{ content: 'Zero all axes', side: 'left' }}
                         text="Zero"
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
@@ -490,6 +494,7 @@ function DRO({
                     onClick={goXYAxes}
                     disabled={!canClick}
                     size="sm"
+                    tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                 >
                     <span className="font-mono text-lg">
                         {isRotaryMode ? 'XA' : 'XY'}

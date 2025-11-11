@@ -39,7 +39,9 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     const position = store.get('workspace.toolChangePosition');
     const curZPos = Math.abs(position.z);
 
-    return (maxZTravel - curZPos - 2).toFixed(3);
+    let result = (maxZTravel - curZPos - 2).toFixed(3);
+
+    return result;
 };
 
 const wizard = {
@@ -100,15 +102,17 @@ const wizard = {
                             label: 'Probe Initial Tool',
                             cb: () => {
                                 controller.command('gcode', [
-                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G91 G21',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=(posz+(global.toolchange.RETRACT * -1)).toFixed(3)',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                 ]);

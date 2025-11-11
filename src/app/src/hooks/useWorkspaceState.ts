@@ -17,7 +17,7 @@ const workspaceSubscription = {
         // Set up a single store listener
         store.on('change', (data: State) => {
             if (
-                !data.workspace ||
+                !data?.workspace ||
                 isEqual(this.currentWorkspace, data.workspace)
             ) {
                 return;

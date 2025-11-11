@@ -17,7 +17,12 @@ export type TOUCHPLATE_TYPES_T =
 
 export interface ProbeProfile {
     xyThickness: number;
-    zThickness: number;
+    zThickness: {
+        standardBlock: number;
+        autoZero: number;
+        zProbe: number;
+        probe3D: number;
+    };
     plateWidth: number;
     plateLength: number;
     functions: {
@@ -43,11 +48,13 @@ export interface ProbingOptions {
     modal: string;
     units: UNITS_EN;
     toolDiameter: number;
+    tipDiameter3D: number;
     xRetractModifier?: number;
     yRetractModifier?: number;
     xRetract?: number;
     yRetract?: number;
     zRetract?: number;
+    xyRetract3D?: number;
     retract: number;
     axes: {
         x: boolean;
@@ -60,7 +67,12 @@ export interface ProbingOptions {
     probeDistances: BasicPosition;
     probeFast: number;
     probeSlow: number;
-    zThickness: number;
+    zThickness: {
+        standardBlock: number;
+        autoZero: number;
+        zProbe: number;
+        probe3D: number;
+    };
     xThickness?: number;
     yThickness?: number;
     xyThickness?: number;
@@ -71,6 +83,7 @@ export interface ProbingOptions {
     $13: string;
     plateType: TOUCHPLATE_TYPES_T;
     probeType: PROBE_TYPES_T;
+    homingEnabled: boolean;
 }
 
 export interface ProbeWidgetSettings {
@@ -95,6 +108,8 @@ export interface Probe {
     probeType: string;
     probeAxis: string;
     direction: number;
+    tipDiameter3D: number;
+    xyRetract3D: number;
 }
 
 export interface Actions {
@@ -115,6 +130,7 @@ export interface Actions {
     _setToolDiameter: (selection: { value: number }) => void;
     nextProbeDirection: () => void;
     _setProbeType: (value: string) => void;
+    _setCurrentTool: (tool: AvailableTool) => void;
 }
 
 export interface AvailableTool {

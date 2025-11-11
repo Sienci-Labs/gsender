@@ -17,7 +17,7 @@ const widgetSubscription = {
 
         // Set up a single store listener
         store.on('change', (data: State) => {
-            if (!data.widgets) {
+            if (!data?.widgets) {
                 return;
             }
 

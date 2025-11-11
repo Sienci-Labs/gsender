@@ -43,7 +43,7 @@ export function AxisRow({
     const { shouldWarnZero } = useWorkspaceState();
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
             {homingMode || !shouldWarnZero ? (
                 <Button
                     onClick={() => {
@@ -56,6 +56,10 @@ export function AxisRow({
                     disabled={disabled}
                     variant={homingMode ? 'alt' : 'secondary'}
                     size="sm"
+                    tooltip={{
+                        content: `${homingMode ? 'Home' : 'Zero'} your ${label}-axis`,
+                        side: 'left',
+                    }}
                 >
                     <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                         {`${homingMode ? 'H' : ''}${label}${homingMode ? '' : '0'}`}
@@ -111,6 +115,9 @@ export function AxisRow({
                 onClick={() => gotoZero(axis)}
                 variant="alt"
                 size="sm"
+                tooltip={{
+                    content: `Go to ${label}-axis zero`,
+                }}
             >
                 <span className="text-lg font-mono">{label}</span>
             </Button>

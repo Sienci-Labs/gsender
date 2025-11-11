@@ -20,13 +20,19 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import pubsub from 'pubsub-js';
 
 type StartFromLineProps = {
     disabled: boolean;
     lastLine: number;
 };
 
-const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
+const StartFromLine = ({
+    disabled,
+    lastLine,
+    atcValidator,
+}: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const [state, setState] = useState({
         showModal: false,
@@ -43,6 +49,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                 ? 10
                 : 0.4,
     });
+    const { delay = 0 } = useWidgetState('spindle');
 
     const lineTotal = useSelector((state: RootState) => state.file.total);
 
@@ -58,7 +65,13 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
 
         const newSafeHeight =
             units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
-        controller.command('gcode:start', startFromLine, zMax, newSafeHeight);
+        controller.command(
+            'gcode:start',
+            startFromLine,
+            zMax,
+            newSafeHeight,
+            delay,
+        );
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
@@ -80,15 +93,27 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             disabled,
                     },
                 )}
-                onClick={() =>
-                    setState((prev) => ({ ...prev, showModal: true }))
-                }
+                onClick={() => {
+                    const [invalidATC, payload] = atcValidator();
+                    if (invalidATC) {
+                        if (payload.type === 'error') {
+                            pubsub.publish('atc_validator', payload);
+                            return;
+                        } else {
+                            console.log(
+                                'we warn but open the regular dialog with some special state',
+                            );
+                        }
+                    }
+
+                    setState((prev) => ({ ...prev, showModal: true }));
+                }}
             >
                 <MdFormatListNumbered className="text-2xl mr-1" /> Start From
             </ShadButton>
             <Dialog
                 open={state.showModal}
-                onOpenChange={(open) => {
+                onOpenChange={() => {
                     setState((prev) => ({ ...prev, showModal: false }));
                 }}
             >

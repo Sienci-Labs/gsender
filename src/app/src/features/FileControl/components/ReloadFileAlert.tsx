@@ -12,19 +12,31 @@ import {
 import { Button } from 'app/components/Button';
 import { FaRedo } from 'react-icons/fa';
 
-export function ReloadFileAlert({ fileLoaded, handleFileReload }) {
+import { Tooltip } from 'app/components/Tooltip';
+
+type ReloadFileAlertProps = {
+    fileLoaded: boolean;
+    handleFileReload: () => void;
+};
+
+export function ReloadFileAlert({
+    fileLoaded,
+    handleFileReload,
+}: ReloadFileAlertProps) {
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button
-                    disabled={!fileLoaded}
-                    icon={
-                        <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
-                    }
-                    variant="ghost"
-                    className="h-full rounded-none"
-                />
-            </AlertDialogTrigger>
+            <Tooltip content="Reload File">
+                <AlertDialogTrigger asChild>
+                    <Button
+                        disabled={!fileLoaded}
+                        icon={
+                            <FaRedo className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
+                        }
+                        variant="ghost"
+                        className="h-full rounded-none"
+                    />
+                </AlertDialogTrigger>
+            </Tooltip>
             <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>

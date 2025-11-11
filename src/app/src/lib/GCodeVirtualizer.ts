@@ -21,9 +21,19 @@ interface Modal {
 }
 
 interface RotationResult {
+    x: number;
     y: number;
     z: number;
     a: number;
+}
+
+type SpindleToolEventCode = 'S' | 'T' | 'M' | 'TC';
+
+interface SpindleToolEvent {
+    S?: Number;
+    T?: Number;
+    M?: Number;
+    TC?: boolean;
 }
 
 interface VMState {
@@ -33,6 +43,8 @@ interface VMState {
     bbox: BBox;
     usedAxes: Set<string>;
     invalidLines: string[];
+    toolchange: number[];
+    spindleToolEvents: { [key: number]: SpindleToolEvent };
 }
 
 type Data = Array<{
@@ -77,32 +89,42 @@ export const shouldRotate = (
 };
 
 export const rotateAxis = (
-    axis: 'y' | 'z',
-    { y, z, a }: { y: number; z: number; a: number },
+    axis: 'x' | 'y' | 'z',
+    { x, y, z, a }: { x: number; y: number; z: number; a: number },
 ): RotationResult | null => {
     if (!axis) {
         throw new Error('Axis is required');
     }
 
-    const angle = toRadians(a);
+    // Invert the A-axis angle to match the expected rotation direction convention
+    // This fixes the issue where G-code uses negative A values for clockwise rotation
+    // but the visualization expects the opposite convention
+    const angle = toRadians(-a);
+    // const angle = toRadians(a);
 
     // Calculate the sine and cosine of the angle
     const sinA = Math.sin(angle);
     const cosA = Math.cos(angle);
 
+    // Rotate the vertex around the x-axis
+    if (axis === 'x') {
+        const rotatedY = y * cosA - z * sinA;
+        const rotatedZ = y * sinA + z * cosA;
+        return { x: x, y: rotatedY, z: rotatedZ, a };
+    }
+
     // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        const rotatedZ = z * cosA - y * sinA;
-        const rotatedY = z * sinA + y * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedZ = z * cosA - x * sinA;
+        const rotatedX = z * sinA + x * cosA;
+        return { x: rotatedX, y: y, z: rotatedZ, a };
     }
 
     // Rotate the vertex around the z-axis
-    //This logic is just for testing
     if (axis === 'z') {
-        const rotatedY = y * cosA - z * sinA;
-        const rotatedZ = y * sinA + z * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedX = x * cosA - y * sinA;
+        const rotatedY = x * sinA + y * cosA;
+        return { x: rotatedX, y: rotatedY, z: z, a };
     }
 
     return null;
@@ -233,7 +255,9 @@ class GCodeVirtualizer extends EventEmitter {
             },
         },
         usedAxes: new Set(),
-        invalidLines: []
+        invalidLines: [],
+        toolchange: [],
+        spindleToolEvents: {},
     };
 
     // data to save so we don't have to reparse
@@ -266,7 +290,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
     //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
-    VALID_GCODE_REGEX = /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi
+    VALID_GCODE_REGEX =
+        /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi;
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -898,6 +923,7 @@ class GCodeVirtualizer extends EventEmitter {
         },
         // M6: Tool Change
         M6: (params: Record<string, any>): void => {
+            this.vmState.toolchange.push(this.totalLines);
             if (params && params.T !== undefined) {
                 this.setModal({ tool: params.T });
                 this.saveModal({ tool: params.T });
@@ -957,6 +983,7 @@ class GCodeVirtualizer extends EventEmitter {
             modal: Modal,
             v1: BasicPosition,
             v2: BasicPosition,
+            v0: BasicPosition,
         ) => void;
         callback?: () => void;
         collate?: boolean;
@@ -1049,8 +1076,9 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     virtualize(line = ''): void {
-        this.setEstimate = false // Reset on each line
+        this.setEstimate = false; // Reset on each line
         if (!line) {
+            this.totalLines += 1;
             this.fn.callback();
             return;
         }
@@ -1061,19 +1089,16 @@ class GCodeVirtualizer extends EventEmitter {
             .replace(this.re3, '');
 
         if (line === '') {
+            this.totalLines += 1;
             return;
         }
-
-        /*if (line.this.INVALID_GCODE_REGEX.test(line)) {
-            console.log(`Bad line - ${line}`);
-            this.vmState.invalidLines.push(line);
-        }*/
 
         if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
             this.vmState.invalidLines.push(line);
         }
 
-        const parsedLine = parseLine(line);
+        let parsedLine = parseLine(line);
+        this.totalLines += 1; // Moved here so M6 and T commands are correctly stored
         // collect spindle and feed rates
         for (let word of parsedLine.words) {
             const letter = word[0];
@@ -1085,6 +1110,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
+                this.updateSpindleToolEvents('S', Number(code));
             }
         }
 
@@ -1138,13 +1164,16 @@ class GCodeVirtualizer extends EventEmitter {
             } else if (letter === 'M') {
                 cmd = letter + code;
                 args = this.fromPairs(words.slice(1));
+                this.updateSpindleToolEvents('M', Number(code));
             } else if (letter === 'T') {
                 // T1 ; w/o M6
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('T', Number(code));
             } else if (letter === 'S') {
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('S', Number(code));
             } else if (
                 letter === 'X' ||
                 letter === 'Y' ||
@@ -1189,9 +1218,10 @@ class GCodeVirtualizer extends EventEmitter {
         this.modalCounter++;
         this.feedrateCounter++;
         */
-        this.totalLines += 1;
+
         this.fn.callback();
         this.emit('data', parsedLine);
+        parsedLine = null;
     }
 
     generateFileStats() {
@@ -1220,6 +1250,8 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            toolchanges: this.vmState.toolchange,
+            spindleToolEvents: this.vmState.spindleToolEvents,
         };
     }
 
@@ -1536,6 +1568,18 @@ class GCodeVirtualizer extends EventEmitter {
             return;
         }
         this.totalTime += time;
+    }
+
+    updateSpindleToolEvents(
+        word: SpindleToolEventCode,
+        code: number | boolean,
+    ) {
+        if (!this.vmState.spindleToolEvents[this.totalLines]) {
+            this.vmState.spindleToolEvents[this.totalLines] = { [word]: code };
+        } else {
+            // @ts-ignore
+            this.vmState.spindleToolEvents[this.totalLines][word] = code;
+        }
     }
 }
 

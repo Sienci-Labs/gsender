@@ -111,8 +111,10 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const startProbe = (): void => {
         const probeCommands = actions.generateProbeCommands();
@@ -132,7 +134,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
     const { touchplateType } = touchplate;
     //const probeCommands = actions.generateProbeCommands();
-    //console.log(probeCommands.join('\n'));
+    //console.log(probeCommands.length);
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     const probeActive = actions.returnProbeConnectivity();

@@ -29,14 +29,16 @@ import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from '../../lib/rounding';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { findIndex, get } from 'lodash';
+import findIndex from 'lodash/findIndex';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
+import { SPINDLE_LASER_T } from './definitions';
 
 interface SpindleState {
     minimized: boolean;
     isFullscreen: boolean;
     canClick: boolean;
-    mode: string;
+    mode: SPINDLE_LASER_T;
     spindleSpeed: number;
     laser: {
         duration: number;
@@ -161,6 +163,17 @@ const SpindleWidget = () => {
             }
             config.set('speed', newSpindleSpeed);
             updateSpindleSpeed(newSpindleSpeed);
+        }
+
+        if (
+            spindleMax !== state.spindleMax ||
+            spindleMin !== state.spindleMin
+        ) {
+            setState((prev) => ({
+                ...prev,
+                spindleMax,
+                spindleMin,
+            }));
         }
     }, [state, laserAsSpindle, spindleMax, spindleMin]);
 
@@ -633,71 +646,47 @@ const SpindleWidget = () => {
         },
     };
 
-    const shuttleControlEvents = {
-        TOGGLE_SPINDLE_LASER_MODE: {
-            title: 'Toggle Between Spindle and Laser Mode',
-            keys: '',
-            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () => {
+    const subscribe = () => {
+        return [
+            pubsub.subscribe('shortcut:TOGGLE_SPINDLE_LASER_MODE', () => {
                 if (!canClickShortcut()) {
                     return;
                 }
                 actions.handleModeToggle();
-            },
-        },
-        CW_LASER_ON: {
-            title: 'CW / Laser On',
-            keys: '',
-            cmd: 'CW_LASER_ON',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () => {
+            }),
+            pubsub.subscribe('shortcut:CW_LASER_ON', () => {
                 if (!canClickShortcut()) {
                     return;
                 }
                 stateRef.current.mode === LASER_MODE
                     ? actions.sendLaserM3()
                     : actions.sendM3();
-            },
-        },
-        CCW_LASER_TEST: {
-            title: 'CCW / Laser Test',
-            keys: '',
-            cmd: 'CCW_LASER_TEST',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () => {
+            }),
+            pubsub.subscribe('shortcut:CCW_LASER_TEST', () => {
                 if (!canClickShortcut()) {
                     return;
                 }
                 stateRef.current.mode === LASER_MODE
                     ? actions.runShortcutLaserTest()
                     : actions.sendM4();
-            },
-        },
-        STOP_LASER_OFF: {
-            title: 'Stop / Laser Off',
-            keys: '',
-            cmd: 'STOP_LASER_OFF',
-            preventDefault: false,
-            isActive: true,
-            category: SPINDLE_LASER_CATEGORY,
-            callback: () => {
+            }),
+            pubsub.subscribe('shortcut:STOP_LASER_OFF', () => {
                 if (!canClickShortcut()) {
                     return;
                 }
                 actions.sendM5();
-            },
-        },
+            }),
+        ];
     };
 
-    useKeybinding(shuttleControlEvents);
-    useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        const tokens = subscribe();
+        return () => {
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
+        };
+    }, []);
 
     // const active = getSpindleActiveState();
 

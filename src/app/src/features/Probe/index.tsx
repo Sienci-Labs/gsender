@@ -22,7 +22,7 @@
  */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -30,6 +30,8 @@ import {
     PROBE_TYPE_AUTO,
     TOUCHPLATE_TYPE_ZERO,
     PROBE_TYPE_DIAMETER,
+    TOUCHPLATE_TYPE_3D,
+    PROBE_TYPE_TIP,
 } from 'app/lib/constants';
 import store from 'app/store';
 import { convertToImperial } from 'app/lib/units';
@@ -52,12 +54,14 @@ import {
     PROBE_TYPES_T,
     ProbeCommand,
     ProbeProfile,
+    ProbingOptions,
     State,
     TOUCHPLATE_TYPES_T,
 } from './definitions';
-import { BasicObject, UNITS_EN } from 'app/definitions/general';
+import { UNITS_EN } from 'app/definitions/general';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import { Workspace } from 'app/workspace/definitions';
 
 const ProbeWidget = () => {
     const {
@@ -68,6 +72,7 @@ const ProbeWidget = () => {
         isConnected,
         $13,
         activeState,
+        $22,
     } = useTypedSelector((state) => ({
         distance: state.controller.state.parserstate?.modal.distance,
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -75,49 +80,30 @@ const ProbeWidget = () => {
         workflow: state.controller.workflow,
         isConnected: state.connection.isConnected,
         $13: state.controller.settings.settings.$13 ?? '0',
+        $22: state.controller.settings.settings.$22 ?? '0',
         activeState: state.controller.state.status?.activeState,
+        mpos: state.controller.mpos,
+        zMaxTravel: state.controller.settings.settings.$132 ?? '170',
     }));
 
     const { actions: config } = getWidgetConfigContext();
 
-    const calcToolDiamater = (
-        newTouchplateType?: TOUCHPLATE_TYPES_T,
-    ): number => {
-        const defaultToolDiameter = units === METRIC_UNITS ? 6.35 : 0.25;
-        const currentPlateType = newTouchplateType || touchplateType;
-        let toolDiameter: number;
-        if (currentPlateType === TOUCHPLATE_TYPE_AUTOZERO) {
-            toolDiameter = null;
-        } else {
-            toolDiameter =
-                availableTools.length === 0
-                    ? defaultToolDiameter
-                    : availableTools[0][
-                          units === METRIC_UNITS
-                              ? 'metricDiameter'
-                              : 'imperialDiameter'
-                      ];
-        }
-        return toolDiameter;
+    const defaultTool: AvailableTool = {
+        metricDiameter: 6.35,
+        imperialDiameter: 0.25,
+        type: '',
     };
 
-    const calcProbeType = (): PROBE_TYPES_T => {
-        let probeType: PROBE_TYPES_T;
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
-            probeType = PROBE_TYPE_AUTO;
-        } else {
-            probeType = PROBE_TYPE_DIAMETER;
-        }
-        return probeType;
-    };
-
-    const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
+    const [touchplateType, setTouchplateType] = useState<TOUCHPLATE_TYPES_T>(
+        store.get('workspace.probeProfile.touchplateType'),
+    );
     const [units, setUnits] = useState<UNITS_EN>(store.get('workspace.units'));
+    const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
     const [availableTools, setAvailableTools] = useState<AvailableTool[]>(
         store.get('workspace.tools', []),
     );
-    const [touchplateType, setTouchplateType] = useState<TOUCHPLATE_TYPES_T>(
-        store.get('workspace.probeProfile.touchplateType'),
+    const [currentTool, setCurrentTool] = useState<AvailableTool>(
+        availableTools ? availableTools[0] : defaultTool,
     );
     // const [toolChangeActive, setToolChangeActive] = useState<boolean>(false);
     // const [port, setPort] = useState<string>(controller.port);
@@ -145,34 +131,78 @@ const ProbeWidget = () => {
     const [zProbeDistance, setZProbeDistance] = useState<number>(
         config.get('zProbeDistance') || {},
     );
+    const [tipDiameter3D, setTipDiameter3D] = useState<number>(
+        config.get('tipDiameter3D') || 2,
+    );
+    const [xyRetract3D, setXYRetract3D] = useState<number>(
+        config.get('xyRetract3D') || {},
+    );
     const [touchplate, setTouchplate] = useState<ProbeProfile>(
         store.get('workspace.probeProfile', {}),
     );
-    const [toolDiameter, setToolDiameter] =
-        useState<number>(calcToolDiamater());
     const [useSafeProbeOption, setUseSafeProbeOption] =
         useState<boolean>(false);
     const [selectedProbeCommand, setSelectedProbeCommand] = useState<number>(0);
     const [connectivityTest, setConnectivityTest] = useState<boolean>(
         config.get('connectivityTest'),
     );
-    const [probeType, setProbeType] = useState<PROBE_TYPES_T>(calcProbeType());
     const [connectionMade, setConnectionMade] = useState<boolean>(false);
     const [direction, setDirection] = useState<number>(
         config.get('direction', 0),
     );
 
+    const calcProbeType = (): PROBE_TYPES_T => {
+        let probeType: PROBE_TYPES_T;
+        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+            probeType = PROBE_TYPE_AUTO;
+        } else {
+            probeType = PROBE_TYPE_DIAMETER;
+        }
+        return probeType;
+    };
+
+    const [probeType, setProbeType] = useState<PROBE_TYPES_T>(calcProbeType());
+
+    const calcToolDiamater = (
+        newU?: UNITS_EN,
+        newPT?: PROBE_TYPES_T,
+    ): number => {
+        const newProbeType = newPT || probeType;
+        const newUnits = newU || units;
+        const defaultToolDiameter = units === METRIC_UNITS ? 6.35 : 0.25;
+        let toolDiameter: number;
+        if (
+            newProbeType === PROBE_TYPE_AUTO ||
+            newProbeType === PROBE_TYPE_TIP
+        ) {
+            toolDiameter = 0.0;
+        } else {
+            toolDiameter = !currentTool
+                ? defaultToolDiameter // we shouldn't run into a situation where it's not auto/tip and the current tool isnt defined, but just in case
+                : currentTool[
+                      newUnits === METRIC_UNITS
+                          ? 'metricDiameter'
+                          : 'imperialDiameter'
+                  ];
+        }
+        return toolDiameter;
+    };
+
+    const [toolDiameter, setToolDiameter] = useState<number>(() => {
+        return calcToolDiamater();
+    });
+
     const connectionMadeRef = useRef<boolean>(false);
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
-        x: 50,
-        y: 50,
+        x: 30,
+        y: 30,
         z: zProbeDistance ? zProbeDistance : 30,
     };
     const PROBE_DISTANCE_IMPERIAL = {
-        x: 2,
-        y: 2,
+        x: 1.2,
+        y: 1.2,
         z: zProbeDistance ? convertToImperial(zProbeDistance) : 1.2,
     };
 
@@ -249,6 +279,8 @@ const ProbeWidget = () => {
                 x: false,
             };
 
+            const is3D = selectedProfile.touchplateType === TOUCHPLATE_TYPE_3D;
+
             if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
                 functions.z = true;
             } else {
@@ -277,7 +309,7 @@ const ProbeWidget = () => {
                     command = {
                         id: 'XYZ Touch',
                         safe: true,
-                        tool: true,
+                        tool: is3D ? false : true,
                         axes: {
                             x: true,
                             y: true,
@@ -290,7 +322,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'XY Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: true,
                         y: true,
@@ -302,7 +334,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'X Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: true,
                         y: false,
@@ -314,7 +346,7 @@ const ProbeWidget = () => {
                 command = {
                     id: 'Y Touch',
                     safe: true,
-                    tool: true,
+                    tool: is3D ? false : true,
                     axes: {
                         x: false,
                         y: true,
@@ -346,6 +378,9 @@ const ProbeWidget = () => {
         _setProbeType: (value: PROBE_TYPES_T): void => {
             setProbeType(value);
         },
+        _setCurrentTool: (tool: AvailableTool): void => {
+            setCurrentTool(tool);
+        },
         nextProbeDirection: (): void => {
             if (direction === 3) {
                 setDirection(0);
@@ -358,13 +393,16 @@ const ProbeWidget = () => {
     const availableProbeCommands = actions.generatePossibleProbeCommands();
 
     useEffect(() => {
-        store.on('change', onStoreChange);
         actions.generatePossibleProbeCommands();
+    }, []);
+
+    useEffect(() => {
+        store.on('change', onStoreChange);
 
         return () => {
             store.removeListener('change', onStoreChange);
         };
-    }, []);
+    }, [touchplateType, units, toolDiameter, probeType]);
 
     useEffect(() => {
         config.set('probeCommand', probeCommand);
@@ -395,7 +433,13 @@ const ProbeWidget = () => {
                 ? PROBE_DISTANCE_METRIC
                 : PROBE_DISTANCE_IMPERIAL;
         // Grab units for correct modal
-        let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
+        let zThickness,
+            xyThickness,
+            feedrate,
+            fastFeedrate,
+            retractDistance,
+            tipDiameter,
+            xyRetract;
         const modal = units === METRIC_UNITS ? '21' : '20';
         if (units === METRIC_UNITS) {
             zThickness = touchplate.zThickness;
@@ -403,15 +447,26 @@ const ProbeWidget = () => {
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
+            tipDiameter = tipDiameter3D;
+            xyRetract = xyRetract3D;
         } else {
-            zThickness = convertToImperial(touchplate.zThickness);
+            zThickness = {
+                autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
+                standardBlock: convertToImperial(
+                    touchplate.zThickness.standardBlock,
+                ),
+                zProbe: convertToImperial(touchplate.zThickness.zProbe),
+                probe3D: convertToImperial(touchplate.zThickness.probe3D),
+            };
             xyThickness = convertToImperial(touchplate.xyThickness);
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
+            tipDiameter = convertToImperial(tipDiameter3D);
+            xyRetract = convertToImperial(xyRetract3D);
         }
 
-        const options = {
+        const options: ProbingOptions = {
             axes,
             modal,
             probeFast: fastFeedrate,
@@ -425,6 +480,10 @@ const ProbeWidget = () => {
             $13,
             probeDistances,
             probeType,
+            homingEnabled: $22 !== '0',
+            tipDiameter3D: tipDiameter,
+            xyRetract3D: xyRetract,
+            firmware: type,
         };
 
         const code = getProbeCode(options, direction);
@@ -449,39 +508,67 @@ const ProbeWidget = () => {
         return includes(states, activeState);
     };
 
-    const onStoreChange = ({ workspace }: { workspace: BasicObject }) => {
-        const probeProfile: ProbeProfile = get(workspace, 'probeProfile', null);
+    const onStoreChange = useCallback(
+        (data: { workspace: Workspace }) => {
+            if (!data) return;
+            const { workspace } = data;
 
-        if (probeProfile) {
-            if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
-                actions.handleProbeCommandChange(0);
+            const probeProfile: ProbeProfile = get(
+                workspace,
+                'probeProfile',
+                null,
+            );
+            const newUnits = get(workspace, 'units');
+
+            if (probeProfile) {
+                if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
+                    actions.handleProbeCommandChange(0);
+                }
             }
-        }
 
-        setUnits(store.get('workspace.units'));
-        setAvailableTools(store.get('workspace.tools', []));
-        setTouchplateType(store.get('workspace.probeProfile.touchplateType'));
-        setTouchplate(store.get('workspace.probeProfile', {}));
-        setProbeCommand(config.get('probeCommand', 'G38.2'));
-        setUseTLO(config.get('useTLO'));
-        setProbeDepth(config.get('probeDepth') || {});
-        setProbeFeedrate(config.get('probeFeedrate') || {});
-        setProbeFastFeedrate(config.get('probeFastFeedrate') || {});
-        setTouchPlateHeight(config.get('touchPlateHeight') || {});
-        setRetractionDistance(config.get('retractionDistance') || {});
-        setZProbeDistance(config.get('zProbeDistance') || {});
-        setConnectivityTest(config.get('connectivityTest'));
+            // if we are switching from auto zero to another plate, make sure the probe type changes to diameter
+            if (
+                probeProfile &&
+                touchplateType !== probeProfile.touchplateType &&
+                touchplateType === TOUCHPLATE_TYPE_AUTOZERO &&
+                toolDiameter === 0
+            ) {
+                setProbeType(PROBE_TYPE_DIAMETER);
+                setCurrentTool(defaultTool);
+                setToolDiameter(
+                    calcToolDiamater(newUnits, PROBE_TYPE_DIAMETER),
+                );
+            } else {
+                setToolDiameter(calcToolDiamater(newUnits));
+            }
 
-        setToolDiameter(
-            calcToolDiamater(store.get('workspace.probeProfile', {})),
-        );
+            setUnits(store.get('workspace.units'));
+            setAvailableTools(store.get('workspace.tools', []));
+            setTouchplateType(
+                store.get('workspace.probeProfile.touchplateType'),
+            );
+            setTouchplate(store.get('workspace.probeProfile', {}));
+            setProbeCommand(config.get('probeCommand', 'G38.2'));
+            setUseTLO(config.get('useTLO'));
+            setProbeDepth(config.get('probeDepth') || {});
+            setProbeFeedrate(config.get('probeFeedrate') || {});
+            setProbeFastFeedrate(config.get('probeFastFeedrate') || {});
+            setTouchPlateHeight(config.get('touchPlateHeight') || {});
+            setRetractionDistance(config.get('retractionDistance') || {});
+            setZProbeDistance(config.get('zProbeDistance') || {});
+            setTipDiameter3D(config.get('tipDiameter3D', 0));
+            setXYRetract3D(config.get('xyRetract3D', 10));
+            setConnectivityTest(config.get('connectivityTest'));
 
-        let newZProbeDistance = config.get('zProbeDistance');
-        if (newZProbeDistance) {
-            PROBE_DISTANCE_METRIC.z = newZProbeDistance;
-            PROBE_DISTANCE_IMPERIAL.z = convertToImperial(newZProbeDistance);
-        }
-    };
+            let newZProbeDistance = config.get('zProbeDistance');
+            if (newZProbeDistance) {
+                PROBE_DISTANCE_METRIC.z = newZProbeDistance;
+                PROBE_DISTANCE_IMPERIAL.z =
+                    convertToImperial(newZProbeDistance);
+            }
+        },
+        [touchplateType, units, toolDiameter, probeType],
+    );
 
     const state: State = {
         show: modalIsOpen,

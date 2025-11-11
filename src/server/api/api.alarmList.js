@@ -46,7 +46,10 @@ export const fetchRecent = (req, res) => {
 };
 
 export const update = (req, res) => {
-    const alarmList = req.body;
+    const alarmError = req.body;
+    let alarmList = getAlarmList();
+    alarmList.list.push(alarmError);
+
     try {
         config.set(CONFIG_KEY, alarmList);
         res.send({ message: 'alarms/errors saved' });

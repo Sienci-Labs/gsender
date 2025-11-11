@@ -1,9 +1,0 @@
-<svg width="660" height="220" style="outline: 1px solid red">
-    <defs>
-        <clipPath id="test">
-            <path d="M0,0  l 75,100  150,75  -25,-125  Z"/>
-        </clipPath>
-    </defs>
-    <circle cx="110" cy="110" r="100" fill="#9c6" clip-path="url(#path-1)" />
-
-</svg>

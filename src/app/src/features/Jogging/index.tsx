@@ -22,7 +22,9 @@ import { RootState } from 'app/store/redux';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    IMPERIAL_UNITS,
     JOGGING_CATEGORY,
+    METRIC_UNITS,
     TOOLBAR_CATEGORY,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -45,6 +47,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
+import { UNITS_EN } from 'app/definitions/general';
 
 export interface JogValueObject {
     xyStep: number;
@@ -216,12 +219,12 @@ export function Jogging() {
                 'widgets.connection.controller.type',
                 'Grbl',
             );
-            const units = store.get('workspace.units', 'mm');
+            const units: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
             setFirmware(firmwareType);
 
             let convertedJogValues = JSON.parse(JSON.stringify(jogValues));
 
-            if (units === 'in') {
+            if (units === IMPERIAL_UNITS) {
                 convertedJogValues.xyStep = convertValue(
                     convertedJogValues.xyStep,
                     'mm',
@@ -888,35 +891,15 @@ export function Jogging() {
             category: JOGGING_CATEGORY,
             callback: shuttleControlFunctions.JOG,
         },
-        STOP_JOG: {
-            // this one is for the shortcut. can be used at any time, even when not continuous jogging.
-            title: 'Cancel jog move',
-            keys: '',
-            cmd: 'STOP_JOG',
-            payload: { force: true },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: (event: Event, _: Record<string, number> | null) => {
-                const isConnected = get(
-                    reduxStore.getState(),
-                    'connection.isConnected',
-                );
-                if (!isConnected) {
-                    return;
-                }
-                if (event) {
-                    preventDefault(event);
-                }
-
-                controller.command('jog:stop');
-            },
-        },
         STOP_CONT_JOG: {
             // this one is for other functions to call when continuous jogging
+            title: 'Stop Continuous Jog',
+            keys: '',
             cmd: 'STOP_CONT_JOG',
             payload: { force: true },
             preventDefault: false,
+            isActive: false,
+            category: '',
             callback: (event: Event) => {
                 if (event) {
                     preventDefault(event);
@@ -955,10 +938,10 @@ export function Jogging() {
         // }
     };
 
-    // @ts-expect-error
-    useKeybinding(shuttleControlEvents);
-    // @ts-expect-error
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isRotaryMode = mode === 'ROTARY';
     const showA =
@@ -1017,10 +1000,14 @@ export function Jogging() {
                     })}
                 >
                     <div
-                        className={cx('grid gap-x-1 items-center', {
-                            'grid-cols-2 gap-y-3': showA,
-                            'grid-cols-1 gap-y-1 xl:gap-y-2': !showA,
-                        })}
+                        className={cx(
+                            'grid gap-x-1 portrait:gap-x-2 items-center',
+                            {
+                                'grid-cols-2 gap-y-3 portrait:gap-y-6': showA,
+                                'grid-cols-1 gap-y-1 xl:gap-y-2 portrait:gap-y-4':
+                                    !showA,
+                            },
+                        )}
                     >
                         <JogInput
                             label="XY"

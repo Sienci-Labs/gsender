@@ -34,6 +34,7 @@ import ProbeDirectionSelection from './ProbeDirectionSelection';
 import { Actions, State } from './definitions';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import Tooltip from 'app/components/Tooltip';
 
 type ProbeProps = {
     state: State;
@@ -107,8 +108,10 @@ const Probe = ({ state, actions }: ProbeProps) => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const {
         canClick,
@@ -129,22 +132,27 @@ const Probe = ({ state, actions }: ProbeProps) => {
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
-                            <ShadcnButton
+                            <Tooltip
+                                content={`Probe using ${command.id}`}
                                 key={command.id}
-                                onClick={() =>
-                                    actions.handleProbeCommandChange(index)
-                                }
-                                size="icon"
-                                className={cx(
-                                    'rounded-md relative h-[calc(4vh+3px)]',
-                                    {
-                                        'bg-blue-400 bg-opacity-30':
-                                            index === selectedProbeCommand,
-                                    },
-                                )}
                             >
-                                {command.id.split(' ')[0]}
-                            </ShadcnButton>
+                                <ShadcnButton
+                                    key={command.id}
+                                    onClick={() =>
+                                        actions.handleProbeCommandChange(index)
+                                    }
+                                    size="icon"
+                                    className={cx(
+                                        'rounded-md relative h-[calc(4vh+3px)]',
+                                        {
+                                            'bg-blue-400 bg-opacity-30':
+                                                index === selectedProbeCommand,
+                                        },
+                                    )}
+                                >
+                                    {command.id.split(' ')[0]}
+                                </ShadcnButton>
+                            </Tooltip>
                         ))}
                     </div>
                     <div

@@ -25,15 +25,12 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
-import Evilscan from 'evilscan';
 import socketIO from 'socket.io';
 import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
-//import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
-//import settings from '../../config/settings';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
@@ -44,10 +41,7 @@ import {
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
-import {
-    authorizeIPAddress,
-    //validateUser
-} from '../../access-control';
+import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
 import SerialConnection from 'server/lib/SerialConnection';
@@ -236,7 +230,6 @@ class CNCEngine {
 
                     // Load file to controller if it exists
                     if (this.hasFileLoaded()) {
-                        console.log('Load file firing on reconnect');
                         controller.loadFile(this.gcode, this.meta, refresh);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
@@ -604,7 +597,6 @@ class CNCEngine {
 
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                         delay(1500).then(() => {
-                            console.log('Flash started for HAL');
                             try {
                                 halFlasher.flash(data);
                             } catch (err) {
@@ -688,49 +680,6 @@ class CNCEngine {
             socket.on('file:unload', () => {
                 log.debug('Socket unload called');
                 this.unload();
-            });
-
-            socket.on('networkScan', (port, target) => {
-                this.networkDevices = [];
-                const options = {
-                    target: target,
-                    port: port,
-                    banner: true
-                };
-
-                const scan = new Evilscan(options);
-
-                scan.on('result', (device) => {
-                    // fired when item is matching options
-                    // only take open devices
-                    //log.debug(device);
-                    if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
-                        this.networkDevices.push({
-                            ...device,
-                            controllerType: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
-                        });
-                    }
-                });
-
-                scan.on('error', (err) => {
-                    log.error(err);
-                });
-
-                scan.on('done', () => {
-                    // finished !
-                    // this.networkDevices.push({
-                    //     ip: '192.168.1.1',
-                    //     port: 23,
-                    //     banner: GRBL,
-                    //     controllerType: GRBL
-                    // });
-                    log.info('done scan');
-                    socket.emit('networkScan:status', false);
-                });
-
-                log.info('starting network scan');
-                socket.emit('networkScan:status', true);
-                scan.run();
             });
         });
     }

@@ -148,5 +148,5 @@ export function updateAllSettings(settings, eeprom) {
         });
     }
 
-    pubsub.publish('config:saved');
+    pubsub.publish('config:saved', settingsToUpdate);
 }

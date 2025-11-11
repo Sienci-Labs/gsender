@@ -79,10 +79,13 @@ import {
     updateHomingFlag,
     updateSenderStatus,
     updateControllerType,
+    addSDCardFileToList,
+    clearSDCardFiles,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
+    SDCardFile,
     SerialPortOptions,
     WORKFLOW_STATES_T,
 } from '../../definitions';
@@ -112,6 +115,8 @@ import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
+import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -137,14 +142,7 @@ export function* initialize(): Generator<any, void, any> {
         try {
             let res = await api.jobStats.fetch();
             const jobStats = res.data;
-            let newJobStats = jobStats;
 
-            if (status.finishTime) {
-                newJobStats.jobsFinished += 1;
-            } else {
-                newJobStats.jobsCancelled += 1;
-            }
-            newJobStats.totalRuntime += status.timeRunning;
             const job: Job = {
                 id:
                     jobStats.jobs.length > 0
@@ -166,7 +164,13 @@ export function* initialize(): Generator<any, void, any> {
                     ? JOB_STATUS.COMPLETE
                     : JOB_STATUS.STOPPED,
             };
-            newJobStats.jobs.push(job);
+
+            const newJobStats = {
+                finishTime: status.finishTime,
+                timeRunning: status.timeRunning,
+                job: job,
+            };
+
             api.jobStats.update(newJobStats);
             pubsub.publish('lastJob', job);
         } catch (error) {
@@ -265,7 +269,7 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 // await getParsedData().then((value) => {
-                const parsedData = null;
+                const parsedData: null = null;
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
@@ -318,7 +322,7 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         // await getParsedData().then((value) => {
-        const parsedData = null;
+        const parsedData: null = null;
         visualizeWorker.postMessage({
             content,
             visualizer,
@@ -338,7 +342,7 @@ export function* initialize(): Generator<any, void, any> {
             let res = await api.alarmList.fetch();
             const alarmList = res.data;
 
-            const alarmError = {
+            const alarmError: AlarmsErrors = {
                 id:
                     alarmList.list.length > 0
                         ? alarmList.list.length.toString()
@@ -352,8 +356,7 @@ export function* initialize(): Generator<any, void, any> {
                 line: error.line,
                 controller: error.controller,
             };
-            alarmList.list.push(alarmError);
-            api.alarmList.update(alarmList);
+            api.alarmList.update(alarmError);
         } catch (error) {
             console.error(error);
         }
@@ -602,7 +605,6 @@ export function* initialize(): Generator<any, void, any> {
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }
-
             pubsub.publish('wizard:load', {
                 ...payload,
                 title,
@@ -671,10 +673,22 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
+            const msg = 'Press Resume to continue.';
+            const content =
+                payload.comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{payload.comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
-                content: 'Press Resume to continue.',
+                content,
 
                 cancelLabel: 'Stop',
                 onConfirm: () => {
@@ -740,6 +754,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
@@ -748,6 +763,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('sender:M0M1', (opts: { comment: string }) => {
         const { comment = '' } = opts;
+        console.log('CALLED:', opts);
         const msg =
             'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
@@ -923,6 +939,76 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:start', () => {
         errors = [];
+    });
+
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        if (!file) return;
+        reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    controller.addListener('atci', (payload) => {
+        if (payload.subtype === '0') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'Continue',
+                cancelLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('cyclestart');
+                },
+                onClose: () => {
+                    controller.command('reset');
+                },
+            });
+        } else if (payload.subtype === '1') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'OK',
+                cancelLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('cyclestart');
+                },
+                hideClose: true,
+            });
+        } else if (payload.subtype === '2') {
+            Confirm({
+                title: payload.message,
+                content: payload.description,
+                confirmLabel: 'Reset',
+                onConfirm: () => {
+                    controller.command('reset');
+                },
+                hideClose: true,
+            });
+        } else if ((payload.subtype = '10')) {
+            pubsub.publish('helper:info', {
+                title: 'Jogging Inside Keepout Area',
+                content: (
+                    <div className="flex flex-row gap-4 items-centerx`">
+                        <span>Keepout:</span>
+                        <KeepoutToggle />
+                    </div>
+                ),
+                description:
+                    'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
+            });
+        } else {
+            Confirm({
+                title: 'ATCi requested a dialog.',
+                content: 'Continue to unhold, Reset to stop action.',
+                confirmLabel: 'Continue',
+                cancelLabel: 'Reset',
+            });
+        }
+    });
+
+    controller.addListener('job:stop', () => {
+        const revertWorkspace = store.get('workspace.revertWorkspace');
+        // if revert workspace is off, set the current workspace back to what it was when the job started
+        if (!revertWorkspace) {
+            controller.command('gcode', '[global.state.workspace]');
+        }
     });
 
     yield null;

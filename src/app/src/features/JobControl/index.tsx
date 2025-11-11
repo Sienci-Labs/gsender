@@ -45,11 +45,19 @@ const JobControl: React.FC<JobControlProps> = ({
     spindle,
     senderStatus,
     fileCompletion,
+    currentTool,
+    spindleToolEvents,
+    toolOffsets,
+    atcEnabled,
 }) => {
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
-    const disabled = !isConnected || !fileLoaded;
+    //const disabled = !isConnected || !fileLoaded;
     const { state: workflowState } = workflow;
+    const disabled =
+        !fileLoaded ||
+        workflowState !== WORKFLOW_STATE_IDLE ||
+        activeState !== GRBL_ACTIVE_STATE_IDLE;
 
     useEffect(() => {
         subscribe();
@@ -90,9 +98,116 @@ const JobControl: React.FC<JobControlProps> = ({
         setLastLine(senderStatus?.received);
     };
 
+    function validateFileForATC() {
+        let hasTC = false;
+        let toolEvent = null;
+
+        // No ATC, always return a fine validation
+        if (!atcEnabled) {
+            return [false, null];
+        }
+
+        if (!spindleToolEvents) {
+            return;
+        }
+
+        for (const [eventKey] of Object.entries(spindleToolEvents)) {
+            toolEvent = spindleToolEvents[eventKey];
+            if (toolEvent.hasOwnProperty('M') && toolEvent['M'] === 6) {
+                hasTC = true;
+                break;
+            }
+        }
+        // early return if we see a M6 in the file - no need to prompt
+        if (hasTC) {
+            return [false, null];
+        }
+        // No tool change in file - prompt based on current tool and offsets
+
+        // Tool selected with offsets
+        if (currentTool > 0) {
+            const offsets = toolOffsets[Number(currentTool)];
+            const zOffset = get(offsets, 'toolOffsets.z', 0);
+
+            // Tool selected with Offsets
+            if (zOffset < 0) {
+                return [
+                    true,
+                    {
+                        type: 'alert',
+                        title: `Using Current Tool (T${currentTool})`,
+                        body: (
+                            <>
+                                <p>
+                                    This file contains no tool change commands
+                                    (M6) and the tool in the spindle will be
+                                    used.
+                                </p>
+                                <p>
+                                    Please confirm that you want to use this
+                                    tool
+                                </p>
+                            </>
+                        ),
+                    },
+                ];
+            } else {
+                return [
+                    true,
+                    {
+                        type: 'error',
+                        title: 'Current Tool Not Probed',
+                        body: (
+                            <>
+                                <p>
+                                    The file contains no tool change commands
+                                    (M6) and the tool in the spindle will be
+                                    used. However, the tool in the spindle does
+                                    not have an offset.
+                                </p>
+                                <p>
+                                    Select <b>"Probe"</b> in the ATC tab to
+                                    establish an offset and re-zero the
+                                    workpiece before trying again.
+                                </p>
+                            </>
+                        ),
+                    },
+                ];
+            }
+            // Tool selected with no offsets
+        } else {
+            // no current tool - prompt to load one
+            return [
+                true,
+                {
+                    type: 'error',
+                    title: 'No Current Tool',
+                    body: (
+                        <>
+                            <p>
+                                This file contains no tool change commands (M6)
+                                and there is no tool in the spindle.
+                            </p>
+                            <p>
+                                Load the tool you want to use into the spindle
+                                before trying again.
+                            </p>
+                            <p>
+                                Alternatively, you can update your
+                                post-processor to include a tool change command
+                                with your file.
+                            </p>
+                        </>
+                    ),
+                },
+            ];
+        }
+    }
+
     return (
         <>
-            <div className="z-10 absolute bottom-[30%] portrait:max-lg:bottom-[calc(50%+85px)] max-sm:bottom-[30%] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
+            <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea
                         senderStatus={senderStatus}
@@ -102,17 +217,14 @@ const JobControl: React.FC<JobControlProps> = ({
             </div>
             <div className="relative h-full">
                 <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                    {fileLoaded &&
-                        workflowState === WORKFLOW_STATE_IDLE &&
-                        activeState === GRBL_ACTIVE_STATE_IDLE && (
-                            <div className="flex flex-row gap-2 justify-center mb-3 w-full">
-                                <OutlineButton disabled={disabled} />
-                                <StartFromLine
-                                    disabled={disabled}
-                                    lastLine={lastLine}
-                                />
-                            </div>
-                        )}
+                    <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                        <OutlineButton disabled={disabled} />
+                        <StartFromLine
+                            disabled={disabled}
+                            lastLine={lastLine}
+                            atcValidator={validateFileForATC}
+                        />
+                    </div>
                 </div>
 
                 <div className="z-10 absolute top-[-30px] max-xl:top-[-28px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
@@ -123,6 +235,7 @@ const JobControl: React.FC<JobControlProps> = ({
                         isConnected={isConnected}
                         fileLoaded={fileLoaded}
                         onStop={onStop}
+                        validateATC={validateFileForATC}
                     />
                     <ControlButton
                         type={PAUSE}
@@ -174,6 +287,12 @@ export default connect((store) => {
     const senderStatus = get(store, 'controller.sender.status');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
 
+    const spindleToolEvents = get(store, 'file.spindleToolEvents', {});
+    const toolOffsets = get(store, 'controller.settings.toolTable', {});
+    const currentTool = get(store, 'controller.state.status.currentTool', -1);
+    const atcFlag = get(store, 'controller.settings.info.NEWOPT.ATC', '0');
+    const atcEnabled = atcFlag === '1';
+
     return {
         fileLoaded,
         workflow,
@@ -186,5 +305,9 @@ export default connect((store) => {
         spindle,
         senderStatus,
         fileCompletion,
+        spindleToolEvents,
+        toolOffsets,
+        currentTool,
+        atcEnabled,
     };
 })(JobControl);

@@ -1,3 +1,5 @@
+import { TooltipContentProps } from '@radix-ui/react-tooltip';
+
 import {
     Tooltip as TooltipWrapper,
     TooltipTrigger,
@@ -8,17 +10,15 @@ import {
 export interface TooltipProps {
     children?: React.ReactNode;
     content?: string;
-    location?: string;
+    side?: TooltipContentProps['side'];
 }
 
-export function Tooltip(props: TooltipProps) {
+export function Tooltip({ children, content, side }: TooltipProps) {
     return (
-        <TooltipProvider>
+        <TooltipProvider delayDuration={1500}>
             <TooltipWrapper>
-                <TooltipTrigger className="w-full">
-                    {props.children}
-                </TooltipTrigger>
-                <TooltipContent>{props.content}</TooltipContent>
+                <TooltipTrigger asChild>{children}</TooltipTrigger>
+                <TooltipContent side={side}>{content}</TooltipContent>
             </TooltipWrapper>
         </TooltipProvider>
     );

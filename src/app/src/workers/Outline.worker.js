@@ -26,7 +26,6 @@ import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [], mode, bbox } = data;
-    console.log(`Received mode: ${mode}`);
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];

@@ -26,8 +26,8 @@ import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
+
 import GcodeToolpath from '../../lib/GcodeToolpath';
-// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
@@ -55,12 +55,15 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_HAL_ACTIVE_STATE_HOME,
+    GRBL_HAL_ACTIVE_STATE_HOLD,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_CHECK,
+    GRBL_HAL_ACTIVE_STATE_RUN
 } from './constants';
 import {
     METRIC_UNITS,
@@ -82,8 +85,9 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
+
+import { YModem } from 'server/lib/YModemUSB';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -162,7 +166,12 @@ class GrblHalController {
         replyParserState: false, // $G
         replyStatusReport: false, // ?
         alarmCompleteReport: false, //0x87
-        axsReportCount: 0
+        axsReportCount: 0,
+        // Extra function queries
+        accessoryState: {
+            SD: false,
+            ATCI: false
+        }
     };
 
     parserStateEnabled = false;
@@ -207,6 +216,9 @@ class GrblHalController {
 
     // Macro button resume
     programResumeTimeout = null;
+
+    ymodem = null;
+    ymodemTransferInProgress = false;
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -271,7 +283,7 @@ class GrblHalController {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
@@ -485,8 +497,15 @@ class GrblHalController {
                     }
 
                     let tool = line.match(toolCommand);
+                    if (tool && this.toolChangeContext.mappings) {
+                        const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
+                        if (remap) {
+                            line = line.replace(tool[0], `T${remap}`);
+                        }
+                    }
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
+                    // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
@@ -574,7 +593,7 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
@@ -646,14 +665,18 @@ class GrblHalController {
             this.emit('serialport:read', spindle.raw);
         });
 
+        this.runner.on('json', (json) => {
+            this.emit('sdcard:json', json);
+        });
+
         this.runner.on('status', (res) => {
-            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE) {
                 this.initialized = true;
                 this.initController();
             }
 
             // Make sure we also have axs parsed - at most two times or we get endless loop
-            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
+            if (!this.runner.hasAXS() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
                 this.writeln('$I');
                 this.actionMask.axsReportCount++;
             }
@@ -858,7 +881,7 @@ class GrblHalController {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
-            } else if (this.state?.status?.activeState === GRBL_ACTIVE_STATE_HOME) {
+            } else if (this.state?.status?.activeState === GRBL_HAL_ACTIVE_STATE_HOME) {
                 errorOrigin = 'Console';
                 line = '$H';
             } else if (outstanding > 0) {
@@ -900,7 +923,7 @@ class GrblHalController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
                 setTimeout(() => {
@@ -956,7 +979,7 @@ class GrblHalController {
             this.emit('grblHal:info', res);
         });
 
-        this.runner.on('startup', async (res) => {
+        this.runner.on('startup', async (res, semver) => {
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -977,7 +1000,20 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            await delay(25);
+
+            const hasSD = true;
+            if (hasSD && !this.actionMask.accessoryState.SD) {
+                this.connection.write('$FM\n$F\n');
+                this.actionMask.accessoryState.SD = true;
+            }
+
+            if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
+                this.connection.writeln('$spindlesh');
+            } else {
+                this.connection.writeln('$spindles');
+            }
         });
 
         this.toolChanger = new ToolChanger({
@@ -1006,9 +1042,27 @@ class GrblHalController {
             this.emit('settings:group', this.runner.settings.groups);
         });
 
+        this.runner.on('sdcard', (payload) => {
+            this.emit('serialport:read', payload.raw);
+            this.emit('sdcard:files', payload);
+        });
+
+        this.runner.on('atci', (payload) => {
+            this.emit('serialport:read', payload.raw);
+            delete payload.raw;
+            if (payload.subtype) {
+                this.emit('atci', payload);
+            }
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
+                return;
+            }
+
+            // If transferring over ymodem, we cannot send any other commands or bad things happen.
+            if (this.ymodemTransferInProgress) {
                 return;
             }
 
@@ -1039,6 +1093,7 @@ class GrblHalController {
                     this.actionMask.alarmCompleteReport = false;
                 } else {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+
                     if (!this.actionMask.alarmCompleteReport) {
                         this.actionMask.alarmCompleteReport = true;
                     }
@@ -1046,11 +1101,15 @@ class GrblHalController {
             }
         };
 
-        // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             // if parser state enabled, we dont need to query the parser state
             if (!(this.ready) || this.parserStateEnabled) {
+                return;
+            }
+
+            // Do not send any commands while we are transferring a file or else bad things happen
+            if (this.ymodemTransferInProgress) {
                 return;
             }
 
@@ -1168,12 +1227,45 @@ class GrblHalController {
                 }
             }
         }, 250);
+
+        // YModem instance
+        this.ymodem = new YModem();
+        this.ymodem.on('start', () => {
+            this.emit('ymodem:start');
+            this.ymodemTransferInProgress = true;
+        });
+        this.ymodem.on('progress', (progress) => {
+            this.emit('ymodem:progress', progress);
+        });
+        this.ymodem.on('abort', () => {
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:error', 'Transfer aborted by device.');
+            this.restoreListeners();
+        });
+        this.ymodem.on('error', (err) => {
+            this.ymodemTransferInProgress = false;
+            this.emit('ymodem:error', err);
+            this.restoreListeners();
+        });
+
+        this.ymodem.on('complete', () => {
+            //this.clearActionValues(); // Surely this fixes the extra OKs
+            this.emit('ymodem:complete');
+            this.ymodemTransferInProgress = false;
+            this.restoreListeners();
+
+            setTimeout(() => {
+                this.command('sdcard:list');
+            }, 150);
+        });
     }
 
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
+        await delay(50);
+        this.writeln('$I');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
     }
@@ -1272,7 +1364,13 @@ class GrblHalController {
         this.actionMask.queryStatusReport = false;
         this.actionMask.replyParserState = false;
         this.actionMask.replyStatusReport = false;
+
+        // Accessory queries
+        this.actionMask.accessoryState.SD = false;
+        this.actionMask.ATCI = false;
+
         this.actionMask.axsReportCount = 0;
+        this.actionMask.queryStatusCount = 0;
         this.actionTime.queryParserState = 0;
         this.actionTime.queryStatusReport = 0;
         this.actionTime.senderFinishTime = 0;
@@ -1336,6 +1434,10 @@ class GrblHalController {
         };
     }
 
+    restoreListeners() {
+        this.connection.restoreListeners();
+    }
+
     open(port, baudrate, refresh = false, callback = noop) {
         if (!refresh) {
             this.connection.on('data', this.connectionEventListener.data);
@@ -1359,8 +1461,8 @@ class GrblHalController {
         // We set controller ready if version found
         setTimeout(async () => {
             if (this.connection) {
+                this.connection.writeln('\x87');
                 await delay(100);
-                this.connection.writeImmediate(String.fromCharCode(0x87));
                 this.write('$I\n');
             }
             if (!refresh) {
@@ -1380,7 +1482,7 @@ class GrblHalController {
                         this.ready = true;
 
                         // Rewind any files in the sender
-                        this.workflow.stop();
+                        this.workflow && this.workflow.stop();
 
                         if (!this.initialized) {
                             this.initialized = true;
@@ -1521,6 +1623,9 @@ class GrblHalController {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }
 
+                // Reset mappings on file load
+                this.toolChangeContext.mappings = {};
+
                 const ok = this.sender.load(name, gcode + '\n', context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
@@ -1553,6 +1658,10 @@ class GrblHalController {
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
+
+                const atci = _.get(this.settings, 'info.NEWOPT.ATC', '0') === '1';
+
+                this.command('gcode', '%global.state.workspace=modal.wcs');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1596,6 +1705,7 @@ class GrblHalController {
                     });
 
                     const modal = toolpath.getModal();
+
                     const position = toolpath.getPosition();
 
                     const coolant = {
@@ -1636,6 +1746,20 @@ class GrblHalController {
                     // Move up and then to cut start position
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
+                    // ATCI - add M6 before spindles turned on to get correct tool to spin up
+                    if (atci && modal.tool !== 0) {
+                        if (this.toolChangeContext.mappings) {
+                            const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
+                            if (remap) {
+                                console.log('found SFL remap:', remap);
+                                modalGCode.push(`M6 T${remap}`);
+                            }
+                        } else {
+                            console.log('no remap, using found T value');
+                            modalGCode.push(`M6 T${modal.tool}`);
+                        }
+                    }
+
                     if (hasSpindle) {
                         modalGCode.push(`${modal.spindle} S${spindleRate}`);
                     }
@@ -1691,12 +1815,14 @@ class GrblHalController {
                 const [options] = args;
                 const { force = false } = { ...options };
 
+                this.emit('job:stop');
+
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1798,7 +1924,7 @@ class GrblHalController {
                 } else {
                     this.writeln('$H');
                 }
-                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -2167,7 +2293,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                this.toolChangeContext = context;
+                this.toolChangeContext = { ...this.toolChangeContext, ...context };
             },
             'toolchange:pre': () => {
                 log.debug('Starting pre hook');
@@ -2215,6 +2341,53 @@ class GrblHalController {
             },
             'runner:resetSettings': () => {
                 this.runner.deleteSettings();
+            },
+            'sdcard:mount': () => {
+                this.writeln('$FM');
+            },
+            'sdcard:list': () => {
+                const [type = 'cnc'] = args;
+
+                if (type === 'cnc') {
+                    this.writeln('$F');
+                    return;
+                }
+
+                if (type === 'all') {
+                    this.writeln('$F+');
+                    return;
+                }
+            },
+            'sdcard:read': () => {
+                const [fileName] = args;
+
+                const availableFiles = _.get(this.state, 'sdcard.files', []);
+                const hasFile = _.find(availableFiles, (file) => file.name === fileName);
+
+                if (hasFile) {
+                    this.command('gcode', `$F<=${fileName}`);
+                }
+            },
+            'sdcard:run': () => {
+                const [filePath] = args;
+
+                this.writeln(`$F=${filePath}`);
+            },
+            'sdcard:delete': () => {
+                const [filePath] = args;
+
+                this.writeln(`$FD=${filePath}`);
+            },
+            'ymodem:upload': () => {
+                const [fileData] = args;
+                this.ymodem.sendFile(fileData, this.connection.getConnectionObject());
+            },
+            'ymodem:uploadFiles': () => {
+                const [files] = args;
+                this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+            },
+            'ymodem:cancel': () => {
+                console.log('cancel upload');
             }
         }[cmd];
 
@@ -2235,10 +2408,14 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
+        this.actionMask.replyStatusReport =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
             (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
             this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
+
+        this.actionMask.replyParserState =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) ||
+            this.actionMask.replyParserState;
 
         this.connection.write(data, {
             ...context,
