@@ -39,7 +39,6 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
 
         controller.addListener('ymodem:complete', () => {
             setStatus({ type: 'idle', message: '' });
-            console.log('upload complete');
             setTimeout(() => {
                 controller.command('gcode', ['G65 P100', 'G65 P200']);
             }, 1000);

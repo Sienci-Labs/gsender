@@ -20,11 +20,9 @@ export function ATCIConfiguration() {
                 setUploading(false);
             });
             controller.addListener('ymodem:start', () => {
-                console.log('uploading');
                 setUploading(true);
             });
         } else {
-            console.log('closing time');
             controller.removeListener('ymodem:error');
             controller.removeListener('ymodem:complete');
             controller.removeListener('ymodem:start');
