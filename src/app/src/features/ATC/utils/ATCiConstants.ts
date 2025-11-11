@@ -62,7 +62,7 @@ export const toolStateThemes: ToolStateThemes = {
         label: 'Used',
         backgroundColor: 'bg-gray-600/20 dark:bg-gray-600/40',
         borderColor: 'border-gray-800',
-        textColor: 'text-black',
+        textColor: 'text-black dark:text-gray-300',
         backgroundStyle: 'striped-diagonal',
         icon: MdRefresh,
     },
