@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "node server",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest ",
-    "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx",
+    "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest --emptyOutDir",
+    "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx --emptyOutDir",
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
