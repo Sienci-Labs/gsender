@@ -673,10 +673,22 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
+            const msg = 'Press Resume to continue.';
+            const content =
+                payload.comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{payload.comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
-                content: 'Press Resume to continue.',
+                content,
 
                 cancelLabel: 'Stop',
                 onConfirm: () => {
