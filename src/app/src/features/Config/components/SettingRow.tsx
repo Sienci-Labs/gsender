@@ -94,6 +94,7 @@ function returnSettingControl(
                     value={value as number}
                     index={index}
                     eepromKey={setting.eID}
+                    forceEEPROM={setting.forceEEPROM}
                     onChange={handler}
                     unit={setting.unit}
                 />
