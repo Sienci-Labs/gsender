@@ -119,7 +119,7 @@ export function ToolRemapDialog({
                             <SelectTrigger id="tool-select">
                                 <SelectValue placeholder="Select a tool" />
                             </SelectTrigger>
-                            <SelectContent className="z-[10000] bg-white">
+                            <SelectContent className="z-[10000] bg-white dark:bg-dark">
                                 {allTools.map((tool) => {
                                     tool = { ...tool };
                                     const available = isToolAvailable(tool.id);
@@ -150,7 +150,7 @@ export function ToolRemapDialog({
                                             value={tool.id.toString()}
                                             disabled={!available}
                                             className={cn(
-                                                'relative flex w-full bg-white cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                                                'relative flex w-full bg-white dark:bg-dark cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                                                 'border-l-4',
                                                 stateStyle.border,
                                                 !available &&
@@ -167,7 +167,7 @@ export function ToolRemapDialog({
                                         >
                                             <SelectPrimitive.ItemText>
                                                 <div className="flex items-center justify-between gap-3 w-full pr-6">
-                                                    <span className="font-mono font-medium">
+                                                    <span className="font-mono font-medium min-w-[4ch]">
                                                         T{tool.id}
                                                     </span>
                                                     <Badge
