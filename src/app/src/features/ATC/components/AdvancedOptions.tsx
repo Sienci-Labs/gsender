@@ -38,7 +38,7 @@ export function AdvancedOptions() {
                 <CollapsibleTrigger asChild className="p-0 w-full">
                     <button
                         variant="ghost"
-                        className="flex w-full flex-row px-1 py-1 items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                        className="flex w-full flex-row px-1 py-1 items-center justify-between text-sm font-medium text-gray-700 dark:text-white rounded-lg"
                     >
                         <div className="flex items-center gap-1">
                             <LuHardHat className="h-4 w-4" />
