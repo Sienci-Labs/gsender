@@ -6,7 +6,7 @@ import {
 import store from 'app/store';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 
 import {
     GRBL_HAL_SETTINGS,
@@ -230,10 +230,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }
 
     function repopulateEEPROM() {
+        const detectedE = get(
+            reduxStore.getState(),
+            'controller.settings.settings',
+        );
         setEEPROM(
             getFilteredEEPROMSettings(
                 BASE_SETTINGS,
-                detectedEEPROM,
+                detectedE,
                 detectedEEPROMDescriptions,
                 detectedEEPROMGroups,
             ),
