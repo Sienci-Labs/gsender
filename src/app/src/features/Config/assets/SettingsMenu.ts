@@ -120,6 +120,7 @@ export interface gSenderSetting {
     max?: number;
     remap?: EEPROM;
     remapped?: boolean;
+    forceEEPROM?: boolean;
 }
 
 export interface gSenderSubSection {
@@ -372,7 +373,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Pop-up notification duration',
                         key: 'workspace.toastDuration',
-                        description: `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
+                        description:
+                            `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
                         type: 'number',
                         defaultValue: 0,
                         min: TOASTER_DISABLED,
@@ -1184,6 +1186,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the minimum speed of your spindle. ($31)',
                         type: 'hybrid',
                         eID: '$31',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
@@ -1193,6 +1196,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the maximum speed of your spindle. ($30)',
                         type: 'hybrid',
                         eID: '$30',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
