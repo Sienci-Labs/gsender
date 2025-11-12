@@ -224,7 +224,7 @@ export function SettingRow({
                 },
             )}
         >
-            <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-gray-400 flex items-center justify-between sm:block">
+            <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-gray-400 flex items-center justify-between sm:block ">
                 <span>{setting.label}</span>
                 <span className="sm:hidden flex flex-row gap-2">
                     {!isDefault && (
@@ -261,7 +261,7 @@ export function SettingRow({
                     )}
                 </span>
             </span>
-            <span className="w-full sm:w-2/5 sm:order-none order-2 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
+            <span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
                 {setting.description.split('\n').map((line, index) => (
                     <p key={index}>{line}</p>
                 ))}

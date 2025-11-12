@@ -109,11 +109,11 @@ export function EEPROMSettingRow({
                         </Tooltip>
                     </span>
                 </div>
-                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 sm:order-none order-1">
+                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
                     {detailString}
                 </span>
                 <div
-                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-none order-2"
+                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-2 order-2"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -127,7 +127,7 @@ export function EEPROMSettingRow({
                         </div>
                     )}
                 </div>
-                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 justify-end">
+                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 order-3 justify-end">
                     {!isDefault && (
                         <Tooltip content="Reset to default value">
                             <button
