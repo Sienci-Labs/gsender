@@ -38,7 +38,6 @@ export function Config() {
 
     const { settings } = useSettings();
 
-<<<<<<< HEAD
     // lets extract all the eeprom settings
     let allEEPROM: gSenderSetting[] = settings
         .flatMap((section) => section.settings)
@@ -63,8 +62,6 @@ export function Config() {
         },
     ];
 
-=======
->>>>>>> origin/dev
     function navigateToSection(
         _e: MouseEventHandler<HTMLButtonElement>,
         index: number,
@@ -79,7 +76,6 @@ export function Config() {
 
     return (
         <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
-<<<<<<< HEAD
             {activeTab === 'config' ? (
                 <Menu
                     menu={settings}
@@ -91,15 +87,6 @@ export function Config() {
             )}
             <div className="flex flex-col fixed-content-area w-4/5">
                 <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
-=======
-            <Menu
-                menu={settings}
-                onClick={navigateToSection}
-                activeSection={visibleSection}
-            />
-            <div className="flex flex-col fixed-content-area w-4/5 max-sm:w-full">
-                <div className="min-h-1/5 bg-white border max-sm:border-0 border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-sm:pl-0 max-xl:pl-5 dark:bg-dark dark:border-gray-700">
->>>>>>> origin/dev
                     <Search />
                     <FilterDefaultToggle />
                     <ApplicationPreferences />
