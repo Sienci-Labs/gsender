@@ -25,7 +25,10 @@ class GrblHalLineParserResultTool {
     static parse(line) {
         //   [T:1|0.000,0.000,0.000,0.000|0.000]
         //
-        const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
+        //const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
+
+        const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)(.+)?]/);
+
         if (!r) {
             return null;
         }
