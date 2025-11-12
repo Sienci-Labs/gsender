@@ -43,6 +43,7 @@ import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
+import CameraSignaling from '../camera/CameraSignaling';
 import delay from '../../lib/delay';
 import SerialConnection from 'server/lib/SerialConnection';
 import Connection from '../../lib/Connection';
@@ -124,6 +125,9 @@ class CNCEngine {
         }
     });
 
+    // Camera Signaling
+    cameraSignaling = new CameraSignaling();
+
     // @param {object} server The HTTP server instance.
     // @param {string} controller Specify CNC controller.
     start(server, controller = '') {
@@ -166,6 +170,9 @@ class CNCEngine {
             pingInterval: 25000,
             maxHttpBufferSize: 40e6
         });
+
+        // Initialize camera signaling
+        this.cameraSignaling.initialize(this.io);
 
         this.io.use(async (socket, next) => {
             try {
@@ -680,6 +687,54 @@ class CNCEngine {
             socket.on('file:unload', () => {
                 log.debug('Socket unload called');
                 this.unload();
+            });
+
+            // Camera command handlers
+            socket.on('camera:updateSettings', (settings) => {
+                log.debug('Camera settings updated:', settings);
+
+                // Update the camera API state
+                // Note: 'available' is NOT updated here - only by startStream/stopStream
+                const api = require('../../api/api.camera');
+                api.updateStatus({
+                    enabled: settings.enabled,
+                    constraints: settings.constraints
+                });
+
+                log.debug('Camera API state updated:', {
+                    enabled: settings.enabled,
+                    deviceId: settings.deviceId ? 'present' : 'missing'
+                });
+
+                socket.emit('camera:settingsUpdated', settings);
+            });
+
+            socket.on('camera:startStream', (settings) => {
+                log.debug('Camera stream start requested');
+
+                // Update API state to mark stream as available
+                const api = require('../../api/api.camera');
+                api.updateStatus({ available: true });
+
+                // Broadcast to remote clients
+                this.cameraSignaling.broadcastAvailability(true);
+                socket.emit('camera:streamStarted');
+            });
+
+            socket.on('camera:stopStream', () => {
+                log.debug('Camera stream stop requested');
+
+                // Update API state to mark stream as unavailable
+                const api = require('../../api/api.camera');
+                api.updateStatus({ available: false });
+
+                // Broadcast to remote clients
+                this.cameraSignaling.broadcastAvailability(false);
+                socket.emit('camera:streamStopped');
+            });
+
+            socket.on('camera:metrics', (metrics) => {
+                this.cameraSignaling.broadcastMetrics(metrics);
             });
         });
     }

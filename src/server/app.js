@@ -256,7 +256,8 @@ const appMain = () => {
             // Check whether the request path is not restricted
             const whitelist = [
                 // Also see "src/app/api/index.js"
-                urljoin(settings.route, 'api/signin')
+                urljoin(settings.route, 'api/signin'),
+                urljoin(settings.route, 'api/camera/status')
             ];
             bypass = bypass || whitelist.some(path => {
                 return req.path.indexOf(path) === 0;
@@ -366,6 +367,9 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/users/:id'), api.users.read);
         app.put(urljoin(settings.route, 'api/users/:id'), api.users.update);
         app.delete(urljoin(settings.route, 'api/users/:id'), api.users.__delete);
+
+        // Camera
+        app.get(urljoin(settings.route, 'api/camera/status'), api.camera.getStatus);
 
         // Watch
         app.get(urljoin(settings.route, 'api/watch/files'), api.watch.getFiles);

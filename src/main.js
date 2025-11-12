@@ -167,7 +167,9 @@ const main = () => {
                 return;
             }
 
-            const url = `http://${address}:${port}`;
+            // Always use localhost for Electron to ensure secure context for camera access
+            // Even when server binds to 0.0.0.0 for remote access, Electron should connect via localhost
+            const url = `http://localhost:${port}`;
             // The bounds is a rectangle object with the following properties:
             // * `x` Number - The x coordinate of the origin of the rectangle.
             // * `y` Number - The y coordinate of the origin of the rectangle.
