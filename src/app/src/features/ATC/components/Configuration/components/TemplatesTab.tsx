@@ -178,7 +178,7 @@ export const TemplatesTab: React.FC = () => {
                     </h1>
 
                     <div className="flex-1">
-                        <div className="bg-gray-50 border rounded m-2 h-full overflow-auto">
+                        <div className="border rounded m-2 h-full overflow-auto">
                             {selectedTemplate ? (
                                 <GcodeViewer gcode={selectedTemplate.content} />
                             ) : (

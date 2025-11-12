@@ -283,7 +283,7 @@ class GrblHalController {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
@@ -500,9 +500,7 @@ class GrblHalController {
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
                         if (remap) {
-                            console.log('found remap:', remap);
                             line = line.replace(tool[0], `T${remap}`);
-                            console.log('remapped line', line);
                         }
                     }
 
@@ -1005,7 +1003,8 @@ class GrblHalController {
             this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
             await delay(25);
 
-            const hasSD = true;
+            const hasSD = _.get(this.state, 'status.sdCard', null);
+
             if (hasSD && !this.actionMask.accessoryState.SD) {
                 this.connection.write('$FM\n$F\n');
                 this.actionMask.accessoryState.SD = true;

@@ -124,6 +124,7 @@ interface ConfigContextValue {
         type: 'idle' | 'success' | 'error' | 'warning';
         message: string;
     };
+    setStatus: (s) => void;
     templates: ATCIMacroConfig;
 }
 
@@ -231,22 +232,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         const content = generateAllMacros(config);
 
         controller.command('ymodem:uploadFiles', content);
-
-        // Simulate progress
-        for (let i = 0; i <= 100; i += 10) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            setProgress(i);
-        }
-
-        setIsApplying(false);
-        setStatus({
-            type: 'success',
-            message: 'Configuration applied successfully!',
-        });
-
-        setTimeout(() => {
-            setStatus({ type: 'idle', message: '' });
-        }, 3000);
     };
 
     const setWorkspacePosition = (workspace: string) => {
@@ -264,6 +249,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         status,
         templates,
         setTemplates,
+        setStatus,
     };
 
     return (

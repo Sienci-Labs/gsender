@@ -1097,7 +1097,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.vmState.invalidLines.push(line);
         }
 
-        const parsedLine = parseLine(line);
+        let parsedLine = parseLine(line);
         this.totalLines += 1; // Moved here so M6 and T commands are correctly stored
         // collect spindle and feed rates
         for (let word of parsedLine.words) {
@@ -1221,6 +1221,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.fn.callback();
         this.emit('data', parsedLine);
+        parsedLine = null;
     }
 
     generateFileStats() {

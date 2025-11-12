@@ -113,7 +113,6 @@ export type LoadToolMode = 'load' | 'save' | 'loadAndSave';
 export function isATCAvailable() {
     const reduxState = reduxStore.getState();
     const atcFlag = get(reduxState, 'controller.settings.info.NEWOPT.ATC', '0');
-    console.log('ATC Flag', atcFlag);
     return atcFlag === '1';
 }
 

@@ -125,7 +125,7 @@ const ToolChangerPopover: React.FC = ({
             <PopoverContent className="w-96 p-6" align="end">
                 <div className="space-y-2">
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-800">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
                             {getModeTitle(mode)}
                         </h3>
                     </div>
@@ -139,11 +139,11 @@ const ToolChangerPopover: React.FC = ({
                                 <SelectTrigger className="w-full">
                                     <SelectValue>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-mono font-semibold text-slate-800">
+                                            <span className="font-mono font-semibold text-slate-800 dark:text-white">
                                                 {selectedTool?.id}
                                             </span>
                                             {selectedTool?.nickname && (
-                                                <span className="text-slate-600 text-sm truncate">
+                                                <span className="text-slate-600 dark:text-white text-sm truncate">
                                                     {selectedTool.nickname}
                                                 </span>
                                             )}
@@ -160,11 +160,11 @@ const ToolChangerPopover: React.FC = ({
                                                 value={tool.id}
                                             >
                                                 <div className="flex items-center gap-1 min-w-0">
-                                                    <span className="font-mono font-semibold text-slate-800 shrink-0">
+                                                    <span className="font-mono font-semibold text-slate-800 dark:text-white shrink-0">
                                                         {tool?.id}
                                                     </span>
                                                     {tool?.nickname && (
-                                                        <span className="text-slate-600 text-sm truncate">
+                                                        <span className="text-slate-600 dark:text-white text-sm truncate">
                                                             {tool.nickname}
                                                         </span>
                                                     )}
@@ -209,7 +209,9 @@ const ToolChangerPopover: React.FC = ({
                                 >
                                     {statusConfig.title}
                                 </h4>
-                                <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                                <p
+                                    className={`text-sm ${statusConfig.textColor} mt-1 leading-relaxed`}
+                                >
                                     {statusConfig.description}
                                 </p>
                             </div>

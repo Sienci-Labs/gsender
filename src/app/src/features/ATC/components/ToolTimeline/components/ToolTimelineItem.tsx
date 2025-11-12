@@ -131,9 +131,8 @@ export function ToolTimelineItem({
                             <div className="flex flex-col items-end">
                                 <span
                                     className={cn(
-                                        'transition-colors whitespace-nowrap text-xs font-medium opacity-100',
+                                        'transition-colors whitespace-nowrap text-xs font-medium opacity-100 text-black dark:text-white',
                                     )}
-                                    style={{ color: '#000' }}
                                 >
                                     Line {tool.startLine}
                                     {tool.endLine && ` - ${tool.endLine}`}

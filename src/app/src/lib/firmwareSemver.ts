@@ -15,12 +15,10 @@ export function firmwarePastVersion(required: number): boolean {
     }
 
     const reduxState = reduxStore.getState();
-    console.log(reduxState);
     const reportedFirmwareVersion = get(
         reduxState,
         'controller.settings.version.semver',
         0,
     );
-    console.log(reportedFirmwareVersion, required);
     return Number(reportedFirmwareVersion) >= Number(required);
 }

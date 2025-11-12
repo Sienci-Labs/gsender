@@ -15,15 +15,17 @@ import { toast } from 'app/lib/toaster';
 
 interface ConfigModalProps {
     open: boolean;
+    uploading: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
 export const ConfigModal: React.FC<ConfigModalProps> = ({
     open,
     onOpenChange,
+    uploading,
 }) => {
     const [activeTab, setActiveTab] = useState('config');
-    const { updateConfig } = useConfigContext();
+    const { updateConfig, setStatus } = useConfigContext();
 
     useEffect(() => {
         // Set all config values to default, and then repopulate again from SD card.
@@ -34,12 +36,18 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                 variables: { ...updatedConfig.variables },
             });
         });
-        controller.addListener('ymodem:error', (error) => {
-            toast.error('Error uploaded new config');
+
+        controller.addListener('ymodem:complete', () => {
+            setStatus({ type: 'idle', message: '' });
+            setTimeout(() => {
+                controller.command('gcode', ['G65 P100', 'G65 P200']);
+            }, 1000);
         });
+
         return () => {
             controller.removeListener('sdcard:json');
             controller.removeListener('ymodem:error');
+            controller.removeListener('ymodem:complete');
         };
     }, []);
 
@@ -57,7 +65,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                     </TabsList>
 
                     <TabsContent value="config" className="flex-1 mt-4">
-                        <ConfigTab />
+                        <ConfigTab uploading={uploading} />
                     </TabsContent>
 
                     <TabsContent value="templates" className="flex-1 mt-4">

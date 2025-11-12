@@ -12,8 +12,6 @@ export function KeepoutToggle() {
         (state: RootState) => state.controller.state.status?.keepout?.flags,
     );
 
-    console.log('initialFlags', initialFlags);
-
     useEffect(() => {
         if (!initialFlags) {
             setFlags([]);

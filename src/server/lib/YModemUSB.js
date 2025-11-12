@@ -175,7 +175,6 @@ export class YModem extends events.EventEmitter {
             if (fileData.size === 0) {
                 fileChunks = [];
             } else if (fileData.size <= SendSize[this.SOH]) {
-                console.log('Sending using SOH');
                 fileChunks = [
                     this.padRBuffer(
                         fileData.data,
@@ -185,7 +184,6 @@ export class YModem extends events.EventEmitter {
                 ];
                 isLastByteSOH = true;
             } else if (fileData.size <= SendSize[this.STX]) {
-                console.log('Sending using STX');
                 fileChunks = [
                     this.padRBuffer(
                         fileData.data,
@@ -195,12 +193,10 @@ export class YModem extends events.EventEmitter {
                 ];
                 isLastByteSOH = false;
             } else {
-                console.log('Sending using STX+chunks');
                 const fileSplit = this.splitFileToChunks(
                     fileData.data,
                     SendSize[this.STX]
                 );
-                console.log(fileSplit);
                 fileChunks = fileSplit.chunks;
                 isLastByteSOH = fileSplit.isLastByteSOH;
             }

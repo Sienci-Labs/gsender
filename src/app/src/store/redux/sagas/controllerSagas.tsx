@@ -672,10 +672,22 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
+            const msg = 'Press Resume to continue.';
+            const content =
+                payload.comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{payload.comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
-                content: 'Press Resume to continue.',
+                content,
 
                 cancelLabel: 'Stop',
                 onConfirm: () => {
@@ -741,6 +753,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
@@ -749,6 +762,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('sender:M0M1', (opts: { comment: string }) => {
         const { comment = '' } = opts;
+        console.log('CALLED:', opts);
         const msg =
             'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 

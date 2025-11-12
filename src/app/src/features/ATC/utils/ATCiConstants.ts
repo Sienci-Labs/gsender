@@ -32,7 +32,7 @@ export const toolStateThemes: ToolStateThemes = {
     // Primary States
     probed: {
         label: 'Probed',
-        backgroundColor: 'bg-green-500/20',
+        backgroundColor: 'bg-green-500/20 dark:bg-green-500/40',
         borderColor: 'border-green-700',
         textColor: 'text-green-700',
         backgroundStyle: 'solid',
@@ -41,18 +41,18 @@ export const toolStateThemes: ToolStateThemes = {
 
     unprobed: {
         label: 'Unprobed',
-        backgroundColor: 'bg-yellow-500/20',
+        backgroundColor: 'bg-yellow-500/20 dark:bg-yellow-500/40',
         borderColor: 'border-yellow-700',
-        textColor: 'text-yellow-700',
+        textColor: 'text-yellow-700 dark:text-yellow-400',
         backgroundStyle: 'solid',
         icon: FaExclamationCircle,
     },
 
     offrack: {
         label: 'Manual',
-        backgroundColor: 'bg-yellow-200/20',
+        backgroundColor: 'bg-yellow-200/20 dark:bg-yellow-200/40',
         borderColor: 'border-yellow-500',
-        textColor: 'text-yellow-600',
+        textColor: 'text-yellow-600 dark:text-yellow-300',
         backgroundStyle: 'solid',
         icon: PiHandTap,
     },
@@ -60,36 +60,36 @@ export const toolStateThemes: ToolStateThemes = {
     // Support Statuses
     used: {
         label: 'Used',
-        backgroundColor: 'bg-gray-600/20',
+        backgroundColor: 'bg-gray-600/20 dark:bg-gray-600/40',
         borderColor: 'border-gray-800',
-        textColor: 'text-black',
+        textColor: 'text-black dark:text-gray-300',
         backgroundStyle: 'striped-diagonal',
         icon: MdRefresh,
     },
 
     empty: {
         label: 'Empty',
-        backgroundColor: 'bg-gray-400/20',
+        backgroundColor: 'bg-gray-400/20 dark:bg-gray-400/40',
         borderColor: 'border-gray-600',
-        textColor: 'text-gray-600',
+        textColor: 'text-gray-600 dark:text-gray-300',
         backgroundStyle: 'solid',
         icon: PiEmpty,
     },
 
     current: {
         label: 'Current',
-        backgroundColor: 'bg-robin-500/20',
+        backgroundColor: 'bg-robin-500/20 dark:bg-robin-500/40',
         borderColor: 'border-robin-700',
-        textColor: 'text-robin-700',
+        textColor: 'text-robin-700 dark:text-robin-400',
         backgroundStyle: 'solid',
         icon: IoFlash,
     },
 
     error: {
         label: 'Error',
-        backgroundColor: 'bg-red-600/20',
+        backgroundColor: 'bg-red-600/20 dark:bg-red-500/40',
         borderColor: 'border-red-800',
-        textColor: 'text-red-800',
+        textColor: 'text-red-800 dark:text-red-500',
         backgroundStyle: 'striped-diagonal',
         icon: FaBan,
     },
