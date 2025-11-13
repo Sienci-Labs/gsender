@@ -30,9 +30,7 @@ const ControlledInput = ({
     };
 
     const onBlur = (e) => {
-        const current = inputRef.current.value;
-        if (localValue && localValue !== originalValue) {
-            setLocalValue(current);
+        if (localValue && truncateDecimal(localValue) !== originalValue) {
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -49,14 +47,22 @@ const ControlledInput = ({
     };
 
     const onChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        setLocalValue(truncateDecimal(inputRef.current.value));
         if (externalOnChange) {
-            externalOnChange(inputRef.current.value);
+            externalOnChange(truncateDecimal(inputRef.current.value));
         }
     };
 
     const localChange = (e) => {
         setLocalValue(inputRef.current.value);
+    };
+
+    const truncateDecimal = (value: any) => {
+        console.log(value);
+        if (type === 'decimal') {
+            return Number(Number(value).toFixed(3));
+        }
+        return value;
     };
     return (
         <Input

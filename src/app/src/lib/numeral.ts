@@ -21,6 +21,8 @@
  *
  */
 
+import { EEPROM } from 'app/definitions/firmware';
+
 // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
 export const formatBytes = (bytes: number, decimals = 3): string => {
     if (!bytes) {
@@ -31,4 +33,8 @@ export const formatBytes = (bytes: number, decimals = 3): string => {
     const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / k ** i).toFixed(decimals)) + ' ' + sizes[i];
+};
+
+export const convertEIDToNumber = (eID: EEPROM): number => {
+    return Number(eID.replace('$', ''));
 };
