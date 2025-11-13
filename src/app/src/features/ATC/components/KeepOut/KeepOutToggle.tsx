@@ -6,7 +6,7 @@ import { RootState } from 'app/store/redux';
 
 export function KeepoutToggle() {
     const [flags, setFlags] = useState<string[]>([]);
-    const isEnabled = flags.includes('K');
+    const isEnabled = flags.includes('E');
 
     const initialFlags = useTypedSelector(
         (state: RootState) => state.controller.state.status?.keepout?.flags,
