@@ -234,12 +234,20 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             reduxStore.getState(),
             'controller.settings.settings',
         );
+        const detectedDesc = get(
+            reduxStore.getState(),
+            'controller.settings.descriptions',
+        );
+        const detectedGroups = get(
+            reduxStore.getState(),
+            'controller.settings.groups',
+        );
         setEEPROM(
             getFilteredEEPROMSettings(
                 BASE_SETTINGS,
                 detectedE,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
+                detectedDesc,
+                detectedGroups,
             ),
         );
     }
