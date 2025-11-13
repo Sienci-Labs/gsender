@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# export APPLE_ID=
+# export APPLE_APP_SPECIFIC_PASSWORD=
+# export APPLE_TEAM_ID=
+# export CSC_LINK=
+# export CSC_KEY_PASSWORD=
+
 __dirname="$(CDPATH= cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 electron_version=$(electron --version)
 
@@ -32,3 +38,15 @@ yarn electron-rebuild -- \
 
 
 cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"
+
+
+# App developer ID certificate password
+# 2tTqX2gNR45G3JWw
+
+
+# Your app-specific password is:
+# pakl-fsmj-zzvm-ufdc
+
+
+# Team ID
+# YDX7QDZTP4
