@@ -63,7 +63,7 @@
     "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-    "start": "electron-forge start",
+    "start": "cross-env ./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
     "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
@@ -80,9 +80,7 @@
     "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' yarn --cwd ./src/app build",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /src/app",
-    "check-types": "tsc --noEmit -p ./src/app/src",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "check-types": "tsc --noEmit -p ./src/app/src"
   },
   "build": {
     "appId": "org.sienci.gsender",
@@ -175,7 +173,6 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@electron-forge/cli": "^7.10.2",
     "@electron/rebuild": "^3.2.13",
     "@electron/remote": "^2.0.8",
     "@emotion/styled": "^11.10.5",
@@ -422,6 +419,7 @@
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
     "electron": "^33.2.0",
+    "electron-builder": "~23.6.0",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",
@@ -488,7 +486,10 @@
     "@react-pdf/stylesheet": "4.1.8",
     "@react-pdf/textkit": "4.2.0",
     "@react-pdf/types": "2.3.4",
-    "@react-pdf/yoga": "4.1.2"
+    "@react-pdf/yoga": "4.1.2",
+    "webpack@4.47.0": {
+      "terser-webpack-plugin": "^4.2.3"
+    }
   },
   "packageManager": "yarn@1.22.22"
 }
