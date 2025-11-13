@@ -89,8 +89,18 @@
     },
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
-    "asar": false,
-    "asarUnpack": [],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/node_modules/serialport/**/*",
+      "**/node_modules/usb/**/*",
+      "**/node_modules/@serialport/**/*",
+      "**/server/**/*",
+      "**/app/**/*",
+      "**/electron-app/**/*",
+      "**/app-server/**/*"
+    ],
+    "afterPack": "scripts/electron-after-pack.js",
     "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
@@ -120,7 +130,13 @@
       "target": [
         "dmg"
       ],
-      "icon": "electron-build/icon.icns"
+      "icon": "electron-build/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": {
+        "teamId": "YDX7QDZTP4"
+      }
     },
     "dmg": {
       "background": "electron-build/background.png",
@@ -417,7 +433,7 @@
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
     "electron": "^33.2.0",
-    "electron-builder": "~23.6.0",
+    "electron-builder": "24.4.0",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",
