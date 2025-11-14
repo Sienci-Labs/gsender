@@ -23,7 +23,7 @@ describe('CNC Machine Tests', () => {
     // Step 1: Connect to CNC
     cy.log('Attempting to connect to CNC...');
     cy.connectMachine();
-    cy.wait(5000);
+    cy.wait(6000);
     cy.log('Connected to CNC');
 
     // Step 2: Verify CNC machine status is Idle
