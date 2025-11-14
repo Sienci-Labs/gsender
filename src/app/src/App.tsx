@@ -40,7 +40,6 @@ function App() {
     return (
         <>
             <ReduxProvider store={reduxStore}>
-                <ConfirmationDialog />
                 <Toaster
                     richColors
                     closeButton

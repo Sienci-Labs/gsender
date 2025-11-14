@@ -21,34 +21,27 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PiFileZipFill } from 'react-icons/pi';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
 import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
+import isEqual from 'lodash/isEqual';
 import {
     pdf,
     Page,
     View,
     Text,
+    Link,
     Document,
     StyleSheet,
 } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
-import store from '../store';
-import { store as reduxStore } from '../store/redux';
-// import ToolModalButton from 'app/components/ToolModalButton';
+import JSZip from 'jszip';
+
 import { Button } from 'app/components/Button';
-import pkg from '../../package.json';
-import {
-    GRBLHAL,
-    LASER_MODE,
-    METRIC_UNITS,
-    WORKSPACE_MODE,
-} from '../constants';
-import api from '../api';
-import { homingString } from '../lib/eeprom';
+import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
 import { UNITS_EN } from 'app/definitions/general';
@@ -59,118 +52,247 @@ import {
     ControllerState,
     FileInfoState,
 } from 'app/store/definitions';
-import JSZip from 'jszip';
+import controllerInstance from 'app/lib/controller';
+
+import store from '../store';
+import { store as reduxStore } from '../store/redux';
+import pkg from '../../package.json';
+import {
+    GRBLHAL,
+    LASER_MODE,
+    METRIC_UNITS,
+    WORKSPACE_MODE,
+} from '../constants';
+import api from '../api';
+import { homingString } from '../lib/eeprom';
 
 const styles = StyleSheet.create({
+    // Page layout
     body: {
-        paddingTop: 35,
-        paddingBottom: 65,
-        paddingHorizontal: 35,
+        paddingTop: 40,
+        paddingBottom: 60,
+        paddingHorizontal: 40,
+        backgroundColor: '#ffffff',
+        fontFamily: 'Helvetica',
     },
+
+    // Header styles
     title: {
-        fontSize: 24,
+        fontSize: 28,
         textAlign: 'center',
         fontFamily: 'Helvetica-Bold',
+        color: '#1a1a1a',
+        marginBottom: 8,
     },
     author: {
-        fontSize: 12,
+        fontSize: 14,
         textAlign: 'center',
         marginBottom: 40,
         fontFamily: 'Helvetica',
+        color: '#666666',
     },
-    container: {
-        margin: 18,
-        marginTop: 0,
-        fontSize: 12,
+
+    // Section styles
+    section: {
+        marginBottom: 20,
+        padding: 16,
+        backgroundColor: '#f8f9fa',
+        border: '1px solid #e9ecef',
     },
     subtitle: {
-        fontSize: 18,
-        margin: 12,
-        textDecoration: 'underline',
+        fontSize: 16,
         fontFamily: 'Helvetica-Bold',
+        color: '#2c3e50',
+        marginBottom: 12,
+        borderBottom: '1px solid #3498db',
     },
-    lineWrapper: {
-        marginTop: 6,
-        marginBottom: 6,
+
+    // Text styles
+    text: {
+        fontSize: 11,
+        fontFamily: 'Helvetica',
+        color: '#2c3e50',
+        lineHeight: 1.4,
+        marginBottom: 4,
     },
     textBold: {
-        fontSize: 12,
-        textAlign: 'justify',
+        fontSize: 11,
         fontFamily: 'Helvetica-Bold',
-    },
-    text: {
-        fontSize: 12,
-        textAlign: 'justify',
-        fontFamily: 'Helvetica',
+        color: '#1a1a1a',
+        lineHeight: 1.4,
+        marginBottom: 4,
     },
     textItalic: {
-        fontSize: 12,
-        textAlign: 'justify',
+        fontSize: 11,
         fontFamily: 'Helvetica-Oblique',
+        color: '#666666',
+        lineHeight: 1.4,
+        marginBottom: 4,
     },
-    image: {
-        marginVertical: 15,
-        marginHorizontal: 100,
-    },
-    header: {
-        fontSize: 12,
-        marginBottom: 20,
-        textAlign: 'center',
-        color: 'grey',
-    },
-    pageNumber: {
-        position: 'absolute',
-        fontSize: 12,
-        bottom: 30,
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        color: 'grey',
+    textSmall: {
+        fontSize: 9,
+        fontFamily: 'Helvetica',
+        color: '#666666',
+        lineHeight: 1.3,
     },
 
-    // table styles from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
+    // Container styles
+    container: {
+        marginBottom: 12,
+    },
+
+    // Grid layout for information sections
+    grid: {
+        flexDirection: 'row',
+        marginBottom: 16,
+    },
+    gridItem: {
+        flex: 1,
+        marginRight: 12,
+        padding: 12,
+        backgroundColor: '#ffffff',
+        border: '1px solid #e9ecef',
+    },
+    gridItemLast: {
+        flex: 1,
+        padding: 12,
+        backgroundColor: '#ffffff',
+        border: '1px solid #e9ecef',
+    },
+
+    // Table styles - modern and clean
     table: {
-        // display: 'table',
-        width: '280px',
-        margin: 12,
-        marginTop: 6,
-        borderStyle: 'solid',
-        borderLeftWidth: 1,
-        borderTopWidth: 1,
+        width: '100%',
+        marginBottom: 16,
+        backgroundColor: '#ffffff',
+        border: '1px solid #e9ecef',
+    },
+    tableHeader: {
+        backgroundColor: '#3498db',
+        flexDirection: 'row',
     },
     tableRow: {
-        // margin: 'auto',
         flexDirection: 'row',
+        borderBottom: '1px solid #e9ecef',
+    },
+    tableRowEven: {
+        flexDirection: 'row',
+        backgroundColor: '#f8f9fa',
+        borderBottom: '1px solid #e9ecef',
     },
     tableCol: {
-        width: '50%',
-        borderStyle: 'solid',
-        borderWidth: 1,
-        borderLeftWidth: 0,
-        borderTopWidth: 0,
+        flex: 1,
+        padding: 8,
+        borderRight: '1px solid #e9ecef',
+    },
+    tableColLast: {
+        flex: 1,
+        padding: 8,
     },
     tableCell: {
-        margin: 'auto',
-        marginTop: 5,
         fontSize: 10,
+        fontFamily: 'Helvetica',
+        color: '#2c3e50',
+        lineHeight: 1.3,
+    },
+    tableCellHeader: {
+        fontSize: 10,
+        fontFamily: 'Helvetica-Bold',
+        color: '#ffffff',
+        lineHeight: 1.3,
     },
 
-    clearTable: {
-        // display: 'table',
-        width: '100%',
-        margin: 12,
+    // Highlighting styles for non-default EEPROM values
+    highlightedRow: {
+        backgroundColor: '#fff3cd',
+        borderLeft: '4px solid #ffc107',
     },
-    clearTableRow: {
-        marginBottom: 12,
+    highlightedCol: {
+        backgroundColor: '#fff3cd',
+    },
+    highlightedText: {
+        fontFamily: 'Helvetica-Bold',
+        color: '#856404',
+    },
+
+    // Status indicators
+    statusEnabled: {
+        color: '#27ae60',
+        fontFamily: 'Helvetica-Bold',
+    },
+    statusDisabled: {
+        color: '#e74c3c',
+        fontFamily: 'Helvetica-Bold',
+    },
+    statusWarning: {
+        color: '#f39c12',
+        fontFamily: 'Helvetica-Bold',
+    },
+
+    // Code/terminal styles
+    codeBlock: {
+        backgroundColor: '#2c3e50',
+        color: '#ecf0f1',
+        padding: 8,
+        fontFamily: 'Courier',
+        fontSize: 9,
+        lineHeight: 1.3,
+        marginBottom: 8,
+    },
+    codeBlockText: {
+        fontSize: 9,
+        fontFamily: 'Courier',
+        color: '#ecf0f1',
+        lineHeight: 1.3,
+    },
+
+    // Alert styles
+    alert: {
+        padding: 8,
+        marginBottom: 8,
+        border: '1px solid #e9ecef',
+    },
+    alertError: {
+        backgroundColor: '#f8d7da',
+        borderColor: '#f5c6cb',
+        color: '#721c24',
+    },
+    alertWarning: {
+        backgroundColor: '#fff3cd',
+        borderColor: '#ffeaa7',
+        color: '#856404',
+    },
+    alertInfo: {
+        backgroundColor: '#d1ecf1',
+        borderColor: '#bee5eb',
+        color: '#0c5460',
+    },
+    // Navigation styles
+    navBar: {
+        backgroundColor: '#f8f9fa',
+        border: '1px solid #e9ecef',
+        borderRadius: 8,
+        padding: 16,
+        marginBottom: 24,
+    },
+    navTitle: {
+        fontSize: 12,
+        fontFamily: 'Helvetica-Bold',
+        color: '#2c3e50',
+        marginBottom: 8,
+    },
+    navLinks: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
     },
-    clearTableCol: {
-        width: '50%',
-    },
-    clearTableCell: {
-        marginRight: 'auto',
-        marginTop: 12,
+    navLink: {
         fontSize: 10,
+        fontFamily: 'Helvetica',
+        color: '#3498db',
+        textDecoration: 'underline',
+        marginRight: 12,
+        marginBottom: 4,
     },
 });
 
@@ -251,6 +373,15 @@ const getRotaryMode = (): boolean => {
     return isRotaryMode;
 };
 
+const getTerminalHistory = (): string[] => {
+    const terminalHistory: string[] = get(
+        reduxStore.getState(),
+        'console.history',
+        [],
+    );
+    return terminalHistory;
+};
+
 const unwrapObject = (obj: object, iteration: number): string => {
     let tabs = '';
     for (let i = 0; i < iteration; i++) {
@@ -272,29 +403,138 @@ const unwrapObject = (obj: object, iteration: number): string => {
         .join('');
 };
 
-const createTableRows = (array: object): React.JSX.Element[] => {
-    return Object.keys(array).map((key, _i) => (
-        // from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
-        <View style={styles.tableRow} key={uniqueId()}>
-            <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{key}</Text>
-            </View>
-            <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                    {array[key as keyof typeof array]}
-                </Text>
-            </View>
-        </View>
-    ));
+const isEEPROMValueDifferent = (
+    key: string,
+    currentValue: any,
+    machineProfile: MachineProfile,
+    controllerType: string,
+): boolean => {
+    const profileDefaults =
+        controllerType === 'Grbl'
+            ? machineProfile.eepromSettings
+            : machineProfile.grblHALeepromSettings;
+
+    if (!profileDefaults) {
+        return false;
+    }
+
+    const defaultValue = get(profileDefaults, key, '-');
+
+    if (defaultValue === '-') {
+        return false; // Don't highlight if we don't know the default
+    }
+
+    // Compare values, handling numeric comparison for precision
+    return !isEqual(
+        Number(currentValue).toFixed(3),
+        Number(defaultValue).toFixed(3),
+    );
 };
 
+const createTableRows = (
+    array: object,
+    machineProfile: MachineProfile,
+    controllerType: string,
+): React.JSX.Element[] => {
+    return Object.keys(array).map((key, index) => {
+        const currentValue = array[key as keyof typeof array];
+        const isDifferent = isEEPROMValueDifferent(
+            key,
+            currentValue,
+            machineProfile,
+            controllerType,
+        );
+
+        const profileDefaults =
+            controllerType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : machineProfile.grblHALeepromSettings;
+        const defaultValue = get(profileDefaults, key, '-');
+
+        const rowStyle =
+            index % 2 === 0 ? styles.tableRow : styles.tableRowEven;
+
+        return (
+            <View
+                style={[rowStyle, isDifferent && styles.highlightedRow]}
+                key={uniqueId()}
+                wrap={false}
+            >
+                <View
+                    style={[
+                        styles.tableCol,
+                        isDifferent && styles.highlightedCol,
+                    ]}
+                >
+                    <Text
+                        style={[
+                            styles.tableCell,
+                            isDifferent && styles.highlightedText,
+                        ]}
+                    >
+                        {key}
+                    </Text>
+                </View>
+                <View
+                    style={[
+                        styles.tableCol,
+                        isDifferent && styles.highlightedCol,
+                    ]}
+                >
+                    <Text
+                        style={[
+                            styles.tableCell,
+                            isDifferent && styles.highlightedText,
+                        ]}
+                    >
+                        {currentValue}
+                    </Text>
+                </View>
+                <View
+                    style={[
+                        styles.tableColLast,
+                        isDifferent && styles.highlightedCol,
+                    ]}
+                >
+                    <Text
+                        style={[
+                            styles.tableCell,
+                            isDifferent && styles.highlightedText,
+                        ]}
+                    >
+                        {defaultValue}
+                    </Text>
+                </View>
+            </View>
+        );
+    });
+};
+
+async function exportSenderSettings() {
+    const settings = store.get();
+    settings.commandKeys = Object.fromEntries(
+        Object.entries(settings.commandKeys).filter(
+            ([, shortcut]) => (shortcut as any).category !== 'Macros',
+        ),
+    );
+
+    delete settings.session;
+    const res = await api.events.fetch();
+    const events = res.data.records;
+    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+    return new Blob([settingsJSON], { type: 'application/json' });
+}
+
 function generateSupportFile() {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [progress, setProgress] = useState('');
+
     const eeprom = getEEPROMValues();
     const machineProfile = getMachineProfile();
     const version = getGSenderVersion();
     const grblInfo = getGRBLInformation();
     const os = getOS();
-    const history = grblInfo.terminalHistory;
+    const terminalHistory = getTerminalHistory();
     const gcode = getGCodeFile();
     const mode = getMode();
     const connection = getConnection();
@@ -319,598 +559,795 @@ function generateSupportFile() {
     const SupportFile = () => (
         <Document>
             <Page style={styles.body}>
-                <Text style={styles.title}>Diagnostics</Text>
-                <Text style={styles.author}>gSender {version}</Text>
-                <View style={styles.clearTable}>
-                    <View style={styles.clearTableRow}>
-                        <View style={styles.clearTableCol}>
-                            <Text style={styles.clearTableCell}>
-                                <Text style={styles.subtitle}>
-                                    {'Environment\n'}
-                                </Text>
-                                <Text style={styles.textBold}>
-                                    {'OS: '}
-                                    <Text style={styles.text}>{os + '\n'}</Text>
-                                    {'Homing: '}
-                                    <Text style={styles.text}>
-                                        {/* When homing is enabled, the value of $22 will be odd. */}
-                                        {(Number(eeprom.$22) % 2 === 1
-                                            ? 'Enabled'
-                                            : 'Disabled') + '\n'}
-                                    </Text>
-                                    {'Soft Limits: '}
-                                    <Text style={styles.text}>
-                                        {(eeprom.$20 === '1'
-                                            ? 'Enabled'
-                                            : 'Disabled') + '\n'}
-                                    </Text>
-                                    {'Home Location: '}
-                                    <Text style={styles.text}>
-                                        {homingString(eeprom.$23 as string) +
-                                            '\n'}
-                                    </Text>
-                                    {'Report Inches: '}
-                                    <Text style={styles.text}>
-                                        {(eeprom.$13 === '1'
-                                            ? 'Enabled'
-                                            : 'Disabled') + '\n'}
-                                    </Text>
-                                    {'Stepper Motors: '}
-                                    <Text style={styles.text}>
-                                        {(eeprom.$1 === '255'
-                                            ? 'Locked'
-                                            : 'Unlocked') + '\n'}
-                                    </Text>
-                                </Text>
-                            </Text>
-                        </View>
-                        <View style={styles.clearTableCol}>
-                            <Text style={styles.clearTableCell}>
-                                <Text style={styles.subtitle}>
-                                    {'Machine Profile\n'}
-                                </Text>
-                                {machineProfile ? (
-                                    <>
-                                        <Text style={styles.textBold}>
-                                            {'ID: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.id + '\n'}
-                                            </Text>
-                                            {'Company: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.company + '\n'}
-                                            </Text>
-                                            {'Name: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.name + '\n'}
-                                            </Text>
-                                            {'Type: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.type + '\n'}
-                                            </Text>
-                                            {'Version: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.version + '\n'}
-                                            </Text>
-                                            {'Limits:\n'}
-                                            <Text style={styles.text}>
-                                                {'    X Max: ' +
-                                                    get(
-                                                        machineProfile,
-                                                        'limits.xmax',
-                                                        '0',
-                                                    ) +
-                                                    '\n'}
-                                                {'    Y Max: ' +
-                                                    get(
-                                                        machineProfile,
-                                                        'limits.ymax',
-                                                        '0',
-                                                    ) +
-                                                    '\n'}
-                                                {'    Z Max: ' +
-                                                    get(
-                                                        machineProfile,
-                                                        'limits.zmax',
-                                                        '0',
-                                                    ) +
-                                                    '\n'}
-                                            </Text>
-                                            {'Spindle/Laser: '}
-                                            <Text style={styles.text}>
-                                                {machineProfile.spindle + '\n'}
-                                            </Text>
-                                            {'Laser Mode Enabled: '}
-                                            <Text style={styles.text}>
-                                                {mode + '\n'}
-                                            </Text>
-                                        </Text>
-                                    </>
-                                ) : (
-                                    <Text style={styles.text}>{'NULL\n'}</Text>
-                                )}
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={styles.clearTableRow}>
-                        <View style={styles.clearTableCol}>
-                            <Text style={styles.clearTableCell}>
-                                <Text style={styles.subtitle}>
-                                    {'Connection\n'}
-                                </Text>
-                                {connection ? (
-                                    <>
-                                        <Text style={styles.textBold}>
-                                            {'Available Ports:\n'}
-                                            <Text style={styles.text}>
-                                                {unwrapObject(
-                                                    connection.ports,
-                                                    1,
-                                                )}
-                                            </Text>
-                                            {'Connected Port: '}
-                                            <Text style={styles.text}>
-                                                {connection.port + '\n'}
-                                            </Text>
-                                            {'Baudrate: '}
-                                            <Text style={styles.text}>
-                                                {connection.baudrate
-                                                    ? connection.baudrate + '\n'
-                                                    : 'null\n'}
-                                            </Text>
-                                            {'Unrecognized Ports:\n'}
-                                            <Text style={styles.text}>
-                                                {unwrapObject(
-                                                    connection.unrecognizedPorts,
-                                                    1,
-                                                )}
-                                            </Text>
-                                        </Text>
-                                    </>
-                                ) : (
-                                    <Text style={styles.text}>{'NULL\n'}</Text>
-                                )}
-                            </Text>
-                        </View>
-                        <View style={styles.clearTableCol}>
-                            <Text style={styles.clearTableCell}>
-                                <Text style={styles.subtitle}>
-                                    {'GRBL Information\n'}
-                                </Text>
-                                <Text style={styles.textBold}>
-                                    {'Type: '}
-                                    <Text style={styles.text}>
-                                        {grblInfo.type
-                                            ? grblInfo.type + '\n'
-                                            : 'NULL\n'}
-                                    </Text>
-                                    {'Firmware Version: '}
-                                    <Text style={styles.text}>
-                                        {grblInfo.settings.info?.BOARD
-                                            ? grblInfo.settings.info.BOARD +
-                                              '\n'
-                                            : 'N/A\n'}
-                                    </Text>
-                                </Text>
-                                {!isEmpty(grblInfo.mpos) ? (
-                                    <Text style={styles.textBold}>
-                                        {'MPos: \n'}
-                                        <Text style={styles.text}>
-                                            {'    a: ' + grblInfo.mpos.a + '\n'}
-                                            {'    b: ' + grblInfo.mpos.b + '\n'}
-                                            {'    c: ' + grblInfo.mpos.c + '\n'}
-                                            {'    x: ' + grblInfo.mpos.x + '\n'}
-                                            {'    y: ' + grblInfo.mpos.y + '\n'}
-                                            {'    z: ' + grblInfo.mpos.z + '\n'}
-                                        </Text>
-                                    </Text>
-                                ) : (
-                                    <Text style={styles.textBold}>
-                                        {'MPos: '}
-                                        <Text style={styles.text}>
-                                            {'NULL\n'}
-                                        </Text>
-                                    </Text>
-                                )}
-                                {!isEmpty(grblInfo.wpos) ? (
-                                    <Text style={styles.textBold}>
-                                        {'WPos: \n'}
-                                        <Text style={styles.text}>
-                                            {'    a: ' + grblInfo.wpos.a + '\n'}
-                                            {'    b: ' + grblInfo.wpos.b + '\n'}
-                                            {'    c: ' + grblInfo.wpos.c + '\n'}
-                                            {'    x: ' + grblInfo.wpos.x + '\n'}
-                                            {'    y: ' + grblInfo.wpos.y + '\n'}
-                                            {'    z: ' + grblInfo.wpos.z + '\n'}
-                                        </Text>
-                                    </Text>
-                                ) : (
-                                    <Text style={styles.textBold}>
-                                        {'WPos: '}
-                                        <Text style={styles.text}>
-                                            {'NULL\n'}
-                                        </Text>
-                                    </Text>
-                                )}
-                                {grblInfo.sender.status ? (
-                                    <Text style={styles.textBold}>
-                                        {'Sender Status: \n'}
-                                        <Text style={styles.text}>
-                                            {'    Modal: \n'}
-                                            {grblInfo.sender.status.context
-                                                ? unwrapObject(
-                                                      grblInfo.sender.status
-                                                          .context.modal,
-                                                      2,
-                                                  )
-                                                : 'NULL\n'}
-                                            {'    Tool: '}
-                                            {grblInfo.sender.status.context
-                                                ?.tool
-                                                ? '        ' +
-                                                  grblInfo.sender.status.context.tool.toString() +
-                                                  '\n'
-                                                : 'NULL\n'}
-                                        </Text>
-                                    </Text>
-                                ) : (
-                                    <Text style={styles.textBold}>
-                                        {'Sender Status: '}
-                                        <Text style={styles.text}>
-                                            {'NULL\n'}
-                                        </Text>
-                                    </Text>
-                                )}
-                                <Text style={styles.textBold}>
-                                    {'Workflow State: '}
-                                    <Text style={styles.text}>
-                                        {grblInfo.workflow.state + '\n'}
-                                    </Text>
-                                    {'Homing Flag: '}
-                                    <Text style={styles.text}>
-                                        {grblInfo.homingFlag + '\n'}
-                                    </Text>
-                                </Text>
-                            </Text>
-                        </View>
+                <Text style={styles.title}>Diagnostics Report</Text>
+                <Text style={styles.author}>
+                    gSender v{version} • Generated on{' '}
+                    {new Date().toLocaleDateString()}
+                </Text>
+
+                <View style={styles.navBar}>
+                    <Text style={styles.navTitle}>Quick Navigation</Text>
+                    <View style={styles.navLinks}>
+                        <Link src="#environment" style={styles.navLink}>
+                            Environment & Machine Profile
+                        </Link>
+                        <Link src="#connection" style={styles.navLink}>
+                            Connection & Controller Status
+                        </Link>
+                        <Link src="#preferences" style={styles.navLink}>
+                            Preferences & Settings
+                        </Link>
+                        <Link src="#firmware" style={styles.navLink}>
+                            Firmware Settings
+                        </Link>
+                        <Link src="#alerts" style={styles.navLink}>
+                            Errors and Alarms
+                        </Link>
+                        <Link src="#terminal" style={styles.navLink}>
+                            Terminal History
+                        </Link>
+                        <Link src="#gcode" style={styles.navLink}>
+                            G-Code File Status
+                        </Link>
                     </View>
                 </View>
 
-                <View style={styles.clearTable} break>
-                    <View style={styles.clearTableRow}>
-                        <View style={styles.clearTableCol}>
-                            <Text style={styles.clearTableCell}>
-                                <Text style={styles.subtitle}>
-                                    {'Preferences\n'}
-                                </Text>
-                                <Text style={styles.textBold}>
-                                    {'Jog Presets: \n'}
-                                    <Text style={styles.text}>
-                                        {'    Rapid: \n' +
-                                            unwrapObject(jogPresets.rapid, 2) +
-                                            '    Normal: \n' +
-                                            unwrapObject(jogPresets.normal, 2) +
-                                            '    Precise: \n' +
-                                            unwrapObject(jogPresets.precise, 2)}
-                                    </Text>
-                                    {'Workspace Units: '}
-                                    <Text style={styles.text}>
-                                        {workspaceUnits + '\n'}
-                                    </Text>
-                                    {'Laser: '}
-                                    <Text style={styles.text}>
-                                        {mode ? 'Enabled\n' : 'Disabled\n'}
-                                    </Text>
-                                    {'Rotary: '}
-                                    <Text style={styles.text}>
-                                        {isRotaryMode
-                                            ? 'Enabled\n'
-                                            : 'Disabled\n'}
-                                        {isRotaryMode && (
-                                            <Text style={styles.text}>
-                                                {'    Travel Resolution:\n'}
-                                                {'        Y: ' +
-                                                    eeprom.$101 +
-                                                    '\n'}
-                                                {grblInfo.type === GRBLHAL &&
-                                                    '        A: ' +
-                                                        eeprom.$103 +
-                                                        '\n'}
-                                                {'    Maximum Rate:\n'}
-                                                {'        Y: ' +
-                                                    eeprom.$111 +
-                                                    '\n'}
-                                                {grblInfo.type === GRBLHAL &&
-                                                    '        A: ' +
-                                                        eeprom.$113 +
-                                                        '\n'}
-                                                {grblInfo.type === GRBLHAL &&
-                                                    '    Acceleration:\n' +
-                                                        '        Y: ' +
-                                                        eeprom.$121 +
-                                                        '\n' +
-                                                        '        A: ' +
-                                                        eeprom.$123 +
-                                                        '\n' +
-                                                        '    Travel Amount:\n' +
-                                                        '        Y: ' +
-                                                        eeprom.$131 +
-                                                        '\n' +
-                                                        '        A: ' +
-                                                        eeprom.$133 +
-                                                        '\n'}
-                                            </Text>
-                                        )}
-                                    </Text>
-                                </Text>
-                            </Text>
-                        </View>
-                    </View>
-                </View>
+                <View style={styles.grid}>
+                    <View style={styles.gridItem}>
+                        <Text id="environment" style={styles.subtitle}>
+                            Environment
+                        </Text>
+                        <Text style={styles.textBold}>Operating System:</Text>
+                        <Text style={styles.text}>{os}</Text>
 
-                <Text style={styles.subtitle} break>
-                    EEPROM Values
-                </Text>
-                {/* table from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123 */}
-                <View style={styles.table}>
-                    {/* TableHeader */}
-                    <View style={styles.tableRow}>
-                        <View style={styles.tableCol}>
-                            <Text
-                                style={[
-                                    styles.tableCell,
-                                    { fontFamily: 'Helvetica-Bold' },
-                                ]}
-                            >
-                                Setting
-                            </Text>
-                        </View>
-                        <View style={styles.tableCol}>
-                            <Text
-                                style={[
-                                    styles.tableCell,
-                                    { fontFamily: 'Helvetica-Bold' },
-                                ]}
-                            >
-                                Value
-                            </Text>
-                        </View>
+                        <Text style={styles.textBold}>Homing:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                Number(eeprom.$22) % 2 === 1
+                                    ? styles.statusEnabled
+                                    : styles.statusDisabled,
+                            ]}
+                        >
+                            {Number(eeprom.$22) % 2 === 1
+                                ? 'Enabled'
+                                : 'Disabled'}
+                        </Text>
+
+                        <Text style={styles.textBold}>Soft Limits:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                eeprom.$20 === '1'
+                                    ? styles.statusEnabled
+                                    : styles.statusDisabled,
+                            ]}
+                        >
+                            {eeprom.$20 === '1' ? 'Enabled' : 'Disabled'}
+                        </Text>
+
+                        <Text style={styles.textBold}>Home Location:</Text>
+                        <Text style={styles.text}>
+                            {homingString(eeprom.$23 as string)}
+                        </Text>
+
+                        <Text style={styles.textBold}>Report Inches:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                eeprom.$13 === '1'
+                                    ? styles.statusEnabled
+                                    : styles.statusDisabled,
+                            ]}
+                        >
+                            {eeprom.$13 === '1' ? 'Enabled' : 'Disabled'}
+                        </Text>
+
+                        <Text style={styles.textBold}>Stepper Motors:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                eeprom.$1 === '255'
+                                    ? styles.statusWarning
+                                    : styles.statusEnabled,
+                            ]}
+                        >
+                            {eeprom.$1 === '255' ? 'Locked' : 'Unlocked'}
+                        </Text>
                     </View>
-                    {/* TableContent */}
-                    {createTableRows(eeprom)}
-                </View>
-                <Text style={styles.subtitle} break>
-                    Recent Alarms
-                </Text>
-                <View style={styles.container}>
-                    {alarms.length > 0 ? (
-                        alarms.map((log, i) => {
-                            return (
-                                <View
-                                    style={styles.lineWrapper}
-                                    key={uniqueId()}
-                                >
-                                    <Text style={styles.text}>
-                                        {new Date(log.time).toLocaleString() +
-                                            '\n'}
-                                        <Text style={{ color: 'red' }}>
-                                            {'    ' + log.MESSAGE + '\n'}
-                                        </Text>
-                                        <Text>{'    Input: ' + log.line}</Text>
-                                        <Text>
-                                            {'    Controller: ' +
-                                                log.controller}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            );
-                        })
-                    ) : (
-                        <Text style={styles.text}>None</Text>
-                    )}
-                </View>
-                <Text style={styles.subtitle}>Recent Errors</Text>
-                <View style={styles.container}>
-                    {errors.length > 0 ? (
-                        errors.map((log, i) => {
-                            return (
-                                <View
-                                    style={styles.lineWrapper}
-                                    key={uniqueId()}
-                                >
-                                    <Text style={styles.text}>
-                                        {new Date(log.time).toLocaleString() +
-                                            '\n'}
-                                        <Text style={{ color: 'red' }}>
-                                            {'    ' + log.MESSAGE + '\n'}
-                                        </Text>
-                                        <Text>{'    Input: ' + log.line}</Text>
-                                        <Text>
-                                            {'    Controller: ' +
-                                                log.controller}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            );
-                        })
-                    ) : (
-                        <Text style={styles.text}>None</Text>
-                    )}
-                </View>
-                <Text style={styles.subtitle}>Terminal History</Text>
-                <View style={styles.container}>
-                    <Text style={styles.text}>
-                        {history.length > 0
-                            ? history.map((value: string) => {
-                                  return value + '\n';
-                              })
-                            : 'None'}
-                    </Text>
-                </View>
-                <Text style={styles.subtitle}>G-Code File</Text>
-                {fileInfo.fileLoaded && grblInfo.sender.status ? (
-                    <View style={styles.table}>
-                        {/* TableHeader */}
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
+
+                    <View style={styles.gridItemLast}>
+                        <Text id="machine-profile" style={styles.subtitle}>
+                            Machine Profile
+                        </Text>
+                        {machineProfile ? (
+                            <>
+                                <Text style={styles.textBold}>ID:</Text>
+                                <Text style={styles.text}>
+                                    {machineProfile.id}
+                                </Text>
+
+                                <Text style={styles.textBold}>Company:</Text>
+                                <Text style={styles.text}>
+                                    {machineProfile.company}
+                                </Text>
+
+                                <Text style={styles.textBold}>Name:</Text>
+                                <Text style={styles.text}>
+                                    {machineProfile.name}
+                                </Text>
+
+                                <Text style={styles.textBold}>Type:</Text>
+                                <Text style={styles.text}>
+                                    {machineProfile.type}
+                                </Text>
+
+                                <Text style={styles.textBold}>Version:</Text>
+                                <Text style={styles.text}>
+                                    {machineProfile.version}
+                                </Text>
+
+                                <Text style={styles.textBold}>Work Area:</Text>
+                                <Text style={styles.textSmall}>
+                                    X: {get(machineProfile, 'limits.xmax', '0')}
+                                    mm{'\n'}
+                                    Y: {get(machineProfile, 'limits.ymax', '0')}
+                                    mm{'\n'}
+                                    Z: {get(machineProfile, 'limits.zmax', '0')}
+                                    mm
+                                </Text>
+
+                                <Text style={styles.textBold}>
+                                    Spindle/Laser:
+                                </Text>
                                 <Text
                                     style={[
-                                        styles.tableCell,
-                                        { fontFamily: 'Helvetica-Bold' },
+                                        styles.text,
+                                        machineProfile.spindle
+                                            ? styles.statusEnabled
+                                            : styles.statusDisabled,
                                     ]}
                                 >
-                                    Status
+                                    {machineProfile.spindle
+                                        ? 'Available'
+                                        : 'Not Available'}
+                                </Text>
+
+                                <Text style={styles.textBold}>Laser Mode:</Text>
+                                <Text
+                                    style={[
+                                        styles.text,
+                                        mode
+                                            ? styles.statusEnabled
+                                            : styles.statusDisabled,
+                                    ]}
+                                >
+                                    {mode ? 'Enabled' : 'Disabled'}
+                                </Text>
+                            </>
+                        ) : (
+                            <Text style={styles.text}>
+                                No machine profile loaded
+                            </Text>
+                        )}
+                    </View>
+                </View>
+
+                <View style={styles.grid}>
+                    <View style={styles.gridItem}>
+                        <Text id="connection" style={styles.subtitle}>
+                            Connection
+                        </Text>
+                        {connection ? (
+                            <>
+                                <Text style={styles.textBold}>
+                                    Connected Port:
+                                </Text>
+                                <Text style={styles.text}>
+                                    {connection.port || 'Not connected'}
+                                </Text>
+
+                                <Text style={styles.textBold}>Baudrate:</Text>
+                                <Text style={styles.text}>
+                                    {connection.baudrate || 'N/A'}
+                                </Text>
+
+                                {connection.port && (
+                                    <>
+                                        <Text style={styles.textBold}>
+                                            Manufacturer:
+                                        </Text>
+                                        <Text style={styles.text}>
+                                            {connection.manufacturer ||
+                                                'Unknown'}
+                                        </Text>
+
+                                        <Text style={styles.textBold}>
+                                            In Use:
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                styles.text,
+                                                connection.inUse
+                                                    ? styles.statusWarning
+                                                    : styles.statusEnabled,
+                                            ]}
+                                        >
+                                            {connection.inUse ? 'Yes' : 'No'}
+                                        </Text>
+                                    </>
+                                )}
+
+                                <Text style={styles.textBold}>
+                                    Available Ports:
+                                </Text>
+                                <Text style={styles.text}>
+                                    {connection.ports.length > 0
+                                        ? connection.ports
+                                              .map(
+                                                  (port, index) =>
+                                                      `${port.port}${index < connection.ports.length - 1 ? ', ' : ''}`,
+                                              )
+                                              .join('')
+                                        : 'None detected'}
+                                </Text>
+
+                                {connection.unrecognizedPorts &&
+                                    connection.unrecognizedPorts.length > 0 && (
+                                        <>
+                                            <Text style={styles.textBold}>
+                                                Unrecognized Ports:
+                                            </Text>
+                                            {connection.unrecognizedPorts.map(
+                                                (port, index) => (
+                                                    <Text
+                                                        style={styles.text}
+                                                        key={index}
+                                                    >
+                                                        • {port.port}
+                                                    </Text>
+                                                ),
+                                            )}
+                                        </>
+                                    )}
+                            </>
+                        ) : (
+                            <Text style={styles.text}>
+                                No connection information available
+                            </Text>
+                        )}
+                    </View>
+
+                    <View style={styles.gridItemLast}>
+                        <Text id="controller-status" style={styles.subtitle}>
+                            Controller Status
+                        </Text>
+                        <Text style={styles.textBold}>Type:</Text>
+                        <Text style={styles.text}>
+                            {grblInfo.type || 'Unknown'}
+                        </Text>
+
+                        <Text style={styles.textBold}>Firmware:</Text>
+                        <Text style={styles.text}>
+                            {grblInfo.settings.info?.BOARD || 'N/A'}
+                        </Text>
+
+                        <Text style={styles.textBold}>Workflow State:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                grblInfo.workflow.state === 'Idle'
+                                    ? styles.statusEnabled
+                                    : styles.statusWarning,
+                            ]}
+                        >
+                            {grblInfo.workflow.state}
+                        </Text>
+
+                        <Text style={styles.textBold}>Homing Status:</Text>
+                        <Text
+                            style={[
+                                styles.text,
+                                grblInfo.homingFlag
+                                    ? styles.statusEnabled
+                                    : styles.statusDisabled,
+                            ]}
+                        >
+                            {grblInfo.homingFlag ? 'Homed' : 'Not Homed'}
+                        </Text>
+
+                        {!isEmpty(grblInfo.mpos) && (
+                            <>
+                                <Text style={styles.textBold}>
+                                    Machine Position:
+                                </Text>
+                                <Text style={styles.textSmall}>
+                                    X: {grblInfo.mpos.x}mm{'\n'}
+                                    Y: {grblInfo.mpos.y}mm{'\n'}
+                                    Z: {grblInfo.mpos.z}mm
+                                    {grblInfo.mpos.a !== undefined &&
+                                        `\nA: ${grblInfo.mpos.a}°`}
+                                    {grblInfo.mpos.b !== undefined &&
+                                        `\nB: ${grblInfo.mpos.b}°`}
+                                    {grblInfo.mpos.c !== undefined &&
+                                        `\nC: ${grblInfo.mpos.c}°`}
+                                </Text>
+                            </>
+                        )}
+
+                        {!isEmpty(grblInfo.wpos) && (
+                            <>
+                                <Text style={styles.textBold}>
+                                    Work Position:
+                                </Text>
+                                <Text style={styles.textSmall}>
+                                    X: {grblInfo.wpos.x}mm{'\n'}
+                                    Y: {grblInfo.wpos.y}mm{'\n'}
+                                    Z: {grblInfo.wpos.z}mm
+                                    {grblInfo.wpos.a !== undefined &&
+                                        `\nA: ${grblInfo.wpos.a}°`}
+                                    {grblInfo.wpos.b !== undefined &&
+                                        `\nB: ${grblInfo.wpos.b}°`}
+                                    {grblInfo.wpos.c !== undefined &&
+                                        `\nC: ${grblInfo.wpos.c}°`}
+                                </Text>
+                            </>
+                        )}
+                    </View>
+                </View>
+
+                <View style={styles.section}>
+                    <Text id="preferences" style={styles.subtitle}>
+                        Preferences & Settings
+                    </Text>
+
+                    <View style={styles.grid}>
+                        <View style={styles.gridItem}>
+                            <Text style={styles.textBold}>
+                                Workspace Units:
+                            </Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    workspaceUnits === 'mm'
+                                        ? styles.statusEnabled
+                                        : styles.statusWarning,
+                                ]}
+                            >
+                                {workspaceUnits === 'mm'
+                                    ? 'Metric (mm)'
+                                    : 'Imperial (inches)'}
+                            </Text>
+
+                            <Text style={styles.textBold}>Laser Mode:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    mode
+                                        ? styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {mode ? 'Enabled' : 'Disabled'}
+                            </Text>
+
+                            <Text style={styles.textBold}>Rotary Mode:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    isRotaryMode
+                                        ? styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {isRotaryMode ? 'Enabled' : 'Disabled'}
+                            </Text>
+
+                            {isRotaryMode && (
+                                <>
+                                    <Text style={styles.textBold}>
+                                        Rotary Settings:
+                                    </Text>
+                                    <Text style={styles.textSmall}>
+                                        Travel Resolution: Y={eeprom.$101}
+                                        {'\n'}
+                                        {grblInfo.type === GRBLHAL &&
+                                            `A=${eeprom.$103}\n`}
+                                        Max Rate: Y={eeprom.$111}
+                                        {grblInfo.type === GRBLHAL &&
+                                            `, A=${eeprom.$113}`}
+                                    </Text>
+                                </>
+                            )}
+                        </View>
+
+                        <View style={styles.gridItemLast}>
+                            <Text style={styles.textBold}>Jog Presets:</Text>
+
+                            <Text style={styles.textBold}>Rapid:</Text>
+                            <Text style={styles.text}>
+                                XY Step:{' '}
+                                {jogPresets.rapid?.xyStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.rapid.xyStep} mm`
+                                        : `${(jogPresets.rapid.xyStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Z Step:{' '}
+                                {jogPresets.rapid?.zStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.rapid.zStep} mm`
+                                        : `${(jogPresets.rapid.zStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Feedrate:{' '}
+                                {jogPresets.rapid?.feedrate
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.rapid.feedrate} mm/min`
+                                        : `${(jogPresets.rapid.feedrate / 25.4).toFixed(1)} in/min`
+                                    : 'N/A'}
+                            </Text>
+                            {jogPresets.rapid?.aStep && (
+                                <Text style={styles.text}>
+                                    A Step: {jogPresets.rapid.aStep}°
+                                </Text>
+                            )}
+
+                            <Text style={styles.textBold}>Normal:</Text>
+                            <Text style={styles.text}>
+                                XY Step:{' '}
+                                {jogPresets.normal?.xyStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.normal.xyStep} mm`
+                                        : `${(jogPresets.normal.xyStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Z Step:{' '}
+                                {jogPresets.normal?.zStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.normal.zStep} mm`
+                                        : `${(jogPresets.normal.zStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Feedrate:{' '}
+                                {jogPresets.normal?.feedrate
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.normal.feedrate} mm/min`
+                                        : `${(jogPresets.normal.feedrate / 25.4).toFixed(1)} in/min`
+                                    : 'N/A'}
+                            </Text>
+                            {jogPresets.normal?.aStep && (
+                                <Text style={styles.text}>
+                                    A Step: {jogPresets.normal.aStep}°
+                                </Text>
+                            )}
+
+                            <Text style={styles.textBold}>Precise:</Text>
+                            <Text style={styles.text}>
+                                XY Step:{' '}
+                                {jogPresets.precise?.xyStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.precise.xyStep} mm`
+                                        : `${(jogPresets.precise.xyStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Z Step:{' '}
+                                {jogPresets.precise?.zStep
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.precise.zStep} mm`
+                                        : `${(jogPresets.precise.zStep / 25.4).toFixed(3)} in`
+                                    : 'N/A'}
+                            </Text>
+                            <Text style={styles.text}>
+                                Feedrate:{' '}
+                                {jogPresets.precise?.feedrate
+                                    ? workspaceUnits === 'mm'
+                                        ? `${jogPresets.precise.feedrate} mm/min`
+                                        : `${(jogPresets.precise.feedrate / 25.4).toFixed(1)} in/min`
+                                    : 'N/A'}
+                            </Text>
+                            {jogPresets.precise?.aStep && (
+                                <Text style={styles.text}>
+                                    A Step: {jogPresets.precise.aStep}°
+                                </Text>
+                            )}
+                        </View>
+                    </View>
+                </View>
+
+                <View style={styles.section} break>
+                    <Text id="firmware" style={styles.subtitle}>
+                        Firmware Settings
+                    </Text>
+                    <View style={styles.table}>
+                        {/* TableHeader */}
+                        <View style={styles.tableHeader}>
+                            <View style={styles.tableCol}>
+                                <Text style={styles.tableCellHeader}>
+                                    Setting
                                 </Text>
                             </View>
                             <View style={styles.tableCol}>
-                                <Text
-                                    style={[
-                                        styles.tableCell,
-                                        { fontFamily: 'Helvetica-Bold' },
-                                    ]}
-                                >
-                                    Value
+                                <Text style={styles.tableCellHeader}>
+                                    Current Value
+                                </Text>
+                            </View>
+                            <View style={styles.tableColLast}>
+                                <Text style={styles.tableCellHeader}>
+                                    Default Value
                                 </Text>
                             </View>
                         </View>
                         {/* TableContent */}
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Name</Text>
-                            </View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>
-                                    {grblInfo.sender.status.name}
+                        {createTableRows(eeprom, machineProfile, grblInfo.type)}
+                    </View>
+                </View>
+                <View style={styles.section} break>
+                    <Text id="alerts" style={styles.subtitle}>
+                        Errors and Alarms
+                    </Text>
+
+                    <View style={styles.grid}>
+                        <View style={styles.gridItem}>
+                            <Text style={styles.textBold}>
+                                All Alarms ({alarms.length})
+                            </Text>
+                            {alarms.length > 0 ? (
+                                <View style={styles.container}>
+                                    {alarms.map((log) => (
+                                        <View
+                                            style={[
+                                                styles.alert,
+                                                styles.alertError,
+                                            ]}
+                                            key={uniqueId()}
+                                        >
+                                            <Text style={styles.textSmall}>
+                                                <Text style={styles.textBold}>
+                                                    {new Date(
+                                                        log.time,
+                                                    ).toLocaleString()}
+                                                </Text>
+                                                {'\n' + log.MESSAGE}
+                                                {'\nInput: ' + log.line}
+                                                {'\nController: ' +
+                                                    log.controller}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            ) : (
+                                <Text style={styles.text}>
+                                    No alarms recorded
                                 </Text>
-                            </View>
+                            )}
                         </View>
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Sent</Text>
-                            </View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>
-                                    {grblInfo.sender.status.sent}
+
+                        <View style={styles.gridItemLast}>
+                            <Text style={styles.textBold}>
+                                All Errors ({errors.length})
+                            </Text>
+                            {errors.length > 0 ? (
+                                <View style={styles.container}>
+                                    {errors.map((log) => (
+                                        <View
+                                            style={[
+                                                styles.alert,
+                                                styles.alertWarning,
+                                            ]}
+                                            key={uniqueId()}
+                                        >
+                                            <Text style={styles.textSmall}>
+                                                <Text style={styles.textBold}>
+                                                    {new Date(
+                                                        log.time,
+                                                    ).toLocaleString()}
+                                                </Text>
+                                                {'\n' + log.MESSAGE}
+                                                {'\nInput: ' + log.line}
+                                                {'\nController: ' +
+                                                    log.controller}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            ) : (
+                                <Text style={styles.text}>
+                                    No errors recorded
                                 </Text>
-                            </View>
-                        </View>
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Received</Text>
-                            </View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>
-                                    {grblInfo.sender.status.remainingTime}
-                                </Text>
-                            </View>
-                        </View>
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>Total</Text>
-                            </View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>
-                                    {grblInfo.sender.status.total}
-                                </Text>
-                            </View>
+                            )}
                         </View>
                     </View>
-                ) : (
-                    <View style={styles.table}>
-                        {/* TableHeader */}
-                        <View style={styles.tableRow}>
-                            <View style={styles.tableCol}>
+                </View>
+
+                <View style={styles.section}>
+                    <Text id="terminal" style={styles.subtitle}>
+                        Terminal History
+                    </Text>
+                    <View style={styles.codeBlock}>
+                        <Text style={styles.codeBlockText}>
+                            {terminalHistory.length > 0
+                                ? terminalHistory.join('\n') // Show last 20 commands
+                                : 'No terminal history available'}
+                        </Text>
+                    </View>
+                </View>
+
+                <View style={styles.section}>
+                    <Text id="gcode" style={styles.subtitle}>
+                        G-Code File Status
+                    </Text>
+                    {fileInfo.fileLoaded && grblInfo.sender.status ? (
+                        <View>
+                            <Text style={styles.textBold}>
+                                File Information
+                            </Text>
+                            <Text style={styles.text}>
+                                Name: {grblInfo.sender.status.name}
+                            </Text>
+                            <Text style={styles.text}>
+                                Total Lines: {grblInfo.sender.status.total}
+                            </Text>
+                            <Text style={styles.text}>
+                                Lines Sent: {grblInfo.sender.status.sent}
+                            </Text>
+                            <Text style={styles.text}>
+                                Remaining:{' '}
+                                {grblInfo.sender.status.remainingTime}
+                            </Text>
+                            <Text style={styles.text}>
+                                Progress:{' '}
                                 <Text
                                     style={[
-                                        styles.tableCell,
-                                        { fontFamily: 'Helvetica-Bold' },
+                                        Math.round(
+                                            (grblInfo.sender.status.sent /
+                                                grblInfo.sender.status.total) *
+                                                100,
+                                        ) === 100
+                                            ? styles.statusEnabled
+                                            : styles.statusWarning,
                                     ]}
                                 >
-                                    Status
+                                    {Math.round(
+                                        (grblInfo.sender.status.sent /
+                                            grblInfo.sender.status.total) *
+                                            100,
+                                    )}
+                                    % Complete
                                 </Text>
-                            </View>
-                            <View style={styles.tableCol}>
-                                <Text
-                                    style={[
-                                        styles.tableCell,
-                                        { fontFamily: 'Helvetica-Bold' },
-                                    ]}
-                                >
-                                    Value
+                            </Text>
+
+                            <Text style={styles.textBold}>
+                                Full G-Code Content
+                            </Text>
+                            <View
+                                id="g-code-file-content"
+                                style={styles.codeBlock}
+                            >
+                                <Text style={styles.codeBlockText}>
+                                    {gcode
+                                        ? gcode.substring(0, 2000) +
+                                          (gcode.length > 2000
+                                              ? '\n\n... (truncated for file size)'
+                                              : '')
+                                        : 'No file content available'}
                                 </Text>
                             </View>
                         </View>
-                    </View>
-                )}
-                <View style={styles.container}>
-                    <Text style={styles.text}>{gcode || 'No File Loaded'}</Text>
+                    ) : (
+                        <Text style={styles.text}>
+                            No G-code file loaded or no sender status available
+                        </Text>
+                    )}
                 </View>
             </Page>
         </Document>
     );
 
     const submitDiagnosticForm = async () => {
-        const blob = await pdf(<SupportFile />).toBlob();
-        const date = new Date();
-        const currentDate = date.toLocaleDateString().replaceAll('/', '-');
-        const currentTime = date
-            .toLocaleTimeString('it-IT')
-            .replaceAll(':', '-');
-
-        // grbl EEPROM Settings
-        const eepromSettings = getEEPROMValues();
-        const output = JSON.stringify(eepromSettings, null, 1);
-        const eepromBlob = new Blob([output], { type: 'application/json' });
-        const eepromFileName = `gSender-firmware-settings-${currentDate}-${currentTime}.json`;
-
-        const zip = new JSZip();
-        const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
-        const senderSettings = await exportSenderSettings();
-
-        const code = getGCodeFile();
-        if (code.length > 0) {
-            zip.file(getGCodeFileName(), new Blob([code]));
+        if (isGenerating) {
+            return; // Prevent multiple simultaneous generations
         }
 
-        zip.file(diagnosticPDFLabel, blob);
-        zip.file(eepromFileName, eepromBlob); // Add EEPROM
-        zip.file(
-            `gSenderSettings_${currentDate}_${currentTime}.json`,
-            senderSettings,
-        );
-        zip.generateAsync({ type: 'blob' }).then((content) => {
-            saveAs(
-                content,
-                'diagnostics_' + currentDate + '_' + currentTime + '.zip',
-            );
-        });
+        setTimeout(async () => {
+            setIsGenerating(true);
+            setProgress('Preparing...');
 
-        //saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+            const delay = (ms = 100) =>
+                new Promise((resolve) => setTimeout(resolve, ms));
+
+            try {
+                // Step 1: Generate PDF
+                setProgress('Generating PDF...');
+                await delay(100); // Allow UI to update
+                const blob = await pdf(<SupportFile />).toBlob();
+
+                // Step 2: Prepare file data
+                setProgress('Collecting system data...');
+                await delay(100);
+                const date = new Date();
+                const currentDate = date
+                    .toLocaleDateString()
+                    .replaceAll('/', '-');
+                const currentTime = date
+                    .toLocaleTimeString('it-IT')
+                    .replaceAll(':', '-');
+
+                // Step 3: Create EEPROM file
+                setProgress('Exporting EEPROM settings...');
+                await delay(100);
+                const eepromSettings = getEEPROMValues();
+                const output = JSON.stringify(eepromSettings, null, 1);
+                const eepromBlob = new Blob([output], {
+                    type: 'application/json',
+                });
+                const eepromFileName = `gSender-firmware-settings-${currentDate}-${currentTime}.json`;
+
+                // Step 4: Get sender settings
+                setProgress('Exporting application settings...');
+                await delay(100);
+                const senderSettings = await exportSenderSettings();
+
+                // Step 5: Create ZIP
+                setProgress('Creating ZIP archive...');
+                await delay(100);
+                const zip = new JSZip();
+                const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+
+                const code = getGCodeFile();
+                if (code.length > 0) {
+                    zip.file(getGCodeFileName(), new Blob([code]));
+                }
+
+                zip.file(diagnosticPDFLabel, blob);
+                zip.file(eepromFileName, eepromBlob);
+                zip.file(
+                    `gSenderSettings_${currentDate}_${currentTime}.json`,
+                    senderSettings,
+                );
+
+                // Step 6: Generate and download
+                setProgress('Finalizing download...');
+                await delay(100);
+                const content = await zip.generateAsync({ type: 'blob' });
+
+                saveAs(
+                    content,
+                    'diagnostics_' + currentDate + '_' + currentTime + '.zip',
+                );
+
+                setProgress('');
+                toast.success('Diagnostic file downloaded successfully!');
+            } catch (error) {
+                console.error('Error generating diagnostic file:', error);
+                toast.error('Failed to generate diagnostic file');
+            } finally {
+                setIsGenerating(false);
+                setProgress('');
+            }
+        }, 0);
     };
 
     return (
         <Button
-            icon={<PiFileZipFill className="text-gray-600 w-8 h-8 dark:text-gray-200" />}
+            icon={
+                <PiFileZipFill className="text-gray-600 w-8 h-8 dark:text-gray-200" />
+            }
             onClick={submitDiagnosticForm}
-            className=""
             size="lg"
-            text="Download Diagnostic File"
+            text={
+                isGenerating
+                    ? progress || 'Generating...'
+                    : 'Download Diagnostic File'
+            }
+            disabled={isGenerating}
         />
     );
-}
-
-async function exportSenderSettings() {
-    const settings = store.get();
-    settings.commandKeys = Object.fromEntries(
-        Object.entries(settings.commandKeys).filter(
-            ([key, shortcut]) => shortcut.category !== 'Macros',
-        ),
-    );
-    delete settings.session;
-    const res = await api.events.fetch();
-    const events = res.data.records;
-    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
-    return new Blob([settingsJSON], { type: 'application/json' });
 }
 
 export default generateSupportFile;

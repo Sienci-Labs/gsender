@@ -22,6 +22,11 @@ export const visualizeResponse = async ({ data }) => {
         pubsub.publish('toolpath:progress', data);
     } else {
         const { needsVisualization, parsedData } = data;
+
+        pubsub.publish('file:toolchanges', {
+            toolEvents: parsedData.info.spindleToolEvents,
+            total: parsedData.info.total,
+        });
         // Update estimate worker with values
         const estimatePayload = {
             ...data.info,
@@ -33,7 +38,6 @@ export const visualizeResponse = async ({ data }) => {
         }
 
         reduxStore.dispatch(updateFileProcessing(false));
-
 
         // if there's new parsed data, send to redux
         if (parsedData) {

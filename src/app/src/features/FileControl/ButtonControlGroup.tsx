@@ -47,7 +47,8 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
-import { get } from 'lodash';
+import get from 'lodash/get';
+import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,8 +140,10 @@ const ButtonControlGroup = () => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const handleLoadFile = async (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -216,16 +219,18 @@ const ButtonControlGroup = () => {
                 <Divider />
                 <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full">
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={
-                                    <MdKeyboardArrowDown className="w-10 h-8" />
-                                }
-                                variant="ghost"
-                                disabled={!canClick}
-                                className="h-full rounded-none"
-                            />
-                        </DropdownMenuTrigger>
+                        <Tooltip content="View Recent Files">
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    icon={
+                                        <MdKeyboardArrowDown className="w-10 h-8" />
+                                    }
+                                    variant="ghost"
+                                    disabled={!canClick}
+                                    className="h-full rounded-none"
+                                />
+                            </DropdownMenuTrigger>
+                        </Tooltip>
                         <DropdownMenuContent className="w-56 bg-white">
                             <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
                             {recentFiles.map((file) => (
@@ -259,14 +264,16 @@ const ButtonControlGroup = () => {
                     <Divider />
 
                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                icon={<MdClose className="w-6 h-6" />}
-                                variant="ghost"
-                                className="h-full rounded-none"
-                                disabled={isRunning || !fileLoaded}
-                            />
-                        </AlertDialogTrigger>
+                        <Tooltip content="Close File">
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    icon={<MdClose className="w-6 h-6" />}
+                                    variant="ghost"
+                                    className="h-full rounded-none"
+                                    disabled={isRunning || !fileLoaded}
+                                />
+                            </AlertDialogTrigger>
+                        </Tooltip>
                         <AlertDialogContent className="bg-white">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>

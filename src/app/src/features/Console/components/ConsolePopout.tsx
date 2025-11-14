@@ -1,8 +1,10 @@
 import { FaExternalLinkAlt } from 'react-icons/fa';
-import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
 
-export function ConsolePopout({ id = 'console' }) {
+import Tooltip from 'app/components/Tooltip';
+import { toast } from 'app/lib/toaster';
+
+export function ConsolePopout() {
     function openWindow() {
         const route = `/console`;
         if (isElectron()) {
@@ -15,11 +17,13 @@ export function ConsolePopout({ id = 'console' }) {
     }
 
     return (
-        <button
-            className="absolute top-3 right-3 text-white text-2xl"
-            onClick={() => openWindow()}
-        >
-            <FaExternalLinkAlt />
-        </button>
+        <Tooltip content="Open console in new window">
+            <button
+                className="absolute top-3 right-3 text-white text-2xl"
+                onClick={() => openWindow()}
+            >
+                <FaExternalLinkAlt />
+            </button>
+        </Tooltip>
     );
 }

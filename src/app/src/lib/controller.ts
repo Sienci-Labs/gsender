@@ -66,7 +66,7 @@ export interface ControllerListeners {
     'gcode:loaded': Array<Function>; // TO BE DEPRECATED
     'gcode:toolChange': Array<Function>;
     'feeder:status': Array<Function>;
-    'feeder:pause':  Array<Function>;
+    'feeder:pause': Array<Function>;
     'workflow:pause': Array<Function>;
     'sender:status': Array<Function>;
     'workflow:state': Array<Function>;
@@ -99,7 +99,11 @@ export interface ControllerListeners {
     'flash:message': Array<Function>;
     'flash:progress': Array<Function>;
     'spindle:add': Array<Function>;
-
+    atci: Array<Function>;
+    'ymodem:start': Array<Function>;
+    'ymodem:complete': Array<Function>;
+    'ymodem:progress': Array<Function>;
+    'ymodem:error': Array<Function>;
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
@@ -107,6 +111,10 @@ export interface ControllerListeners {
 
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
+    'job:stop': Array<Function>;
+    'sdcard:files': Array<Function>;
+    'sdcard:clear': Array<Function>;
+    'sdcard:json': Array<Function>
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -119,7 +127,7 @@ const ensureArray = (...args: Array<any>) => {
     return ([] as any).concat(args);
 };
 
-const noop = () => {};
+const noop = () => { };
 
 class Controller {
     io: Function = noop;
@@ -210,6 +218,15 @@ class Controller {
 
         requestEstimateData: [],
         'job:start': [],
+        'sdcard:files': [],
+        'sdcard:clear': [],
+        'sdcard:json': [],
+        atci: [],
+        'ymodem:start': [],
+        'ymodem:complete': [],
+        'ymodem:progress': [],
+        'ymodem:error': [],
+        'job:stop': [],
     };
 
     context = {

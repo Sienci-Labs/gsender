@@ -13,10 +13,24 @@ type InputProps = ComponentProps<'input'> & {
     sizing?: 'xs' | 'sm' | 'md' | 'lg';
     wrapperClassName?: string;
     clearOnEnter?: boolean;
+    immediateOnChange?: boolean; // New prop to enable immediate onChange calls
 };
 
 const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, value, onChange, ...props }, ref) => {
+    (
+        {
+            className,
+            type,
+            value,
+            onChange,
+            wrapperClassName,
+            immediateOnChange = false,
+            min,
+            max,
+            ...props
+        },
+        ref,
+    ) => {
         const [originalValue, setOriginalValue] = useState(value);
         const [localValue, setLocalValue] = useState(value);
 
@@ -29,12 +43,12 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             const current = e.target.value;
             if (localValue && localValue !== originalValue) {
                 if (type === 'number') {
-                    if (props.min !== null && current < props.min) {
-                        e.target.value = props.min;
-                        setLocalValue(props.min);
-                    } else if (props.max !== null && current > props.max) {
-                        e.target.value = props.max;
-                        setLocalValue(props.max);
+                    if (min !== null && current < min) {
+                        e.target.value = String(min);
+                        setLocalValue(min);
+                    } else if (max !== null && current > max) {
+                        e.target.value = String(max);
+                        setLocalValue(max);
                     } else {
                         setLocalValue(current);
                     }
@@ -74,12 +88,18 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
         const localChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setLocalValue(e.target.value);
+
+            // If immediateOnChange is enabled, call onChange immediately
+            if (immediateOnChange && onChange) {
+                onChange(e);
+            }
         };
 
         return (
             <ShadcnInput
                 type={type}
                 className={className}
+                wrapperClassName={wrapperClassName}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 onChange={localChange}

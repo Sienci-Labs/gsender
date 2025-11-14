@@ -10,20 +10,16 @@ import {
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
 import {
-    COOLANT_CATEGORY,
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
     GRBLHAL,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import reduxStore from 'app/store/redux';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -53,74 +49,9 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         controllerState?.status?.activeState,
     ]);
 
-    const canRunShortcut = (): boolean => {
-        const isConnected = get(
-            reduxStore.getState(),
-            'connection.isConnected',
-        );
-        const workflow = get(reduxStore.getState(), 'controller.workflow');
-        const controllerType = get(reduxStore.getState(), 'controller.type');
-        const controllerState = get(reduxStore.getState(), 'controller.state');
-
-        if (!isConnected) return false;
-        if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
-        if (![GRBL, GRBLHAL].includes(controllerType)) return false;
-
-        const activeState = controllerState?.status?.activeState;
-        return activeState === GRBL_ACTIVE_STATE_IDLE;
-    };
-
-    const shuttleControlEvents = {
-        MIST_COOLANT: {
-            title: 'Mist coolant (M7)',
-            keys: '',
-            cmd: 'MIST_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => {
-                if (!canRunShortcut()) {
-                    return;
-                }
-                startMist();
-            },
-        },
-        FLOOD_COOLANT: {
-            title: 'Flood coolant (M8)',
-            keys: '',
-            cmd: 'FLOOD_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => {
-                if (!canRunShortcut()) {
-                    return;
-                }
-                startFlood();
-            },
-        },
-        STOP_COOLANT: {
-            title: 'Stop coolant (M9)',
-            keys: '',
-            cmd: 'STOP_COOLANT',
-            preventDefault: false,
-            isActive: true,
-            category: COOLANT_CATEGORY,
-            callback: () => {
-                if (!canRunShortcut()) {
-                    return;
-                }
-                stopCoolant();
-            },
-        },
-    };
-
-    useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
-
     return (
         <div className="flex flex-col justify-around items-center h-full">
-            <div className="flex flex-row justify-around w-full gap-4">
+            <div className="flex flex-row justify-around w-full gap-2">
                 <ActiveStateButton
                     text="Mist"
                     icon={<FaShower />}
@@ -129,6 +60,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={mistActive}
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn on mist coolant' }}
                 />
                 <ActiveStateButton
                     text="Flood"
@@ -138,6 +70,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="w-full h-16"
                     active={floodActive}
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn on flood coolant' }}
                 />
                 <ActiveStateButton
                     text="Off"
@@ -146,6 +79,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="lg"
                     className="w-full h-16"
                     disabled={!canClick()}
+                    tooltip={{ content: 'Turn off coolant' }}
                 />
             </div>
         </div>

@@ -227,6 +227,7 @@ class SerialConnection extends EventEmitter {
     }
 
     addPortListeners() {
+        this.port.removeAllListeners();
         this.port.on('open', this.eventListener.open);
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);

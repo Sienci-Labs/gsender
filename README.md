@@ -11,7 +11,7 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 * **Works on as wide a range in computing systems as possible** (low-end PC to RasPi, leveraging [Electron](https://www.electronjs.org/))
 * Used to be based on the popular [CNCjs controller interface](https://github.com/cncjs/cncjs) but has since been mostly re-written
 
-**Our core principals during development have been to:**
+### Our core principals during development have been to:
 1. Make any CNC feel easy to use no matter your previous experience
 2. Substitute CNC jargon with simple language when possible
 3. Keep the interface flexible to accommodate any common CNC machine
@@ -21,21 +21,20 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
-gSender is available for the following systems and does not yet support headless Pi operation
+gSender is available for the systems below and does not yet support headless Pi operation
 
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Universal)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)                | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                                   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.4.10/gSender-1.4.10-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 
-## 📦 Current Features
+## 📦 Feature Highlights
 
-* [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported
-* Full imperial/metric compatibility
+* [Grbl](https://github.com/gnea/grbl/releases) and [grblHAL](https://github.com/grblHAL/core) controllers supported with full imperial/metric compatibility
 * Smart machine connection
 * 4-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
@@ -70,28 +69,27 @@ gSender is available for the following systems and does not yet support headless
 * Generic support for other machines, including:
     - Shapeoko
     - X-Carve
+    - SainSmart/Genmitsu
+    - FoxAlien
+    - 3018 CNC & PROVer
     - OpenBuilds CNCs
     - Ooznest WorkBee
     - Nomad
     - Carvey
     - RatRig
-    - 3018 CNC & PROVer
     - Bulk-Man 3D
-    - FoxAlien
-    - SainSmart/Genmitsu
     - YoraHome
     - Two Trees
     - BobsCNC
     - CNC4Newbie
     - MillRight
-    - Onefinity (running grbl-based controller)
-    - Mill One, and more...
+    - Onefinity (running grbl-based controller), and more...
 
 ## 🎓 Documentation
 
-All up-to-date documentation on gSender can be found here: [https://sienci.com/gsender-documentation/](https://sienci.com/gsender-documentation/)
+All up-to-date documentation can be found here: [https://sienci.com/gsender-documentation/](https://sienci.com/gsender-documentation/)
 
-If you encounter issues or would like to recommend improvements for gSender, there's a link for feedback submission on the documentation page. We also have a place for discussion on our forum: [https://forum.sienci.com/c/gsender/](https://forum.sienci.com/c/gsender/)
+If you run into issues or have ideas on how to improve gSender, [let us know on GitHub](https://github.com/Sienci-Labs/gsender/issues) or [on our User Forum](https://forum.sienci.com/c/gsender/).
 
 
 ## 📃 Example Files
@@ -104,21 +102,55 @@ If you'd like to test gSender's capabilities, there are several gcode files in t
 gSender is free software, provided as-is and available under the [GNU GPLv3 license](https://github.com/Sienci-Labs/sender/blob/master/LICENSE).
 
 
-## 👓 Further Use
+## 🥽 Compiling Yourself
 
-gSender is also designed in a way that it can be run locally on your computer browser or otherwise compiled for use on other systems which aren't listed in the downloads. We'd appreciate user input and contributions so we can compile documentation on how you can set this up yourself.
+You can both run gSender locally using the public code-base as well as compile it for use on other systems which aren't listed in the downloads. This can come in handy whether you're aiming to customize the application for your specific needs, test experimental features, or contribute to open source development of the gSender project. Read more on the process here: [https://resources.sienci.com/view/gs-compile/](https://resources.sienci.com/view/gs-compile/).
 
+**Note:** This guide is intended for users with some familiarity with command-line interfaces and software development environments. If you are looking to simply install gSender, please refer to the [gSender Installation Guide](https://resources.sienci.com/view/gs-installation/).
 
 ## 🕣 Development History
 <details>
 <summary>Expand to see all version notes</summary>
+
+### 1.5.6 (October 20th, 2025)
+- Fixed issue with surfacing tool inputs not using latest input values when generating gcode
+- Job stats update function altered to prevent situations where jobs would get lost when the array becomes too large
+- Reverted removing early M6 commands
+- Start job shortcut fixed to work on controllers for grblHAL devices
+- Probe diameter cycle shortcut working again
+- Updating values does not remove custom jog values on carve page  
+- Added way to change default units on remote view
+- Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode
+- Various portrait mode look and feel changes
+- Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off
+- Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)
+- Future updates should again be appearing in-app when they become available.
+
+
+### 1.5.5 (September 24, 2025)
+- New probe type, 3D Probe added, with future plans to support more than standard XYZ probing
+- All probing cycles now sped up with reduced delays and reduced default retracts to 2mm
+- Each probe block now has an individually customizable Z thickness
+- AutoZero touch plate can now have it's thickness set
+- All AutoZero probing now moves out of the way at the end to make removing the plate easier
+- Longstanding excess probing movements now removed for speed, safety, and accuracy
+- AutoZero bit diameter probing now offsetting correctly like in 1.4.11
+- Tooltips re-added across the app for more hover information
+- Spindle delay Config option for grbl machines now applies to Tool Change wizards and Start from line
+- New behaviour where gSender will ignore M2 or M30 workspace reversion on job completion unless new Config option is toggled on. This should remove the need for using Automations to preserve workspaces.
+- Machine state now handled if in Laser or Rotary mode and the tab is disabled
+- Fixed safe height movements sometimes using the wrong units
+- Fixed shortcuts that weren't acting as expected or weren't triggering
+- Fixed toolchange wizard always going back to probe position before probing to allow movement for bit changes ahead of probing
+- Fixed Config handling of Rotary forcing hard and soft limits for grbl machines
+- UI styling tweaks, and adjustments to better accommodate smaller screens
 
 ### 1.5.4 (August 27, 2025)
 - Fix controller not instantiating correctly in some situations for grblHAL devices.
 - Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.
 - Visualizer grid sizing more accurately matches your machine size at 2X dimensions.
 - Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.
-- Shortcut order adjusted when configurting binds.
+- Shortcut order adjusted when configuring binds.
 - Precise and Rapid toggle swapped in jog preset selector
 - Start from line modal is now correct based on the file
 - Copy button works on electron versions on Windows in remote mode dialog

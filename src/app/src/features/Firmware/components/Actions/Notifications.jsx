@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 

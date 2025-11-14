@@ -10,10 +10,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import { Input } from 'app/components/shadcn/Input';
+import Tooltip from 'app/components/Tooltip';
 
 import { MACRO_VARIABLES } from './constants';
 import insertAtCaret from './insertAtCaret';
-import { Input } from 'app/components/shadcn/Input';
 
 const MAX_CHARACTERS = 128;
 
@@ -116,7 +117,7 @@ const MacroForm = ({
                         more efficient.
                     </DialogDescription>
                     <div className="flex flex-col gap-2 my-4">
-                        <label>Macro Name</label>
+                        <label>Name</label>
                         <Input
                             ref={nameRef}
                             maxLength={MAX_CHARACTERS}
@@ -129,7 +130,7 @@ const MacroForm = ({
                     </div>
                     <div className="flex flex-col gap-2 mb-4">
                         <div className="flex flex-row gap-2 items-center justify-between">
-                            <label>Macro Commands</label>
+                            <label>G-code</label>
                             <Select<OptionType>
                                 options={options}
                                 onChange={(selectedOption: OptionType) => {
@@ -146,7 +147,7 @@ const MacroForm = ({
                                     }
                                 }}
                                 className="w-1/2"
-                                placeholder="Macro Variables"
+                                placeholder="Variables"
                                 value={null}
                                 styles={{
                                     option: (provided: any, state: any) => ({
@@ -190,15 +191,19 @@ const MacroForm = ({
                                 }}
                             />
                         </div>
-                        <textarea
-                            ref={contentRef}
-                            rows={10}
-                            className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
-                            name="content"
-                            value={macroState.content}
-                            onChange={handleInputChange}
-                            required
-                        />
+
+                        <Tooltip content="Add your g-code here. Use the variables or JavaScript logic to create more complex commands.">
+                            <textarea
+                                ref={contentRef}
+                                rows={10}
+                                className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
+                                name="content"
+                                value={macroState.content}
+                                onChange={handleInputChange}
+                                required
+                                title=""
+                            />
+                        </Tooltip>
                     </div>
                     <div className="flex flex-col gap-2 mb-4">
                         <label>Macro Description</label>
@@ -210,6 +215,7 @@ const MacroForm = ({
                             name="description"
                             value={macroState.description}
                             onChange={handleInputChange}
+                            title=""
                         />
                     </div>
                     <DialogFooter>

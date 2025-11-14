@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Dialog,
@@ -205,8 +205,10 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
         },
     };
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -215,6 +217,9 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                     size="sm"
                     onClick={() => setOpen(true)}
                     disabled={isDisabled}
+                    tooltip={{
+                        content: 'Open mounting setup tool',
+                    }}
                 >
                     Mounting Setup
                 </Button>

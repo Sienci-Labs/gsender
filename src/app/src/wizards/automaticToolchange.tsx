@@ -29,26 +29,17 @@ import {
 } from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
-import { convertToImperial } from 'app/lib/units';
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     const state = reduxStore.getState();
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
-    const $13 = get(state, 'controller.settings.settings.$13', '0');
 
     //const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
     const position = store.get('workspace.toolChangePosition');
     const curZPos = Math.abs(position.z);
 
-    console.log('curr z: ' + curZPos);
-    console.log('max z: ' + maxZTravel);
-    console.log('result: ' + (maxZTravel - curZPos - 2).toFixed(3));
-
-    let result =
-        $13 === '1'
-            ? convertToImperial(maxZTravel - curZPos - 2)
-            : (maxZTravel - curZPos - 2).toFixed(3);
+    let result = (maxZTravel - curZPos - 2).toFixed(3);
 
     return result;
 };
@@ -111,15 +102,17 @@ const wizard = {
                             label: 'Probe Initial Tool',
                             cb: () => {
                                 controller.command('gcode', [
-                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G91 G21',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=(posz+(global.toolchange.RETRACT * -1)).toFixed(3)',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                 ]);

@@ -6,6 +6,7 @@ import Visualizer from 'app/features/Visualizer';
 
 import { Column } from '../Column';
 import { ToolArea } from '../ToolArea';
+import { ToolTimelineWrapper } from 'app/features/ATC/components/ToolTimeline';
 
 export const Carve = () => {
     const { pathname } = useLocation();
@@ -23,8 +24,13 @@ export const Carve = () => {
                         : 'h-[75%] max-xl:h-[76%] max-xl:max-h-[76%] max-h-[75%] pb-10 max-xl:pb-6',
                 )}
             >
-                <div className={isPortrait ? 'h-full w-full' : 'flex-grow'}>
-                    <Visualizer />
+                <div
+                    className={cx(
+                        'relative',
+                        isPortrait ? 'h-full w-full' : 'flex-grow',
+                    )}
+                >
+                    <Visualizer timeline={<ToolTimelineWrapper />} />
                 </div>
 
                 {!isPortrait && (

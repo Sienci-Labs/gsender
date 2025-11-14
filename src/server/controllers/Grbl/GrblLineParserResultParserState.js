@@ -52,6 +52,11 @@ class GrblLineParserResultParserState {
         for (let i = 0; i < words.length; ++i) {
             const word = words[i];
 
+            // Handle malformed words for G parser (Genmitsu...)
+            if (word.length === 0) {
+                continue;
+            }
+
             // Gx, Mx
             if (word.indexOf('G') === 0 || word.indexOf('M') === 0) {
                 const r = _find(GRBL_MODAL_GROUPS, (group) => {

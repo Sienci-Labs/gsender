@@ -11,7 +11,11 @@ import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { BasicPosition, BasicObject } from 'app/definitions/general';
 
-import { ControllerSettings, ControllerState } from '../../definitions';
+import {
+    ControllerSettings,
+    ControllerState,
+    SDCardFile,
+} from '../../definitions';
 
 const initialState: ControllerState = {
     type: '',
@@ -65,6 +69,10 @@ const initialState: ControllerState = {
     },
     terminalHistory: [],
     spindles: [],
+    sdcard: {
+        isMounted: false,
+        files: [],
+    },
 };
 
 function mapPosToFeedbackUnits(
@@ -308,6 +316,35 @@ const controllerSlice = createSlice({
             const { type } = action.payload;
             state.type = type;
         },
+        updateSDCardMountStatus: (
+            state,
+            action: PayloadAction<{ isMounted: boolean }>,
+        ) => {
+            state.sdcard.isMounted = action.payload.isMounted;
+        },
+        addSDCardFileToList: (
+            state,
+            action: PayloadAction<{
+                file: SDCardFile;
+            }>,
+        ) => {
+            const filteredFiles = state.sdcard.files.filter(
+                (file) => file.name !== action.payload.file.name,
+            );
+
+            state.sdcard.files = [...filteredFiles, action.payload.file];
+        },
+        clearSDCardFiles: (
+            state,
+            action: PayloadAction<{
+                path: string;
+            }>,
+        ) => {
+            const filteredFiles = state.sdcard.files.filter(
+                (file) => file.name !== action.payload.path,
+            );
+            state.sdcard.files = filteredFiles;
+        },
     },
 });
 
@@ -321,11 +358,13 @@ export const {
     toolChange,
     updateHomingFlag,
     resetHoming,
-    updateTerminalHistory,
     updateSettingsDescriptions,
     updateAlarmDescriptions,
     addSpindle,
     updateControllerType,
+    updateSDCardMountStatus,
+    addSDCardFileToList,
+    clearSDCardFiles,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;

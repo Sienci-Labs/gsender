@@ -13,12 +13,19 @@ const log = logger('connection');
 
 class Connection extends EventEmitter {
     sockets = {};
+
     controller = null;
+
     controllerType = null;
+
     options = {};
+
     connection = null;
+
     engine = null;
+
     timeout = null;
+
     count = 0;
 
     connectionEventListener = {
@@ -281,8 +288,19 @@ class Connection extends EventEmitter {
         return this.sockets;
     }
 
+    restoreListeners() {
+        this.connection.addPortListeners();
+        /*this.connection.on('data', this.connectionEventListener.data);
+        this.connection.on('close', this.connectionEventListener.close);
+        this.connection.on('error', this.connectionEventListener.error);*/
+    }
+
     setWriteFilter(writeFilter) {
         this.connection.setWriteFilter(writeFilter);
+    }
+
+    getConnectionObject() {
+        return this.connection.port;
     }
 
     emitToSockets(eventName, ...args) {
@@ -305,8 +323,7 @@ class Connection extends EventEmitter {
             this.controllerType,
             this.options,
             this.callback,
-            true
-        );
+            true);
     }
 
     destroy() {

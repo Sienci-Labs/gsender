@@ -12,7 +12,6 @@ import {
     MaintenanceTask,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
-// import maintenanceActions from '../../../../../app_old/containers/Preferences/Stats/lib/maintenanceApiActions';
 
 export const buttonStyle = tv({
     base: 'inline-flex items-center px-6 py-3 border text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out',

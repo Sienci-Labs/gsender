@@ -27,7 +27,6 @@ import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
 import GcodeToolpath from '../../lib/GcodeToolpath';
-// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import ToolChanger from '../../lib/ToolChanger';
@@ -82,7 +81,7 @@ import {
     FILE_TYPE,
     ALARM,
     ERROR
-} from '../../../app_old/constants';
+} from '../../../app/src/constants';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
@@ -486,6 +485,7 @@ class GrblController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
+                    // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
@@ -777,7 +777,6 @@ class GrblController {
                 const line = lines[received] || '';
 
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                console.log(preferences);
 
                 this.emit('serialport:read', `error:${code} (${error?.message})`);
 
@@ -789,7 +788,6 @@ class GrblController {
                     }
 
                     if (preferences.showLineWarnings) {
-                        console.log('Pause branch');
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
@@ -1465,11 +1463,13 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom, zMax, safeHeight = 10] = args;
+                const [lineToStartFrom, zMax, safeHeight = 10, spindleDelay = 1] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
                 this.emit('job:start');
+
+                this.command('gcode', '%global.state.workspace=modal.wcs');
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1563,7 +1563,7 @@ class GrblController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`${modal.motion}`);
-                    modalGCode.push('G4 P1');
+                    modalGCode.push(`G4 P${spindleDelay}`);
                     modalGCode.push('%_GCODE_START');
 
                     // Fast forward sender to line
@@ -1602,6 +1602,8 @@ class GrblController {
 
                 const [options] = args;
                 const { force = false } = { ...options };
+
+                this.emit('job:stop');
 
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {

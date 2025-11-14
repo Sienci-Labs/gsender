@@ -63,6 +63,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: Actions;
@@ -73,6 +74,7 @@ type Props = {
 type Option = {
     value: string;
     label: string;
+    tool: AvailableTool;
 };
 
 const convertAvailableTools = (
@@ -90,18 +92,17 @@ const convertAvailableTools = (
                 units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'
             ],
         ),
+        tool: tool,
     }));
 };
 
 const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
-    const { touchplate, toolDiameter } = state;
+    const { touchplate, toolDiameter, probeType } = state;
     const { touchplateType } = touchplate;
     let { availableTools, units } = state;
 
     const [value, setValue] = useState(
-        touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? PROBE_TYPE_AUTO
-            : String(toolDiameter),
+        probeType === PROBE_TYPE_DIAMETER ? String(toolDiameter) : probeType,
     );
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -130,8 +131,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
             baseOptions.push(
-                { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
-                { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
+                { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, tool: null },
+                { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, tool: null },
             );
         }
 
@@ -153,9 +154,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     useEffect(() => {
         setValue(
-            touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-                ? PROBE_TYPE_AUTO
-                : String(toolDiameter),
+            probeType === PROBE_TYPE_DIAMETER
+                ? String(toolDiameter)
+                : probeType,
         );
     }, [touchplateType]);
 
@@ -190,13 +191,15 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     }, [units]);
 
     const handleChange = useCallback(
-        (value: string): void => {
+        (value: string, tool: AvailableTool): void => {
             if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
                 actions._setProbeType(value);
-                actions._setToolDiameter({ value: null });
+                actions._setToolDiameter({ value: 0.0 });
+                actions._setCurrentTool(null);
             } else {
                 actions._setProbeType(PROBE_TYPE_DIAMETER);
                 actions._setToolDiameter({ value: Number(value) });
+                actions._setCurrentTool(tool);
             }
             setValue(value);
             if (inputRef.current) {
@@ -216,12 +219,12 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             const formattedValue = String(newValue);
             const toolUnits =
                 units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter';
-            const existingToolValues = availableTools.map((tool) =>
-                String(tool[toolUnits]),
+            const existingTool = availableTools.find(
+                (tool) => tool[toolUnits] === newValue,
             );
 
-            if (existingToolValues.includes(formattedValue)) {
-                handleChange(formattedValue);
+            if (existingTool) {
+                handleChange(formattedValue, existingTool);
                 return;
             }
 
@@ -230,17 +233,17 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 metricDiameter:
                     units === METRIC_UNITS
                         ? newValue
-                        : Number((newValue * 25.4).toFixed(2)),
+                        : Number((newValue * 25.4).toFixed(3)),
                 imperialDiameter:
                     units === METRIC_UNITS
-                        ? Number((newValue / 25.4).toFixed(2))
+                        ? Number((newValue / 25.4).toFixed(3))
                         : newValue,
                 type: 'End Mill',
             };
 
             const updatedTools = [...availableTools, newTool];
             store.set('workspace.tools', updatedTools);
-            handleChange(formattedValue);
+            handleChange(formattedValue, newTool);
         },
         [handleChange, availableTools, units],
     );
@@ -261,48 +264,45 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                 const firstTool = updatedTools[0];
                 if (firstTool) {
                     const diameter = String(firstTool[toolUnits]);
-                    handleChange(diameter);
+                    handleChange(diameter, firstTool);
                 }
             }
         },
         [handleChange, availableTools, units, value],
     );
 
-    const probeDiameterScrollUp = useCallback(() => {
-        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-            return;
-        }
+    const handleProbeDiameterScroll = useCallback(
+        (direction: 'up' | 'down') => {
+            if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
+                return;
+            }
 
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        if (currentIndex === -1) {
-            return;
-        }
+            const currentIndex = options.findIndex(
+                (opt) => opt.value === value,
+            );
+            if (currentIndex === -1) {
+                return;
+            }
 
-        let newIndex = currentIndex - 1;
-        if (newIndex < 0) {
-            newIndex = options.length - 1;
-        }
+            let newIndex = currentIndex + (direction === 'up' ? -1 : 1);
+            if (newIndex < 0) {
+                newIndex = options.length - 1;
+            }
 
-        handleChange(options[newIndex].value);
-    }, [handleChange, options, value]);
+            if (newIndex >= options.length) {
+                newIndex = 0;
+            }
 
-    const probeDiameterScrollDown = useCallback(() => {
-        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-            return;
-        }
+            handleChange(options[newIndex].value, options[newIndex].tool);
+        },
+        [handleChange, options, value],
+    );
 
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        if (currentIndex === -1) {
-            return;
-        }
-
-        let newIndex = currentIndex + 1;
-        if (newIndex >= options.length) {
-            newIndex = 0;
-        }
-
-        handleChange(options[newIndex].value);
-    }, [handleChange, options, value]);
+    // Use a ref to always point to the latest scroll handler to avoid stale closures
+    const scrollHandlerRef = useRef(handleProbeDiameterScroll);
+    useEffect(() => {
+        scrollHandlerRef.current = handleProbeDiameterScroll;
+    }, [handleProbeDiameterScroll]);
 
     const shuttleControlEvents = useRef({
         PROBE_DIAMETER_SCROLL_UP: {
@@ -312,7 +312,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             preventDefault: false,
             isActive: true,
             category: PROBING_CATEGORY,
-            callback: probeDiameterScrollUp,
+            callback: () => scrollHandlerRef.current('up'),
         },
         PROBE_DIAMETER_SCROLL_DOWN: {
             title: 'Tool Diameter scroll down',
@@ -321,12 +321,14 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             preventDefault: false,
             isActive: true,
             category: PROBING_CATEGORY,
-            callback: probeDiameterScrollDown,
+            callback: () => scrollHandlerRef.current('down'),
         },
     }).current;
 
-    useKeybinding(shuttleControlEvents);
     useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     function getUnitString(option: PROBE_TYPES_T) {
         if (option === 'Tip' || option === 'Auto') {
@@ -357,7 +359,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                             option.value === value,
                     },
                 )}
-                onClick={() => handleChange(option.value)}
+                onClick={() => handleChange(option.value, option.tool)}
             >
                 <div className="flex items-center justify-between w-full">
                     <span>
@@ -396,6 +398,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                             role="combobox"
                             className="w-full justify-between bg-white dark:bg-gray-800"
                             disabled={!probeCommand.tool}
+                            tooltip={{
+                                content: 'Select tool diameter',
+                                side: 'left',
+                            }}
                         >
                             {value ? (
                                 <span>
@@ -414,20 +420,25 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                         </div>
                         <div className="pt-2 border-t">
                             <div className="flex items-center space-x-2">
-                                <Input
-                                    placeholder={`Custom diameter (${units})`}
-                                    onKeyDown={(
-                                        e: KeyboardEvent<HTMLInputElement>,
-                                    ) => {
-                                        if (e.key === 'Enter') {
-                                            handleCreateOption(
-                                                inputRef.current.value,
-                                            );
-                                        }
-                                    }}
-                                    sizing="sm"
-                                    ref={inputRef}
-                                />
+                                <Tooltip
+                                    content="Create and use a custom probe diameter"
+                                    side="bottom"
+                                >
+                                    <Input
+                                        placeholder={`Custom diameter (${units})`}
+                                        onKeyDown={(
+                                            e: KeyboardEvent<HTMLInputElement>,
+                                        ) => {
+                                            if (e.key === 'Enter') {
+                                                handleCreateOption(
+                                                    inputRef.current.value,
+                                                );
+                                            }
+                                        }}
+                                        sizing="sm"
+                                        ref={inputRef}
+                                    />
+                                </Tooltip>
                                 <Button
                                     onClick={() => {
                                         if (inputRef.current.value) {

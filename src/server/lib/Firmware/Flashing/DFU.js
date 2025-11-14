@@ -11,33 +11,53 @@ import delay from 'server/lib/delay';
 const log = logger('DFU');
 
 class DFU {
-    IDS = [1155, 57105] // 0x0483 VID 0xDF11 PID for usb in DFU mode
+    IDS = [1155, 57105]
+
+    // 0x0483 VID 0xDF11 PID for usb in DFU mode
     // DFU request commands
     DETACH = 0x00;
+
     DNLOAD = 0x01;
+
     UPLOAD = 0x02;
+
     GETSTATUS = 0x03;
+
     CLRSTATUS = 0x04;
+
     GETSTATE = 0x05;
+
     ABORT = 6;
+
     appIDLE = 0;
+
     appDETACH = 1;
 
     // DFU states
     dfuIDLE = 2;
+
     dfuDNLOAD_SYNC = 3;
+
     dfuDNBUSY = 4;
+
     dfuDNLOAD_IDLE = 5;
+
     dfuMANIFEST_SYNC = 6;
+
     dfuMANIFEST = 7;
+
     dfuMANIFEST_WAIT_RESET = 8;
+
     dfuUPLOAD_IDLE = 9;
+
     dfuERROR = 10;
+
     STATUS_OK = 0x0;
 
     // Opcodes
 
     dfu_SET_ADDRESS = 0x21;
+
     dfu_ERASE_PAGE = 0x41;
 
     DFU_TIMEOUT = 8000;
@@ -165,7 +185,7 @@ class DFU {
                 }
             }, (err) => {
                 log.error(err);
-                return Promise.reject(`requestIn Fail: ${err}`);
+                return Promise.reject(new Error(`requestIn Fail: ${err}`));
             });
     }
 
@@ -183,12 +203,12 @@ class DFU {
                     if (result.status === 'ok') {
                         return Promise.resolve(result.bytesWritten);
                     } else {
-                        return Promise.reject(result.status);
+                        return Promise.reject(new Error(result.status));
                     }
                 },
                 (err) => {
                     log.error(err);
-                    return Promise.reject(`requestOut Fail: ${err}`);
+                    return Promise.reject(new Error(`requestOut Fail: ${err}`));
                 }
             );
     }
@@ -208,14 +228,14 @@ class DFU {
                 pollTimeout: data.getUint32(1, true) & 0xFFFFFF,
                 state: data.getUint8(4)
             }),
-            error => Promise.reject(`DFU GETSTATUS failed: ${error}`)
+            error => Promise.reject(new Error(`DFU GETSTATUS failed: ${error}`))
         );
     }
 
     getState() {
         return this.requestIn(this.GETSTATE, 1).then(
             data => Promise.resolve(data.getUint8(0)),
-            error => Promise.reject(`DFU getState error: ${error}`)
+            error => Promise.reject(new Error(`DFU getState error: ${error}`))
         );
     }
 

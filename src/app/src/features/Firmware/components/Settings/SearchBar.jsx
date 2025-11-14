@@ -1,50 +1,30 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
-
-// import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import Button from 'app/components/Button';
 
 import { FirmwareContext } from '../../utils';
 
-const Wrapper = styled.div`
-    display: grid;
-    grid-template-columns: 5fr 1fr;
-`;
-
-const Input = styled.input`
-    border: solid 1px #9ca3af;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-`;
-
-// const Button = styled(FunctionButton)`
-//     border-top-left-radius: 0;
-//     margin: 0px;
-//     border-bottom-left-radius: 0;
-//     border-left: none;
-//     box-shadow: none;
-// `;
-
 const SearchBar = () => {
     const { filterText, setFilterText } = useContext(FirmwareContext);
 
     return (
-        <Wrapper>
-            <Input
-                className="form-control"
+        <div className="grid grid-cols-[5fr_1fr]">
+            <input
+                className="form-control border border-gray-400 rounded-none rounded-l px-2 py-1"
                 placeholder="Search Firmware Settings..."
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
+                type="text"
             />
             <Button
                 onClick={() => setFilterText('')}
                 disabled={!filterText}
                 color="primary"
+                className="rounded-none rounded-r"
             >
                 Clear Search
             </Button>
-        </Wrapper>
+        </div>
     );
 };
 

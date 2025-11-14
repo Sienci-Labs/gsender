@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { IconFunctionButton } from 'app/features/Config/components/IconFunctionButton.tsx';
+import { useRef } from 'react';
 import { PiDownloadSimple, PiUploadSimple } from 'react-icons/pi';
 import { GrPowerReset } from 'react-icons/gr';
 import {
@@ -10,9 +9,9 @@ import {
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 
 export function ApplicationPreferences() {
-    const inputRef = useRef();
+    const inputRef = useRef<HTMLInputElement>(null);
     return (
-        <fieldset className="flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-gray-700 dark:text-white">
+        <fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-gray-700 dark:text-white">
             <legend className="text-slate-600 dark:text-white">
                 gSender Preferences
             </legend>
@@ -38,7 +37,7 @@ export function ApplicationPreferences() {
                     type="file"
                     onChange={importSettings}
                     onClick={(e) => {
-                        e.target.value = null;
+                        (e.target as HTMLInputElement).value = '';
                     }}
                     accept=".json"
                     className="hidden"

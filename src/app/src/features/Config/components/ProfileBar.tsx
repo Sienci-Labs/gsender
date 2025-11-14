@@ -16,19 +16,16 @@ import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
 import controller from 'app/lib/controller.ts';
+import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 
-interface ProfileBarProps {
-    setShowFlashDialog: () => void;
-}
-
-export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
+export function ProfileBar() {
     const {
         rawEEPROM,
-        setEEPROM,
         settingsAreDirty,
         setSettingsAreDirty,
         EEPROM,
         settingsValues,
+        machineProfile,
     } = useSettings();
     const inputRef = useRef(null);
     const [flashOpen, setFlashOpen] = useState(false);
@@ -46,14 +43,37 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
         setFlashOpen(!flashOpen);
     }
 
-    function importEEPROMSettings(e) {
+    function importEEPROMSettings(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files[0];
         try {
             importFirmwareSettings(file, (e) => {
-                const uploadedSettings = JSON.parse(e.target.result);
+                const uploadedSettings: EEPROMSettings = JSON.parse(
+                    e.target.result as string,
+                );
                 const code = [];
+                let formattedSettings: EEPROMSettings = {};
 
-                for (const [key, value] of Object.entries(uploadedSettings)) {
+                if (machineProfile.orderedSettings) {
+                    // get the ordered settings in first
+                    machineProfile.orderedSettings.forEach((_value, key) => {
+                        if (uploadedSettings[key as EEPROM]) {
+                            formattedSettings[key as EEPROM] =
+                                uploadedSettings[key as EEPROM];
+                        }
+                    });
+                    // then get the rest
+                    for (const [key, value] of Object.entries(
+                        uploadedSettings,
+                    )) {
+                        if (!formattedSettings[key as EEPROM]) {
+                            formattedSettings[key as EEPROM] = value;
+                        }
+                    }
+                } else {
+                    formattedSettings = uploadedSettings;
+                }
+
+                for (const [key, value] of Object.entries(formattedSettings)) {
                     code.push(`${key}=${value}`);
                 }
                 code.push('$$');
@@ -71,14 +91,14 @@ export function ProfileBar({ setShowFlashDialog }: ProfileBarProps) {
     }
 
     return (
-        <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 dark:bg-dark">
+        <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-dark">
             <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
             <div className="flex flex-row items-center border border-gray-200 h-12 rounded-lg justify-between">
-                <div className="w-1/4 min-w-64  mx-auto px-2">
+                <div className="w-1/4 min-w-64  mx-auto px-2 max-sm:hidden">
                     <MachineProfileSelector />
                 </div>
 
-                <div className="grid h-full max-w-lg grid-cols-4 font-medium divide-x">
+                <div className="grid h-full max-w-lg grid-cols-4 font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
                     <RestoreDefaultDialog />
                     <ActionButton
                         icon={<PiLightning />}

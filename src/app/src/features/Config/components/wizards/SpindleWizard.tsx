@@ -1,11 +1,11 @@
 import { Button } from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
-import {useSelector} from "react-redux";
-import {RootState} from "app/store/redux";
-import {GRBLHAL} from "app/constants";
-import {delay} from "lodash";
-import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-import autoSpinIcon from "app/features/Config/assets/images/autospin.svg";
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
+import { GRBLHAL } from 'app/constants';
+import delay from 'lodash/delay';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import autoSpinIcon from 'app/features/Config/assets/images/autospin.svg';
 
 function startSpindle() {
     controller.command('gcode', 'M3 S1000');

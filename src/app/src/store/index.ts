@@ -11,7 +11,10 @@ import ImmutableStore from 'app/lib/immutable-store';
 import log from 'app/lib/log';
 import defaultState from './defaultState';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
-import { TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD } from "app/lib/constants.ts";
+import {
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_STANDARD,
+} from 'app/lib/constants.ts';
 
 interface UserData {
     path: string;
@@ -196,7 +199,8 @@ const merge = (base: any, saved: any): any => {
 
     // if they are both not objects, use saved. migration will be made later if needed
     if ((!baseIsObject || baseIsArray) && (!savedIsObject || savedIsArray)) {
-        if (saved === undefined) { // but if the saved version doesnt exist, use base
+        if (saved === undefined) {
+            // but if the saved version doesnt exist, use base
             return base;
         }
         return saved;
@@ -290,27 +294,62 @@ const migrateStore = (): void => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.5.5')) {
+        // if user has default retraction distance (4), change it to the new default (2)
+        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        if (currentRetractDistance === 4) {
+            store.set('widgets.probe.retractionDistance', 2);
+        }
+    }
+
     // zThickness setting now has 3 options - port previous value to them
-    if (semver.lt(cnc.version, '1.5.4')) {
-        const currentZThickness = store.get('workspace.probeProfile.zThickness');
-        if (typeof currentZThickness === 'number' || typeof currentZThickness === 'string') {
-            store.set('workspace.probeProfile.zThickness.standardBlock', currentZThickness);
+    if (
+        semver.lt(cnc.version, '1.5.5') ||
+        semver.lt(cnc.version, '1.6.0-EDGE1')
+    ) {
+        const currentZThickness = store.get(
+            'workspace.probeProfile.zThickness',
+        );
+        if (
+            typeof currentZThickness === 'number' ||
+            typeof currentZThickness === 'string'
+        ) {
+            store.set(
+                'workspace.probeProfile.zThickness.standardBlock',
+                currentZThickness,
+            );
             store.set('workspace.probeProfile.zThickness.autoZero', 5);
-            store.set('workspace.probeProfile.zThickness.zProbe', currentZThickness);
+            store.set(
+                'workspace.probeProfile.zThickness.zProbe',
+                currentZThickness,
+            );
+            store.set('workspace.probeProfile.zThickness.probe3D', 0);
         }
     }
 
     // Set probe type to AutoZero if it was formerly "AutoZero Touchplate"
     if (semver.lt(cnc.version, '1.5.3')) {
-        const currentProbeSettings = store.get('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_STANDARD)
+        const currentProbeSettings = store.get(
+            'workspace.probeProfile.touchplateType',
+            TOUCHPLATE_TYPE_STANDARD,
+        );
         if (currentProbeSettings === 'AutoZero Touchplate') {
-            store.set('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_AUTOZERO)
+            store.set(
+                'workspace.probeProfile.touchplateType',
+                TOUCHPLATE_TYPE_AUTOZERO,
+            );
         }
     }
 
     if (semver.lt(cnc.version, '1.5.1')) {
-        const currentSpindleSetting = store.get('workspace.spindleFunctions', false);
-        const machineProfileSpindleSetting = store.get('workspace.machineProfile.spindle', false);
+        const currentSpindleSetting = store.get(
+            'workspace.spindleFunctions',
+            false,
+        );
+        const machineProfileSpindleSetting = store.get(
+            'workspace.machineProfile.spindle',
+            false,
+        );
         if (currentSpindleSetting) {
             return;
         }

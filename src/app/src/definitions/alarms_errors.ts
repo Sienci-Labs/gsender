@@ -1,4 +1,5 @@
 export interface AlarmsErrors {
+    id: string;
     type: string;
     source: string;
     time: Date;

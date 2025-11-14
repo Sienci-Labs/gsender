@@ -329,7 +329,6 @@ class Visualizer extends Component {
 
         // Handle WebGL context restoration
         const handleContextRestored = () => {
-            console.log('Visualizer: WebGL context restored, recreating scene');
             const wasAnimationRunning = this.animationLoopRunning;
 
             if (this.node) {
@@ -372,9 +371,6 @@ class Visualizer extends Component {
 
         // Check if scene needs to be recreated (e.g., if renderer was lost)
         if (this.node && !this.isSceneInitialized() && this.props.show) {
-            console.log(
-                'Visualizer: Scene not properly initialized, attempting to recreate',
-            );
             this.retrySceneCreation().catch((error) => {
                 console.error('Visualizer: Failed to recreate scene:', error);
             });
@@ -835,25 +831,6 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-        /*{
-            // Imperial Coordinate System
-            _each(impGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(currentTheme.get(GRID_PART));
-            });
-        }
-
-        {
-            // Metric Coordinate System
-            _each(metGroup.getObjectByName('GridLine').children, (o) => {
-                console.log('before', o.material.color);k
-                o.material.color.set(currentTheme.get(GRID_PART));
-                console.log('after', o.material.color);
-            });
-            const o = metGroup.getObjectByName('GridLine');
-            console.log(o);
-            console.log(o.material.color);
-        }*/
-
         this.recolorGridLabels(IMPERIAL_UNITS);
         this.recolorGridLabels(METRIC_UNITS);
         this.recolorGridNumbers(IMPERIAL_UNITS);
@@ -1163,7 +1140,6 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 const vertices = this.props.actions.getHull();
-                console.log('enabled:', this.props.homingEnabled);
                 const zTravel = this.props.homingEnabled ? getZUpTravel(5) : 5;
 
                 try {
@@ -1509,8 +1485,6 @@ class Visualizer extends Component {
 
     createGridLineNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
-        console.log(mm);
-        console.log(inches);
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1601,10 +1575,6 @@ class Visualizer extends Component {
                 width = Math.max(width, 360);
                 height = Math.max(height, 360);
             }
-
-            console.log(
-                `Visualizer: Creating scene with dimensions ${width}x${height}`,
-            );
 
             // WebGLRenderer
             this.renderer = new THREE.WebGLRenderer({
@@ -1841,9 +1811,6 @@ class Visualizer extends Component {
             setTimeout(() => {
                 if (el && !el.firstChild) {
                     el.appendChild(this.renderer.domElement);
-                    console.log(
-                        'Visualizer: Scene created and DOM element appended successfully',
-                    );
 
                     // Force an immediate render
                     this.updateScene({ forceUpdate: true });
@@ -2445,6 +2412,7 @@ class Visualizer extends Component {
                 isLaser: vizualization.isLaser,
                 spindleChanges: vizualization.spindleChanges,
                 theme: currentTheme,
+                toolchanges: vizualization.info.toolchanges,
             });
 
             // this.handleSceneRender(vizualization, callback);
@@ -2759,8 +2727,6 @@ class Visualizer extends Component {
     }
 
     forceSceneRefresh() {
-        console.log('Visualizer: Forcing complete scene refresh');
-
         // Clear existing scene
         this.clearScene();
 
@@ -2823,18 +2789,12 @@ class Visualizer extends Component {
                 }
 
                 retryCount++;
-                console.log(
-                    `Visualizer: Attempting to create scene (attempt ${retryCount}/${maxRetries})`,
-                );
 
                 if (this.node) {
                     this.createScene(this.node);
 
                     setTimeout(() => {
                         if (this.isSceneInitialized()) {
-                            console.log(
-                                'Visualizer: Scene created successfully on retry',
-                            );
                             this.resizeRenderer();
                             this.updateScene({ forceUpdate: true });
 

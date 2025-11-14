@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import Select from 'react-select';
-import { cloneDeep, set, get } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import set from 'lodash/set';
+import get from 'lodash/get';
 
 import { Switch } from 'app/components/shadcn/Switch';
 
