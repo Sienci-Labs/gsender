@@ -160,6 +160,12 @@ export function SettingRow({
     };
 
     function handleSingleSettingReset(setting: EEPROM, value: string | number) {
+        setEEPROM((prev) => {
+            const updated = [...prev];
+            updated[updated.findIndex((val) => val.setting === setting)].dirty =
+                false;
+            return updated;
+        });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
         toast.success(`Restored ${setting} to default value of ${value}`, {
             position: 'bottom-right',

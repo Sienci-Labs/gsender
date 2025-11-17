@@ -271,14 +271,25 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [connectionState]);
 
     useEffect(() => {
-        setEEPROM(
-            getFilteredEEPROMSettings(
-                BASE_SETTINGS,
-                detectedEEPROM,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
-            ),
+        const filteredEEPROMSettings = getFilteredEEPROMSettings(
+            BASE_SETTINGS,
+            detectedEEPROM,
+            detectedEEPROMDescriptions,
+            detectedEEPROMGroups,
         );
+        // if the setting is dirty, keep the change
+        // this fixes the issue where resetting an eeprom also resets unsaved changes
+        const newEEPROM = filteredEEPROMSettings.map((eeprom) => {
+            const currentEEP = EEPROM.find(
+                (value) => value.setting === eeprom.setting,
+            );
+            if (currentEEP?.dirty) {
+                return currentEEP;
+            }
+            return eeprom;
+        });
+
+        setEEPROM(newEEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {
