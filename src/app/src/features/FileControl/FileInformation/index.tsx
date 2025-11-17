@@ -266,11 +266,10 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 <span>({total} lines)</span>
             </div>
 
-            {!path && (
+            {path && (
                 <div className="text-gray-500 text-xs max-w-full flex flex-row">
                     <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
-                        {/* {path} */}
-                        /Example/Path/To/That/Is/Very/Long/File.gcode
+                        {path}
                     </span>
                 </div>
             )}
