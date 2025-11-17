@@ -47,6 +47,8 @@ const Terminal = (
     const fitAddonInstance = useRef<FitAddon | null>(null);
     const [senderId] = useState(uuidv4());
     const dispatch = useDispatch();
+    const pendingFeederCommands = useRef<Map<string, number>>(new Map());
+    const pendingUserCommands = useRef<Map<string, number>>(new Map());
 
     useImperativeHandle(ref, () => ({
         clear: () => {
@@ -80,6 +82,7 @@ const Terminal = (
                 scrollSensitivity: 0.5,
                 smoothScrollDuration: 100,
                 tabStopWidth: 4,
+                lineHeight: 1.4,
                 fontFamily:
                     'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif',
                 fontSize: 14,
@@ -147,6 +150,14 @@ const Terminal = (
         }
 
         if (source) {
+            if (source === 'feeder') {
+                pendingFeederCommands.current.set(data, Date.now());
+                return;
+            }
+            if (source === 'client') {
+                pendingUserCommands.current.set(data, Date.now());
+                return;
+            }
             terminalInstance.current?.writeln(
                 color.blackBright(source) +
                     ' ' +
@@ -220,6 +231,49 @@ const Terminal = (
             const isAnErrorMessage = data.includes('error:');
 
             if (isAnErrorMessage) {
+                const now = Date.now();
+                const trimmedData = data.trim();
+
+                if (pendingFeederCommands.current.size > 0) {
+                    const recentCommands = Array.from(
+                        pendingFeederCommands.current.entries(),
+                    ).filter(([, timestamp]) => now - timestamp < 1000);
+
+                    if (recentCommands.length > 0) {
+                        const [command] = recentCommands[0];
+                        pendingFeederCommands.current.delete(command);
+
+                        terminalInstance.current?.writeln(
+                            color.blackBright('feeder  ') +
+                                '❌  ' +
+                                color.xterm(TERMINAL_GREY)(command) +
+                                ' - ' +
+                                color.xterm(TERMINAL_RED)(trimmedData),
+                        );
+                        return;
+                    }
+                }
+
+                if (pendingUserCommands.current.size > 0) {
+                    const recentUserCommands = Array.from(
+                        pendingUserCommands.current.entries(),
+                    ).filter(([, timestamp]) => now - timestamp < 1000);
+
+                    if (recentUserCommands.length > 0) {
+                        const [command] = recentUserCommands[0];
+                        pendingUserCommands.current.delete(command);
+
+                        terminalInstance.current?.writeln(
+                            color.blackBright('console') +
+                                ' ❌  ' +
+                                color.xterm(TERMINAL_GREY)(command) +
+                                ' - ' +
+                                color.xterm(TERMINAL_RED)(trimmedData),
+                        );
+                        return;
+                    }
+                }
+
                 const throttledWriteToTerminal = throttle(
                     writeToTerminal,
                     250,
@@ -227,6 +281,66 @@ const Terminal = (
                 );
                 throttledWriteToTerminal(data);
                 return;
+            }
+
+            const trimmedData = data.trim();
+
+            if (trimmedData === 'ok') {
+                const now = Date.now();
+
+                if (pendingFeederCommands.current.size > 0) {
+                    const recentCommands = Array.from(
+                        pendingFeederCommands.current.entries(),
+                    ).filter(([, timestamp]) => now - timestamp < 1000);
+
+                    if (recentCommands.length > 0) {
+                        const [command] = recentCommands[0];
+                        pendingFeederCommands.current.delete(command);
+
+                        terminalInstance.current?.writeln(
+                            color.blackBright('feeder  ') +
+                                '✅  ' +
+                                color.xterm(TERMINAL_GREY)(command),
+                        );
+                        return;
+                    }
+                }
+
+                if (pendingUserCommands.current.size > 0) {
+                    const recentUserCommands = Array.from(
+                        pendingUserCommands.current.entries(),
+                    ).filter(([, timestamp]) => now - timestamp < 1000);
+
+                    if (recentUserCommands.length > 0) {
+                        const [command] = recentUserCommands[0];
+                        pendingUserCommands.current.delete(command);
+
+                        terminalInstance.current?.writeln(
+                            color.blackBright('console') +
+                                ' ✅  ' +
+                                color.xterm(TERMINAL_GREY)(command),
+                        );
+                        return;
+                    }
+                }
+            }
+
+            const fiveMinutesAgo = Date.now() - 300000;
+            for (const [
+                command,
+                timestamp,
+            ] of pendingFeederCommands.current.entries()) {
+                if (timestamp < fiveMinutesAgo) {
+                    pendingFeederCommands.current.delete(command);
+                }
+            }
+            for (const [
+                command,
+                timestamp,
+            ] of pendingUserCommands.current.entries()) {
+                if (timestamp < fiveMinutesAgo) {
+                    pendingUserCommands.current.delete(command);
+                }
             }
 
             writeToTerminal(data);
