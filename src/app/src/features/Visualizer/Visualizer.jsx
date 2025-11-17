@@ -2375,6 +2375,7 @@ class Visualizer extends Component {
     }
 
     load(name, vizualization, callback) {
+        console.log('load');
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disabledLite, liteMode } =
