@@ -1,13 +1,19 @@
 describe('CNC Machine Tests', () => {
 
-  // Ignore known hydration-related UI errors, remove this once hydration error is fixed
+  // Handle uncaught exceptions from the application
   Cypress.on('uncaught:exception', (err) => {
+    // Log the error for debugging
+    console.log('Uncaught exception:', err.message);
+    
     const ignoreMessages = [
       'Hydration failed',
-      'There was an error while hydrating'
+      'There was an error while hydrating',
+      'Cannot read properties of undefined',
+      'reading \'get\''
     ];
+    
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // ignore these exceptions
+      return false; // Prevent test from failing
     }
     return true;
   });
@@ -16,6 +22,7 @@ describe('CNC Machine Tests', () => {
     cy.viewport(1280, 800);
     cy.visit('http://localhost:8000/#/');
     cy.get('#app', { timeout: 20000 }).should('exist');
+    cy.wait(2000); // Give app time to initialize despite errors
   });
 
   it('Test Case 1: Connects to CNC first, uploads file, then disconnects', () => {

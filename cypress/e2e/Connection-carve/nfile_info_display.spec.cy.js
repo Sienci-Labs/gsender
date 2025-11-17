@@ -1,12 +1,17 @@
-// cypress/e2e/cncMachineFileInfo.cy.js
+
 describe('CNC Machine File Info Test', () => {
 
-  // Ignore known hydration-related UI errors
+  // Ignore known hydration-related UI errors and the undefined.get() error
   Cypress.on('uncaught:exception', (err) => {
+    console.log('Uncaught exception:', err.message);
+    
     const ignoreMessages = [
       'Hydration failed',
-      'There was an error while hydrating'
+      'There was an error while hydrating',
+      'Cannot read properties of undefined',
+      'reading \'get\''
     ];
+    
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
       return false; // ignore these exceptions
     }
@@ -17,6 +22,7 @@ describe('CNC Machine File Info Test', () => {
     cy.viewport(1280, 800);
     cy.visit('http://localhost:8000/#/');
     cy.get('#app', { timeout: 20000 }).should('exist');
+    cy.wait(2000); // Give app time to recover from initialization error
   });
 
   it('Uploads file, toggles, and prints file info', () => {

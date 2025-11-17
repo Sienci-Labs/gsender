@@ -1,6 +1,6 @@
 // ***********************************************
 // cypress/support/commands.js
-// Custom commands for CNC machine
+// Custom commands for Gsender
 // ***********************************************
 
 // ----------------------
@@ -76,4 +76,112 @@ Cypress.Commands.add('uploadGcodeFile', (fileName = 'sample.gcode') => {
     .selectFile(`cypress/fixtures/${fileName}`, { force: true });
 
   cy.wait(5000);
+  
+  cy.log(` G-code file ${fileName} uploaded successfully`);
+}); // ← ADDED THIS CLOSING BRACE
+
+// ----------------------
+// Go to location
+// ----------------------
+Cypress.Commands.add('goToLocation', (options = {}) => {
+  const { 
+    x = 0, 
+    y = 0, 
+    z = 0, 
+    verifyPosition = true,
+    waitTime = 3000
+  } = options;
+
+  cy.log(`Opening "Go to Location" dialog for coordinates (${x}, ${y}, ${z})...`);
+  
+  // Open Go To Location popup
+  cy.get('div.min-h-10 button')
+    .should('be.visible')
+    .click({ force: true });
+
+  cy.wait(1000);
+  cy.log(' "Go to Location" button clicked');
+
+  // Enter coordinates
+  cy.log(`Entering coordinates: X=${x}, Y=${y}, Z=${z}...`);
+
+  cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
+    cy.log(`Found ${$inputs.length} number inputs`);
+    
+    // X input
+    cy.wrap($inputs[0])
+      .clear({ force: true })
+      .type(String(x), { force: true })
+      .should('have.value', String(x));
+    cy.log(` X coordinate: ${x}`);
+
+    // Y input  
+    cy.wrap($inputs[1])
+      .clear({ force: true })
+      .type(String(y), { force: true })
+      .should('have.value', String(y));
+    cy.log(` Y coordinate: ${y}`);
+
+    // Z input
+    cy.wrap($inputs[2])
+      .focus()
+      .clear({ force: true })
+      .invoke('val', '')
+      .type(String(z), { force: true })
+      .blur()
+      .should('have.value', String(z));
+    cy.log(` Z coordinate: ${z}`);
+  });
+
+  cy.wait(500);
+
+  // Click Go button
+  cy.log('Clicking "Go!" button...');
+  cy.get('body > div:nth-of-type(2) button')
+    .contains('Go!')
+    .click({ force: true });
+  
+  cy.wait(2000);
+  cy.log('✓ Go button clicked');
+
+  // Close popup
+  cy.log('Closing popup...');
+  cy.get('body').click(50, 50, { force: true });
+  cy.wait(500);
+  cy.log('✓ Popup closed');
+
+  // Wait for machine to reach position
+  cy.log(`Waiting ${waitTime}ms for machine to reach position...`);
+  cy.wait(waitTime);
+
+  // Verify position (if enabled)
+  if (verifyPosition) {
+    cy.log('Verifying machine position...');
+    cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
+      .should('have.length', 3)
+      .then(($inputs) => {
+        const xValue = $inputs.eq(0).val();
+        const yValue = $inputs.eq(1).val();
+        const zValue = $inputs.eq(2).val();
+        
+        cy.log(`Current position: X=${xValue}, Y=${yValue}, Z=${zValue}`);
+        
+        const expectedX = parseFloat(x).toFixed(2);
+        const expectedY = parseFloat(y).toFixed(2);
+        const expectedZ = parseFloat(z).toFixed(2);
+        
+        cy.wrap($inputs.eq(0)).should('have.value', expectedX);
+        cy.wrap($inputs.eq(1)).should('have.value', expectedY);
+        cy.wrap($inputs.eq(2)).should('have.value', expectedZ);
+        
+        if (xValue === expectedX && yValue === expectedY && zValue === expectedZ) {
+          cy.log(` POSITION VERIFIED: Machine is at (${expectedX}, ${expectedY}, ${expectedZ}) ✓✓✓`);
+        } else {
+          cy.log(' POSITION MISMATCH');
+          throw new Error(`Expected (${expectedX}, ${expectedY}, ${expectedZ}) but got (${xValue}, ${yValue}, ${zValue})`);
+        }
+      });
+  }
+
+  cy.log(` Successfully moved to location (${x}, ${y}, ${z})`);
 });

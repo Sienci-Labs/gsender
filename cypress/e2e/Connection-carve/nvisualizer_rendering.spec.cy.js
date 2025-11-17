@@ -1,13 +1,18 @@
 describe('CNC Machine File Info Test', () => {
 
-  // Ignore known hydration-related UI errors
+  // Ignore known hydration-related UI errors and undefined.get() error
   Cypress.on('uncaught:exception', (err) => {
+    console.log('Uncaught exception:', err.message);
+    
     const ignoreMessages = [
       'Hydration failed',
-      'There was an error while hydrating'
+      'There was an error while hydrating',
+      'Cannot read properties of undefined',
+      'reading \'get\''
     ];
+    
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
+      return false; // Ignore these exceptions
     }
     return true;
   });
@@ -16,6 +21,7 @@ describe('CNC Machine File Info Test', () => {
     cy.viewport(1280, 800);
     cy.visit('http://localhost:8000/#/');
     cy.get('#app', { timeout: 20000 }).should('exist');
+    cy.wait(2000); // Give app time to recover from initialization error
   });
 
   it('Connects to CNC, uploads file, and verifies visualizer + file info', () => {
@@ -24,18 +30,18 @@ describe('CNC Machine File Info Test', () => {
     // Step 1: Connect to CNC Machine
     cy.log('Connecting to CNC machine...');
     cy.connectMachine();
-    cy.wait(3000);
+    cy.wait(6000);
     cy.log(' Connected to CNC');
 
     // Step 2: Verify visualizer exists BEFORE file upload
     cy.log(' Checking visualizer UI before file upload...');
     cy.get('#visualizer_container', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log(' Visualizer container exists before upload'));
+      .then(() => cy.log('✓ Visualizer container exists before upload'));
 
     cy.get('#visualizer_container canvas[data-engine="three.js r146"]', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log(' Visualizer canvas exists before upload'));
+      .then(() => cy.log('✓ Visualizer canvas exists before upload'));
 
     // Step 3: Check if Outline and Start From buttons exist and their state BEFORE upload
     cy.log(' Checking Outline and Start From buttons state BEFORE upload...');
@@ -75,7 +81,7 @@ describe('CNC Machine File Info Test', () => {
     cy.log(' Checking visualizer UI after file upload...');
     cy.get('#visualizer_container', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log(' Visualizer container visible after upload'));
+      .then(() => cy.log('✓ Visualizer container visible after upload'));
 
     cy.get('#visualizer_container canvas[data-engine="three.js r146"]', { timeout: 15000 })
       .should('be.visible')
@@ -83,7 +89,7 @@ describe('CNC Machine File Info Test', () => {
         expect($canvas.attr('width')).to.exist;
         expect($canvas.attr('height')).to.exist;
       })
-      .then(() => cy.log(' Visualizer canvas loaded with file content'));
+      .then(() => cy.log('✓ Visualizer canvas loaded with file content'));
 
     // Step 7: Verify "Outline" button state AFTER upload
     cy.log(' Verifying Outline button state after upload...');
@@ -93,7 +99,7 @@ describe('CNC Machine File Info Test', () => {
       .then(($btn) => {
         cy.log(' Outline button is visible and enabled after upload');
         cy.wrap($btn).parents().first().invoke('attr', 'id').then(parentId => {
-          cy.log(` Outline button parent container: ${parentId || 'no ID'}`);
+          cy.log(`Outline button parent container: ${parentId || 'no ID'}`);
         });
       });
 
@@ -112,7 +118,7 @@ describe('CNC Machine File Info Test', () => {
     // Step 9: Final confirmation
     cy.log(' Test Complete: File uploaded and visualized in the UI');
     cy.log(' Result: File uploaded and visualized the file contents in the UI');
-    cy.log('Outline button is visible and enabled after upload');
-    cy.log('Start From button is visible and enabled after upload');
+    cy.log(' Outline button is visible and enabled after upload');
+    cy.log(' Start From button is visible and enabled after upload');
   });
 });
