@@ -151,6 +151,7 @@ export function SettingRow({
     const handleSettingsChange = (index) => (value) => {
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
+            console.log(prev);
             const updated = [...prev];
             updated[index].value = value;
             updated[index].dirty = true;
