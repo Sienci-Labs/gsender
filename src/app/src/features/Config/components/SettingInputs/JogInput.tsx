@@ -43,6 +43,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                     onChange={(e) => customJogUpdater(e, 'xyStep')}
                     suffix={units}
                     value={convertedValue.xyStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -52,6 +53,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                     onChange={(e) => customJogUpdater(e, 'zStep')}
                     suffix={units}
                     value={convertedValue.zStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -61,6 +63,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                     onChange={(e) => customJogUpdater(e, 'aStep')}
                     suffix="deg"
                     value={convertedValue.aStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
@@ -70,6 +73,7 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                     onChange={(e) => customJogUpdater(e, 'feedrate')}
                     suffix={`${units}/min`}
                     value={convertedValue.feedrate}
+                    min={0.001}
                 />
             </div>
         </div>

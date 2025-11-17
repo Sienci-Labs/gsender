@@ -99,6 +99,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     value={currentValue}
                     onChange={(e) => onChange(Number(e.target.value))}
                     className="flex-1"
+                    min={0.001}
                 />
                 <Button
                     type="button"
