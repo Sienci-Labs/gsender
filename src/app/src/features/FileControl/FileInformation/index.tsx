@@ -36,6 +36,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
         useTypedSelector((state) => state.file);
 
     const [toggleInfo, setToggleInfo] = useState(false);
+    const [showEditor, setShowEditor] = useState(false);
     const [recentFiles, setRecentFiles] =
         useState<RecentFile[]>(getRecentFiles());
     const [lastJob, setLastJob] = useState<Job>(null);
@@ -60,6 +61,12 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             pubsub.subscribe('lastJob', (_: string, job: Job) => {
                 setLastJob(job);
             }),
+            pubsub.subscribe(
+                'gcode-editor:toggle',
+                (_: string, isVisible: boolean) => {
+                    setShowEditor(isVisible);
+                },
+            ),
         ];
         return () => {
             tokens.forEach((token) => {
@@ -67,6 +74,16 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             });
         };
     }, []);
+
+    useEffect(() => {
+        pubsub.publish('gcode-editor:toggle', showEditor);
+    }, [showEditor]);
+
+    useEffect(() => {
+        if (!fileLoaded && showEditor) {
+            setShowEditor(false);
+        }
+    }, [fileLoaded, showEditor]);
 
     if (fileProcessing) {
         return <LoadingAnimation />;
@@ -269,9 +286,18 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                     <span className="text-gray-500">Size</span>
                 </div>
 
-                <div className="flex-grow flex justify-center items-center min-w-[120px]">
-                    <ToggleOutput />
-                </div>
+                <ToggleOutput />
+
+                {fileLoaded && (
+                    <div className="flex flex-col items-center mr-1">
+                        <span className="text-gray-500">Editor</span>
+                        <Switch
+                            checked={showEditor}
+                            onChange={() => setShowEditor((prev) => !prev)}
+                            position="vertical"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
