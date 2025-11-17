@@ -236,7 +236,6 @@ class Visualizer extends Component {
             );
         },
         loadGCode: (name, vizualization, size) => {
-            console.log('loadgCode');
             const capable = {
                 view3D: !!this.visualizer,
             };

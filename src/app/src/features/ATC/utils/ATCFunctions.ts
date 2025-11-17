@@ -8,6 +8,7 @@ import {
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import * as THREE from 'three';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');
