@@ -8,7 +8,7 @@ interface InputProps extends React.ComponentProps<'input'> {
     externalOnChange: (value: string) => void;
 }
 
-const ControlledInput = ({
+const ControlledNumberInput = ({
     className,
     value,
     type = 'decimal',
@@ -30,7 +30,7 @@ const ControlledInput = ({
     };
 
     const onBlur = (e) => {
-        if (localValue && localValue !== originalValue) {
+        if (localValue && truncateDecimal(localValue) !== originalValue) {
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -47,19 +47,26 @@ const ControlledInput = ({
     };
 
     const onChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        setLocalValue(truncateDecimal(inputRef.current.value));
         if (externalOnChange) {
-            externalOnChange(inputRef.current.value);
+            externalOnChange(truncateDecimal(inputRef.current.value));
         }
     };
 
     const localChange = (e) => {
+        console.log(inputRef.current.value);
         setLocalValue(inputRef.current.value);
     };
 
+    const truncateDecimal = (value: any) => {
+        if (type === 'decimal') {
+            return Number(Number(value).toFixed(3));
+        }
+        return value;
+    };
     return (
         <Input
-            type={type}
+            type="number"
             className={className}
             ref={inputRef}
             onFocus={onFocus}
@@ -72,4 +79,4 @@ const ControlledInput = ({
     );
 };
 
-export default ControlledInput;
+export default ControlledNumberInput;
