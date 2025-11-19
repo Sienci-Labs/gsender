@@ -169,7 +169,7 @@ const PrimaryVisualizer = ({
                     {isEditorMounted && (
                         <div
                             className={cx(
-                                'absolute top-0 left-0 right-0 bottom-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ease-in-out',
+                                'absolute top-0 left-0 right-0 bottom-0 z-20 flex items-center justify-center p-4 transition-opacity duration-200 ease-in-out',
                                 {
                                     'opacity-0 pointer-events-none':
                                         !showEditor,
