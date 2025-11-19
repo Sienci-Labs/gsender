@@ -386,7 +386,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-white dark:bg-dark rounded-md shadow-lg">
+        <div className="w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg">
             <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
@@ -568,6 +568,18 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 }
                             };
 
+                            const getLineClassName = () => {
+                                if (isSelected) {
+                                    return 'bg-blue-100 dark:bg-blue-900/30';
+                                }
+                                if (lineStatus !== 'none') {
+                                    return getLineStatusClass();
+                                }
+                                if (index % 2 === 0) {
+                                    return 'bg-gray-200 dark:bg-dark-lighter';
+                                }
+                                return 'hover:bg-gray-100 dark:hover:bg-dark-lighter/50';
+                            };
                             return (
                                 <div
                                     key={index}
@@ -578,17 +590,12 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                         right: 0,
                                         height: LINE_HEIGHT,
                                     }}
-                                    className={`flex items-center py-1 px-2 transition-colors group ${
-                                        isSelected
-                                            ? 'bg-blue-100 dark:bg-blue-900/30'
-                                            : lineStatus !== 'none'
-                                              ? getLineStatusClass()
-                                              : index % 2 === 0
-                                                ? 'bg-gray-200 dark:bg-dark-lighter'
-                                                : 'hover:bg-gray-100 dark:hover:bg-dark-lighter/50'
-                                    } ${isJobRunning ? 'cursor-not-allowed' : ''}`}
+                                    className={cn(
+                                        'flex items-center py-1 px-2 transition-colors group',
+                                        getLineClassName(),
+                                        { 'cursor-not-allowed': isJobRunning },
+                                    )}
                                 >
-                                    {/* Selection checkbox */}
                                     <div
                                         className={`flex items-center justify-center w-6 h-6 mr-3 rounded transition-colors flex-shrink-0 ${
                                             isJobRunning

@@ -171,11 +171,10 @@ const PrimaryVisualizer = ({
                             className={cx(
                                 'absolute top-0 left-0 right-0 bottom-0 z-20 flex items-center justify-center p-4 transition-opacity duration-200 ease-in-out',
                                 {
-                                    'opacity-0 pointer-events-none':
+                                    'opacity-0 pointer-events-none bg-transparent':
                                         !showEditor,
-                                    'opacity-100': showEditor,
-                                    'bg-black bg-opacity-50': showEditor,
-                                    'bg-transparent': !showEditor,
+                                    'opacity-100 bg-black bg-opacity-50':
+                                        showEditor,
                                 },
                             )}
                         >
