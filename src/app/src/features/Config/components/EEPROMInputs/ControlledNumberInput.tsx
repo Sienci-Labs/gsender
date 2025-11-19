@@ -1,12 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-const ControlledInput = ({
+import { Input } from 'app/components/shadcn/Input';
+
+interface InputProps extends React.ComponentProps<'input'> {
+    className: string;
+    value: any;
+    externalOnChange: (value: string) => void;
+}
+
+const ControlledNumberInput = ({
     className,
     value,
     type = 'decimal',
     externalOnChange = null,
     ...rest
-}) => {
+}: InputProps) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);
@@ -22,9 +30,7 @@ const ControlledInput = ({
     };
 
     const onBlur = (e) => {
-        const current = inputRef.current.value;
-        if (localValue && localValue !== originalValue) {
-            setLocalValue(current);
+        if (localValue && truncateDecimal(localValue) !== originalValue) {
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -41,18 +47,26 @@ const ControlledInput = ({
     };
 
     const onChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        setLocalValue(truncateDecimal(inputRef.current.value));
         if (externalOnChange) {
-            externalOnChange(inputRef.current.value);
+            externalOnChange(truncateDecimal(inputRef.current.value));
         }
     };
 
     const localChange = (e) => {
+        console.log(inputRef.current.value);
         setLocalValue(inputRef.current.value);
     };
+
+    const truncateDecimal = (value: any) => {
+        if (type === 'decimal') {
+            return Number(Number(value).toFixed(3));
+        }
+        return value;
+    };
     return (
-        <input
-            type={type}
+        <Input
+            type="number"
             className={className}
             ref={inputRef}
             onFocus={onFocus}
@@ -65,4 +79,4 @@ const ControlledInput = ({
     );
 };
 
-export default ControlledInput;
+export default ControlledNumberInput;

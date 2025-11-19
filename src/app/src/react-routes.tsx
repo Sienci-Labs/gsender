@@ -2,7 +2,6 @@ import { Routes, Route, Outlet } from 'react-router';
 import noop from 'lodash/noop';
 import Workspace from './workspace';
 import { Config } from './features/Config';
-import Firmware from './features/Firmware';
 import KeyboardShortcuts from './features/Keyboard';
 import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
@@ -10,7 +9,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
@@ -123,13 +122,6 @@ export const ReactRoutes = () => {
                                         icon={FaSdCard}
                                         link={'/tools/sd'}
                                     />
-
-                                    <ToolCard
-                                        title="Old Firmware"
-                                        description="This is depreciated and used to be used for updating firmware"
-                                        icon={FaMicrochip}
-                                        link="/tools/firmware"
-                                    />
                                 </div>
                             </div>
                         }
@@ -221,20 +213,6 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <SDCard />
-                            </Page>
-                        }
-                    />
-                    <Route
-                        path="firmware"
-                        element={
-                            <Page
-                                title="Firmware (Legacy)"
-                                withGoBackButton
-                                withFixedArea
-                            >
-                                <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
-                                    <Firmware />
-                                </div>
                             </Page>
                         }
                     />

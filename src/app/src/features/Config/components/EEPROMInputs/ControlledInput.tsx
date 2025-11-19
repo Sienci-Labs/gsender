@@ -30,9 +30,7 @@ const ControlledInput = ({
     };
 
     const onBlur = (e) => {
-        const current = inputRef.current.value;
         if (localValue && localValue !== originalValue) {
-            setLocalValue(current);
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -58,6 +56,7 @@ const ControlledInput = ({
     const localChange = (e) => {
         setLocalValue(inputRef.current.value);
     };
+
     return (
         <Input
             type={type}

@@ -25,6 +25,7 @@ import { GRBLHAL } from 'app/constants';
 import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
 import Tooltip from 'app/components/Tooltip';
 import pubsub from 'pubsub-js';
+import { EEPROM } from 'app/definitions/firmware';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -148,7 +149,7 @@ export function SettingRow({
         isHidden = setting.hidden();
     }
 
-    const handleSettingsChange = (index) => (value) => {
+    const handleSettingsChange = (index: number) => (value: any) => {
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
             const updated = [...prev];
@@ -158,7 +159,13 @@ export function SettingRow({
         });
     };
 
-    function handleSingleSettingReset(setting, value) {
+    function handleSingleSettingReset(setting: EEPROM, value: string | number) {
+        setEEPROM((prev) => {
+            const updated = [...prev];
+            updated[updated.findIndex((val) => val.setting === setting)].dirty =
+                false;
+            return updated;
+        });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
         toast.success(`Restored ${setting} to default value of ${value}`, {
             position: 'bottom-right',

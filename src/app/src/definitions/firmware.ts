@@ -50,6 +50,7 @@ export interface FilteredEEPROM {
     dataType?: string;
     format?: string;
     unitString?: string;
+    dirty?: boolean;
 }
 
 export interface RotaryModeFirmwareSettings {

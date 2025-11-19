@@ -6,7 +6,7 @@ import {
 import store from 'app/store';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 
 import {
     GRBL_HAL_SETTINGS,
@@ -32,7 +32,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
-    EEPROM?: object;
+    EEPROM?: FilteredEEPROM[];
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
     machineProfile: MachineProfile;
@@ -64,7 +64,16 @@ const defaultState: iSettingsContext = {
     settings: SettingsMenu,
     settingsToUpdate: {},
     EEPROMToUpdate: {},
-    EEPROM: {},
+    EEPROM: [
+        {
+            unit: '',
+            setting: '$',
+            globalIndex: 0,
+            value: '',
+            group: '',
+            groupID: 0,
+        },
+    ],
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
@@ -221,12 +230,24 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }
 
     function repopulateEEPROM() {
+        const detectedE = get(
+            reduxStore.getState(),
+            'controller.settings.settings',
+        );
+        const detectedDesc = get(
+            reduxStore.getState(),
+            'controller.settings.descriptions',
+        );
+        const detectedGroups = get(
+            reduxStore.getState(),
+            'controller.settings.groups',
+        );
         setEEPROM(
             getFilteredEEPROMSettings(
                 BASE_SETTINGS,
-                detectedEEPROM,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
+                detectedE,
+                detectedDesc,
+                detectedGroups,
             ),
         );
     }
@@ -250,14 +271,25 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [connectionState]);
 
     useEffect(() => {
-        setEEPROM(
-            getFilteredEEPROMSettings(
-                BASE_SETTINGS,
-                detectedEEPROM,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
-            ),
+        const filteredEEPROMSettings = getFilteredEEPROMSettings(
+            BASE_SETTINGS,
+            detectedEEPROM,
+            detectedEEPROMDescriptions,
+            detectedEEPROMGroups,
         );
+        // if the setting is dirty, keep the change
+        // this fixes the issue where resetting an eeprom also resets unsaved changes
+        const newEEPROM = filteredEEPROMSettings.map((eeprom) => {
+            const currentEEP = EEPROM.find(
+                (value) => value.setting === eeprom.setting,
+            );
+            if (currentEEP?.dirty) {
+                return currentEEP;
+            }
+            return eeprom;
+        });
+
+        setEEPROM(newEEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {
@@ -274,8 +306,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
         }
 
-        if (v.type === 'hybrid') {
-            // If filterNonDefault is enabled, make sure the current value equals the default value
+        if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
             return !eepromIsDefault(v);
         }
 
