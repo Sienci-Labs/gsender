@@ -105,12 +105,21 @@ function DRO({
         });
     }, []);
 
-    function jogToCorner(corner: string) {
+    function jogToCorner(
+        corner: string,
+        homingDir?: string,
+        homingFl?: boolean,
+        pullO?: string | number,
+    ) {
+        const currentHomingDir = homingDir || homingDirection;
+        const currentHomingFlag = homingFl || homingFlag;
+        const currentPullOff = pullO || pullOff;
+
         const gcode = getMovementGCode(
             corner,
-            homingDirection,
-            homingFlag,
-            Number(pullOff),
+            currentHomingDir,
+            currentHomingFlag,
+            Number(currentPullOff),
         );
         controller.command('gcode', gcode);
     }
@@ -321,7 +330,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(BACK_LEFT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(BACK_LEFT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
@@ -336,7 +359,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(BACK_RIGHT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(BACK_RIGHT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
@@ -351,7 +388,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(FRONT_LEFT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(FRONT_LEFT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
@@ -366,7 +417,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(FRONT_RIGHT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(FRONT_RIGHT, homingDir, homingFl, pullO);
             },
         },
     };

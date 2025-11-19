@@ -8,6 +8,7 @@ export interface HybridNumberInputProps {
     index: number;
     subIndex: number;
     eepromKey: string;
+    forceEEPROM?: boolean;
 }
 
 export function HybridNumber({
@@ -15,12 +16,14 @@ export function HybridNumber({
     value,
     eepromKey,
     onChange,
+    forceEEPROM = false,
 }: HybridNumberInputProps) {
     const { firmwareType, connected, EEPROM, setEEPROM, setSettingsAreDirty } =
         useSettings();
     const [eepromObject, setEEPROMObject] = useState({});
 
-    const useEEPROM = connected && firmwareType === 'grblHAL';
+    const useEEPROM =
+        (connected && firmwareType === 'grblHAL') || (connected && forceEEPROM);
 
     useEffect(() => {
         let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
