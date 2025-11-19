@@ -386,7 +386,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg">
+        <div className="w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg rounded-md overflow-hidden dark:border dark:border-dark-lighter">
             <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
