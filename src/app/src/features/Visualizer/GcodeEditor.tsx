@@ -572,14 +572,50 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 if (isSelected) {
                                     return 'bg-blue-100 dark:bg-blue-900/30';
                                 }
+
                                 if (lineStatus !== 'none') {
                                     return getLineStatusClass();
                                 }
+
                                 if (index % 2 === 0) {
                                     return 'bg-gray-200 dark:bg-dark-lighter';
                                 }
+
                                 return 'hover:bg-gray-100 dark:hover:bg-dark-lighter/50';
                             };
+
+                            const getInnerLineClassName = () => {
+                                if (isSelected) {
+                                    return 'text-blue-700 dark:text-blue-300 font-medium';
+                                }
+
+                                if (lineStatus === 'current') {
+                                    return 'text-yellow-900 dark:text-yellow-100 font-medium';
+                                }
+
+                                if (lineStatus === 'processed') {
+                                    return 'text-green-700 dark:text-green-300';
+                                }
+
+                                return 'text-muted-foreground';
+                            };
+
+                            const getInputClassName = () => {
+                                if (isSelected) {
+                                    return 'text-blue-900 dark:text-blue-100';
+                                }
+
+                                if (lineStatus === 'current') {
+                                    return 'text-yellow-900 dark:text-yellow-100 font-medium';
+                                }
+
+                                if (lineStatus === 'processed') {
+                                    return 'text-green-900 dark:text-green-100';
+                                }
+
+                                return 'dark:text-white';
+                            };
+
                             return (
                                 <div
                                     key={index}
@@ -634,15 +670,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                         )}
                                     </div>
                                     <span
-                                        className={`mr-4 min-w-[60px] text-right select-none ${
-                                            isSelected
-                                                ? 'text-blue-700 dark:text-blue-300 font-medium'
-                                                : lineStatus === 'current'
-                                                  ? 'text-yellow-700 dark:text-yellow-300 font-bold'
-                                                  : lineStatus === 'processed'
-                                                    ? 'text-green-700 dark:text-green-300'
-                                                    : 'text-muted-foreground'
-                                        }`}
+                                        className={cn(
+                                            'dark:text-white mr-4 min-w-[60px] text-right select-none',
+                                            getInnerLineClassName(),
+                                        )}
                                     >
                                         {index + 1}
                                         {lineStatus === 'current' && (
@@ -687,15 +718,14 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                             }
                                         }}
                                         disabled={isJobRunning}
-                                        className={`flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1 ${
-                                            isSelected
-                                                ? 'text-blue-900 dark:text-blue-100'
-                                                : lineStatus === 'current'
-                                                  ? 'text-yellow-900 dark:text-yellow-100 font-medium'
-                                                  : lineStatus === 'processed'
-                                                    ? 'text-green-900 dark:text-green-100'
-                                                    : 'dark:text-white'
-                                        } ${isJobRunning ? 'cursor-not-allowed opacity-75' : ''}`}
+                                        className={cn(
+                                            'flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1',
+                                            getInputClassName(),
+                                            {
+                                                'cursor-not-allowed opacity-75':
+                                                    isJobRunning,
+                                            },
+                                        )}
                                     />
                                 </div>
                             );
