@@ -20,8 +20,8 @@ type GcodeEditorProps = {
     onClose: () => void;
 };
 
-const LINE_HEIGHT = 32; // Height of each line in pixels
-const OVERSCAN = 10; // Number of lines to render outside the visible area
+const LINE_HEIGHT = 32;
+const OVERSCAN = 10;
 
 const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     const { content, name } = useTypedSelector((state) => state.file);
@@ -48,14 +48,12 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         workflowState === WORKFLOW_STATE_PAUSED;
     const currentLineRunning = senderStatus?.currentLineRunning ?? -1;
 
-    // Split content into lines asynchronously to avoid blocking UI
     useEffect(() => {
         if (content) {
-            // Use setTimeout to defer the splitting to avoid blocking the UI
             const timeoutId = setTimeout(() => {
                 const lines = content.split('\n');
                 setGcodeLines(lines);
-                setOriginalLines(lines); // Store original for revert
+                setOriginalLines(lines);
                 setHasChanges(false);
             }, 0);
             return () => clearTimeout(timeoutId);
@@ -65,7 +63,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         }
     }, [content]);
 
-    // Calculate visible range
     const visibleRange = useMemo(() => {
         const start = Math.max(
             0,
@@ -78,37 +75,30 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         return { start, end };
     }, [scrollTop, containerHeight, gcodeLines.length]);
 
-    // Handle scroll
     const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
         setScrollTop(e.currentTarget.scrollTop);
     }, []);
 
-    // Measure container height
     useEffect(() => {
         const updateHeight = () => {
             if (scrollContainerRef.current) {
                 setContainerHeight(scrollContainerRef.current.clientHeight);
             }
         };
-        // Use requestAnimationFrame to ensure DOM is ready
         requestAnimationFrame(updateHeight);
         window.addEventListener('resize', updateHeight);
         return () => window.removeEventListener('resize', updateHeight);
     }, []);
 
-    // Calculate total height for scrollbar
     const totalHeight = gcodeLines.length * LINE_HEIGHT;
 
-    // Clear selection and auto-scroll when job starts running
     useEffect(() => {
         if (isJobRunning) {
-            // Clear selection when job starts
             setSelectedLines(new Set());
             setLastSelectedIndex(null);
         }
     }, [isJobRunning]);
 
-    // Auto-scroll to current line when job is running
     useEffect(() => {
         if (
             isJobRunning &&
@@ -121,9 +111,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             const scrollTop = container.scrollTop;
             const scrollBottom = scrollTop + container.clientHeight;
 
-            // Only scroll if current line is not visible
             if (lineTop < scrollTop || lineBottom > scrollBottom) {
-                // Scroll to center the current line
                 const targetScroll =
                     lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
                 container.scrollTo({
@@ -136,7 +124,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
     const handleLineChange = (index: number, value: string) => {
         if (isJobRunning) {
-            return; // Disable editing when job is running
+            return;
         }
         const newLines = [...gcodeLines];
         newLines[index] = value;
@@ -144,11 +132,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         setHasChanges(true);
     };
 
-    // Handle checkbox click - always toggles selection
     const handleCheckboxClick = useCallback(
         (index: number, e: React.MouseEvent) => {
             if (isJobRunning) {
-                return; // Disable selection when job is running
+                return;
             }
             e.preventDefault();
             e.stopPropagation();
@@ -164,10 +151,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     newSelection.add(i);
                 }
             } else {
-                // Always toggle when clicking checkbox
                 if (newSelection.has(index)) {
                     newSelection.delete(index);
-                    // If we deselected the last selected index, find a new one
                     if (lastSelectedIndex === index && newSelection.size > 0) {
                         newLastSelectedIndex = Math.max(
                             ...Array.from(newSelection),
@@ -186,11 +171,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         [selectedLines, lastSelectedIndex, isJobRunning],
     );
 
-    // Handle line click - for clicking on the line itself (not checkbox)
     const handleLineClick = useCallback(
         (index: number, e: React.MouseEvent) => {
             if (isJobRunning) {
-                return; // Disable selection when job is running
+                return;
             }
             e.preventDefault();
             e.stopPropagation();
@@ -199,17 +183,14 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             let newLastSelectedIndex: number | null = index;
 
             if (e.shiftKey && lastSelectedIndex !== null) {
-                // Range selection with Shift
                 const start = Math.min(lastSelectedIndex, index);
                 const end = Math.max(lastSelectedIndex, index);
                 for (let i = start; i <= end; i++) {
                     newSelection.add(i);
                 }
             } else if (e.ctrlKey || e.metaKey) {
-                // Toggle selection with Ctrl/Cmd
                 if (newSelection.has(index)) {
                     newSelection.delete(index);
-                    // If we deselected the last selected index, find a new one
                     if (lastSelectedIndex === index && newSelection.size > 0) {
                         newLastSelectedIndex = Math.max(
                             ...Array.from(newSelection),
@@ -221,12 +202,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     newSelection.add(index);
                 }
             } else {
-                // Single selection - if clicking the only selected line, deselect it
                 if (newSelection.size === 1 && newSelection.has(index)) {
                     newSelection.clear();
                     newLastSelectedIndex = null;
                 } else {
-                    // Otherwise, select just this line
                     newSelection.clear();
                     newSelection.add(index);
                 }
@@ -239,7 +218,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     );
 
     const handleContainerClick = useCallback((e: React.MouseEvent) => {
-        // Deselect all when clicking on empty space
         if (
             e.target === e.currentTarget ||
             (e.target as HTMLElement).classList.contains('line-container')
@@ -249,7 +227,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         }
     }, []);
 
-    // Handle delete selected lines
     const handleDeleteSelected = useCallback(() => {
         if (isJobRunning || selectedLines.size === 0) return;
 
@@ -264,10 +241,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         setLastSelectedIndex(null);
     }, [gcodeLines, selectedLines, isJobRunning]);
 
-    // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Only handle shortcuts if editor container is focused or contains focused element
             const container = scrollContainerRef.current;
             if (!container || !container.contains(document.activeElement)) {
                 return;
@@ -282,29 +257,19 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 ? (activeElement as HTMLInputElement).selectionStart || 0
                 : 0;
 
-            // Select all with Ctrl/Cmd+A
             if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
                 e.preventDefault();
                 const allIndices = new Set(gcodeLines.map((_, i) => i));
                 setSelectedLines(allIndices);
-            }
-            // Deselect with Escape
-            else if (e.key === 'Escape') {
+            } else if (e.key === 'Escape') {
                 if (selectedLines.size > 0) {
                     setSelectedLines(new Set());
                     setLastSelectedIndex(null);
                 }
-            }
-            // Delete selected lines with Delete or Backspace
-            else if (
+            } else if (
                 (e.key === 'Delete' || e.key === 'Backspace') &&
                 selectedLines.size > 0
             ) {
-                // Only delete lines if:
-                // 1. Not typing in input, OR
-                // 2. Input is empty, OR
-                // 3. Cursor is at start and Backspace, OR
-                // 4. Cursor is at end and Delete
                 const shouldDeleteLines =
                     !isInputFocused ||
                     inputValue === '' ||
@@ -533,8 +498,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             >
                 <div
                     className={`
-                        fixed bottom-2 right-2 z-10
-                        transition-opacity transition-transform
+                        fixed bottom-6 right-6 z-10
+                        transition-opacity
                         ${scrollTop > 500 ? 'pointer-events-auto' : 'pointer-events-none'}
                     `}
                     style={{
@@ -577,10 +542,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 | 'upcoming'
                                 | 'none' = 'none';
                             if (isJobRunning && currentLineRunning >= 0) {
-                                // currentLineRunning is 0-indexed and represents the line currently being executed
-                                // Lines before currentLineRunning are processed (already executed)
-                                // Lines at currentLineRunning and nearby are current (being executed)
-                                // Lines after are upcoming (will be executed)
                                 if (index < currentLineRunning) {
                                     lineStatus = 'processed';
                                 } else if (
@@ -705,13 +666,11 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                             )
                                         }
                                         onClick={(e) => {
-                                            // Select line when clicking on input
                                             if (!isSelected && !isJobRunning) {
                                                 handleLineClick(index, e);
                                             }
                                         }}
                                         onFocus={() => {
-                                            // Select line when focusing on input (if not already selected)
                                             if (!isSelected && !isJobRunning) {
                                                 const newSelection = new Set([
                                                     index,
