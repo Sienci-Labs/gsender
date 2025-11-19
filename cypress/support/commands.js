@@ -78,10 +78,10 @@ Cypress.Commands.add('uploadGcodeFile', (fileName = 'sample.gcode') => {
   cy.wait(5000);
   
   cy.log(` G-code file ${fileName} uploaded successfully`);
-}); // ← ADDED THIS CLOSING BRACE
+});
 
 // ----------------------
-// Go to location
+// Go to location grbl
 // ----------------------
 Cypress.Commands.add('goToLocation', (options = {}) => {
   const { 
@@ -96,8 +96,9 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
   
   // Open Go To Location popup
   cy.get('div.min-h-10 button')
-    .should('be.visible')
-    .click({ force: true });
+  .first()  // Click only the first button
+  .should('be.visible')
+  .click({ force: true });
 
   cy.wait(1000);
   cy.log(' "Go to Location" button clicked');
@@ -139,16 +140,16 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
   cy.log('Clicking "Go!" button...');
   cy.get('body > div:nth-of-type(2) button')
     .contains('Go!')
-    .click({ force: true });
+    .click({ force: true, multiple: true });
   
   cy.wait(2000);
-  cy.log('✓ Go button clicked');
+  cy.log(' Go button clicked');
 
   // Close popup
   cy.log('Closing popup...');
   cy.get('body').click(50, 50, { force: true });
   cy.wait(500);
-  cy.log('✓ Popup closed');
+  cy.log(' Popup closed');
 
   // Wait for machine to reach position
   cy.log(`Waiting ${waitTime}ms for machine to reach position...`);
@@ -184,4 +185,62 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
   }
 
   cy.log(` Successfully moved to location (${x}, ${y}, ${z})`);
+});
+
+/// ============Go to location grlHal===============
+                //GO TO LOCATION//
+Cypress.Commands.add('grblHalGoToLocation', (x = 0, y = 0, z = 0) => {
+
+  // Step 3: Open Go To Location popup
+  cy.log('Opening Go to Location popup...');
+  cy.get('svg path[d*="M498.1 5.6c10.1 7"]').parent().click({ force: true });
+
+  cy.wait(1000);
+  cy.log('"Go to Location" popup opened');
+
+  // Step 4: Enter coordinates in all input fields
+  cy.log('Entering X, Y, Z values...');
+
+  cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
+    cy.log(`Found ${$inputs.length} number inputs`);
+
+    cy.wrap($inputs[0])
+      .clear({ force: true })
+      .type(String(x), { force: true })
+      .should('have.value', String(x));
+
+    cy.wrap($inputs[1])
+      .clear({ force: true })
+      .type(String(y), { force: true })
+      .should('have.value', String(y));
+
+    cy.wrap($inputs[2])
+      .focus()
+      .clear({ force: true })
+      .invoke('val', '')
+      .type(String(z), { force: true })
+      .blur()
+      .should('have.value', String(z));
+  });
+
+  cy.wait(500);
+
+  // Step 5: Click Go button
+  cy.log('Clicking Go button...');
+  cy.get('body > div:nth-of-type(2) button')
+    .contains('Go!')
+    .click({ force: true });
+
+  cy.wait(2000);
+  cy.log('Go button clicked');
+
+  // Step 6: Close popup
+  cy.log('Closing popup...');
+  cy.get('body').click(50, 50, { force: true });
+  cy.wait(500);
+  cy.log('Popup closed');
+
+  // Step 7: Wait for machine movement
+  cy.log('Waiting for machine to reach position...');
+  cy.wait(3000);
 });
