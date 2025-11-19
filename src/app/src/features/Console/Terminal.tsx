@@ -265,7 +265,7 @@ const Terminal = (
 
                         terminalInstance.current?.writeln(
                             '❌  ' +
-                                color.blackBright('console') +
+                                color.blackBright('console ') +
                                 +color.xterm(TERMINAL_GREY)(command) +
                                 ' - ' +
                                 color.xterm(TERMINAL_RED)(trimmedData),
@@ -299,7 +299,7 @@ const Terminal = (
 
                         terminalInstance.current?.writeln(
                             '✅  ' +
-                                color.blackBright('feeder  ') +
+                                color.blackBright('feeder ') +
                                 color.xterm(TERMINAL_GREY)(command),
                         );
                         return;
@@ -317,7 +317,7 @@ const Terminal = (
 
                         terminalInstance.current?.writeln(
                             '✅  ' +
-                                color.blackBright('console') +
+                                color.blackBright('console ') +
                                 color.xterm(TERMINAL_GREY)(command),
                         );
                         return;
