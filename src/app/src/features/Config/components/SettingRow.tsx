@@ -153,6 +153,7 @@ export function SettingRow({
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
             const updated = [...prev];
+            updated[index].prevValue = updated[index].value;
             updated[index].value = value;
             updated[index].dirty = true;
             return updated;
@@ -162,8 +163,12 @@ export function SettingRow({
     function handleSingleSettingReset(setting: EEPROM, value: string | number) {
         setEEPROM((prev) => {
             const updated = [...prev];
-            updated[updated.findIndex((val) => val.setting === setting)].dirty =
-                false;
+            const eeprom =
+                updated[updated.findIndex((val) => val.setting === setting)];
+            if (eeprom.dirty && eeprom.prevValue === value) {
+                eeprom.value = value;
+            }
+            eeprom.dirty = false;
             return updated;
         });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
@@ -172,7 +177,7 @@ export function SettingRow({
         });
     }
 
-    function handleProgramSettingReset(setting) {
+    function handleProgramSettingReset(setting: gSenderSetting) {
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
             const defaultVal = getEEPROMDefaultValue(setting.eID);
             if (defaultVal !== '-') {
