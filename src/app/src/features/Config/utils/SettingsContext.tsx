@@ -4,7 +4,7 @@ import {
     SettingsMenuSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import store from 'app/store';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, store as reduxStore } from 'app/store/redux';
 
@@ -20,6 +20,7 @@ import isEqual from 'lodash/isEqual';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import {
     EEPROM,
+    EEPROMDescriptions,
     EEPROMSettings,
     FilteredEEPROM,
     FIRMWARE_TYPES_T,
@@ -29,6 +30,8 @@ import pubsub from 'pubsub-js';
 import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { debounce } from 'lodash';
+import { BasicObject } from 'app/definitions/general';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -252,18 +255,120 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         );
     }
 
+    const updateEEPROM = useCallback(
+        debounce(
+            (
+                BASE_SETTINGS: typeof GRBL_HAL_SETTINGS | typeof GRBL_SETTINGS,
+                detectedEEPROM: EEPROMSettings,
+                detectedEEPROMDescriptions: EEPROMDescriptions,
+                detectedEEPROMGroups: BasicObject,
+                EEPROM: FilteredEEPROM[],
+            ) => {
+                const filteredEEPROMSettings = getFilteredEEPROMSettings(
+                    BASE_SETTINGS,
+                    detectedEEPROM,
+                    detectedEEPROMDescriptions,
+                    detectedEEPROMGroups,
+                );
+                // if the setting is dirty, keep the change
+                // this fixes the issue where resetting an eeprom also resets unsaved changes
+                const newEEPROM = filteredEEPROMSettings.map((eeprom) => {
+                    const currentEEP = EEPROM.find(
+                        (value) => value.setting === eeprom.setting,
+                    );
+                    if (currentEEP?.dirty) {
+                        return currentEEP;
+                    }
+                    return eeprom;
+                });
+
+                setEEPROM(newEEPROM);
+            },
+            500,
+        ),
+        [],
+    );
+
+    const updateEEPROMDesc = useCallback(
+        debounce(
+            (
+                settings: SettingsMenuSection[],
+                detectedEEPROMDescriptions: EEPROMDescriptions,
+            ) => {
+                if (!settings.length) {
+                    return;
+                }
+
+                const firmwareCurrent = firmwarePastVersion(
+                    ATCI_SUPPORTED_VERSION,
+                );
+
+                settings.map((ss) => {
+                    if (!ss || !ss.settings) {
+                        return;
+                    }
+                    ss.settings.map((s) => {
+                        s.settings.map((o) => {
+                            if (o.type == 'eeprom') {
+                                let eID = get(o, 'eID', null);
+                                // if remap and version match
+                                if (
+                                    Object.hasOwn(o, 'remap') &&
+                                    firmwareCurrent
+                                ) {
+                                    eID = get(o, 'remap', null);
+                                    o.remapped = true;
+                                }
+                                // set eID to remap, maybe some sort of remapped flag?
+                                if (eID) {
+                                    let oKey = Number(eID.replace('$', ''));
+                                    let oEEPROM = get(
+                                        detectedEEPROMDescriptions,
+                                        oKey,
+                                        '',
+                                    );
+                                    if (oEEPROM) {
+                                        o.description = get(
+                                            oEEPROM,
+                                            'details',
+                                            '',
+                                        );
+                                        o.label = get(
+                                            oEEPROM,
+                                            'description',
+                                            '',
+                                        );
+                                    }
+                                }
+                            }
+                        });
+                    });
+                });
+            },
+            500,
+        ),
+        [],
+    );
+
+    const updateRawEEPROM = useCallback(
+        debounce((detectedEEPROM: EEPROMSettings) => {
+            setRawEEPROM(detectedEEPROM);
+        }, 500),
+        [],
+    );
+
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
-            return repopulateSettings();
+            repopulateSettings();
         });
         pubsub.subscribe('eeprom:repopulate', () => {
-            return repopulateEEPROM();
+            repopulateEEPROM();
         });
     }, []);
 
     useEffect(() => {
-        setRawEEPROM(detectedEEPROM);
+        updateRawEEPROM(detectedEEPROM);
     }, [detectedEEPROM]);
 
     useEffect(() => {
@@ -271,25 +376,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }, [connectionState]);
 
     useEffect(() => {
-        const filteredEEPROMSettings = getFilteredEEPROMSettings(
+        updateEEPROM(
             BASE_SETTINGS,
             detectedEEPROM,
             detectedEEPROMDescriptions,
             detectedEEPROMGroups,
+            EEPROM,
         );
-        // if the setting is dirty, keep the change
-        // this fixes the issue where resetting an eeprom also resets unsaved changes
-        const newEEPROM = filteredEEPROMSettings.map((eeprom) => {
-            const currentEEP = EEPROM.find(
-                (value) => value.setting === eeprom.setting,
-            );
-            if (currentEEP?.dirty) {
-                return currentEEP;
-            }
-            return eeprom;
-        });
-
-        setEEPROM(newEEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {
@@ -443,42 +536,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     // Populate eeprom descriptions as needed
     useEffect(() => {
-        if (!settings.length) {
-            return;
-        }
-
-        const firmwareCurrent = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-
-        settings.map((ss) => {
-            if (!ss || !ss.settings) {
-                return;
-            }
-            ss.settings.map((s) => {
-                s.settings.map((o) => {
-                    if (o.type == 'eeprom') {
-                        let eID = get(o, 'eID', null);
-                        // if remap and version match
-                        if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
-                            eID = get(o, 'remap', null);
-                            o.remapped = true;
-                        }
-                        // set eID to remap, maybe some sort of remapped flag?
-                        if (eID) {
-                            let oKey = Number(eID.replace('$', ''));
-                            let oEEPROM = get(
-                                detectedEEPROMDescriptions,
-                                oKey,
-                                '',
-                            );
-                            if (oEEPROM) {
-                                o.description = get(oEEPROM, 'details', '');
-                                o.label = get(oEEPROM, 'description', '');
-                            }
-                        }
-                    }
-                });
-            });
-        });
+        updateEEPROMDesc(settings, detectedEEPROMDescriptions);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     const payload = {
