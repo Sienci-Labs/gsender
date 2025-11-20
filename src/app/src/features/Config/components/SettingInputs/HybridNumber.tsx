@@ -6,9 +6,10 @@ export interface HybridNumberInputProps {
     unit?: string;
     value: number;
     index: number;
-    subIndex: number;
+    subIndex?: number;
     eepromKey: string;
     forceEEPROM?: boolean;
+    onChange?: (v: any) => void;
 }
 
 export function HybridNumber({

@@ -31,11 +31,11 @@ interface SettingRowProps {
     setting: gSenderSetting;
     index?: number;
     subIndex?: number;
-    changeHandler: (v) => void;
+    changeHandler: (v: any) => void;
 }
 
 function returnSettingControl(
-    connected: boolean,
+    _connected: boolean,
     setting: gSenderSetting,
     value: gSenderSettingsValues = 0,
     index: number = -1,
@@ -84,7 +84,7 @@ function returnSettingControl(
         case 'ip':
             return (
                 <IPSettingInput
-                    ip={value as number[]}
+                    ip={value as unknown as number[]}
                     index={index}
                     onChange={handler}
                 />
@@ -105,7 +105,7 @@ function returnSettingControl(
         case 'location':
             return (
                 <LocationInput
-                    value={value as object}
+                    value={value as unknown as object}
                     onChange={handler}
                     unit={setting.unit}
                 />
@@ -121,7 +121,13 @@ function returnSettingControl(
         case 'wizard':
             return setting.wizard();
         case 'jog':
-            return <JogInput value={value} index={index} onChange={handler} />;
+            return (
+                <JogInput
+                    value={value as unknown as object}
+                    index={index}
+                    onChange={handler}
+                />
+            );
         default:
             return setting.type;
     }
@@ -200,7 +206,9 @@ export function SettingRow({
         pubsub.publish('programSettingReset', setting.key);
     }
 
-    const populatedValue = settingsValues[setting.globalIndex] || {};
+    const populatedValue = settingsValues[setting.globalIndex] || {
+        type: 'text',
+    };
 
     // if EEPROM or Hybrid and not connected, show nothing
     if (

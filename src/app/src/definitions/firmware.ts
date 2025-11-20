@@ -26,6 +26,7 @@ export interface EEPROMDescriptions {
 }
 
 export interface FilteredEEPROM {
+    key?: string;
     unit: string;
     setting: EEPROM;
     message?: string;
@@ -43,6 +44,7 @@ export interface FilteredEEPROM {
     requiredBit?: number;
     globalIndex: number;
     value: string;
+    prevValue?: string;
     description?: string;
     details?: string;
     group: BasicType;
