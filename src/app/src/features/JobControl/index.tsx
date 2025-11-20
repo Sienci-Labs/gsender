@@ -18,6 +18,7 @@ import ProgressArea from './ProgressArea';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
+import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
@@ -207,6 +208,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     return (
         <>
+            <SDCardProgress />
             <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea

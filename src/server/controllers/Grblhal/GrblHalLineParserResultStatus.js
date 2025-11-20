@@ -217,6 +217,20 @@ class GrblHalLineParserResultStatus {
             };
         }
 
+        if (_.has(result, 'SD')) {
+            console.log(line);
+            console.log(result.SD);
+            payload.SD = {
+                name: result.SD[1],
+                percentage: Number(result.SD[0])
+            };
+        } else {
+            payload.sdProgress = {
+                name: null,
+                percentage: 0
+            };
+        }
+
         return {
             type: GrblHalLineParserResultStatus,
             payload: payload
