@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import WoodcuttingProgress from 'app/features/JobControl/WoodcuttingProgress.tsx';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime.ts';
 
 export function SDCardProgress() {
     const [progress, setProgress] = useState({ name: null, percentage: 0 });
@@ -49,6 +50,9 @@ export function SDCardProgress() {
                             percentage={progress.percentage}
                             isPaused={false}
                         />
+                    </div>
+                    <div className="w-full flex flex-row justify-between gap-2 text-gray-400 text-sm whitespace-nowrap">
+                        <span>{`File: ${progress.name}`}</span>
                     </div>
                 </div>
             </div>
