@@ -12,8 +12,11 @@ export function SDCardProgress() {
     );
 
     useEffect(() => {
+        console.log(sdCardProgress);
         if (sdCardProgress) {
             setProgress(sdCardProgress);
+        } else {
+            setProgress({ name: null, percentage: 0 });
         }
     }, [sdCardProgress]);
 
@@ -51,8 +54,8 @@ export function SDCardProgress() {
                             isPaused={false}
                         />
                     </div>
-                    <div className="w-full flex flex-row justify-between gap-2 text-gray-400 text-sm whitespace-nowrap">
-                        <span>{`File: ${progress.name}`}</span>
+                    <div className="w-full flex flex-row gap-2 text-gray-400 text-sm whitespace-nowrap items-center justify-center">
+                        <span>{`${progress.name}`}</span>
                     </div>
                 </div>
             </div>

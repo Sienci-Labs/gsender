@@ -218,14 +218,12 @@ class GrblHalLineParserResultStatus {
         }
 
         if (_.has(result, 'SD')) {
-            console.log(line);
-            console.log(result.SD);
             payload.SD = {
                 name: result.SD[1],
                 percentage: Number(result.SD[0])
             };
         } else {
-            payload.sdProgress = {
+            payload.SD = {
                 name: null,
                 percentage: 0
             };
