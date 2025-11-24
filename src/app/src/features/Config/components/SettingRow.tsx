@@ -159,7 +159,10 @@ export function SettingRow({
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
             const updated = [...prev];
-            updated[index].prevValue = updated[index].value;
+            // save the value from before we started editing
+            if (!updated[index].ogValue) {
+                updated[index].ogValue = updated[index].value;
+            }
             updated[index].value = value;
             updated[index].dirty = true;
             return updated;
@@ -171,8 +174,16 @@ export function SettingRow({
             const updated = [...prev];
             const eeprom =
                 updated[updated.findIndex((val) => val.setting === setting)];
-            if (eeprom.dirty && eeprom.prevValue === value) {
+            // if the value is edited, but the original value that was saved is equal to the default value,
+            // we know that the eeprom in the firmware = default,
+            // so we can safely set it to the default here.
+            // we need to do this, because if the firmware value hasnt changed from default,
+            // then resetting it will NOT trigger a redux update,
+            // which means the config input will not update to show the default value -
+            // it will stay as the edited value.
+            if (eeprom.dirty && eeprom.ogValue === value) {
                 eeprom.value = value;
+                eeprom.ogValue = null;
             }
             eeprom.dirty = false;
             return updated;
@@ -188,6 +199,14 @@ export function SettingRow({
             const defaultVal = getEEPROMDefaultValue(setting.eID);
             if (defaultVal !== '-') {
                 handleSingleSettingReset(setting.eID, defaultVal);
+                // since hybrids are sometimes referenced using the settings values, we have to update that as well
+                store.set(setting.key, defaultVal);
+                setSettingsValues((prev) => {
+                    const updated = [...prev];
+                    updated[setting.globalIndex].value = defaultVal;
+                    updated[setting.globalIndex].dirty = false;
+                    return updated;
+                });
             } else {
                 toast.error(`No default found for $${setting.eID}.`);
             }

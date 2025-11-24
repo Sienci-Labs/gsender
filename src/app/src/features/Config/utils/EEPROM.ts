@@ -115,6 +115,7 @@ export function generateEEPROMSettings(eeprom: FilteredEEPROM[]) {
         if (setting.dirty) {
             toChange[setting.setting] = setting.value;
             setting.dirty = false;
+            setting.ogValue = null; // reset og value
         }
     });
     return toChange;

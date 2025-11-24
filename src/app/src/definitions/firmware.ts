@@ -44,7 +44,7 @@ export interface FilteredEEPROM {
     requiredBit?: number;
     globalIndex: number;
     value: string;
-    prevValue?: string;
+    ogValue?: string;
     description?: string;
     details?: string;
     group: BasicType;

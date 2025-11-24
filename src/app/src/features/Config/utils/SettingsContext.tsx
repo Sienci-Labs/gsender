@@ -500,10 +500,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return true; // default in cases where we don't know the default
         }
 
-        // Lookup hybrid current value because stored value is actually the local state
-        if ((settingData as gSenderSetting).type === 'hybrid') {
+        // if we are checking default for numbers, we need to include decimals
+        if (
+            (settingData as gSenderSetting).type === 'hybrid' ||
+            Number((settingData as FilteredEEPROM).dataType) === 5 || // integer
+            Number((settingData as FilteredEEPROM).dataType) === 6 // decimal
+        ) {
             return isEqual(
-                Number(detectedEEPROM[settingKey]).toFixed(3),
+                Number(settingData.value).toFixed(3),
                 Number(inputDefault).toFixed(3),
             );
         }
