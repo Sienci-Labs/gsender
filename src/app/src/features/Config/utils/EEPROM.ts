@@ -109,12 +109,13 @@ export const getDatatypeInput = (
     return halDatatypeMap[type] || String;
 };
 
-export function generateEEPROMSettings(eeprom) {
-    const toChange = {};
+export function generateEEPROMSettings(eeprom: FilteredEEPROM[]) {
+    const toChange: EEPROMSettings = {};
     eeprom.map((setting) => {
         if (setting.dirty) {
             toChange[setting.setting] = setting.value;
             setting.dirty = false;
+            setting.ogValue = null; // reset og value
         }
     });
     return toChange;

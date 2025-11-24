@@ -54,7 +54,6 @@ const ControlledNumberInput = ({
     };
 
     const localChange = (e) => {
-        console.log(inputRef.current.value);
         setLocalValue(inputRef.current.value);
     };
 

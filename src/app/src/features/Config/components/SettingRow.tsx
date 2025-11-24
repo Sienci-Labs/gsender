@@ -31,11 +31,11 @@ interface SettingRowProps {
     setting: gSenderSetting;
     index?: number;
     subIndex?: number;
-    changeHandler: (v) => void;
+    changeHandler: (v: any) => void;
 }
 
 function returnSettingControl(
-    connected: boolean,
+    _connected: boolean,
     setting: gSenderSetting,
     value: gSenderSettingsValues = 0,
     index: number = -1,
@@ -84,7 +84,7 @@ function returnSettingControl(
         case 'ip':
             return (
                 <IPSettingInput
-                    ip={value as number[]}
+                    ip={value as unknown as number[]}
                     index={index}
                     onChange={handler}
                 />
@@ -105,7 +105,7 @@ function returnSettingControl(
         case 'location':
             return (
                 <LocationInput
-                    value={value as object}
+                    value={value as unknown as object}
                     onChange={handler}
                     unit={setting.unit}
                 />
@@ -121,7 +121,13 @@ function returnSettingControl(
         case 'wizard':
             return setting.wizard();
         case 'jog':
-            return <JogInput value={value} index={index} onChange={handler} />;
+            return (
+                <JogInput
+                    value={value as unknown as object}
+                    index={index}
+                    onChange={handler}
+                />
+            );
         default:
             return setting.type;
     }
@@ -153,6 +159,10 @@ export function SettingRow({
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
             const updated = [...prev];
+            // save the value from before we started editing
+            if (!updated[index].ogValue) {
+                updated[index].ogValue = updated[index].value;
+            }
             updated[index].value = value;
             updated[index].dirty = true;
             return updated;
@@ -162,8 +172,20 @@ export function SettingRow({
     function handleSingleSettingReset(setting: EEPROM, value: string | number) {
         setEEPROM((prev) => {
             const updated = [...prev];
-            updated[updated.findIndex((val) => val.setting === setting)].dirty =
-                false;
+            const eeprom =
+                updated[updated.findIndex((val) => val.setting === setting)];
+            // if the value is edited, but the original value that was saved is equal to the default value,
+            // we know that the eeprom in the firmware = default,
+            // so we can safely set it to the default here.
+            // we need to do this, because if the firmware value hasnt changed from default,
+            // then resetting it will NOT trigger a redux update,
+            // which means the config input will not update to show the default value -
+            // it will stay as the edited value.
+            if (eeprom.dirty && eeprom.ogValue === value) {
+                eeprom.value = value;
+                eeprom.ogValue = null;
+            }
+            eeprom.dirty = false;
             return updated;
         });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
@@ -172,11 +194,19 @@ export function SettingRow({
         });
     }
 
-    function handleProgramSettingReset(setting) {
+    function handleProgramSettingReset(setting: gSenderSetting) {
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
             const defaultVal = getEEPROMDefaultValue(setting.eID);
             if (defaultVal !== '-') {
                 handleSingleSettingReset(setting.eID, defaultVal);
+                // since hybrids are sometimes referenced using the settings values, we have to update that as well
+                store.set(setting.key, defaultVal);
+                setSettingsValues((prev) => {
+                    const updated = [...prev];
+                    updated[setting.globalIndex].value = defaultVal;
+                    updated[setting.globalIndex].dirty = false;
+                    return updated;
+                });
             } else {
                 toast.error(`No default found for $${setting.eID}.`);
             }
@@ -195,7 +225,9 @@ export function SettingRow({
         pubsub.publish('programSettingReset', setting.key);
     }
 
-    const populatedValue = settingsValues[setting.globalIndex] || {};
+    const populatedValue = settingsValues[setting.globalIndex] || {
+        type: 'text',
+    };
 
     // if EEPROM or Hybrid and not connected, show nothing
     if (
