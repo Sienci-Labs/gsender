@@ -29,7 +29,6 @@
     "crc-full": "^1.1.0",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
-    "downloadjs": "^1.4.7",
     "electron-log": "^4.3.5",
     "electron-store": "~8.1.0",
     "electron-updater": "^5.3.0",
@@ -66,7 +65,6 @@
     "pubsub-js": "~1.9.4",
     "range_check": "~1.4.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^1.5.2",
     "react-dom": "^18.2.0",
     "react-icons": "^5.3.0",
     "react-infinite-tree": "~0.7.1",
@@ -125,5 +123,5 @@
     "type": "git",
     "url": "https://github.com/Sienci-Labs/gsender"
   },
-  "version": "1.6.0-Edge1"
+  "version": "1.6.0-Edge-1"
 }

@@ -1,29 +1,25 @@
-import {
-    gSenderSetting,
-    gSenderSubSection,
-} from 'app/features/Config/assets/SettingsMenu.ts';
+import { gSenderSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { matchesSearchTerm } from 'app/features/Config/utils/Settings.ts';
 import cn from 'classnames';
-import React from 'react';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
     label?: string;
     connected?: boolean;
     wizard?: () => JSX.Element;
+    showEEPROMOnly?: boolean;
 }
 export function SettingSection({
     settings = [],
     label = null,
     connected = false,
     wizard,
+    showEEPROMOnly,
 }: SettingSectionProps): JSX.Element {
-    const { setSettingsValues, setSettingsAreDirty, searchTerm } =
-        useSettings();
+    const { setSettingsValues, setSettingsAreDirty } = useSettings();
 
-    const changeHandler = (i) => (v) => {
+    const changeHandler = (i: number) => (v: any) => {
         setSettingsAreDirty(true);
 
         setSettingsValues((prev) => {
@@ -60,7 +56,7 @@ export function SettingSection({
                 },
             )}
         >
-            {label && (
+            {label && !showEEPROMOnly && (
                 <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
                     <span className="text-blue-500  text-xl">{label}</span>
                     {connected && wizard && wizard()}

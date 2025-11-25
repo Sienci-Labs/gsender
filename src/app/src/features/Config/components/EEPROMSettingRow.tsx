@@ -1,4 +1,3 @@
-import { gSenderEEPROMSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
@@ -8,11 +7,12 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from 'app/components/Tooltip';
+import { EEPROM } from 'app/definitions/firmware';
 
 interface EEPROMSettingRowProps {
     eID: string;
     changeHandler: (value: number) => void;
-    resetHandler: (k, v) => void;
+    resetHandler: (setting: EEPROM, value: string | number) => void;
     link?: string;
     linkLabel?: string;
 }
@@ -109,11 +109,11 @@ export function EEPROMSettingRow({
                         </Tooltip>
                     </span>
                 </div>
-                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 sm:order-none order-1">
+                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
                     {detailString}
                 </span>
                 <div
-                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-none order-2"
+                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-2 order-2"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -127,7 +127,7 @@ export function EEPROMSettingRow({
                         </div>
                     )}
                 </div>
-                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 justify-end">
+                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 order-3 justify-end">
                     {!isDefault && (
                         <Tooltip content="Reset to default value">
                             <button

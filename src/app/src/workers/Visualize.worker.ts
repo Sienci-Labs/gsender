@@ -639,7 +639,6 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     //const feedrateChanges = vm.getFeedrateChanges();
     fileInfo = vm.generateFileStats();
     fileInfo.toolchanges = toolchanges;
-    console.log(fileInfo);
 
     parsedDataToSend = {
         data: [],

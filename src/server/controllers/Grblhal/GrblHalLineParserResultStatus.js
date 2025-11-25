@@ -200,12 +200,8 @@ class GrblHalLineParserResultStatus {
         // Sko Keepout area
         if (_.has(result, 'ATCI')) {
             const values = result.ATCI;
-            const flags = values[4] || '';
+            const flags = values[0] || '';
             payload.keepout = {
-                xMin: values[1],
-                xMax: values[0],
-                yMin: values[3],
-                yMax: values[2],
                 flags: flags.split('')
             };
         }
@@ -218,6 +214,18 @@ class GrblHalLineParserResultStatus {
             payload.probe = {
                 type: Number(result.P[0]),
                 protected: result.P[1] === 'P'
+            };
+        }
+
+        if (_.has(result, 'SD')) {
+            payload.SD = {
+                name: result.SD[1],
+                percentage: Number(result.SD[0])
+            };
+        } else {
+            payload.SD = {
+                name: null,
+                percentage: 0
             };
         }
 

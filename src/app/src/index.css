@@ -78,6 +78,11 @@ html,
         max-height: calc(100vh - 64px - 1.125rem - 3rem);
     }
 
+    .fixed-config-area {
+        height: calc(100vh - 64px - 115px);
+        max-height: calc(100vh - 64px - 115px);
+    }
+
     .rapidButtonTransform {
         transform: scale(1.4) translatex(-25px) perspective(160px)
             rotateX(55deg);

@@ -2099,6 +2099,12 @@ class GrblController {
             ...context,
             source: WRITE_SOURCE_CLIENT
         });
+
+        this.emit('serialport:write', data, {
+            ...context,
+            source: WRITE_SOURCE_CLIENT
+        });
+
         log.silly(`> ${data}`);
     }
 
