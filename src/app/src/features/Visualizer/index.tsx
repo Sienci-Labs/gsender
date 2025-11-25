@@ -1562,6 +1562,7 @@ class Visualizer extends Component {
                 widgetContentRef={(ref) => {
                     this.widgetContent = ref;
                 }}
+                timeline={this.props.timeline}
             />
         );
 

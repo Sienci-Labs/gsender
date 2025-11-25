@@ -6,8 +6,10 @@ export interface HybridNumberInputProps {
     unit?: string;
     value: number;
     index: number;
-    subIndex: number;
+    subIndex?: number;
     eepromKey: string;
+    forceEEPROM?: boolean;
+    onChange?: (v: any) => void;
 }
 
 export function HybridNumber({
@@ -15,12 +17,14 @@ export function HybridNumber({
     value,
     eepromKey,
     onChange,
+    forceEEPROM = false,
 }: HybridNumberInputProps) {
     const { firmwareType, connected, EEPROM, setEEPROM, setSettingsAreDirty } =
         useSettings();
     const [eepromObject, setEEPROMObject] = useState({});
 
-    const useEEPROM = connected && firmwareType === 'grblHAL';
+    const useEEPROM =
+        (connected && firmwareType === 'grblHAL') || (connected && forceEEPROM);
 
     useEffect(() => {
         let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
@@ -32,16 +36,20 @@ export function HybridNumber({
 
     function hybridOnChange(v) {
         if (useEEPROM) {
-            const payload = { ...eepromObject, value: v, dirty: true };
+            let payload = { ...eepromObject, value: v, dirty: true };
             setEEPROM((prev) => {
                 const updated = [...prev];
+                // save the value from before we started editing
+                if (!payload.ogValue) {
+                    payload.ogValue = prev[payload.globalIndex].value;
+                }
                 updated[payload.globalIndex] = payload;
                 return updated;
             });
             setSettingsAreDirty(true);
-        } else {
-            onChange(v);
         }
+        // since hybrids are always referencing the settings values, we always have to update that as well
+        onChange(v);
     }
 
     // If we're connected and using SLB we use the EEPROM value

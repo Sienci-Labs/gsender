@@ -22,7 +22,6 @@ export const getProbeSettings = (): ProbeWidgetSettings => {
         'workspace.probeProfile.touchplateType',
     );
 
-    console.log(probeProfile);
     let probeThickness = probeProfile.zThickness.standardBlock;
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
         probeThickness = probeProfile.zThickness.autoZero;

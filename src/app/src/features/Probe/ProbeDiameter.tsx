@@ -271,41 +271,38 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         [handleChange, availableTools, units, value],
     );
 
-    const probeDiameterScrollUp = useCallback(() => {
-        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-            return;
-        }
+    const handleProbeDiameterScroll = useCallback(
+        (direction: 'up' | 'down') => {
+            if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
+                return;
+            }
 
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        if (currentIndex === -1) {
-            return;
-        }
+            const currentIndex = options.findIndex(
+                (opt) => opt.value === value,
+            );
+            if (currentIndex === -1) {
+                return;
+            }
 
-        let newIndex = currentIndex - 1;
-        if (newIndex < 0) {
-            newIndex = options.length - 1;
-        }
+            let newIndex = currentIndex + (direction === 'up' ? -1 : 1);
+            if (newIndex < 0) {
+                newIndex = options.length - 1;
+            }
 
-        handleChange(options[newIndex].value, options[newIndex].tool);
-    }, [handleChange, options, value]);
+            if (newIndex >= options.length) {
+                newIndex = 0;
+            }
 
-    const probeDiameterScrollDown = useCallback(() => {
-        if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-            return;
-        }
+            handleChange(options[newIndex].value, options[newIndex].tool);
+        },
+        [handleChange, options, value],
+    );
 
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        if (currentIndex === -1) {
-            return;
-        }
-
-        let newIndex = currentIndex + 1;
-        if (newIndex >= options.length) {
-            newIndex = 0;
-        }
-
-        handleChange(options[newIndex].value, options[newIndex].tool);
-    }, [handleChange, options, value]);
+    // Use a ref to always point to the latest scroll handler to avoid stale closures
+    const scrollHandlerRef = useRef(handleProbeDiameterScroll);
+    useEffect(() => {
+        scrollHandlerRef.current = handleProbeDiameterScroll;
+    }, [handleProbeDiameterScroll]);
 
     const shuttleControlEvents = useRef({
         PROBE_DIAMETER_SCROLL_UP: {
@@ -315,7 +312,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             preventDefault: false,
             isActive: true,
             category: PROBING_CATEGORY,
-            callback: probeDiameterScrollUp,
+            callback: () => scrollHandlerRef.current('up'),
         },
         PROBE_DIAMETER_SCROLL_DOWN: {
             title: 'Tool Diameter scroll down',
@@ -324,7 +321,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             preventDefault: false,
             isActive: true,
             category: PROBING_CATEGORY,
-            callback: probeDiameterScrollDown,
+            callback: () => scrollHandlerRef.current('down'),
         },
     }).current;
 

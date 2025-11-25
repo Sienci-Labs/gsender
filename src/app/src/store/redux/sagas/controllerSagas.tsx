@@ -79,10 +79,12 @@ import {
     updateHomingFlag,
     updateSenderStatus,
     updateControllerType,
+    addSDCardFileToList,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
+    SDCardFile,
     SerialPortOptions,
     WORKFLOW_STATES_T,
 } from '../../definitions';
@@ -96,7 +98,7 @@ import {
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-import { connectToLastDevice } from 'app/features/Firmware/utils/index';
+import { connectToLastDevice } from 'app/lib/connection';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -113,6 +115,7 @@ import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -669,10 +672,22 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
+            const msg = 'Press Resume to continue.';
+            const content =
+                payload.comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{payload.comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
             Confirm({
                 title: `${payload.data} pause detected`,
                 confirmLabel: 'Resume',
-                content: 'Press Resume to continue.',
+                content,
 
                 cancelLabel: 'Stop',
                 onConfirm: () => {
@@ -738,6 +753,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
@@ -922,6 +938,75 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('job:start', () => {
         errors = [];
     });
+
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        if (!file) return;
+        reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    controller.addListener(
+        'atci',
+        (payload: {
+            subtype: string;
+            message: string;
+            description: string;
+        }) => {
+            if (payload.subtype === '0') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    onClose: () => {
+                        controller.command('reset');
+                    },
+                });
+            } else if (payload.subtype === '1') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'OK',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    hideClose: true,
+                });
+            } else if (payload.subtype === '2') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('reset');
+                    },
+                    hideClose: true,
+                });
+            } else if ((payload.subtype = '10')) {
+                pubsub.publish('helper:info', {
+                    title: 'Jogging Inside Keepout Area',
+                    content: (
+                        <div className="flex flex-row gap-4 items-centerx`">
+                            <span>Keepout:</span>
+                            <KeepoutToggle />
+                        </div>
+                    ),
+                    description:
+                        'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
+                });
+            } else {
+                Confirm({
+                    title: 'ATCi requested a dialog.',
+                    content: 'Continue to unhold, Reset to stop action.',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                });
+            }
+        },
+    );
 
     controller.addListener('job:stop', () => {
         const revertWorkspace = store.get('workspace.revertWorkspace');

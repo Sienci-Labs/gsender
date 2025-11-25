@@ -25,8 +25,7 @@ import chunk from 'lodash/chunk';
 import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = [], mode, bbox, zTravel } = data;
-    console.log(zTravel);
+    const { isLaser = false, parsedData = [], mode, bbox } = data;
 
     const getOutlineGcode = (concavity = 20) => {
         let vertices = [];
@@ -47,7 +46,7 @@ self.onmessage = ({ data }) => {
             return [
                 '%X0=posx,Y0=posy,Z0=posz',
                 '%MM=modal.distance',
-                `G21 G91 G0 Z${zTravel}`,
+                'G21 G91 G0 Z5',
                 'G90',
                 'G0 X0 Y0',
                 `G0 X[${bbox.min.x}] Y[${bbox.max.y}]`,
@@ -55,14 +54,14 @@ self.onmessage = ({ data }) => {
                 `G0 X[${bbox.max.x}] Y[${bbox.min.y}]`,
                 `G0 X[${bbox.min.x}] Y[${bbox.min.y}]`,
                 'G0 X[X0] Y[Y0]',
-                `G21 G91 G0 Z-${zTravel}`,
+                'G21 G91 G0 Z-5',
                 '[MM]',
             ];
         } else {
             return [
                 '%X0=posx,Y0=posy,Z0=posz',
                 '%MM=modal.distance',
-                `G21 G91 G0 Z${zTravel}`,
+                'G21 G91 G0 Z5',
                 'G90',
                 'G0 X0 Y0',
                 'G0 X[xmin] Y[ymax]',
@@ -70,7 +69,7 @@ self.onmessage = ({ data }) => {
                 'G0 X[xmax] Y[ymin]',
                 'G0 X[xmin] Y[ymin]',
                 'G0 X[X0] Y[Y0]',
-                `G21 G91 G0 Z-${zTravel}`,
+                'G21 G91 G0 Z-5',
                 '[MM]',
             ];
         }
@@ -81,7 +80,7 @@ self.onmessage = ({ data }) => {
         const movementModal = isLaser ? 'G1' : 'G0'; // G1 is necessary for laser outline since G0 won't enable it
         gCode.push('%X0=posx,Y0=posy,Z0=posz');
         gCode.push('%MM=modal.distance');
-        gCode.push(`G21 G91 G0 Z${zTravel}`);
+        gCode.push('G21 G91 G0 Z5');
         // Laser outline requires some additional preamble for feedrate and enabling the laser
         if (isLaser) {
             gCode.push('G1F3000 M3 S1');
@@ -94,7 +93,7 @@ self.onmessage = ({ data }) => {
             gCode.push('M5 S0');
         }
         gCode.push('G0 X[X0] Y[Y0]');
-        gCode.push(`G21 G91 G0 Z-${zTravel}`);
+        gCode.push('G21 G91 G0 Z-5');
 
         gCode.push('[MM]');
         return gCode;

@@ -41,6 +41,10 @@ import {
 } from '../../constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
+import {
+    isATCAvailable,
+    sendATCHomingDialog,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 
 interface MachineStatusProps {
     alarmCode: ALARM_CODE;
@@ -74,7 +78,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 controller.command('reset:limit');
                 return;
             } else if (alarmCode === 'Homing' || alarmCode === 11) {
-                controller.command('homing');
+                if (isATCAvailable()) {
+                    sendATCHomingDialog();
+                } else {
+                    controller.command('homing');
+                }
                 return;
             }
         } else if (activeState === GRBL_ACTIVE_STATE_HOLD) {
@@ -187,6 +195,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 export default connect((store) => {
     const $22 = get(store, 'controller.settings.settings.$22', '0');
     const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
+
     const activeState = get(
         store,
         'controller.state.status.activeState',

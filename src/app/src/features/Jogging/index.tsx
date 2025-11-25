@@ -22,7 +22,9 @@ import { RootState } from 'app/store/redux';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
+    IMPERIAL_UNITS,
     JOGGING_CATEGORY,
+    METRIC_UNITS,
     TOOLBAR_CATEGORY,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -45,6 +47,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
+import { UNITS_EN } from 'app/definitions/general';
 
 export interface JogValueObject {
     xyStep: number;
@@ -216,12 +219,12 @@ export function Jogging() {
                 'widgets.connection.controller.type',
                 'Grbl',
             );
-            const units = store.get('workspace.units', 'mm');
+            const units: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
             setFirmware(firmwareType);
 
             let convertedJogValues = JSON.parse(JSON.stringify(jogValues));
 
-            if (units === 'in') {
+            if (units === IMPERIAL_UNITS) {
                 convertedJogValues.xyStep = convertValue(
                     convertedJogValues.xyStep,
                     'mm',

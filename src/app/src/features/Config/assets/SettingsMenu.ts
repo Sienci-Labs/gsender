@@ -40,6 +40,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import { ATCIWizard } from 'app/features/Config/components/wizards/ATCiWizard.tsx';
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -61,6 +62,11 @@ import {
     SPINDLE_LASER_T,
 } from 'app/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import {
+    TOASTER_DISABLED,
+    TOASTER_LONG,
+    TOASTER_UNTIL_CLOSE,
+} from 'app/lib/toaster/ToasterLib';
 
 export interface SettingsMenuSection {
     label: string;
@@ -112,6 +118,9 @@ export interface gSenderSetting {
     onUpdate?: () => void;
     min?: number;
     max?: number;
+    remap?: EEPROM;
+    remapped?: boolean;
+    forceEEPROM?: boolean;
 }
 
 export interface gSenderSubSection {
@@ -360,6 +369,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show upcoming maintenance tasks at the end of each job.',
                         type: 'boolean',
+                    },
+                    {
+                        label: 'Pop-up notification duration',
+                        key: 'workspace.toastDuration',
+                        description: `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
+                        type: 'number',
+                        defaultValue: 0,
+                        min: TOASTER_DISABLED,
+                        max: TOASTER_LONG,
                     },
                 ],
             },
@@ -720,12 +738,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
-                    { type: 'eeprom', eID: '$450' },
-                    { type: 'eeprom', eID: '$451' },
-                    { type: 'eeprom', eID: '$452' },
-                    { type: 'eeprom', eID: '$453' },
-                    { type: 'eeprom', eID: '$454' },
-                    { type: 'eeprom', eID: '$455' },
+                    { type: 'eeprom', eID: '$450', remap: '$590' },
+                    { type: 'eeprom', eID: '$451', remap: '$591' },
+                    { type: 'eeprom', eID: '$452', remap: '$592' },
+                    { type: 'eeprom', eID: '$453', remap: '$490' },
+                    { type: 'eeprom', eID: '$454', remap: '$491' },
+                    { type: 'eeprom', eID: '$455', remap: '$492' },
                 ],
             },
         ],
@@ -1167,6 +1185,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the minimum speed of your spindle. ($31)',
                         type: 'hybrid',
                         eID: '$31',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
@@ -1176,6 +1195,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the maximum speed of your spindle. ($30)',
                         type: 'hybrid',
                         eID: '$30',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
@@ -1321,6 +1341,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$743',
+                        remap: '$716',
                     },
                     {
                         label: 'Minimum laser power',
@@ -1400,10 +1421,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
-                    { type: 'eeprom', eID: '$456' },
-                    { type: 'eeprom', eID: '$457' },
-                    { type: 'eeprom', eID: '$458' },
-                    { type: 'eeprom', eID: '$459' },
+                    { type: 'eeprom', eID: '$456', remap: '$750' },
+                    { type: 'eeprom', eID: '$457', remap: '$751' },
+                    { type: 'eeprom', eID: '$458', remap: '$752' },
+                    { type: 'eeprom', eID: '$459', remap: '$753' },
                 ],
             },
         ],
@@ -1513,10 +1534,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Tool Changing',
         icon: IoIosSwap,
+        wizard: ATCIWizard,
         settings: [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable ATCi Controls',
+                        key: 'workspace.atcEnabled',
+                        description: 'Enable ATCi Controls',
+                    },
                     {
                         label: 'Passthrough',
                         type: 'boolean',
@@ -1591,6 +1619,25 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                 ],
             },
+            {
+                label: 'Keepout',
+                settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Warn on Home',
+                        description:
+                            'Warn when homing that the keepout area is disabled and collisions are possible depending on homing cycle.',
+                        key: 'widgets.atc.warnOnHome',
+                    },
+                    { type: 'eeprom', eID: '$683' },
+                    { type: 'eeprom', eID: '$684' },
+                    { type: 'eeprom', eID: '$685' },
+                    { type: 'eeprom', eID: '$686' },
+                    { type: 'eeprom', eID: '$687' },
+                    { type: 'eeprom', eID: '$688' },
+                    { type: 'eeprom', eID: '$689' },
+                ],
+            },
         ],
     },
     {
@@ -1630,10 +1677,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$664',
+                        remap: '$536',
                     },
                     {
                         type: 'eeprom',
                         eID: '$665',
+                        remap: '$537',
                     },
                 ],
             },

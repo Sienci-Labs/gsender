@@ -11,7 +11,7 @@ import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 export function ApplicationPreferences() {
     const inputRef = useRef<HTMLInputElement>(null);
     return (
-        <fieldset className="flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-gray-700 dark:text-white">
+        <fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-gray-700 dark:text-white">
             <legend className="text-slate-600 dark:text-white">
                 gSender Preferences
             </legend>
