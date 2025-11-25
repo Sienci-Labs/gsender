@@ -4,6 +4,10 @@ import { Input } from 'app/components/shadcn/Input';
 import { Label } from 'app/components/shadcn/Label';
 import { Position } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import { FiTarget } from 'react-icons/fi';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import { mapPositionToUnits } from 'app/lib/units.ts';
+import map from 'lodash/map';
+import mapValues from 'lodash/mapValues';
 
 interface PositionInputProps {
     label: string;
@@ -20,6 +24,8 @@ export const PositionInput: React.FC<PositionInputProps> = ({
     onUseCurrent,
     disabled = false,
 }) => {
+    const { units } = useWorkspaceState();
+
     const handleAxisChange = (axis: keyof Position, value: string) => {
         if (disabled) return;
         const numValue = parseFloat(value) || 0;
@@ -28,6 +34,11 @@ export const PositionInput: React.FC<PositionInputProps> = ({
             [axis]: numValue,
         });
     };
+
+    const unitPosition = mapValues(position, (pos, axis) => {
+        if (axis === 'a') return pos;
+        return String(mapPositionToUnits(pos, units));
+    });
 
     return (
         <div className="flex items-center justify-between gap-4 py-1">
@@ -40,7 +51,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     <Input
                         type="number"
                         step="0.1"
-                        value={position.x}
+                        value={unitPosition.x}
                         onChange={(e) => handleAxisChange('x', e.target.value)}
                         className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         disabled={disabled}
@@ -53,7 +64,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     <Input
                         type="number"
                         step="0.1"
-                        value={position.y}
+                        value={unitPosition.y}
                         onChange={(e) => handleAxisChange('y', e.target.value)}
                         className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         disabled={disabled}
@@ -66,7 +77,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     <Input
                         type="number"
                         step="0.1"
-                        value={position.z}
+                        value={unitPosition.z}
                         onChange={(e) => handleAxisChange('z', e.target.value)}
                         className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         disabled={disabled}

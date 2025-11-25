@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { Switch } from 'app/components/shadcn/Switch';
-
 interface OffsetManagementWidgetProps {
     value?: number;
     onChange?: (value: number) => void;
