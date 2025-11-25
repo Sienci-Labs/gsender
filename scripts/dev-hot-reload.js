@@ -15,7 +15,7 @@ console.log('👀 Watching electron-app files for hot reload...\n');
 function compileElectronApp() {
     const timestamp = new Date().toLocaleTimeString();
     console.log(`[${timestamp}] 🔧 Compiling electron-app...`);
-    
+
     try {
         const rootDir = path.join(__dirname, '..');
         execSync('npx babel src/electron-app --config-file ./babel.config.js --out-dir output/electron-app --quiet', {
@@ -66,4 +66,3 @@ process.on('SIGTERM', () => {
     watcher.close();
     process.exit(0);
 });
-
