@@ -8,8 +8,8 @@ const pkg = require('./package.json');
 // Load environment variables based on target
 function loadEnv(target) {
     const envFile = target === 'production'
-        ? 'webpack.config.server.production.env'
-        : 'webpack.config.server.development.env';
+        ? '.env.prod'
+        : '.env.dev';
 
     dotenv.config({ path: path.resolve(__dirname, envFile) });
 }
