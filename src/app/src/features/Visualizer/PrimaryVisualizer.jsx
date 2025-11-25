@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import { SadIcon } from 'lucide-react';
+import { FrownIcon } from 'lucide-react';
 import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
@@ -132,7 +132,7 @@ const PrimaryVisualizer = ({
                         />
                     ) : (
                         <div>
-                            <SadIcon size={4} />
+                            <FrownIcon size={4} />
                             <span style={{ fontSize: '16px' }}>
                                 {
                                     "It looks like your device doesn't support WebGL"
