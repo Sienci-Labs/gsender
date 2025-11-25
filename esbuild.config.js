@@ -19,7 +19,7 @@ function loadEnv(target) {
 const srcResolverPlugin = {
     name: 'src-resolver',
     setup(build) {
-        const resolveFromSrc = async (importPath) => {
+        const resolveFromSrc = (importPath) => {
             const basePath = path.resolve(__dirname, 'src', importPath);
 
             // Try exact path first
@@ -51,18 +51,18 @@ const srcResolverPlugin = {
         };
 
         // Resolve imports like 'server/...' from 'src/' directory
-        build.onResolve({ filter: /^server\// }, async (args) => {
-            const resolved = await resolveFromSrc(args.path);
+        build.onResolve({ filter: /^server\// }, (args) => {
+            const resolved = resolveFromSrc(args.path);
             return { path: resolved };
         });
 
-        build.onResolve({ filter: /^app\// }, async (args) => {
-            const resolved = await resolveFromSrc(args.path);
+        build.onResolve({ filter: /^app\// }, (args) => {
+            const resolved = resolveFromSrc(args.path);
             return { path: resolved };
         });
 
-        build.onResolve({ filter: /^electron-app\// }, async (args) => {
-            const resolved = await resolveFromSrc(args.path);
+        build.onResolve({ filter: /^electron-app\// }, (args) => {
+            const resolved = resolveFromSrc(args.path);
             return { path: resolved };
         });
     },
@@ -127,34 +127,34 @@ function createHexFilePlugin(target) {
 
 // Helper to copy static directories
 async function copyStaticFiles(target) {
-  const serverDirs = ['i18n', 'views'];
-  const isDev = target === 'development';
-  
-  // In dev: copy to output/server/ AND output/ (for app.js __dirname resolution)
-  // In prod: copy to dist/gsender/server/ AND dist/gsender/ (for app.js __dirname resolution)
-  const baseDir = isDev 
-    ? path.join(__dirname, 'output')
-    : path.join(__dirname, 'dist/gsender');
-  
-  const serverOutputDir = isDev
-    ? path.join(__dirname, 'output/server')
-    : path.join(__dirname, 'dist/gsender/server');
+    const serverDirs = ['i18n', 'views'];
+    const isDev = target === 'development';
 
-  for (const dir of serverDirs) {
-    const srcDir = path.join(__dirname, 'src/server', dir);
-    
-    if (fs.existsSync(srcDir)) {
-      // Copy to server directory
-      const serverDestDir = path.join(serverOutputDir, dir);
-      await fs.promises.mkdir(serverDestDir, { recursive: true });
-      await copyDir(srcDir, serverDestDir);
-      
-      // Also copy to base directory (for __dirname resolution in bundled code)
-      const baseDestDir = path.join(baseDir, dir);
-      await fs.promises.mkdir(baseDestDir, { recursive: true });
-      await copyDir(srcDir, baseDestDir);
+    // In dev: copy to output/server/ AND output/ (for app.js __dirname resolution)
+    // In prod: copy to dist/gsender/server/ AND dist/gsender/ (for app.js __dirname resolution)
+    const baseDir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender');
+
+    const serverOutputDir = isDev
+        ? path.join(__dirname, 'output/server')
+        : path.join(__dirname, 'dist/gsender/server');
+
+    for (const dir of serverDirs) {
+        const srcDir = path.join(__dirname, 'src/server', dir);
+
+        if (fs.existsSync(srcDir)) {
+            // Copy to server directory
+            const serverDestDir = path.join(serverOutputDir, dir);
+            fs.promises.mkdir(serverDestDir, { recursive: true });
+            copyDir(srcDir, serverDestDir);
+
+            // Also copy to base directory (for __dirname resolution in bundled code)
+            const baseDestDir = path.join(baseDir, dir);
+            fs.promises.mkdir(baseDestDir, { recursive: true });
+            copyDir(srcDir, baseDestDir);
+        }
     }
-  }
 }
 
 async function copyDir(src, dest) {
@@ -166,9 +166,9 @@ async function copyDir(src, dest) {
         const destPath = path.join(dest, entry.name);
 
         if (entry.isDirectory()) {
-            await copyDir(srcPath, destPath);
+            copyDir(srcPath, destPath);
         } else {
-            await fs.promises.copyFile(srcPath, destPath);
+            fs.promises.copyFile(srcPath, destPath);
         }
     }
 }
@@ -201,7 +201,6 @@ function getSentryPlugin() {
 
 // Shared configuration
 const createConfig = (target, entry, outdir, additionalOptions = {}) => {
-    const isDev = target === 'development';
     const isProd = target === 'production';
 
     const plugins = additionalOptions.plugins || [];
@@ -269,35 +268,35 @@ async function buildServer(target) {
 
 // Build electron main process
 async function buildElectron(target) {
-  loadEnv(target);
-  
-  const isDev = target === 'development';
-  const outdir = isDev 
-    ? path.join(__dirname, 'output')
-    : path.join(__dirname, 'dist/gsender');
+    loadEnv(target);
 
-  const config = createConfig(
-    target,
-    path.join(__dirname, 'src/main.js'),
-    outdir,
-    {
-      packages: 'external', // Don't bundle any node_modules
-      outExtension: { '.js': '.js' },
-      plugins: [srcResolverPlugin, createHexFilePlugin(target)],
-      external: [
-        // Keep electron-app files separate (compiled by prebuild scripts)
-        './electron-app/*',
-      ],
+    const isDev = target === 'development';
+    const outdir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender');
+
+    const config = createConfig(
+        target,
+        path.join(__dirname, 'src/main.js'),
+        outdir,
+        {
+            packages: 'external', // Don't bundle any node_modules
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin(target)],
+            external: [
+                // Keep electron-app files separate (compiled by prebuild scripts)
+                './electron-app/*',
+            ],
+        }
+    );
+
+    try {
+        await esbuild.build(config);
+        console.log('✅ Electron main build complete');
+    } catch (error) {
+        console.error('❌ Electron main build failed:', error);
+        process.exit(1);
     }
-  );
-
-  try {
-    await esbuild.build(config);
-    console.log('✅ Electron main build complete');
-  } catch (error) {
-    console.error('❌ Electron main build failed:', error);
-    process.exit(1);
-  }
 }
 
 // Build server-cli
@@ -331,71 +330,71 @@ async function buildServerCli(target) {
 
 // Watch mode for development - watches all targets
 async function watchAll() {
-  loadEnv('development');
-  
-  console.log('🔥 Hot reload mode - watching all files...\n');
-  
-  // Server config
-  const serverConfig = createConfig(
-    'development',
-    path.join(__dirname, 'src/server/index.js'),
-    path.join(__dirname, 'output/server'),
-    {
-      packages: 'external',
-      plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-    }
-  );
+    loadEnv('development');
 
-  // Electron main config
-  const electronConfig = createConfig(
-    'development',
-    path.join(__dirname, 'src/main.js'),
-    path.join(__dirname, 'output'),
-    {
-      packages: 'external',
-      outExtension: { '.js': '.js' },
-      plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-      external: ['./electron-app/*'],
-    }
-  );
+    console.log('🔥 Hot reload mode - watching all files...\n');
 
-  // Server CLI config
-  const cliConfig = createConfig(
-    'development',
-    path.join(__dirname, 'src/server-cli.js'),
-    path.join(__dirname, 'output'),
-    {
-      packages: 'external',
-      outExtension: { '.js': '.js' },
-      plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-    }
-  );
+    // Server config
+    const serverConfig = createConfig(
+        'development',
+        path.join(__dirname, 'src/server/index.js'),
+        path.join(__dirname, 'output/server'),
+        {
+            packages: 'external',
+            plugins: [srcResolverPlugin, createHexFilePlugin('development')],
+        }
+    );
 
-  // Copy static files initially
-  await copyStaticFiles('development');
+    // Electron main config
+    const electronConfig = createConfig(
+        'development',
+        path.join(__dirname, 'src/main.js'),
+        path.join(__dirname, 'output'),
+        {
+            packages: 'external',
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin('development')],
+            external: ['./electron-app/*'],
+        }
+    );
 
-  // Create watch contexts for all targets
-  const serverCtx = await esbuild.context(serverConfig);
-  const electronCtx = await esbuild.context(electronConfig);
-  const cliCtx = await esbuild.context(cliConfig);
+    // Server CLI config
+    const cliConfig = createConfig(
+        'development',
+        path.join(__dirname, 'src/server-cli.js'),
+        path.join(__dirname, 'output'),
+        {
+            packages: 'external',
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin('development')],
+        }
+    );
 
-  // Watch all simultaneously
-  await Promise.all([
-    serverCtx.watch(),
-    electronCtx.watch(),
-    cliCtx.watch(),
-  ]);
+    // Copy static files initially
+    await copyStaticFiles('development');
 
-  console.log('👀 Watching:');
-  console.log('   - Server files (output/server/index.js)');
-  console.log('   - Electron main (output/main.js)');
-  console.log('   - Server CLI (output/server-cli.js)');
-  console.log('\n✨ Hot reload enabled! Edit files and see changes instantly.\n');
+    // Create watch contexts for all targets
+    const serverCtx = await esbuild.context(serverConfig);
+    const electronCtx = await esbuild.context(electronConfig);
+    const cliCtx = await esbuild.context(cliConfig);
+
+    // Watch all simultaneously
+    await Promise.all([
+        serverCtx.watch(),
+        electronCtx.watch(),
+        cliCtx.watch(),
+    ]);
+
+    console.log('👀 Watching:');
+    console.log('   - Server files (output/server/index.js)');
+    console.log('   - Electron main (output/main.js)');
+    console.log('   - Server CLI (output/server-cli.js)');
+    console.log('\n✨ Hot reload enabled! Edit files and see changes instantly.\n');
 }
 
 // Backward compatibility - watch server only
 async function watchServer() {
-  await watchAll();
+    await watchAll();
 }
 
 // Main build function
@@ -430,11 +429,11 @@ async function build() {
 
 // Export for use in other scripts
 module.exports = {
-  buildServer,
-  buildElectron,
-  buildServerCli,
-  watchAll,
-  createConfig,
+    buildServer,
+    buildElectron,
+    buildServerCli,
+    watchAll,
+    createConfig,
 };
 
 // Run if called directly
