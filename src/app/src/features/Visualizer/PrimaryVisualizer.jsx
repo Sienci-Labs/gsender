@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import Icon from '@mdi/react';
-import { mdiEmoticonSadOutline } from '@mdi/js';
+import { SadIcon } from 'lucide-react';
 import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
@@ -133,7 +132,7 @@ const PrimaryVisualizer = ({
                         />
                     ) : (
                         <div>
-                            <Icon path={mdiEmoticonSadOutline} size={4} />
+                            <SadIcon size={4} />
                             <span style={{ fontSize: '16px' }}>
                                 {
                                     "It looks like your device doesn't support WebGL"
