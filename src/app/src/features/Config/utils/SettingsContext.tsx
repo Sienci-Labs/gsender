@@ -229,7 +229,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const [populatedSettings, globalValues] =
             populateSettingsValues(settings);
         setSettings([...populatedSettings]);
-        setSettingsValues([...gl    obalValues]);
+        setSettingsValues([...globalValues]);
     }
 
     function repopulateEEPROM() {
