@@ -301,6 +301,7 @@
     "nrf-intel-hex": "^1.3.0",
     "objtools": "~2.0.0",
     "postcss": "^8.4.47",
+    "postcss-cli": "^11.0.1",
     "prop-types": "~15.7.2",
     "pubsub-js": "~1.9.4",
     "qs": "~6.7.0",
