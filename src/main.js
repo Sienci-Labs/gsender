@@ -47,6 +47,23 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
+// Hot reload in development
+if (process.env.NODE_ENV === 'development') {
+    try {
+        require('electron-reloader')(module, {
+            debug: false,
+            watchRenderer: false, // Vite handles frontend
+            ignore: [
+                /node_modules/,
+                /output\/app/,
+                /\.map$/,
+            ],
+        });
+    } catch (err) {
+        // electron-reloader not available, continue without it
+    }
+}
+
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
