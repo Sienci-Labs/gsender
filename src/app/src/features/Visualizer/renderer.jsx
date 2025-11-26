@@ -28,7 +28,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 import Space from 'app/components/Space';
-import i18n from 'app/lib/i18n';
 import { formatBytes } from 'app/lib/numeral';
 import styles from './renderer.styl';
 
@@ -174,7 +173,7 @@ const renderer = (node, treeOptions) => {
         : '';
     const type = (function (node) {
         if (node.props.type === 'd') {
-            return i18n._('File folder');
+            return 'File folder';
         }
 
         if (node.props.type === 'f') {
@@ -186,8 +185,11 @@ const renderer = (node, treeOptions) => {
             // -> ''
             const extname = path.extname(node.name || '').slice(1);
             return extname.length > 0
-                ? i18n._('{{extname}} File', { extname: extname.toUpperCase() }) // e.g. NC File
-                : i18n._('File');
+                ? `{{extname}} File`.replace(
+                      '{{extname}}',
+                      extname.toUpperCase(),
+                  ) // e.g. NC File
+                : 'File';
         }
 
         return '';

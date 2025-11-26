@@ -22,9 +22,9 @@
  */
 
 import path from 'path';
-import pkg from '../../package.json';
-import { languages } from '../../../build.config';
 import os from 'os';
+
+import pkg from '../../package.json';
 
 const RC_FILE = pkg.version.includes('EDGE') ? '.edge_rc' : '.sender_rc';
 const SESSION_PATH = '.sienci-sessions';
@@ -122,68 +122,4 @@ export default {
     siofu: { // SocketIOFileUploader
         dir: './tmp/siofu'
     },
-    i18next: {
-        lowerCaseLng: true,
-
-        // logs out more info (console)
-        debug: false,
-
-        // language to lookup key if not found on set language
-        fallbackLng: 'en',
-
-        // string or array of namespaces
-        ns: [
-            'config',
-            'resource' // default
-        ],
-
-        // default namespace used if not passed to translation function
-        defaultNS: 'resource',
-
-        whitelist: languages,
-
-        // array of languages to preload
-        preload: [],
-
-        // language codes to lookup, given set language is 'en-US':
-        // 'all' --> ['en-US', 'en', 'dev']
-        // 'currentOnly' --> 'en-US'
-        // 'languageOnly' --> 'en'
-        load: 'currentOnly',
-
-        // char to separate keys
-        keySeparator: '.',
-
-        // char to split namespace from key
-        nsSeparator: ':',
-
-        interpolation: {
-            prefix: '{{',
-            suffix: '}}'
-        },
-
-        detection: {
-            // order and from where user language should be detected
-            order: ['session', 'querystring', 'cookie', 'header'],
-
-            // keys or params to lookup language from
-            lookupQuerystring: 'lang',
-            lookupCookie: 'lang',
-            lookupSession: 'lang',
-
-            // cache user language
-            caches: ['cookie']
-        },
-
-        backend: {
-            // path where resources get loaded from
-            loadPath: path.resolve(__dirname, '..', 'i18n', '{{lng}}', '{{ns}}.json'),
-
-            // path to post missing resources
-            addPath: path.resolve(__dirname, '..', 'i18n', '{{lng}}', '{{ns}}.savedMissing.json'),
-
-            // jsonIndent to use when storing json files
-            jsonIndent: 4
-        }
-    }
 };

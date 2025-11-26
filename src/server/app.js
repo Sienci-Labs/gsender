@@ -36,34 +36,21 @@ import express from 'express';
 import expressJwt from 'express-jwt';
 import session from 'express-session';
 import 'hogan.js';
-import i18next from 'i18next';
-import Backend from 'i18next-fs-backend';
-//import jwt from 'jsonwebtoken';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import favicon from 'serve-favicon';
 import serveStatic from 'serve-static';
 import sessionFileStore from 'session-file-store';
 import _get from 'lodash/get';
-// import _noop from 'lodash/noop';
 import rimraf from 'rimraf';
-import {
-    LanguageDetector as i18nextLanguageDetector,
-    handle as i18nextHandle
-} from 'i18next-http-middleware';
 
 import urljoin from './lib/urljoin';
 import logger from './lib/logger';
 import settings from './config/settings';
 import * as api from './api';
-// import errclient from './lib/middleware/errclient';
-// import errlog from './lib/middleware/errlog';
-// import errnotfound from './lib/middleware/errnotfound';
-// import errserver from './lib/middleware/errserver';
 import config from './services/configstore';
 import {
     authorizeIPAddress,
-    //validateUser
 } from './access-control';
 import {
     ERR_FORBIDDEN
@@ -112,12 +99,6 @@ const appMain = () => {
 
     // Cors
     app.use(cors());
-
-    // Setup i18n (i18next)
-    i18next
-        .use(Backend)
-        .use(i18nextLanguageDetector)
-        .init(settings.i18next);
 
     app.use(async (req, res, next) => {
         try {
@@ -241,8 +222,6 @@ const appMain = () => {
             }));
         });
     });
-
-    app.use(i18nextHandle(i18next, {}));
 
     { // Secure API Access
         app.use(urljoin(settings.route, 'api'), expressJwt({

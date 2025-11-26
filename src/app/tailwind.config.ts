@@ -8,15 +8,6 @@ export default {
     ],
     important: true,
     darkMode: 'class',
-    /*
-  purge: {
-    enabled: false,
-  },
-  safelist: [
-    {
-      pattern: /./, // the "." means "everything"
-    },
-  ],*/
     theme: {
         extend: {
             transitionProperty: {

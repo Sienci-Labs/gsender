@@ -23,7 +23,6 @@
 
 /* eslint react/prop-types: 0 */
 import { ReactElement } from 'react';
-import i18n from './i18n';
 
 export interface ValidationProps {
     type: string;
@@ -79,7 +78,7 @@ const required = (
             return null;
         }
 
-        return <Error>{i18n._('This field is required.')}</Error>;
+        return <Error>This field is required.</Error>;
     }
 
     if (props.type === 'checkbox') {
@@ -87,12 +86,12 @@ const required = (
             return null;
         }
 
-        return <Error>{i18n._('This field is required.')}</Error>;
+        return <Error>This field is required.</Error>;
     }
 
     value = ('' + value).trim();
     if (!value) {
-        return <Error>{i18n._('This field is required.')}</Error>;
+        return <Error>This field is required.</Error>;
     }
 
     return null;
@@ -113,7 +112,7 @@ const password = (
         bothChanged &&
         components.password[0].value !== components.confirm[0].value
     ) {
-        return <Error>{i18n._('Passwords should be equal.')}</Error>;
+        return <Error>Passwords should be equal.</Error>;
     }
 
     return null;

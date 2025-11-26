@@ -23,7 +23,6 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import i18n from 'app/lib/i18n';
 
 import styles from './index.module.styl';
 
@@ -45,7 +44,7 @@ class CameraDisplay extends PureComponent {
                 <h3 className={styles.viewTitle}>{cameraPosition}</h3>
                 <div className={styles.buttonContainer}>
                     <button
-                        title={i18n._('Top')}
+                        title="Top"
                         type="button"
                         tabIndex={0}
                         className={
@@ -58,7 +57,7 @@ class CameraDisplay extends PureComponent {
                         }}
                     />
                     <button
-                        title={i18n._('Left')}
+                        title="Left"
                         type="button"
                         tabIndex={0}
                         className={
@@ -71,7 +70,7 @@ class CameraDisplay extends PureComponent {
                         }}
                     />
                     <button
-                        title={i18n._('Front')}
+                        title="Front"
                         type="button"
                         tabIndex={0}
                         className={
@@ -84,7 +83,7 @@ class CameraDisplay extends PureComponent {
                         }}
                     />
                     <button
-                        title={i18n._('3D')}
+                        title="3D"
                         type="button"
                         tabIndex={0}
                         className={
@@ -107,7 +106,7 @@ class CameraDisplay extends PureComponent {
                         className={styles.cornerC2}
                     />
                     <button
-                        title={i18n._('Right')}
+                        title="Right"
                         type="button"
                         tabIndex={0}
                         className={

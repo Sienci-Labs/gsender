@@ -28,7 +28,6 @@ import ReactDOM from 'react-dom';
 import InfiniteTree from 'react-infinite-tree';
 import api from 'app/api';
 import Modal from 'app/components/Modal';
-import i18n from 'app/lib/i18n';
 import renderer from './renderer';
 import styles from './renderer.styl';
 
@@ -139,7 +138,7 @@ class WatchDirectory extends PureComponent {
         return (
             <Modal disableOverlayClick size="md" onClose={actions.closeModal}>
                 <Modal.Header>
-                    <Modal.Title>{i18n._('Watch Directory')}</Modal.Title>
+                    <Modal.Title>Watch Directory</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <table
@@ -152,10 +151,10 @@ class WatchDirectory extends PureComponent {
                     >
                         <thead>
                             <tr>
-                                <th>{i18n._('Name')}</th>
-                                <th>{i18n._('Date modified')}</th>
-                                <th>{i18n._('Type')}</th>
-                                <th>{i18n._('Size')}</th>
+                                <th>Name</th>
+                                <th>Date modified</th>
+                                <th>Type</th>
+                                <th>Size</th>
                             </tr>
                         </thead>
                     </table>
@@ -278,7 +277,7 @@ class WatchDirectory extends PureComponent {
                         className="btn btn-default"
                         onClick={actions.closeModal}
                     >
-                        {i18n._('Cancel')}
+                        Cancel
                     </button>
                     <button
                         type="button"
@@ -298,7 +297,7 @@ class WatchDirectory extends PureComponent {
                         }}
                         disabled={!canUpload}
                     >
-                        {i18n._('Load G-code')}
+                        Load G-code
                     </button>
                 </Modal.Footer>
             </Modal>
