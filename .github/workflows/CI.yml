@@ -7,6 +7,7 @@ on:
       - master
       - dev
       - features/* # all feature branches
+      - fixes/* # all fix branches
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
@@ -23,6 +24,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     permissions:
       contents: write
     steps:
@@ -114,6 +118,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     permissions:
       contents: write
     steps:
@@ -212,6 +219,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=8192
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     permissions:
       contents: write
     steps:
