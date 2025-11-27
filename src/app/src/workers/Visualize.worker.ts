@@ -25,7 +25,6 @@ import { ArcCurve } from 'three';
 
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 import { BasicPosition } from 'app/definitions/general';
-import { t } from 'react-router/dist/production/index-react-server-client-BKpa2trA';
 
 interface WorkerData {
     content: string;
@@ -37,6 +36,7 @@ interface WorkerData {
     isNewFile?: boolean;
     accelerations?: any;
     maxFeedrates?: any;
+    atcEnabled?: boolean;
 }
 
 interface SVGVertex {
@@ -57,6 +57,7 @@ interface Modal {
     motion: string;
     plane?: string;
     units?: string;
+    tool?: number;
 }
 
 interface SpindleValues {
@@ -71,10 +72,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         isLaser = false,
         shouldIncludeSVG = false,
         needsVisualization = true,
-        parsedData = {},
-        isNewFile = false,
+        // parsedData = {},
+        // isNewFile = false,
         accelerations,
         maxFeedrates,
+        atcEnabled,
     } = data;
 
     // Common state variables
@@ -82,7 +84,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     const colors: [string, number][] = [];
     const frames: number[] = [];
     let currentTool = 0;
-    const toolchanges = [];
+    const toolchanges: number[] = [];
 
     // Laser specific state variables
     const spindleSpeeds = new Set<number>();
@@ -112,7 +114,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         }
     };
 
-    const isNewTool = (t) => {
+    const isNewTool = (t: number) => {
         if (currentTool !== t) {
             currentTool = t;
             return true;
@@ -608,6 +610,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         collate: true,
         accelerations,
         maxFeedrates,
+        atcEnabled,
     });
 
     vm.on('data', (data: any) => {

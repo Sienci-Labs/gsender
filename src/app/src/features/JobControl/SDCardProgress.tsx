@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import WoodcuttingProgress from 'app/features/JobControl/WoodcuttingProgress.tsx';
-import { convertMillisecondsToTimeStamp } from 'app/lib/datetime.ts';
 
 export function SDCardProgress() {
     const [progress, setProgress] = useState({ name: null, percentage: 0 });
@@ -12,15 +11,12 @@ export function SDCardProgress() {
     );
 
     useEffect(() => {
-        console.log(sdCardProgress);
         if (sdCardProgress) {
             setProgress(sdCardProgress);
         } else {
             setProgress({ name: null, percentage: 0 });
         }
     }, [sdCardProgress]);
-
-    console.log(progress);
 
     if (!progress.name) {
         return <></>;
