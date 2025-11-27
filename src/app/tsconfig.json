@@ -55,7 +55,8 @@
         "**/*.mjs"
     ],
     "exclude": [
-        "output"
+        "output",
+        "node_modules"
     ]
     // "references": [{ "path": "./tsconfig.node.json" }]
 }
