@@ -1,8 +1,9 @@
 import Button from 'app/components/Button';
 import cn from 'classnames';
 import { TooltipProps } from 'app/components/Tooltip';
+import { JSX } from 'react';
 
-interface ActiveStateButtonProps {
+type ActiveStateButtonProps = {
     icon: JSX.Element;
     active?: boolean;
     onClick?: (event: React.MouseEvent) => void;
@@ -11,7 +12,7 @@ interface ActiveStateButtonProps {
     text?: string;
     disabled?: boolean;
     tooltip?: TooltipProps;
-}
+};
 
 export function ActiveStateButton({
     icon,

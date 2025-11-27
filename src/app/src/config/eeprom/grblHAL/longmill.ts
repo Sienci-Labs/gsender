@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import { EEPROMSettings } from 'definitions/firmware';
+import { EEPROMSettings } from 'app/definitions/firmware';
 
 export const LONGMILL_MASTER_LIST_GRBLHAL: EEPROMSettings = {
     $0: '5.0',

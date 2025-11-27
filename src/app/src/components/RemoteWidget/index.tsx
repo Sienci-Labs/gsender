@@ -1,6 +1,11 @@
 import { Widget } from 'app/components/Widget';
 
-export function RemoteWidget({ children, label }) {
+interface RemoteWidgetProps {
+    children: React.ReactElement;
+    label: string;
+}
+
+export function RemoteWidget({ children, label }: RemoteWidgetProps) {
     return (
         <Widget>
             <Widget.Content className="flex flex-col">

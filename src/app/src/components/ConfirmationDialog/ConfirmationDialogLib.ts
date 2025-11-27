@@ -51,7 +51,6 @@ export const Confirm = (options: ConfirmOptions = {}): void => {
         cancelLabel = 'Cancel',
         show = true,
         hideClose = false,
-        hideConfirm,
     } = options;
 
     pubsub.publish('dialog:new', {

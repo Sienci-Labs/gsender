@@ -37,5 +37,3 @@ const Content: React.FC<WidgetProps> = ({ className, active, ...props }) => (
 );
 
 export default Content;
-// export default forwardRef((props, ref) => <Content {...props} reference={ref} />);
-//h-[calc(100% - 2rem)]

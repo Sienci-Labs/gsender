@@ -21,13 +21,13 @@
  *
  */
 
-import React, { PointerEventHandler } from 'react';
-import { Slider } from '../shadcn/Slider';
+import { PointerEventHandler } from 'react';
 import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
-import cx from 'classnames';
 
+import { Slider } from 'app/components/shadcn/Slider';
+import { cn } from 'app/lib/utils';
 import Button from 'app/components/Button';
-import Tooltip from '../Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 export interface RangeSliderProps {
     [key: string]: any;
@@ -61,7 +61,7 @@ const RangeSlider = ({
     unitString = 'unit',
     disabled,
     ...props
-}: RangeSliderProps): React.JSX.Element => {
+}: RangeSliderProps) => {
     const textComponent = showText ? (
         <div className="flex flex-row items-center justify-between w-full px-4">
             <span className="w-16 text-left">{title}</span>
@@ -90,7 +90,7 @@ const RangeSlider = ({
                     className="flex relative items-center w-full h-6"
                     trackClassName="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow bg-[repeating-linear-gradient(-45deg,transparent,transparent_20px,lightgrey_20px,lightgrey_40px)]"
                     rangeClassName={`absolute h-full rounded-full shadow-inner shadow-gray-400 ${colour}`}
-                    thumbClassName={cx(
+                    thumbClassName={cn(
                         'block w-6 h-6 rounded-xl border-slate-600 border-solid border-2 relative outline-none',
                         {
                             'bg-white': !disabled,

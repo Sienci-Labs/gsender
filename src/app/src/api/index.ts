@@ -27,12 +27,9 @@ import {
     GCodeOptions,
     SigninOptions,
     StateOptions,
-    USER_DATA_COLLECTION_T,
     WatchOptions,
 } from './definitions';
 import { MachineProfile } from 'app/definitions/firmware';
-
-// import store from "../store";
 
 // Create an instance of axios
 const authrequest = axios.create({
@@ -46,8 +43,6 @@ const authrequest = axios.create({
 // Request interceptor to add bearer token and prevent caching
 authrequest.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        // const token = store.get("session.token");
-
         const token = '';
 
         if (token) {
@@ -130,12 +125,7 @@ const downloadGCode = (options: GCodeOptions): void => {
     $port.setAttribute('name', 'port');
     $port.setAttribute('value', port);
 
-    // const $token = document.createElement("input");
-    // $token.setAttribute("name", "token");
-    // $token.setAttribute("value", store.get("session.token"));
-
     $form.appendChild($port);
-    // $form.appendChild($token);
 
     document.body.append($form);
     $form.submit();

@@ -15,7 +15,7 @@ export function IndicatorButton({
     active = false,
     disabled = false,
     onClick,
-}: IndicatorButtonProps): JSX.Element {
+}: IndicatorButtonProps) {
     return (
         <button
             type="button"

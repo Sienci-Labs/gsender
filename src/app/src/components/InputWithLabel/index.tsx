@@ -17,7 +17,7 @@ interface InputProps {
     };
 }
 
-const Input: React.FC<InputProps> = ({
+const Input = ({
     value,
     label,
     units,
@@ -26,7 +26,7 @@ const Input: React.FC<InputProps> = ({
     className,
     style,
     tooltip,
-}) => {
+}: InputProps) => {
     const ShowTooltip = ({
         tooltip,
         children,
@@ -35,7 +35,6 @@ const Input: React.FC<InputProps> = ({
         children: React.ReactNode;
     }) => {
         if (tooltip?.content) {
-            // Implement your tooltip logic here
             return <Tooltip {...tooltip}>{children}</Tooltip>;
         }
         return <>{children}</>;

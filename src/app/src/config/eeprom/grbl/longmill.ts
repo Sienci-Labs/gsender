@@ -1,4 +1,4 @@
-import { EEPROMSettings } from 'definitions/firmware';
+import { EEPROMSettings } from 'app/definitions/firmware';
 
 export const LONGMILL_MASTER_LIST_GRBL: EEPROMSettings = {
     $0: '10',

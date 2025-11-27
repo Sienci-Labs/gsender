@@ -22,9 +22,10 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { METRIC_UNITS } from '../../constants';
-import store from '../../store';
-import { round } from '../../lib/rounding';
+
+import { METRIC_UNITS } from 'app/constants';
+import store from 'app/store';
+import { round } from 'app/lib/rounding';
 
 export interface ControlledNumberInputProps {
     className?: string;

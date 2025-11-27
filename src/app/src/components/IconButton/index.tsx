@@ -1,6 +1,7 @@
-import { ButtonProps, buttonStyle } from 'app/components/Button';
-import cx from 'classnames';
-import { Button } from '../shadcn/Button';
+import { JSX } from 'react';
+
+import { ButtonProps } from 'app/components/Button';
+import { Button } from 'app/components/shadcn/Button';
 
 export interface IconButtonProps extends ButtonProps {
     icon: JSX.Element;

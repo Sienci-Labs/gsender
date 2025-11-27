@@ -26,8 +26,6 @@ import cx from 'classnames';
 
 import { DIALOG_CANCEL, DIALOG_CONFIRM } from './ConfirmationDialogLib';
 
-import styles from './index.module.styl';
-
 interface ConfirmationDialogButtonProps {
     children: React.ReactNode;
     onClick: () => void;
@@ -44,13 +42,11 @@ const ConfirmationDialogButton: React.FC<ConfirmationDialogButtonProps> = ({
             type="button"
             onClick={onClick}
             className={cx(
-                styles.confirmationDialogButton,
+                'py-2 px-4 text-base rounded-lg bg-none border-none outline-none transition-all duration-150',
                 {
-                    [styles.confirmationDialogButtonConfirm]:
+                    ['bg-blue-600 text-white hover:bg-blue-700']:
                         variant === DIALOG_CONFIRM,
-                },
-                {
-                    [styles.confirmationDialogButtonCancel]:
+                    ['bg-white text-red-600 border border-red-600 hover:bg-red-300 hover:text-white']:
                         variant === DIALOG_CANCEL,
                 },
             )}

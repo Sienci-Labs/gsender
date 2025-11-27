@@ -22,13 +22,6 @@
  */
 import { useState, useEffect, ReactNode } from 'react';
 import pubsub from 'pubsub-js';
-import cx from 'classnames';
-import { FaExclamationTriangle, FaRedo } from 'react-icons/fa';
-import { Button } from 'app/components/Button';
-import ConfirmationDialogButton from './ConfirmationDialogButton';
-import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
-
-import styles from './index.module.styl';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,7 +31,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog.tsx';
 
 interface DialogOptions {
@@ -63,12 +55,6 @@ const ConfirmationDialog = () => {
     const [cancelLabel, setCancelLabel] = useState<string | null>(null);
     const [hideClose, setHideClose] = useState(false);
     const [hideConfirm, setHideConfirm] = useState(false);
-
-    let hideModal = !show;
-
-    useEffect(() => {
-        hideModal = !show;
-    }, [show]);
 
     useEffect(() => {
         const token = pubsub.subscribe(
@@ -127,53 +113,6 @@ const ConfirmationDialog = () => {
             </AlertDialogContent>
         </AlertDialog>
     );
-    /*return (
-        <div
-            className={cx(styles.confirmationDialogWrapper, {
-                [styles.hidden]: hideModal,
-            })}
-        >
-            <div className={styles.confirmationDialog}>
-                <div className={styles.confirmationBar} />
-                <div className={styles.confirmationDialogTitle}>
-                    <FaExclamationTriangle />
-                    <span>{title}</span>
-                </div>
-                <div className={styles.confirmationDialogContent}>
-                    {content}
-                </div>
-                <div className={styles.confirmationDialogButtons}>
-                    {cancelLabel && (
-                        <ConfirmationDialogButton
-                            onClick={() => {
-                                if (onClose !== null) {
-                                    onClose();
-                                }
-                                setShow(false);
-                            }}
-                            variant={DIALOG_CANCEL}
-                        >
-                            {cancelLabel}
-                        </ConfirmationDialogButton>
-                    )}
-
-                    {confirmLabel && (
-                        <ConfirmationDialogButton
-                            onClick={() => {
-                                if (onConfirm !== null) {
-                                    onConfirm();
-                                }
-                                setShow(false);
-                            }}
-                            variant={DIALOG_CONFIRM}
-                        >
-                            {confirmLabel}
-                        </ConfirmationDialogButton>
-                    )}
-                </div>
-            </div>
-        </div>
-    );*/
 };
 
 export default ConfirmationDialog;
