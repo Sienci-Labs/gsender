@@ -156,6 +156,17 @@ const PrimaryVisualizer = ({
                         </Tooltip>
                     </div>
 
+                    <div className="absolute bottom-60 left-5">
+                        <button
+                            className="bg-red-500 text-white px-4 py-2 rounded-md"
+                            onClick={() => {
+                                throw new Error('Test: Throw Error');
+                            }}
+                        >
+                            Test: Throw Error
+                        </button>
+                    </div>
+
                     <CameraDisplay
                         camera={camera}
                         cameraPosition={cameraPosition}
