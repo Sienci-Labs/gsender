@@ -2368,6 +2368,13 @@ class Visualizer extends Component {
         );
 
         typeof callback === 'function' && callback({ bbox: bbox });
+
+        if (store.get('widgets.visualizer.checkFile')) {
+            controller.command('gcode:test');
+            toast.info('Running Check mode', {
+                position: 'bottom-right',
+            });
+        }
     }
 
     getToolpathHull() {

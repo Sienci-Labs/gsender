@@ -1706,6 +1706,8 @@ class GrblHalController {
                     activeState = _.get(this.state, 'status.activeState', '');
                     if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
+                    } else if (activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
+                        this.write('$C');
                     }
 
                     await delay(700); // delay 700ms
