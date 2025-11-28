@@ -208,7 +208,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
-                        label: 'Run Check Mode after loading a file',
+                        label: 'Run Check mode on file load',
                         key: 'widgets.visualizer.checkFile',
                         description:
                             'Immediately runs Check Mode ($C) on the gcode file after loading.',
