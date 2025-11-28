@@ -24,10 +24,9 @@ describe('Pause job ', () => {
     cy.wait(2000); // Give app time to recover from initialization error
   });
 
-  it('Test Case: pause Job', () => {
+  it('Test Case: pausing the  Job', () => {
 
-    // Step 1: Connect to CNC
-    cy.log('Step 1: Connecting to CNC...');
+    // Step 1: Connect to CNC using custom command
     cy.connectMachine();
     cy.wait(6000);
     cy.log('Connected to CNC');
@@ -112,7 +111,7 @@ describe('Pause job ', () => {
         cy.wrap(status).as('jobStatus');
       });
 
-    // Extract Time taken
+    // Extract Time taken for the job 
     cy.contains('strong', 'Time:')
       .parent()
       .invoke('text')
@@ -124,7 +123,7 @@ describe('Pause job ', () => {
         cy.wrap(timeTaken).as('timeTaken');
       });
 
-    // Verify no errors
+    // Verify there are no errors
     cy.contains('strong', 'Errors:')
       .parent()
       .invoke('text')

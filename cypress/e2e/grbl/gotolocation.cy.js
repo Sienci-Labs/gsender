@@ -24,7 +24,7 @@ describe('CNC Machine Tests Grbl', () => {
     cy.wait(2000); // Give app time to recover from initialization error
   });
 
-  it('Test Case: Connect to CNC and verify home position', () => {
+  it('Test Case: Connect to CNC and verify go to location', () => {
 
     // Step 1: Connect to CNC
     cy.log('Step 1: Connecting to CNC...');
@@ -41,10 +41,11 @@ describe('CNC Machine Tests Grbl', () => {
       });
 
     cy.wait(2000);
-
+    
     // Step 3: Open Go To Location popup
-    cy.log('Step 3: Opening Go to Location popup...');
+    cy.log('Step 3: Opening Go To Location popup...');
     cy.get('div.min-h-10 button')
+      .first()  // Click only the first button
       .should('be.visible')
       .click({ force: true });
 
@@ -63,7 +64,7 @@ describe('CNC Machine Tests Grbl', () => {
         .clear({ force: true })
         .type('0', { force: true })
         .should('have.value', '0');
-      cy.log('X coordinate: 0');
+      cy.log(' X coordinate: 0');
 
       // Y input  
       cy.wrap($inputs[1])
@@ -80,7 +81,7 @@ describe('CNC Machine Tests Grbl', () => {
         .type('0', { force: true })
         .blur()
         .should('have.value', '0');
-      cy.log('Z coordinate: 0');
+      cy.log(' Z coordinate: 0');
     });
 
     cy.wait(500);
@@ -92,7 +93,7 @@ describe('CNC Machine Tests Grbl', () => {
       .click({ force: true });
     
     cy.wait(2000);
-    cy.log('Go button clicked');
+    cy.log(' Go button clicked');
 
     // Step 6: Click outside popup to close
     cy.log('Step 6: Closing popup...');
@@ -129,7 +130,56 @@ describe('CNC Machine Tests Grbl', () => {
         }
       });
 
+    // Step 9: Checking different values using custom command
+    cy.log('Step 9: Checking different values...');
     cy.log(' Go To Location flow completed successfully');
+    
+    // Test positive values
+    cy.log('Testing positive values for axes...');
+    cy.goToLocation({ x: 5, y: 5, z: 5, waitTime: 5000 });
+    cy.log(' Tested positive value for axes');
+    
+    // Test negative values
+    cy.log('Testing negative values for axes...');
+   cy.goToLocation({ x: -5, y: -5, z: -5, waitTime: 5000 });
+    cy.log(' Verified negative values for axes');
+    
+    // Test float values
+    cy.log('Testing float values for axes...');
+    cy.goToLocation({ x: 0.5, y: 2.5, z: -5.5, waitTime: 5000 });
+    cy.log(' Verified float values for axes');
+    
+    // Return to home position
+    cy.log('Returning to home position...');
+    cy.goToLocation(0, 0, 0);
+    cy.log('Returned to home position');
+
+    // Step 10: Verify final position is 0,0,0
+    cy.log('Step 10: Verifying machine\'s current location...');
+    cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
+      .should('have.length', 3)
+      .then(($inputs) => {
+        const xValue = $inputs.eq(0).val();
+        const yValue = $inputs.eq(1).val();
+        const zValue = $inputs.eq(2).val();
+        
+        cy.log(`Current position: X=${xValue}, Y=${yValue}, Z=${zValue}`);
+        
+        // Verify all values are 0.00
+        cy.wrap($inputs.eq(0)).should('have.value', '0.00');
+        cy.wrap($inputs.eq(1)).should('have.value', '0.00');
+        cy.wrap($inputs.eq(2)).should('have.value', '0.00');
+        
+        // Check if all are 0.00
+        if (xValue === '0.00' && yValue === '0.00' && zValue === '0.00') {
+          cy.log('TEST PASSED: Machine is at home position (0.00, 0.00, 0.00) ');
+        } else {
+          cy.log('TEST FAILED: Machine is not at home position');
+          throw new Error(`Expected position (0.00, 0.00, 0.00) but got (${xValue}, ${yValue}, ${zValue})`);
+        }
+      });
+    cy.log(' ALL TESTS COMPLETED SUCCESSFULLY ');
+  
   });
 
 });

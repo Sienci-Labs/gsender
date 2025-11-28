@@ -1,4 +1,4 @@
-describe('CNC Machine Tests', () => {
+describe('Load file testing in grblHal', () => {
 
   // Handle uncaught exceptions from the application
   Cypress.on('uncaught:exception', (err) => {
@@ -29,7 +29,7 @@ describe('CNC Machine Tests', () => {
 
     // Step 1: Connect to CNC
     cy.log('Attempting to connect to CNC...');
-    cy.connectMachine();
+    cy.connectToGrblHAL();
     cy.wait(6000);
     cy.log('Connected to CNC');
 
@@ -101,7 +101,7 @@ describe('CNC Machine Tests', () => {
 
     // Step 3: Now connect to CNC
     cy.log('Attempting to connect to CNC...');
-    cy.connectMachine();
+    cy.connectToGrblHAL();
     cy.wait(5000);
     cy.log('Connected to CNC');
 
