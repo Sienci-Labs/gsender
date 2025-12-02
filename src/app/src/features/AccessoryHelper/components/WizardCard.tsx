@@ -15,7 +15,7 @@ export default function WizardCard({
     return (
         <div
             onClick={onSelect}
-            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer border-2 border-gray-200 hover:border-blue-400 overflow-hidden"
+            className="bg-white flex flex-col rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer border-2 border-gray-200 hover:border-blue-400 overflow-hidden"
         >
             <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                 {wizard.thumbnail ? (
