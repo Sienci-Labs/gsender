@@ -41,6 +41,8 @@ import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDial
 import { BiSolidCylinder } from 'react-icons/bi';
 import SDCard from 'app/features/SDCard';
 import { FaSdCard } from 'react-icons/fa';
+import { AccessoryHelper } from 'app/features/AccessoryHelper';
+import { LuDrill } from 'react-icons/lu';
 
 export const ReactRoutes = () => {
     return (
@@ -121,6 +123,14 @@ export const ReactRoutes = () => {
                                         }
                                         icon={FaSdCard}
                                         link={'/tools/sd'}
+                                    />
+                                    <ToolCard
+                                        title={'Accessory Installation'}
+                                        description={
+                                            'Manage and install your CNC accessories'
+                                        }
+                                        icon={LuDrill}
+                                        link={'/tools/accessory'}
                                     />
                                 </div>
                             </div>
@@ -213,6 +223,18 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <SDCard />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path={'accessory/:tool?'}
+                        element={
+                            <Page
+                                title="Accessory Installation"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <AccessoryHelper />
                             </Page>
                         }
                     />
