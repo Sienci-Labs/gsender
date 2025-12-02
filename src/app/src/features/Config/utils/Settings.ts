@@ -1,4 +1,3 @@
-import download from 'downloadjs';
 import store from 'app/store';
 import api from 'app/api';
 import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
@@ -17,7 +16,14 @@ export function exportFirmwareSettings(settings: object) {
     const today = new Date();
     const filename = `gSender-firmware-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
-    download(blob, filename, 'json');
+    // Native JS way to download file
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 }
 
 export function humanReadableMachineName(o) {

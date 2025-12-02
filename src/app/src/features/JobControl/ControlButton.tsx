@@ -39,7 +39,14 @@ interface ControlButtonProps {
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
     fileLoaded: boolean;
-    validateATC?: () => [boolean, object];
+    validateATC?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
     onStop: () => void;
 }
 

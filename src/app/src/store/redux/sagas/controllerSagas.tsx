@@ -116,6 +116,7 @@ import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
+import get from 'lodash/get';
 
 export function* initialize(): Generator<any, void, any> {
     // let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -226,6 +227,12 @@ export function* initialize(): Generator<any, void, any> {
                 _get(reduxState, 'controller.settings.settings.$112', 3000.0),
             ),
         };
+        const atcFlag: string = get(
+            reduxStore,
+            'controller.settings.info.NEWOPT.ATC',
+            '0',
+        );
+        const atcEnabled = atcFlag === '1';
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -276,6 +283,7 @@ export function* initialize(): Generator<any, void, any> {
                     isNewFile,
                     accelerations,
                     maxFeedrates,
+                    atcEnabled,
                 });
                 // });
             } else {
@@ -332,6 +340,7 @@ export function* initialize(): Generator<any, void, any> {
             isNewFile,
             accelerations,
             maxFeedrates,
+            atcEnabled,
         });
         // });
     };
@@ -900,7 +909,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'gcode_error',
         _throttle(
-            (error) => {
+            (error: string) => {
                 errors.push(error);
             },
             250,

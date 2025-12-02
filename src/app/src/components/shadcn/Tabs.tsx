@@ -1,4 +1,4 @@
-'use client';
+// https://ui.shadcn.com/docs/components/tabs
 
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';

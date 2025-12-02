@@ -1,5 +1,5 @@
 import { Widget } from 'app/components/Widget';
-import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { BasicPosition, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
@@ -32,6 +32,16 @@ interface JobControlProps {
     spindle: string;
     senderStatus: SenderStatus;
     fileCompletion: number;
+    currentTool: number;
+    spindleToolEvents: {
+        [key: string]: {
+            M: number;
+        };
+    };
+    toolOffsets: {
+        [key: number]: BasicPosition;
+    };
+    atcEnabled: boolean;
 }
 
 const JobControl: React.FC<JobControlProps> = ({
@@ -99,7 +109,14 @@ const JobControl: React.FC<JobControlProps> = ({
         setLastLine(senderStatus?.received);
     };
 
-    function validateFileForATC() {
+    const validateFileForATC = (): [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ] => {
         let hasTC = false;
         let toolEvent = null;
 
@@ -204,7 +221,7 @@ const JobControl: React.FC<JobControlProps> = ({
                 },
             ];
         }
-    }
+    };
 
     return (
         <>
@@ -292,10 +309,14 @@ export default connect((store) => {
     const spindleToolEvents = get(store, 'file.spindleToolEvents', {});
     const toolOffsets = get(store, 'controller.settings.toolTable', {});
     const currentTool = get(store, 'controller.state.status.currentTool', -1);
-    const atcFlag = get(store, 'controller.settings.info.NEWOPT.ATC', '0');
+    const atcFlag: string = get(
+        store,
+        'controller.settings.info.NEWOPT.ATC',
+        '0',
+    );
     const atcEnabled = atcFlag === '1';
 
-    return {
+    const data: JobControlProps = {
         fileLoaded,
         workflow,
         activeState,
@@ -312,4 +333,5 @@ export default connect((store) => {
         currentTool,
         atcEnabled,
     };
+    return data;
 })(JobControl);

@@ -26,6 +26,14 @@ import path from 'path';
 
 const maxAge = 0;
 
+// Resolve paths relative to where the binary is executed from
+// In dev: output/server-cli.js, so __dirname = /path/to/workspace/output
+const getAppPath = () => {
+    // __dirname will be /path/to/workspace/output
+    // app is at /path/to/workspace/output/app
+    return path.resolve(__dirname, 'app');
+};
+
 export default {
     route: '/', // with trailing slash
     assets: {
@@ -33,7 +41,8 @@ export default {
             routes: [
                 '' // empty path
             ],
-            path: path.resolve(__dirname, '..', '..', 'app'),
+            // In development, app is in output/app
+            path: getAppPath(),
             maxAge: maxAge
         }
     },

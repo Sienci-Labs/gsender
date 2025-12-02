@@ -163,6 +163,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     zMaxFeed: number = 0;
 
+    atcEnabled: boolean = false;
+
     re1: RegExp = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
 
     re2: RegExp = new RegExp(/\s*;.*/g); // Remove anything after a semi-colon to the end of the line, including preceding spaces
@@ -928,6 +930,11 @@ class GCodeVirtualizer extends EventEmitter {
                 this.setModal({ tool: params.T });
                 this.saveModal({ tool: params.T });
             }
+            if (this.atcEnabled) {
+                this.totalTime += 45; // add 45 seconds for toolchange
+                this.estimates.push(45);
+                this.setEstimate = true;
+            }
         },
         // Coolant Control
         // M7: Turn mist coolant on
@@ -997,6 +1004,7 @@ class GCodeVirtualizer extends EventEmitter {
             yMaxFeed?: number;
             zMaxFeed?: number;
         };
+        atcEnabled?: boolean;
     }) {
         super();
         const {
@@ -1007,6 +1015,7 @@ class GCodeVirtualizer extends EventEmitter {
             collate = false,
             accelerations,
             maxFeedrates,
+            atcEnabled,
         } = options;
 
         this.fn = { addLine, addArcCurve, addCurve, callback };
@@ -1032,6 +1041,8 @@ class GCodeVirtualizer extends EventEmitter {
             this.vmState.spindle = new Set<string>();
             this.vmState.invalidLines = [];
         }
+
+        this.atcEnabled = atcEnabled;
     }
 
     partitionWordsByGroup(words: [string, any][] = []): [string, any][][] {

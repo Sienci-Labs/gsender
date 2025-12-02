@@ -22,8 +22,8 @@
  */
 
 import AvrgirlArduino from '@sienci/avrgirl-arduino';
-import mk1Image from '!file-loader!./mk1_20220214.hex';
-import mk2Image from '!file-loader!./mk2_20220214.hex';
+import mk1Image from './mk1_20220214.hex';
+import mk2Image from './mk2_20220214.hex';
 import logger from '../../logger';
 
 const log = logger('FlashLib: ');
