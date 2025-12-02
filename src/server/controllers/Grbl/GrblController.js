@@ -63,7 +63,6 @@ import {
     GRBL_ALARMS,
     GRBL_ERRORS,
     GRBL_SETTINGS,
-    GRBL_ACTIVE_STATE_CHECK
 } from './constants';
 import {
     METRIC_UNITS,
@@ -1613,8 +1612,6 @@ class GrblController {
                     activeState = _.get(this.state, 'status.activeState', '');
                     if (activeState === GRBL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
-                    } else if (activeState === GRBL_ACTIVE_STATE_CHECK) {
-                        this.write('$C');
                     }
 
                     await delay(700); // delay 700ms

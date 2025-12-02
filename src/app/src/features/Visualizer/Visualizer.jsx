@@ -537,7 +537,11 @@ class Visualizer extends Component {
 
             let newPos = workPosition;
 
-            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
+            if (
+                isConnected &&
+                activeState === GRBL_ACTIVE_STATE_CHECK &&
+                this.fileLoaded
+            ) {
                 newPos = this.visualizer.getCurrentLocation();
             }
 
