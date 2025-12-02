@@ -33,13 +33,14 @@ describe('GrblHal File upload and job run', () => {
     cy.wait(3000);
 
    
-    // Step 5: Click the correct Start button (the green one with play icon)
-    cy.log('Step 5: Starting the job...');
-    cy.get('button.bg-green-600.dark\\:bg-green-700')
-      .contains('Start')
-      .should('be.visible')
-      .click({ force: true });
-    cy.log(' Start button clicked - Job running...');
+    // Step 5: Starting Job
+cy.log('Step 5: Starting Job...');
+cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
+  .contains('Start')
+  .should('be.visible')
+  .click({ force: true });
+cy.wait(2000);
+cy.log('Job started');
 
     // Step 6: Wait for job completion popup
     cy.log('Step 6: Waiting for job completion...');

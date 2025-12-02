@@ -53,14 +53,14 @@ describe('CNC Machine Tests Grbl', () => {
     cy.log('File Uploaded');
     cy.wait(2000);
     
-    // Step 5: Starting Job
-    cy.log('Step 5: Starting Job...');
-    cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
-      .contains('Start')
-      .should('be.visible')
-      .click({ force: true });
-    cy.wait(2000);
-    cy.log('Job started');
+// Step 5: Starting Job
+cy.log('Step 5: Starting Job...');
+cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
+  .contains('Start')
+  .should('be.visible')
+  .click({ force: true });
+cy.wait(2000);
+cy.log('Job started');
 
     // Step 6: Verify job is running
     cy.log('Step 6: Verifying job is running...');
