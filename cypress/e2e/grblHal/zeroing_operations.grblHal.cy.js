@@ -30,18 +30,25 @@ describe('Grblhal Zeroing axis and go to zero', () => {
     // Step 1: Connect to CNC
     cy.log('Step 1: Connecting to CNC...');
     cy.connectMachine();
-    cy.wait(6000);
-    cy.log(' Connected');
+    cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.log('Connected');
 
     // Step 2: Wait for Idle status
     cy.log('Step 2: Waiting for Idle status...');
     cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
     cy.wait(2000);
-    cy.log(' Machine is Idle');
+    cy.log('Machine is Idle');
 
     // Step 3: Move to position (0, 0, 0)
     cy.log('Step 3: Moving to position (0, 0, 0)...');
     cy.goToLocation({ x: 0, y: 0, z: 0 });
+    cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.log('At position (0, 0, 0)');
 
     // Step 4: Test X-axis movement and zeroing
     cy.log('Step 4: Testing X-axis...');
@@ -53,9 +60,12 @@ describe('Grblhal Zeroing axis and go to zero', () => {
 
     cy.get('#xPlus').click();
     cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
 
     cy.verifyAxes(5, 0, 0);
-    cy.log(' X moved to 5mm');
+    cy.log('X moved to 5mm');
 
     // Zero X axis
     cy.log('Zeroing X axis...');
@@ -67,7 +77,9 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .click({ force: true });
 
     cy.wait(waitAfter);
-    cy.log(' X axis zeroed');
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.log('X axis zeroed');
 
     // Step 5: Test Y-axis movement and zeroing
     cy.log('Step 5: Testing Y-axis...');
@@ -76,9 +88,12 @@ describe('Grblhal Zeroing axis and go to zero', () => {
 
     cy.get('#yPlus').click();
     cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
 
     cy.verifyAxes(0, 5, 0);
-    cy.log(' Y moved to 5mm');
+    cy.log('Y moved to 5mm');
 
     // Zero Y axis
     cy.log('Zeroing Y axis...');
@@ -90,7 +105,9 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .click({ force: true });
 
     cy.wait(waitAfter);
-    cy.log(' Y axis zeroed');
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.log('Y axis zeroed');
 
     // Step 6: Test Z-axis movement and zeroing
     cy.log('Step 6: Testing Z-axis...');
@@ -101,9 +118,12 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .should('exist')
       .click({ force: true });
     cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
 
     cy.verifyAxes(0, 0, 5);
-    cy.log(' Z moved to 5mm');
+    cy.log('Z moved to 5mm');
 
     // Zero Z axis
     cy.log('Zeroing Z axis...');
@@ -115,9 +135,11 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .click({ force: true });
 
     cy.wait(waitAfter);
-    cy.log(' Z axis zeroed');
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.log('Z axis zeroed');
 
-    cy.log(' All axes tested and zeroed successfully');
+    cy.log('All axes tested and zeroed successfully');
 
     // Testing go to X axis zero
     // Click on console tab 
@@ -138,12 +160,15 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .should('be.visible')
       .click();
     cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
     cy.log(' X button clicked');
 
     // Verify console lines has values for go to X axis 0 
     cy.log('Step 9: Verifying console contains details about moving to X zero axis...');
     cy.verifyConsoleContains('G90 G0 X0', 'ok');
-    cy.log(' X axis go to zero verified');
+    cy.log('X axis go to zero verified');
 
     // Step 10: Click Y button to go to Y=0
     cy.log('Step 10: Clicking Y button to go to Y=0...');
@@ -154,12 +179,15 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .should('be.visible')
       .click();
     cy.wait(3000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
     cy.log(' Y button clicked');
 
     // Verify console lines has values for go to Y axis 0 
     cy.log('Step 11: Verifying console contains details about moving to Y zero axis...');
     cy.verifyConsoleContains('G90 G0 Y0', 'ok');
-    cy.log(' Y axis go to zero verified');
+    cy.log('Y axis go to zero verified');
 
     // Step 12: Click Z button to go to Z=0
     cy.log('Step 12: Clicking Z button to go to Z=0...');
@@ -170,7 +198,10 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .should('be.visible')
       .click();
     cy.wait(3000);
-    cy.log(' Z button clicked');
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.log('Z button clicked');
 
     // Verify console lines has values for go to Z axis 0 
     cy.log('Step 13: Verifying console contains details about moving to Z zero axis...');
@@ -186,14 +217,17 @@ describe('Grblhal Zeroing axis and go to zero', () => {
       .should('be.visible')
       .click();
     cy.wait(3000);
-    cy.log(' XY button clicked');
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.log('XY button clicked');
 
     // Verify console lines has values for go to XY axis 0 
     cy.log('Step 15: Verifying console contains details about moving to XY zero axes...');
     cy.verifyConsoleContains('G90 G0 X0 Y0', 'ok');
-    cy.log(' XY axes go to zero verified');
+    cy.log('XY axes go to zero verified');
 
-    cy.log(' All go-to-zero operations completed and verified successfully');
+    cy.log('All go-to-zero operations completed and verified successfully');
   });
 
 });

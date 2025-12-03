@@ -32,9 +32,12 @@ describe('Console commands testing ', () => {
     cy.wait(3000);
     cy.autoUnlock();
     cy.log('Connected to CNC');
+    //Unlock machine if needed
+    cy.unlockMachineIfNeeded();
 
     //Waiting until idle status 
     cy.log('Step 2: Waiting for idle state...');
+    cy.unlockMachineIfNeeded();
     cy.contains(/^idle$/i, {timeout : 30000}).should('be.visible');
     cy.wait(1000);
 
@@ -44,7 +47,7 @@ describe('Console commands testing ', () => {
     cy.log('Console cleared successfully');
     cy.wait(1000);
 
-    //Input G-code commands to set axes to 0
+    //Input G-code commands to set axes using console
     cy.log('Step 4: Setting axes to zero...');
     
     // Set X axis to 0
@@ -66,35 +69,6 @@ describe('Console commands testing ', () => {
     cy.verifyAxes(0, 0, 0);
     cy.log('Test completed successfully - all axes verified at zero');
 
-    //Disconnect machine 
-    cy.disconnectIfIdle();
-    cy.log('Machine is disconnected');
-
-  });
-
-  it.only('Connects machine and moves to position 5,5,5', () => {
-    
-    //Connects machine 
-    cy.log('Step 1: Connecting to CNC...');
-    cy.connectMachine();
-    cy.wait(3000);
-    cy.autoUnlock();
-    cy.log('Connected to CNC');
-
-    //Waiting until idle status 
-    cy.log('Step 2: Waiting for idle state...');
-    cy.contains(/^idle$/i, {timeout : 30000}).should('be.visible');
-    cy.wait(1000);
-
-    //Go to console and clear 
-    cy.log('Step 3: Clearing console...');
-    cy.clearConsole();
-    cy.log('Console cleared successfully');
-    cy.wait(1000);
-
-    //Makes axes 0,0,0
-    cy.goToLocation(0,0,0);
-
     // Go to axis 5,5,5
     cy.log('Step 4: Moving to position X5 Y5 Z5...');
     cy.sendConsoleCommand('G0 X5 Y5 Z5');
@@ -104,7 +78,7 @@ describe('Console commands testing ', () => {
     cy.log('Step 5: Verifying axes positions...');
     cy.verifyAxes(5, 5, 5);
     cy.log('Test completed successfully - all axes verified at 5,5,5');
-
+    
     //Disconnect machine 
     cy.disconnectIfIdle();
     cy.log('Machine is disconnected');

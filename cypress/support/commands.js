@@ -121,81 +121,65 @@ Cypress.Commands.add('autoUnlock', () => {
 // Connect to CNC - GrblHAL
 // ----------------------
 Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
-  const {
-    timeout = 30000,
-    unlockIfNeeded = true,
-    verifyFirmware = true,
-    waitForIdle = true
-  } = options;
-
-  cy.log('Starting GrblHAL connection process...');
-
-  // Step 1: Find and click Connect button using SVG icon
-  cy.log('Step 1: Looking for Connect to CNC button...');
+  cy.log('Starting connection check...');
+  cy.wait(2000); // Brief wait for UI to stabilize
   
-  // Target the specific SVG icon in the Connect button
-  cy.get('svg[viewBox="0 0 256 256"]', { timeout: 20000 })
-    .parents('div.h-12.max-xl\\:h-10')
-    .should('exist')
-    .scrollIntoView()
-    .should('be.visible')
-    .then(($btn) => {
-      cy.log('Found Connect button with wrench icon');
-      cy.wrap($btn).click({ force: true });
-    });
-
-  cy.wait(3000);
-  cy.log('Connect button clicked');
-
-  // Step 2: Select COM port
-  cy.log('Step 2: Selecting COM port...');
-  cy.get('div.absolute', { timeout: 20000 })
-    .should('be.visible')
-    .find('button')
-    .first()
-    .should('contain.text', 'COM')
-    .then(($btn) => {
-      const portName = $btn.text().trim();
-      cy.log(`Selecting port: ${portName}`);
-      $btn.click();
-    });
-
-  cy.wait(3000);
-  cy.log(' COM port selected');
-
-  // Step 3: Unlock machine if needed
-  if (unlockIfNeeded) {
-    cy.log('Step 3: Checking if unlock is needed...');
-    cy.unlockMachineIfNeeded();
-  }
-
-  // Step 4: Wait for Idle state
-  if (waitForIdle) {
-    cy.log('Step 4: Waiting for machine to reach Idle state...');
-    cy.contains(/^Idle$/i, { timeout })
+  cy.get('body').then(($body) => {
+    const bodyText = $body.text();
+    
+    // Check if already in Idle state
+    if (/\bIdle\b/i.test(bodyText)) {
+      cy.log('Machine is already connected and in Idle state');
+      return;
+    }
+    
+    // Check if connected but waiting for Idle
+    if (/\b(Disconnect|disconnect)\b/.test(bodyText)) {
+      cy.log('Machine is connected, waiting for Idle state...');
+      cy.contains(/^Idle$/i, { timeout: 30000 })
+        .should('be.visible')
+        .then(() => {
+          cy.log('Machine reached Idle state');
+        });
+      return;
+    }
+    
+    // Not connected - initiate connection
+    cy.log('Machine not connected. Initiating connection...');
+    
+    cy.contains(/^connect to CNC$/i, { timeout: 20000 })
+      .should('exist')
+      .scrollIntoView()
       .should('be.visible')
+      .click({ force: true })
       .then(() => {
-        cy.log(' Machine is in Idle state');
+        cy.log('Connect button clicked');
+        cy.wait(1000);
+        
+        // Select first available COM port
+        cy.get('div.absolute', { timeout: 20000 })
+          .should('be.visible')
+          .find('button')
+          .first()
+          .should('contain.text', 'COM')
+          .then(($btn) => {
+            const portName = $btn.text().trim();
+            cy.log(`Selecting port: ${portName}`);
+            cy.wrap($btn).click({ force: true });
+          });
+        
+        // Handle unlock if needed
+        cy.unlockMachineIfNeeded();
+        
+        // Wait for Idle state
+        cy.log('Waiting for machine to reach Idle state...');
+        cy.contains(/^Idle$/i, { timeout: 30000 })
+          .should('be.visible')
+          .then(() => {
+            cy.log('CNC machine connected successfully and is in Idle state');
+          });
       });
-  }
-
-  // Step 5: Verify firmware type
-  if (verifyFirmware) {
-    cy.log('Step 5: Verifying GrblHAL firmware...');
-    cy.get('body').then(($body) => {
-      const text = $body.text().toLowerCase();
-
-      if (text.includes('grblhal')) {
-        cy.log('Firmware Detected: GrblHAL');
-      } else if (text.includes('grbl')) {
-        cy.log('Firmware Detected: Grbl (not GrblHAL)');
-      } else {
-        cy.log('Firmware information not found');
-      }
-    });
-  }
-
-  cy.log(' GrblHAL connection process completed');
+  });
 });
 
 // ----------------------
