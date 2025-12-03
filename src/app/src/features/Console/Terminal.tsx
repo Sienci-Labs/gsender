@@ -42,7 +42,9 @@ type Props = {
 let newHistory: string[] = [];
 
 const pushUpdatedTerminalHistory = debounce(() => {
-    reduxStore.dispatch(addToHistory(newHistory));
+    reduxStore.dispatch(
+        addToHistory(newHistory.slice(-MAX_TERMINAL_INPUT_ARRAY_SIZE)),
+    );
     newHistory = [];
 }, 1000);
 
@@ -140,9 +142,6 @@ const Terminal = (
         }
 
         newHistory.push(data);
-        if (newHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
-            newHistory.shift();
-        }
         pushUpdatedTerminalHistory();
 
         if (data.includes('error:')) {
