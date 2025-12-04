@@ -26,6 +26,14 @@ import pubsub from 'pubsub-js';
 type StartFromLineProps = {
     disabled: boolean;
     lastLine: number;
+    atcValidator?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
 };
 
 const StartFromLine = ({

@@ -217,6 +217,18 @@ class GrblHalLineParserResultStatus {
             };
         }
 
+        if (_.has(result, 'SD')) {
+            payload.SD = {
+                name: result.SD[1],
+                percentage: Number(result.SD[0])
+            };
+        } else {
+            payload.SD = {
+                name: null,
+                percentage: 0
+            };
+        }
+
         return {
             type: GrblHalLineParserResultStatus,
             payload: payload

@@ -1,4 +1,3 @@
-import { gSenderEEPROMSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
@@ -8,11 +7,12 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from 'app/components/Tooltip';
+import { EEPROM } from 'app/definitions/firmware';
 
 interface EEPROMSettingRowProps {
     eID: string;
     changeHandler: (value: number) => void;
-    resetHandler: (k, v) => void;
+    resetHandler: (setting: EEPROM, value: string | number) => void;
     link?: string;
     linkLabel?: string;
 }

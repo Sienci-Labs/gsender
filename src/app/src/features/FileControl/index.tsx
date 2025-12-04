@@ -113,7 +113,7 @@ const FileControl = () => {
     return (
         <Widget>
             <Widget.Content>
-                <div className="w-full flex flex-col gap-2 max-xl:gap-1">
+                <div className="w-full flex flex-col items-center">
                     <ButtonControlGroup />
                     <FileInformation
                         handleRecentFileUpload={handleRecentFileUpload}

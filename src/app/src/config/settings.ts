@@ -65,7 +65,6 @@ const settings: ConfigSettings = {
         // default namespace used if not passed to translation function
         defaultNS: 'resource',
 
-        // @see webpack.webconfig.xxx.js
         whitelist: import.meta.env.VITE_LANGUAGES?.split(','),
 
         // array of languages to preload

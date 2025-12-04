@@ -1,5 +1,5 @@
 import { Widget } from 'app/components/Widget';
-import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { BasicPosition, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
@@ -18,6 +18,7 @@ import ProgressArea from './ProgressArea';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
+import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
@@ -31,6 +32,16 @@ interface JobControlProps {
     spindle: string;
     senderStatus: SenderStatus;
     fileCompletion: number;
+    currentTool: number;
+    spindleToolEvents: {
+        [key: string]: {
+            M: number;
+        };
+    };
+    toolOffsets: {
+        [key: number]: BasicPosition;
+    };
+    atcEnabled: boolean;
 }
 
 const JobControl: React.FC<JobControlProps> = ({
@@ -98,7 +109,14 @@ const JobControl: React.FC<JobControlProps> = ({
         setLastLine(senderStatus?.received);
     };
 
-    function validateFileForATC() {
+    const validateFileForATC = (): [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ] => {
         let hasTC = false;
         let toolEvent = null;
 
@@ -203,10 +221,11 @@ const JobControl: React.FC<JobControlProps> = ({
                 },
             ];
         }
-    }
+    };
 
     return (
         <>
+            <SDCardProgress />
             <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea
@@ -290,10 +309,14 @@ export default connect((store) => {
     const spindleToolEvents = get(store, 'file.spindleToolEvents', {});
     const toolOffsets = get(store, 'controller.settings.toolTable', {});
     const currentTool = get(store, 'controller.state.status.currentTool', -1);
-    const atcFlag = get(store, 'controller.settings.info.NEWOPT.ATC', '0');
+    const atcFlag: string = get(
+        store,
+        'controller.settings.info.NEWOPT.ATC',
+        '0',
+    );
     const atcEnabled = atcFlag === '1';
 
-    return {
+    const data: JobControlProps = {
         fileLoaded,
         workflow,
         activeState,
@@ -310,4 +333,5 @@ export default connect((store) => {
         currentTool,
         atcEnabled,
     };
+    return data;
 })(JobControl);

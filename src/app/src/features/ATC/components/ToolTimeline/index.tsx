@@ -9,13 +9,11 @@ import {
     LIGHT_THEME_VALUES,
 } from 'app/features/Visualizer/constants';
 import store from 'app/store';
-import { generateComplementaryColor } from 'app/workers/colors.worker';
 import { RootState } from 'app/store/redux';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import get from 'lodash/get';
 import controller from 'app/lib/controller.ts';
-import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
-import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
+import { generateComplementaryColor } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 function getThemeCuttingColour() {
     const visualizerTheme = store.get('widgets.visualizer.theme', 'Dark');

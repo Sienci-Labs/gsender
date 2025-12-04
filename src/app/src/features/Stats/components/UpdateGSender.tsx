@@ -9,7 +9,7 @@ export function UpdateGSender({
     notes = {
         version: '1.5.0-EDGE-6',
         releaseDate: '2025-03-11T14:28:46.936Z',
-        releaseNotes: "",
+        releaseNotes: '',
     },
 }) {
     const [version, setVersion] = useState<string>('');
@@ -31,7 +31,6 @@ export function UpdateGSender({
     useEffect(() => {
         setVersion(notes.version);
         setReleaseDate(notes.releaseDate);
-        console.log(notes);
         setReleaseNotes(notes.releaseNotes);
     }, [notes]);
 

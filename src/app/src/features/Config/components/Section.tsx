@@ -19,21 +19,18 @@ interface SectionProps {
     settings: gSenderSettings[];
     eeprom?: gSenderEEEPROMSettings;
     wizard?: () => JSX.Element;
+    showEEPROMOnly?: boolean;
 }
 
 export const Section = React.forwardRef(
     (
         {
             title,
-            children,
-            activeSection,
-            key,
             id,
-            index,
             settings,
             connected = false,
-            eeprom,
             wizard = null,
+            showEEPROMOnly,
         }: SectionProps,
         ref,
     ) => {
@@ -49,7 +46,22 @@ export const Section = React.forwardRef(
             (a, b) => a + b.settings.length,
             0,
         );
-        return (
+        return showEEPROMOnly ? (
+            filteredSettings.length > 0 &&
+                filteredSettings.map((setting: gSenderSubSection, _index) => {
+                    return (
+                        <div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
+                            <SettingSection
+                                connected={connected}
+                                settings={setting.settings}
+                                label={setting.label}
+                                wizard={setting.wizard}
+                                showEEPROMOnly={true}
+                            />
+                        </div>
+                    );
+                })
+        ) : (
             <div
                 id={id}
                 className={cn({

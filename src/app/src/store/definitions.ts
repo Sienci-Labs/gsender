@@ -73,6 +73,9 @@ export interface ControllerSettings {
     descriptions?: EEPROMDescriptions;
     groups: BasicObject;
     alarms: BasicObject;
+    version: {
+        semver: number;
+    };
 }
 
 export interface gSenderInfo {
@@ -256,5 +259,5 @@ export interface ConsoleState {
 }
 
 export interface ShortcutSliceState {
-    isFinished: boolean
+    isFinished: boolean;
 }

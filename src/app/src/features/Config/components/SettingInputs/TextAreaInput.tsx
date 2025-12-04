@@ -2,7 +2,7 @@ interface TextAreaInputProps {
     value: string;
     onChange: (value: string) => void;
     index: number;
-    subIndex: number;
+    subIndex?: number;
 }
 
 export function TextAreaInput({ value, onChange }: TextAreaInputProps) {

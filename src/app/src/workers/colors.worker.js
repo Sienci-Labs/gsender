@@ -38,7 +38,7 @@ import {
  * @param {THREE.Color} color - The input Three.js Color instance
  * @returns {THREE.Color} - A new Three.js Color instance with complementary color
  */
-export const generateComplementaryColor = (color, tcCounter) => {
+const generateComplementaryColor = (color, tcCounter) => {
     // Convert to HSL for easier manipulation
     const hsl = { h: 0, s: 0, l: 0 };
     color.getHSL(hsl);
