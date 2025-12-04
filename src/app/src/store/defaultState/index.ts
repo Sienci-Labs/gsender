@@ -32,7 +32,8 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
-    GRBLHAL, OUTLINE_MODE_DETAILED,
+    GRBLHAL,
+    OUTLINE_MODE_DETAILED,
 } from '../../constants';
 
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
@@ -146,7 +147,7 @@ const defaultState: State = {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
             forceHardLimits: false,
-            forceSoftLimits: false
+            forceSoftLimits: false,
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -192,7 +193,7 @@ const defaultState: State = {
                 },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                 distances: [],
-                threshold: 250
+                threshold: 250,
             },
             mdi: {
                 disabled: false,
@@ -300,7 +301,7 @@ const defaultState: State = {
                     startHeight: 50,
                     finalHeight: 40,
                     enableRehoming: false,
-                    shouldDwell: false
+                    shouldDwell: false,
                 },
             },
             tab: {
@@ -339,7 +340,7 @@ const defaultState: State = {
             cutDirectionFlipped: false,
             shouldDwell: false,
             flood: false,
-            mist: false
+            mist: false,
         },
         visualizer: {
             minimized: false,
@@ -355,6 +356,7 @@ const defaultState: State = {
             SVGEnabled: false,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
+            checkFile: false,
             gcode: {
                 displayName: true,
             },
