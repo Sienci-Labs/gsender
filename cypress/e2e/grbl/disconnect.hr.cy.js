@@ -18,20 +18,19 @@ describe('Connect and Disconnect from CNC Machine', () => {
     cy.title().should('eq', 'gSender');
   });
 
-  it('connects and disconnects the CNC machine if Idle', () => {
-    // Step 1: Connect to CNC using reusable command
+  it('connects and disconnects the CNC machine if Idle', () => { // Step 1: Connect to CNC using reusable command
     cy.log(' Connecting to CNC machine...');
     cy.connectMachine();
-
-    // Step 2: Verify CNC is Idle
-    cy.contains(/^Idle$/i, { timeout: 20000 })
+    cy.unlockMachineIfNeeded(); //Unlock if there are any errors 
+    
+    cy.contains(/^Idle$/i, { timeout: 20000 }) // Step 2: Verify CNC is Idle
       .should('be.visible')
       .then((status) => {
         const machineStatus = status.text().trim();
         cy.log(` Machine is in status: "${machineStatus}"`);
 
-        // Step 3: If Idle, disconnect using force click
-        if (machineStatus.toLowerCase() === 'idle') {
+        
+        if (machineStatus.toLowerCase() === 'idle') { // Step 3: If Idle, disconnect using force click
           cy.log(' Machine is Idle — disconnecting...');
 
           cy.get('button.bg-red-600.text-white')
@@ -40,8 +39,8 @@ describe('Connect and Disconnect from CNC Machine', () => {
 
           cy.log(' Disconnect clicked — verifying status...');
 
-          // Step 4: Verify the machine is disconnected
-          cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
+          
+          cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 }) // Step 4: Verify the machine is disconnected
             .should('be.visible')
             .then(() => cy.log(' Machine disconnect verified successfully.'));
         } else {

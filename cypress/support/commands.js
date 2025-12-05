@@ -1,10 +1,29 @@
 // ***********************************************
 // cypress/support/commands.js
 // Custom commands for Gsender
+//1. wait for idle status
+//2.Load UI
+//3.Connect to CNC machine grbl
+//4.Auto unlock 
+// 5.Connect to CNC - GrblHAL
+// 6.Disconnect if Idle
+// 7.Upload G-code file
+//8.Go to location grbl
+//9.Go to location grblHal
+//10.Unlock Machine if Needed
+//11.Verify Specific Console Line Contains Text
+//12.Zero X Axis
+//13.Zero Y Axis
+//14.Zero Z Axis
+//15.Zero All Axes
+//16.Force input into a field
+//17.Send Console Command
+//18.Clear Console Command
+//19.Verify axes for expected values (flexible with decimals)
 // ***********************************************
 
 // ----------------------
-// Wait for Idle State
+// 1.Wait for Idle State
 // ----------------------
 Cypress.Commands.add('waitForIdle', (timeout = 30000) => {
   cy.log('Waiting for machine to reach Idle state...');
@@ -17,9 +36,56 @@ Cypress.Commands.add('waitForIdle', (timeout = 30000) => {
     cy.log(' Machine is in Idle state');
   });
 });
+//=======//
+//2.Load UI//
+//=======//
+Cypress.Commands.add('loadUI', (url, options = {}) => {
+  const {
+    maxRetries = 3,
+    waitTime = 3000,
+    timeout = 5000
+  } = options;
+
+  function tryLoadUI(attempt = 1) {
+    cy.log(`Loading attempt ${attempt} of ${maxRetries}`);
+    
+    if (attempt === 1) {
+      cy.visit(url, { 
+        failOnStatusCode: false,
+        timeout: 30000 
+      });
+    } else {
+      cy.reload();
+    }
+
+    cy.wait(waitTime);
+
+    // Check multiple indicators that UI has loaded
+    cy.get('body', { timeout }).then(($body) => {
+      const hasButton = $body.find('button').length > 0;
+      const hasCOM = $body.text().includes('COM');
+      const hasConnection = $body.text().includes('Connect') || $body.text().includes('Connection');
+      
+      const uiLoaded = hasButton && (hasCOM || hasConnection);
+      
+      cy.log(`Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`);
+      
+      if (uiLoaded) {
+        cy.log(' UI loaded successfully');
+      } else if (attempt < maxRetries) {
+        cy.log(' UI not loaded, refreshing...');
+        tryLoadUI(attempt + 1);
+      } else {
+        throw new Error(`Failed to load UI after ${maxRetries} attempts`);
+      }
+    });
+  }
+
+  tryLoadUI();
+});
 
 // ----------------------
-// Connect to CNC machine grbl
+//3.Connect to CNC machine grbl
 // ----------------------
 Cypress.Commands.add('connectMachine', () => {
   cy.log('Starting connection check...');
@@ -82,9 +148,8 @@ Cypress.Commands.add('connectMachine', () => {
       });
   });
 });
-
 // -----------------------
-// Auto unlock 
+//4.Auto unlock 
 // -----------------------
 Cypress.Commands.add('autoUnlock', () => {
   cy.get('body', { log: false, timeout: 1000 }).then({ timeout: 1000 }, ($body) => {
@@ -118,7 +183,7 @@ Cypress.Commands.add('autoUnlock', () => {
 });
 
 // ------------------------
-// Connect to CNC - GrblHAL
+// 5.Connect to CNC - GrblHAL
 // ----------------------
 Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
   cy.log('Starting connection check...');
@@ -183,7 +248,7 @@ Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
 });
 
 // ----------------------
-// Disconnect if Idle
+// 6.Disconnect if Idle
 // ----------------------
 Cypress.Commands.add('disconnectIfIdle', () => {
   cy.wait(5000);
@@ -206,7 +271,7 @@ Cypress.Commands.add('disconnectIfIdle', () => {
 });
 
 // ----------------------
-// Upload G-code file
+//7.Upload G-code file
 // ----------------------
 Cypress.Commands.add('uploadGcodeFile', (fileName = 'sample.gcode') => {
   cy.wait(5000);
@@ -220,7 +285,7 @@ Cypress.Commands.add('uploadGcodeFile', (fileName = 'sample.gcode') => {
 });
 
 // ----------------------
-// Go to location grbl
+//8.Go to location grbl
 // ----------------------
 Cypress.Commands.add('goToLocation', (options = {}) => {
   const { x = 0, y = 0, z = 0, verifyPosition = true, waitTime = 3000 } = options;
@@ -301,7 +366,7 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
 });
 
 // ----------------------
-// Go to location grblHal
+//9.Go to location grblHal
 // ----------------------
 Cypress.Commands.add('grblHalGoToLocation', (x = 0, y = 0, z = 0) => {
   cy.log('Opening Go to Location popup...');
@@ -328,7 +393,7 @@ Cypress.Commands.add('grblHalGoToLocation', (x = 0, y = 0, z = 0) => {
 });
 
 // ----------------------
-// Unlock Machine if Needed
+//10.Unlock Machine if Needed
 // ----------------------
 Cypress.Commands.add('unlockMachineIfNeeded', () => {
   cy.get('body').then($body => {
@@ -344,7 +409,7 @@ Cypress.Commands.add('unlockMachineIfNeeded', () => {
 });
 
 // ----------------------
-// Verify Specific Console Line Contains Text
+//11.Verify Specific Console Line Contains Text
 // ----------------------
 Cypress.Commands.add('verifyConsoleContains', (text) => {
   cy.log(`Checking if console contains: "${text}"`);
@@ -359,7 +424,7 @@ Cypress.Commands.add('verifyConsoleContains', (text) => {
 });
 
 // ----------------------
-// Zero X Axis
+//12.Zero X Axis
 // ----------------------
 Cypress.Commands.add('zeroXAxis', () => {
   cy.log('Zeroing X axis...');
@@ -371,7 +436,7 @@ Cypress.Commands.add('zeroXAxis', () => {
 });
 
 // ----------------------
-// Zero Y Axis
+//13.Zero Y Axis
 // ----------------------
 Cypress.Commands.add('zeroYAxis', () => {
   cy.log('Zeroing Y axis...');
@@ -383,7 +448,7 @@ Cypress.Commands.add('zeroYAxis', () => {
 });
 
 // ----------------------
-// Zero Z Axis
+//14.Zero Z Axis
 // ----------------------
 Cypress.Commands.add('zeroZAxis', () => {
   cy.log('Zeroing Z axis...');
@@ -395,7 +460,7 @@ Cypress.Commands.add('zeroZAxis', () => {
 });
 
 // ----------------------
-// Zero All Axes
+//15.Zero All Axes
 // ----------------------
 Cypress.Commands.add('zeroAllAxes', () => {
   cy.log('Resetting all axes to zero...');
@@ -406,7 +471,7 @@ Cypress.Commands.add('zeroAllAxes', () => {
 });
 
 // ----------------------
-// Force input into a field
+//16.Force input into a field
 // ----------------------
 Cypress.Commands.add('forceInput', (selector, value) => {
   cy.get(selector)
@@ -418,7 +483,7 @@ Cypress.Commands.add('forceInput', (selector, value) => {
     });
 });
 // ----------------------
-// Send Console Command
+//17.Send Console Command
 // ----------------------
 Cypress.Commands.add('sendConsoleCommand', (command) => {
   cy.log(`Sending console command: ${command}`);
@@ -440,7 +505,7 @@ Cypress.Commands.add('sendConsoleCommand', (command) => {
   cy.log(` Command sent: ${command}`);
 });
 // ----------------------
-// Clear Console Command
+//18.Clear Console Command
 // ----------------------
 Cypress.Commands.add('clearConsole', () => {
   cy.log('Clearing console...');
@@ -471,7 +536,7 @@ Cypress.Commands.add('clearConsole', () => {
   cy.log('Console cleared successfully');
 });
 // ----------------------
-// Verify axes for expected values (flexible with decimals)
+//19.Verify axes for expected values (flexible with decimals)
 // ----------------------
 Cypress.Commands.add('verifyAxes', (expectedX = 0, expectedY = 0, expectedZ = 0) => {
   cy.log(`Verifying axes positions: X=${expectedX}, Y=${expectedY}, Z=${expectedZ}...`);

@@ -12,7 +12,7 @@ describe('Connect To CNC and Detect Firmware', () => {
     ];
     
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // Prevent Cypress from failing
+      return false; // prevent cypress from failing 
     }
     return true;
   });   
@@ -26,21 +26,16 @@ describe('Connect To CNC and Detect Firmware', () => {
 
   beforeEach(() => {
     cy.viewport(1280, 800);
-    
-    // Simple visit without onBeforeLoad
-    cy.visit('http://localhost:8000/#/', {
-      failOnStatusCode: false
+    // Use loadUI custom command instead of manual visit
+    cy.loadUI('http://localhost:8000/#/', {
+      maxRetries: 3,
+      waitTime: 3000,
+      timeout: 5000
     });
-    
-    // Wait for app to initialize
-    cy.get('#app', { timeout: 30000 }).should('exist');
-    cy.wait(3000); // Give app time to settle
   });
 
   it('connects to CNC, selects COM port, and detects firmware', () => {
     cy.wait(5000);
-
-    
 
     cy.log('Checking for Connect button...');
     cy.contains(/^connect to CNC$/i, { timeout: 20000 })
@@ -61,13 +56,13 @@ describe('Connect To CNC and Detect Firmware', () => {
         $btn.click();
       });
 
-    cy.unlockMachineIfNeeded(); //Unlock if there are any errors 
+    cy.unlockMachineIfNeeded(); // Unlock if there are any errors 
 
     cy.log('Waiting for machine to reach Idle state...');
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should('be.visible')
       .then(() => {
-        cy.log(' CNC machine connected successfully and is in Idle state');
+        cy.log('CNC machine connected successfully and is in Idle state');
       });
 
     cy.wait(2000);
@@ -76,12 +71,16 @@ describe('Connect To CNC and Detect Firmware', () => {
       const text = $body.text().toLowerCase();
 
       if (text.includes('grblhal')) {
-        cy.log(' Firmware Detected: GrblHAL');
+        cy.log('Firmware Detected: GrblHAL');
       } else if (text.includes('grbl')) {
-        cy.log(' Firmware Detected: Grbl');
+        cy.log('Firmware Detected: Grbl');
       } else {
-        cy.log(' Firmware information not found.');
+        cy.log('Firmware information not found.');
       }
     });
+
+    //Disconnect the machine using custom command
+    cy.disconnectIfIdle();
   });
+
 });
