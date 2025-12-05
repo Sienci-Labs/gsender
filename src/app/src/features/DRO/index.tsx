@@ -105,6 +105,12 @@ function DRO({
         });
     }, []);
 
+    useEffect(() => {
+        if (!singleAxisHoming) {
+            setHomingMode(false);
+        }
+    }, [singleAxisHoming]);
+
     function jogToCorner(
         corner: string,
         homingDir?: string,
