@@ -1625,10 +1625,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'IP address',
+                        label: 'Connect to IP',
                         key: 'widgets.connection.ip',
                         description:
-                            'Set the IP address for network scanning. (Default 192.168.5.1)',
+                            'IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
                     { type: 'eeprom', eID: '$301' },
