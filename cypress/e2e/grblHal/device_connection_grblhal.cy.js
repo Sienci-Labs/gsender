@@ -25,7 +25,7 @@ describe('Connect To CNC and Detect Firmware', () => {
   });
 // Custom retry loop to check whether the UI is loaded completely
   beforeEach(() => {
-  cy.visitAndWait('http://localhost:8000/#/', '#app', 3);
+  cy.loadUI('http://localhost:8000/#/', '#app', 3);
 });
 
   it('connects to CNC, selects COM port, and detects firmware', () => {
