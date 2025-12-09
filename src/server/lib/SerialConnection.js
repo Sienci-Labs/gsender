@@ -172,8 +172,9 @@ class SerialConnection extends EventEmitter {
     // @param {function} callback The error-first callback.
     open(callback) {
         this.callback = callback;
-        const { path, baudRate, network, ...rest } = this.settings;
-
+        const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
+        console.log(ethernetPort);
+        console.log(rest);
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
         const looksLikeIP = path.match(expr);
@@ -213,7 +214,7 @@ class SerialConnection extends EventEmitter {
             });
 
             this.addPortListeners();
-            this.port.connect(23, path);
+            this.port.connect(ethernetPort, path);
         } else {
             this.port = new SerialPort({
                 path,
