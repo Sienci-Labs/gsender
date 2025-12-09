@@ -24,17 +24,17 @@
 import { ArcCurve, Vector3 } from 'three';
 
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
+import { VISUALIZER_TYPES_T } from 'app/features/Visualizer/definitions';
 
 interface WorkerData {
     content: string;
-    visualizer: any;
     isLaser?: boolean;
     shouldIncludeSVG?: boolean;
     needsVisualization?: boolean;
-    parsedData?: any;
-    isNewFile?: boolean;
     accelerations?: any;
     maxFeedrates?: any;
+    isSecondary: boolean;
+    activeVisualizer: VISUALIZER_TYPES_T;
 }
 
 interface SVGVertex {
@@ -65,14 +65,13 @@ interface SpindleValues {
 self.onmessage = function ({ data }: { data: WorkerData }) {
     const {
         content,
-        visualizer,
         isLaser = false,
         shouldIncludeSVG = false,
         needsVisualization = true,
-        parsedData = {},
-        isNewFile = false,
         accelerations,
         maxFeedrates,
+        isSecondary,
+        activeVisualizer,
     } = data;
 
     // Common state variables
@@ -81,7 +80,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     const frames: number[] = [];
 
     // Laser specific state variables
-    const spindleSpeeds = new Set<number>();
+    const spindleSpeeds: number[] = [];
     let spindleSpeed = 0;
     let spindleOn = false;
     let spindleChanges: SpindleValues[] = [];
@@ -102,7 +101,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         const spindleMatches = words.filter((word) => word[0] === 'S');
         const [spindleCommand, spindleValue] = spindleMatches[0] || [];
         if (spindleCommand) {
-            spindleSpeeds.add(Number(spindleValue));
+            spindleSpeeds.push(Number(spindleValue));
             spindleSpeed = Number(spindleValue);
             spindleOn = Number(spindleValue) > 0;
         }
@@ -182,7 +181,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
                     // svg
                     if (shouldIncludeSVG) {
-                        const multiplier = units === 'G21' ? 1 : 25.4 // We need to make path bigger for inches
+                        const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
                         svgInitialization(motion);
                         SVGVertices.push({
                             x1: v1.x * multiplier,
@@ -236,7 +235,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 v0: Vector3,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane, units} = modal;
+                    const { motion, plane, units } = modal;
                     const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
@@ -483,16 +482,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     fileInfo = vm.generateFileStats();
 
     parsedDataToSend = {
-        data: [],
         estimates: estimates,
         info: fileInfo,
-        modalChanges: [],
-        feedrateChanges: [],
-        invalidLines: fileInfo.invalidLines
+        invalidLines: fileInfo.invalidLines,
     };
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
+    let tSpindleSpeeds = new Float32Array(spindleSpeeds);
 
     // create path for the last motion
     if (shouldIncludeSVG) {
@@ -501,33 +498,39 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     paths = JSON.parse(JSON.stringify(paths));
 
     const message: {
-        vertices: Float32Array;
+        vertices: ArrayBuffer;
         paths: Path[];
         colors: [string, number][];
-        frames: Uint32Array;
-        visualizer: any;
+        frames: ArrayBuffer;
         info: any;
         needsVisualization: boolean;
         parsedData: any;
-        spindleSpeeds?: Set<number>;
+        spindleSpeeds?: ArrayBuffer;
         spindleChanges?: SpindleValues[];
         isLaser?: boolean;
+        isSecondary: boolean;
+        activeVisualizer: VISUALIZER_TYPES_T;
     } = {
-        vertices: tVertices,
+        vertices: tVertices.buffer,
         paths,
         colors,
-        frames: tFrames,
-        visualizer,
+        frames: tFrames.buffer,
         info: fileInfo,
         needsVisualization,
         parsedData: parsedDataToSend,
+        isSecondary,
+        activeVisualizer,
     };
 
     if (isLaser) {
-        message.spindleSpeeds = spindleSpeeds;
+        message.spindleSpeeds = tSpindleSpeeds.buffer;
         message.isLaser = isLaser;
         message.spindleChanges = spindleChanges;
     }
 
-    self.postMessage(message);
+    postMessage(message, [
+        tVertices.buffer,
+        tFrames.buffer,
+        tSpindleSpeeds.buffer,
+    ]);
 };

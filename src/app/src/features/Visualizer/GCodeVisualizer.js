@@ -65,7 +65,7 @@ class GCodeVisualizer {
         colorArray,
         savedColors,
     ) {
-        this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
+        this.vertices = new THREE.Float32BufferAttribute(vertices.buffer, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;

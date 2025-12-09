@@ -46,7 +46,7 @@ onmessage = function ({ data }) {
     const updateLaserModeColors = () => {
         const defaultColor = new THREE.Color(theme.get(LASER_PART));
         const fillColor = new THREE.Color(theme.get(BACKGROUND_PART));
-        const maxSpindleValue = Math.max(...[...spindleSpeeds]);
+        const maxSpindleValue = Math.max(...spindleSpeeds);
 
         const calculateOpacity = (speed) =>
             maxSpindleValue === 0 ? 1 : speed / maxSpindleValue;
@@ -94,11 +94,12 @@ onmessage = function ({ data }) {
 
     //this.geometry.setFromPoints(this.vertices);
     const colorArray = getColorTypedArray(colors, motionColor);
+    const savedColorsTyped = new Float32Array(savedColors);
 
     const message = {
-        colorArray: colorArray,
-        savedColors: savedColors,
+        colorArrayBuffer: colorArray.buffer,
+        savedColorsBuffer: savedColorsTyped.buffer,
     };
 
-    postMessage(message);
+    postMessage(message, [colorArray.buffer, savedColorsTyped.buffer]);
 };

@@ -34,7 +34,6 @@ export const visualizeResponse = async ({ data }) => {
 
         reduxStore.dispatch(updateFileProcessing(false));
 
-
         // if there's new parsed data, send to redux
         if (parsedData) {
             await replaceParsedData(parsedData).then(() => {
@@ -53,6 +52,8 @@ export const visualizeResponse = async ({ data }) => {
 
         // Handle file load
         pubsub.publish('file:load', data);
+        pubsub.publish('placeholder:invalidLines', parsedData.invalidLines);
+        pubsub.publish('visualizeWorker:terminate');
         // Visualizer Rendering
         if (needsVisualization) {
             setTimeout(() => {
