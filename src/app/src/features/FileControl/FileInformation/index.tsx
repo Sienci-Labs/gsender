@@ -281,6 +281,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                         checked={toggleInfo}
                         onChange={() => setToggleInfo((prev) => !prev)}
                         position="vertical"
+                        data-testid="toggle-info"
                     />
                     <span className="text-gray-500">Size</span>
                 </div>
@@ -294,6 +295,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             checked={showEditor}
                             onChange={() => setShowEditor((prev) => !prev)}
                             position="vertical"
+                            data-testid="show-gcode-editor"
                         />
                     </div>
                 )}
