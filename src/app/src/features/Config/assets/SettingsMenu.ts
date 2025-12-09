@@ -1654,6 +1654,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Set the IP address for network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
+                    {
+                        label: 'Ethernet Port',
+                        key: 'widgets.connection.ethernetPort',
+                        description:
+                            'What port is exposed by the controller for ethernet connectivity.  This will be used when attempting to connect over ethernet. (Default 23)',
+                        type: 'ip',
+                    },
                     { type: 'eeprom', eID: '$301' },
                     { type: 'eeprom', eID: '$302' },
                     { type: 'eeprom', eID: '$303' },
