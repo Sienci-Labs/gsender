@@ -276,11 +276,9 @@ export function* initialize(): Generator<any, void, any> {
                 );
                 visualizeWorker.onmessage = visualizeResponse;
                 // await getParsedData().then((value) => {
-                const parsedData: null = null;
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
-                    parsedData,
                     isNewFile,
                     accelerations,
                     maxFeedrates,
@@ -330,14 +328,12 @@ export function* initialize(): Generator<any, void, any> {
         );
         visualizeWorker.onmessage = visualizeResponse;
         // await getParsedData().then((value) => {
-        const parsedData: null = null;
         visualizeWorker.postMessage({
             content,
             visualizer,
             isLaser,
             shouldIncludeSVG,
             needsVisualization,
-            parsedData,
             isNewFile,
             accelerations,
             maxFeedrates,
@@ -725,7 +721,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     // TODO: uncomment when worker types are defined
-    pubsub.subscribe('file:load', () => {
+    pubsub.subscribe('visualizeWorker:terminate', () => {
         const visualizeWorker = new Worker(
             new URL('../../../workers/Visualize.worker.ts', import.meta.url),
             { type: 'module' },
@@ -742,24 +738,24 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     // // for when you don't want to send file to backend
-    pubsub.subscribe(
-        'visualizer:load',
-        (_, { content, size, name, visualizer }) => {
-            parseGCode(content, size, name, visualizer);
-        },
-    );
+    // pubsub.subscribe(
+    //     'visualizer:load',
+    //     (_, { content, size, name, visualizer }) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
     // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
     pubsub.subscribe('estimate:done', (_msg, _data) => {
         // estimateWorker?.terminate();
     });
 
-    pubsub.subscribe(
-        'reparseGCode',
-        (_msg: string, { content, size, name, visualizer }) => {
-            parseGCode(content, size, name, visualizer);
-        },
-    );
+    // pubsub.subscribe(
+    //     'reparseGCode',
+    //     (_msg: string, { content, size, name, visualizer }) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;

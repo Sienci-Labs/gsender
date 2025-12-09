@@ -57,6 +57,8 @@ export const visualizeResponse = async ({ data }) => {
 
         // Handle file load
         pubsub.publish('file:load', data);
+        pubsub.publish('placeholder:invalidLines', parsedData.invalidLines);
+        pubsub.publish('visualizeWorker:terminate');
         // Visualizer Rendering
         if (needsVisualization) {
             setTimeout(() => {
