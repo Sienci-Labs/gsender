@@ -229,7 +229,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
         return `${(size / (1024 * 1024)).toFixed(0)} MB`;
     };
 
-    const splitFileNameAndExtension = (name: string) => {
+    const splitFileNameAndExtension = (name: string = '') => {
         if (!name) return ['', ''];
 
         if (name.indexOf('.') > 0) {
