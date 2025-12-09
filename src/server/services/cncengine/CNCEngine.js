@@ -447,6 +447,7 @@ class CNCEngine {
             // Open serial port
             socket.on('open', (port, options, callback) => {
                 const engine = this;
+                console.log(options);
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 

@@ -1752,11 +1752,9 @@ class GrblHalController {
                         if (this.toolChangeContext.mappings) {
                             const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
                             if (remap) {
-                                console.log('found SFL remap:', remap);
                                 modalGCode.push(`M6 T${remap}`);
                             }
                         } else {
-                            console.log('no remap, using found T value');
                             modalGCode.push(`M6 T${modal.tool}`);
                         }
                     }
