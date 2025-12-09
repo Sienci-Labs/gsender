@@ -5,7 +5,6 @@ import {
     VISUALIZER_TYPES,
 } from '../../constants';
 import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
-
 // Types
 
 export type VISUALIZER_TYPES_T =
@@ -36,6 +35,7 @@ export interface Visualizer {
     SVGEnabled: boolean;
     jobEndModal: boolean;
     maintenanceTaskNotifications: boolean;
+    checkFile: boolean;
     gcode: {
         displayName: boolean;
     };

@@ -376,8 +376,8 @@ class CNCEngine {
                             });
 
                         // Filter ports by productId to avoid non-arduino devices from appearing
-                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740', '0FA7'];
-                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0', '0483'];
+                        const validProductIDs = ['0483', '6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740', '0FA7'];
+                        const validVendorIDs = ['16C0', '1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0', '0483'];
                         let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
                             if (!port.vendorId || !port.productId) {
                                 return false;

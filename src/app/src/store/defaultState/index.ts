@@ -364,6 +364,7 @@ const defaultState: State = {
             SVGEnabled: false,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
+            checkFile: false,
             gcode: {
                 displayName: true,
             },
