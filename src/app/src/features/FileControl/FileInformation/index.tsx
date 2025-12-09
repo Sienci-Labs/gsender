@@ -230,6 +230,8 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
     };
 
     const splitFileNameAndExtension = (name: string) => {
+        if (!name) return ['', ''];
+
         if (name.indexOf('.') > 0) {
             return name.split('.');
         }
