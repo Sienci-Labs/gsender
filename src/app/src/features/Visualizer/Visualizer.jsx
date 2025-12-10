@@ -1017,6 +1017,7 @@ class Visualizer extends Component {
             }),
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
+                pubsub.publish('visualizeWorker:terminate');
 
                 const showWarningsOnLoad = store.get(
                     'widgets.visualizer.showWarning',

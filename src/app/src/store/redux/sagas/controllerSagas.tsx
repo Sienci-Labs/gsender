@@ -116,7 +116,7 @@ import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 
 export function* initialize(): Generator<any, void, any> {
-    // let visualizeWorker: typeof VisualizeWorker | null = null;
+    let visualizeWorker: typeof VisualizeWorker | null = null;
     // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
@@ -256,8 +256,7 @@ export function* initialize(): Generator<any, void, any> {
             const needsVisualization = shouldVisualize();
 
             if (needsVisualization) {
-                // visualizeWorker = new VisualizeWorker();
-                const visualizeWorker = new Worker(
+                visualizeWorker = new Worker(
                     new URL(
                         '../../../workers/Visualize.worker.ts',
                         import.meta.url,
@@ -273,7 +272,6 @@ export function* initialize(): Generator<any, void, any> {
                     accelerations,
                     maxFeedrates,
                 });
-                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -310,13 +308,11 @@ export function* initialize(): Generator<any, void, any> {
 
         const needsVisualization = shouldVisualize();
 
-        // visualizeWorker = new VisualizeWorker();
-        const visualizeWorker = new Worker(
+        visualizeWorker = new Worker(
             new URL('../../../workers/Visualize.worker.ts', import.meta.url),
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        // await getParsedData().then((value) => {
         visualizeWorker.postMessage({
             content,
             visualizer,
@@ -327,7 +323,6 @@ export function* initialize(): Generator<any, void, any> {
             accelerations,
             maxFeedrates,
         });
-        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
@@ -710,11 +705,6 @@ export function* initialize(): Generator<any, void, any> {
 
     // TODO: uncomment when worker types are defined
     pubsub.subscribe('visualizeWorker:terminate', () => {
-        const visualizeWorker = new Worker(
-            new URL('../../../workers/Visualize.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
-
         visualizeWorker?.terminate();
     });
 
