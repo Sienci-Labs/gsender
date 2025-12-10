@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { ConsoleState } from '../../definitions';
-
-const MAX_HISTORY_SIZE = 1000;
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 
 const initialState: ConsoleState = {
     inputHistory: [],
@@ -14,16 +13,18 @@ const consoleSlice = createSlice({
     initialState,
     reducers: {
         setInputHistory(state, action: PayloadAction<string[]>) {
-            state.inputHistory = action.payload.slice(-MAX_HISTORY_SIZE);
+            state.inputHistory = action.payload.slice(
+                -MAX_TERMINAL_INPUT_ARRAY_SIZE,
+            );
         },
         addToInputHistory(state, action: PayloadAction<string>) {
             state.inputHistory = [...state.inputHistory, action.payload].slice(
-                -MAX_HISTORY_SIZE,
+                -MAX_TERMINAL_INPUT_ARRAY_SIZE,
             );
         },
-        addToHistory(state, action: PayloadAction<string>) {
-            state.history = [...state.history, action.payload].slice(
-                -MAX_HISTORY_SIZE,
+        addToHistory(state, action: PayloadAction<string[]>) {
+            state.history = [...state.history, ...action.payload].slice(
+                -MAX_TERMINAL_INPUT_ARRAY_SIZE,
             );
         },
     },

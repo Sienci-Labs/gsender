@@ -228,6 +228,7 @@ const defaultState: State = {
             },
             autoReconnect: false,
             ip: [192, 168, 5, 1],
+            ethernetPort: 23,
         },
         console: {
             minimized: false,
@@ -363,6 +364,7 @@ const defaultState: State = {
             SVGEnabled: false,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
+            checkFile: false,
             gcode: {
                 displayName: true,
             },

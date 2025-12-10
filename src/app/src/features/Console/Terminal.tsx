@@ -8,6 +8,7 @@ import {
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';
+import reduxStore from 'app/store/redux';
 import { useDispatch } from 'react-redux';
 import uuidv4 from 'uuid/v4';
 
@@ -25,6 +26,7 @@ import { addToHistory } from 'app/store/redux/slices/console.slice';
 import store from 'app/store';
 
 import '@xterm/xterm/css/xterm.css';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 
 // These will be loaded dynamically
 let XtermTerminal: any;
@@ -37,6 +39,15 @@ type TerminalRef = {
 type Props = {
     isActive: boolean;
 };
+
+let newHistory: string[] = [];
+
+const pushUpdatedTerminalHistory = debounce(() => {
+    reduxStore.dispatch(
+        addToHistory(newHistory.slice(-MAX_TERMINAL_INPUT_ARRAY_SIZE)),
+    );
+    newHistory = [];
+}, 1000);
 
 const Terminal = (
     { isActive }: Props,
@@ -135,7 +146,8 @@ const Terminal = (
             return;
         }
 
-        dispatch(addToHistory(data));
+        newHistory.push(data);
+        pushUpdatedTerminalHistory();
 
         if (data.includes('error:')) {
             terminalInstance.current?.writeln(color.xterm(TERMINAL_RED)(data));

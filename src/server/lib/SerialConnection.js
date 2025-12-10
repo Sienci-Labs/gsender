@@ -102,6 +102,8 @@ class SerialConnection extends EventEmitter {
         }
 
         const settings = Object.assign({}, defaultSettings, rest);
+        settings.ethernetPort = rest.ethernetPort;
+
 
         if (settings.port) {
             throw new TypeError(
@@ -172,7 +174,7 @@ class SerialConnection extends EventEmitter {
     // @param {function} callback The error-first callback.
     open(callback) {
         this.callback = callback;
-        const { path, baudRate, network, ...rest } = this.settings;
+        const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
@@ -195,6 +197,8 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
+        console.log(`Conection to port ${ethernetPort}`);
+
         if (network || looksLikeIP) {
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {
@@ -213,7 +217,7 @@ class SerialConnection extends EventEmitter {
             });
 
             this.addPortListeners();
-            this.port.connect(23, path);
+            this.port.connect(ethernetPort, path);
         } else {
             this.port = new SerialPort({
                 path,

@@ -1752,11 +1752,9 @@ class GrblHalController {
                         if (this.toolChangeContext.mappings) {
                             const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
                             if (remap) {
-                                console.log('found SFL remap:', remap);
                                 modalGCode.push(`M6 T${remap}`);
                             }
                         } else {
-                            console.log('no remap, using found T value');
                             modalGCode.push(`M6 T${modal.tool}`);
                         }
                     }
@@ -2086,20 +2084,10 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    const interval = setInterval(() => {
-                        // check if in check (lol)
-                        // if we aren't in check, there may be a race condition
-                        // where the verify is done before the board is in check
-                        // which makes it stay in check forever
-                        if (this.runner && this.runner.isCheck()) {
-                            this.feeder.reset();
-                            this.workflow.start();
-                            this.sender.next();
-                            this.feederCB = null;
-                            clearInterval(interval);
-                            return;
-                        }
-                    }, 200);
+                    this.feeder.reset();
+                    this.workflow.start();
+                    this.sender.next();
+                    this.feederCB = null;
                 };
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
