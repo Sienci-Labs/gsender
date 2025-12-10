@@ -2431,7 +2431,7 @@ class Visualizer extends Component {
                 isLaser: visualization.isLaser,
                 spindleChanges: visualization.spindleChanges,
                 theme: currentTheme,
-                toolchanges: vizualization.info.toolchanges,
+                toolchanges: visualization.info.toolchanges,
             });
 
             // this.handleSceneRender(vizualization, callback);

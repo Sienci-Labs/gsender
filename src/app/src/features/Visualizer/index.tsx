@@ -1452,14 +1452,14 @@ class Visualizer extends Component {
                     },
                 });
             }),
-            // pubsub.subscribe('file:load', (_, data) => {
-            //     this.setState({
-            //         gcode: {
-            //             ...this.state.gcode,
-            //             visualization: data,
-            //         },
-            //     });
-            // }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data,
+                    },
+                });
+            }),
             pubsub.subscribe(
                 'gcode:rotarySetup',
                 async (_, { setupFile, name }) => {
