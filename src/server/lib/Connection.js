@@ -94,13 +94,14 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
-        const { baudrate, rtscts, network, defaultFirmware } = { ...options };
+        const { baudrate, rtscts, network, defaultFirmware, ethernetPort } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
             rtscts: !!rtscts,
             defaultFirmware,
+            ethernetPort,
             network,
         };
         this.callback = callback;
@@ -110,6 +111,7 @@ class Connection extends EventEmitter {
             path: port,
             baudRate: baudrate,
             rtscts: !!rtscts,
+            ethernetPort,
             network,
             writeFilter: (data) => {
                 const line = data.trim();

@@ -1,5 +1,16 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Copy, Save, X, Check, RotateCcw, Trash2, ArrowUp } from 'lucide-react';
+import {
+    Copy,
+    Save,
+    X,
+    Check,
+    RotateCcw,
+    Trash2,
+    ArrowUp,
+    Search,
+    ChevronUp,
+    ChevronDown,
+} from 'lucide-react';
 
 import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
@@ -15,6 +26,14 @@ import { store as reduxStore } from 'app/store/redux';
 import { updateFileContent } from 'app/store/redux/slices/fileInfo.slice';
 import { RootState } from 'app/store/redux';
 import { cn } from 'app/lib/utils';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import {
+    a11yLight,
+    a11yDark,
+} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { Input } from 'app/components/shadcn/Input';
 
 type GcodeEditorProps = {
     onClose: () => void;
@@ -40,9 +59,17 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
         null,
     );
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
+    const [matchIndices, setMatchIndices] = useState<number[]>([]);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [editingLineIndex, setEditingLineIndex] = useState<number | null>(
+        null,
+    );
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const lineInputsRef = useRef<Map<number, HTMLInputElement>>(new Map());
-
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const { enableDarkMode } = useWorkspaceState();
     const isJobRunning =
         workflowState === WORKFLOW_STATE_RUNNING ||
         workflowState === WORKFLOW_STATE_PAUSED;
@@ -62,6 +89,54 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             setOriginalLines([]);
         }
     }, [content]);
+
+    // Find matches when search query changes
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setMatchIndices([]);
+            setCurrentMatchIndex(-1);
+            return;
+        }
+
+        const query = searchQuery.trim();
+        const matches: number[] = [];
+        gcodeLines.forEach((line, index) => {
+            if (line.toLowerCase().includes(query.toLowerCase())) {
+                matches.push(index);
+            }
+        });
+
+        setMatchIndices(matches);
+        if (matches.length > 0) {
+            setCurrentMatchIndex(0);
+        } else {
+            setCurrentMatchIndex(-1);
+        }
+    }, [searchQuery, gcodeLines]);
+
+    // Scroll to current match
+    useEffect(() => {
+        if (
+            currentMatchIndex >= 0 &&
+            matchIndices.length > 0 &&
+            scrollContainerRef.current
+        ) {
+            const lineIndex = matchIndices[currentMatchIndex];
+            const lineTop = lineIndex * LINE_HEIGHT;
+            const container = scrollContainerRef.current;
+            const scrollTop = container.scrollTop;
+            const scrollBottom = scrollTop + container.clientHeight;
+
+            if (lineTop < scrollTop || lineTop + LINE_HEIGHT > scrollBottom) {
+                const targetScroll =
+                    lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
+                container.scrollTo({
+                    top: Math.max(0, targetScroll),
+                    behavior: 'smooth',
+                });
+            }
+        }
+    }, [currentMatchIndex, matchIndices]);
 
     const visibleRange = useMemo(() => {
         const start = Math.max(
@@ -171,52 +246,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
         [selectedLines, lastSelectedIndex, isJobRunning],
     );
 
-    const handleLineClick = useCallback(
-        (index: number, e: React.MouseEvent) => {
-            if (isJobRunning) {
-                return;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-
-            const newSelection = new Set(selectedLines);
-            let newLastSelectedIndex: number | null = index;
-
-            if (e.shiftKey && lastSelectedIndex !== null) {
-                const start = Math.min(lastSelectedIndex, index);
-                const end = Math.max(lastSelectedIndex, index);
-                for (let i = start; i <= end; i++) {
-                    newSelection.add(i);
-                }
-            } else if (e.ctrlKey || e.metaKey) {
-                if (newSelection.has(index)) {
-                    newSelection.delete(index);
-                    if (lastSelectedIndex === index && newSelection.size > 0) {
-                        newLastSelectedIndex = Math.max(
-                            ...Array.from(newSelection),
-                        );
-                    } else if (newSelection.size === 0) {
-                        newLastSelectedIndex = null;
-                    }
-                } else {
-                    newSelection.add(index);
-                }
-            } else {
-                if (newSelection.size === 1 && newSelection.has(index)) {
-                    newSelection.clear();
-                    newLastSelectedIndex = null;
-                } else {
-                    newSelection.clear();
-                    newSelection.add(index);
-                }
-            }
-
-            setSelectedLines(newSelection);
-            setLastSelectedIndex(newLastSelectedIndex);
-        },
-        [selectedLines, lastSelectedIndex, isJobRunning],
-    );
-
     const handleContainerClick = useCallback((e: React.MouseEvent) => {
         if (
             e.target === e.currentTarget ||
@@ -257,12 +286,22 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 ? (activeElement as HTMLInputElement).selectionStart || 0
                 : 0;
 
-            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                setIsSearchOpen(true);
+                setTimeout(() => {
+                    searchInputRef.current?.focus();
+                    searchInputRef.current?.select();
+                }, 0);
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
                 e.preventDefault();
                 const allIndices = new Set(gcodeLines.map((_, i) => i));
                 setSelectedLines(allIndices);
             } else if (e.key === 'Escape') {
-                if (selectedLines.size > 0) {
+                if (isSearchOpen) {
+                    setIsSearchOpen(false);
+                    setSearchQuery('');
+                } else if (selectedLines.size > 0) {
                     setSelectedLines(new Set());
                     setLastSelectedIndex(null);
                 }
@@ -286,7 +325,32 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [gcodeLines, selectedLines, handleDeleteSelected]);
+    }, [
+        gcodeLines,
+        selectedLines,
+        handleDeleteSelected,
+        isSearchOpen,
+        matchIndices,
+        currentMatchIndex,
+    ]);
+
+    const handleSearchNext = () => {
+        if (matchIndices.length === 0) return;
+        const nextIndex =
+            currentMatchIndex < matchIndices.length - 1
+                ? currentMatchIndex + 1
+                : 0;
+        setCurrentMatchIndex(nextIndex);
+    };
+
+    const handleSearchPrevious = () => {
+        if (matchIndices.length === 0) return;
+        const prevIndex =
+            currentMatchIndex > 0
+                ? currentMatchIndex - 1
+                : matchIndices.length - 1;
+        setCurrentMatchIndex(prevIndex);
+    };
 
     const handleCopy = async () => {
         try {
@@ -423,61 +487,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 </div>
                 <div className="flex gap-1.5 items-center flex-shrink-0">
                     <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleCopy}
-                        disabled={isJobRunning}
-                        className="border border-gray-500"
-                        icon={<Copy className="h-4 w-4" />}
-                        tooltip={{
-                            content: isJobRunning
-                                ? 'Copy disabled while job is running'
-                                : selectedLines.size > 0
-                                  ? `Copy ${selectedLines.size} selected line(s)`
-                                  : 'Copy all lines',
-                        }}
-                    />
-                    {selectedLines.size > 0 && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleDeleteSelected}
-                            disabled={isJobRunning}
-                            className="border border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            icon={<Trash2 className="h-4 w-4" />}
-                            tooltip={{
-                                content: isJobRunning
-                                    ? 'Delete disabled while job is running'
-                                    : `Delete ${selectedLines.size} selected line(s)`,
-                            }}
-                        />
-                    )}
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleRevert}
-                        disabled={!hasChanges || isJobRunning}
-                        className="border border-gray-500"
-                        icon={<RotateCcw className="h-4 w-4" />}
-                        tooltip={{
-                            content: isJobRunning
-                                ? 'Revert disabled while job is running'
-                                : 'Revert to original content',
-                        }}
-                    />
-                    <Button
-                        variant="primary"
-                        size="icon"
-                        onClick={handleSave}
-                        disabled={!hasChanges || isJobRunning}
-                        icon={<Save className="h-4 w-4" />}
-                        tooltip={{
-                            content: isJobRunning
-                                ? 'Save disabled while job is running'
-                                : 'Save changes',
-                        }}
-                    />
-                    <Button
                         variant="ghost"
                         size="icon"
                         onClick={onClose}
@@ -495,13 +504,12 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 onScroll={handleScroll}
                 onClick={handleContainerClick}
                 tabIndex={0}
+                style={{
+                    scrollbarColor: 'grey transparent',
+                }}
             >
                 <div
-                    className={`
-                        fixed bottom-6 right-6 z-10
-                        transition-opacity
-                        ${scrollTop > 500 ? 'pointer-events-auto' : 'pointer-events-none'}
-                    `}
+                    className={`fixed bottom-20 right-8 z-10 transition-opacity ${scrollTop > 500 ? 'pointer-events-auto' : 'pointer-events-none'}`}
                     style={{
                         opacity: scrollTop > 500 ? 1 : 0,
                         transform:
@@ -523,17 +531,84 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         }}
                         disabled={isJobRunning}
                         icon={<ArrowUp className="h-4 w-4" />}
+                        tooltip={{
+                            content: 'Scroll to top',
+                        }}
                     />
                 </div>
+
+                {isSearchOpen && (
+                    <div className="fixed top-20 right-6 z-10 flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+                        <Input
+                            name="search-gcode-lines"
+                            sizing="sm"
+                            value={searchQuery}
+                            placeholder="Search..."
+                            ref={searchInputRef}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSearchNext();
+                                } else if (e.key === 'Enter' && e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSearchPrevious();
+                                }
+                            }}
+                        />
+                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {matchIndices.length > 0
+                                ? `${currentMatchIndex + 1}/${matchIndices.length}`
+                                : '0/0'}
+                        </span>
+                        <Button
+                            size="icon"
+                            onClick={handleSearchPrevious}
+                            disabled={matchIndices.length === 0}
+                            className="h-6 w-6"
+                            icon={<ChevronUp className="h-3 w-3" />}
+                            tooltip={{
+                                content: 'Previous match (Shift+Enter)',
+                            }}
+                        />
+                        <Button
+                            size="icon"
+                            onClick={handleSearchNext}
+                            disabled={matchIndices.length === 0}
+                            className="h-6 w-6"
+                            icon={<ChevronDown className="h-3 w-3" />}
+                            tooltip={{
+                                content: 'Next match (Enter)',
+                            }}
+                        />
+                        <Button
+                            size="icon"
+                            onClick={() => {
+                                setSearchQuery('');
+                                setIsSearchOpen(false);
+                            }}
+                            className="h-6 w-6"
+                            icon={<X className="h-3 w-3" />}
+                            tooltip={{
+                                content: 'Close search',
+                            }}
+                        />
+                    </div>
+                )}
                 <div
                     style={{ height: totalHeight, position: 'relative' }}
-                    className="font-mono text-sm"
+                    className="font-mono text-sm flex-1"
                 >
                     {gcodeLines
                         .slice(visibleRange.start, visibleRange.end)
                         .map((line, relativeIndex) => {
                             const index = visibleRange.start + relativeIndex;
                             const isSelected = selectedLines.has(index);
+                            const isMatch = matchIndices.includes(index);
+                            const isCurrentMatch =
+                                isMatch &&
+                                currentMatchIndex >= 0 &&
+                                matchIndices[currentMatchIndex] === index;
 
                             // Determine line status for job visualization
                             let lineStatus:
@@ -569,6 +644,12 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             };
 
                             const getLineClassName = () => {
+                                if (isCurrentMatch) {
+                                    return 'bg-yellow-200 dark:bg-yellow-900/40 ring-2 ring-yellow-500';
+                                }
+                                if (isMatch) {
+                                    return 'bg-yellow-50 dark:bg-yellow-900/20';
+                                }
                                 if (isSelected) {
                                     return 'bg-blue-100 dark:bg-blue-900/30';
                                 }
@@ -629,7 +710,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                     className={cn(
                                         'flex items-center py-1 px-2 transition-colors group',
                                         getLineClassName(),
-                                        { 'cursor-not-allowed': isJobRunning },
+                                        {
+                                            'cursor-not-allowed': isJobRunning,
+                                        },
                                     )}
                                 >
                                     <div
@@ -671,7 +754,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                     </div>
                                     <span
                                         className={cn(
-                                            'dark:text-white mr-4 min-w-[60px] text-right select-none',
+                                            'dark:text-white mr-4 min-w-10 text-right select-none',
                                             getInnerLineClassName(),
                                         )}
                                     >
@@ -682,55 +765,176 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                             </span>
                                         )}
                                     </span>
-                                    <input
-                                        ref={(el) => {
-                                            if (el) {
-                                                lineInputsRef.current.set(
-                                                    index,
-                                                    el,
-                                                );
-                                            } else {
-                                                lineInputsRef.current.delete(
-                                                    index,
-                                                );
-                                            }
-                                        }}
-                                        type="text"
-                                        value={line}
-                                        onChange={(e) =>
-                                            handleLineChange(
-                                                index,
-                                                e.target.value,
-                                            )
-                                        }
-                                        onClick={(e) => {
-                                            if (!isSelected && !isJobRunning) {
-                                                handleLineClick(index, e);
-                                            }
-                                        }}
-                                        onFocus={() => {
-                                            if (!isSelected && !isJobRunning) {
-                                                const newSelection = new Set([
-                                                    index,
-                                                ]);
-                                                setSelectedLines(newSelection);
-                                                setLastSelectedIndex(index);
-                                            }
-                                        }}
-                                        disabled={isJobRunning}
-                                        className={cn(
-                                            'flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1',
-                                            getInputClassName(),
-                                            {
-                                                'cursor-not-allowed opacity-75':
-                                                    isJobRunning,
-                                            },
+                                    <div className="flex-1 min-w-0">
+                                        {editingLineIndex === index ? (
+                                            <input
+                                                ref={(el) => {
+                                                    if (el) {
+                                                        lineInputsRef.current.set(
+                                                            index,
+                                                            el,
+                                                        );
+                                                        el.focus();
+                                                    } else {
+                                                        lineInputsRef.current.delete(
+                                                            index,
+                                                        );
+                                                    }
+                                                }}
+                                                type="text"
+                                                value={line}
+                                                onChange={(e) =>
+                                                    handleLineChange(
+                                                        index,
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                onBlur={() => {
+                                                    setEditingLineIndex(null);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        setEditingLineIndex(
+                                                            null,
+                                                        );
+                                                    } else if (
+                                                        e.key === 'Escape'
+                                                    ) {
+                                                        setEditingLineIndex(
+                                                            null,
+                                                        );
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    'w-full bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1',
+                                                    getInputClassName(),
+                                                )}
+                                            />
+                                        ) : (
+                                            <div
+                                                onClick={(e) => {
+                                                    if (!isJobRunning) {
+                                                        e.stopPropagation();
+                                                        setEditingLineIndex(
+                                                            index,
+                                                        );
+                                                    }
+                                                }}
+                                                onDoubleClick={(e) => {
+                                                    if (!isJobRunning) {
+                                                        e.stopPropagation();
+                                                        setEditingLineIndex(
+                                                            index,
+                                                        );
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    'cursor-text px-1',
+                                                    {
+                                                        'cursor-not-allowed':
+                                                            isJobRunning,
+                                                    },
+                                                )}
+                                            >
+                                                <SyntaxHighlighter
+                                                    language="gcode"
+                                                    style={
+                                                        enableDarkMode
+                                                            ? a11yDark
+                                                            : a11yLight
+                                                    }
+                                                    customStyle={{
+                                                        background:
+                                                            'transparent',
+                                                        padding: 0,
+                                                        margin: 0,
+                                                        fontSize: 'inherit',
+                                                        lineHeight: 'inherit',
+                                                    }}
+                                                    PreTag="span"
+                                                    CodeTag="span"
+                                                >
+                                                    {line || ' '}
+                                                </SyntaxHighlighter>
+                                            </div>
                                         )}
-                                    />
+                                    </div>
                                 </div>
                             );
                         })}
                 </div>
+            </div>
+            <div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
+                <Button
+                    variant={isSearchOpen ? 'primary' : 'outline'}
+                    size="icon"
+                    onClick={() => {
+                        setIsSearchOpen((prev) => !prev);
+                        setTimeout(() => {
+                            searchInputRef.current?.focus();
+                        }, 100);
+                    }}
+                    className="border border-gray-500"
+                    icon={<Search className="h-4 w-4" />}
+                    tooltip={{
+                        content: 'Search (Ctrl+F / Cmd+F)',
+                    }}
+                />
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCopy}
+                    disabled={isJobRunning}
+                    className="border border-gray-500"
+                    icon={<Copy className="h-4 w-4" />}
+                    tooltip={{
+                        content: isJobRunning
+                            ? 'Copy disabled while job is running'
+                            : selectedLines.size > 0
+                              ? `Copy ${selectedLines.size} selected line(s)`
+                              : 'Copy all lines',
+                    }}
+                />
+                {selectedLines.size > 0 && (
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDeleteSelected}
+                        disabled={isJobRunning}
+                        className="border border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        icon={<Trash2 className="h-4 w-4" />}
+                        tooltip={{
+                            content: isJobRunning
+                                ? 'Delete disabled while job is running'
+                                : `Delete ${selectedLines.size} selected line(s)`,
+                        }}
+                    />
+                )}
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleRevert}
+                    disabled={!hasChanges || isJobRunning}
+                    className="border border-gray-500"
+                    icon={<RotateCcw className="h-4 w-4" />}
+                    tooltip={{
+                        content: isJobRunning
+                            ? 'Revert disabled while job is running'
+                            : 'Revert to original content',
+                    }}
+                />
+                <Button
+                    variant="primary"
+                    size="icon"
+                    onClick={handleSave}
+                    disabled={!hasChanges || isJobRunning}
+                    icon={<Save className="h-4 w-4" />}
+                    tooltip={{
+                        content: isJobRunning
+                            ? 'Save disabled while job is running'
+                            : 'Save changes',
+                    }}
+                />
             </div>
         </div>
     );

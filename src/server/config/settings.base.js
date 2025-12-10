@@ -23,7 +23,6 @@
 
 import path from 'path';
 import pkg from '../../package.json';
-import { languages } from '../../../build.config';
 import os from 'os';
 
 const RC_FILE = pkg.version.includes('EDGE') ? '.edge_rc' : '.sender_rc';
@@ -140,7 +139,7 @@ export default {
         // default namespace used if not passed to translation function
         defaultNS: 'resource',
 
-        whitelist: languages,
+        whitelist: ['en'],
 
         // array of languages to preload
         preload: [],

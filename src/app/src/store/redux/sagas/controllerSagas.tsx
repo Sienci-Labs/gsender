@@ -59,6 +59,7 @@ import {
     JOB_STATUS,
     GRBL,
     LIGHTWEIGHT_OPTIONS,
+    GRBL_ACTIVE_STATE_CHECK,
 } from 'app/constants';
 import {
     closeConnection,
@@ -1021,7 +1022,11 @@ export function* initialize(): Generator<any, void, any> {
         const revertWorkspace = store.get('workspace.revertWorkspace');
         // if revert workspace is off, set the current workspace back to what it was when the job started
         if (!revertWorkspace) {
-            controller.command('gcode', '[global.state.workspace]');
+            if (GRBL_ACTIVE_STATE_CHECK) {
+                controller.command('gcode', '[global.state.testWCS]');
+            } else {
+                controller.command('gcode', '[global.state.workspace]');
+            }
         }
     });
 

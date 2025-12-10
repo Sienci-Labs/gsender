@@ -79,6 +79,8 @@ function Connection(props: ConnectionProps) {
         const baud = Number(store.get('widgets.connection.baudrate'));
         const defaultFirmware = store.get('workspace.defaultFirmware', GRBL);
 
+        let ethernetPort = store.get('widgets.connection.ethernetPort', 23);
+
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
@@ -91,6 +93,7 @@ function Connection(props: ConnectionProps) {
                 baudrate: baud,
                 network,
                 defaultFirmware,
+                ethernetPort,
             },
             (err: string) => {
                 if (err) {

@@ -168,7 +168,7 @@ const PrimaryVisualizer = ({
                     {isEditorMounted && (
                         <div
                             className={cx(
-                                'absolute top-0 left-0 right-0 bottom-0 z-20 flex items-center justify-center p-4 rounded-md transition-opacity duration-200 ease-in-out',
+                                'absolute top-0 left-0 right-0 bottom-0 z-10 flex items-center justify-center p-4 rounded-md transition-opacity duration-200 ease-in-out',
                                 {
                                     'opacity-0 pointer-events-none bg-transparent':
                                         !showEditor,
@@ -179,7 +179,7 @@ const PrimaryVisualizer = ({
                         >
                             <div
                                 className={cx(
-                                    'w-full h-full max-w-6xl max-h-[90vh] transition-all duration-200 ease-in-out',
+                                    'w-full h-full max-w-6xl max-h-[95%] self-start transition-all duration-200 ease-in-out portrait:max-h-[85%]',
                                     {
                                         'scale-95 opacity-0': !showEditor,
                                         'scale-100 opacity-100': showEditor,
