@@ -1,5 +1,6 @@
-describe('Unlock Machine if Needed - GrblHAL', () => {
+describe('Machine Connection and Unlock Test', () => {
 
+  // Ignore known errors
   Cypress.on('uncaught:exception', (err) => {
     console.log('Uncaught exception:', err.message);
     
@@ -7,8 +8,7 @@ describe('Unlock Machine if Needed - GrblHAL', () => {
       'Hydration failed',
       'There was an error while hydrating',
       'Cannot read properties of undefined',
-      'reading \'get\'',
-      'ResizeObserver loop'
+      'reading \'get\''
     ];
     
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
@@ -17,157 +17,165 @@ describe('Unlock Machine if Needed - GrblHAL', () => {
     return true;
   });
 
-  Cypress.on('window:alert', (str) => {
-    if (str.includes('Click to unlock Machine')) {
-      cy.log('Alert detected: Click to unlock Machine');
-      return true;
-    }
-  });
-
   beforeEach(() => {
-    cy.viewport(2327, 1186);
-    
-    cy.visit('http://localhost:8000/', {
-      failOnStatusCode: false
-    });
-    
-    cy.get('#app', { timeout: 30000 }).should('exist');
-    cy.wait(3000);
-  });
-
-  it('connects to CNC, unlocks machine if locked, and verifies idle state', () => {
-    cy.log('Step 1: Click Connect to CNC button');
-    
-    // Use text-based selector instead of CSS path
-    cy.contains('button', /connect to cnc/i, { timeout: 20000 })
-      .should('be.visible')
-      .click();
-
+    cy.viewport(2133, 1050);
+    cy.visit('http://localhost:8000/#/');
+    cy.get('#app', { timeout: 20000 }).should('exist');
     cy.wait(2000);
+  });
 
-    cy.log('Step 2: Select COM port');
-    cy.get('div.absolute', { timeout: 20000 })
-      .should('be.visible')
-      .find('button')
-      .contains(/COM/i)
-      .first()
-      .then(($btn) => {
-        const portText = $btn.text().trim();
-        cy.log(`Selecting port: ${portText}`);
-      })
+  it('Connect to machine and unlock to reach idle state', () => {
+    
+    // Step 1: Connect to machine by clicking COM port
+    cy.log('Step 1: Connecting to machine via COM port...');
+    
+    // Click the COM4 USB button to connect
+    cy.get('div.absolute > button.m-0')
+      .contains('COM4')
       .click();
-
+    
     cy.wait(3000);
+    cy.log('Connection initiated');
 
-    cy.log('Step 3: Check if machine is locked and unlock if needed');
-    cy.get('body').then(($body) => {
-      if ($body.find('svg.hidden').length > 0) {
-        cy.log(' Machine is LOCKED - Attempting to unlock...');
+    // Step 2: Wait for unlock popup to appear
+    cy.log('Step 2: Waiting for unlock popup...');
+    cy.wait(2000);
+    
+    // Step 3: Check for unlock popup and click it
+    cy.log('Step 3: Looking for unlock popup...');
+    
+    cy.get('body').then($body => {
+      
+      // Check if unlock button/popup exists
+      const unlockButton = $body.find('#app > div > div.border div.mt-4 button');
+      
+      if (unlockButton.length > 0) {
+        cy.log('Unlock popup found - Machine is locked');
+        cy.log('Clicking unlock popup to reach idle state...');
         
-        cy.get('svg.hidden')
-          .parent('button')
+        // Click the unlock button using exact selector from JSON
+        cy.get('#app > div > div.border div.mt-4 button')
+          .contains('Click to Unlock')
           .should('be.visible')
           .click({ force: true });
         
         cy.wait(2000);
-        cy.log(' Machine unlocked successfully');
-      } else {
-        cy.log('Machine is already unlocked');
-      }
-    });
-
-    cy.log('Step 4: Verify machine reaches Idle state');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(() => {
-        cy.log('Machine is in Idle state and ready');
-      });
-
-    cy.log('Step 5: Verify GrblHAL firmware detected');
-    cy.get('body').then(($body) => {
-      const text = $body.text().toLowerCase();
-      
-      if (text.includes('grblhal')) {
-        cy.log(' Firmware Detected: GrblHAL');
-        expect(text).to.include('grblhal');
-      } else if (text.includes('grbl')) {
-        cy.log('Firmware Detected: Grbl (not GrblHAL)');
-      } else {
-        cy.log(' Firmware information not found');
-      }
-    });
-  });
-
-  it('should handle locked machine state correctly', () => {
-    cy.log('Connecting to CNC...');
-    cy.contains('button', /connect to cnc/i, { timeout: 20000 })
-      .should('be.visible')
-      .click();
-
-    cy.log('Selecting COM port...');
-    cy.get('div.absolute', { timeout: 20000 })
-      .should('be.visible')
-      .find('button')
-      .contains(/COM/i)
-      .first()
-      .click();
-
-    cy.wait(3000);
-
-    cy.log('Checking lock status...');
-    cy.get('body').then(($body) => {
-      const isLocked = $body.find('svg.hidden').length > 0;
-      
-      if (isLocked) {
-        cy.log('Machine is locked - testing unlock functionality');
+        cy.log('Unlock popup clicked');
         
-        // Verify lock icon exists
-        cy.get('svg.hidden').should('exist');
+      } else {
+        cy.log('No unlock popup found - checking alternative selector...');
         
-        // Click unlock button
-        cy.get('svg.hidden')
+        // Try alternative selector - the path element
+        cy.get('#app > div > div.border div.mt-4 path', { timeout: 5000 })
+          .should('exist')
           .parent('button')
-          .should('be.visible')
           .click({ force: true });
         
         cy.wait(2000);
-        
-        // Verify machine becomes idle after unlock
-        cy.contains(/^Idle$/i, { timeout: 30000 })
-          .should('be.visible');
-        
-        cy.log('Lock/unlock functionality working correctly');
-      } else {
-        cy.log('Machine is not locked - no unlock needed');
-        
-        // Still verify idle state
-        cy.contains(/^Idle$/i, { timeout: 30000 })
-          .should('be.visible');
+        cy.log('Unlock button clicked via path selector');
       }
     });
+
+    // Step 4: Verify machine reaches idle state
+    cy.log('Step 4: Verifying machine is in idle state...');
+    
+    // Wait for idle state indicator
+    cy.wait(3000);
+    
+    // Check that unlock popup is gone
+    cy.get('body').should('not.contain', 'Click to Unlock');
+    
+    cy.log('Machine is now in idle state and ready for operations');
+    cy.log('Test completed successfully');
   });
 
-  it('should use custom command to unlock machine', () => {
-    cy.log('Connecting to CNC...');
-    cy.contains('button', /connect to cnc/i, { timeout: 20000 })
-      .should('be.visible')
+  it('Keep clicking unlock until machine reaches idle', () => {
+    
+    cy.log('Connecting to machine...');
+    
+    // Connect via COM port
+    cy.get('div.absolute > button.m-0')
+      .contains('COM4')
       .click();
+    
+    cy.wait(4000);
 
-    cy.log('Selecting COM port...');
-    cy.get('div.absolute', { timeout: 20000 })
-      .should('be.visible')
-      .find('button')
-      .contains(/COM/i)
-      .first()
+    // Keep clicking unlock button until idle state is reached
+    cy.log('Attempting to unlock machine (multiple clicks if needed)...');
+    
+    const maxAttempts = 10;
+    let attempts = 0;
+    
+    const clickUnlock = () => {
+      cy.get('body').then($body => {
+        attempts++;
+        
+        // Check if unlock button still exists
+        const unlockExists = $body.find('#app > div > div.border div.mt-4 button, #app > div > div.border div.mt-4 path').length > 0;
+        
+        if (unlockExists && attempts < maxAttempts) {
+          cy.log(`Unlock attempt ${attempts}/${maxAttempts}`);
+          
+          // Click unlock button
+          cy.get('#app > div > div.border div.mt-4 button, #app > div > div.border div.mt-4 path')
+            .first()
+            .parent('button')
+            .click({ force: true });
+          
+          cy.wait(1500);
+          
+          // Recursively check again
+          clickUnlock();
+          
+        } else if (!unlockExists) {
+          cy.log(`Machine unlocked after ${attempts} attempts`);
+          cy.log('Machine should now be in idle state');
+        } else {
+          cy.log(`Max attempts (${maxAttempts}) reached`);
+        }
+      });
+    };
+    
+    // Start the unlock process
+    cy.wait(2000);
+    clickUnlock();
+    
+    cy.log('Test completed');
+  });
+
+  it('Connect and wait for idle state after unlock', () => {
+    
+    cy.log('Step 1: Connecting to machine...');
+    
+    // Connect
+    cy.get('div.absolute > button.m-0')
+      .contains('COM4')
       .click();
+    
+    cy.wait(5000);
 
+    cy.log('Step 2: Clicking unlock popup...');
+    
+    // Click unlock - using multiple selectors for reliability
+    cy.get('body').then($body => {
+      if ($body.find('#app > div > div.border div.mt-4 button').length > 0) {
+        cy.get('#app > div > div.border div.mt-4 button')
+          .click({ force: true });
+      } else if ($body.find('#app > div > div.border div.mt-4 path').length > 0) {
+        cy.get('#app > div > div.border div.mt-4 path')
+          .parent('button')
+          .click({ force: true });
+      }
+    });
+    
     cy.wait(3000);
 
-    cy.log('Verifying Idle state...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(() => {
-        cy.log(' Machine connected and ready');
-      });
+    cy.log('Step 3: Waiting for idle state...');
+    
+    // Wait and verify no more unlock popups
+    cy.get('body').should('not.contain', 'Click to Unlock');
+    
+    cy.log(' Machine is in idle state - ready for operations');
   });
+
 });

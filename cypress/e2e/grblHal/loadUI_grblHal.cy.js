@@ -3,7 +3,7 @@ describe('gSender UI Load Test', () => {
   const MAX_RETRIES = 3;
   
   beforeEach(() => {
-    cy.viewport(2844, 1450);
+    cy.viewport(1280, 800);
   });
 
   it('should load gSender UI with refresh on failure', () => {

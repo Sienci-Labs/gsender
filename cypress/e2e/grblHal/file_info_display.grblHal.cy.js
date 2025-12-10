@@ -42,9 +42,8 @@ describe('GrblHal Machine File Info Test', () => {
       });
 
     // Step 3: Click the toggle button
-    cy.get('button[role="switch"]')
-      .should('exist')
-      .click({ force: true })
+    //cy.get('button[role="switch"]').eq(0)
+    cy.get('[data-testid="toggle-info"]').click({ force: true })
       .then(() => cy.log('Toggle button clicked'));
 
     // Step 4: Print Estimated Time
