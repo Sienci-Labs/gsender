@@ -803,7 +803,7 @@ class GrblHalController {
                 code: `${code}`,
                 description: _.get(error, 'description', ''),
                 line: line,
-                lineNumber: isFileError ? received + 1 : '',
+                lineNumber: isFileError ? received : '',
                 origin: errorOrigin,
                 controller: GRBLHAL,
                 fileRunning: isRunning
@@ -818,7 +818,7 @@ class GrblHalController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received + 1} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -888,7 +888,7 @@ class GrblHalController {
                     code: code,
                     description: alarm.description || '',
                     line: line,
-                    lineNumber: isFileError ? received + 1 : '',
+                    lineNumber: isFileError ? received : '',
                     origin: errorOrigin,
                     controller: GRBLHAL,
                 }, isRunning);
