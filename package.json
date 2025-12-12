@@ -220,6 +220,7 @@
     "@tanstack/react-router": "^1.46.8",
     "@tanstack/react-table": "^8.9.3",
     "@types/lodash": "^4.17.21",
+    "@types/three": "^0.182.0",
     "@vitejs/plugin-react": "4.3.1",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",

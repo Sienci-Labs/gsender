@@ -1017,6 +1017,7 @@ class Visualizer extends Component {
             }),
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
+                pubsub.publish('visualizeWorker:terminate');
 
                 const showWarningsOnLoad = store.get(
                     'widgets.visualizer.showWarning',
@@ -1125,11 +1126,11 @@ class Visualizer extends Component {
                 });
             }),
             pubsub.subscribe('colors:load', (_, data) => {
-                const { colorArray, savedColors } = data;
+                const { colorArrayBuffer, savedColorsBuffer } = data;
                 this.handleSceneRender(
                     this.vizualization,
-                    colorArray,
-                    savedColors,
+                    new Float32Array(colorArrayBuffer),
+                    new Float32Array(savedColorsBuffer),
                     this.renderCallback,
                 );
                 if (this.colorsWorker) {
@@ -2393,10 +2394,17 @@ class Visualizer extends Component {
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
+        const visualization = {
+            ...vizualization,
+            vertices: new Float32Array(vizualization.vertices),
+            frames: new Uint32Array(vizualization.frames),
+            spindleSpeeds: new Float32Array(vizualization.spindleSpeeds),
+        };
+
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.vizualization = vizualization;
+            this.vizualization = visualization;
             this.renderCallback = callback;
 
             // we may need to redraw grid if machine size is diff
@@ -2417,13 +2425,13 @@ class Visualizer extends Component {
             this.colorsWorker = colorsWorker;
             this.colorsWorker.onmessage = colorsResponse;
             this.colorsWorker.postMessage({
-                colors: vizualization.colors,
-                frames: vizualization.frames,
-                spindleSpeeds: vizualization.spindleSpeeds,
-                isLaser: vizualization.isLaser,
-                spindleChanges: vizualization.spindleChanges,
+                colors: visualization.colors,
+                frames: visualization.frames,
+                spindleSpeeds: visualization.spindleSpeeds,
+                isLaser: visualization.isLaser,
+                spindleChanges: visualization.spindleChanges,
                 theme: currentTheme,
-                toolchanges: vizualization.info.toolchanges,
+                toolchanges: visualization.info.toolchanges,
             });
 
             // this.handleSceneRender(vizualization, callback);
