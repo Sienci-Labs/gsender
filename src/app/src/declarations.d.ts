@@ -9,5 +9,4 @@ declare module 'classnames';
 declare module 'react-select';
 declare module 'chained-function';
 declare module 'ensure-array';
-declare module 'three';
 declare module 'uuid/v4';
