@@ -2400,6 +2400,13 @@ class Visualizer extends Component {
             frames: new Uint32Array(vizualization.frames),
             spindleSpeeds: new Float32Array(vizualization.spindleSpeeds),
         };
+        // Enable hiding of processed lines based on setting
+        // Default to true (enabled) for cleaner view and better performance
+        const hideProcessedLines = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+        this.visualizer.setHideProcessedLines(hideProcessedLines);
 
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
