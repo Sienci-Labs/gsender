@@ -1006,9 +1006,13 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:stop', () => {
         const revertWorkspace = store.get('workspace.revertWorkspace');
+        const activeState = _get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
         // if revert workspace is off, set the current workspace back to what it was when the job started
         if (!revertWorkspace) {
-            if (GRBL_ACTIVE_STATE_CHECK) {
+            if (activeState === GRBL_ACTIVE_STATE_CHECK) {
                 controller.command('gcode', '[global.state.testWCS]');
             } else {
                 controller.command('gcode', '[global.state.workspace]');
