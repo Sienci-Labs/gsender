@@ -777,6 +777,7 @@ class GrblHalController {
 
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
+            console.log('error found');
             const isRunning = this.workflow.isRunning();
             const firmwareIsAlarmed = this.runner.isAlarm();
 
