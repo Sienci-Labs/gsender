@@ -24,9 +24,6 @@ export function WizardManager({ wizard, onExit }: WizardManagerProps) {
 
     const handleExitWizard = () => {
         setSelectedSubWizard(null);
-        if (onExit) {
-            onExit();
-        }
     };
 
     if (selectedSubWizard) {
