@@ -5,6 +5,8 @@ import { Placeholder } from 'app/features/AccessoryInstaller/components/wizard/p
 import PlaceholderImage from '../assets/placeholder.png';
 import { MacroConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx';
 import { ControllerConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx';
+import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx';
+import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -60,7 +62,7 @@ export function useSienciATCWizard(): Wizard {
                         {
                             id: 'rack-position',
                             title: 'Rack Position',
-                            component: Placeholder,
+                            component: RackPosition,
                             secondaryContent: [
                                 {
                                     type: 'image',
@@ -75,7 +77,7 @@ export function useSienciATCWizard(): Wizard {
                         {
                             id: 'tool-length-sensor',
                             title: 'Tool Length Sensor Position',
-                            component: Placeholder,
+                            component: TLSPosition,
                             secondaryContent: [
                                 {
                                     type: 'image',
@@ -84,13 +86,6 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: Placeholder,
-                                },
-                                {
-                                    type: 'link',
-                                    title: 'Need Help?',
-                                    content:
-                                        'Follow along in our online resources',
-                                    url: 'https://example.com/docs',
                                 },
                             ],
                         },
