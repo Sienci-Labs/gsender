@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ExternalLink, QrCode } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { SecondaryContent } from '../../types/wizard';
 
 interface SecondaryContentPanelProps {
@@ -95,10 +94,6 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                                     }
                                     className="w-full flex items-center gap-3 p-4 hover:bg-blue-50 transition-colors text-left"
                                 >
-                                    <QrCode
-                                        className={`flex-shrink-0 transition-colors ${isQRExpanded ? 'text-blue-600' : 'text-blue-500'}`}
-                                        size={20}
-                                    />
                                     <div className="flex-1">
                                         {item.title && (
                                             <div className="font-semibold text-gray-900">

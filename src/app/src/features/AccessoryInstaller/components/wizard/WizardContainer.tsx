@@ -61,7 +61,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     const StepComponent = currentStep.component;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="h-full bg-gray-50 flex flex-col">
             <ProgressBar
                 currentStep={currentStepIndex + 1}
                 totalSteps={subWizard.steps.length}

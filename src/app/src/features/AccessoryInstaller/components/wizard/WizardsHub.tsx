@@ -15,7 +15,7 @@ export function WizardsHub({
     description,
 }: WizardsHubProps) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="h-full bg-gradient-to-br from-gray-50 to-gray-100">
             <div className="max-w-6xl mx-auto px-8 py-16">
                 <div className="mb-12">
                     <div className="flex items-center gap-3 mb-4">
@@ -33,6 +33,7 @@ export function WizardsHub({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {wizards.map((wizard) => {
+                        console.log(wizard);
                         const totalSteps = wizard.subWizards.reduce(
                             (acc, sw) => acc + sw.steps.length,
                             0,

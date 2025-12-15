@@ -29,8 +29,14 @@ export interface SubWizard {
     icon?: React.ComponentType<any>;
 }
 
+export interface ValidationResult {
+    success: boolean;
+    reason?: string;
+}
+
 export interface Wizard {
     id: string;
     title: string;
     subWizards: SubWizard[];
+    validations: (() => ValidationResult)[];
 }

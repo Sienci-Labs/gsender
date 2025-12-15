@@ -44,6 +44,7 @@ export function WizardManager({ wizard, onExit }: WizardManagerProps) {
             subWizards={wizard.subWizards}
             onSelectSubWizard={handleSelectSubWizard}
             onBack={onExit}
+            validations={wizard.validations}
         />
     );
 }
