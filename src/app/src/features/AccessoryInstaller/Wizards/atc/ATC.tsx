@@ -4,13 +4,18 @@ import { useMemo } from 'react';
 import { Placeholder } from 'app/features/AccessoryInstaller/components/wizard/placeholder.tsx';
 
 export function useSienciATCWizard(): Wizard {
-    const validations = useValidations();
+    const { connectionValidation, homingValidation } = useValidations();
+
+    const validations = useMemo(
+        () => [connectionValidation, homingValidation],
+        [connectionValidation, homingValidation],
+    );
 
     return useMemo<Wizard>(
         () => ({
             id: 'sienci-atc',
             title: 'Sienci ATC',
-            validations,
+            validations: [...validations],
             subWizards: [
                 {
                     id: 'initial-setup',

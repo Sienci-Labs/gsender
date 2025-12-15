@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Wizard } from '../../types/wizard';
 import { WizardsHub } from './WizardsHub';
 import { WizardManager } from './WizardManager';
@@ -15,6 +15,17 @@ export function WizardsManager({
     hubDescription,
 }: WizardsManagerProps) {
     const [selectedWizard, setSelectedWizard] = useState<Wizard | null>(null);
+
+    useEffect(() => {
+        if (selectedWizard) {
+            const updatedWizard = wizards.find(
+                (w) => w.id === selectedWizard.id,
+            );
+            if (updatedWizard && updatedWizard !== selectedWizard) {
+                setSelectedWizard(updatedWizard);
+            }
+        }
+    }, [wizards, selectedWizard]);
 
     const handleSelectWizard = (wizard: Wizard) => {
         setSelectedWizard(wizard);

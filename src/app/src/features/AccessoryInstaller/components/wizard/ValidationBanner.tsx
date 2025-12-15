@@ -9,10 +9,13 @@ interface ValidationBannerProps {
 export function ValidationBanner({ validations }: ValidationBannerProps) {
     const [validationError, setValidationError] = useState<string | null>(null);
 
+    console.log('outside effect', validations[0]());
+
     useEffect(() => {
         if (validations && validations.length > 0) {
             for (const validation of validations) {
                 const result = validation();
+                console.log('result:', result);
                 if (!result.success) {
                     setValidationError(result.reason || 'Validation failed');
                     return;

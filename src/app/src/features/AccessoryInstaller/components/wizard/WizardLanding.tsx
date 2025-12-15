@@ -21,6 +21,8 @@ export function WizardLanding({
         (sw) => sw.id === subWizards[0]?.id,
     );
 
+    console.log('on landing', validations[0]());
+
     const hasValidationFailures = () => {
         if (!validations || validations.length === 0) return false;
 
