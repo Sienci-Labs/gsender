@@ -1,9 +1,48 @@
 import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { useState } from 'react';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
+    const [rackSize, setRackSize] = useState<number>(12);
+
+    const handleUpload = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+    };
+
     return (
-        <div>
-            <p>I'm a macro config</p>
+        <div className="flex flex-col gap-5 p-2 justify-start">
+            <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Rack Size
+                </label>
+                <select
+                    value={rackSize}
+                    onChange={(e) => setRackSize(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    <option value="no-tool-rack">No tool rack</option>
+                    <option value="6-tool">6 Tool Rack</option>
+                    <option value="12-tool">12 Tool Rack</option>
+                </select>
+            </div>
+            <p>
+                Sienci ATC operates using a set of macro programs stored in the
+                micro SD card of your controller.
+            </p>
+
+            <p>
+                Specify your rack size and click “Upload Macros” to upload the
+                relevant program files into the SD card. This can be changed
+                later.
+            </p>
+
+            <StepActionButton
+                label={'Upload'}
+                runningLabel="Uploading..."
+                onApply={handleUpload}
+                onComplete={onComplete}
+                onUncomplete={onUncomplete}
+            />
         </div>
     );
 }

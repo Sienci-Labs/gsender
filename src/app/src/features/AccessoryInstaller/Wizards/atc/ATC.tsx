@@ -2,13 +2,16 @@ import { Wizard } from 'app/features/AccessoryInstaller/types';
 import { useValidations } from 'app/features/AccessoryInstaller/hooks/UseValidations.tsx';
 import { useMemo } from 'react';
 import { Placeholder } from 'app/features/AccessoryInstaller/components/wizard/placeholder.tsx';
+import PlaceholderImage from '../assets/placeholder.png';
+import { MacroConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx';
+import { ControllerConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx';
 
 export function useSienciATCWizard(): Wizard {
-    const { connectionValidation, homingValidation } = useValidations();
+    const { connectionValidation } = useValidations();
 
     const validations = useMemo(
-        () => [connectionValidation, homingValidation],
-        [connectionValidation, homingValidation],
+        () => [connectionValidation],
+        [connectionValidation],
     );
 
     return useMemo<Wizard>(
@@ -27,25 +30,30 @@ export function useSienciATCWizard(): Wizard {
                         {
                             id: 'macro-configuration',
                             title: 'Macro Configuration',
-                            component: Placeholder,
+                            component: MacroConfiguration,
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content:
-                                        'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=600',
+                                    content: PlaceholderImage,
                                     title: 'SD Card Installation',
                                 },
                             ],
                         },
                         {
-                            id: 'initial-calibration',
-                            title: 'Initial Calibration',
-                            component: Placeholder,
+                            id: 'controller-configuration',
+                            title: 'Controller Configuration',
+                            component: ControllerConfiguration,
                             secondaryContent: [
                                 {
                                     type: 'image',
+                                    content: PlaceholderImage,
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Learn More',
                                     content:
-                                        'https://images.pexels.com/photos/159201/tool-work-bench-hammer-pliers-159201.jpeg?auto=compress&cs=tinysrgb&w=600',
+                                        'View our online resources for a full list of settings changes.',
+                                    url: 'https://example.com/docs',
                                 },
                             ],
                         },
@@ -56,8 +64,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content:
-                                        'https://images.pexels.com/photos/4792509/pexels-photo-4792509.jpeg?auto=compress&cs=tinysrgb&w=600',
+                                    content: PlaceholderImage,
                                 },
                                 {
                                     type: 'component',
@@ -72,8 +79,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content:
-                                        'https://images.pexels.com/photos/5691577/pexels-photo-5691577.jpeg?auto=compress&cs=tinysrgb&w=600',
+                                    content: PlaceholderImage,
                                 },
                                 {
                                     type: 'component',
