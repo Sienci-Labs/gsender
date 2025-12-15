@@ -27,6 +27,7 @@ export interface SubWizard {
     configVersion?: string;
     steps: WizardStep[];
     icon?: React.ComponentType<any>;
+    completionPage?: React.ComponentType<any>;
 }
 
 export interface ValidationResult {
