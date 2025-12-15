@@ -2,23 +2,28 @@ interface ProgressBarProps {
     currentStep: number;
     totalSteps: number;
     onExit: () => void;
+    isCompleted?: boolean;
 }
 
 export function ProgressBar({
     currentStep,
     totalSteps,
     onExit,
+    isCompleted = false,
 }: ProgressBarProps) {
-    const progressPercentage = Math.round(
-        ((currentStep - 1) / totalSteps) * 100,
-    );
+    const progressPercentage = isCompleted
+        ? 100
+        : Math.round(((currentStep - 1) / totalSteps) * 100);
+    const displayStep = isCompleted ? totalSteps : currentStep;
 
     return (
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
             <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-600">
-                        Step {currentStep} of {totalSteps}
+                        {isCompleted
+                            ? 'All Steps Complete'
+                            : `Step ${displayStep} of ${totalSteps}`}
                     </span>
                     <span className="text-sm text-gray-600">
                         {progressPercentage}% Complete
@@ -26,7 +31,7 @@ export function ProgressBar({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                     <div
-                        className="bg-blue-500 h-full transition-all duration-300 ease-out"
+                        className={`h-full transition-all duration-300 ease-out ${isCompleted ? 'bg-green-500' : 'bg-blue-500'}`}
                         style={{ width: `${progressPercentage}%` }}
                     />
                 </div>

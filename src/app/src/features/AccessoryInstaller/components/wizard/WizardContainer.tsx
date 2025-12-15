@@ -79,16 +79,15 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 currentStep={currentStepIndex + 1}
                 totalSteps={subWizard.steps.length}
                 onExit={onExit}
+                isCompleted={showCompletion}
             />
 
             <div className="flex flex-1 overflow-hidden">
-                {showCompletion && CompletionComponent ? (
-                    <div className="flex-1 p-12 overflow-y-auto">
+                <div className="w-3/5 p-12 overflow-y-auto">
+                    {showCompletion && CompletionComponent ? (
                         <CompletionComponent />
-                    </div>
-                ) : (
-                    <>
-                        <div className="w-3/5 p-12 overflow-y-auto">
+                    ) : (
+                        <>
                             <h1 className="text-4xl font-bold text-gray-900 mb-2">
                                 {currentStep.title}
                             </h1>
@@ -108,15 +107,15 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                                     onDataChange={handleDataChange}
                                 />
                             </div>
-                        </div>
+                        </>
+                    )}
+                </div>
 
-                        <div className="w-2/5 bg-gray-200 p-12 overflow-y-auto">
-                            <SecondaryContentPanel
-                                content={currentStep.secondaryContent || []}
-                            />
-                        </div>
-                    </>
-                )}
+                <div className="w-2/5 bg-gray-200 p-12 overflow-y-auto">
+                    <SecondaryContentPanel
+                        content={currentStep.secondaryContent || []}
+                    />
+                </div>
             </div>
 
             <div className="bg-white border-t border-gray-200 px-8 py-4 flex items-center justify-between">
