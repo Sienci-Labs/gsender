@@ -29,7 +29,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
     }
 
     return (
-        <div className="flex flex-col gap-6 h-full">
+        <div className="flex flex-col gap-6 h-full justify-around">
             {content.map((item, index) => {
                 if (item.type === 'image') {
                     return (
