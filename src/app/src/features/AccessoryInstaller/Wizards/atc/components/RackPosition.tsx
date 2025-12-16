@@ -1,10 +1,23 @@
 import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const [rackPositionMethod, setRackPositionMethod] =
         useState<string>('utility');
+
+    const mpos = useSelector((state: RootState) => state.controller.mpos);
+
+    useEffect(() => {
+        if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+        const { x, y, z } = mpos;
+        setPosition({ x, y, z });
+    }, [mpos]);
+
+    const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
 
     const applySettings = async () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -38,6 +51,13 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         <b>Keep your hands near the E-stop</b> and click “Find
                         Rack” to start.
                     </p>
+                    <StepActionButton
+                        label="Probe Rack"
+                        runningLabel="Probing..."
+                        onApply={applySettings}
+                        onComplete={onComplete}
+                        onUncomplete={onUncomplete}
+                    />
                 </>
             )}
 
@@ -57,16 +77,26 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         Once you are happy with the position, use the “Set
                         Position” button to set your rack position.
                     </p>
+                    <PositionSetter
+                        showZ={true}
+                        xPosition={position.x}
+                        yPosition={position.y}
+                        zPosition={position.z}
+                        onPositionChange={(positions) => {
+                            console.log(positions);
+                        }}
+                        actionButton={
+                            <StepActionButton
+                                label="Set Position"
+                                runningLabel="Setting..."
+                                onApply={applySettings}
+                                onComplete={onComplete}
+                                onUncomplete={onUncomplete}
+                            />
+                        }
+                    />
                 </>
             )}
-
-            <StepActionButton
-                label="Probe Rack"
-                runningLabel="Probing..."
-                onApply={applySettings}
-                onComplete={onComplete}
-                onUncomplete={onUncomplete}
-            />
         </div>
     );
 }
