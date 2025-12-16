@@ -1,12 +1,32 @@
 import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     const [rackSize, setRackSize] = useState<number>(12);
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [error, setError] = useState<boolean>(false);
+
+    useEffect(() => {
+        controller.addListener('ymodem:complete', () => {
+            setIsComplete(true);
+            setError(false);
+            onComplete();
+            setTimeout(() => {
+                setIsComplete(false);
+            }, 2000);
+        });
+        controller.addListener('ymodem:error', () => {
+            setError(true);
+        });
+        return () => {
+            controller.removeListener('ymodem:complete');
+            controller.removeListener('ymodem:error');
+        };
+    }, []);
 
     const handleUpload = async () => {
         if (rackSize === 0) {
@@ -32,8 +52,8 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         const config = store.get('widgets.atc.templates');
         const content = generateAllMacros(config);
 
-        //controller.command('ymodem:uploadFiles', content);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        controller.command('ymodem:uploadFiles', content);
+        //await new Promise((resolve) => setTimeout(resolve, 2000));
     };
 
     return (
@@ -67,8 +87,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                 label={'Upload'}
                 runningLabel="Uploading..."
                 onApply={handleUpload}
-                onComplete={onComplete}
-                onUncomplete={onUncomplete}
+                isComplete={isComplete}
             />
         </div>
     );

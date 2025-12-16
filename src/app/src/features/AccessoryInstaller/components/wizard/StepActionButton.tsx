@@ -8,9 +8,9 @@ interface StepActionButtonProps {
     runningLabel?: string;
     finishedLabel?: string;
     errorLabel?: string;
-    onApply: () => Promise<void> | void;
-    onComplete?: () => void;
-    onUncomplete?: () => void;
+    onApply: () => void;
+    isComplete?: boolean;
+    error?: string | null;
     className?: string;
     variant?: 'primary' | 'secondary';
     icon?: React.ReactNode;
@@ -22,44 +22,32 @@ export function StepActionButton({
     finishedLabel = 'Complete',
     errorLabel = 'Error',
     onApply,
-    onComplete,
-    onUncomplete,
+    isComplete = false,
+    error = null,
     className = '',
     variant = 'primary',
     icon,
 }: StepActionButtonProps) {
-    const [state, setState] = useState<ButtonState>('available');
-    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
-        if (state === 'finished' || state === 'error') {
-            const timeout = setTimeout(() => {
-                setState('available');
-                setErrorMessage('');
-            }, 4000);
-
-            return () => clearTimeout(timeout);
+        if (isComplete || error) {
+            setIsRunning(false);
         }
-    }, [state]);
+    }, [isComplete, error]);
 
-    const handleClick = async () => {
-        if (state === 'running' || state === 'finished') return;
-
-        setState('running');
-        setErrorMessage('');
-        onUncomplete?.();
-
-        try {
-            await onApply();
-            setState('finished');
-            onComplete?.();
-        } catch (error) {
-            setState('error');
-            setErrorMessage(
-                error instanceof Error ? error.message : 'An error occurred',
-            );
-        }
+    const handleClick = () => {
+        setIsRunning(true);
+        onApply();
     };
+
+    const state: ButtonState = error
+        ? 'error'
+        : isComplete
+          ? 'finished'
+          : isRunning
+            ? 'running'
+            : 'available';
 
     const getButtonStyles = () => {
         const baseStyles =
@@ -133,13 +121,13 @@ export function StepActionButton({
                 {getButtonContent()}
             </button>
 
-            {state === 'error' && errorMessage && (
+            {state === 'error' && error && (
                 <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
                     <AlertCircle
                         className="text-red-600 flex-shrink-0 mt-0.5"
                         size={18}
                     />
-                    <p className="text-sm text-red-800">{errorMessage}</p>
+                    <p className="text-sm text-red-800">{error}</p>
                 </div>
             )}
         </div>
