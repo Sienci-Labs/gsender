@@ -99,7 +99,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                                 </p>
                             )}
 
-                            <div className="mt-8">
+                            <div className="mt-8 font-sans w-4/5">
                                 <StepComponent
                                     onComplete={handleStepComplete}
                                     onUncomplete={handleStepUncomplete}
