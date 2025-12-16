@@ -105,7 +105,10 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                                                     />
                                                 </button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-4">
+                                            <PopoverContent
+                                                className="w-auto p-4 mr-14"
+                                                sideOffset={10}
+                                            >
                                                 <div className="flex flex-col items-center gap-3">
                                                     <div className="text-sm font-semibold text-gray-900">
                                                         Scan QR Code
