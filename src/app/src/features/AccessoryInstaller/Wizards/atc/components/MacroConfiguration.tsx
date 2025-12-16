@@ -21,6 +21,10 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         });
         controller.addListener('ymodem:error', () => {
             setError(true);
+            setTimeout(() => {
+                setIsComplete(false);
+                setError(false);
+            }, 3000);
         });
         return () => {
             controller.removeListener('ymodem:complete');
