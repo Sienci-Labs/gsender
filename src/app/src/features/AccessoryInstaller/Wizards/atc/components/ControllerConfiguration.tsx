@@ -15,7 +15,10 @@ export function ControllerConfiguration({
                 The following controller settings are required to ensure
                 compatibility with the Sienci ATC.
             </p>
-            <ul>
+            <ul
+                className="list-disc list-inside"
+                style={{ fontSize: '1.1rem' }}
+            >
                 <li>Homing direction</li>
                 <li>Tool number persistence</li>
                 <li>Input and output pin settings</li>

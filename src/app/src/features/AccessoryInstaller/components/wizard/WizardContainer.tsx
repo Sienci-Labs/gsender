@@ -99,7 +99,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                                 </p>
                             )}
 
-                            <div className="mt-8 font-sans w-4/5">
+                            <div className="mt-8">
                                 <StepComponent
                                     onComplete={handleStepComplete}
                                     onUncomplete={handleStepUncomplete}
@@ -113,7 +113,11 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 
                 <div className="w-2/5 bg-gray-200 p-12 overflow-y-auto">
                     <SecondaryContentPanel
-                        content={currentStep.secondaryContent || []}
+                        content={
+                            showCompletion
+                                ? []
+                                : currentStep.secondaryContent || []
+                        }
                     />
                 </div>
             </div>

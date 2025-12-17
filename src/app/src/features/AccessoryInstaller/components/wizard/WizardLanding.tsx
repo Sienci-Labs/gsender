@@ -68,7 +68,7 @@ export function WizardLanding({
                             {activeSubWizard.configVersion}
                         </p>
                     )}
-                    <ValidationBanner validations={validations} />`
+                    <ValidationBanner validations={validations} />
                     <div className="flex flex-col gap-3 mt-12 max-w-md">
                         {subWizards.map((subWizard, index) => {
                             const isActive = index === 0;

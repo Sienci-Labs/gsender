@@ -8,6 +8,7 @@ import { ControllerConfiguration } from 'app/features/AccessoryInstaller/Wizards
 import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx';
 import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx';
 import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx';
+import { Jogging } from 'app/features/Jogging';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -72,7 +73,7 @@ export function useSienciATCWizard(): Wizard {
                                 },
                                 {
                                     type: 'component',
-                                    content: Placeholder,
+                                    content: Jogging,
                                 },
                             ],
                         },
@@ -87,7 +88,7 @@ export function useSienciATCWizard(): Wizard {
                                 },
                                 {
                                     type: 'component',
-                                    content: Placeholder,
+                                    content: Jogging,
                                 },
                             ],
                         },

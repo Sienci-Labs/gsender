@@ -9,8 +9,6 @@ interface ValidationBannerProps {
 export function ValidationBanner({ validations }: ValidationBannerProps) {
     const [validationError, setValidationError] = useState<string | null>(null);
 
-    console.log('outside effect', validations[0]());
-
     useEffect(() => {
         if (validations && validations.length > 0) {
             for (const validation of validations) {
@@ -26,7 +24,7 @@ export function ValidationBanner({ validations }: ValidationBannerProps) {
     }, [validations]);
 
     if (!validationError) {
-        return null;
+        return <div className="mt-4 max-w-3/5 h-14"></div>;
     }
 
     return (
