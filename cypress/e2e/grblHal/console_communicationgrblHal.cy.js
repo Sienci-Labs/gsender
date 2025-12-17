@@ -1,22 +1,4 @@
 describe('Console commands testing ', () => { 
-
-  //Ignoring known hydration error
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
-
   beforeEach(() => {
     cy.viewport(1280, 800);
     cy.visit('http://localhost:8000/#/');

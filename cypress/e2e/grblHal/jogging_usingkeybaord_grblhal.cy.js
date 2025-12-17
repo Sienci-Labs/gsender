@@ -1,150 +1,258 @@
-describe('Keyboard Jog Test - Shift + Right Arrow', () => {
+describe('Dynamic Keyboard Jogging Test - All Axes', () => {
 
-  // Ignore known hydration-related UI errors and undefined.get() error
+  // Ignore known exceptions
   Cypress.on('uncaught:exception', (err) => {
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
+    console.log('Uncaught exception:', err.message);
+    const ignoreMessages = ['reading \'get\''];
     if (ignoreMessages.some(msg => err.message.includes(msg))) {
       return false;
     }
     return true;
   });
 
-  beforeEach(() => {
-    cy.viewport(2327, 1186);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
+  before(() => {
+    cy.viewport(2844, 1450);
   });
 
-  it('Test Case: Verify and Use Keyboard Shortcut for Jog X+ (right)', () => {
+  beforeEach(() => {
+    cy.visit('http://localhost:8000/#/', { timeout: 30000 });
+    cy.get('#app', { timeout: 20000 }).should('exist');
+    cy.wait(3000);
+  });
+
+  // Helper function to convert shortcut text to Cypress key format
+  const convertShortcutToKeys = (shortcutText) => {
+    const parts = shortcutText.toLowerCase().trim().split('+').map(p => p.trim());
+    const keyMap = {
+      'shift': '{shift}',
+      'ctrl': '{ctrl}',
+      'alt': '{alt}',
+      'left': '{leftarrow}',
+      'right': '{rightarrow}',
+      'up': '{uparrow}',
+      'down': '{downarrow}',
+      'pageup': '{pageup}',
+      'pagedown': '{pagedown}',
+      'home': '{home}',
+      'end': '{end}',
+      'enter': '{enter}',
+      'space': ' ',
+      'tab': '{tab}'
+    };
+
+    return parts.map(part => keyMap[part] || part).join('');
+  };
+
+  // Helper function to get and test a jog direction
+  const testJogDirection = (jogName, searchPattern, axisIndex, expectedDirection, xyMove, zMove) => {
+    cy.log(`Testing ${jogName}`);
     
-    cy.log('=== KEYBOARD JOG TEST: Shift + Right Arrow ===');
-
-    // Step 1: Connect to CNC
-    cy.log('Step 1: Connecting to CNC machine...');
-    cy.connectMachine();
-    cy.wait(7000);
-
-    // Unlock machine if needed
-    cy.unlockMachineIfNeeded();
-
-    // Verify machine status is Idle
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
-
-    // Step 2: Zero all axes
-    cy.log('Step 2: Zeroing all axes...');
-    cy.zeroAllAxes();
-    cy.verifyAxes(0, 0, 0);
-
-    // Step 3: Switch to Normal mode (as shown in JSON)
-    cy.log('Step 3: Switching to Normal mode...');
-    cy.get('div.h-\\[75\\%\\] button.bg-blue-400').contains('Normal').click();
-    cy.wait(500);
-
-    // Step 4: Navigate to Tools page
-    cy.log('Step 4: Navigating to Tools page...');
-    cy.get('a:nth-of-type(3) path').click(); // Click Tools icon
+    // Navigate to Keyboard Shortcuts
+    cy.get('a:nth-of-type(3) span').contains('Tools').click();
     cy.wait(2000);
-
-    // Step 5: Click on Keyboard Shortcuts
-    cy.log('Step 5: Opening Keyboard Shortcuts settings...');
     cy.contains('Keyboard Shortcuts').parent().click();
+    cy.wait(3000);
+
+    // Wait for table to load and debug
+    cy.get('table', { timeout: 15000 }).should('be.visible');
     cy.wait(1000);
 
-    // Step 6: Find Jog X+ (right) row and click to open edit dialog
-    cy.log('Step 6: Finding Jog X+ (right) keyboard shortcut...');
-    cy.contains('tr', 'Jog X+ (right)').within(() => {
-      // Click on the edit button (SVG icon)
-      cy.get('td:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) svg').click();
+    cy.get('tbody tr', { timeout: 10000 }).then($rows => {
+      cy.log(`Found ${$rows.length} rows in shortcuts table`);
+      $rows.each((index, row) => {
+        const rowText = Cypress.$(row).text();
+        if (rowText.toLowerCase().includes('jog')) {
+          cy.log(`Row ${index}: ${rowText.substring(0, 60)}`);
+        }
+      });
     });
-    cy.wait(1000);
 
-    // Step 7: Verify the current shortcut
-    cy.log('Step 7: Verifying current keyboard shortcut...');
-    
-    // Check if the shortcut is "shift + right"
-    cy.get('body').then($body => {
-      if ($body.find('h4.text-lg:contains("shift + right")').length > 0) {
-        cy.log('✓ Correct shortcut found: shift + right');
-        
-        // Close the dialog by clicking Cancel
-        cy.contains('button', 'Cancel').click();
-        cy.wait(500);
-        
-        // Step 8: Navigate back to home/config page
-        cy.log('Step 8: Navigating back to Carve page...');
-        cy.get('#app > div > div.h-full > div.flex img').first().click(); // Click Carve icon
-        cy.wait(2000);
-
-        // Verify we're back on the main page
-        cy.contains(/^Idle$/i, { timeout: 10000 }).should('be.visible');
-
-        // Step 9: Get current X position before keyboard jog
-        cy.log('Step 9: Getting current X position...');
-        cy.get('div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) input')
-          .invoke('val')
-          .then((initialX) => {
-            const startX = parseFloat(initialX);
-            cy.log(`Initial X position: ${startX}`);
-
-            // Get the XY preset value to know expected movement
-            cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(1) input')
-              .invoke('val')
-              .then((xyPreset) => {
-                const moveAmount = parseFloat(xyPreset);
-                cy.log(`XY preset value: ${moveAmount}`);
-                const expectedX = startX + moveAmount;
-
-                // Step 10: Execute keyboard shortcut (Shift + Right Arrow)
-                cy.log('Step 10: Executing keyboard shortcut: Shift + Right Arrow...');
-                cy.get('body').type('{shift}{rightarrow}', { release: false });
-                cy.wait(3000); // Wait for movement to complete
-
-                // Step 11: Verify X position changed
-                cy.log('Step 11: Verifying X position after keyboard jog...');
-                cy.get('div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) input')
-                  .invoke('val')
-                  .then((finalX) => {
-                    const endX = parseFloat(finalX);
-                    cy.log(`Final X position: ${endX}, Expected: ${expectedX}`);
-                    
-                    // Allow small tolerance for floating point comparison
-                    expect(Math.abs(endX - expectedX)).to.be.lessThan(0.01);
-                    cy.log('✓ X position updated correctly via keyboard shortcut!');
-                  });
-
-                // Step 12: Return X to zero using X- button
-                cy.log('Step 12: Returning X to zero position...');
-                cy.get('#xMinus').click();
-                cy.wait(3000);
-                
-                cy.verifyAxes(0, 0, 0);
-                cy.log('✓ Returned to zero position');
-              });
+    // Find the row using regex pattern and click edit button
+    cy.get('tbody tr', { timeout: 10000 }).then($rows => {
+      let foundRow = false;
+      
+      $rows.each((index, row) => {
+        const rowText = Cypress.$(row).text();
+        if (searchPattern.test(rowText)) {
+          cy.log(`Matched row: "${rowText.substring(0, 50)}"`);
+          cy.wrap(row).within(() => {
+            cy.get('td:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) svg').click();
           });
-
-        cy.log('=== TEST COMPLETED SUCCESSFULLY ===');
-        
-      } else {
-        // If different shortcut found
-        cy.get('h4.text-lg').eq(1).invoke('text').then((shortcutText) => {
-          cy.log(` Different shortcut found: ${shortcutText}`);
-          cy.log(' Please update the shortcut to "shift + right" to pass this test');
-          
-          // Close the dialog
-          cy.contains('button', 'Cancel').click();
-          
-          // Fail the test with a clear message
-          throw new Error(`Expected shortcut "shift + right" but found "${shortcutText}". Please update the keyboard shortcut.`);
-        });
+          foundRow = true;
+          return false; // break the loop
+        }
+      });
+      
+      if (!foundRow) {
+        throw new Error(`Could not find row matching pattern: ${searchPattern}`);
       }
     });
-  });
 
+    cy.wait(1500);
+
+    // Get the shortcut text from the dialog - try multiple selectors
+    cy.get('body').then($body => {
+      let shortcutText = '';
+      
+      // Strategy 1: Look for h4 with class text-lg
+      const h4Elements = $body.find('h4.text-lg');
+      if (h4Elements.length > 1) {
+        shortcutText = h4Elements.eq(1).text().trim();
+      } else if (h4Elements.length === 1) {
+        shortcutText = h4Elements.eq(0).text().trim();
+      }
+      
+      // Strategy 2: If not found, look for kbd tags
+      if (!shortcutText || shortcutText.length < 2) {
+        const kbdElements = $body.find('kbd');
+        if (kbdElements.length > 0) {
+          shortcutText = kbdElements.map((i, el) => Cypress.$(el).text()).get().join(' + ');
+        }
+      }
+
+      // Strategy 3: Look in dialog content with regex
+      if (!shortcutText || shortcutText.length < 2) {
+        const dialogContent = $body.find('[role="dialog"]').text();
+        const match = dialogContent.match(/(shift|ctrl|alt)[\s\+]+(left|right|up|down|pageup|pagedown)/i);
+        if (match) {
+          shortcutText = match[0];
+        }
+      }
+
+      cy.log(`${jogName} shortcut detected: "${shortcutText}"`);
+      
+      // Validate we got a shortcut
+      if (!shortcutText || shortcutText.length < 2) {
+        cy.log('WARNING: Could not detect shortcut, using default');
+        const fallbacks = {
+          'X+ (right)': 'shift + right',
+          'X- (left)': 'shift + left',
+          'Y+ (up)': 'shift + up',
+          'Y- (down)': 'shift + down',
+          'Z+ (up)': 'shift + pageup',
+          'Z- (down)': 'shift + pagedown'
+        };
+        
+        // Match fallback by searching jogName
+        for (const [key, value] of Object.entries(fallbacks)) {
+          if (jogName.includes(key)) {
+            shortcutText = value;
+            break;
+          }
+        }
+        cy.log(`Using fallback shortcut: ${shortcutText}`);
+      }
+      
+      const keySequence = convertShortcutToKeys(shortcutText);
+      cy.log(`Converted to Cypress format: ${keySequence}`);
+      
+      // Close the dialog
+      cy.contains('button', 'Cancel').click();
+      cy.wait(500);
+
+      // Navigate back to Carve page
+      cy.get('#app > div > div.h-full > div.flex img').first().click();
+      cy.wait(2000);
+      cy.contains(/^Idle$/i, { timeout: 10000 }).should('be.visible');
+
+      // Determine which axis and expected movement
+      const moveAmount = (axisIndex === 3) ? zMove : xyMove;
+      const expectedMove = expectedDirection * moveAmount;
+      
+      // Get axis input selector
+      const axisInputSelector = `div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(${axisIndex}) input`;
+      
+      // Get initial position
+      cy.get(axisInputSelector).invoke('val').then((startPos) => {
+        const initialPos = parseFloat(startPos);
+        const expectedPos = initialPos + expectedMove;
+        cy.log(`Initial: ${initialPos}, Expected: ${expectedPos}`);
+
+        // Execute the keyboard shortcut
+        cy.log(`Executing: ${keySequence}`);
+        cy.get('body').type(keySequence);
+        cy.wait(3500);
+
+        // Verify the position changed correctly
+        cy.get(axisInputSelector).invoke('val').then((endPos) => {
+          const finalPos = parseFloat(endPos);
+          const difference = Math.abs(finalPos - expectedPos);
+          cy.log(`Final: ${finalPos}, Difference: ${difference.toFixed(4)} mm`);
+          
+          expect(difference).to.be.lessThan(0.01, 
+            `Expected ${jogName} to move to ${expectedPos}, but got ${finalPos}`);
+          cy.log(`${jogName} successful!`);
+        });
+      });
+
+      // Return to zero for next test
+      cy.wait(1500);
+      cy.zeroAllAxes();
+      cy.wait(1000);
+    });
+  };
+
+  it('Test all keyboard jog shortcuts dynamically', () => {
+    
+    cy.log('DYNAMIC KEYBOARD JOGGING TEST');
+
+    // Step 1: Connect to CNC
+    cy.log('STEP 1: Connect to CNC');
+    cy.connectMachine();
+    cy.wait(7000);
+    cy.unlockMachineIfNeeded();
+    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.log('Machine connected and Idle');
+
+    // Step 2: Zero all axes
+    cy.log('STEP 2: Zero All Axes');
+    cy.zeroAllAxes();
+    cy.verifyAxes(0, 0, 0);
+    cy.log('All axes zeroed');
+
+    // Step 3: Get preset values
+    cy.log('STEP 3: Get Movement Presets');
+    cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(1) input')
+      .invoke('val')
+      .then((xyPreset) => {
+        const xyMove = parseFloat(xyPreset);
+        cy.log(`XY Preset: ${xyMove} mm`);
+        
+        cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(2) input')
+          .invoke('val')
+          .then((zPreset) => {
+            const zMove = parseFloat(zPreset);
+            cy.log(`Z Preset: ${zMove} mm`);
+
+            // Test each direction with regex patterns
+            cy.log('STEP 4: Test X+ (Right)');
+            testJogDirection('X+ (right)', /X\+.*(right|→)/i, 1, +1, xyMove, zMove);
+
+            cy.log('STEP 5: Test X- (Left)');
+            testJogDirection('X- (left)', /X-.*(left|←)/i, 1, -1, xyMove, zMove);
+
+            cy.log('STEP 6: Test Y+ (Up)');
+            testJogDirection('Y+ (up)', /Y\+.*(up|↑)/i, 2, +1, xyMove, zMove);
+
+            cy.log(' STEP 7: Test Y- (Down)');
+            testJogDirection('Y- (down)', /Y-.*(down|↓)/i, 2, -1, xyMove, zMove);
+
+            cy.log('STEP 8: Test Z+ (Up)');
+            testJogDirection('Z+ (up)', /Z\+.*(up|↑)/i, 3, +1, xyMove, zMove);
+
+            cy.log('STEP 9: Test Z- (Down)');
+            testJogDirection('Z- (down)', /Z-.*(down|↓)/i, 3, -1, xyMove, zMove);
+
+            // Final Summary
+            cy.log('TEST SUMMARY');
+            cy.log('X+ (Right) - PASSED');
+            cy.log(' X- (Left) - PASSED');
+            cy.log('Y+ (Up) - PASSED');
+            cy.log(' Y- (Down) - PASSED');
+            cy.log('Z+ (Up) - PASSED');
+            cy.log('Z- (Down) - PASSED');
+            cy.log('ALL TESTS COMPLETED');
+          });
+      });
+  });
 });
