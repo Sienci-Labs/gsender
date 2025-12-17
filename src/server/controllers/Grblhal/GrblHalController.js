@@ -1821,6 +1821,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
+                    this.write('\x19');
                     if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
