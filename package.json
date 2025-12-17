@@ -382,7 +382,7 @@
     "chokidar": "^4.0.3",
     "concurrently": "~4.1.0",
     "coveralls": "~3.0.3",
-    "cross-env": "^5.2.1",
+    "cross-env": "^10.1.0",
     "css-loader": "~2.1.1",
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
