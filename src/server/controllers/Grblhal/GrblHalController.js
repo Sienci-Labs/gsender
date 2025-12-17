@@ -1885,7 +1885,11 @@ class GrblHalController {
                 this.feeder.next();
             },
             'feeder:stop': () => {
+                clearInterval(this.feederCB);
                 this.feeder.reset();
+                this.workflow.stop();
+                this.write('\x19');
+
 
                 delay(100).then(() => {
                     this.write('~');
