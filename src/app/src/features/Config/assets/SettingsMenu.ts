@@ -208,6 +208,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
+                        label: 'Run Check mode on file load',
+                        key: 'widgets.visualizer.checkFile',
+                        description:
+                            'Immediately runs Check Mode ($C) on the gcode file after loading.',
+                        type: 'boolean',
+                    },
+                    {
                         label: 'Outline style',
                         key: 'workspace.outlineMode',
                         type: 'select',
@@ -1618,10 +1625,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'IP address',
+                        label: 'Connect to IP',
                         key: 'widgets.connection.ip',
                         description:
-                            'Set the IP address for network scanning. (Default 192.168.5.1)',
+                            'IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
                     { type: 'eeprom', eID: '$301' },

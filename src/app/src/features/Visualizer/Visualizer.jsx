@@ -537,7 +537,11 @@ class Visualizer extends Component {
 
             let newPos = workPosition;
 
-            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
+            if (
+                isConnected &&
+                activeState === GRBL_ACTIVE_STATE_CHECK &&
+                this.fileLoaded
+            ) {
                 newPos = this.visualizer.getCurrentLocation();
             }
 
@@ -2368,6 +2372,13 @@ class Visualizer extends Component {
         );
 
         typeof callback === 'function' && callback({ bbox: bbox });
+
+        if (store.get('widgets.visualizer.checkFile')) {
+            controller.command('gcode:test');
+            toast.info('Running Check mode', {
+                position: 'bottom-right',
+            });
+        }
     }
 
     getToolpathHull() {
