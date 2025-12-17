@@ -1015,6 +1015,23 @@ class Visualizer extends Component {
                 this.recolorScene();
                 this.updateScene({ forceUpdate: true });
             }),
+            pubsub.subscribe('job:end', () => {
+                // Reset hidden lines when job finishes
+                if (this.visualizer) {
+                    this.visualizer.setHideProcessedLines(false);
+                    this.updateScene({ forceUpdate: true });
+                }
+            }),
+            pubsub.subscribe('workflow:state', (msg, state) => {
+                // Re-apply hide processed lines setting when job starts
+                if (state === 'running' && this.visualizer) {
+                    const hideProcessedLines = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    );
+                    this.visualizer.setHideProcessedLines(hideProcessedLines);
+                }
+            }),
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
                 pubsub.publish('visualizeWorker:terminate');
@@ -2400,6 +2417,12 @@ class Visualizer extends Component {
             frames: new Uint32Array(vizualization.frames),
             spindleSpeeds: new Float32Array(vizualization.spindleSpeeds),
         };
+
+        const hideProcessedLines = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+        this.visualizer.setHideProcessedLines(hideProcessedLines);
 
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 

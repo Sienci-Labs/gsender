@@ -394,6 +394,7 @@ const defaultState: State = {
             showWarning: false,
             showLineWarnings: false,
             showSoftLimitWarning: false,
+            hideProcessedLines: false,
         },
     },
     commandKeys: {},

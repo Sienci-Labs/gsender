@@ -65,4 +65,5 @@ export interface Visualizer {
     showWarning: boolean;
     showLineWarnings: boolean;
     showSoftLimitWarning: boolean;
+    hideProcessedLines: boolean;
 }
