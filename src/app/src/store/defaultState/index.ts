@@ -142,6 +142,16 @@ const defaultState: State = {
         terminal: {
             inputHistory: [],
         },
+        camera: {
+            enabled: false,
+            deviceId: '',
+            constraints: {
+                width: 1280,
+                height: 720,
+                frameRate: 30,
+            },
+            qualityPreset: 'medium' as 'low' | 'medium' | 'high',
+        },
         mode: WORKSPACE_MODE.DEFAULT,
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,

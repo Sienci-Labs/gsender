@@ -120,7 +120,11 @@
       "target": [
         "dmg"
       ],
-      "icon": "electron-build/icon.icns"
+      "icon": "electron-build/icon.icns",
+      "entitlements": "electron-build/entitlements.mac.plist",
+      "entitlementsInherit": "electron-build/entitlements.mac.inherit.plist",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
     },
     "dmg": {
       "background": "electron-build/background.png",
