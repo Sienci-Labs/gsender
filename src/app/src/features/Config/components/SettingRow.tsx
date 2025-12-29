@@ -158,6 +158,7 @@ export function SettingRow({
     const handleSettingsChange = (index: number) => (value: any) => {
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
+            console.log(prev);
             const updated = [...prev];
             // save the value from before we started editing
             if (!updated[index].ogValue) {
