@@ -22,7 +22,9 @@
 //19.Verify axes for expected values (flexible with decimals)
 //20.Homing enabling and perform homing
 //21.Axis Homing Z< Y & X 
+//22.Go to URLS 
 // ***********************************************
+
 
 // ----------------------
 // 1.Wait for Idle State
@@ -798,4 +800,187 @@ Cypress.Commands.add('verifyAxes', (expectedX = 0, expectedY = 0, expectedZ = 0)
 
   cy.log('Axes verified successfully');
 
+});
+
+// Delete all macro files
+// Custom command to delete all macros (MORE ROBUST)
+Cypress.Commands.add('deleteAllMacros', () => {
+  cy.log('=== DELETE ALL MACROS - Custom Command ===');
+  
+  function deleteNextMacro() {
+    cy.get('body').then($body => {
+      const macros = $body.find('div.flex-grow span');
+      
+      if (macros.length === 0) {
+        cy.log('✅ All macros have been deleted');
+        return;
+      }
+      
+      const macroName = macros.first().text().trim();
+      cy.log(`🗑️ Deleting: "${macroName}" | Remaining: ${macros.length}`);
+      
+      // Find and click the three-dot menu
+      cy.get('div.flex-grow span')
+        .first()
+        .closest('div[class*="flex"]')
+        .find('button')
+        .last()
+        .click({ force: true });
+      
+      cy.wait(2000);  // Give menu time to appear
+      
+      // Try multiple strategies to find Delete option
+      cy.get('body').then($menuBody => {
+        // Strategy 1: Look for span with Delete text
+        if ($menuBody.find('span:contains("Delete")').length > 0) {
+          cy.log('Found Delete in span');
+          cy.contains('span', 'Delete')
+            .first()
+            .click({ force: true });
+        }
+        // Strategy 2: Look for div with Delete text
+        else if ($menuBody.find('div:contains("Delete")').length > 0) {
+          cy.log('Found Delete in div');
+          cy.contains('div', 'Delete')
+            .first()
+            .click({ force: true });
+        }
+        // Strategy 3: Look for menu item role
+        else if ($menuBody.find('[role="menuitem"]').length > 0) {
+          cy.log('Found menuitem role');
+          cy.get('[role="menuitem"]')
+            .contains(/Delete/i)
+            .click({ force: true });
+        }
+        // Strategy 4: Just find any element with Delete
+        else {
+          cy.log('Using fallback - any element with Delete');
+          cy.contains(/Delete/i)
+            .first()
+            .click({ force: true });
+        }
+      });
+      
+      cy.wait(2000);
+      
+      // Confirm deletion in dialog - try multiple approaches
+      cy.get('body').then($dialogBody => {
+        // Look for button with Delete text that's visible
+        const deleteButtons = $dialogBody.find('button:visible:contains("Delete")');
+        
+        if (deleteButtons.length > 0) {
+          cy.log(`Found ${deleteButtons.length} Delete button(s) in dialog`);
+          cy.get('button:visible')
+            .contains(/Delete/i)
+            .click({ force: true });
+        } else {
+          // Fallback: find any button with blue background (typical confirm button)
+          cy.log('Using fallback for confirm button');
+          cy.get('button.bg-blue-500, button[class*="blue"]')
+            .contains(/Delete/i)
+            .click({ force: true });
+        }
+      });
+      
+      cy.wait(3000);  // Wait for deletion to complete
+      
+      // Recursively delete next macro
+      deleteNextMacro();
+    });
+  }
+  
+  // Start the deletion process
+  deleteNextMacro();
+});
+
+// Alternative: More defensive version with error handling
+Cypress.Commands.add('deleteAllMacrosSafe', () => {
+  cy.log('=== DELETE ALL MACROS (SAFE MODE) - Custom Command ===');
+  
+  function deleteNextMacroSafe() {
+    cy.get('body').then($body => {
+      const macros = $body.find('div.flex-grow span');
+      
+      if (macros.length === 0) {
+        cy.log(' All macros have been deleted');
+        return;
+      }
+      
+      const macroName = macros.first().text().trim();
+      cy.log(`Attempting to delete: "${macroName}" | Remaining: ${macros.length}`);
+      
+      // Click three-dot menu
+      cy.get('div.flex-grow span')
+        .first()
+        .closest('div[class*="flex"]')
+        .find('button')
+        .last()
+        .click({ force: true });
+      
+      cy.wait(2000);
+      
+      // Wait for menu to appear and click Delete
+      cy.get('body').then($menu => {
+        const menuText = $menu.text();
+        cy.log(`Menu content: ${menuText.substring(0, 100)}...`);
+        
+        // Find and click Delete - very lenient
+        cy.get('body')
+          .find('*')
+          .filter((index, el) => {
+            const text = el.textContent.trim();
+            return text === 'Delete' || text.toLowerCase() === 'delete';
+          })
+          .filter(':visible')
+          .first()
+          .click({ force: true });
+      });
+      
+      cy.wait(2000);
+      
+      // Confirm deletion
+      cy.get('button')
+        .filter(':visible')
+        .filter((index, el) => {
+          const text = el.textContent;
+          return /delete/i.test(text);
+        })
+        .first()
+        .click({ force: true });
+      
+      cy.wait(3000);
+      
+      // Recursively delete next
+      deleteNextMacroSafe();
+    });
+  }
+  
+  deleteNextMacroSafe();
+});
+
+
+
+
+// Simple URL Navigation Commands
+// ==============================
+
+// URL Definitions
+const BASE_URL = 'http://localhost:8000';
+
+// Page URLs
+Cypress.Commands.add('goToCarve', () => {
+  cy.visit('http://localhost:8000/#/');
+  
+});
+
+Cypress.Commands.add('goToStats', () => {
+  cy.visit('http://localhost:8000/#/stats');
+});
+
+Cypress.Commands.add('goToTools', () => {
+  cy.visit('http://localhost:8000/#/tools');
+});
+
+Cypress.Commands.add('goToConfig', () => {
+  cy.visit('http://localhost:8000/#/configuration');
 });

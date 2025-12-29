@@ -15,7 +15,7 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
   });
 
   beforeEach(() => {
-    cy.visit('http://localhost:8000/#/', { timeout: 30000 });
+  cy.goToCarve();
     cy.get('#app', { timeout: 20000 }).should('exist');
     cy.wait(3000);
   });

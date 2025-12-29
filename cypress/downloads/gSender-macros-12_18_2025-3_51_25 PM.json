@@ -1,0 +1,14 @@
+[
+ {
+  "name": "CLSM Kit Settings",
+  "content": "$100=2222222222222200\n$101=100\n$102=100\n$110=7000\n$111=7000\n$112=2000\n$23=1\n$$",
+  "description": "This macro will change the motor speeds settings on your gSender so that is compatible with the closed loop stepper motors.",
+  "id": "c30d36e8-31dc-4dc9-acf8-735ecc77dd62"
+ },
+ {
+  "name": "CLSM Kit Settings-edited",
+  "content": "$100=200\n$101=200\n$102=200\n$110=6000\n$111=6000\n$112=1000\n$23=1\n$$",
+  "description": "This is a test data",
+  "id": "3ffae9e1-7fb4-4238-ae0d-93b1808cccd7"
+ }
+]
