@@ -233,6 +233,7 @@ const MacroForm = ({
                                     });
                                 }
                             }}
+                            data-testid="add-macro-button"
                         >
                             {id ? 'Update Macro' : 'Add New Macro'}
                         </Button>
