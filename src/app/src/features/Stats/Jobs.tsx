@@ -95,7 +95,7 @@ export function Jobs() {
             <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
                 <StatCard>
                     <CardHeader>Job History</CardHeader>
-                    <div class="w-full flex flex-col">
+                    <div className="w-full flex flex-col">
                         <SortableTable
                             defaultData={defaultData}
                             data={jobs}
