@@ -56,6 +56,14 @@ import ShortcutsTable from '../ShortcutsTable';
 import EditArea from './EditArea';
 import { generateList } from '../utils';
 
+import {
+    DownloadIcon,
+    UploadIcon,
+    PrinterIcon,
+    ToggleLeftIcon,
+    ToggleRightIcon,
+} from 'lucide-react';
+
 /**
  * Keybinding settings page
  * @prop {Boolean} active Check if this page is currently active or not
@@ -302,6 +310,97 @@ const Keyboard = () => {
     );
 
     const datasetList = generateList(dataSet);
+
+    const handleExportShortcuts = () => {
+        try {
+            const exportData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                shortcuts: shortcutsList,
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `gsender-shortcuts-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            toast.success('Shortcuts exported successfully!', {
+                duration: 3000,
+                position: 'bottom-right',
+            });
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Failed to export shortcuts.', {
+                position: 'bottom-right',
+            });
+        }
+    };
+
+    const handleImportShortcuts = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json,.json';
+
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importData = JSON.parse(event.target.result);
+
+                    // Validate the imported data
+                    if (!importData.shortcuts) {
+                        throw new Error('Invalid shortcuts file format');
+                    }
+
+                    // Merge imported shortcuts with existing ones
+                    const mergedShortcuts = { ...shortcutsList };
+
+                    Object.entries(importData.shortcuts).forEach(
+                        ([key, shortcut]) => {
+                            // Only import if the shortcut exists in allShuttleControlEvents
+                            if (
+                                allShuttleControlEvents[key] ||
+                                mergedShortcuts[key]
+                            ) {
+                                mergedShortcuts[key] = {
+                                    ...mergedShortcuts[key],
+                                    ...shortcut,
+                                };
+                            }
+                        },
+                    );
+
+                    updateKeybindings(mergedShortcuts, false);
+
+                    toast.success('Shortcuts imported successfully!', {
+                        duration: 3000,
+                        position: 'bottom-right',
+                    });
+                } catch (error) {
+                    console.error('Import error:', error);
+                    toast.error(
+                        'Failed to import shortcuts. Please check the file format.',
+                        {
+                            position: 'bottom-right',
+                        },
+                    );
+                }
+            };
+
+            reader.readAsText(file);
+        };
+
+        input.click();
+    };
 
     const handlePrintShortcuts = () => {
         // Group shortcuts by category
@@ -571,25 +670,53 @@ const Keyboard = () => {
                     onShortcutToggle={toggleKeybinding}
                 />
             </div>
-            <div className="flex gap-4 justify-end">
-                <Button
-                    onClick={enableAllShortcuts}
-                    disabled={allShortcutsEnabled}
-                >
-                    <i className="fas fa-toggle-on" />
-                    Enable All Shortcuts
-                </Button>
-                <Button
-                    onClick={disableAllShortcuts}
-                    disabled={allShortcutsDisabled}
-                >
-                    <i className="fas fa-toggle-off" />
-                    Disable All Shortcuts
-                </Button>
-                <Button onClick={handlePrintShortcuts}>
-                    <i className="fas fa-print" />
-                    Print Shortcuts
-                </Button>
+            <div className="flex gap-4 justify-between">
+                <div className="flex gap-4">
+                    <Button
+                        onClick={handleImportShortcuts}
+                        icon={<DownloadIcon size={16} />}
+                        text="Import"
+                        tooltip={{
+                            content: 'Import shortcuts from a file',
+                        }}
+                    />
+                    <Button
+                        onClick={handleExportShortcuts}
+                        icon={<UploadIcon size={16} />}
+                        text="Export"
+                        tooltip={{
+                            content: 'Export shortcuts to a file',
+                        }}
+                    />
+                </div>
+                <div className="flex gap-4">
+                    <Button
+                        onClick={enableAllShortcuts}
+                        disabled={allShortcutsEnabled}
+                        icon={<ToggleRightIcon size={16} />}
+                        text="Enable All"
+                        tooltip={{
+                            content: 'Enable all shortcuts',
+                        }}
+                    />
+                    <Button
+                        onClick={disableAllShortcuts}
+                        disabled={allShortcutsDisabled}
+                        icon={<ToggleLeftIcon size={16} />}
+                        text="Disable All"
+                        tooltip={{
+                            content: 'Disable all shortcuts',
+                        }}
+                    />
+                    <Button
+                        onClick={handlePrintShortcuts}
+                        icon={<PrinterIcon size={16} />}
+                        text="Print"
+                        tooltip={{
+                            content: 'Print shortcuts',
+                        }}
+                    />
+                </div>
             </div>
 
             {showEditModal && stopCallback() && (

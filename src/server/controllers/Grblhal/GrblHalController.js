@@ -1822,6 +1822,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
+                    this.write('\x19');
                     if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
@@ -1885,7 +1886,11 @@ class GrblHalController {
                 this.feeder.next();
             },
             'feeder:stop': () => {
+                clearInterval(this.feederCB);
                 this.feeder.reset();
+                this.workflow.stop();
+                this.write('\x19');
+
 
                 delay(100).then(() => {
                     this.write('~');

@@ -265,6 +265,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Hide processed lines',
+                        key: 'widgets.visualizer.hideProcessedLines',
+                        description:
+                            'Hide processed g-code lines in the visualizer.',
+                        type: 'boolean',
+                    },
+                    {
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
