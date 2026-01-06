@@ -15,6 +15,8 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
+import api from 'app/api';
+import config from '../../../server/services/configstore';
 
 interface UserData {
     path: string;
@@ -61,6 +63,13 @@ const getConfig = (): string => {
         content = JSON.stringify(normalizeState({}));
     }
 
+    // if (!window.location.href.includes('192.168.'))
+    //     // save preferences to api so that remote window can fetch it
+    //     // if the there are no prefs, its the remote window, so dont save it
+    //     console.log(JSON.parse(content));
+    //     api.preferences.replace(JSON.parse(content));
+    // }
+
     return content;
 };
 
@@ -82,6 +91,10 @@ const persist = (data: StoreData): void => {
         if (isElectron()) {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData!.path, value);
+
+            // save preferences to api so that remote window can fetch it
+            console.log(persistData);
+            api.preferences.replace(persistData);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -296,7 +309,9 @@ const migrateStore = (): void => {
 
     if (semver.lt(cnc.version, '1.5.5')) {
         // if user has default retraction distance (4), change it to the new default (2)
-        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        const currentRetractDistance = store.get(
+            'widgets.probe.retractionDistance',
+        );
         if (currentRetractDistance === 4) {
             store.set('widgets.probe.retractionDistance', 2);
         }
@@ -649,6 +664,18 @@ const migrateStore = (): void => {
     }
 };
 
+const syncPrefs = async () => {
+    try {
+        const config = await api.preferences.fetch();
+        console.log(config);
+        if (config) {
+            store.persist(config.data);
+        }
+    } catch (err) {
+        log.error(err);
+    }
+};
+
 try {
     // saveBackup();
     migrateStore();
@@ -656,7 +683,19 @@ try {
     log.error(err);
 }
 
+try {
+    // sync prefs if remote window
+    if (!isElectron()) {
+        config.on('change', (data) => {
+            store.persist(data.preferences);
+        });
+    }
+} catch (err) {
+    log.error(err);
+}
+
 store.getConfig = getConfig;
 store.persist = persist;
+store.syncPrefs = syncPrefs;
 
 export default store;

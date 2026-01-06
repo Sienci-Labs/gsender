@@ -108,6 +108,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 
     persist = noop;
     getConfig = noop;
+    syncPrefs = noop;
 }
 
 export default ImmutableStore;
