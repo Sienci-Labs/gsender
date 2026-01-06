@@ -33,7 +33,7 @@ class GrblHalLineParserResultATCI {
         };
 
         //  Keepout specific logic - how to handle
-        if (r[0].includes('inside the keepout zone') || r[0].includes('Jog move blocked')) {
+        if (r[0].includes('inside the keepout zone')) {
             payload.subtype = 10;
             payload.description = r[3].trim();
         }
