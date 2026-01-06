@@ -117,10 +117,21 @@ export function isATCAvailable() {
     return atcFlag === '1';
 }
 
+export function isKeepoutEnabled() {
+    const reduxState = reduxStore.getState();
+    const keepoutFlag = get(
+        reduxState,
+        'controller.state.status.keepout.flags',
+        [],
+    );
+    return keepoutFlag.includes('E');
+}
+
 export function sendATCHomingDialog() {
     const hasATC = isATCAvailable();
+    const keepoutEnabled = isKeepoutEnabled();
     const warningEnabled = store.get('widgets.atc.warnOnHome', false);
-    if (hasATC && warningEnabled) {
+    if (hasATC && !keepoutEnabled && warningEnabled) {
         Confirm({
             title: 'Homing Collision Warning',
             content:

@@ -92,6 +92,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                 runningLabel="Uploading..."
                 onApply={handleUpload}
                 isComplete={isComplete}
+                error={error}
             />
         </div>
     );
