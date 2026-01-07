@@ -108,6 +108,7 @@ jobs:
   build-macos:
     name: Build macOS packages
     runs-on: macos-latest
+    environment: CI
     strategy:
       matrix:
         node-version: [20.x]
