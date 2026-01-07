@@ -118,8 +118,15 @@
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
+
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "electron-build/entitlements.mac.plist",
