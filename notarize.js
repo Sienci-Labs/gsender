@@ -13,6 +13,10 @@ exports.default = async function notarizing(context) {
 
     const appName = context.packager.appInfo.productFilename;
 
+    console.log('~~~~~~~~~~~~');
+    console.log(appOutDir);
+    console.log('~~~~~~~~~~~~');
+
     try {
         await notarize({
             appBundleId: 'org.sienci.gsender',
