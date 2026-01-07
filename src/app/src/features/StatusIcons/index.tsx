@@ -9,6 +9,7 @@ import actions, {
     HeadlessSettings,
 } from 'app/features/RemoteMode/apiActions.ts';
 import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.tsx';
+import Tooltip from 'app/components/Tooltip';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
@@ -55,34 +56,40 @@ const StatusIcons = () => {
 
     return (
         <div className="flex flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 max-sm:hidden">
-            <button
-                className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                onClick={toggleRemoteModeDialog}
-            >
-                <RemoteIndicator
-                    className={cx('w-6 h-7', {
-                        'fill-gray-400': !headlessSettings.headlessStatus,
-                        'fill-green-500': headlessSettings.headlessStatus,
-                    })}
-                />
-            </button>
-            <Link
-                className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/tools/keyboard-shortcuts'}
-            >
-                <FaRegKeyboard className="text-green-500 w-7 h-7" />
-            </Link>
-            <Link
-                className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
-                to={'/tools/gamepad'}
-            >
-                <LuGamepad2
-                    className={cx('w-7 h-7', {
-                        'text-gray-400': !gamepadConnected,
-                        'text-green-500': gamepadConnected,
-                    })}
-                />
-            </Link>
+            <Tooltip content="Wireless Control">
+                <button
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    onClick={toggleRemoteModeDialog}
+                >
+                    <RemoteIndicator
+                        className={cx('w-6 h-7', {
+                            'fill-gray-400': !headlessSettings.headlessStatus,
+                            'fill-green-500': headlessSettings.headlessStatus,
+                        })}
+                    />
+                </button>
+            </Tooltip>
+            <Tooltip content="Keyboard Shortcuts">
+                <Link
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    to={'/tools/keyboard-shortcuts'}
+                >
+                    <FaRegKeyboard className="text-green-500 w-7 h-7" />
+                </Link>
+            </Tooltip>
+            <Tooltip content="Gamepad Shortcuts">
+                <Link
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    to={'/tools/gamepad'}
+                >
+                    <LuGamepad2
+                        className={cx('w-7 h-7', {
+                            'text-gray-400': !gamepadConnected,
+                            'text-green-500': gamepadConnected,
+                        })}
+                    />
+                </Link>
+            </Tooltip>
             <RemoteModeDialog
                 showRemote={showRemoteDialog}
                 onClose={() => setShowRemoteDialog(false)}

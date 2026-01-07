@@ -7,7 +7,7 @@ const StringInput = ({ info, setting, onChange, disabled }) => {
     let { value } = setting;
 
     return (
-        <div className="ring-1 ring-gray-300 flex flex-row flex-1 rounded relative items-center">
+        <div className="ring-1 ring-gray-300 flex flex-row flex-1 relative items-center rounded-md">
             <ControlledInput
                 type="text"
                 className={styles.textInput}

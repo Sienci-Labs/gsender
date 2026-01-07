@@ -18,7 +18,7 @@ export function ExternalLink({
             href={link}
             target="_blank"
             rel="noreferrer"
-            className="drop-shadow-md hover:scale-105 rounded border-top border-2 border-t-blue-500 p-3 border-rounded-t flex flex-row items-center justify-between gap-4 flex-grow dark:text-white dark:border-dark-lighter dark:border-t-blue-500"
+            className="drop-shadow-md hover:scale-105 rounded border-top border-2 border-t-blue-500 p-3 border-rounded-t flex flex-row items-center justify-between gap-4 flex-grow dark:bg-dark dark:text-white dark:border-dark-lighter dark:border-t-blue-500"
         >
             <div className={'flex flex-row gap-2 flex-shrink-1'}>
                 <span className="text-4xl p-2 text-white bg-opacity-50 rounded bg-gradient-to-b from-blue-500 to-robin-300 fill-blue-500">

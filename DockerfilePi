@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM siganberg/gsender-pi-builder:1.0 AS builder
+FROM --platform=$BUILDPLATFORM kglovernsienci/gsender-pi-builder AS builder
 ARG BUILDPLATFORM
 ARG NODE_OPTIONS="--max-old-space-size=8192"
 ARG USE_SYSTEM_FPM="true"

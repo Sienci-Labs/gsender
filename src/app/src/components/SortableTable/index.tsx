@@ -200,7 +200,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 
     /***** RENDERING *****/
     return (
-        <div className="w-full h-full flex flex-grow flex-col items-center gap-3">
+        <div className="w-full h-full flex flex-grow flex-col items-center gap-1">
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
             <div

@@ -8,15 +8,10 @@ export type SHORTCUT_CATEGORY_T =
 
 // Interfaces
 
-export interface CommandKey {
+export interface CommandKey { // we only save these properties in store, even though the shuttle events have more
     cmd: string;
     keys: string;
     isActive: boolean;
-    title: string;
-    payload: BasicObject;
-    preventDefault: boolean;
-    category: SHORTCUT_CATEGORY_T;
-    callback: Function;
 }
 
 export interface CommandKeys {

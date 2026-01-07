@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: gSenderInfo = {
     releaseNotes: {
         version: '',
-        releaseNotes: [],
+        releaseNotes: '',
         releaseDate: '',
     },
     hasUpdate: false,

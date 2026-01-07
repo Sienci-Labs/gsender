@@ -48,8 +48,11 @@ const JobControl: React.FC<JobControlProps> = ({
 }) => {
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
-    const disabled = !isConnected || !fileLoaded;
     const { state: workflowState } = workflow;
+    const disabled =
+        !fileLoaded ||
+        workflowState !== WORKFLOW_STATE_IDLE ||
+        activeState !== GRBL_ACTIVE_STATE_IDLE;
 
     useEffect(() => {
         subscribe();
@@ -92,7 +95,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
     return (
         <>
-            <div className="z-10 absolute bottom-[30%] portrait:max-lg:bottom-[calc(50%+85px)] max-sm:bottom-[30%] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
+            <div className="z-10 absolute bottom-[30%] portrait:bottom-[calc(50%+85px)] left-1/2 right-1/2 -translate-x-1/2 w-64 justify-center items-center flex">
                 {isConnected && fileLoaded && senderStatus?.sent > 0 && (
                     <ProgressArea
                         senderStatus={senderStatus}
@@ -102,17 +105,13 @@ const JobControl: React.FC<JobControlProps> = ({
             </div>
             <div className="relative h-full">
                 <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
-                    {fileLoaded &&
-                        workflowState === WORKFLOW_STATE_IDLE &&
-                        activeState === GRBL_ACTIVE_STATE_IDLE && (
-                            <div className="flex flex-row gap-2 justify-center mb-3 w-full">
-                                <OutlineButton disabled={disabled} />
-                                <StartFromLine
-                                    disabled={disabled}
-                                    lastLine={lastLine}
-                                />
-                            </div>
-                        )}
+                    <div className="flex flex-row gap-2 justify-center mb-3 w-full">
+                        <OutlineButton disabled={disabled} />
+                        <StartFromLine
+                            disabled={disabled}
+                            lastLine={lastLine}
+                        />
+                    </div>
                 </div>
 
                 <div className="z-10 absolute top-[-30px] max-xl:top-[-28px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">

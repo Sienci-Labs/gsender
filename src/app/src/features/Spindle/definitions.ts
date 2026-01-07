@@ -14,15 +14,7 @@ export interface SpindleState {
     spindleMax: number;
     spindleMin: number;
     delay: number;
-    laser: {
-        laserOnOutline: boolean,
-        power: number;
-        duration: number;
-        xOffset: number;
-        yOffset: number;
-        minPower: number;
-        maxPower: number;
-    };
+    laser: LaserState;
 }
 
 export interface Spindle {
@@ -33,4 +25,14 @@ export interface Spindle {
     laser: boolean;
     raw: string;
     order: number
+}
+
+export interface LaserState {
+    laserOnOutline: boolean,
+    power: number;
+    duration: number;
+    xOffset: number;
+    yOffset: number;
+    minPower: number;
+    maxPower: number;
 }

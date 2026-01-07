@@ -1,19 +1,36 @@
 import get from 'lodash/get';
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
-import { TOUCHPLATE_TYPE_AUTOZERO } from '../lib/constants';
+import {
+    TOUCHPLATE_TYPE_3D,
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_ZERO,
+} from '../lib/constants';
 import { UNITS_GCODE } from 'app/definitions/general';
-import { ProbeWidgetSettings } from 'app/features/Probe/definitions';
+import {
+    Probe,
+    ProbeProfile,
+    ProbeWidgetSettings,
+    TOUCHPLATE_TYPES_T,
+} from 'app/features/Probe/definitions';
 import { ReduxState } from 'app/store/definitions';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
-    const probeSettings = store.get('widgets.probe');
-    const touchplateType = store.get('workspace.probeProfile.touchplateType');
+    const probeProfile: ProbeProfile = store.get('workspace.probeProfile');
+    const probeSettings: Probe = store.get('widgets.probe');
+    const touchplateType: TOUCHPLATE_TYPES_T = store.get(
+        'workspace.probeProfile.touchplateType',
+    );
 
-    const probeThickness =
-        touchplateType === TOUCHPLATE_TYPE_AUTOZERO
-            ? '5'
-            : probeSettings.zProbeDistance;
+    console.log(probeProfile);
+    let probeThickness = probeProfile.zThickness.standardBlock;
+    if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        probeThickness = probeProfile.zThickness.autoZero;
+    } else if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
+        probeThickness = probeProfile.zThickness.zProbe;
+    } else if (touchplateType === TOUCHPLATE_TYPE_3D) {
+        probeThickness = probeProfile.zThickness.probe3D;
+    }
 
     return {
         slowSpeed: probeSettings.probeFeedrate,

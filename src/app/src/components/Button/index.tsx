@@ -2,6 +2,7 @@ import React, { JSX } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
+import Tooltip, { TooltipProps } from 'app/components/Tooltip';
 
 export const buttonStyle = tv({
     base: 'relative border rounded hover:opacity-90 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
@@ -40,6 +41,7 @@ export type ButtonProps = ButtonVariants &
         className?: string;
         text?: string;
         active?: boolean;
+        tooltip?: TooltipProps;
         size?: 'mini' | 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'custom';
     };
 
@@ -54,10 +56,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             icon,
             text,
             active,
+            tooltip,
             ...rest
         } = props;
 
-        return (
+        const buttonContent = (
             <ShadcnButton
                 className={buttonStyle({
                     variant,
@@ -80,6 +83,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 )}
             </ShadcnButton>
         );
+
+        if (tooltip?.content) {
+            return <Tooltip {...tooltip}>{buttonContent}</Tooltip>;
+        }
+
+        return buttonContent;
     },
 );
 

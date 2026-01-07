@@ -37,39 +37,43 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
     return (
         <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">XY</span>
+                <span className="min-w-[7ch]">XY:</span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'xyStep')}
                     suffix={units}
                     value={convertedValue.xyStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">Z</span>
+                <span className="min-w-[7ch]">Z:</span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'zStep')}
                     suffix={units}
                     value={convertedValue.zStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">A</span>
+                <span className="min-w-[7ch]">A:</span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'aStep')}
                     suffix="deg"
                     value={convertedValue.aStep}
+                    min={0.001}
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">Speed</span>
+                <span className="min-w-[7ch]">Speed:</span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'feedrate')}
                     suffix={`${units}/min`}
                     value={convertedValue.feedrate}
+                    min={0.001}
                 />
             </div>
         </div>

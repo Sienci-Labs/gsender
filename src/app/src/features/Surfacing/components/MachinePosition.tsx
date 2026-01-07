@@ -2,12 +2,7 @@ import React from 'react';
 
 import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
 import { Switch } from 'app/components/shadcn/Switch';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from 'app/components/shadcn/Tooltip';
+import { Tooltip } from 'app/components/Tooltip';
 import SpiralIcon from '../SVG/Spiral';
 import ZigZagIcon from '../SVG/ZigZag';
 import {
@@ -72,97 +67,63 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                     name="positions"
                     value={startPosition}
                     className="border-black"
-                    // depth={3}
                     onValueChange={(value) =>
                         setSurfacing({ ...surfacing, startPosition: value })
                     }
-                    // size="large"
                 >
                     {positionRadioButtons.map((position) => (
                         <div key={position.key} className={position.className}>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipContent>
-                                        {position.title}
-                                    </TooltipContent>
-                                    <TooltipTrigger asChild>
-                                        <RadioGroupItem
-                                            value={position.value}
-                                            className="m-0"
-                                            size="h-8 w-8"
-                                        />
-                                    </TooltipTrigger>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <Tooltip content={position.title}>
+                                <RadioGroupItem
+                                    value={position.value}
+                                    className="m-0"
+                                    size="h-8 w-8"
+                                />
+                            </Tooltip>
                         </div>
                     ))}
                 </RadioGroup>
             </div>
 
             <div>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        justifyContent: 'space-between',
-                    }}
-                >
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipContent className="break-words">
-                                Select Spiral Surfacing Type
-                            </TooltipContent>
-                            <TooltipTrigger asChild>
-                                <SpiralIcon
-                                    checked={surfacing.type === SPIRAL_MOVEMENT}
-                                    className={cx(
-                                        'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white ',
-                                        {
-                                            // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
-                                            'bg-blue-50 fill-black border-blue-500':
-                                                type === SPIRAL_MOVEMENT,
-                                        },
-                                    )}
-                                    onClick={() =>
-                                        setSurfacing({
-                                            ...surfacing,
-                                            type: SPIRAL_MOVEMENT,
-                                        })
-                                    }
-                                />
-                            </TooltipTrigger>
-                        </Tooltip>
-                    </TooltipProvider>
+                <div className="flex items-center gap-4 justify-between">
+                    <Tooltip content="Spiral surfacing pattern">
+                        <SpiralIcon
+                            checked={surfacing.type === SPIRAL_MOVEMENT}
+                            className={cx(
+                                'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
+                                {
+                                    'bg-blue-50 fill-black border-blue-500':
+                                        type === SPIRAL_MOVEMENT,
+                                },
+                            )}
+                            onClick={() =>
+                                setSurfacing({
+                                    ...surfacing,
+                                    type: SPIRAL_MOVEMENT,
+                                })
+                            }
+                        />
+                    </Tooltip>
 
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipContent className="break-words">
-                                Select Zig-Zag Surfacing Type
-                            </TooltipContent>
-                            <TooltipTrigger asChild>
-                                <ZigZagIcon
-                                    checked={
-                                        surfacing.type === ZIG_ZAG_MOVEMENT
-                                    }
-                                    className={cx(
-                                        'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white',
-                                        {
-                                            // hover:bg-blue-950 hover:fill-black hover:border-blue-500':
-                                            'bg-blue-50 fill-black border-blue-500':
-                                                type === ZIG_ZAG_MOVEMENT,
-                                        },
-                                    )}
-                                    onClick={() =>
-                                        setSurfacing({
-                                            ...surfacing,
-                                            type: ZIG_ZAG_MOVEMENT,
-                                        })
-                                    }
-                                />
-                            </TooltipTrigger>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip content="Zig-Zag surfacing pattern">
+                        <ZigZagIcon
+                            checked={surfacing.type === ZIG_ZAG_MOVEMENT}
+                            className={cx(
+                                'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
+                                {
+                                    'bg-blue-50 fill-black border-blue-500':
+                                        type === ZIG_ZAG_MOVEMENT,
+                                },
+                            )}
+                            onClick={() =>
+                                setSurfacing({
+                                    ...surfacing,
+                                    type: ZIG_ZAG_MOVEMENT,
+                                })
+                            }
+                        />
+                    </Tooltip>
                 </div>
 
                 <div className="flex mt-4 justify-between items-center">
@@ -170,7 +131,6 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                         Flip Cut Direction
                     </span>
                     <Switch
-                        // size="small"
                         onChange={(value) =>
                             setSurfacing({
                                 ...surfacing,

@@ -15,14 +15,14 @@ export interface PortListingsProps {
 
 function truncatePortName(port: string = ''): string {
     const portName = port.split('/').pop();
-    return portName.substring(portName.length - 8, portName.length);
+    return portName.substring(portName.length - 10, portName.length);
 }
 
 export function PortListingButton({ port, connectionHandler, baud }) {
     return (
         <button
             type="button"
-            className="w-full m-0 p-4 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
+            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
             onClick={() => connectionHandler(port.port, ConnectionType.USB)}
             key={`port-${port.port}`}
         >

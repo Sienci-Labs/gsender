@@ -31,7 +31,9 @@ const log = logger('DFUFlasher');
 
 class DFUFlasher extends events.EventEmitter {
     SET_ADDRESS = 0x21;
+
     ERASE_PAGE = 0x41;
+
     XFER_SIZE = 2048; // we evaluate this
 
     constructor({ hex, ...options }) {

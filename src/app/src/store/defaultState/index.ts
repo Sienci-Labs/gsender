@@ -32,7 +32,8 @@ import {
     ROTARY_MODE_FIRMWARE_SETTINGS,
     DEFAULT_FIRMWARE_SETTINGS,
     LIGHTWEIGHT_OPTIONS,
-    GRBLHAL, OUTLINE_MODE_DETAILED,
+    GRBLHAL,
+    OUTLINE_MODE_DETAILED,
 } from '../../constants';
 
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
@@ -61,6 +62,7 @@ const defaultState: State = {
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
+        revertWorkspace: false,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
@@ -89,7 +91,12 @@ const defaultState: State = {
         machineProfile: machineProfiles[5] as MachineProfile,
         probeProfile: {
             xyThickness: 10,
-            zThickness: 15,
+            zThickness: {
+                standardBlock: 15,
+                autoZero: 5,
+                zProbe: 15,
+                probe3D: 0,
+            },
             plateWidth: 50,
             plateLength: 50,
             functions: {
@@ -140,7 +147,7 @@ const defaultState: State = {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
             forceHardLimits: false,
-            forceSoftLimits: false
+            forceSoftLimits: false,
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -150,6 +157,7 @@ const defaultState: State = {
         },
         park: { x: 0, y: 0, z: 0 },
         notifications: [],
+        toastDuration: 0,
         enableDarkMode: false,
     },
     widgets: {
@@ -185,7 +193,7 @@ const defaultState: State = {
                 },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                 distances: [],
-                threshold: 250
+                threshold: 250,
             },
             mdi: {
                 disabled: false,
@@ -272,12 +280,14 @@ const defaultState: State = {
             probeDepth: 10,
             probeFeedrate: 75,
             probeFastFeedrate: 150,
-            retractionDistance: 4,
+            retractionDistance: 2,
             zProbeDistance: 30,
             touchPlateHeight: 10,
             probeType: 'Auto',
             direction: 0,
             probeAxis: 'Z',
+            tipDiameter3D: 2,
+            xyRetract3D: 10,
         },
         rotary: {
             stockTurning: {
@@ -291,6 +301,7 @@ const defaultState: State = {
                     startHeight: 50,
                     finalHeight: 40,
                     enableRehoming: false,
+                    shouldDwell: false,
                 },
             },
             tab: {
@@ -318,8 +329,8 @@ const defaultState: State = {
             bitDiameter: 22,
             stepover: 40,
             feedrate: 2500,
-            length: 0,
-            width: 0,
+            length: 100,
+            width: 100,
             skimDepth: 1,
             maxDepth: 1,
             spindleRPM: 17000,
@@ -329,7 +340,7 @@ const defaultState: State = {
             cutDirectionFlipped: false,
             shouldDwell: false,
             flood: false,
-            mist: false
+            mist: false,
         },
         visualizer: {
             minimized: false,
@@ -345,6 +356,7 @@ const defaultState: State = {
             SVGEnabled: false,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
+            checkFile: false,
             gcode: {
                 displayName: true,
             },

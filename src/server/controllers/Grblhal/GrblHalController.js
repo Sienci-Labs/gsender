@@ -26,8 +26,8 @@ import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
+
 import GcodeToolpath from '../../lib/GcodeToolpath';
-// import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
@@ -55,12 +55,15 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_HAL_ACTIVE_STATE_HOME,
+    GRBL_HAL_ACTIVE_STATE_HOLD,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_CHECK,
+    GRBL_HAL_ACTIVE_STATE_RUN
 } from './constants';
 import {
     METRIC_UNITS,
@@ -82,8 +85,8 @@ import {
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';
-import { GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_IDLE } from 'server/controllers/Grbl/constants';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
+
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -164,6 +167,8 @@ class GrblHalController {
         alarmCompleteReport: false, //0x87
         axsReportCount: 0
     };
+
+    parserStateEnabled = false;
 
     actionTime = {
         queryParserState: 0,
@@ -485,6 +490,7 @@ class GrblHalController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
+                    // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
@@ -572,7 +578,7 @@ class GrblHalController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            if (this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 log.info('Exiting check mode');
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
@@ -645,13 +651,13 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
-            if (!this.runner.hasSettings() && res.activeState === GRBL_ACTIVE_STATE_IDLE) {
+            if (!this.runner.hasSettings() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE) {
                 this.initialized = true;
                 this.initController();
             }
 
             // Make sure we also have axs parsed - at most two times or we get endless loop
-            if (!this.runner.hasAXS() && res.activeState === GRBL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
+            if (!this.runner.hasAXS() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
                 this.writeln('$I');
                 this.actionMask.axsReportCount++;
             }
@@ -698,7 +704,8 @@ class GrblHalController {
         });
 
         this.runner.on('ok', (res) => {
-            if (this.actionMask.queryParserState.reply) {
+            // we only query when parser state option in $10 is disabled
+            if (this.actionMask.queryParserState.reply && !this.parserStateEnabled) {
                 if (this.actionMask.replyParserState) {
                     this.actionMask.replyParserState = false;
                     this.emit('serialport:read', res.raw);
@@ -706,6 +713,15 @@ class GrblHalController {
                 this.actionMask.queryParserState.reply = false;
 
                 return;
+                // if parser state is enabled, it does not send an 'ok' when the state auto emits
+                // so only consume the ok if the user entered $G
+            } else if (this.actionMask.queryParserState.reply && this.parserStateEnabled) {
+                if (this.actionMask.replyParserState) {
+                    this.actionMask.replyParserState = false;
+                    this.actionMask.queryParserState.reply = false;
+                    this.emit('serialport:read', res.raw);
+                    return;
+                }
             }
 
             const { hold, sent, received } = this.sender.state;
@@ -787,7 +803,7 @@ class GrblHalController {
                 code: `${code}`,
                 description: _.get(error, 'description', ''),
                 line: line,
-                lineNumber: isFileError ? received + 1 : '',
+                lineNumber: isFileError ? received : '',
                 origin: errorOrigin,
                 controller: GRBLHAL,
                 fileRunning: isRunning
@@ -802,7 +818,7 @@ class GrblHalController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received + 1} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -846,7 +862,7 @@ class GrblHalController {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
-            } else if (this.state?.status?.activeState === GRBL_ACTIVE_STATE_HOME) {
+            } else if (this.state?.status?.activeState === GRBL_HAL_ACTIVE_STATE_HOME) {
                 errorOrigin = 'Console';
                 line = '$H';
             } else if (outstanding > 0) {
@@ -872,7 +888,7 @@ class GrblHalController {
                     code: code,
                     description: alarm.description || '',
                     line: line,
-                    lineNumber: isFileError ? received + 1 : '',
+                    lineNumber: isFileError ? received : '',
                     origin: errorOrigin,
                     controller: GRBLHAL,
                 }, isRunning);
@@ -888,7 +904,7 @@ class GrblHalController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === GRBL_HAL_ACTIVE_STATE_CHECK) {
                 this.workflow.stopTesting();
                 this.command('gcode', '$C');
                 setTimeout(() => {
@@ -924,6 +940,17 @@ class GrblHalController {
                     this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
                 } else {
                     this.emit('serialport:read', `${res.name}=${res.value}`);
+                }
+            }
+
+            // check if parser state option is enabled
+            if (res.name === '$10') {
+                const value = res.value;
+                // eslint-disable-next-line no-bitwise
+                if (value & 512) {
+                    this.parserStateEnabled = true;
+                } else {
+                    this.parserStateEnabled = false;
                 }
             }
         });
@@ -1026,7 +1053,8 @@ class GrblHalController {
         // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
-            if (!(this.ready)) {
+            // if parser state enabled, we dont need to query the parser state
+            if (!(this.ready) || this.parserStateEnabled) {
                 return;
             }
 
@@ -1335,8 +1363,8 @@ class GrblHalController {
         // We set controller ready if version found
         setTimeout(async () => {
             if (this.connection) {
+                this.connection.writeln('\x87');
                 await delay(100);
-                this.connection.writeImmediate(String.fromCharCode(0x87));
                 this.write('$I\n');
             }
             if (!refresh) {
@@ -1530,6 +1558,8 @@ class GrblHalController {
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 this.emit('job:start');
 
+                this.command('gcode', '%global.state.workspace=modal.wcs');
+
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
@@ -1604,7 +1634,7 @@ class GrblHalController {
 
                     const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                     let modalWcs = modal.wcs;
-                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                    if (modalWcs !== wcs && modalWcs === 'G54') {
                         modalWcs = wcs;
                     }
                     const setModalGcode = modal.motion === 'G2' || modal.motion === 'G3' ? `${modal.motion} X${xVal.toFixed(3)} J0 F${feedRate}` : `${modal.motion}`;
@@ -1667,12 +1697,14 @@ class GrblHalController {
                 const [options] = args;
                 const { force = false } = { ...options };
 
+                this.emit('job:stop');
+
                 const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1735,7 +1767,11 @@ class GrblHalController {
                 this.feeder.next();
             },
             'feeder:stop': () => {
+                clearInterval(this.feederCB);
                 this.feeder.reset();
+                this.workflow.stop();
+                this.write('\x19');
+
 
                 delay(100).then(() => {
                     this.write('~');
@@ -1774,7 +1810,7 @@ class GrblHalController {
                 } else {
                     this.writeln('$H');
                 }
-                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -1935,20 +1971,10 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    const interval = setInterval(() => {
-                        // check if in check (lol)
-                        // if we aren't in check, there may be a race condition
-                        // where the verify is done before the board is in check
-                        // which makes it stay in check forever
-                        if (this.runner && this.runner.isCheck()) {
-                            this.feeder.reset();
-                            this.workflow.start();
-                            this.sender.next();
-                            this.feederCB = null;
-                            clearInterval(interval);
-                            return;
-                        }
-                    }, 200);
+                    this.feeder.reset();
+                    this.workflow.start();
+                    this.sender.next();
+                    this.feederCB = null;
                 };
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
@@ -2211,8 +2237,14 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) || this.actionMask.replyParserState;
+        this.actionMask.replyStatusReport =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) ||
+            (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
+            this.actionMask.replyStatusReport;
+
+        this.actionMask.replyParserState =
+            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) ||
+            this.actionMask.replyParserState;
 
         this.connection.write(data, {
             ...context,

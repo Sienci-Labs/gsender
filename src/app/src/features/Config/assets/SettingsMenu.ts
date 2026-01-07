@@ -8,14 +8,14 @@ import { GiTargetLaser } from 'react-icons/gi';
 import { FaRobot } from 'react-icons/fa';
 import { RxButton } from 'react-icons/rx';
 import { CiMapPin } from 'react-icons/ci';
-import { IoIosSwap, IoMdMove } from 'react-icons/io';
+import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
 import { MdOutlineReadMore } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
-    PROBE_TYPE_AUTO,
+    TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
@@ -29,7 +29,16 @@ import { SquaringToolWizard } from 'app/features/Config/components/wizards/Squar
 import { XJogWizard } from 'app/features/Config/components/wizards/XJogWizard.tsx';
 import { YJogWizard } from 'app/features/Config/components/wizards/YJogWizard.tsx';
 import { ZJogWizard } from 'app/features/Config/components/wizards/ZJogWizard.tsx';
-import { GRBL, GRBLHAL, LIGHTWEIGHT_OPTIONS, OUTLINE_MODES } from 'app/constants';
+import {
+    GRBL,
+    GRBLHAL,
+    IMPERIAL_UNITS,
+    LASER_MODE,
+    LIGHTWEIGHT_OPTIONS,
+    OUTLINE_MODES,
+    SPINDLE_MODE,
+    WORKSPACE_MODE,
+} from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -38,8 +47,25 @@ import {
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import pubsub from 'pubsub-js';
-import { EEPROM } from 'app/definitions/firmware';
+import { EEPROM, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { updatePartialControllerSettings } from 'app/store/redux/slices/controller.slice';
+import findIndex from 'lodash/findIndex';
+import { BasicPosition, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
+import { convertToImperial } from 'app/lib/units';
+import { round, roundMetric } from 'app/lib/rounding';
+import {
+    LaserState,
+    Spindle,
+    SPINDLE_LASER_T,
+} from 'app/features/Spindle/definitions';
+import { updateWorkspaceMode } from 'app/lib/rotary';
+import {
+    TOASTER_DISABLED,
+    TOASTER_LONG,
+    TOASTER_UNTIL_CLOSE,
+} from 'app/lib/toaster/ToasterLib';
 
 export interface SettingsMenuSection {
     label: string;
@@ -87,9 +113,11 @@ export interface gSenderSetting {
     disabled?: () => boolean;
     hidden?: () => boolean;
     onDisable?: () => void;
+    onEnable?: () => void;
     onUpdate?: () => void;
     min?: number;
     max?: number;
+    forceEEPROM?: boolean;
 }
 
 export interface gSenderSubSection {
@@ -180,11 +208,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
                     },
                     {
+                        label: 'Run Check mode on file load',
+                        key: 'widgets.visualizer.checkFile',
+                        description:
+                            'Immediately runs Check Mode ($C) on the gcode file after loading.',
+                        type: 'boolean',
+                    },
+                    {
                         label: 'Outline style',
                         key: 'workspace.outlineMode',
                         type: 'select',
-                        description: 'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
-                        options: OUTLINE_MODES
+                        description:
+                            'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
+                        options: OUTLINE_MODES,
+                    },
+                    {
+                        label: 'Revert workspace',
+                        key: 'workspace.revertWorkspace',
+                        type: 'boolean',
+                        defaultValue: false,
+                        description:
+                            "Allow g-code 'job finishing' commands like M2 and M30 to reset your CNC's workspace back to G54 at the end of each job.",
+                        options: OUTLINE_MODES,
                     },
                     {
                         label: 'Send usage data',
@@ -267,8 +312,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
                         key: 'widgets.axes.jog.threshold',
-                        min: 50
-                    }
+                        min: 50,
+                    },
                 ],
             },
             {
@@ -329,6 +374,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show upcoming maintenance tasks at the end of each job.',
                         type: 'boolean',
                     },
+                    {
+                        label: 'Pop-up notification duration',
+                        key: 'workspace.toastDuration',
+                        description: `How long pop-up notifications should stay visible (in milliseconds) before auto-dismissing. Set to 0 to keep default pop-up notification durations. Set to ${TOASTER_UNTIL_CLOSE} to keep them visible until manually dismissed. Set to ${TOASTER_DISABLED} to disable pop-up notifications entirely.`,
+                        type: 'number',
+                        defaultValue: 0,
+                        min: TOASTER_DISABLED,
+                        max: TOASTER_LONG,
+                    },
                 ],
             },
             {
@@ -371,9 +425,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
                         hidden: () => {
-                            const connected = controller.portOpen
+                            const connected = controller.portOpen;
                             return !connected;
-                        }
+                        },
                     },
                     {
                         type: 'eeprom',
@@ -489,13 +543,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
+                            TOUCHPLATE_TYPE_3D,
                         ],
                     },
                     {
-                        label: 'Z thickness',
-                        key: 'workspace.probeProfile.zThickness',
+                        label: 'Tip diameter',
+                        key: 'widgets.probe.tipDiameter3D',
                         description:
-                            'Plate thickness where the bit touches when Z-axis probing. (Default 15)',
+                            'Diameter of probe tip where it touches off the material. (Default 2)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -503,8 +558,73 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are not using 3D probe
+                            return probeType !== TOUCHPLATE_TYPE_3D;
+                        },
+                    },
+                    {
+                        label: 'Block thickness',
+                        key: 'workspace.probeProfile.zThickness.standardBlock',
+                        description:
+                            'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using Block touchplate
+                            return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
+                    },
+                    {
+                        label: 'AutoZero thickness',
+                        key: 'workspace.probeProfile.zThickness.autoZero',
+                        description:
+                            'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using AutoZero touchplate
+                            return probeType !== TOUCHPLATE_TYPE_AUTOZERO;
+                        },
+                    },
+                    {
+                        label: 'Puck thickness',
+                        key: 'workspace.probeProfile.zThickness.zProbe',
+                        description:
+                            'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using Puck touchplate
+                            return probeType !== TOUCHPLATE_TYPE_ZERO;
+                        },
+                    },
+                    {
+                        label: 'Z offset',
+                        key: 'workspace.probeProfile.zThickness.probe3D',
+                        description:
+                            'Adjust to improve the Z zeroing accuracy of your probe. (Default 0)',
+                        type: 'number',
+                        unit: 'mm',
+                        defaultValue: 0,
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using 3D probe
+                            return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
                     {
@@ -519,8 +639,25 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero or Z-only touchplate
+                            // Hidden if we are not using Block touchplate
                             return probeType !== TOUCHPLATE_TYPE_STANDARD;
+                        },
+                    },
+                    {
+                        label: 'XY retract',
+                        key: 'widgets.probe.xyRetract3D',
+                        description:
+                            'How much extra to move off the surface when probing. (Default 10)',
+                        type: 'number',
+                        unit: 'mm',
+                        defaultValue: 10,
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using 3D probe
+                            return probeType !== TOUCHPLATE_TYPE_3D;
                         },
                     },
                     {
@@ -575,7 +712,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Retraction',
                         key: 'widgets.probe.retractionDistance',
                         description:
-                            'How far the bit moves away after a successful touch. (Default 4)',
+                            'How far the bit moves away after a successful touch. (Default 2)',
                         type: 'number',
                         unit: 'mm',
                         hidden: () => {
@@ -795,9 +932,241 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the Spindle/Laser tab and related functions on the main Carve page.',
                         key: 'workspace.spindleFunctions',
-                        onDisable: () => {
-                            // Disable laser mode if spindle functions turned off. TBD what to do with EEPROM.
-                            store.set('widgets.spindle.mode', 'spindle');
+                        onUpdate: () => {
+                            const spindleFunctions = store.get(
+                                'workspace.spindleFunctions',
+                            );
+                            const mode: SPINDLE_LASER_T = store.get(
+                                'widgets.spindle.mode',
+                                SPINDLE_MODE,
+                            );
+
+                            // if we are turning off the spindle tab, set to spindle mode
+                            if (!spindleFunctions && mode === LASER_MODE) {
+                                const preferredUnits =
+                                    store.get('workspace.units') ===
+                                    IMPERIAL_UNITS
+                                        ? 'G20'
+                                        : 'G21';
+                                const active: boolean =
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.modal.spindle',
+                                        'M5',
+                                    ) !== 'M5';
+                                const controllerType: FIRMWARE_TYPES_T = get(
+                                    reduxStore.getState(),
+                                    'state.controller.type',
+                                    'grbl',
+                                );
+                                const availableSpindles: Spindle[] = get(
+                                    reduxStore.getState(),
+                                    'state.controller.spindles',
+                                    [],
+                                );
+                                const units: UNITS_GCODE = get(
+                                    reduxStore.getState(),
+                                    'state.controller.modal.units',
+                                );
+                                const spindleMin = Number(
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$31',
+                                        1000,
+                                    ),
+                                );
+                                const spindleMax = Number(
+                                    get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$30',
+                                        30000,
+                                    ),
+                                );
+                                const laser: LaserState = store.get(
+                                    'widgets.spindle.laser',
+                                    {
+                                        maxPower: 0,
+                                        minPower: 0,
+                                    },
+                                );
+
+                                // get previously saved spindle values
+                                const prevSpindleMin = store.get(
+                                    'widgets.spindle.spindleMin',
+                                    0,
+                                );
+                                const prevSpindleMax = store.get(
+                                    'widgets.spindle.spindleMax',
+                                    0,
+                                );
+
+                                const SLBLaserExists =
+                                    controllerType === GRBLHAL &&
+                                    findIndex(
+                                        availableSpindles,
+                                        (o) => o.label === 'SLB_LASER',
+                                    ) !== -1;
+
+                                const calculateAdjustedOffsets = (
+                                    xOffset: number,
+                                    yOffset: number,
+                                    units: UNITS_GCODE | UNITS_EN,
+                                ): [number, number] => {
+                                    const $13: string = get(
+                                        reduxStore.getState(),
+                                        'state.controller.settings.settings.$13',
+                                        '0',
+                                    );
+                                    const wpos: BasicPosition = get(
+                                        reduxStore.getState(),
+                                        'state.controller.wpos',
+                                        { x: 0, y: 0, z: 0 },
+                                    );
+                                    let { x, y } = wpos;
+
+                                    if ($13 === '1' || units === 'G20') {
+                                        units = 'G20';
+                                        x /= 25.4;
+                                        y /= 25.4;
+                                    }
+                                    return [
+                                        round(
+                                            Number(x) + Number(xOffset),
+                                            units,
+                                        ),
+                                        round(
+                                            Number(y) + Number(yOffset),
+                                            units,
+                                        ),
+                                    ];
+                                };
+
+                                const getSpindleOffsetCode = (
+                                    preferredUnits: UNITS_GCODE | UNITS_EN,
+                                ): string[] => {
+                                    const laserXOffset = Number(
+                                        get(
+                                            reduxStore.getState(),
+                                            'state.controller.settings.settings.$741',
+                                            0,
+                                        ),
+                                    );
+                                    const laserYOffset = Number(
+                                        get(
+                                            reduxStore.getState(),
+                                            'state.controller.settings.settings.$742',
+                                            0,
+                                        ),
+                                    );
+                                    const wcs: string = get(
+                                        reduxStore.getState(),
+                                        'state.controller.modal.wcs',
+                                        '',
+                                    );
+                                    const currentWCS: number =
+                                        {
+                                            G54: 1,
+                                            G55: 2,
+                                            G56: 3,
+                                            G57: 4,
+                                            G58: 5,
+                                            G59: 6,
+                                        }[wcs] || 0;
+
+                                    let offsetQuery = [];
+
+                                    let { xOffset, yOffset } = laser;
+
+                                    // If using grblHAL AND SLB_LASER, use the eeprom laser offset values
+                                    if (controllerType === GRBLHAL) {
+                                        xOffset = laserXOffset;
+                                        yOffset = laserYOffset;
+                                    }
+
+                                    xOffset = Number(xOffset) * -1;
+                                    yOffset = Number(yOffset) * -1;
+                                    if (preferredUnits === 'G20') {
+                                        xOffset = convertToImperial(xOffset);
+                                        yOffset = convertToImperial(yOffset);
+                                    } else {
+                                        xOffset = roundMetric(xOffset);
+                                        yOffset = roundMetric(yOffset);
+                                    }
+
+                                    const [xoffsetAdjusted, yOffsetAdjusted] =
+                                        calculateAdjustedOffsets(
+                                            xOffset,
+                                            yOffset,
+                                            preferredUnits,
+                                        );
+                                    if (xOffset === 0 && yOffset !== 0) {
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} Y${yOffsetAdjusted}`,
+                                        ];
+                                    } else if (xOffset !== 0 && yOffset === 0) {
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} X${xoffsetAdjusted}`,
+                                        ];
+                                    } else if (xOffset !== 0 && yOffset !== 0) {
+                                        offsetQuery = [
+                                            `G10 L20 P${currentWCS} X${xoffsetAdjusted} Y${yOffsetAdjusted}`,
+                                        ];
+                                    } else {
+                                        offsetQuery = [''];
+                                    }
+
+                                    return offsetQuery;
+                                };
+
+                                // set mode to spindle
+                                store.set('widgets.spindle.mode', 'spindle');
+
+                                // save current laser values if laser spindle doesnt exist
+                                if (!SLBLaserExists) {
+                                    laser.maxPower = spindleMax;
+                                    laser.minPower = spindleMin;
+                                    store.set('widgets.spindle.laser', laser);
+                                }
+
+                                const powerCommands = SLBLaserExists
+                                    ? []
+                                    : [
+                                          `$30=${prevSpindleMax}`,
+                                          `$31=${prevSpindleMin}`,
+                                      ];
+
+                                if (active) {
+                                    controller.command('gcode', 'M5');
+                                }
+
+                                const commands = [
+                                    preferredUnits,
+                                    ...getSpindleOffsetCode(preferredUnits),
+                                    ...powerCommands,
+                                    '$32=0',
+                                    units,
+                                ];
+
+                                // only update max/min if slb laser doesnt exist
+                                if (!SLBLaserExists) {
+                                    reduxStore.dispatch(
+                                        updatePartialControllerSettings({
+                                            $30: prevSpindleMax.toString(),
+                                            $31: prevSpindleMin.toString(),
+                                            $32: '0',
+                                        }),
+                                    );
+                                } else {
+                                    // update only laser/spindle mode eeprom if slb laser exists
+                                    reduxStore.dispatch(
+                                        updatePartialControllerSettings({
+                                            $32: '0',
+                                        }),
+                                    );
+                                }
+
+                                controller.command('gcode', commands);
+                            }
                         },
                     },
                     {
@@ -820,6 +1189,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the minimum speed of your spindle. ($31)',
                         type: 'hybrid',
                         eID: '$31',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
@@ -829,6 +1199,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Match this to the maximum speed of your spindle. ($30)',
                         type: 'hybrid',
                         eID: '$30',
+                        forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
@@ -1075,6 +1446,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the Rotary tab and related functions on the main Carve page.',
                         type: 'boolean',
+                        onUpdate: () => {
+                            // when tab is turned off, turn off rotary mode
+                            const mode = store.get('workspace.mode');
+                            const showTab = store.get(
+                                'widgets.rotary.tab.show',
+                            );
+                            if (!showTab && mode === WORKSPACE_MODE.ROTARY) {
+                                updateWorkspaceMode(WORKSPACE_MODE.DEFAULT);
+                            }
+                        },
                     },
                     { type: 'eeprom', eID: '$376' },
                     {
@@ -1097,18 +1478,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     { type: 'eeprom', eID: '$123' },
                     {
-                        label: 'Force hard limits',
-                        key: 'workspace.rotaryAxis.firmwareSettings.$21',
-                        description:
-                            'Updates hard limits to this value when toggling into rotary mode.',
-                        type: 'number',
-                    },
-                    {
                         label: 'Force soft limits',
                         key: 'workspace.rotaryAxis.firmwareSettings.$20',
                         description:
-                            'Updates soft limits to this value when toggling into rotary mode.',
-                        type: 'number',
+                            'Enable soft limits when toggling into rotary mode (grbl only).',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Force hard limits',
+                        key: 'workspace.rotaryAxis.firmwareSettings.$21',
+                        description:
+                            'Enable hard limits when toggling into rotary mode (grbl only).',
+                        type: 'boolean',
                     },
                 ],
             },
@@ -1244,10 +1625,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'IP address',
+                        label: 'Connect to IP',
                         key: 'widgets.connection.ip',
                         description:
-                            'Set the IP address for network scanning. (Default 192.168.5.1)',
+                            'IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
                     { type: 'eeprom', eID: '$301' },

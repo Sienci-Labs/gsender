@@ -25,6 +25,7 @@ import { Helper } from 'app/features/Helper/index';
 import { FaFeatherAlt } from 'react-icons/fa';
 import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import cx from 'classnames';
+import { Tooltip } from 'app/components/Tooltip';
 
 const PrimaryVisualizer = ({
     actions,
@@ -99,12 +100,18 @@ const PrimaryVisualizer = ({
                     )}
 
                     <div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
-                        <FaFeatherAlt
-                            className={cx('cursor-pointer', {
-                                'text-gray-500': !state.liteMode,
-                            })}
-                            onClick={() => actions.handleLiteModeToggle()}
-                        />
+                        <Tooltip content="Toggle lightweight mode">
+                            <button>
+                                <FaFeatherAlt
+                                    className={cx('cursor-pointer', {
+                                        'text-gray-500': !state.liteMode,
+                                    })}
+                                    onClick={() =>
+                                        actions.handleLiteModeToggle()
+                                    }
+                                />
+                            </button>
+                        </Tooltip>
                     </div>
 
                     <CameraDisplay

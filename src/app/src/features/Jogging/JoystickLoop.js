@@ -1,4 +1,6 @@
-import { throttle, inRange, get } from 'lodash';
+import throttle from 'lodash/throttle';
+import inRange from 'lodash/inRange';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';

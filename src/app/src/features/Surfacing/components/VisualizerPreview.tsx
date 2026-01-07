@@ -26,7 +26,7 @@ const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
         return (
             <div className="flex flex-col h-full items-center justify-center">
                 <p className="text-gray-500 text-center text-sm">
-                    No G-code generated yet. <br /> Please generate G-code
+                    No g-code generated yet. <br /> Please generate g-code
                     first.
                 </p>
             </div>

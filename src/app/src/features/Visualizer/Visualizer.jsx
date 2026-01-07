@@ -56,16 +56,12 @@ import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import TrackballControls from 'app/lib/three/oldTrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
-import log from 'app/lib/log';
+
 import _ from 'lodash';
 import store from 'app/store';
-import api from 'app/api';
+
 import { colorsResponse } from 'app/workers/colors.response';
-import {
-    Toaster,
-    TOASTER_DANGER,
-    TOASTER_UNTIL_CLOSE,
-} from '../../lib/toaster/ToasterLib';
+
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
@@ -108,6 +104,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
 import { outlineResponse } from '../../workers/Outline.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -332,7 +329,6 @@ class Visualizer extends Component {
 
         // Handle WebGL context restoration
         const handleContextRestored = () => {
-            console.log('Visualizer: WebGL context restored, recreating scene');
             const wasAnimationRunning = this.animationLoopRunning;
 
             if (this.node) {
@@ -375,9 +371,6 @@ class Visualizer extends Component {
 
         // Check if scene needs to be recreated (e.g., if renderer was lost)
         if (this.node && !this.isSceneInitialized() && this.props.show) {
-            console.log(
-                'Visualizer: Scene not properly initialized, attempting to recreate',
-            );
             this.retrySceneCreation().catch((error) => {
                 console.error('Visualizer: Failed to recreate scene:', error);
             });
@@ -544,7 +537,11 @@ class Visualizer extends Component {
 
             let newPos = workPosition;
 
-            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
+            if (
+                isConnected &&
+                activeState === GRBL_ACTIVE_STATE_CHECK &&
+                this.fileLoaded
+            ) {
                 newPos = this.visualizer.getCurrentLocation();
             }
 
@@ -838,25 +835,6 @@ class Visualizer extends Component {
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
-        /*{
-            // Imperial Coordinate System
-            _each(impGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(currentTheme.get(GRID_PART));
-            });
-        }
-
-        {
-            // Metric Coordinate System
-            _each(metGroup.getObjectByName('GridLine').children, (o) => {
-                console.log('before', o.material.color);k
-                o.material.color.set(currentTheme.get(GRID_PART));
-                console.log('after', o.material.color);
-            });
-            const o = metGroup.getObjectByName('GridLine');
-            console.log(o);
-            console.log(o.material.color);
-        }*/
-
         this.recolorGridLabels(IMPERIAL_UNITS);
         this.recolorGridLabels(METRIC_UNITS);
         this.recolorGridNumbers(IMPERIAL_UNITS);
@@ -865,11 +843,15 @@ class Visualizer extends Component {
 
     recolorGridLabels(units) {
         const { mm, in: inches } = this.machineProfile;
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
+        const axisLengthX =
+            units === IMPERIAL_UNITS
+                ? inches.width * IMPERIAL_GRID_SPACING
+                : mm.depth;
+        const axisLengthY =
+            units === IMPERIAL_UNITS
+                ? inches.depth * IMPERIAL_GRID_SPACING
+                : mm.depth;
         const height = 170;
 
         const { currentTheme } = this.props.state;
@@ -886,7 +868,7 @@ class Visualizer extends Component {
         {
             // Axis Labels
             const axisXLabel = new TextSprite({
-                x: axisLength + 10,
+                x: axisLengthX + 10,
                 y: 0,
                 z: 0,
                 size: 20,
@@ -896,7 +878,7 @@ class Visualizer extends Component {
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
                 x: 0,
-                y: axisLength + 10,
+                y: axisLengthY + 10,
                 z: 0,
                 size: 20,
                 text: 'Y',
@@ -926,15 +908,15 @@ class Visualizer extends Component {
     recolorGridNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
 
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width / 10) * 10;
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
-        const imperialGridCount = Math.round(inchesMax / 4);
-        const metricGridCount = Math.round(mmMax / 9);
-
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
+        const gridCountX =
+            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+        const gridCountY =
+            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
         const gridSpacing =
             units === IMPERIAL_UNITS
                 ? IMPERIAL_GRID_SPACING
@@ -949,7 +931,7 @@ class Visualizer extends Component {
                 ? this.group.getObjectByName('ImperialGridLineNumbers')
                 : this.group.getObjectByName('MetricGridLineNumbers');
 
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountX; i <= gridCountX; ++i) {
             if (i !== 0) {
                 unitGroup.remove(unitGroup.getObjectByName('xtextLabel' + i));
                 const xtextLabel = new TextSprite({
@@ -965,7 +947,10 @@ class Visualizer extends Component {
                 });
                 xtextLabel.name = 'xtextLabel' + i;
                 unitGroup.add(xtextLabel);
-
+            }
+        }
+        for (let i = -gridCountY; i <= gridCountY; ++i) {
+            if (i !== 0) {
                 unitGroup.remove(unitGroup.getObjectByName('ytextLabel' + i));
                 const ytextLabel = new TextSprite({
                     x: -textOffset,
@@ -1159,6 +1144,7 @@ class Visualizer extends Component {
                 this.outlineRunning = true;
 
                 const vertices = this.props.actions.getHull();
+                const zTravel = this.props.homingEnabled ? getZUpTravel(5) : 5;
 
                 try {
                     const outlineWorker = new Worker(
@@ -1182,7 +1168,6 @@ class Visualizer extends Component {
                         'workspace.outlineMode',
                         'Detailed',
                     );
-                    console.log('outlineMode', outlineMode);
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
@@ -1203,6 +1188,7 @@ class Visualizer extends Component {
                         isLaser,
                         parsedData: vertices,
                         mode: outlineMode,
+                        zTravel,
                     });
                 } catch (e) {
                     console.log(e);
@@ -1414,21 +1400,27 @@ class Visualizer extends Component {
 
     createCoordinateSystem(units) {
         const { mm, in: inches } = this.machineProfile;
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
 
-        const imperialGridCount = Math.ceil(inchesMax / 4);
-        const metricGridCount = Math.ceil(mmMax / 9);
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width / 10) * 10;
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
-        const axisLength = units === IMPERIAL_UNITS ? inchesMax : mmMax;
-        const height = 170;
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
-        const gridSpacing =
+        const axisLengthX =
             units === IMPERIAL_UNITS
-                ? IMPERIAL_GRID_SPACING
-                : METRIC_GRID_SPACING;
+                ? inches.width * IMPERIAL_GRID_SPACING
+                : mm.width;
+        const axisLengthY =
+            units === IMPERIAL_UNITS
+                ? inches.depth * IMPERIAL_GRID_SPACING
+                : mm.depth;
+        const height = 170;
+        const gridCountX =
+            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+        const gridCountY =
+            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
+        const gridSpacing =
+            units === IMPERIAL_UNITS ? IMPERIAL_GRID_SPACING : 1;
         const group = new THREE.Group();
         const step = units === IMPERIAL_UNITS ? 25.4 : 10;
 
@@ -1437,8 +1429,8 @@ class Visualizer extends Component {
         {
             // Coordinate Grid
             const gridLine = new GridLine(
-                gridCount * gridSpacing * 2,
-                gridCount * gridSpacing * 2,
+                gridCountX * gridSpacing * 2,
+                gridCountY * gridSpacing * 2,
                 step,
                 currentTheme.get(GRID_PART), // grid
             );
@@ -1448,7 +1440,11 @@ class Visualizer extends Component {
 
         {
             // Coordinate JogControl
-            const coordinateAxes = new CoordinateAxes(axisLength, height);
+            const coordinateAxes = new CoordinateAxes(
+                axisLengthX,
+                axisLengthY,
+                height,
+            );
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -1456,7 +1452,7 @@ class Visualizer extends Component {
         {
             // Axis Labels
             const axisXLabel = new TextSprite({
-                x: axisLength + 10,
+                x: axisLengthX + 10,
                 y: 0,
                 z: 0,
                 size: 20,
@@ -1466,7 +1462,7 @@ class Visualizer extends Component {
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
                 x: 0,
-                y: axisLength + 10,
+                y: axisLengthY + 10,
                 z: 0,
                 size: 20,
                 text: 'Y',
@@ -1494,15 +1490,19 @@ class Visualizer extends Component {
     createGridLineNumbers(units) {
         const { mm, in: inches } = this.machineProfile;
 
-        const inchesMax =
-            Math.max(inches.width, inches.depth) + IMPERIAL_GRID_SPACING * 10;
-        const mmMax = Math.max(mm.width, mm.depth) + METRIC_GRID_SPACING * 10;
+        const imperialGridCountX = Math.ceil(inches.width);
+        const metricGridCountX = Math.ceil(mm.width / 10) * 10;
+        const imperialGridCountY = Math.ceil(inches.depth);
+        const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
-        const imperialGridCount = Math.round(inchesMax / 4);
-        const metricGridCount = Math.round(mmMax / 9);
-
-        const gridCount =
-            units === IMPERIAL_UNITS ? imperialGridCount : metricGridCount;
+        const gridCountX =
+            units === IMPERIAL_UNITS
+                ? imperialGridCountX
+                : Math.ceil(metricGridCountX / 10);
+        const gridCountY =
+            units === IMPERIAL_UNITS
+                ? imperialGridCountY
+                : Math.ceil(metricGridCountY / 10);
 
         const gridSpacing =
             units === IMPERIAL_UNITS
@@ -1514,7 +1514,7 @@ class Visualizer extends Component {
 
         const { currentTheme } = this.props.state;
 
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountX; i <= gridCountX; ++i) {
             if (i !== 0) {
                 const textLabel = new TextSprite({
                     x: i * gridSpacing,
@@ -1531,7 +1531,7 @@ class Visualizer extends Component {
                 group.add(textLabel);
             }
         }
-        for (let i = -gridCount; i <= gridCount; ++i) {
+        for (let i = -gridCountY; i <= gridCountY; ++i) {
             if (i !== 0) {
                 const textLabel = new TextSprite({
                     x: -textOffset,
@@ -1579,10 +1579,6 @@ class Visualizer extends Component {
                 width = Math.max(width, 360);
                 height = Math.max(height, 360);
             }
-
-            console.log(
-                `Visualizer: Creating scene with dimensions ${width}x${height}`,
-            );
 
             // WebGLRenderer
             this.renderer = new THREE.WebGLRenderer({
@@ -1819,9 +1815,6 @@ class Visualizer extends Component {
             setTimeout(() => {
                 if (el && !el.firstChild) {
                     el.appendChild(this.renderer.domElement);
-                    console.log(
-                        'Visualizer: Scene created and DOM element appended successfully',
-                    );
 
                     // Force an immediate render
                     this.updateScene({ forceUpdate: true });
@@ -2379,6 +2372,13 @@ class Visualizer extends Component {
         );
 
         typeof callback === 'function' && callback({ bbox: bbox });
+
+        if (store.get('widgets.visualizer.checkFile')) {
+            controller.command('gcode:test');
+            toast.info('Running Check mode', {
+                position: 'bottom-right',
+            });
+        }
     }
 
     getToolpathHull() {
@@ -2737,8 +2737,6 @@ class Visualizer extends Component {
     }
 
     forceSceneRefresh() {
-        console.log('Visualizer: Forcing complete scene refresh');
-
         // Clear existing scene
         this.clearScene();
 
@@ -2801,18 +2799,12 @@ class Visualizer extends Component {
                 }
 
                 retryCount++;
-                console.log(
-                    `Visualizer: Attempting to create scene (attempt ${retryCount}/${maxRetries})`,
-                );
 
                 if (this.node) {
                     this.createScene(this.node);
 
                     setTimeout(() => {
                         if (this.isSceneInitialized()) {
-                            console.log(
-                                'Visualizer: Scene created successfully on retry',
-                            );
                             this.resizeRenderer();
                             this.updateScene({ forceUpdate: true });
 
@@ -2881,6 +2873,11 @@ export default connect(
         const controllerType = _get(store, 'controller.type');
         const senderStatus = _get(store, 'controller.sender.status');
         const fileName = _get(store, 'file.name');
+        const homingValue = _get(
+            store,
+            'controller.settings.settings.$22',
+            '0',
+        );
 
         return {
             machinePosition,
@@ -2899,6 +2896,7 @@ export default connect(
             controllerType,
             senderStatus,
             fileName,
+            homingEnabled: homingValue !== '0',
         };
     },
     null,

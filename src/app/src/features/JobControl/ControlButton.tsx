@@ -14,9 +14,12 @@ import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
+    GRBL_ACTIVE_STATE_CHECK,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
     MACHINE_CONTROL_BUTTONS,
     PAUSE,
     START,
@@ -25,7 +28,7 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 
 type MACHINE_CONTROL_BUTTONS_T =
@@ -132,106 +135,161 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         setDisabled(isDisabled());
     });
 
-    const shuttleControlEvents = {
-        START_JOB: {
-            title: 'Start job',
-            keys: '~',
-            gamepadKeys: '9',
-            keysName: 'Start',
-            cmd: 'START_JOB',
-            payload: {
-                type: GRBL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (shortcutIsDisabled()) {
-                    return;
-                }
-                handleRun();
-            },
-        },
-        PAUSE_JOB: {
-            title: 'Pause job',
-            keys: '!',
-            gamepadKeys: '2',
-            keysName: 'X',
-            cmd: 'PAUSE_JOB',
-            payload: {
-                type: GRBL,
-            },
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (shortcutIsDisabled()) {
-                    return;
-                }
-                handlePause();
-            },
-        },
-        STOP_JOB: {
-            title: 'Stop job',
-            keys: '@',
-            gamepadKeys: '3',
-            keysName: 'Y',
-            cmd: 'STOP_JOB',
-            preventDefault: true,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (shortcutIsDisabled()) {
-                    return;
-                }
-                handleStop();
-            },
-        },
-        RUN_OUTLINE: {
-            title: 'Run outline',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            keys: '',
-            cmd: 'RUN_OUTLINE',
-            callback: () => {
-                if (shortcutIsDisabled()) {
-                    return;
-                }
-                pubsub.publish('outline:start');
-            },
-        },
+    // only include the shortcut for the current button
+    // it doesn't matter where runOutline goes, so I just put it with the start button
+    const getShuttleEvent = () => {
+        switch (type) {
+            case 'START':
+                return {
+                    START_JOB: {
+                        title: 'Start job',
+                        keys: '~',
+                        gamepadKeys: '9',
+                        keysName: 'Start',
+                        cmd: 'START_JOB',
+                        payload: {
+                            type: GRBL,
+                        },
+                        preventDefault: true,
+                        isActive: true,
+                        category: CARVING_CATEGORY,
+                        callback: () => {
+                            const activeState = get(
+                                reduxStore.getState(),
+                                'controller.state.status.activeState',
+                            );
+                            const workflow = get(
+                                reduxStore.getState(),
+                                'controller.workflow',
+                            );
+
+                            if (shortcutIsDisabled()) {
+                                return;
+                            }
+                            handleRun(activeState, workflow);
+                        },
+                    },
+                    RUN_OUTLINE: {
+                        title: 'Run outline',
+                        preventDefault: false,
+                        isActive: true,
+                        category: CARVING_CATEGORY,
+                        keys: '',
+                        cmd: 'RUN_OUTLINE',
+                        callback: () => {
+                            if (shortcutIsDisabled()) {
+                                return;
+                            }
+                            pubsub.publish('outline:start');
+                        },
+                    },
+                };
+            case 'PAUSE':
+                return {
+                    PAUSE_JOB: {
+                        title: 'Pause job',
+                        keys: '!',
+                        gamepadKeys: '2',
+                        keysName: 'X',
+                        cmd: 'PAUSE_JOB',
+                        payload: {
+                            type: GRBL,
+                        },
+                        preventDefault: true,
+                        isActive: true,
+                        category: CARVING_CATEGORY,
+                        callback: () => {
+                            if (shortcutIsDisabled()) {
+                                return;
+                            }
+                            handlePause();
+                        },
+                    },
+                };
+            case 'STOP':
+                return {
+                    STOP_JOB: {
+                        title: 'Global Stop',
+                        keys: '@',
+                        gamepadKeys: '3',
+                        keysName: 'Y',
+                        cmd: 'STOP_JOB',
+                        preventDefault: true,
+                        isActive: true,
+                        category: CARVING_CATEGORY,
+                        callback: () => {
+                            const activeState = get(
+                                reduxStore.getState(),
+                                'controller.state.status.activeState',
+                            );
+                            const firmwareType = get(
+                                reduxStore.getState(),
+                                'controller.type',
+                            );
+                            // if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
+                            if (shortcutIsDisabled()) {
+                                if (activeState === GRBL_ACTIVE_STATE_JOG) {
+                                    return controller.command('jog:cancel');
+                                }
+                                if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                                    return;
+                                }
+                                if (firmwareType === GRBLHAL) {
+                                    return controller.command('reset:soft');
+                                }
+                                controller.command('reset');
+                                return;
+                            }
+                            handleStop(activeState);
+                        },
+                    },
+                };
+        }
     };
 
-    useKeybinding(shuttleControlEvents);
-    useShuttleEvents(shuttleControlEvents);
+    const shuttleControlEvents = getShuttleEvent();
 
-    const handleRun = (): void => {
+    useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
+
+    const handleRun = (
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ): void => {
+        const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
+
         console.assert(
-            includes(
-                [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
-                workflow.state,
-            ) || activeState === GRBL_ACTIVE_STATE_HOLD,
+            includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], state) ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD,
         );
 
-        if (workflow.state === WORKFLOW_STATE_IDLE) {
-            controller.command('gcode:start');
+        if (
+            state === WORKFLOW_STATE_PAUSED ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+        ) {
+            controller.command('gcode:resume');
             return;
         }
 
-        if (
-            workflow.state === WORKFLOW_STATE_PAUSED ||
-            activeState === GRBL_ACTIVE_STATE_HOLD
-        ) {
-            controller.command('gcode:resume');
+        if (state === WORKFLOW_STATE_IDLE) {
+            controller.command('gcode:start');
+            return;
         }
     };
     const handlePause = (): void => {
         controller.command('gcode:pause');
     };
-    const handleStop = (): void => {
+    const handleStop = (reduxActiveState?: GRBL_ACTIVE_STATES_T): void => {
+        const currentActiveState = reduxActiveState || activeState;
         onStop();
         controller.command('gcode:stop', { force: true });
+        if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
+            controller.command('gcode', '$C');
+        }
     };
 
     const message: Message = {
@@ -270,7 +328,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             !disabled && type === STOP,
                     },
                 )}
-                title={type}
                 onClick={onClick[type]}
                 disabled={disabled}
             >

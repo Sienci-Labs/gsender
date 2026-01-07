@@ -9,9 +9,7 @@ import { NumberSettingInput } from 'app/features/Config/components/SettingInputs
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
 import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
 import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
-import {
-    useSettings,
-} from 'app/features/Config/utils/SettingsContext.tsx';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
@@ -25,6 +23,8 @@ import store from 'app/store';
 import { FaMicrochip } from 'react-icons/fa6';
 import { GRBLHAL } from 'app/constants';
 import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
+import Tooltip from 'app/components/Tooltip';
+import pubsub from 'pubsub-js';
 
 interface SettingRowProps {
     setting: gSenderSetting;
@@ -94,6 +94,7 @@ function returnSettingControl(
                     value={value as number}
                     index={index}
                     eepromKey={setting.eID}
+                    forceEEPROM={setting.forceEEPROM}
                     onChange={handler}
                     unit={setting.unit}
                 />
@@ -138,7 +139,7 @@ export function SettingRow({
         firmwareType,
         connected,
         isSettingDefault,
-        getEEPROMDefaultValue
+        getEEPROMDefaultValue,
     } = useSettings();
 
     const displaySetting = { ...setting };
@@ -151,6 +152,7 @@ export function SettingRow({
     const handleSettingsChange = (index) => (value) => {
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
+            console.log(prev);
             const updated = [...prev];
             updated[index].value = value;
             updated[index].dirty = true;
@@ -169,7 +171,7 @@ export function SettingRow({
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
             const defaultVal = getEEPROMDefaultValue(setting.eID);
             if (defaultVal !== '-') {
-                handleSingleSettingReset(setting.eID, defaultVal)
+                handleSingleSettingReset(setting.eID, defaultVal);
             } else {
                 toast.error(`No default found for $${setting.eID}.`);
             }
@@ -185,6 +187,7 @@ export function SettingRow({
                 });
             }
         }
+        pubsub.publish('programSettingReset', setting.key);
     }
 
     const populatedValue = settingsValues[setting.globalIndex] || {};
@@ -237,28 +240,34 @@ export function SettingRow({
             </span>
             <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
                 {!isDefault && (
-                    <button
-                        className="text-3xl"
-                        title="Reset Setting"
-                        onClick={() => {
-                            Confirm({
-                                title: 'Reset setting',
-                                content:
-                                    'Are you sure you want to reset this value to default?',
-                                confirmLabel: 'Yes',
-                                onConfirm: () => {
-                                    handleProgramSettingReset(populatedValue);
-                                },
-                            });
-                        }}
-                    >
-                        <BiReset />
-                    </button>
+                    <Tooltip content="Reset to default value">
+                        <button
+                            className="text-3xl"
+                            title=""
+                            onClick={() => {
+                                Confirm({
+                                    title: 'Reset setting',
+                                    content:
+                                        'Are you sure you want to reset this value to default?',
+                                    confirmLabel: 'Yes',
+                                    onConfirm: () => {
+                                        handleProgramSettingReset(
+                                            populatedValue,
+                                        );
+                                    },
+                                });
+                            }}
+                        >
+                            <BiReset />
+                        </button>
+                    </Tooltip>
                 )}
                 {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
-                    <span className="text-robin-500 text-4xl">
-                        <FaMicrochip />
-                    </span>
+                    <Tooltip content="Machine setting">
+                        <span className="text-robin-500 text-4xl">
+                            <FaMicrochip />
+                        </span>
+                    </Tooltip>
                 ) : (
                     <span className="text-robin-500 min-w-9" />
                 )}

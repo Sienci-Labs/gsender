@@ -69,8 +69,8 @@ interface DROProps {
     workflowState: string;
     isConnected: boolean;
     activeState: string;
-    preferredUnits: 'in' | 'mm';
     singleAxisHoming: boolean;
+    isRemote?: boolean;
 }
 
 function DRO({
@@ -82,6 +82,7 @@ function DRO({
     activeState,
     homingEnabled,
     singleAxisHoming,
+    isRemote,
 }: DROProps) {
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { units: preferredUnits } = useWorkspaceState();
@@ -104,12 +105,21 @@ function DRO({
         });
     }, []);
 
-    function jogToCorner(corner: string) {
+    function jogToCorner(
+        corner: string,
+        homingDir?: string,
+        homingFl?: boolean,
+        pullO?: string | number,
+    ) {
+        const currentHomingDir = homingDir || homingDirection;
+        const currentHomingFlag = homingFl || homingFlag;
+        const currentPullOff = pullO || pullOff;
+
         const gcode = getMovementGCode(
             corner,
-            homingDirection,
-            homingFlag,
-            Number(pullOff),
+            currentHomingDir,
+            currentHomingFlag,
+            Number(currentPullOff),
         );
         controller.command('gcode', gcode);
     }
@@ -204,7 +214,7 @@ function DRO({
         ZERO_A_AXIS: {
             id: 72,
             title: 'Zero A-axis',
-            keys: ['shift', '0'].join('+'),
+            keys: ['shift', 'y'].join('+'),
             cmd: 'ZERO_A_AXIS',
             preventDefault: true,
             payload: { axis: AXIS_A },
@@ -235,7 +245,7 @@ function DRO({
         GO_TO_A_AXIS_ZERO: {
             id: 73,
             title: 'Go to A zero',
-            keys: ['shift', '1'].join('+'),
+            keys: ['shift', 't'].join('+'),
             cmd: 'GO_TO_A_AXIS_ZERO',
             preventDefault: true,
             payload: { axisList: [AXIS_A] },
@@ -320,7 +330,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(BACK_LEFT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(BACK_LEFT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
@@ -335,7 +359,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(BACK_RIGHT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(BACK_RIGHT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
@@ -350,7 +388,21 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(FRONT_LEFT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(FRONT_LEFT, homingDir, homingFl, pullO);
             },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
@@ -365,13 +417,29 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                jogToCorner(FRONT_RIGHT);
+                const homingDir = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$23',
+                    '0',
+                );
+                const homingFl = get(
+                    reduxStore.getState(),
+                    'controller.homingFlag',
+                );
+                const pullO = get(
+                    reduxStore.getState(),
+                    'controller.settings.settings.$27',
+                    1,
+                );
+                jogToCorner(FRONT_RIGHT, homingDir, homingFl, pullO);
             },
         },
     };
 
     useShuttleEvents(shuttleControlEvents);
-    useKeybinding(shuttleControlEvents);
+    useEffect(() => {
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
     const isRotaryMode = mode === 'ROTARY';
 
@@ -387,7 +455,7 @@ function DRO({
 
     return (
         <div className="relative">
-            <UnitBadge />
+            <UnitBadge isRemote={isRemote} />
             <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (
@@ -440,9 +508,10 @@ function DRO({
                     />
                 )}
             </div>
-            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1">
+            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
                 {!shouldWarnZero ? (
                     <Button
+                        tooltip={{ content: 'Zero all axes', side: 'left' }}
                         text="Zero"
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
@@ -490,6 +559,7 @@ function DRO({
                     onClick={goXYAxes}
                     disabled={!canClick}
                     size="sm"
+                    tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                 >
                     <span className="font-mono text-lg">
                         {isRotaryMode ? 'XA' : 'XY'}

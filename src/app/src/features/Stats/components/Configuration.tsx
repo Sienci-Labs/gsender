@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
+import get from 'lodash/get';
+
 import { RootState } from 'app/store/redux';
 import { homingString } from 'app/lib/eeprom.ts';
-import get from 'lodash/get';
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import store from 'app/store';
 import { MachineProfile } from 'app/definitions/firmware';
-import ip from "ip";
+import { isIPv4 } from 'app/lib/utils';
 
 export function ConfigRow({
     label,
@@ -22,7 +23,7 @@ export function ConfigRow({
             <div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
                 {label}
             </div>
-            <div className="bg-white pl-2 dark:text-white dark:bg-dark">
+            <div className="pl-2 bg-white dark:text-white dark:bg-dark">
                 {connected ? children : <b>-</b>}
             </div>
         </div>
@@ -54,13 +55,13 @@ export function Configuration() {
         (state: RootState) => state.controller.settings.settings,
     );
 
-    const { $20, $13, $22 } = settings;
+    const { $20, $13, $22, $23 } = settings;
 
     const reportInchesString = $13 === '1' ? 'Enabled' : 'Disabled';
     const softLimitsString = $20 === '1' ? 'Enabled' : 'Disabled';
     const homingEnabledString = Number($22) > 0 ? 'Enabled' : 'Disabled';
 
-    const looksLikeIP = ip.isV4Format(connectionPort);
+    const looksLikeIP = isIPv4(connectionPort);
 
     return (
         <div className="flex flex-col gap-1">
@@ -69,10 +70,14 @@ export function Configuration() {
                 <span className="font-normal">{machineProfile.type}</span>
             </div>
             <ConfigRow connected={connected} label={'Connection'}>
-                {
-                    looksLikeIP ? <b>{connectionPort}</b> : <span><b>{truncatePort(connectionPort)}</b> at <b>{baudrate}</b> baud</span>
-                }
-
+                {looksLikeIP ? (
+                    <b>{connectionPort}</b>
+                ) : (
+                    <span>
+                        <b>{truncatePort(connectionPort)}</b> at{' '}
+                        <b>{baudrate}</b> baud
+                    </span>
+                )}
             </ConfigRow>
             <ConfigRow connected={connected} label={'Axes'}>
                 <b>{axesList.join(', ')}</b>
@@ -84,7 +89,7 @@ export function Configuration() {
                 <b>{homingEnabledString}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Home location'}>
-                <b>{homingString($20)}</b>
+                <b>{homingString($23)}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Report inches'}>
                 <b>{reportInchesString}</b>
