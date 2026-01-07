@@ -16,11 +16,6 @@ exports.default = async function notarizing(context) {
     console.log('App Name:', appName);
     console.log('App Path:', appPath);
     console.log('App Path Exists:', fs.existsSync(appPath));
-
-    if (fs.existsSync(appOutDir)) {
-        console.log('Contents of appOutDir:');
-        console.log(fs.readdirSync(appOutDir));
-    }
     console.log('==========================================');
 
     if (!fs.existsSync(appPath)) {
@@ -35,8 +30,12 @@ exports.default = async function notarizing(context) {
     }
 
     console.log('Starting notarization...');
+    console.log('Apple ID:', process.env.APPLE_ID);
+    console.log('Team ID:', process.env.APPLE_TEAM_ID);
+
     try {
         await notarize({
+            tool: 'notarytool',
             appBundleId: 'org.sienci.gsender',
             appPath: appPath,
             appleId: process.env.APPLE_ID,
