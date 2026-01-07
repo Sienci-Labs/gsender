@@ -120,7 +120,11 @@
       "target": [
         "dmg"
       ],
-      "strictVerify": false,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "electron-build/entitlements.mac.plist",
+      "entitlementsInherit": "electron-build/entitlements.mac.plist",
+
 
       "icon": "electron-build/icon.icns"
     },
