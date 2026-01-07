@@ -31,4 +31,10 @@ yarn electron-rebuild -- \
     --which-module=serialport
 
 
-cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"
+# Check if building for macOS
+if [[ "$*" == *"--macos"* ]] || [[ "$*" == *"--mac"* ]] || [[ "$*" == *"-m"* ]]; then
+    echo "Building for macOS with code signing and notarization..."
+    cross-env USE_HARD_LINKS=false CSC_LINK="${CSC_LINK}" CSC_KEY_PASSWORD="${CSC_KEY_PASSWORD}" APPLE_ID="${APPLE_ID}" APPLE_APP_SPECIFIC_PASSWORD="${APPLE_APP_SPECIFIC_PASSWORD}" APPLE_TEAM_ID="${APPLE_TEAM_ID}" yarn electron-builder -- "$@"
+else
+    cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"
+fi
