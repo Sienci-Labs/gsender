@@ -143,7 +143,6 @@ jobs:
           echo "• CSC_KEY_PASSWORD is set: ${{ secrets.CSC_KEY_PASSWORD != '' }}"
           echo "• CSC_LINK is set: ${{ secrets.CSC_LINK != '' }}"
           echo "• CSC_LINK is set: ${{ secrets.CI_TOKEN != '' }}"
-          echo "• CSC_LINK is set: ${{ CI_TOKEN != '' }}"
       - name: Install Yarn package manager and Node Gyp
         run: |
           npm install -g yarn
