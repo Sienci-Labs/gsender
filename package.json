@@ -404,6 +404,7 @@
     "@babel/preset-react": "~7.0.0",
     "@babel/preset-typescript": "^7.27.1",
     "@babel/register": "~7.4.0",
+    "@electron/notarize": "2.5",
     "@rollup/plugin-json": "^6.1.0",
     "@sentry/vite-plugin": "^3.5.0",
     "@sentry/webpack-plugin": "^2.7.1",
