@@ -140,6 +140,8 @@ jobs:
           echo "• RUNNER_OS=$RUNNER_OS"
           echo "• RUNNER_TEMP=$RUNNER_TEMP"
           echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+          echo "• CSC_KEY_PASSWORD is set: ${{ secrets.CSC_KEY_PASSWORD != '' }}"
+          echo "• CSC_LINK is set: ${{ secrets.CSC_LINK != '' }}"
       - name: Install Yarn package manager and Node Gyp
         run: |
           npm install -g yarn
@@ -159,6 +161,7 @@ jobs:
         run: yarn run build-latest
       - name: Build macOS binaries
         run: yarn run build:macos
+
       - name: Prepare release assets
         shell: bash
         run: |

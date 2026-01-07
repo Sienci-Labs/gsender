@@ -34,15 +34,15 @@ yarn electron-rebuild -- \
 # Check if building for macOS
 if [[ "$*" == *"--macos"* ]] || [[ "$*" == *"--mac"* ]] || [[ "$*" == *"-m"* ]]; then
     echo "Building for macOS with code signing and notarization..."
-    echo "Building for macOS with code signing and notarization..."
-    # Export variables so they're available to child processes
-    export CSC_LINK="${CSC_LINK}"
-    export CSC_KEY_PASSWORD="${CSC_KEY_PASSWORD}"
-    export APPLE_ID="${APPLE_ID}"
-    export APPLE_APP_SPECIFIC_PASSWORD="${APPLE_APP_SPECIFIC_PASSWORD}"
-    export APPLE_TEAM_ID="${APPLE_TEAM_ID}"
-    export USE_HARD_LINKS=false
-    yarn electron-builder -- "$@"
+    echo "Checking environment variables:"
+    echo "  CSC_LINK is set: ${CSC_LINK:+yes}"
+    echo "  CSC_KEY_PASSWORD is set: ${CSC_KEY_PASSWORD:+yes}"
+    echo "  APPLE_ID is set: ${APPLE_ID:+yes}"
+    echo "  APPLE_APP_SPECIFIC_PASSWORD is set: ${APPLE_APP_SPECIFIC_PASSWORD:+yes}"
+    echo "  APPLE_TEAM_ID is set: ${APPLE_TEAM_ID:+yes}"
+
+    # Use npx to run electron-builder directly from node_modules
+    USE_HARD_LINKS=false npx --no-install electron-builder "$@"
 else
-    cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"
+    USE_HARD_LINKS=false yarn electron-builder -- "$@"
 fi
