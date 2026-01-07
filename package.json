@@ -87,6 +87,7 @@
     "extraMetadata": {
       "main": "./main.js"
     },
+    "afterSign": "./notarize.js",
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
@@ -122,13 +123,10 @@
           "target": "dmg"
         }
       ],
-
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "electron-build/entitlements.mac.plist",
       "entitlementsInherit": "electron-build/entitlements.mac.plist",
-
-
       "icon": "electron-build/icon.icns"
     },
     "dmg": {
@@ -266,6 +264,7 @@
     "detect-browser": "~4.4.0",
     "dfu": "^0.1.5",
     "downloadjs": "^1.4.7",
+    "electron-builder-notarize": "^1.5.2",
     "electron-log": "^4.3.5",
     "electron-store": "~8.1.0",
     "electron-updater": "^5.3.0",
