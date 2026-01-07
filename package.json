@@ -132,6 +132,7 @@
     },
     "dmg": {
       "background": "electron-build/background.png",
+      "sign": false, // Specific old bug, .app is signed and notarized, not .dmg
       "icon": "electron-build/icon.icns",
       "iconSize": 80,
       "iconTextSize": 12,
