@@ -163,7 +163,8 @@ jobs:
         run: yarn run build-latest
       - name: Build macOS binaries
         run: yarn run build:macos
-
+      - name: Check Dir Contents
+        run: ls -al output
       - name: Prepare release assets
         shell: bash
         run: |
