@@ -122,6 +122,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
     } = state;
 
     const { touchplateType } = touchplate;
+    console.log(touchplateType);
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     return (
@@ -182,10 +183,12 @@ const Probe = ({ state, actions }: ProbeProps) => {
                     />
                 </div>
             </div>
-            <ProbeDirectionSelection
-                direction={direction}
-                onClick={actions.nextProbeDirection}
-            />
+            {touchplateType !== 'Z Probe' && (
+                <ProbeDirectionSelection
+                    direction={direction}
+                    onClick={actions.nextProbeDirection}
+                />
+            )}
         </div>
     );
 };
