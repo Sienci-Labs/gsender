@@ -120,6 +120,8 @@
       "target": [
         "dmg"
       ],
+      "strictVerify": false,
+
       "icon": "electron-build/icon.icns"
     },
     "dmg": {
