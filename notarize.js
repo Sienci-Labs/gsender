@@ -11,7 +11,7 @@ exports.default = async function notarizing(context) {
 
     // Only notarize for x64 build to avoid duplicate notarization attempts
     // The universal binary will be notarized once
-    if (arch !== 2) { // 2 = x64, skip arm64 (3)
+    if (arch !== 3) { // 2 = x64, skip arm64 (3)
         console.log(`Skipping notarization for arch ${arch} (will notarize with x64 build)`);
         return;
     }
