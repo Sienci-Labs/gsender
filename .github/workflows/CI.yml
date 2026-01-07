@@ -108,11 +108,17 @@ jobs:
   build-macos:
     name: Build macOS packages
     runs-on: macos-latest
+    environment: CI
     strategy:
       matrix:
         node-version: [20.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
@@ -135,6 +141,9 @@ jobs:
           echo "• RUNNER_OS=$RUNNER_OS"
           echo "• RUNNER_TEMP=$RUNNER_TEMP"
           echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+          echo "• CSC_KEY_PASSWORD is set: ${{ secrets.CSC_KEY_PASSWORD != '' }}"
+          echo "• CSC_LINK is set: ${{ secrets.CSC_LINK != '' }}"
+          echo "• CSC_LINK is set: ${{ secrets.CI_TOKEN != '' }}"
       - name: Install Yarn package manager and Node Gyp
         run: |
           npm install -g yarn
@@ -154,6 +163,7 @@ jobs:
         run: yarn run build-latest
       - name: Build macOS binaries
         run: yarn run build:macos
+
       - name: Prepare release assets
         shell: bash
         run: |
