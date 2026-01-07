@@ -3,8 +3,16 @@ const path = require('path');
 const fs = require('fs');
 
 exports.default = async function notarizing(context) {
-    const { electronPlatformName, appOutDir } = context;
+    const { electronPlatformName, appOutDir, arch } = context;
+
     if (electronPlatformName !== 'darwin') {
+        return;
+    }
+
+    // Only notarize for x64 build to avoid duplicate notarization attempts
+    // The universal binary will be notarized once
+    if (arch !== 2) { // 2 = x64, skip arm64 (3)
+        console.log(`Skipping notarization for arch ${arch} (will notarize with x64 build)`);
         return;
     }
 
@@ -15,7 +23,7 @@ exports.default = async function notarizing(context) {
     console.log('App Out Dir:', appOutDir);
     console.log('App Name:', appName);
     console.log('App Path:', appPath);
-    console.log('App Path Exists:', fs.existsSync(appPath));
+    console.log('Architecture:', arch);
     console.log('==========================================');
 
     if (!fs.existsSync(appPath)) {
@@ -28,6 +36,9 @@ exports.default = async function notarizing(context) {
         console.log('Skipping notarization: Apple credentials not provided');
         return;
     }
+
+    // Add a small delay to ensure file handles are released
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     console.log('Starting notarization...');
     console.log('Apple ID:', process.env.APPLE_ID);
