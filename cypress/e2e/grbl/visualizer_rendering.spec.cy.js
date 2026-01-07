@@ -37,11 +37,11 @@ describe('CNC Machine File Info Test', () => {
     cy.log(' Checking visualizer UI before file upload...');
     cy.get('#visualizer_container', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log('✓ Visualizer container exists before upload'));
+      .then(() => cy.log(' Visualizer container exists before upload'));
 
     cy.get('#visualizer_container canvas[data-engine="three.js r146"]', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log('✓ Visualizer canvas exists before upload'));
+      .then(() => cy.log(' Visualizer canvas exists before upload'));
 
     // Step 3: Check if Outline and Start From buttons exist and their state BEFORE upload
     cy.log(' Checking Outline and Start From buttons state BEFORE upload...');
@@ -81,7 +81,7 @@ describe('CNC Machine File Info Test', () => {
     cy.log(' Checking visualizer UI after file upload...');
     cy.get('#visualizer_container', { timeout: 10000 })
       .should('be.visible')
-      .then(() => cy.log('✓ Visualizer container visible after upload'));
+      .then(() => cy.log('Visualizer container visible after upload'));
 
     cy.get('#visualizer_container canvas[data-engine="three.js r146"]', { timeout: 15000 })
       .should('be.visible')

@@ -135,7 +135,7 @@ describe('CNC Machine Tests GrblHal', () => {
         
         // Check if all are 0.00
         if (xValue === '0.00' && yValue === '0.00' && zValue === '0.00') {
-          cy.log('TEST PASSED: Machine is at home position (0.00, 0.00, 0.00) ✓✓✓');
+          cy.log('TEST PASSED: Machine is at home position (0.00, 0.00, 0.00)');
         } else {
           cy.log('TEST FAILED: Machine is not at home position');
           throw new Error(`Expected position (0.00, 0.00, 0.00) but got (${xValue}, ${yValue}, ${zValue})`);

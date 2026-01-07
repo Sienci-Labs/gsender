@@ -72,7 +72,7 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.log('Step 1: Connecting to machine...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.log('✓ Machine connected');
+    cy.log(' Machine connected');
 
     // Step 2: Verify machine is in locked state
     cy.log('Step 2: Checking for locked state...');
@@ -82,9 +82,9 @@ describe('Machine Unlock Functionality Tests', () => {
                        $body.text().includes('Click to Unlock Machine');
       
       if (isLocked) {
-        cy.log('✓ Machine is locked as expected');
+        cy.log(' Machine is locked as expected');
       } else {
-        cy.log('⚠ Machine is already unlocked');
+        cy.log('Machine is already unlocked');
       }
     });
 
@@ -97,7 +97,7 @@ describe('Machine Unlock Functionality Tests', () => {
       .click({ force: true });
     
     cy.wait(2000);
-    cy.log('✓ Unlock button clicked');
+    cy.log(' Unlock button clicked');
 
     // Step 4: Verify machine is unlocked
     cy.log('Step 4: Verifying machine is unlocked...');
@@ -106,7 +106,7 @@ describe('Machine Unlock Functionality Tests', () => {
       expect(stillLocked).to.be.false;
     });
     
-    cy.log('✓ Machine successfully unlocked');
+    cy.log(' Machine successfully unlocked');
     cy.log('=== Test Passed ===');
   });
 
@@ -130,7 +130,7 @@ describe('Machine Unlock Functionality Tests', () => {
       ].join(','));
 
       if (unlockElements.length > 0) {
-        cy.log('✓ Unlock popup/button found');
+        cy.log(' Unlock popup/button found');
         
         // Click to dismiss/unlock
         cy.log('Step 3: Clicking to unlock...');
@@ -143,9 +143,9 @@ describe('Machine Unlock Functionality Tests', () => {
         // Verify popup is gone
         cy.log('Step 4: Verifying popup is dismissed...');
         cy.get('body').should('not.contain', 'Click to Unlock Machine');
-        cy.log('✓ Popup dismissed successfully');
+        cy.log(' Popup dismissed successfully');
       } else {
-        cy.log('⚠ No unlock popup found - machine may already be unlocked');
+        cy.log(' No unlock popup found - machine may already be unlocked');
       }
     });
 
@@ -163,7 +163,7 @@ describe('Machine Unlock Functionality Tests', () => {
     // First unlock
     cy.unlockMachine();
     cy.wait(3000);
-    cy.log('✓ First unlock completed');
+    cy.log(' First unlock completed');
 
     // Simulate operation that might cause lock
     cy.log('Step 2: Simulating operations...');
@@ -173,12 +173,12 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.log('Step 3: Second unlock check...');
     cy.unlockMachine();
     cy.wait(2000);
-    cy.log('✓ Second unlock check completed');
+    cy.log(' Second unlock check completed');
 
     // Third check
     cy.log('Step 4: Third unlock check...');
     cy.unlockMachine();
-    cy.log('✓ Third unlock check completed');
+    cy.log('Third unlock check completed');
 
     cy.log('=== Test Passed ===');
   });
@@ -200,7 +200,7 @@ describe('Machine Unlock Functionality Tests', () => {
       .click({ force: true });
     
     cy.wait(2000);
-    cy.log('✓ Clicked unlock using recorded selector');
+    cy.log(' Clicked unlock using recorded selector');
 
     // Verify unlock
     cy.log('Step 3: Verifying unlock...');
@@ -232,13 +232,13 @@ describe('Machine Unlock Functionality Tests', () => {
             .click({ force: true });
           
           cy.wait(2000);
-          cy.log('✓ Unlock attempted');
+          cy.log('Unlock attempted');
           
           // Verify unlock succeeded
           cy.get('body').then($newBody => {
             const stillLocked = $newBody.find('svg.hidden').length > 0;
             if (stillLocked) {
-              cy.log('⚠ Machine still locked - retry needed');
+              cy.log('Machine still locked - retry needed');
               // Retry once
               cy.wrap(unlockButton.first())
                 .parent('button')
@@ -247,10 +247,10 @@ describe('Machine Unlock Functionality Tests', () => {
             }
           });
         } else {
-          cy.log('✓ No unlock needed - machine already unlocked');
+          cy.log(' No unlock needed - machine already unlocked');
         }
       } catch (error) {
-        cy.log('⚠ Error during unlock:', error.message);
+        cy.log('Error during unlock:', error.message);
         throw error;
       }
     });
@@ -266,19 +266,19 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.connectMachine();
     cy.wait(6000);
     cy.ensureMachineUnlocked();
-    cy.log('✓ Initial unlock completed');
+    cy.log(' Initial unlock completed');
 
     // Disconnect
     cy.log('Step 2: Disconnecting...');
     cy.contains('button', 'Disconnect').click({ force: true });
     cy.wait(3000);
-    cy.log('✓ Disconnected');
+    cy.log(' Disconnected');
 
     // Reconnect
     cy.log('Step 3: Reconnecting...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.log('✓ Reconnected');
+    cy.log(' Reconnected');
 
     // Unlock after reconnection
     cy.log('Step 4: Unlocking after reconnection...');
@@ -287,7 +287,7 @@ describe('Machine Unlock Functionality Tests', () => {
     
     // Verify machine is responsive
     cy.get('#app').should('be.visible');
-    cy.log('✓ Machine unlocked and responsive');
+    cy.log(' Machine unlocked and responsive');
 
     cy.log('=== Test Passed ===');
   });
@@ -306,16 +306,16 @@ describe('Machine Unlock Functionality Tests', () => {
       if (unlockButton.length > 0) {
         // Verify button is visible
         cy.wrap(unlockButton).should('be.visible');
-        cy.log('✓ Unlock button is visible');
+        cy.log(' Unlock button is visible');
 
         // Verify button is enabled
         cy.wrap(unlockButton).should('not.be.disabled');
-        cy.log('✓ Unlock button is enabled');
+        cy.log(' Unlock button is enabled');
 
         // Click and verify
         cy.wrap(unlockButton).click({ force: true });
         cy.wait(2000);
-        cy.log('✓ Unlock button is clickable');
+        cy.log(' Unlock button is clickable');
       } else {
         cy.log('ℹ No unlock button present - machine already unlocked');
       }
@@ -346,7 +346,7 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.get('#app').should('be.visible');
     cy.get('body').should('not.contain', 'error');
     
-    cy.log('✓ Machine remains functional after rapid unlocks');
+    cy.log('Machine remains functional after rapid unlocks');
     cy.log('=== Test Passed ===');
   });
 
@@ -377,7 +377,5 @@ describe('Machine Unlock Functionality Tests', () => {
     });
 
     cy.wait(2000);
-
-    // Continue with the rest of your test...
   });
 });

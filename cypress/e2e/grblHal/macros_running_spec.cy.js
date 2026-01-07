@@ -65,8 +65,36 @@ describe('Macros Upload, Execution and Verification Test', () => {
 
   it('Upload and run macro with success message verification and config validation', () => {
 
+    // Helper function to search and verify a setting by label
+    const verifyConfigValue = (searchTerm, expectedValue, settingName) => {
+      cy.log(`Verifying: ${settingName}`);
+      
+      // Clear and search for the setting
+      cy.get('#simple-search', { timeout: 10000 })
+        .should('be.visible')
+        .clear()
+        .type(searchTerm);
+      cy.wait(2000);
+      
+      // Strategy: Find the fieldset containing the label text, then find input within it
+      cy.contains('fieldset', new RegExp(searchTerm, 'i'))
+        .filter(':visible')
+        .first()
+        .within(() => {
+          // Find the input with the module class within this specific fieldset
+          cy.get('input.index-module__textInput___KtY0r, input[type="text"], input[type="number"]')
+            .not('[type="checkbox"]')
+            .not('[type="radio"]')
+            .first()
+            .should('have.value', expectedValue.toString())
+            .then(() => {
+              cy.log(` ${settingName} = ${expectedValue} (Verified)`);
+            });
+        });
+    };
+
     // Step 1: Load the application and connect to CNC
-    cy.log('STEP 1: Loading Application & Connecting to CNC');
+    cy.log('STEP 1: Loading Application & Connecting to CNC ===');
     
     // Visit the main page directly
     cy.visit('http://localhost:8000/#/', {
@@ -101,7 +129,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Machine ready (alarm handled if present)');
 
     // Step 2: Navigate to Configuration page
-    cy.log('STEP 2: Navigate to Configuration ===');
+    cy.log('=== STEP 2: Navigate to Configuration ===');
     cy.visit('http://localhost:8000/#/configuration', {
       timeout: 20000,
       failOnStatusCode: false
@@ -110,7 +138,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Configuration page loaded');
 
     // Step 3: Restore defaults
-    cy.log('STEP 3: Restore Defaults');
+    cy.log('=== STEP 3: Restore Defaults ===');
     
     // Click on Defaults button
     cy.get('div.fixed div.grid > button', { timeout: 15000 })
@@ -129,7 +157,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Defaults restored');
 
     // Step 4: Go back to main page (Carve)
-    cy.log('STEP 4: Navigate back to Carve ===');
+    cy.log('=== STEP 4: Navigate back to Carve ===');
     cy.visit('http://localhost:8000/#/', {
       timeout: 20000,
       failOnStatusCode: false
@@ -142,7 +170,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.wait(1000);
 
     // Step 5: Click on Macros tab
-    cy.log('STEP 5: Open Macros Tab ===');
+    cy.log('=== STEP 5: Open Macros Tab ===');
     cy.get('button', { timeout: 15000 })
       .contains(/Macros/i)
       .should('be.visible')
@@ -151,7 +179,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Macros tab opened');
 
     // Step 6: Upload macro file and verify success message
-    cy.log('STEP 6: Upload Macro File ===');
+    cy.log('=== STEP 6: Upload Macro File ===');
     
     // Click Import button
     cy.get('button')
@@ -220,7 +248,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       });
 
     // Step 7: Click on macro name to run it and verify success
-    cy.log('STEP 7: Run Macro and Verify Execution Success ===');
+    cy.log('=== STEP 7: Run Macro and Verify Execution Success ===');
     
     // Handle unlock before running macro
     cy.unlockMachineIfNeeded();
@@ -261,7 +289,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Execution success popup closed');
 
     // Step 8: Navigate to Configuration page to verify settings
-    cy.log('STEP 8: Verify Macro Applied Settings ===');
+    cy.log('=== STEP 8: Verify Macro Applied Settings ===');
     
     cy.visit('http://localhost:8000/#/configuration', {
       timeout: 20000,
@@ -269,34 +297,6 @@ describe('Macros Upload, Execution and Verification Test', () => {
     });
     cy.wait(3000);
     cy.log('Configuration page loaded for verification');
-
-    // Helper function to search and verify a setting by label
-    const verifyConfigValue = (searchTerm, expectedValue, settingName) => {
-      cy.log(`Verifying: ${settingName}`);
-      
-      // Clear and search for the setting
-      cy.get('#simple-search', { timeout: 10000 })
-        .should('be.visible')
-        .clear()
-        .type(searchTerm);
-      cy.wait(2000);
-      
-      // Strategy: Find the fieldset containing the label text, then find input within it
-      cy.contains('fieldset', new RegExp(searchTerm, 'i'))
-        .filter(':visible')
-        .first()
-        .within(() => {
-          // Find the input with the module class within this specific fieldset
-          cy.get('input.index-module__textInput___KtY0r, input[type="text"], input[type="number"]')
-            .not('[type="checkbox"]')
-            .not('[type="radio"]')
-            .first()
-            .should('have.value', expectedValue.toString())
-            .then(() => {
-              cy.log(`✓ ${settingName} = ${expectedValue} (Verified)`);
-            });
-        });
-    };
 
     // Verify X-axis travel resolution
     cy.log('Verifying Travel Resolutions');
@@ -317,7 +317,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     verifyConfigValue('Z-axis maximum rate', '2000', 'Z-axis maximum rate');
 
     // Verify Homing Direction Invert settings (SWITCH BUTTONS)
-    cy.log('✓ Verifying Homing Direction Invert Settings');
+    cy.log(' Verifying Homing Direction Invert Settings');
     
     // Clear search and search for homing direction invert
     cy.get('#simple-search', { timeout: 10000 })
@@ -333,7 +333,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'true')
       .should('have.attr', 'data-state', 'checked')
       .then(() => {
-        cy.log('✓ X-axis homing direction invert: ENABLED (Correct)');
+        cy.log(' X-axis homing direction invert: ENABLED (Correct)');
       });
 
     // Verify Y-axis is disabled (unchecked)
@@ -343,7 +343,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'false')
       .should('have.attr', 'data-state', 'unchecked')
       .then(() => {
-        cy.log('✓ Y-axis homing direction invert: DISABLED (Correct)');
+        cy.log(' Y-axis homing direction invert: DISABLED (Correct)');
       });
 
     // Verify Z-axis is disabled (unchecked)
@@ -353,7 +353,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'false')
       .should('have.attr', 'data-state', 'unchecked')
       .then(() => {
-        cy.log('✓ Z-axis homing direction invert: DISABLED (Correct)');
+        cy.log('Z-axis homing direction invert: DISABLED (Correct)');
       });
 
     // Verify A-axis is disabled (unchecked) if present
@@ -365,7 +365,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
           .should('have.attr', 'aria-checked', 'false')
           .should('have.attr', 'data-state', 'unchecked')
           .then(() => {
-            cy.log('✓ A-axis homing direction invert: DISABLED (Correct)');
+            cy.log(' A-axis homing direction invert: DISABLED (Correct)');
           });
       } else {
         cy.log('ℹ A-axis not present (skipped)');
@@ -374,11 +374,11 @@ describe('Macros Upload, Execution and Verification Test', () => {
 
     // Final verification summary
     cy.log('═══════════════════════════════════════════════');
-    cy.log('TEST SUMMARY ✓');
+    cy.log('TEST SUMMARY ');
     cy.get('@macroName').then((name) => {
       cy.log(`Macro Name: ${name}`);
-      cy.log('✓ Macro uploaded successfully');
-      cy.log('✓ Macro executed successfully');
+      cy.log(' Macro uploaded successfully');
+      cy.log('Macro executed successfully');
       cy.log('All configuration values verified:');
       cy.log('  - X/Y/Z travel resolution = 100');
       cy.log('  - X/Y maximum rate = 7000');
@@ -387,7 +387,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       cy.log('  - Y/Z/A homing invert = DISABLED');
     });
 
-    cy.log('✓ MACRO TEST COMPLETED SUCCESSFULLY');
+    cy.log('MACRO TEST COMPLETED SUCCESSFULLY');
     cy.log('═══════════════════════════════════════════════');
    
     cy.wait(2000);
@@ -443,7 +443,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Edit dialog opened');
 
     // Step 11: Update macro fields
-    cy.log('STEP 11: Update Macro Fields');
+    cy.log('=== STEP 11: Update Macro Fields ===');
 
     // Update Name field
     cy.log('Updating macro name...');
@@ -504,7 +504,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     });
 
     // Step 12: Verify the edited macro name appears
-    cy.log('STEP 12: Verify Edited Macro Name');
+    cy.log('=== STEP 12: Verify Edited Macro Name ===');
     cy.get('div.flex-grow span', { timeout: 10000 })
       .contains(/CLSM Kit Settings-edited/i)
       .should('be.visible')
@@ -514,7 +514,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       });
 
     // Step 13: Run the edited macro
-    cy.log('STEP 13: Run Edited Macro');
+    cy.log('=== STEP 13: Run Edited Macro ===');
     
     // Handle unlock before running
     cy.unlockMachineIfNeeded();
@@ -550,7 +550,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     });
 
     // Step 14: Verify edited macro settings in Configuration
-    cy.log('STEP 14: Verify Edited Macro Settings');
+    cy.log('=== STEP 14: Verify Edited Macro Settings ===');
     
     cy.visit('http://localhost:8000/#/configuration', {
       timeout: 20000,
@@ -576,7 +576,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
     verifyConfigValue('Z-axis maximum rate', '1000', 'Z-axis maximum rate');
 
     // Verify homing direction invert (should be enabled for X only based on $23=1)
-    cy.log('Verifying Edited Homing Direction Invert Settings');
+    cy.log(' Verifying Edited Homing Direction Invert Settings');
     
     cy.get('#simple-search', { timeout: 10000 })
       .should('be.visible')
@@ -591,7 +591,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'true')
       .should('have.attr', 'data-state', 'checked')
       .then(() => {
-        cy.log('✓ X-axis homing direction invert: ENABLED (Correct)');
+        cy.log('X-axis homing direction invert: ENABLED (Correct)');
       });
 
     // Y-axis should be disabled
@@ -601,7 +601,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'false')
       .should('have.attr', 'data-state', 'unchecked')
       .then(() => {
-        cy.log('✓ Y-axis homing direction invert: DISABLED (Correct)');
+        cy.log(' Y-axis homing direction invert: DISABLED (Correct)');
       });
 
     // Z-axis should be disabled
@@ -611,15 +611,15 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.attr', 'aria-checked', 'false')
       .should('have.attr', 'data-state', 'unchecked')
       .then(() => {
-        cy.log('✓ Z-axis homing direction invert: DISABLED (Correct)');
+        cy.log(' Z-axis homing direction invert: DISABLED (Correct)');
       });
 
     // Final summary for edited macro
     cy.log('═══════════════════════════════════════════════');
-    cy.log('EDITED MACRO TEST SUMMARY ✓');
+    cy.log('EDITED MACRO TEST SUMMARY ');
     cy.log('Macro Name: CLSM Kit Settings-edited');
-    cy.log('✓ Macro edited successfully');
-    cy.log('✓ Edited macro executed successfully');
+    cy.log(' Macro edited successfully');
+    cy.log(' Edited macro executed successfully');
     cy.log('All edited configuration values verified:');
     cy.log('  - X/Y/Z travel resolution = 200');
     cy.log('  - X/Y maximum rate = 6000');
@@ -657,7 +657,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .click();
     cy.wait(1000);
 
-    cy.log('✓ Export functionality tested');
+    cy.log(' Export functionality tested');
 
     // Step 16: Delete all macros
     cy.log('=== STEP 16: Delete All Macros ===');
@@ -667,11 +667,286 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.contains(/No Macros/i, { timeout: 10000 })
       .should('be.visible')
       .then(() => {
-        cy.log('✓ All macros deleted successfully');
+        cy.log('All macros deleted successfully');
       });
 
     cy.log('=== STEP 16 COMPLETED ===');
     
+    cy.wait(2000);
+
+    // Step 17: Add New Macro Manually
+    cy.log('=== STEP 17: Add New Macro Manually ===');
+
+    // Navigate to application
+    cy.visit('http://localhost:8000/#/', {
+      timeout: 20000,
+      failOnStatusCode: false
+    });
+    cy.wait(3000);
+
+    // Handle unlock if needed
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+
+    // Verify machine is in Idle state
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should('be.visible');
+    cy.log('Machine is Idle');
+
+    // Open Macros tab
+    cy.get('button', { timeout: 15000 })
+      .contains(/Macros/i)
+      .should('be.visible')
+      .click();
+    cy.wait(2000);
+    cy.log('Macros tab opened');
+
+    // Click Add button
+    cy.log('Clicking Add button...');
+    cy.contains('button', /^Add$/i, { timeout: 10000 })
+      .should('be.visible')
+      .click({ force: true });
+    cy.wait(2000);
+    cy.log(' Add button clicked');
+
+    // Verify form is visible
+    cy.log('Verifying Add Macro form...');
+    cy.get('input[name="name"][type="text"][maxlength="128"]', { timeout: 10000 })
+      .should('be.visible')
+      .should('be.enabled');
+    cy.log(' Add Macro form is visible');
+
+    // Fill in Macro Name
+    const macroName = 'CLSM Kit Settings ADD';
+    cy.log(`Entering macro name: ${macroName}`);
+    cy.get('input[name="name"][type="text"][maxlength="128"]')
+      .should('be.visible')
+      .clear({ force: true })
+      .type(macroName, { force: true });
+    cy.wait(500);
+    cy.log(`Name entered: ${macroName}`);
+
+    // Fill in G-code
+    const gcode = '$100=100\n$101=100\n$102=100\n$110=7000\n$111=7000\n$112=2000\n$23=1\n$$';
+    cy.log('Entering G-code...');
+    cy.get('textarea[name="content"][required]', { timeout: 10000 })
+      .should('be.visible')
+      .clear({ force: true })
+      .type(gcode, { delay: 10, force: true });
+    cy.wait(500);
+    cy.log('G-code entered');
+
+    // Fill in Description
+    const description = 'TEST DATA FOR ADDING MACROS';
+    cy.log(`Entering description: ${description}`);
+    cy.get('textarea[name="description"][maxlength="128"]', { timeout: 10000 })
+      .should('be.visible')
+      .clear({ force: true })
+      .type(description, { force: true });
+    cy.wait(500);
+    cy.log(` Description entered: ${description}`);
+
+    // Click Add New Macro button
+    cy.log('Clicking Add New Macro button...');
+    cy.wait(1000);
+    cy.get('[data-testid="add-macro-button"]')
+      .click({ force: true });
+    cy.wait(2000);
+    cy.log('Add New Macro button clicked');
+
+    // Verify success message or form closure
+    cy.log('Checking for success indication...');
+    cy.get('body').then($body => {
+      if ($body.find('section ol li').length > 0) {
+        cy.get('section ol li', { timeout: 10000 })
+          .should('exist')
+          .and('be.visible')
+          .then($toast => {
+            const toastText = $toast.text().trim();
+            cy.log(` Success message: "${toastText}"`);
+            
+            const hasSuccess = /added|success|created|macro/i.test(toastText);
+            expect(hasSuccess).to.be.true;
+          });
+
+        // Close toast if present
+        if ($body.find('section button svg').length > 0) {
+          cy.get('section button svg', { timeout: 5000 })
+            .first()
+            .click({ force: true });
+          cy.wait(1000);
+          cy.log('Toast closed');
+        }
+      } else {
+        cy.log('No toast found - checking for form closure');
+        cy.get('input[name="name"][type="text"]').should('not.exist');
+        cy.log('Form closed successfully');
+      }
+    });
+
+    // Step 18: Verify newly added macro in list
+    cy.log('=== STEP 18: Verify Newly Added Macro ===');
+    cy.get('div.flex-grow span', { timeout: 10000 })
+      .contains(new RegExp(macroName, 'i'))
+      .should('be.visible')
+      .then($macro => {
+        const displayedName = $macro.text().trim();
+        cy.log(` Macro found: "${displayedName}"`);
+        expect(displayedName).to.include('CLSM Kit Settings ADD');
+      });
+    cy.log('STEP 17-18 COMPLETED: Macro added and verified');
+
+    // Step 19: Run the newly added macro
+    cy.log('=== STEP 19: Run Newly Added Macro ===');
+
+    // Handle unlock before running
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+
+    // Click on the newly added macro to execute it
+    cy.get('div.flex-grow span')
+      .contains(/CLSM Kit Settings ADD/i)
+      .should('be.visible')
+      .click();
+    cy.wait(2000);
+    cy.log('Newly added macro clicked to execute');
+
+    // Check for execution success message
+    cy.log('Checking for execution success message...');
+    cy.get('section ol li', { timeout: 15000 })
+      .should('exist')
+      .and('be.visible')
+      .then($toast => {
+        const toastText = $toast.text().trim();
+        cy.log(` Execution message: "${toastText}"`);
+      });
+
+    // Close execution popup
+    cy.get('body').then($body => {
+      if ($body.find('section button svg').length > 0) {
+        cy.get('section button svg')
+          .first()
+          .click({ force: true });
+        cy.wait(1000);
+        cy.log(' Execution popup closed');
+      }
+    });
+
+    cy.log('STEP 19 COMPLETED: Newly added macro executed');
+
+    // Step 20: Verify newly added macro settings in Configuration
+    cy.log('=== STEP 20: Verify Newly Added Macro Settings ===');
+
+    cy.visit('http://localhost:8000/#/configuration', {
+      timeout: 20000,
+      failOnStatusCode: false
+    });
+    cy.wait(3000);
+    cy.log('Configuration page loaded for verification');
+
+    // Verify travel resolutions (should be 100)
+    cy.log('Verifying Travel Resolutions from newly added macro');
+    verifyConfigValue('X-axis travel resolution', '100', 'X-axis travel resolution');
+    verifyConfigValue('Y-axis travel resolution', '100', 'Y-axis travel resolution');
+    verifyConfigValue('Z-axis travel resolution', '100', 'Z-axis travel resolution');
+
+    // Verify maximum rates (should be 7000, 7000, 2000)
+    cy.log('Verifying Maximum Rates from newly added macro');
+    verifyConfigValue('X-axis maximum rate', '7000', 'X-axis maximum rate');
+    verifyConfigValue('Y-axis maximum rate', '7000', 'Y-axis maximum rate');
+    verifyConfigValue('Z-axis maximum rate', '2000', 'Z-axis maximum rate');
+
+    // Verify homing direction invert
+    cy.log(' Verifying Homing Direction Invert Settings');
+
+    cy.get('#simple-search', { timeout: 10000 })
+      .should('be.visible')
+      .clear()
+      .type('Homing direction invert');
+    cy.wait(2000);
+
+    // X-axis should be enabled ($23=1)
+    cy.get('button[role="switch"][id*="$23-0"]', { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .should('have.attr', 'aria-checked', 'true')
+      .should('have.attr', 'data-state', 'checked')
+      .then(() => {
+        cy.log(' X-axis homing direction invert: ENABLED (Correct)');
+      });
+
+    // Y-axis should be disabled
+    cy.get('button[role="switch"][id*="$23-1"]', { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .should('have.attr', 'aria-checked', 'false')
+      .should('have.attr', 'data-state', 'unchecked')
+      .then(() => {
+        cy.log(' Y-axis homing direction invert: DISABLED (Correct)');
+      });
+
+    // Z-axis should be disabled
+    cy.get('button[role="switch"][id*="$23-2"]', { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .should('have.attr', 'aria-checked', 'false')
+      .should('have.attr', 'data-state', 'unchecked')
+      .then(() => {
+        cy.log(' Z-axis homing direction invert: DISABLED (Correct)');
+      });
+
+    // Final summary for newly added macro
+    cy.log('═══════════════════════════════════════════════');
+    cy.log('NEWLY ADDED MACRO TEST SUMMARY ');
+    cy.log('═══════════════════════════════════════════════');
+    cy.log(`Macro Name: ${macroName}`);
+    cy.log(`Description: ${description}`);
+    cy.log('Macro added manually via UI');
+    cy.log(' Macro executed successfully');
+    cy.log(' All configuration values verified:');
+    cy.log('  - X/Y/Z travel resolution = 100');
+    cy.log('  - X/Y maximum rate = 7000');
+    cy.log('  - Z maximum rate = 2000');
+    cy.log('  - X homing invert = ENABLED');
+    cy.log('  - Y/Z homing invert = DISABLED');
+    cy.log('═══════════════════════════════════════════════');
+    cy.log('STEP 20 COMPLETED');
+    cy.log('═══════════════════════════════════════════════');
+
+    cy.wait(2000);
+
+    // Step 21: Clean up - Delete the newly added macro
+    cy.log('=== STEP 21: Clean Up - Delete Newly Added Macro ===');
+
+    // Navigate back to Macros tab
+    cy.visit('http://localhost:8000/#/', {
+      timeout: 20000,
+      failOnStatusCode: false
+    });
+    cy.wait(3000);
+
+    cy.unlockMachineIfNeeded();
+    cy.wait(1000);
+
+    // Open Macros tab
+    cy.get('button', { timeout: 15000 })
+      .contains(/Macros/i)
+      .should('be.visible')
+      .click();
+    cy.wait(2000);
+
+    // Delete all macros
+    deleteAllMacros();
+
+    cy.log('Verify no macros remain after cleanup');
+    cy.contains(/No Macros/i, { timeout: 10000 })
+      .should('be.visible')
+      .then(() => {
+        cy.log(' All macros deleted successfully');
+      });
+
+    cy.log('=== STEP 21 COMPLETED ===');
+
     // Final complete test summary
     cy.log('═══════════════════════════════════════════════');
     cy.log('COMPLETE MACRO LIFECYCLE TEST SUMMARY');
@@ -692,8 +967,13 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.log('Step 14:  Configuration verified (edited values)');
     cy.log('Step 15:  Macro exported successfully');
     cy.log('Step 16:  All macros deleted successfully');
+    cy.log('Step 17:  New macro added manually');
+    cy.log('Step 18:  Newly added macro verified');
+    cy.log('Step 19:  Newly added macro executed successfully');
+    cy.log('Step 20:  Configuration verified (new macro values)');
+    cy.log('Step 21:  Cleanup completed');
     cy.log('═══════════════════════════════════════════════');
-    cy.log('✓ ALL TESTS COMPLETED SUCCESSFULLY');
+    cy.log('ALL TESTS COMPLETED SUCCESSFULLY');
     cy.log('═══════════════════════════════════════════════');
   });
 

@@ -1,0 +1,14 @@
+[
+ {
+  "name": "CLSM Kit Settings ADD",
+  "content": "$100=100\n$101=100\n$102=100\n$110=7000\n$111=7000\n$112=2000\n$23=1\n$$",
+  "description": "TEST DATA FOR ADDING MACROS",
+  "id": "62338455-b41d-408d-87a7-3d78d0a19345"
+ },
+ {
+  "name": "CLSM Kit Settings-edited",
+  "content": "$100=200\n$101=200\n$102=200\n$110=6000\n$111=6000\n$112=1000\n$23=1\n$$",
+  "description": "This is a test data",
+  "id": "f2b03464-a3a7-456b-a8dc-8517a1e45a96"
+ }
+]

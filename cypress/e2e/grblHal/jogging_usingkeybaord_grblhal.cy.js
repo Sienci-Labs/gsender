@@ -15,7 +15,7 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
   });
 
   beforeEach(() => {
-  cy.goToCarve();
+    cy.goToCarve();
     cy.get('#app', { timeout: 20000 }).should('exist');
     cy.wait(3000);
   });
@@ -47,12 +47,6 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
   const testJogDirection = (jogName, searchPattern, axisIndex, expectedDirection, xyMove, zMove) => {
     cy.log(`Testing ${jogName}`);
     
-    // Navigate to Keyboard Shortcuts
-    cy.get('a:nth-of-type(3) span').contains('Tools').click();
-    cy.wait(2000);
-    cy.contains('Keyboard Shortcuts').parent().click();
-    cy.wait(3000);
-
     // Wait for table to load and debug
     cy.get('table', { timeout: 15000 }).should('be.visible');
     cy.wait(1000);
@@ -210,8 +204,41 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
     cy.verifyAxes(0, 0, 0);
     cy.log('All axes zeroed');
 
-    // Step 3: Get preset values
-    cy.log('STEP 3: Get Movement Presets');
+    // Step 3: Test X+ and X- jogging on Carve page
+    cy.log('STEP 3: Test X+ and X- Jogging on Carve Page');
+    
+    // Jog X+ axis
+    cy.log('Testing X+ jogging...');
+    cy.get('path#xPlus')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(3000);
+    cy.log('X+ jog button clicked');
+
+    // Jog X- axis
+    cy.log('Testing X- jogging...');
+    cy.get('path#xMinus')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(3000);
+    cy.log('X- jog button clicked');
+
+    // Step 4: Navigate to Tools page and then Keyboard Shortcuts
+    cy.log('STEP 4: Navigate to Tools > Keyboard Shortcuts');
+    cy.get('a:nth-of-type(3) span').contains('Tools').click();
+    cy.wait(2000);
+    cy.contains('Keyboard Shortcuts').parent().click();
+    cy.wait(3000);
+    cy.log('Navigated to Keyboard Shortcuts page');
+
+    // Step 5: Get preset values
+    cy.log('STEP 5: Get Movement Presets');
+    
+    // Navigate back to Carve to get preset values
+    cy.get('#app > div > div.h-full > div.flex img').first().click();
+    cy.wait(2000);
+    cy.contains(/^Idle$/i, { timeout: 10000 }).should('be.visible');
+    
     cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(1) input')
       .invoke('val')
       .then((xyPreset) => {
@@ -224,31 +251,67 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
             const zMove = parseFloat(zPreset);
             cy.log(`Z Preset: ${zMove} mm`);
 
+            // Navigate back to Keyboard Shortcuts for testing
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
             // Test each direction with regex patterns
-            cy.log('STEP 4: Test X+ (Right)');
+            cy.log('STEP 6: Test X+ (Right)');
             testJogDirection('X+ (right)', /X\+.*(right|→)/i, 1, +1, xyMove, zMove);
 
-            cy.log('STEP 5: Test X- (Left)');
+            // Navigate back to Keyboard Shortcuts
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
+            cy.log('STEP 7: Test X- (Left)');
             testJogDirection('X- (left)', /X-.*(left|←)/i, 1, -1, xyMove, zMove);
 
-            cy.log('STEP 6: Test Y+ (Up)');
+            // Navigate back to Keyboard Shortcuts
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
+            cy.log('STEP 8: Test Y+ (Up)');
             testJogDirection('Y+ (up)', /Y\+.*(up|↑)/i, 2, +1, xyMove, zMove);
 
-            cy.log(' STEP 7: Test Y- (Down)');
+            // Navigate back to Keyboard Shortcuts
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
+            cy.log('STEP 9: Test Y- (Down)');
             testJogDirection('Y- (down)', /Y-.*(down|↓)/i, 2, -1, xyMove, zMove);
 
-            cy.log('STEP 8: Test Z+ (Up)');
+            // Navigate back to Keyboard Shortcuts
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
+            cy.log('STEP 10: Test Z+ (Up)');
             testJogDirection('Z+ (up)', /Z\+.*(up|↑)/i, 3, +1, xyMove, zMove);
 
-            cy.log('STEP 9: Test Z- (Down)');
+            // Navigate back to Keyboard Shortcuts
+            cy.get('a:nth-of-type(3) span').contains('Tools').click();
+            cy.wait(2000);
+            cy.contains('Keyboard Shortcuts').parent().click();
+            cy.wait(3000);
+
+            cy.log('STEP 11: Test Z- (Down)');
             testJogDirection('Z- (down)', /Z-.*(down|↓)/i, 3, -1, xyMove, zMove);
 
             // Final Summary
             cy.log('TEST SUMMARY');
             cy.log('X+ (Right) - PASSED');
-            cy.log(' X- (Left) - PASSED');
+            cy.log('X- (Left) - PASSED');
             cy.log('Y+ (Up) - PASSED');
-            cy.log(' Y- (Down) - PASSED');
+            cy.log('Y- (Down) - PASSED');
             cy.log('Z+ (Up) - PASSED');
             cy.log('Z- (Down) - PASSED');
             cy.log('ALL TESTS COMPLETED');
