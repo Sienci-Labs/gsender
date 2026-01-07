@@ -7,7 +7,9 @@ exports.default = async function notarizing(context) {
         electronPlatformName,
         appOutDir
     } = context;
-    if (electronPlatformName !== 'darwin') return;
+    if (electronPlatformName !== 'darwin') {
+        return;
+    }
 
     const appName = context.packager.appInfo.productFilename;
 
