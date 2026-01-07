@@ -41,8 +41,7 @@ if [[ "$*" == *"--macos"* ]] || [[ "$*" == *"--mac"* ]] || [[ "$*" == *"-m"* ]];
     echo "  APPLE_APP_SPECIFIC_PASSWORD is set: ${APPLE_APP_SPECIFIC_PASSWORD:+yes}"
     echo "  APPLE_TEAM_ID is set: ${APPLE_TEAM_ID:+yes}"
 
-    # Use npx to run electron-builder directly from node_modules
-    USE_HARD_LINKS=false npx --no-install electron-builder "$@"
+    USE_HARD_LINKS=false yarn electron-builder -- "$@"
 else
     USE_HARD_LINKS=false yarn electron-builder -- "$@"
 fi
