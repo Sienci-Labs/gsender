@@ -6,7 +6,7 @@ on:
     branches:
       - master
       - dev
-      - chris-test
+      - features/* # all feature branches
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
