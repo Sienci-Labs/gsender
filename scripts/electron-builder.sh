@@ -34,7 +34,15 @@ yarn electron-rebuild -- \
 # Check if building for macOS
 if [[ "$*" == *"--macos"* ]] || [[ "$*" == *"--mac"* ]] || [[ "$*" == *"-m"* ]]; then
     echo "Building for macOS with code signing and notarization..."
-    cross-env USE_HARD_LINKS=false CSC_LINK="${CSC_LINK}" CSC_KEY_PASSWORD="${CSC_KEY_PASSWORD}" APPLE_ID="${APPLE_ID}" APPLE_APP_SPECIFIC_PASSWORD="${APPLE_APP_SPECIFIC_PASSWORD}" APPLE_TEAM_ID="${APPLE_TEAM_ID}" yarn electron-builder -- "$@"
+    echo "Building for macOS with code signing and notarization..."
+    # Export variables so they're available to child processes
+    export CSC_LINK="${CSC_LINK}"
+    export CSC_KEY_PASSWORD="${CSC_KEY_PASSWORD}"
+    export APPLE_ID="${APPLE_ID}"
+    export APPLE_APP_SPECIFIC_PASSWORD="${APPLE_APP_SPECIFIC_PASSWORD}"
+    export APPLE_TEAM_ID="${APPLE_TEAM_ID}"
+    export USE_HARD_LINKS=false
+    yarn electron-builder -- "$@"
 else
     cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"
 fi
