@@ -125,7 +125,6 @@
             "x64",
             "arm64"
           ]
-
         }
       ],
       "notarize": false,
@@ -138,7 +137,7 @@
     },
     "dmg": {
       "background": "electron-build/background.png",
-      "sign": false, // Specific old bug, .app is signed and notarized, not .dmg
+      "sign": false,
       "icon": "electron-build/icon.icns",
       "iconSize": 80,
       "iconTextSize": 12,
