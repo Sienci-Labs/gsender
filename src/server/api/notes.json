@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.5.7",
+    "date": "January 8th, 2026",
+    "notes": [
+      "Fixed issue with start job shortcut",
+      "Unlock button now has same logic as large Alarm unlock button for Alarm 10 and 17 where it will reset and unlock for you",
+      "Corner selection hidden for Z-only probe type",
+      "Added support for Teensy boards in recognized devices",
+      "Error line reporting mismatch fixed",
+      "Stopping on start event codes should now correctly clear the planner and reset the board.",
+      "Added cut depth validation to Surfacing tool",
+      "Added import/export functionality for gamepad profiles"
+    ]
+  },
+  {
     "version": "1.5.6",
     "date": "October 20th, 2025",
     "notes": [
@@ -37,22 +51,6 @@
       "Fixed toolchange wizard always going back to probe position before probing to allow movement for bit changes ahead of probing",
       "Fixed Config handling of Rotary forcing hard and soft limits for grbl machines",
       "UI styling tweaks, and adjustments to better accommodate smaller screens"
-    ]
-  },
-  {
-    "version": "1.5.4",
-    "date": "August 27, 2025",
-    "notes": [
-      "Fix controller not instantiating correctly in some situations for grblHAL devices.",
-      "Added some checks for soft limits on Z movements for application routines to limit alarming when outlining, probing, and tool changing.",
-      "Visualizer grid sizing more accurately matches your machine size at 2X dimensions.",
-      "Shortcut state handling adjusted for some binds to prevent them from working when they shouldn't.",
-      "Shortcut order adjusted when configuring binds.",
-      "Precise and Rapid toggle swapped in jog preset selector",
-      "Start from line modal is now correct based on the file",
-      "Copy button works on electron versions on Windows in remote mode dialog",
-      "Rotary surfacing gcode generation adjusted to fix some cases of incorrect movements",
-      "Various styling and copy adjustments."
     ]
   }
 ]
