@@ -247,7 +247,7 @@
     "connect-restreamer": "~1.0.3",
     "consolidate": "~0.15.1",
     "cookie-parser": "~1.4.4",
-    "core-js": "~3.26.1",
+    "core-js": "^3.47.0",
     "cors": "^2.8.5",
     "csv": "^6.3.3",
     "cypress-real-events": "^1.11.0",

@@ -3,14 +3,21 @@
     "version": "1.5.7",
     "date": "January 8th, 2026",
     "notes": [
-      "Fixed issue with start job shortcut",
-      "Unlock button now has same logic as large Alarm unlock button for Alarm 10 and 17 where it will reset and unlock for you",
+      "Fixed issue with start job shortcut not firing in some situations.",
+      "Unlock button now has same logic as large Alarm unlock button for Alarm 10 and 17 where it will reset and unlock for you.",
       "Corner selection hidden for Z-only probe type",
       "Added support for Teensy boards in recognized devices",
       "Error line reporting mismatch fixed",
       "Stopping on start event codes should now correctly clear the planner and reset the board.",
       "Added cut depth validation to Surfacing tool",
-      "Added import/export functionality for gamepad profiles"
+      "Auto-reconnect should work for Ethernet again.",
+      "Added import/export functionality for gamepad profiles",
+      "Homing location now shows correctly on stats page",
+      "Fixed issue with terminal history order",
+      "Added new config option to run check on a file when it's loaded in.",
+      "Fixed issue with rapid position shortcuts not memoizing positions",
+      "GRBL spindle max/min again correctly updates the eeprom on change",
+      "Config search behaviour updates to be more consistent with modified flag enabled."
     ]
   },
   {
