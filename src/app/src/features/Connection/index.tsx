@@ -133,7 +133,10 @@ function Connection(props: ConnectionProps) {
             return;
 
         // TODO: Add autoconnect for ethernet
-        if (isIPv4(port)) return;
+        if (isIPv4(port)) {
+            handleConnect(port, ConnectionType.ETHERNET);
+            return;
+        }
 
         handleConnect(port, ConnectionType.USB);
     }
