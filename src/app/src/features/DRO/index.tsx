@@ -461,9 +461,9 @@ function DRO({
                 {isConnected && homingEnabled && (
                     <RapidPositionButtons disabled={!canClick} />
                 )}
-                {isConnected && homingEnabled && (
-                    <Parking disabled={!canClick} />
-                )}
+
+                <Parking disabled={!canClick} isConnected={isConnected} homingEnabled={homingEnabled}/>
+
             </div>
             <div className="w-full flex flex-row justify-between px-3">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>

@@ -22,7 +22,7 @@ function goToParkLocation() {
     controller.command('gcode', code);
 }
 
-export function Parking({ disabled = false }) {
+export function Parking({ disabled = false, isConnected = false, homingEnabled = false }) {
     const shuttleControlEvents = {
         HOMING_PARK: {
             title: 'Park ',
@@ -44,6 +44,10 @@ export function Parking({ disabled = false }) {
     useEffect(() => {
         useKeybinding(shuttleControlEvents);
     }, []);
+
+    if (!isConnected || !homingEnabled) {
+        return null;
+    }
 
     return (
         <Tooltip content="Go to Park Location">
