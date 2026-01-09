@@ -1,0 +1,121 @@
+[
+  {
+    "label": "After Homing & Zero",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:02:19.888Z"
+  },
+  {
+    "label": "After Movement to (300, 100, -50)",
+    "x": 300,
+    "y": 100,
+    "z": -50,
+    "timestamp": "2026-01-09T21:02:30.557Z"
+  },
+  {
+    "label": "After Zero at New Location",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:02:35.189Z"
+  },
+  {
+    "label": "Before Outline Operation",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:02:48.465Z"
+  },
+  {
+    "label": "Outline Start",
+    "x": 54.56,
+    "y": 43.96,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:50.645Z"
+  },
+  {
+    "label": "During Outline - 1s",
+    "x": 122.04,
+    "y": 51.66,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:51.716Z"
+  },
+  {
+    "label": "During Outline - 2s",
+    "x": 189.62,
+    "y": 52.81,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:52.766Z"
+  },
+  {
+    "label": "During Outline - 3s",
+    "x": 221.69,
+    "y": 18.02,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:53.818Z"
+  },
+  {
+    "label": "During Outline - 4s",
+    "x": 156.81,
+    "y": 12.1,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:54.885Z"
+  },
+  {
+    "label": "During Outline - 5s",
+    "x": 72.23,
+    "y": 4.57,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:55.928Z"
+  },
+  {
+    "label": "During Outline - 6s",
+    "x": 3.98,
+    "y": 0.25,
+    "z": 5,
+    "timestamp": "2026-01-09T21:02:56.981Z"
+  },
+  {
+    "label": "During Outline - 7s",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:02:58.047Z"
+  },
+  {
+    "label": "During Outline - 8s",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:02:59.097Z"
+  },
+  {
+    "label": "During Outline - 9s",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:03:00.157Z"
+  },
+  {
+    "label": "During Outline - 10s",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:03:01.203Z"
+  },
+  {
+    "label": "After Outline Complete",
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "timestamp": "2026-01-09T21:03:03.289Z"
+  },
+  {
+    "label": "Final - After Homing",
+    "x": -300,
+    "y": -100,
+    "z": 50,
+    "timestamp": "2026-01-09T21:03:22.728Z"
+  }
+]

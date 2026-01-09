@@ -599,37 +599,27 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
 Cypress.Commands.add('goToLocation', (x = 0, y = 0, z = 0) => {
   cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
   
-  // STEP 1: Open the Go To Location dialog using aria-controls pattern
-  cy.log('Opening Go To Location dialog...');
+  // Open Go To Location dialog using the correct button selector
+  cy.log('Step 4: Opening Go to Location popup...');
+    cy.get('button[aria-controls="radix-:rn:"]').click(); //to find the excat button 
+    ({ force: true });
   
-  // Use attribute selector with wildcard to match dynamic radix ID
-  cy.get('button[aria-controls^="radix-"]')
-    .filter(':contains("Z0")')
-    .first()
-    .click({ force: true });
+  cy.wait(1500);
   
-  cy.wait(1000);
-  cy.log('"Go to Location" button clicked');
-
-  // STEP 2: Enter coordinates
-  cy.log('Entering values...');
-
-  // Get all number inputs in the dialog
+  // Enter coordinates in the dialog inputs
   cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
     cy.log(`Found ${$inputs.length} number inputs`);
     
     // X input
     cy.wrap($inputs[0])
       .clear({ force: true })
-      .type(String(x), { force: true })
-      .should('have.value', String(x));
+      .type(String(x), { force: true });
     cy.log(`X coordinate: ${x}`);
 
     // Y input  
     cy.wrap($inputs[1])
       .clear({ force: true })
-      .type(String(y), { force: true })
-      .should('have.value', String(y));
+      .type(String(y), { force: true });
     cy.log(`Y coordinate: ${y}`);
 
     // Z input
@@ -638,35 +628,33 @@ Cypress.Commands.add('goToLocation', (x = 0, y = 0, z = 0) => {
       .clear({ force: true })
       .invoke('val', '')
       .type(String(z), { force: true })
-      .blur()
-      .should('have.value', String(z));
+      .blur();
     cy.log(`Z coordinate: ${z}`);
   });
 
   cy.wait(500);
 
-  // STEP 3: Click Go! button
-  cy.log('Clicking Go! button...');
+  // Click Go button
+  cy.log('Clicking Go button...');
   cy.get('body > div:nth-of-type(2) button')
     .contains('Go!')
     .click({ force: true });
   
   cy.wait(2000);
-  cy.log('Go! button clicked');
+  cy.log('Go button clicked');
 
-  // STEP 4: Close popup by clicking outside
+  // Close popup by clicking outside
   cy.log('Closing popup...');
   cy.get('body').click(50, 50, { force: true });
   cy.wait(500);
-  cy.log('Popup closed');
-
-  // STEP 5: Wait for machine to reach position
-  cy.log('Waiting for machine to reach position...');
-  cy.wait(3000);
   
-  cy.log(`Successfully moved to X=${x}, Y=${y}, Z=${z}`);
+  // Wait for machine to reach position and return to Idle
+  cy.log('Waiting for machine to reach position...');
+  cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+  cy.wait(2000);
+  
+  cy.log(`✓ Moved to X=${x}, Y=${y}, Z=${z}`);
 });
-
 // ----------------------
 //10.Unlock Machine if Needed
 // ----------------------

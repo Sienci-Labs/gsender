@@ -12,8 +12,7 @@ describe('CNC Machine - Complete Z and XYZ Axis Probing', () => {
     
     cy.log('═══════════════════════════════════════');
     cy.log('PART 1: PROBE CONFIGURATION');
-    cy.log('═══════════════════════════════════════');
-    
+
     // Step 1: Visit and connect
   cy.log('Step 1: Loading application...');
 cy.loadUI('http://localhost:8000/#/');

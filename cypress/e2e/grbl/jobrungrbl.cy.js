@@ -1,4 +1,4 @@
-describe('CNC Machine Tests Grbl', () => {
+describe('CNC Machine Tests job run Grbl', () => {
 
   // Ignore known hydration-related UI errors and undefined.get() error
   Cypress.on('uncaught:exception', (err) => {
