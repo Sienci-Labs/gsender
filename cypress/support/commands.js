@@ -23,6 +23,8 @@
 //20.Homing enabling and perform homing
 //21.Axis Homing Z< Y & X 
 //22.Go to URLS 
+//23. Checking probing pin is active
+//24.Jogging every axes  
 // ***********************************************
 
 
@@ -594,28 +596,75 @@ Cypress.Commands.add('goToLocation', (options = {}) => {
 // ----------------------
 //9.Go to location grblHal
 // ----------------------
-Cypress.Commands.add('grblHalGoToLocation', (x = 0, y = 0, z = 0) => {
-  cy.log('Opening Go to Location popup...');
-  cy.get('svg path[d*="M498.1 5.6c10.1 7"]').parent().click({ force: true });
-
+Cypress.Commands.add('goToLocation', (x = 0, y = 0, z = 0) => {
+  cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
+  
+  // STEP 1: Open the Go To Location dialog using aria-controls pattern
+  cy.log('Opening Go To Location dialog...');
+  
+  // Use attribute selector with wildcard to match dynamic radix ID
+  cy.get('button[aria-controls^="radix-"]')
+    .filter(':contains("Z0")')
+    .first()
+    .click({ force: true });
+  
   cy.wait(1000);
-  cy.log('"Go to Location" popup opened');
+  cy.log('"Go to Location" button clicked');
 
+  // STEP 2: Enter coordinates
+  cy.log('Entering values...');
+
+  // Get all number inputs in the dialog
   cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
-    cy.wrap($inputs[0]).clear({ force: true }).type(String(x), { force: true }).should('have.value', String(x));
-    cy.wrap($inputs[1]).clear({ force: true }).type(String(y), { force: true }).should('have.value', String(y));
-    cy.wrap($inputs[2]).focus().clear({ force: true }).invoke('val', '').type(String(z), { force: true }).blur().should('have.value', String(z));
+    cy.log(`Found ${$inputs.length} number inputs`);
+    
+    // X input
+    cy.wrap($inputs[0])
+      .clear({ force: true })
+      .type(String(x), { force: true })
+      .should('have.value', String(x));
+    cy.log(`X coordinate: ${x}`);
+
+    // Y input  
+    cy.wrap($inputs[1])
+      .clear({ force: true })
+      .type(String(y), { force: true })
+      .should('have.value', String(y));
+    cy.log(`Y coordinate: ${y}`);
+
+    // Z input
+    cy.wrap($inputs[2])
+      .focus()
+      .clear({ force: true })
+      .invoke('val', '')
+      .type(String(z), { force: true })
+      .blur()
+      .should('have.value', String(z));
+    cy.log(`Z coordinate: ${z}`);
   });
 
   cy.wait(500);
 
+  // STEP 3: Click Go! button
+  cy.log('Clicking Go! button...');
   cy.get('body > div:nth-of-type(2) button')
     .contains('Go!')
     .click({ force: true });
-
+  
   cy.wait(2000);
+  cy.log('Go! button clicked');
+
+  // STEP 4: Close popup by clicking outside
+  cy.log('Closing popup...');
   cy.get('body').click(50, 50, { force: true });
   cy.wait(500);
+  cy.log('Popup closed');
+
+  // STEP 5: Wait for machine to reach position
+  cy.log('Waiting for machine to reach position...');
+  cy.wait(3000);
+  
+  cy.log(`Successfully moved to X=${x}, Y=${y}, Z=${z}`);
 });
 
 // ----------------------
@@ -802,162 +851,163 @@ Cypress.Commands.add('verifyAxes', (expectedX = 0, expectedY = 0, expectedZ = 0)
 
 });
 
-// Delete all macro files
-// Custom command to delete all macros (MORE ROBUST)
-Cypress.Commands.add('deleteAllMacros', () => {
-  cy.log('=== DELETE ALL MACROS - Custom Command ===');
-  
-  function deleteNextMacro() {
-    cy.get('body').then($body => {
-      const macros = $body.find('div.flex-grow span');
-      
-      if (macros.length === 0) {
-        cy.log('✅ All macros have been deleted');
-        return;
+//23. Checking probing pin is active
+Cypress.Commands.add('checkProbingIsActive', (options = {}) => {
+  const {
+    maxAttempts = 30,
+    waitTime = 1000,
+  } = options;
+
+  cy.log(' Checking if Probe/TLS is active (green)...');
+
+  const checkGreen = () => {
+    return cy.get('body').then(($body) => {
+      const $probeTLS = $body.find('div.text-gray-500:contains("Probe/TLS")');
+      if ($probeTLS.length === 0) {
+        return false;
       }
-      
-      const macroName = macros.first().text().trim();
-      cy.log(`🗑️ Deleting: "${macroName}" | Remaining: ${macros.length}`);
-      
-      // Find and click the three-dot menu
-      cy.get('div.flex-grow span')
-        .first()
-        .closest('div[class*="flex"]')
-        .find('button')
-        .last()
-        .click({ force: true });
-      
-      cy.wait(2000);  // Give menu time to appear
-      
-      // Try multiple strategies to find Delete option
-      cy.get('body').then($menuBody => {
-        // Strategy 1: Look for span with Delete text
-        if ($menuBody.find('span:contains("Delete")').length > 0) {
-          cy.log('Found Delete in span');
-          cy.contains('span', 'Delete')
-            .first()
-            .click({ force: true });
-        }
-        // Strategy 2: Look for div with Delete text
-        else if ($menuBody.find('div:contains("Delete")').length > 0) {
-          cy.log('Found Delete in div');
-          cy.contains('div', 'Delete')
-            .first()
-            .click({ force: true });
-        }
-        // Strategy 3: Look for menu item role
-        else if ($menuBody.find('[role="menuitem"]').length > 0) {
-          cy.log('Found menuitem role');
-          cy.get('[role="menuitem"]')
-            .contains(/Delete/i)
-            .click({ force: true });
-        }
-        // Strategy 4: Just find any element with Delete
-        else {
-          cy.log('Using fallback - any element with Delete');
-          cy.contains(/Delete/i)
-            .first()
-            .click({ force: true });
-        }
-      });
-      
-      cy.wait(2000);
-      
-      // Confirm deletion in dialog - try multiple approaches
-      cy.get('body').then($dialogBody => {
-        // Look for button with Delete text that's visible
-        const deleteButtons = $dialogBody.find('button:visible:contains("Delete")');
-        
-        if (deleteButtons.length > 0) {
-          cy.log(`Found ${deleteButtons.length} Delete button(s) in dialog`);
-          cy.get('button:visible')
-            .contains(/Delete/i)
-            .click({ force: true });
-        } else {
-          // Fallback: find any button with blue background (typical confirm button)
-          cy.log('Using fallback for confirm button');
-          cy.get('button.bg-blue-500, button[class*="blue"]')
-            .contains(/Delete/i)
-            .click({ force: true });
-        }
-      });
-      
-      cy.wait(3000);  // Wait for deletion to complete
-      
-      // Recursively delete next macro
-      deleteNextMacro();
+
+      const $parent = $probeTLS.closest('.relative');
+      return $parent.find('.bg-green-500').length > 0;
     });
-  }
-  
-  // Start the deletion process
-  deleteNextMacro();
+  };
+
+  const clickZMinusUntilGreen = (attempt = 1) => {
+    if (attempt > maxAttempts) {
+      throw new Error(` Probe/TLS did not turn green after ${maxAttempts} attempts`);
+    }
+
+    cy.log(` Attempt ${attempt}/${maxAttempts}: Clicking Z-`);
+
+    cy.get(
+      'path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]'
+    )
+      .should('exist')
+      .click({ force: true });
+
+    cy.wait(waitTime);
+
+    checkGreen().then((isGreen) => {
+      if (isGreen) {
+        cy.log(' Probe/TLS is GREEN');
+      } else {
+        cy.log(' Probe/TLS not active yet, retrying...');
+        clickZMinusUntilGreen(attempt + 1);
+      }
+    });
+  };
+
+  // Start the process
+  clickZMinusUntilGreen();
+
+  // Final assertion (safety check)
+  cy.contains('div.text-gray-500', 'Probe/TLS')
+    .should('be.visible')
+    .closest('.relative')
+    .find('.bg-green-500')
+    .should('exist');
+
+  cy.log(' Probing is ACTIVE and verified');
 });
 
-// Alternative: More defensive version with error handling
-Cypress.Commands.add('deleteAllMacrosSafe', () => {
-  cy.log('=== DELETE ALL MACROS (SAFE MODE) - Custom Command ===');
-  
-  function deleteNextMacroSafe() {
-    cy.get('body').then($body => {
-      const macros = $body.find('div.flex-grow span');
-      
-      if (macros.length === 0) {
-        cy.log(' All macros have been deleted');
-        return;
-      }
-      
-      const macroName = macros.first().text().trim();
-      cy.log(`Attempting to delete: "${macroName}" | Remaining: ${macros.length}`);
-      
-      // Click three-dot menu
-      cy.get('div.flex-grow span')
-        .first()
-        .closest('div[class*="flex"]')
-        .find('button')
-        .last()
-        .click({ force: true });
-      
-      cy.wait(2000);
-      
-      // Wait for menu to appear and click Delete
-      cy.get('body').then($menu => {
-        const menuText = $menu.text();
-        cy.log(`Menu content: ${menuText.substring(0, 100)}...`);
-        
-        // Find and click Delete - very lenient
-        cy.get('body')
-          .find('*')
-          .filter((index, el) => {
-            const text = el.textContent.trim();
-            return text === 'Delete' || text.toLowerCase() === 'delete';
-          })
-          .filter(':visible')
-          .first()
-          .click({ force: true });
-      });
-      
-      cy.wait(2000);
-      
-      // Confirm deletion
-      cy.get('button')
-        .filter(':visible')
-        .filter((index, el) => {
-          const text = el.textContent;
-          return /delete/i.test(text);
-        })
-        .first()
-        .click({ force: true });
-      
-      cy.wait(3000);
-      
-      // Recursively delete next
-      deleteNextMacroSafe();
-    });
+// 24.Jogging every axes 
+// -------- X axis jogging --------
+Cypress.Commands.add('jogXPlusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X+ ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xPlus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X+ jog ${i}/${times} completed`);
   }
-  
-  deleteNextMacroSafe();
 });
 
+Cypress.Commands.add('jogXMinusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X- ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xMinus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X- jog ${i}/${times} completed`);
+  }
+});
+
+// -------- Y axis jogging --------
+Cypress.Commands.add('jogYPlusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging Y+ ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#yPlus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ Y+ jog ${i}/${times} completed`);
+  }
+});
+
+Cypress.Commands.add('jogYMinusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging Y- ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#yMinus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ Y- jog ${i}/${times} completed`);
+  }
+});
+
+// -------- Z axis jogging --------
+Cypress.Commands.add('jogZPlusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging Z+ ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ Z+ jog ${i}/${times} completed`);
+  }
+});
+
+Cypress.Commands.add('jogZMinusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging Z- ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ Z- jog ${i}/${times} completed`);
+  }
+});
+
+// -------- XY combined jogging --------
+Cypress.Commands.add('jogXYPlusPlusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X+Y+ ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xPlusYPlus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X+Y+ jog ${i}/${times} completed`);
+  }
+});
+
+Cypress.Commands.add('jogXYPlusMinusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X+Y- ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xPlusYMinus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X+Y- jog ${i}/${times} completed`);
+  }
+});
+
+Cypress.Commands.add('jogXYMinusMinusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X-Y- ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xMinusYMinus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X-Y- jog ${i}/${times} completed`);
+  }
+});
+
+Cypress.Commands.add('jogXYMinusPlusTimes', (times = 1, waitTime = 2000) => {
+  cy.log(`Jogging X-Y+ ${times} time(s)...`);
+  for (let i = 1; i <= times; i++) {
+    cy.get('path#xMinusYPlus').should('exist').click({ force: true });
+    cy.wait(waitTime);
+    cy.log(`✓ X-Y+ jog ${i}/${times} completed`);
+  }
+});
 
 
 

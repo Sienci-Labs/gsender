@@ -68,7 +68,7 @@ describe('Job run in grblHal', () => {
 
     // Step 4: Go to specific location to zero axis THESE VALUES CAN VARU ACCORDING TO FILE AND MACHINE 
     cy.log('Step 4: Moving to position (60,-200,-15)...');
-    cy.grblHalGoToLocation(300,100, -50);
+    cy.goToLocation(300,100, -50);
 
     cy.log('Machine is in 300,100,-50 location');
 
