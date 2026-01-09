@@ -28,7 +28,7 @@ import {
 } from 'app/constants';
 import mapValues from 'lodash/mapValues';
 import { mapPositionToUnits } from 'app/lib/units.ts';
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
@@ -96,6 +96,20 @@ function DRO({
         get(state, 'controller.settings.settings.$27', 1),
     );
 
+
+    // Shortcut refs
+    const homingFlagRef = useRef(homingFlag);
+    const homingDirectionRef = useRef(homingDirection);
+    const pullOffRef = useRef(pullOff);
+
+    useEffect(() => {
+        homingFlagRef.current = homingFlag;
+        homingDirectionRef.current = homingDirection;
+        pullOffRef.current = pullOff;
+    }, [homingFlag, homingDirection, pullOff]);
+
+
+
     useEffect(() => {
         setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
         store.on('change', () => {
@@ -105,7 +119,17 @@ function DRO({
         });
     }, []);
 
-    function jogToCorner(
+    const jogToCorner = useCallback((corner: string) => {
+        const gcode = getMovementGCode(
+            corner,
+            homingDirectionRef.current,
+            homingFlagRef.current,
+            Number(pullOffRef.current),
+        );
+        controller.command('gcode', gcode);
+    }, []);
+
+    /*function jogToCorner(
         corner: string,
         homingDir?: string,
         homingFl?: boolean,
@@ -122,7 +146,7 @@ function DRO({
             Number(currentPullOff),
         );
         controller.command('gcode', gcode);
-    }
+    }*/
 
     function toggleHoming() {
         setHomingMode((prev) => !prev);
@@ -330,21 +354,8 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                const homingDir = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$23',
-                    '0',
-                );
-                const homingFl = get(
-                    reduxStore.getState(),
-                    'controller.homingFlag',
-                );
-                const pullO = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$27',
-                    1,
-                );
-                jogToCorner(BACK_LEFT, homingDir, homingFl, pullO);
+                jogToCorner(BACK_LEFT);
+
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
@@ -359,21 +370,7 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                const homingDir = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$23',
-                    '0',
-                );
-                const homingFl = get(
-                    reduxStore.getState(),
-                    'controller.homingFlag',
-                );
-                const pullO = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$27',
-                    1,
-                );
-                jogToCorner(BACK_RIGHT, homingDir, homingFl, pullO);
+                jogToCorner(BACK_RIGHT);
             },
         },
         HOMING_GO_TO_FRONT_LEFT_CORNER: {
@@ -388,21 +385,7 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                const homingDir = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$23',
-                    '0',
-                );
-                const homingFl = get(
-                    reduxStore.getState(),
-                    'controller.homingFlag',
-                );
-                const pullO = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$27',
-                    1,
-                );
-                jogToCorner(FRONT_LEFT, homingDir, homingFl, pullO);
+                jogToCorner(FRONT_LEFT);
             },
         },
         HOMING_GO_TO_FRONT_RIGHT_CORNER: {
@@ -417,21 +400,7 @@ function DRO({
                 if (!canRunShortcut(true)) {
                     return;
                 }
-                const homingDir = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$23',
-                    '0',
-                );
-                const homingFl = get(
-                    reduxStore.getState(),
-                    'controller.homingFlag',
-                );
-                const pullO = get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$27',
-                    1,
-                );
-                jogToCorner(FRONT_RIGHT, homingDir, homingFl, pullO);
+                jogToCorner(FRONT_RIGHT);
             },
         },
     };
