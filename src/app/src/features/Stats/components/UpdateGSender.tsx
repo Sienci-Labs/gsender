@@ -22,7 +22,7 @@ export function UpdateGSender({
             window.ipcRenderer.on(
                 'update_download_progress',
                 (t, percentage) => {
-                    setDownloadPercent(percentage);
+                    setDownloadPercent(Number(Number(percentage).toFixed(0)));
                 },
             );
         }
