@@ -122,7 +122,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
     } = state;
 
     const { touchplateType } = touchplate;
-    console.log(touchplateType);
+
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     return (

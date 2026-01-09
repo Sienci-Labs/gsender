@@ -21,7 +21,7 @@
  *
  */
 
-import { useEffect, useState } from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {
     Dialog,
@@ -47,6 +47,13 @@ interface RunProbeProps {
 }
 
 const RunProbe = ({ actions, state }: RunProbeProps) => {
+    const actionsRef = useRef(actions);
+
+    useEffect(() => {
+        actionsRef.current = actions;
+    }, [actions]);
+
+
     const {
         connectionMade,
         connectionMadeRef,
@@ -116,14 +123,15 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         useKeybinding(shuttleControlEvents);
     }, []);
 
-    const startProbe = (): void => {
-        const probeCommands = actions.generateProbeCommands();
-        // console.log(probeCommands);
+    const startProbe = useCallback((): void => {
+        const probeCommands = actionsRef.current.generateProbeCommands();
+        console.log(probeCommands);
 
-        actions.runProbeCommands(probeCommands);
+        actionsRef.current.runProbeCommands(probeCommands);
         toast.info('Initiated probing cycle', { position: 'bottom-right' });
-        actions.onOpenChange(false);
-    };
+        actionsRef.current.onOpenChange(false);
+    }, []);
+
 
     useEffect(() => {
         return () => {
