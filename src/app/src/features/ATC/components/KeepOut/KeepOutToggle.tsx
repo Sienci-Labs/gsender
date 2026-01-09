@@ -24,9 +24,9 @@ export function KeepoutToggle() {
         const newEnabled = !isEnabled;
 
         if (newEnabled) {
-            controller.command('gcode', ['M810 P1']);
+            controller.command('gcode', ['M960 P1']);
         } else {
-            controller.command('gcode', ['M810 P0']);
+            controller.command('gcode', ['M960 P0']);
         }
     };
 
