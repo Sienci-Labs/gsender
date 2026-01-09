@@ -114,6 +114,7 @@ You can both run gSender locally using the public code-base as well as compile i
 
 ### 1.5.7 (January 8th, 2026)
 - Fixed issue with start job shortcut not firing in some situations.
+- Park shortcut now persists between sessions.
 - Unlock button now has same logic as large Alarm unlock button for Alarm 10 and 17 where it will reset and unlock for you.
 - Corner selection hidden for Z-only probe type
 - Added support for Teensy boards in recognized devices

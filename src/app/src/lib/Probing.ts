@@ -72,7 +72,6 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
     if (plateType === TOUCHPLATE_TYPE_ZERO) {
         zThickness = zThicknesses.zProbe;
     } else if (plateType === TOUCHPLATE_TYPE_3D) {
-        console.log(zThicknesses.probe3D);
         zThickness = zThicknesses.probe3D;
     }
 
@@ -165,9 +164,6 @@ const updateOptionsForDirection = (
     );
     options.yThickness = toolCompensatedXY * yProbeDir;
     options.xThickness = toolCompensatedXY * xProbeDir;
-
-    // Figure out movement distances for getting bit into position
-    console.log('diameter', diameter);
 
     //Via Chris - xyMovement should be xyThickness + retraction distance + tool Radius
     let xyMovement =

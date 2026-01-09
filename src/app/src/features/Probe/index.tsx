@@ -487,7 +487,7 @@ const ProbeWidget = () => {
         };
 
         const code = getProbeCode(options, direction);
-        code.push(distance + '\n');
+        code.push(distance);
 
         return code;
     };

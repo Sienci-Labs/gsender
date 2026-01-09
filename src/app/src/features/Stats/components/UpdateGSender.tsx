@@ -31,7 +31,6 @@ export function UpdateGSender({
     useEffect(() => {
         setVersion(notes.version);
         setReleaseDate(notes.releaseDate);
-        console.log(notes);
         setReleaseNotes(notes.releaseNotes);
     }, [notes]);
 

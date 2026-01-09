@@ -17,7 +17,6 @@ export function getZTravels() {
 
     const zMaxTravel = Math.abs(Number(get(settings, 'settings.$132', 0)));
     const zMpos = Math.abs(Number(get(mpos, 'z', 0)));
-    console.log(zMaxTravel, zMpos, zMaxTravel - zMpos - OFFSET);
     return [zMpos - OFFSET, zMaxTravel - zMpos - OFFSET];
 }
 

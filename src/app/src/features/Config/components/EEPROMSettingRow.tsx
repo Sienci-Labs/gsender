@@ -1,4 +1,3 @@
-import { gSenderEEPROMSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
