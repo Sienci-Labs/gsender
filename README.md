@@ -117,6 +117,7 @@ You can both run gSender locally using the public code-base as well as compile i
 - Park shortcut now persists between sessions.
 - Unlock button now has same logic as large Alarm unlock button for Alarm 10 and 17 where it will reset and unlock for you.
 - Corner selection hidden for Z-only probe type
+- Squaring tool calculations for custom distances are now correct.
 - Added support for Teensy boards in recognized devices
 - Error line reporting mismatch fixed
 - Stopping on start event codes should now correctly clear the planner and reset the board.
@@ -129,6 +130,8 @@ You can both run gSender locally using the public code-base as well as compile i
 - Fixed issue with rapid position shortcuts not memoizing positions
 - GRBL spindle max/min again correctly updates the eeprom on change
 - Config search behaviour updates to be more consistent with modified flag enabled.
+- Probe shortcut no longer causes an error 2 due to stale distance modal.
+- Rapid position shortcut no longer has a stale homing location value
 
 ### 1.5.6 (October 20th, 2025)
 - Fixed issue with surfacing tool inputs not using latest input values when generating gcode
