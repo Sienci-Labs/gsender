@@ -143,8 +143,8 @@ const ResultsStep = () => {
                             Results
                         </h3>
                         {renderResult()}
-                    </div> 
-                    
+                    </div>
+
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-white">
                             Measured Dimensions
@@ -244,9 +244,11 @@ const ResultsStep = () => {
                                                 </AlertDialogTitle>
                                                 <div className="space-y-4">
                                                     <p>
-                                                        This will update the X-axis ($100) and
-                                                        Y-axis ($101) step/mm values in your
-                                                        CNC firmware to the new ones below:
+                                                        This will update the
+                                                        X-axis ($100) and Y-axis
+                                                        ($101) step/mm values in
+                                                        your CNC firmware to the
+                                                        new ones below:
                                                     </p>
                                                     <p>
                                                         X-axis:{' '}
