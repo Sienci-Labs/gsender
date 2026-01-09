@@ -11,7 +11,6 @@ export const fetch = (req, res) => {
 
 export const replace = (req, res) => {
     const prefs = req.body;
-    log.error('**********************************hi');
 
     try {
         config.set(CONFIG_KEY, prefs);

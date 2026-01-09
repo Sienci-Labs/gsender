@@ -63,13 +63,6 @@ const getConfig = (): string => {
         content = JSON.stringify(normalizeState({}));
     }
 
-    // if (!window.location.href.includes('192.168.'))
-    //     // save preferences to api so that remote window can fetch it
-    //     // if the there are no prefs, its the remote window, so dont save it
-    //     console.log(JSON.parse(content));
-    //     api.preferences.replace(JSON.parse(content));
-    // }
-
     return content;
 };
 

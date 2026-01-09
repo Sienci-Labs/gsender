@@ -18,7 +18,7 @@ export const TopBar = ({ isRemoteWindow }: Props) => {
             // wait a second for the initial store loading to be processed
             setTimeout(() => {
                 store.syncPrefs();
-            }, 1000);
+            }, 500);
         }
     }, []);
     return (
