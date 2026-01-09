@@ -125,7 +125,6 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
     const startProbe = useCallback((): void => {
         const probeCommands = actionsRef.current.generateProbeCommands();
-        console.log(probeCommands);
 
         actionsRef.current.runProbeCommands(probeCommands);
         toast.info('Initiated probing cycle', { position: 'bottom-right' });

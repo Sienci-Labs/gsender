@@ -7,7 +7,6 @@ import _get from 'lodash/get';
 export function VisualizerPlaceholder() {
     useEffect(() => {
         const token = pubsub.subscribe('file:load', (msg, data) => {
-            console.log('i need to be here');
             const showWarningsOnLoad = store.get(
                 'widgets.visualizer.showWarning',
                 false,

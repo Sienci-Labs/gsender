@@ -245,7 +245,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 detectedEEPROMGroups,
             ),
         );
-        console.log(EEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {
