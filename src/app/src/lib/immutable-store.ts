@@ -97,7 +97,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
         if (cb) {
             cb();
         }
-        this.emit('change');
+        this.emit('change', this.state);
     }
 
     clear(): T {

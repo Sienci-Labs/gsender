@@ -16,7 +16,7 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
 import api from 'app/api';
-import config from '../../../server/services/configstore';
+import pubsub from 'pubsub-js';
 
 interface UserData {
     path: string;
@@ -93,7 +93,6 @@ const persist = (data: StoreData): void => {
             fs.writeFileSync(userData!.path, value);
 
             // save preferences to api so that remote window can fetch it
-            console.log(persistData);
             api.preferences.replace(persistData);
         } else {
             localStorage.setItem('sienci', value);
@@ -667,9 +666,14 @@ const migrateStore = (): void => {
 const syncPrefs = async () => {
     try {
         const config = await api.preferences.fetch();
-        console.log(config);
         if (config) {
-            store.persist(config.data);
+            store.restoreState(config.data.state, () => {
+                setTimeout(() => {
+                    pubsub.publish('repopulate');
+                }, 50);
+            });
+            // force UI to update with the changes
+            pubsub.publish('config:saved', config.data.state);
         }
     } catch (err) {
         log.error(err);
@@ -679,17 +683,6 @@ const syncPrefs = async () => {
 try {
     // saveBackup();
     migrateStore();
-} catch (err) {
-    log.error(err);
-}
-
-try {
-    // sync prefs if remote window
-    if (!isElectron()) {
-        config.on('change', (data) => {
-            store.persist(data.preferences);
-        });
-    }
 } catch (err) {
     log.error(err);
 }
