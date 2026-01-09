@@ -401,6 +401,10 @@ const appMain = () => {
 
         // Release Notes
         app.get(urljoin(settings.route, 'api/releasenotes'), api.releaseNotes.fetchReleaseNotes);
+
+        // Preferences
+        app.get(urljoin(settings.route, 'api/preferences'), api.preferences.fetch);
+        app.put(urljoin(settings.route, 'api/preferences'), api.preferences.replace);
     }
 
     // app.get(urljoin(settings.route, '/'), async (req, res) => {

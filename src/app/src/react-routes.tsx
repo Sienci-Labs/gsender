@@ -247,7 +247,7 @@ export const ReactRoutes = () => {
                 path="remote"
                 element={
                     <div className="flex flex-col gap-2">
-                        <TopBar />
+                        <TopBar isRemoteWindow={true} />
                         <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
