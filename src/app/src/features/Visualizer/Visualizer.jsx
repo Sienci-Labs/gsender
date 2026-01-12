@@ -2158,7 +2158,15 @@ class Visualizer extends Component {
             return;
         }
 
-        this.visualizer.group.rotateX(radians);
+        // Always animate to the absolute rotation value
+        // This ensures the visual stays in sync with the actual axis position
+        gsap.to(this.visualizer.group.rotation, {
+            x: radians,
+            duration: 0.25,
+            ease: 'power1.inOut',
+            overwrite: true,
+            onUpdate: () => this.updateScene({ forceUpdate: true }),
+        });
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -2181,7 +2189,7 @@ class Visualizer extends Component {
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
 
-        const valueHasChanged = prevValue === currValue;
+        const valueHasChanged = prevValue !== currValue;
 
         if (!isRotaryFile) {
             return;
@@ -2202,9 +2210,11 @@ class Visualizer extends Component {
          *  - Controller is GRBLHal
          *  - A-axis value has changed since previous value
          */
+
         if (grblCondition || grblHalCondition) {
-            const axisDifference = currValue - prevValue;
-            this.rotateGcodeModal(axisDifference);
+            // Always use the absolute current axis value for rotation
+            // This keeps the visual model in perfect sync with the machine position
+            this.rotateGcodeModal(currValue);
         }
     }
 
