@@ -9,6 +9,7 @@ import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/compon
 import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx';
 import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx';
 import { Jogging } from 'app/features/Jogging';
+import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -59,6 +60,17 @@ export function useSienciATCWizard(): Wizard {
                                     content:
                                         'View our online resources for a full list of settings changes.',
                                     url: 'https://example.com/docs',
+                                },
+                            ],
+                        },
+                        {
+                            id: 'restart-rehome',
+                            title: 'Restart and Rehome',
+                            component: RestartAndRehome,
+                            secondaryContent: [
+                                {
+                                    type: 'image',
+                                    content: PlaceholderImage,
                                 },
                             ],
                         },
