@@ -676,6 +676,13 @@ const syncPrefs = async () => {
 try {
     // saveBackup();
     migrateStore();
+
+    if (isElectron()) {
+        window.ipcRenderer.send(
+            'assignPromptExit',
+            store.get('workspace.promptExit'),
+        );
+    }
 } catch (err) {
     log.error(err);
 }

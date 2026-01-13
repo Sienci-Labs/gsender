@@ -67,6 +67,7 @@ import {
     TOASTER_LONG,
     TOASTER_UNTIL_CLOSE,
 } from 'app/lib/toaster/ToasterLib';
+import isElectron from 'is-electron';
 
 export interface SettingsMenuSection {
     label: string;
@@ -233,6 +234,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             "Allow g-code 'job finishing' commands like M2 and M30 to reset your CNC's workspace back to G54 at the end of each job.",
                         options: OUTLINE_MODES,
+                    },
+                    {
+                        label: 'Prompt on exit',
+                        key: 'workspace.promptExit',
+                        type: 'boolean',
+                        description:
+                            'Pop up a confirmation window when exiting the program.',
+                        onEnable: () => {
+                            if (isElectron()) {
+                                window.ipcRenderer.send(
+                                    'assignPromptExit',
+                                    true,
+                                );
+                            }
+                        },
+                        onDisable: () => {
+                            if (isElectron()) {
+                                window.ipcRenderer.send(
+                                    'assignPromptExit',
+                                    false,
+                                );
+                            }
+                        },
                     },
                     {
                         label: 'Send usage data',
