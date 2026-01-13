@@ -53,7 +53,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
                 disabled={canRestart}
             />
 
-            <p>AND</p>
+            <p className="font-bold">AND</p>
 
             <StepActionButton
                 label={'Re-home'}
