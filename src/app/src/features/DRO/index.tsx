@@ -456,7 +456,7 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge isRemote={isRemote} />
-            <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
+            <div className="w-full min-h-10 portrait:min-h-20 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
                 {isConnected && homingEnabled && (
                     <RapidPositionButtons disabled={!canClick} />
