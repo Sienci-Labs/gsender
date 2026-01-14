@@ -36,7 +36,7 @@ export function AJog({
     )();
 
     return (
-        <div id="aJog" className="relative">
+        <div id="aJog" className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]">
             <TabJog
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}
@@ -45,7 +45,7 @@ export function AJog({
             <img
                 src={aLabels}
                 alt="a Labels tab"
-                className="absolute top-1 right-1 pointer-events-none"
+                className="absolute top-1 right-1 pointer-events-none w-full h-full object-contain"
             />
         </div>
     );
