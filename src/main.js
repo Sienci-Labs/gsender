@@ -199,7 +199,8 @@ const main = () => {
             const options = {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
-                kiosk,
+                kiosk: true,
+                frame: false,
             };
             const window = await windowManager.openWindow(url, options, splashScreen);
 
