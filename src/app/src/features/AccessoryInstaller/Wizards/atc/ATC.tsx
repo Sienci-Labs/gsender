@@ -9,7 +9,7 @@ import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/compon
 import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx';
 import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx';
 import { Jogging } from 'app/features/Jogging';
-import {RestartHome} from "app/features/AccessoryInstaller/components/wizard/RestartHome.tsx";
+import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -64,9 +64,9 @@ export function useSienciATCWizard(): Wizard {
                             ],
                         },
                         {
-                            id: 'restart-home',
-                            title: 'Restart Controller',
-                            component: RestartHome,
+                            id: 'restart-rehome',
+                            title: 'Restart and Rehome',
+                            component: RestartAndRehome,
                             secondaryContent: [
                                 {
                                     type: 'image',
