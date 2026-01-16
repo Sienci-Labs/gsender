@@ -108,6 +108,13 @@ class Visualizer extends Component {
 
     state = this.getInitialState();
 
+    displayWebGLErrorMessage = () => {
+        const errorElement = WebGL.getWebGLErrorMessage();
+        toast.error('WebGL is not available. Please ensure your graphics drivers are up to date and WebGL is enabled in your browser settings.');
+        // Optionally display the error element in a modal or append it to the DOM
+        console.error('WebGL Error:', errorElement.innerHTML);
+    };
+
     actions = {
         dismissNotification: () => {
             this.setState((state) => ({
@@ -419,7 +426,7 @@ class Visualizer extends Component {
         },
         toggle3DView: () => {
             if (!WebGL.isWebGLAvailable() && this.state.disabled) {
-                displayWebGLErrorMessage();
+                this.displayWebGLErrorMessage();
                 return;
             }
 
@@ -687,7 +694,7 @@ class Visualizer extends Component {
         this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
-            displayWebGLErrorMessage();
+            this.displayWebGLErrorMessage();
 
             setTimeout(() => {
                 this.setState((state) => ({
