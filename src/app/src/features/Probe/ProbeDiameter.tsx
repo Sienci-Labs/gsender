@@ -34,6 +34,7 @@ import { X, Plus, ChevronDown } from 'lucide-react';
 
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     PROBE_TYPE_AUTO,
     PROBE_TYPE_TIP,
     PROBE_TYPE_DIAMETER,
@@ -129,7 +130,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         const baseOptions: Option[] = [];
         const toolsObjects = convertAvailableTools(availableTools, units);
 
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
             baseOptions.push(
                 { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, tool: null },
                 { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, tool: null },

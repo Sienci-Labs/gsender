@@ -22,6 +22,8 @@ export interface ProbeProfile {
         autoZero: number;
         zProbe: number;
         probe3D: number;
+        bitZero: number;
+        bitZeroZOnly: number;
     };
     plateWidth: number;
     plateLength: number;
@@ -72,6 +74,8 @@ export interface ProbingOptions {
         autoZero: number;
         zProbe: number;
         probe3D: number;
+        bitZero: number;
+        bitZeroZOnly: number;
     };
     xThickness?: number;
     yThickness?: number;

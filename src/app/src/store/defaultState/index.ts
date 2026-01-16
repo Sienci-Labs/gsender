@@ -96,6 +96,8 @@ const defaultState: State = {
                 autoZero: 5,
                 zProbe: 15,
                 probe3D: 0,
+                bitZero: 13,
+                bitZeroZOnly: 15.5,
             },
             plateWidth: 50,
             plateLength: 50,
