@@ -25,6 +25,7 @@ import React from 'react';
 import {
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_ZERO,
     TOUCHPLATE_TYPE_3D,
 } from 'app/lib/constants';
@@ -53,7 +54,7 @@ const ProbeImage: React.FC<Props> = ({
 }) => {
     const getProbeImage = () => {
         const { id } = probeCommand;
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
             if (id === 'Z Touch') {
                 return AutoZProbe;
             }

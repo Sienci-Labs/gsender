@@ -3,6 +3,7 @@ import {
     PROBE_TYPE_TIP,
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_ZERO,
 } from './constants';
 import { GRBLHAL, METRIC_UNITS } from '../constants';
@@ -809,6 +810,348 @@ export const get3AxisAutoDiameterRoutine = ({
     return code;
 };
 
+// BitZero V2 Constants (from working macros)
+const BITZERO_BORE_DIAMETER = 15; // Bore diameter in mm
+const BITZERO_INSET_THICKNESS = 13; // Probe inset thickness for XYZ probing (mm)
+const BITZERO_PROBE_THICKNESS = 15.5; // Overall probe thickness for Z-only probing (mm)
+const BITZERO_PROBE_FEEDRATE = 100; // mm/min
+const BITZERO_PROBE_SLOW_FEEDRATE = 50; // mm/min
+const BITZERO_TRAVEL_FEEDRATE = 300; // mm/min
+const BITZERO_SAFE_HEIGHT = 15; // mm
+
+// BitZero-specific routine - aligned with working macros from:
+// https://github.com/vsergeev/nomad3-cncjs-macros
+// The bit starts inside the bore and probes to find center, then sets X0Y0 at bore center
+// Supports all 4 corner directions (BL, TL, TR, BR)
+export const get3AxisBitZeroRoutine = ({
+    axes,
+    $13,
+    firmware,
+    zThickness,
+    direction = BL,
+}: ProbingOptions): Array<string> => {
+    const code: Array<string> = [];
+    const p = 'P0';
+
+    const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
+
+    // BitZero bore center IS the corner (X0,Y0) - no offset needed
+    const xOff = 0;
+    const yOff = 0;
+
+    // Calculate direction modifiers for diagonal move (to Z probe surface)
+    // The diagonal move goes AWAY from the workpiece center
+    let xMod = 1;
+    let yMod = 1;
+
+    if (direction === BL) {
+        xMod = 1; yMod = 1;    // Move toward +X, +Y for Z probe
+    } else if (direction === TL) {
+        xMod = 1; yMod = -1;   // Move toward +X, -Y for Z probe
+    } else if (direction === TR) {
+        xMod = -1; yMod = -1;  // Move toward -X, -Y for Z probe
+    } else if (direction === BR) {
+        xMod = -1; yMod = 1;   // Move toward -X, +Y for Z probe
+    }
+
+    let prependUnits: UNITS_GCODE | '' = '';
+    if ($13 === '1') {
+        prependUnits = 'G20';
+    }
+
+    // Use zThickness values from settings, with fallbacks to BitZero V2 specs
+    const zThicknessXYZ = zThickness.bitZero || BITZERO_INSET_THICKNESS;
+    const zThicknessZOnly = zThickness.bitZeroZOnly || BITZERO_PROBE_THICKNESS;
+
+    if (axes.x && axes.y && axes.z) {
+        // XYZ Probing: Start inside bore, probe XY first to find center,
+        // then move out of bore and probe Z on top plate
+        code.push(
+            '; BitZero V2 Probe XYZ',
+            `; Direction: ${direction} (0=BL, 1=TL, 2=TR, 3=BR)`,
+            '; Instructions: Run with tool located inside probing bore.',
+            `%PROBE_DELAY=${probeDelay}`,
+            `%BORE_DIAMETER=${BITZERO_BORE_DIAMETER}`,
+            `%INSET_THICKNESS=${zThicknessXYZ}`,
+            `%SAFE_HEIGHT=${BITZERO_SAFE_HEIGHT}`,
+            `%X_MOD=${xMod}`,
+            `%Y_MOD=${yMod}`,
+            'M5', // Stop spindle
+            'G21', // Units metric
+
+            // ============ Probe X ============
+            'G91', // Incremental positioning
+
+            // Probe left
+            `G38.2 X-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X1 = Number(posx)',
+
+            // Retract X
+            `G1 X1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe right
+            `G38.2 X[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X2 = Number(posx)',
+
+            // Go to X center
+            'G90', // Absolute positioning
+            `G1 X[(X1 + X2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS X
+            `G10 L20 ${p} X${xOff}`,
+            'G4 P0.1',
+
+            // ============ Probe Y ============
+            'G91', // Incremental positioning
+
+            // Probe top (positive Y)
+            `G38.2 Y[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y1 = Number(posy)',
+
+            // Retract Y
+            `G1 Y-1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe bottom (negative Y)
+            `G38.2 Y-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y2 = Number(posy)',
+
+            // Go to Y center
+            'G90', // Absolute positioning
+            `G1 Y[(Y1 + Y2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS Y
+            `G10 L20 ${p} Y${yOff}`,
+            'G4 P0.1',
+
+            // ============ Probe Z ============
+            'G91', // Incremental positioning
+
+            // Retract Z (raise up)
+            `G1 Z[INSET_THICKNESS] F${BITZERO_TRAVEL_FEEDRATE}`,
+            // Travel diagonally to position over probe top plate (outside bore)
+            // Direction-aware: moves away from workpiece center
+            `G1 X[BORE_DIAMETER * X_MOD] Y[BORE_DIAMETER * Y_MOD] F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe fast
+            `G38.2 Z-[INSET_THICKNESS] F${BITZERO_PROBE_FEEDRATE}`,
+            `G1 Z2 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe slow
+            `G38.2 Z-5 F${BITZERO_PROBE_SLOW_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Offset WCS Z by probe inset thickness
+            `G10 L20 ${p} Z[INSET_THICKNESS]`,
+            'G4 P0.1',
+
+            // ============ Retract and go to zero ============
+            'G91', // Incremental positioning
+            `G1 Z[SAFE_HEIGHT] F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Go to work zero
+            'G90', // Absolute positioning
+            `${prependUnits} G0 X0 Y0`,
+        );
+    } else if (axes.x && axes.y) {
+        // XY Probing: Start inside bore, probe to find center
+        code.push(
+            '; BitZero V2 Probe XY',
+            `; Direction: ${direction} (0=BL, 1=TL, 2=TR, 3=BR)`,
+            '; Instructions: Run with tool located inside probing bore.',
+            `%PROBE_DELAY=${probeDelay}`,
+            `%BORE_DIAMETER=${BITZERO_BORE_DIAMETER}`,
+            `%SAFE_HEIGHT=${BITZERO_SAFE_HEIGHT}`,
+            'M5', // Stop spindle
+            'G21', // Units metric
+
+            // ============ Probe X ============
+            'G91', // Incremental positioning
+
+            // Probe left
+            `G38.2 X-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X1 = Number(posx)',
+
+            // Retract X
+            `G1 X1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe right
+            `G38.2 X[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X2 = Number(posx)',
+
+            // Go to X center
+            'G90', // Absolute positioning
+            `G1 X[(X1 + X2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS X
+            `G10 L20 ${p} X${xOff}`,
+            'G4 P0.1',
+
+            // ============ Probe Y ============
+            'G91', // Incremental positioning
+
+            // Probe top (positive Y)
+            `G38.2 Y[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y1 = Number(posy)',
+
+            // Retract Y
+            `G1 Y-1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe bottom (negative Y)
+            `G38.2 Y-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y2 = Number(posy)',
+
+            // Go to Y center
+            'G90', // Absolute positioning
+            `G1 Y[(Y1 + Y2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS Y
+            `G10 L20 ${p} Y${yOff}`,
+            'G4 P0.1',
+
+            // ============ Retract and go to zero ============
+            'G91', // Incremental positioning
+            `G1 Z[SAFE_HEIGHT] F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Go to work zero
+            'G90', // Absolute positioning
+            `${prependUnits} G0 X0 Y0`,
+        );
+    } else if (axes.z) {
+        // Z-only probing: Probe placed flat on surface (uses full probe thickness)
+        code.push(
+            '; BitZero V2 Probe Z',
+            '; Instructions: Run with tool within 20mm of top of probe surface.',
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_THICKNESS=${zThicknessZOnly}`,
+            `%PROBE_DISTANCE=20`,
+            `%SAFE_HEIGHT=${BITZERO_SAFE_HEIGHT}`,
+            'M5', // Stop spindle
+            'G21', // Units metric
+
+            // ============ Probe Z ============
+            'G91', // Incremental positioning
+
+            // Probe fast
+            `G38.2 Z-[PROBE_DISTANCE] F${BITZERO_PROBE_FEEDRATE}`,
+            `G1 Z2 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe slow
+            `G38.2 Z-5 F${BITZERO_PROBE_SLOW_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Offset WCS Z by probe thickness
+            `G10 L20 ${p} Z[PROBE_THICKNESS]`,
+            'G4 P0.1',
+
+            // ============ Retract Z ============
+            'G91', // Incremental positioning
+            `G1 Z[SAFE_HEIGHT] F${BITZERO_TRAVEL_FEEDRATE}`,
+        );
+    } else if (axes.x) {
+        // X-only probing: Start inside bore, probe to find X center
+        code.push(
+            '; BitZero V2 Probe X',
+            '; Instructions: Run with tool located inside probing bore.',
+            `%PROBE_DELAY=${probeDelay}`,
+            `%BORE_DIAMETER=${BITZERO_BORE_DIAMETER}`,
+            `%SAFE_HEIGHT=${BITZERO_SAFE_HEIGHT}`,
+            'M5', // Stop spindle
+            'G21', // Units metric
+
+            // ============ Probe X ============
+            'G91', // Incremental positioning
+
+            // Probe left
+            `G38.2 X-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X1 = Number(posx)',
+
+            // Retract X
+            `G1 X1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe right
+            `G38.2 X[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%X2 = Number(posx)',
+
+            // Go to X center
+            'G90', // Absolute positioning
+            `G1 X[(X1 + X2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS X
+            `G10 L20 ${p} X${xOff}`,
+            'G4 P0.1',
+
+            // ============ Retract Z ============
+            'G91', // Incremental positioning
+            `G1 Z[SAFE_HEIGHT] F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Go to work zero X
+            'G90', // Absolute positioning
+            `${prependUnits} G0 X0`,
+        );
+    } else if (axes.y) {
+        // Y-only probing: Start inside bore, probe to find Y center
+        code.push(
+            '; BitZero V2 Probe Y',
+            '; Instructions: Run with tool located inside probing bore.',
+            `%PROBE_DELAY=${probeDelay}`,
+            `%BORE_DIAMETER=${BITZERO_BORE_DIAMETER}`,
+            `%SAFE_HEIGHT=${BITZERO_SAFE_HEIGHT}`,
+            'M5', // Stop spindle
+            'G21', // Units metric
+
+            // ============ Probe Y ============
+            'G91', // Incremental positioning
+
+            // Probe top (positive Y)
+            `G38.2 Y[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y1 = Number(posy)',
+
+            // Retract Y
+            `G1 Y-1 F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Probe bottom (negative Y)
+            `G38.2 Y-[BORE_DIAMETER] F${BITZERO_PROBE_FEEDRATE}`,
+            'G4 P0.1',
+            '%Y2 = Number(posy)',
+
+            // Go to Y center
+            'G90', // Absolute positioning
+            `G1 Y[(Y1 + Y2) / 2] F${BITZERO_TRAVEL_FEEDRATE}`,
+            'G4 P0.1',
+
+            // Set WCS Y
+            `G10 L20 ${p} Y${yOff}`,
+            'G4 P0.1',
+
+            // ============ Retract Z ============
+            'G91', // Incremental positioning
+            `G1 Z[SAFE_HEIGHT] F${BITZERO_TRAVEL_FEEDRATE}`,
+
+            // Go to work zero Y
+            'G90', // Absolute positioning
+            `${prependUnits} G0 Y0`,
+        );
+    }
+
+    return code;
+};
+
 export const getNextDirection = (
     direction: PROBE_DIRECTIONS,
 ): PROBE_DIRECTIONS => {
@@ -841,6 +1184,14 @@ export const getProbeCode = (
         } else {
             return get3AxisAutoDiameterRoutine({ ...options, direction });
         }
+    }
+
+    // BitZero probe - uses bore-style probing
+    if (plateType === TOUCHPLATE_TYPE_BITZERO) {
+        return get3AxisBitZeroRoutine({
+            ...options,
+            direction,
+        });
     }
 
     // Standard plate, we modify some values for specific directions

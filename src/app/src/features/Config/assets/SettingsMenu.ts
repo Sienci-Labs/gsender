@@ -17,6 +17,7 @@ import { IconType } from 'react-icons';
 import {
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
@@ -544,6 +545,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
                             TOUCHPLATE_TYPE_3D,
+                            TOUCHPLATE_TYPE_BITZERO,
                         ],
                     },
                     {
@@ -628,6 +630,38 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'BitZero thickness (XYZ)',
+                        key: 'workspace.probeProfile.zThickness.bitZero',
+                        description:
+                            'Plate thickness for XYZ probing where the bit touches the inset surface inside the bore. (Default 13)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using BitZero
+                            return probeType !== TOUCHPLATE_TYPE_BITZERO;
+                        },
+                    },
+                    {
+                        label: 'BitZero thickness (Z-only)',
+                        key: 'workspace.probeProfile.zThickness.bitZeroZOnly',
+                        description:
+                            'Plate thickness for Z-only probing where the probe is placed flat on the surface. (Default 15.5)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using BitZero
+                            return probeType !== TOUCHPLATE_TYPE_BITZERO;
+                        },
+                    },
+                    {
                         label: 'XY thickness',
                         key: 'workspace.probeProfile.xyThickness',
                         description:
@@ -672,8 +706,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_BITZERO;
                         },
                     },
                     {
@@ -688,8 +722,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_BITZERO;
                         },
                     },
                     {
@@ -704,8 +738,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_BITZERO;
                         },
                     },
                     {
@@ -720,8 +754,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return probeType === TOUCHPLATE_TYPE_AUTOZERO || probeType === TOUCHPLATE_TYPE_BITZERO;
                         },
                     },
                     {
