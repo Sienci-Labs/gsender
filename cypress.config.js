@@ -1,19 +1,28 @@
-const { defineConfig } = require("cypress");
+const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
   e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
+    baseUrl: process.env.BASE_URL || 'http://localhost:8000',
+    reporter: 'mochawesome', // must be exactly like this
+    reporterOptions: {
+      reportDir: 'cypress/reports/mochawesome', // folder for HTML/JSON reports
+      overwrite: false,
+      html: true,           // generate HTML report
+      json: true,           // generate JSON report
+      charts: true,         // include charts
+      embeddedScreenshots: true, // attach screenshots
     },
-    baseUrl: 'http://localhost:8000',
-    experimentalStudio: true,
-    video: true,
-    screenshotOnRunFailure: true, //for screenshots and videos
-    supportFile: 'cypress/support/e2e.js', // Support file
-    pageLoadTimeout: 200000,
-    env: {
-      file:'cypress/fixtures/sample.gcode'
-    }
-  }
+    setupNodeEvents(on, config) {
+      // Handle uncaught exceptions from the application
+      on('before:browser:launch', (browser = {}, launchOptions) => {
+        return launchOptions;
+      });
+
+      return config;
+    },
+    // Disable web security to avoid some cross-origin issues
+    chromeWebSecurity: false,
+    // Experimental feature to handle obstructive code
+    experimentalModifyObstructiveThirdPartyCode: true,
+  },
 });
- 

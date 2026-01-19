@@ -1,27 +1,10 @@
 describe('Load file testing in grblHal', () => {
 
-  // Handle uncaught exceptions from the application
-  Cypress.on('uncaught:exception', (err) => {
-    // Log the error for debugging
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // Prevent test from failing
-    }
-    return true;
-  });
-
   beforeEach(() => {
-    cy.loadUI('http://localhost:8000/#/');
+    cy.viewport(1689, 810);
+    cy.visit('http://localhost:8000/#/');
+    cy.wait(2000);
   });
-
   it('Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect', () => {
 
     // ========== STEP 1: Connect to CNC ==========

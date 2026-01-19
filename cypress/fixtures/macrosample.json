@@ -1,8 +1,8 @@
 [
  {
-  "name": "CLSM Kit Settings",
-  "content": "$100=100\n$101=100\n$102=100\n$110=7000\n$111=7000\n$112=2000\n$23=1\n$$",
-  "description": "This macro will change the motor speeds settings on your gSender so that is compatible with the closed loop stepper motors.",
-  "id": "45efdf8c-28ac-472f-beec-441459c81806"
+  "name": "X plus jogging ",
+  "content": "$J=G21 G91 X10 F6000",
+  "description": "X axis jogging",
+  "id": "23296230-2ff3-4384-aff8-8bd1374173a2"
  }
 ]

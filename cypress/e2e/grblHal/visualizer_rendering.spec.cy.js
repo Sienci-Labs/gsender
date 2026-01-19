@@ -17,16 +17,15 @@ describe('CNC Visualizer rendering test case', () => {
     return true;
   });
 
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    
-    // Use custom loadUI command
-    cy.loadUI('http://localhost:8000/#/', {
-      maxRetries: 3,
-      waitTime: 2000,
-      timeout: 20000
-    });
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
+});
 
   it('Connects to CNC, uploads file, and verifies visualizer + file info', () => {
     const fileName = 'sample.gcode';

@@ -1,9 +1,13 @@
 describe('CNC Machine - Complete Z and XYZ Axis Probing', () => {
-  
-  before(() => {
-    cy.viewport(1689, 810);
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
-
+});
   it('Configures probe once, performs Z axis probing, then XYZ axis probing', () => {
     
     // ═══════════════════════════════════════

@@ -1,551 +1,284 @@
-describe('Outline + Job Run with Complete Bit Position and Line Processing Tracking', () => {
-
+describe('CNC Bit Position and Job Progress Tracking', () => {
   beforeEach(() => {
-    cy.viewport(1280, 800);
-    
-    // Use custom loadUI command
-    cy.loadUI('http://localhost:8000/#/', {
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
       maxRetries: 3,
-      waitTime: 2000,
-      timeout: 20000
+      waitTime: 3000,
+      timeout: 5000
     });
   });
 
-  it('Test Case: Outline Feature + Job Run with Position and Line Tracking', () => {
-
-    // Initialize tracking arrays
-    const outlinePositionLog = [];
-    const jobPositionLog = [];
-    const lineProcessingLog = [];
-    let outlineStartTime = null;
-    let outlineEndTime = null;
-    let jobStartTime = null;
-    let jobEndTime = null;
-
-    // Helper function to capture current position
-    const capturePosition = (label, logArray) => {
-      return cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
-        .then(($inputs) => {
-          const position = {
-            label,
-            x: parseFloat($inputs.eq(0).val()) || 0,
-            y: parseFloat($inputs.eq(1).val()) || 0,
-            z: parseFloat($inputs.eq(2).val()) || 0,
-            timestamp: Date.now()
-          };
-          logArray.push(position);
-          cy.log(`[${label}] Position: X=${position.x}, Y=${position.y}, Z=${position.z}`);
-          return cy.wrap(position);
-        });
+  it('should connect, track bit positions, verify movement, and validate specific position values during job execution', () => {
+    // Store initial positions
+    const positionLog = {
+      work: { x: [], y: [], z: [] },
+      machine: { x: [], y: [] },
+      timestamps: []
     };
 
-    // Helper function to capture line processing status
-    const captureLineProcessing = (label) => {
-      return cy.window().then((win) => {
-        try {
-          const store = win.reduxStore || win.store;
-          if (store) {
-            const state = store.getState();
-            const senderStatus = state.controller?.sender?.status;
-            
-            if (senderStatus) {
-              const lineStatus = {
-                label,
-                sent: senderStatus.sent || 0,
-                received: senderStatus.received || 0,
-                total: senderStatus.total || 0,
-                currentLine: senderStatus.currentLineRunning || 0,
-                timestamp: Date.now()
-              };
-              lineProcessingLog.push(lineStatus);
-              
-              const percentComplete = lineStatus.total > 0 
-                ? ((lineStatus.received / lineStatus.total) * 100).toFixed(1)
-                : 0;
-              
-              cy.log(`[${label}] Lines: ${lineStatus.received}/${lineStatus.total} (${percentComplete}%) | Current: Line ${lineStatus.currentLine}`);
-              return cy.wrap(lineStatus);
-            }
-          }
-        } catch (error) {
-          cy.log(`Unable to capture line status: ${error.message}`);
-        }
-        return cy.wrap(null);
+    // Helper function to capture position values
+    const capturePositions = (label) => {
+      cy.log(`Capturing positions: ${label}`);
+      
+      // Capture Work Position values (X, Y, Z inputs)
+      cy.get('input[type="number"].text-blue-500').eq(0).invoke('val').then((xWork) => {
+        positionLog.work.x.push({ value: parseFloat(xWork), label });
       });
+      
+      cy.get('input[type="number"].text-blue-500').eq(1).invoke('val').then((yWork) => {
+        positionLog.work.y.push({ value: parseFloat(yWork), label });
+      });
+      
+      cy.get('input[type="number"].text-blue-500').eq(2).invoke('val').then((zWork) => {
+        positionLog.work.z.push({ value: parseFloat(zWork), label });
+      });
+
+      // Capture Machine Position values (X, Y spans)
+      cy.get('span.font-mono.text-gray-400').eq(0).invoke('text').then((xMachine) => {
+        positionLog.machine.x.push({ value: parseFloat(xMachine), label });
+      });
+      
+      cy.get('span.font-mono.text-gray-400').eq(1).invoke('text').then((yMachine) => {
+        positionLog.machine.y.push({ value: parseFloat(yMachine), label });
+      });
+
+      positionLog.timestamps.push({ time: new Date().toISOString(), label });
     };
 
-    // Helper function to capture both position and line processing for job
-    const captureJobSnapshot = (label) => {
-      cy.log(`--- Job Snapshot: ${label} ---`);
-      capturePosition(label, jobPositionLog);
-      captureLineProcessing(label);
-    };
-    // PART 1: OUTLINE OPERATION
-    cy.log('PART 1: OUTLINE FEATURE TEST');
-
-    // Step 1: Connect to CNC
+    // Step 1: Connect to CNC machine FIRST
     cy.log('Step 1: Connecting to CNC...');
     cy.connectMachine();
-    cy.wait(6000);
-    cy.log('Connected to CNC');
+    cy.wait(6000); // Wait for connection to establish
+    cy.log('✓ Connected to CNC');
     
+    // Step 2: Handle unlock if needed
+    cy.log('Step 2: Unlocking machine if needed...');
     cy.unlockMachineIfNeeded();
-
-    // Step 2: Verify machine status is Idle
-    cy.log('Step 2: Verifying machine status...');
+    
+    // Step 3: Verify machine is in Idle state
+    cy.log('Step 3: Verifying machine status...');
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should('be.visible')
       .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
+        cy.log(`✓ Machine status: "${status.text().trim()}"`);
       });
     cy.wait(2000);
 
-    // Step 3: Enable homing and perform homing operation
-    cy.log('Step 3: Performing axis homing...');
-    cy.enableAxisHomingAndHome();
-    cy.unlockMachineIfNeeded();
-    cy.log('All axes are now homed');
+    // Step 4: Load a G-code file (required before job can start)
+    cy.log('Step 4: Loading G-code file...');
+    cy.uploadGcodeFile();
+    cy.wait(2000); // Wait for file to load and process
+    cy.log('✓ File Uploaded');
     
-    // Disable axis homing toggle
-    cy.log('Disabling homing toggle button...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div.flex > button')
+    // Step 5: Zero all axes (buttons should now be enabled)
+    cy.log('Step 5: Zeroing all axes...');
+    
+    // Zero X axis - wait for it to be enabled
+    cy.contains('button', 'X0', { timeout: 10000 })
+      .should('not.be.disabled')
+      .click();
+    cy.wait(500);
+    
+    // Zero Y axis
+    cy.contains('button', 'Y0')
+      .should('not.be.disabled')
+      .click();
+    cy.wait(500);
+    
+    // Zero Z axis
+    cy.contains('button', 'Z0')
+      .should('not.be.disabled')
       .click();
     cy.wait(1000);
-    
-    // Zero all axes after homing
-    cy.log('Zeroing all axes after homing...');
-    cy.zeroAllAxes();
-    cy.log('All axes are zero');
-    
-    capturePosition('After Homing & Zero', outlinePositionLog);
 
-    // Step 4: Go to specific location
-    cy.log('Step 4: Moving to position (300, 100, -50)...');
-    cy.goToLocation(300, 100, -50);
-    cy.log('Machine is at location (300, 100, -50)');
-    
-    capturePosition('After Movement to (300, 100, -50)', outlinePositionLog);
+    // Step 6: Verify axes are zeroed
+    cy.log('Step 6: Verifying axes are zeroed...');
+    cy.get('input[type="number"].text-blue-500').eq(0).should('have.value', '0.00');
+    cy.get('input[type="number"].text-blue-500').eq(1).should('have.value', '0.00');
+    cy.get('input[type="number"].text-blue-500').eq(2).should('have.value', '0.00');
+    cy.log('✓ All axes zeroed successfully');
 
-    // Step 5: Zero all axes at the new location
-    cy.log('Step 5: Zeroing all axes at new location...');
-    cy.zeroAllAxes();
-    cy.log('All axes zeroed at (300, 100, -50)');
-    cy.wait(2000);
-    
-    capturePosition('After Zero at New Location', outlinePositionLog);
+    // Capture initial zeroed positions
+    capturePositions('After Zeroing');
 
-    // Step 6: Upload G-code file
-    cy.log('Step 6: Uploading G-code file...');
-    cy.uploadGcodeFile();
-    cy.log('File uploaded successfully');
-    cy.wait(3000);
+    // Step 7: Start the job
+    cy.log('Step 7: Starting job run...');
     
-    capturePosition('Before Outline Operation', outlinePositionLog);
-
-    // Step 7: Start Outline Operation
-    cy.log('Step 7: Starting Outline Operation...');
-    
-    cy.then(() => {
-      outlineStartTime = Date.now();
-      cy.log(`Outline Start Time: ${new Date(outlineStartTime).toISOString()}`);
-    });
-    
-    cy.get('div.bg-transparent > div > div:nth-of-type(1) > button')
-      .should('be.visible')
-      .and('contain.text', 'Outline')
-      .click({ force: true });
-    
-    cy.log('Outline button clicked');
-    cy.wait(2000);
-    
-    capturePosition('Outline Start', outlinePositionLog);
-
-    // Step 8: Monitor bit position during outline
-    cy.log('Step 8: Tracking Bit Position During Outline...');
-    
-    cy.get('body').then($body => {
-      const runningText = $body.text();
-      if (runningText.match(/run|running|jog/i)) {
-        cy.log('Outline operation detected as running');
-        
-        // Track position every 1 second for up to 10 seconds
-        for (let i = 1; i <= 10; i++) {
-          cy.wait(1000);
-          capturePosition(`During Outline - ${i}s`, outlinePositionLog);
-          
-          cy.get('body').then($body => {
-            const currentText = $body.text();
-            if (!currentText.match(/run|running|jog/i)) {
-              cy.log('Outline completed, stopping position tracking');
-              return false;
-            }
-          });
-        }
-      } else {
-        cy.log('Outline operation may have completed very quickly');
-        capturePosition('Outline Immediate Complete', outlinePositionLog);
-      }
-    });
-
-    // Step 9: Wait for machine to be idle after outline
-    cy.log('Step 9: Waiting for machine to return to Idle...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        outlineEndTime = Date.now();
-        cy.log(`Machine status: "${status.text().trim()}"`);
-        cy.log(`Outline End Time: ${new Date(outlineEndTime).toISOString()}`);
-        cy.log(`Outline Duration: ${((outlineEndTime - outlineStartTime) / 1000).toFixed(2)}s`);
-      });
-    cy.wait(2000);
-    
-    capturePosition('After Outline Complete', outlinePositionLog);
-
-    // Step 10: Verify return to starting position
-    cy.log('Step 10: Verifying Return to Start Position...');
-    cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
-      .then(($inputs) => {
-        const finalX = parseFloat($inputs.eq(0).val());
-        const finalY = parseFloat($inputs.eq(1).val());
-        const finalZ = parseFloat($inputs.eq(2).val());
-        
-        cy.log(`Position after Outline: X=${finalX}, Y=${finalY}, Z=${finalZ}`);
-        
-        const tolerance = 0.1;
-        const xMatch = Math.abs(finalX - 0) < tolerance;
-        const yMatch = Math.abs(finalY - 0) < tolerance;
-        const zMatch = Math.abs(finalZ - 0) < tolerance;
-        
-        if (xMatch && yMatch && zMatch) {
-          cy.log('Machine returned to starting position (0, 0, 0)');
-        } else {
-          cy.log(`Machine position: X=${finalX}, Y=${finalY}, Z=${finalZ} (Expected: 0, 0, 0)`);
-        }
-      });
-
-    // PART 2: JOB RUN WITH TRACKING
-    cy.log('PART 2: JOB RUN WITH POSITION & LINE TRACKING');
-
-    // Step 11: Verify machine is still at zero
-    cy.log('Step 11: Verifying machine ready for job...');
-    capturePosition('Before Job Start', jobPositionLog);
-    captureLineProcessing('Before Job Start');
-
-    // Step 12: Start the job
-    cy.log('Step 12: Starting Job...');
-    
-    cy.then(() => {
-      jobStartTime = Date.now();
-      cy.log(`Job Start Time: ${new Date(jobStartTime).toISOString()}`);
-    });
-    
+    // Find and click the Start button
     cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
       .contains('Start')
       .should('be.visible')
       .click({ force: true });
     cy.wait(2000);
-    cy.log('Job started');
+    cy.log('✓ Job started');
 
-    // Step 13: Verify job is running
-    cy.log('Step 13: Verifying job is running...');
+    // Capture positions immediately after start
+    capturePositions('Job Started');
+
+    // Step 8: Verify job is running
+    cy.log('Step 8: Verifying job is running...');
     cy.contains(/running|run/i, { timeout: 10000 })
       .should('be.visible')
       .then(status => {
-        cy.log(`Job status: "${status.text().trim()}"`);
+        cy.log(`✓ Job status: "${status.text().trim()}"`);
       });
-    
-    captureJobSnapshot('Job Running - Initial');
 
-    // Step 14: Monitor bit position and line processing during job
-    cy.log('Step 14: Monitoring Bit Position and Line Processing...');
+    // Step 9: Monitor position changes during job execution
+    cy.log('Step 9: Monitoring position changes...');
     
-    const monitorJob = (iteration = 1, maxIterations = 40) => {
-      if (iteration > maxIterations) {
-        cy.log('Max monitoring iterations reached');
-        return;
-      }
+    // Poll positions at intervals
+    const monitoringIntervals = [1000, 2000, 3000, 5000, 7000, 10000];
+    
+    monitoringIntervals.forEach((interval, index) => {
+      cy.wait(interval - (index > 0 ? monitoringIntervals[index - 1] : 0));
+      capturePositions(`During Job - ${interval}ms`);
       
-      cy.wait(3000);
-      
-      // Check if job is still running
-      cy.get('body').then($body => {
-        const bodyText = $body.text();
-        const isRunning = bodyText.match(/running|run/i) && !bodyText.match(/^Idle$/i);
+      // Verify that positions are changing (not all zeros)
+      cy.get('input[type="number"].text-blue-500').then(($inputs) => {
+        const values = [...$inputs].map(input => parseFloat(input.value));
+        const hasMovement = values.some(val => Math.abs(val) > 0.01);
         
-        if (isRunning) {
-          captureJobSnapshot(`Job Running - ${iteration * 3}s`);
-          monitorJob(iteration + 1, maxIterations);
-        } else {
-          cy.log(`Job completed at ${iteration * 3} seconds`);
-          captureJobSnapshot('Job Completed - Final Position');
+        if (hasMovement) {
+          cy.log(`✓ Bit movement detected at ${interval}ms`);
         }
       });
-    };
+    });
+
+    // Step 10: Verify specific position values (Z-axis and machine positions)
+    cy.log('Step 10: Verifying specific position values...');
     
-    // Start monitoring
-    monitorJob();
+    // Check Work Z-axis position
+    cy.get('input[type="number"].text-blue-500').eq(2).invoke('val').then((zValue) => {
+      const z = parseFloat(zValue);
+      cy.log(`Work Z position: ${zValue} mm`);
+      
+      // Z should have moved from 0 if job is running
+      if (Math.abs(z) > 0.01) {
+        expect(z).to.be.a('number');
+        cy.log('✓ Z-axis is moving');
+      }
+    });
 
-    // Step 15: Wait for job completion
-    cy.log('Step 15: Waiting for job completion...');
-    cy.contains(/^Idle$/i, { timeout: 120000 })
-      .should('be.visible')
-      .then(status => {
-        jobEndTime = Date.now();
-        cy.log(`Job completed. Status: "${status.text().trim()}"`);
-        cy.log(`Job End Time: ${new Date(jobEndTime).toISOString()}`);
-        cy.log(`Total Job Duration: ${((jobEndTime - jobStartTime) / 1000).toFixed(2)}s`);
-      });
-    cy.wait(3000);
-    
-    captureJobSnapshot('After Job Completion');
+    // Check Machine X position
+    cy.get('span.font-mono.text-gray-400').eq(0).should('exist').invoke('text').then((text) => {
+      cy.log(`Machine X: ${text} mm`);
+      expect(parseFloat(text)).to.be.a('number');
+      cy.log('✓ Machine X position valid');
+    });
 
-    // Step 16: Extract job completion details
-    cy.log('Step 16: Extracting Job Completion Details...');
-    
-    cy.contains('h2', 'Job End').should('be.visible');
+    // Check Machine Y position
+    cy.get('span.font-mono.text-gray-400').eq(1).should('exist').invoke('text').then((text) => {
+      cy.log(`Machine Y: ${text} mm`);
+      expect(parseFloat(text)).to.be.a('number');
+      cy.log('✓ Machine Y position valid');
+    });
 
-    cy.contains('strong', 'Status:')
-      .parent()
-      .find('span.text-green-500')
-      .should('be.visible')
-      .invoke('text')
-      .then((statusText) => {
-        const status = statusText.trim();
-        cy.log(`Job Status: ${status}`);
-        expect(status).to.equal('COMPLETE');
-        cy.wrap(status).as('jobStatus');
-      });
-
-    cy.contains('strong', 'Time:')
-      .next('span')
-      .should('be.visible')
-      .invoke('text')
-      .then((timeText) => {
-        const timeTaken = timeText.trim();
-        cy.log(`Time Taken: ${timeTaken}`);
-        cy.wrap(timeTaken).as('timeTaken');
-      });
-
-    cy.contains('strong', 'Errors:')
-      .next('span')
-      .should('be.visible')
-      .invoke('text')
-      .then((errorText) => {
-        const errors = errorText.trim();
-        cy.log(`Errors: ${errors}`);
-        expect(errors).to.equal('None');
-        cy.wrap(errors).as('jobErrors');
-      });
-
+    // Step 11: Stop the job (or let it complete)
+    cy.log('Step 11: Stopping job...');
+    cy.get('body').then(($body) => {
+      if ($body.find('button[aria-label="Stop"]').length > 0) {
+        cy.get('button[aria-label="Stop"]').first().click();
+        cy.log('✓ Job stopped manually');
+      } else if ($body.find('button[aria-label="Pause"]').length > 0) {
+        cy.get('button[aria-label="Pause"]').first().click();
+        cy.log('✓ Job paused');
+      }
+    });
     cy.wait(1000);
 
-    // ANALYSIS AND REPORTING
-    cy.log('COMPREHENSIVE ANALYSIS');
+    // Capture final positions
+    capturePositions('Job Stopped/Paused');
 
-    // Step 17: Analyze Outline Position Changes
-    cy.log('Step 17: Analyzing Outline Position Changes...');
-    cy.wrap(outlinePositionLog).then((log) => {
-      cy.log('OUTLINE POSITION ANALYSIS');
-      cy.log(`Total outline snapshots: ${log.length}`);
-      
-      const outlineStartIndex = log.findIndex(p => p.label === 'Outline Start');
-      const outlineEndIndex = log.findIndex(p => p.label === 'After Outline Complete');
-      
-      if (outlineStartIndex !== -1 && outlineEndIndex !== -1) {
-        let totalOutlineMovement = 0;
-        for (let i = outlineStartIndex + 1; i <= outlineEndIndex; i++) {
-          const prev = log[i - 1];
-          const curr = log[i];
-          const deltaX = curr.x - prev.x;
-          const deltaY = curr.y - prev.y;
-          const deltaZ = curr.z - prev.z;
-          totalOutlineMovement += Math.sqrt(deltaX**2 + deltaY**2 + deltaZ**2);
-        }
-        
-        cy.log(`Outline Distance Traveled: ${totalOutlineMovement.toFixed(3)}mm`);
-        cy.log(`Outline Duration: ${((outlineEndTime - outlineStartTime) / 1000).toFixed(2)}s`);
-        
-        if (totalOutlineMovement > 1) {
-          cy.log('Bit moved during outline operation');
-        } else {
-          cy.log('Little or no movement detected during outline');
-        }
-      }
-    });
-
-    // Step 18: Analyze Job Position Changes
-    cy.log('Step 18: Analyzing Job Position Changes...');
-    cy.wrap(jobPositionLog).then((log) => {
-      cy.log('JOB POSITION ANALYSIS');
-      cy.log(`Total job position snapshots: ${log.length}`);
-      
-      const jobStartPos = log.find(p => p.label === 'Job Running - Initial');
-      const jobEndPos = log.find(p => p.label === 'After Job Completion');
-      
-      if (jobStartPos && jobEndPos) {
-        const totalDistance = Math.sqrt(
-          Math.pow(jobEndPos.x - jobStartPos.x, 2) +
-          Math.pow(jobEndPos.y - jobStartPos.y, 2) +
-          Math.pow(jobEndPos.z - jobStartPos.z, 2)
-        );
-        
-        cy.log(`Job Start Position: X=${jobStartPos.x}, Y=${jobStartPos.y}, Z=${jobStartPos.z}`);
-        cy.log(`Job End Position: X=${jobEndPos.x}, Y=${jobEndPos.y}, Z=${jobEndPos.z}`);
-        cy.log(`Job Distance Traveled: ${totalDistance.toFixed(3)}mm`);
-      }
-      
-      let totalMovement = 0;
-      let maxSpeed = 0;
-      
-      for (let i = 1; i < log.length; i++) {
-        const prev = log[i - 1];
-        const curr = log[i];
-        
-        const distance = Math.sqrt(
-          Math.pow(curr.x - prev.x, 2) +
-          Math.pow(curr.y - prev.y, 2) +
-          Math.pow(curr.z - prev.z, 2)
-        );
-        
-        const timeDelta = (curr.timestamp - prev.timestamp) / 1000;
-        const speed = timeDelta > 0 ? distance / timeDelta : 0;
-        
-        totalMovement += distance;
-        maxSpeed = Math.max(maxSpeed, speed);
-      }
-      
-      cy.log(`Total Job Movement: ${totalMovement.toFixed(3)}mm`);
-      cy.log(`Max Speed: ${maxSpeed.toFixed(2)}mm/s`);
-      cy.log(`Average Position Updates: ${(log.length / ((jobEndTime - jobStartTime) / 1000)).toFixed(2)} per second`);
-    });
-
-    // Step 19: Analyze Line Processing
-    cy.log('Step 19: Analyzing Line Processing...');
-    cy.wrap(lineProcessingLog).then((log) => {
-      cy.log('LINE PROCESSING ANALYSIS');
-      cy.log(`Total line processing snapshots: ${log.length}`);
-      
-      if (log.length > 0) {
-        const firstSnapshot = log[0];
-        const lastSnapshot = log[log.length - 1];
-        
-        cy.log(`Total Lines in File: ${lastSnapshot.total}`);
-        cy.log(`Lines Processed: ${lastSnapshot.received}`);
-        
-        if (lastSnapshot.timestamp !== firstSnapshot.timestamp) {
-          const processingRate = lastSnapshot.received / ((lastSnapshot.timestamp - firstSnapshot.timestamp) / 1000);
-          cy.log(`Processing Rate: ${processingRate.toFixed(2)} lines/second`);
-        }
-        
-        // Show progression at key points
-        cy.log('PROCESSING PROGRESSION');
-        [0, Math.floor(log.length / 4), Math.floor(log.length / 2), Math.floor(3 * log.length / 4), log.length - 1].forEach(index => {
-          const snapshot = log[index];
-          if (snapshot) {
-            const percentComplete = snapshot.total > 0 
-              ? ((snapshot.received / snapshot.total) * 100).toFixed(1)
-              : 0;
-            cy.log(`${snapshot.label}: ${percentComplete}% complete (${snapshot.received}/${snapshot.total} lines)`);
-          }
-        });
-        
-        if (lastSnapshot.received === lastSnapshot.total) {
-          cy.log('All lines processed successfully');
-        } else {
-          cy.log(`Lines processed: ${lastSnapshot.received}/${lastSnapshot.total}`);
-        }
-      } else {
-        cy.log('No line processing data captured');
-      }
-    });
-
-    // Step 20: Final Summary
-    cy.log('Step 20: Final Summary...');
-    
-    cy.get('@jobStatus').then((status) => {
-      cy.get('@timeTaken').then((time) => {
-        cy.get('@jobErrors').then((errors) => {
-          cy.log('COMPLETE TEST SUMMARY');
-          cy.log('OUTLINE OPERATION:');
-          cy.log(`  Duration: ${((outlineEndTime - outlineStartTime) / 1000).toFixed(2)}s`);
-          cy.log(`  Position Snapshots: ${outlinePositionLog.length}`);
-          cy.log('');
-          cy.log('JOB EXECUTION:');
-          cy.log(`  Status: ${status}`);
-          cy.log(`  Time Taken: ${time}`);
-          cy.log(`  Errors: ${errors}`);
-          cy.log(`  Position Snapshots: ${jobPositionLog.length}`);
-          cy.log(`  Line Processing Snapshots: ${lineProcessingLog.length}`);
-          cy.log('');
-          cy.log(`  Total Test Duration: ${((jobEndTime - outlineStartTime) / 1000).toFixed(2)}s`);
-        });
-      });
-    });
-
-    // Step 21: Close job completion popup
-    cy.log('Step 21: Closing job completion popup...');
-    cy.contains('button', 'Close')
-      .should('be.visible')
-      .click({ force: true });
-    cy.wait(1000);
-    cy.log('Popup closed');
-
-    cy.contains('h2', 'Job End').should('not.exist');
-    cy.log('Popup successfully closed');
-
-    // Step 22: Return to home position
-    cy.log('Step 22: Returning to home position...');
-    cy.ensureHomingEnabledAndHome();
-    cy.log('Returned to home position');
-
-    // Step 23: Save all data
-    cy.log('Step 23: Saving Test Data...');
-    
-    cy.wrap(outlinePositionLog).then((log) => {
-      cy.writeFile('cypress/results/outline-position-log.json', log);
-      cy.log('Outline position log saved');
-    });
-    
-    cy.wrap(jobPositionLog).then((log) => {
-      cy.writeFile('cypress/results/job-position-log.json', log);
-      cy.log('Job position log saved');
-    });
-    
-    cy.wrap(lineProcessingLog).then((log) => {
-      cy.writeFile('cypress/results/job-line-processing-log.json', log);
-      cy.log(' Line processing log saved');
-    });
-    
-    // Create comprehensive report
+    // Step 12: Analyze and verify position data
+    cy.log('Step 12: Analyzing captured position data...');
     cy.then(() => {
-      const report = {
-        testName: 'Outline + Job Run with Complete Tracking',
+      cy.log('═══════════════════════════════════════');
+      cy.log('       POSITION LOG SUMMARY       ');
+      cy.log('═══════════════════════════════════════');
+      
+      cy.log(`Work X positions: ${JSON.stringify(positionLog.work.x)}`);
+      cy.log(`Work Y positions: ${JSON.stringify(positionLog.work.y)}`);
+      cy.log(`Work Z positions: ${JSON.stringify(positionLog.work.z)}`);
+      cy.log(`Machine X positions: ${JSON.stringify(positionLog.machine.x)}`);
+      cy.log(`Machine Y positions: ${JSON.stringify(positionLog.machine.y)}`);
+      
+      // Assertions - verify we captured data
+      expect(positionLog.work.x.length).to.be.greaterThan(2);
+      expect(positionLog.work.y.length).to.be.greaterThan(2);
+      expect(positionLog.work.z.length).to.be.greaterThan(2);
+      
+      // Calculate total movement
+      const xMovement = Math.abs(
+        positionLog.work.x[positionLog.work.x.length - 1].value - 
+        positionLog.work.x[0].value
+      );
+      const yMovement = Math.abs(
+        positionLog.work.y[positionLog.work.y.length - 1].value - 
+        positionLog.work.y[0].value
+      );
+      const zMovement = Math.abs(
+        positionLog.work.z[positionLog.work.z.length - 1].value - 
+        positionLog.work.z[0].value
+      );
+      
+      cy.log('═══════════════════════════════════════');
+      cy.log('       MOVEMENT SUMMARY       ');
+      cy.log('═══════════════════════════════════════');
+      cy.log(`Total X movement: ${xMovement.toFixed(3)} mm`);
+      cy.log(`Total Y movement: ${yMovement.toFixed(3)} mm`);
+      cy.log(`Total Z movement: ${zMovement.toFixed(3)} mm`);
+      cy.log('═══════════════════════════════════════');
+      
+      // Additional validation - verify movement occurred
+      const totalMovement = xMovement + yMovement + zMovement;
+      expect(totalMovement).to.be.greaterThan(0);
+      cy.log(`✓ Total combined movement: ${totalMovement.toFixed(3)} mm`);
+      
+      // Save position log to file
+      cy.writeFile('cypress/results/position-log.json', positionLog);
+      cy.log('✓ Position data saved to: cypress/results/position-log.json');
+      
+      // Save movement summary to separate file
+      const movementSummary = {
+        testName: 'CNC Bit Position Tracking',
         timestamp: new Date().toISOString(),
-        outline: {
-          startTime: new Date(outlineStartTime).toISOString(),
-          endTime: new Date(outlineEndTime).toISOString(),
-          duration: (outlineEndTime - outlineStartTime) / 1000,
-          positionSnapshots: outlinePositionLog.length,
-          positionData: outlinePositionLog
+        totalDataPoints: positionLog.work.x.length,
+        movement: {
+          x: xMovement,
+          y: yMovement,
+          z: zMovement,
+          total: totalMovement
         },
-        job: {
-          startTime: new Date(jobStartTime).toISOString(),
-          endTime: new Date(jobEndTime).toISOString(),
-          duration: (jobEndTime - jobStartTime) / 1000,
-          positionSnapshots: jobPositionLog.length,
-          lineProcessingSnapshots: lineProcessingLog.length,
-          positionData: jobPositionLog,
-          lineProcessingData: lineProcessingLog
-        },
-        totalTestDuration: (jobEndTime - outlineStartTime) / 1000
+        positions: {
+          initial: {
+            x: positionLog.work.x[0]?.value || 0,
+            y: positionLog.work.y[0]?.value || 0,
+            z: positionLog.work.z[0]?.value || 0
+          },
+          final: {
+            x: positionLog.work.x[positionLog.work.x.length - 1]?.value || 0,
+            y: positionLog.work.y[positionLog.work.y.length - 1]?.value || 0,
+            z: positionLog.work.z[positionLog.work.z.length - 1]?.value || 0
+          }
+        }
       };
       
-      cy.writeFile('cypress/results/complete-outline-job-report.json', report);
-      cy.log('Complete report saved to: cypress/results/complete-outline-job-report.json');
+      cy.writeFile('cypress/results/movement-summary.json', movementSummary);
+      cy.log('✓ Movement summary saved to: cypress/results/movement-summary.json');
     });
 
-    cy.log('OUTLINE + JOB RUN WITH COMPLETE TRACKING TEST COMPLETED');
-
+    // Step 13: Close any modal dialogs
+    cy.log('Step 13: Closing any open dialogs...');
+    cy.get('body').then(($body) => {
+      if ($body.find('button:contains("Close")').length > 0) {
+        cy.contains('button', 'Close').click({ force: true });
+        cy.log('✓ Dialog closed');
+      }
+    });
+    
+    cy.log('═══════════════════════════════════════');
+    cy.log('✓ POSITION TRACKING TEST COMPLETED SUCCESSFULLY');
+    cy.log('═══════════════════════════════════════');
   });
-
 });

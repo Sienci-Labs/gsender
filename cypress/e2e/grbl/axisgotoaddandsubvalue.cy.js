@@ -1,30 +1,20 @@
 describe('Go to axis  Movements by Adding and  Values Test', () => {
 
-  // Ignore known hydration-related UI errors and undefined.get() error
-  Cypress.on('uncaught:exception', (err) => {
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
 
   beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
+     cy.viewport(1920, 1080);
+    // Use custom loadUI command
+   cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 3,
+      waitTime: 2000,
+      timeout: 20000
+    });
   });
+
 
   it('Test Case 1: Precise Mode - Adding and Subtracting Preset Values', () => {
     
-    cy.log('=== PRECISE MODE: Adding and Subtracting Preset Values Test ===');
+    cy.log('PRECISE MODE: Adding and Subtracting Preset Values Test');
 
     cy.log('Step 1: Connecting to CNC machine...');
     cy.connectMachine();
@@ -151,7 +141,7 @@ describe('Go to axis  Movements by Adding and  Values Test', () => {
                     cy.wait(2000);
                     cy.verifyAxes(0, 0, 0);
 
-                    cy.log('=== TEST COMPLETED SUCCESSFULLY ===');
+                    cy.log('TEST COMPLETED SUCCESSFULLY ');
                   });
               });
           });
@@ -160,7 +150,7 @@ describe('Go to axis  Movements by Adding and  Values Test', () => {
 
   it('Test Case 2: Normal Mode - Adding and Subtracting Go to axis  Values', () => {
     
-    cy.log('=== NORMAL MODE: Adding and Subtracting Preset Values Test ===');
+    cy.log('NORMAL MODE: Adding and Subtracting Preset Values Test');
 
     cy.log('Step 1: Connecting to CNC machine...');
     cy.connectMachine();
@@ -287,7 +277,7 @@ describe('Go to axis  Movements by Adding and  Values Test', () => {
                     cy.wait(3000);
                     cy.verifyAxes(0, 0, 0);
 
-                    cy.log('=== TEST COMPLETED SUCCESSFULLY ===');
+                    cy.log('TEST COMPLETED SUCCESSFULLY');
                   });
               });
           });
@@ -296,7 +286,7 @@ describe('Go to axis  Movements by Adding and  Values Test', () => {
 
   it('Test Case 3: Rapid Mode - Adding and Subtracting Go to axis Values', () => {
     
-    cy.log('=== RAPID MODE: Adding and Subtracting Preset Values Test ===');
+    cy.log('RAPID MODE: Adding and Subtracting Preset Values Test');
         
     cy.log('Step 1: Connecting to CNC machine...');
     cy.connectMachine();
@@ -423,7 +413,7 @@ describe('Go to axis  Movements by Adding and  Values Test', () => {
                     cy.wait(4000);
                     cy.verifyAxes(0, 0, 0);
 
-                    cy.log('=== RAPID MODE TEST COMPLETED SUCCESSFULLY ===');
+                    cy.log('RAPID MODE TEST COMPLETED SUCCESSFULLY');
                   });
               });
           });

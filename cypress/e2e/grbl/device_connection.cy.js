@@ -24,15 +24,17 @@ describe('Connect To CNC and Detect Firmware', () => {
     }
   });
 
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    // Use loadUI custom command instead of manual visit
-    cy.loadUI('http://localhost:8000/#/', {
-      maxRetries: 3,
-      waitTime: 3000,
-      timeout: 5000
-    });
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
+});
+
 
   it('connects to CNC, selects COM port, and detects firmware', () => {
     cy.wait(5000);

@@ -19,7 +19,7 @@ describe('CNC Machine File Info Test', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1280, 800);
+    cy.viewport(1920, 1080);
     cy.visit('http://localhost:8000/#/');
     cy.get('#app', { timeout: 20000 }).should('exist');
     cy.wait(2000); // Give app time to recover from initialization error

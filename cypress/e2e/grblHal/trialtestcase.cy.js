@@ -1,23 +1,21 @@
 describe('CNC Machine - XY Axis Probing', () => {
-  
-  before(() => {
-    cy.viewport(2844, 1450);
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
-
+});
   it('Configures probe and performs XY axis probing', () => {
     
-    // ═══════════════════════════════════════
     // PART 1: PROBE CONFIGURATION
-    // ═══════════════════════════════════════
-    
-    cy.log('═══════════════════════════════════════');
+
     cy.log('PART 1: PROBE CONFIGURATION');
-    cy.log('═══════════════════════════════════════');
     
     // Step 1: Load application and connect
-    cy.log('Step 1: Loading application...');
-    cy.loadUI('http://localhost:8000/#/');
-    cy.log('✓ Application loaded');
+
 
     cy.log('Step 2: Connecting to CNC machine...');
     cy.connectMachine();
@@ -58,7 +56,7 @@ describe('CNC Machine - XY Axis Probing', () => {
             cy.wrap($switch).click({ force: true });
             cy.wait(500);
             cy.get('@applyState').then((state) => { state.needsApply = true; });
-            cy.log(`✓ ${settingName} enabled`);
+            cy.log(` ${settingName} enabled`);
           }
         });
     };
@@ -69,32 +67,26 @@ describe('CNC Machine - XY Axis Probing', () => {
     // Apply settings if needed
     cy.get('@applyState').then((state) => {
       if (state.needsApply) {
-        cy.log('⚙ Applying settings...');
+        cy.log('Applying settings...');
         cy.get('div.ring > button').contains('Apply Settings').click({ force: true });
         cy.wait(3000);
         cy.get('body').should('not.have.attr', 'data-scroll-locked');
         cy.wait(1000);
-        cy.log('✓ Settings applied');
+        cy.log('Settings applied');
       } else {
-        cy.log('✓ All settings correct');
+        cy.log(' All settings correct');
       }
     });
 
-    cy.log('✓ PROBE CONFIGURATION COMPLETED');
+    cy.log('PROBE CONFIGURATION COMPLETED');
 
     // Navigate back to Carve
     cy.get('#app > div > div.h-full > div.flex img').should('be.visible').click();
     cy.wait(2000);
-    cy.log('✓ Carve page opened');
+    cy.log('Carve page opened');
 
-
-    // ═══════════════════════════════════════
     // PART 2: POSITION SETUP FOR XY PROBING
-    // ═══════════════════════════════════════
-
-    cy.log('═══════════════════════════════════════');
     cy.log('PART 2: POSITION SETUP FOR XY PROBING');
-    cy.log('═══════════════════════════════════════');
 
     // Open Machine Information
     cy.log('Step 5: Opening Machine Information popup...');
@@ -104,7 +96,7 @@ describe('CNC Machine - XY Axis Probing', () => {
     cy.log('Step 6: Pinning popup...');
     cy.get('body > div:nth-of-type(2) svg').first().click({ force: true });
     cy.wait(1000);
-    cy.log('✓ Machine Information pinned');
+    cy.log('Machine Information pinned');
 
     // Jog Z- until TLS green
     cy.log('Step 7: Jogging Z- until Probe/TLS turns green...');
@@ -130,7 +122,7 @@ describe('CNC Machine - XY Axis Probing', () => {
       
       checkProbeGreen().then((isGreen) => {
         if (isGreen) {
-          cy.log(`✓ Probe/TLS GREEN after ${attempt} clicks!`);
+          cy.log(` Probe/TLS GREEN after ${attempt} clicks!`);
         } else {
           cy.log(`Probe/TLS still red, continuing...`);
           clickZMinus(attempt + 1, maxAttempts);
@@ -147,7 +139,7 @@ describe('CNC Machine - XY Axis Probing', () => {
       .closest('.relative')
       .find('.bg-green-500')
       .should('exist');
-    cy.log('✓ Probe/TLS confirmed GREEN');
+    cy.log('Probe/TLS confirmed GREEN');
 
     // Set Z jog distance to 5 and move Z+ once
     // Click Z0 and go to Z=5
@@ -201,15 +193,8 @@ cy.log('Moved to Z=5');
     cy.log('Y- jog completed');
 
     cy.log('POSITION SETUP COMPLETED');
-
-
-    // ═══════════════════════════════════════
     // PART 3: XY AXIS PROBING
-    // ═══════════════════════════════════════
-
-    cy.log('═══════════════════════════════════════');
     cy.log('PART 3: XY AXIS PROBING OPERATION');
-    cy.log('═══════════════════════════════════════');
 
     // Open probe dialog
     cy.log('Step 16: Opening probe dialog...');
@@ -221,7 +206,7 @@ cy.log('Moved to Z=5');
     cy.log('Step 17: Closing probe dialog...');
     cy.get('#radix-\\:r1i\\: svg').should('be.visible').click();
     cy.wait(1500);
-    cy.log('✓ Probe dialog closed');
+    cy.log('Probe dialog closed');
 
     // Click XY probe button
     cy.log('Step 18: Opening XY probe interface...');
@@ -247,10 +232,8 @@ cy.log('Moved to Z=5');
 
     cy.log(' XY AXIS PROBING COMPLETED');
 
-
-    // ═══════════════════════════════════════
     // FINAL SUMMARY
-    // ═══════════════════════════════════════
+
 
     cy.log(' COMPLETE XY PROBING TEST PASSED! ');
     cy.log('Test Summary:');

@@ -11,7 +11,7 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
   });
 
   before(() => {
-    cy.viewport(2844, 1450);
+    cy.viewport(1920, 1080);
   });
 
   beforeEach(() => {

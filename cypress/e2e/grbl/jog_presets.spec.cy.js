@@ -16,13 +16,16 @@ describe('Gsender - Update Rapid Presets & Verify Jogging Values', () => {
   const EXPECTED_Z  = '15';
   const EXPECTED_A  = '15';
   const EXPECTED_SPEED = '4500';
-
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
+});
+
 
   it('Connects machine, updates rapid presets and verifies jogging values', () => {
 

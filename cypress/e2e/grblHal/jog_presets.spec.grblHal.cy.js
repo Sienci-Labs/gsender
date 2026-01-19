@@ -1,28 +1,14 @@
 describe('Gsender testing preset create update', () => {
-
-  // Ignore known hydration-related UI errors
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 4,
+    waitTime: 4000,
+    timeout: 5000
   });
+});
 
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
-  });
 
   it('Test Case 1: Verify Rapid preset values are updated correctly', () => {
     // Define the expected values
@@ -38,12 +24,12 @@ describe('Gsender testing preset create update', () => {
     cy.log(' Connected to CNC');
 
     // Step 2: Wait for Idle status and Zero all axes
-    cy.log('Step 2: Zeroing all axes...');
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.wait(2000);
-    cy.goToLocation({ x: 0, y: 0, z: 0 });
-    cy.wait(2000);
-    cy.log(' All axes zeroed to (0, 0, 0)');
+    // x axis
+    cy.zeroXAxis();
+    //y Axis 
+    cy.zeroYAxis();
+    //Z axis 
+    cy.zeroZAxis();
 
     // Step 3: Navigate to configuration page
     cy.log('Step 3: Navigating to config page...');
@@ -174,12 +160,12 @@ describe('Gsender testing preset create update', () => {
     cy.log('Connected to CNC');
 
     // Step 2: Zero all axes
-    cy.log('Step 2: Zeroing all axes...');
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.wait(2000);
-    cy.goToLocation({ x: 0, y: 0, z: 0 });
-    cy.wait(2000);
-    cy.log('All axes at (0, 0, 0)');
+    // x axis
+    cy.zeroXAxis();
+    //y Axis 
+    cy.zeroYAxis();
+    //Z axis 
+    cy.zeroZAxis();
 
     // Step 3: Navigate to home page and click Rapid
     cy.log('Step 3: Navigating to home page...');

@@ -1,11 +1,15 @@
 describe('Console commands testing ', () => { 
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
+ 
+ 
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
-
+});
   it('Connects machine and sets axes to zero', () => {
 
     //Connection

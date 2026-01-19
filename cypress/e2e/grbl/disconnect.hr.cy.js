@@ -11,12 +11,15 @@ describe('Connect and Disconnect from CNC Machine', () => {
     }
     return true;
   });
-
-  beforeEach(() => {
-    cy.viewport(2844, 1450);
-    cy.visit('http://localhost:8000/');
-    cy.title().should('eq', 'gSender');
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 3,
+    waitTime: 3000,
+    timeout: 5000
   });
+});
 
   it('connects and disconnects the CNC machine if Idle', () => { // Step 1: Connect to CNC using reusable command
     cy.log(' Connecting to CNC machine...');

@@ -1,28 +1,16 @@
 describe('Gsender testing jogging using buttons', () => {
 
-  // Ignore known hydration-related UI errors
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
 
-  beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
+ beforeEach(() => {
+  cy.viewport(1920, 1080);
+  // Use loadUI custom command with dynamic baseUrl
+  cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+    maxRetries: 4,
+    waitTime: 4000,
+    timeout: 5000
   });
+});
+
 
   it('Test Case: jogging using buttons', () => {
     // Step 1: Connect to CNC

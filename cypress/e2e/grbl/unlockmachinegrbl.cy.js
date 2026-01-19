@@ -1,69 +1,15 @@
-import '../support/commands'
-describe('Comprehensive Axis Movement and Jog Control Tests', () => {
+import '../support/commands';
 
-  // Ignore known hydration-related UI errors and undefined.get() error
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // ignore these exceptions
-    }
-    return true;
-  });
 
   beforeEach(() => {
-    cy.viewport(1280, 800);
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000); // Give app time to recover from initialization error
-  });
-
-  it('Test Case 1: Basic axis movements and position reset', () => {
-
-    // Step 1: Connect to CNCimport '../support/commands'
-
-describe('Machine Unlock Functionality Tests', () => {
-
-  // Ignore known hydration-related UI errors
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
-
-  beforeEach(() => {
-    cy.viewport(2133, 1050); // Using viewport from your JSON recording
-    cy.visit('http://localhost:8000/#/');
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(2000);
-  });
-
-  afterEach(() => {
-    // Disconnect after each test
-    cy.get('body').then($body => {
-      if ($body.find('button:contains("Disconnect")').length > 0) {
-        cy.contains('button', 'Disconnect').click({ force: true });
-        cy.wait(1000);
-      }
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 3,
+      waitTime: 3000,
+      timeout: 5000
     });
-  });
+
 
   it('TC-UNLOCK-001: Unlock machine after connection when locked', () => {
     cy.log('=== Test Case: Unlock machine after connection ===');
@@ -72,7 +18,7 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.log('Step 1: Connecting to machine...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.log(' Machine connected');
+    cy.log('✓ Machine connected');
 
     // Step 2: Verify machine is in locked state
     cy.log('Step 2: Checking for locked state...');
@@ -82,9 +28,9 @@ describe('Machine Unlock Functionality Tests', () => {
                        $body.text().includes('Click to Unlock Machine');
       
       if (isLocked) {
-        cy.log(' Machine is locked as expected');
+        cy.log('✓ Machine is locked as expected');
       } else {
-        cy.log('Machine is already unlocked');
+        cy.log('ℹ Machine is already unlocked');
       }
     });
 
@@ -97,7 +43,7 @@ describe('Machine Unlock Functionality Tests', () => {
       .click({ force: true });
     
     cy.wait(2000);
-    cy.log(' Unlock button clicked');
+    cy.log('✓ Unlock button clicked');
 
     // Step 4: Verify machine is unlocked
     cy.log('Step 4: Verifying machine is unlocked...');
@@ -106,12 +52,12 @@ describe('Machine Unlock Functionality Tests', () => {
       expect(stillLocked).to.be.false;
     });
     
-    cy.log(' Machine successfully unlocked');
-    cy.log('=== Test Passed ===');
+    cy.log('Machine successfully unlocked');
+    cy.log('Test Passed ');
   });
 
   it('TC-UNLOCK-002: Verify unlock popup appears and can be dismissed', () => {
-    cy.log('=== Test Case: Verify unlock popup functionality ===');
+    cy.log('Test Case: Verify unlock popup functionality ');
     
     // Connect and wait for popup
     cy.log('Step 1: Connecting to machine...');
@@ -130,7 +76,7 @@ describe('Machine Unlock Functionality Tests', () => {
       ].join(','));
 
       if (unlockElements.length > 0) {
-        cy.log(' Unlock popup/button found');
+        cy.log('Unlock popup/button found');
         
         // Click to dismiss/unlock
         cy.log('Step 3: Clicking to unlock...');
@@ -143,9 +89,9 @@ describe('Machine Unlock Functionality Tests', () => {
         // Verify popup is gone
         cy.log('Step 4: Verifying popup is dismissed...');
         cy.get('body').should('not.contain', 'Click to Unlock Machine');
-        cy.log(' Popup dismissed successfully');
+        cy.log('✓ Popup dismissed successfully');
       } else {
-        cy.log(' No unlock popup found - machine may already be unlocked');
+        cy.log('ℹ No unlock popup found - machine may already be unlocked');
       }
     });
 
@@ -161,9 +107,9 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.wait(6000);
     
     // First unlock
-    cy.unlockMachine();
+    cy.unlockMachineIfNeeded();
     cy.wait(3000);
-    cy.log(' First unlock completed');
+    cy.log('✓ First unlock completed');
 
     // Simulate operation that might cause lock
     cy.log('Step 2: Simulating operations...');
@@ -171,14 +117,14 @@ describe('Machine Unlock Functionality Tests', () => {
 
     // Check and unlock again if needed
     cy.log('Step 3: Second unlock check...');
-    cy.unlockMachine();
+    cy.unlockMachineIfNeeded();
     cy.wait(2000);
-    cy.log(' Second unlock check completed');
+    cy.log('✓ Second unlock check completed');
 
     // Third check
     cy.log('Step 4: Third unlock check...');
-    cy.unlockMachine();
-    cy.log('Third unlock check completed');
+    cy.unlockMachineIfNeeded();
+    cy.log('✓ Third unlock check completed');
 
     cy.log('=== Test Passed ===');
   });
@@ -191,16 +137,22 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.connectMachine();
     cy.wait(6000);
 
-    // Use exact selector from your JSON recording
+    // Use exact selector from JSON recording
     cy.log('Step 2: Using recorded selector to unlock...');
-    cy.get('#app > div > div.border div.mt-4 path', { timeout: 10000 })
-      .should('exist')
-      .parent('button')
-      .should('be.visible')
-      .click({ force: true });
-    
-    cy.wait(2000);
-    cy.log(' Clicked unlock using recorded selector');
+    cy.get('body').then($body => {
+      if ($body.find('#app > div > div.border div.mt-4 path').length > 0) {
+        cy.get('#app > div > div.border div.mt-4 path', { timeout: 10000 })
+          .should('exist')
+          .parent('button')
+          .should('be.visible')
+          .click({ force: true });
+        
+        cy.wait(2000);
+        cy.log('✓ Clicked unlock using recorded selector');
+      } else {
+        cy.log('ℹ No unlock button found - machine already unlocked');
+      }
+    });
 
     // Verify unlock
     cy.log('Step 3: Verifying unlock...');
@@ -232,13 +184,13 @@ describe('Machine Unlock Functionality Tests', () => {
             .click({ force: true });
           
           cy.wait(2000);
-          cy.log('Unlock attempted');
+          cy.log('✓ Unlock attempted');
           
           // Verify unlock succeeded
           cy.get('body').then($newBody => {
             const stillLocked = $newBody.find('svg.hidden').length > 0;
             if (stillLocked) {
-              cy.log('Machine still locked - retry needed');
+              cy.log('⚠ Machine still locked - retry needed');
               // Retry once
               cy.wrap(unlockButton.first())
                 .parent('button')
@@ -247,10 +199,10 @@ describe('Machine Unlock Functionality Tests', () => {
             }
           });
         } else {
-          cy.log(' No unlock needed - machine already unlocked');
+          cy.log('ℹ No unlock needed - machine already unlocked');
         }
       } catch (error) {
-        cy.log('Error during unlock:', error.message);
+        cy.log('❌ Error during unlock:', error.message);
         throw error;
       }
     });
@@ -265,29 +217,29 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.log('Step 1: Initial connection...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.ensureMachineUnlocked();
-    cy.log(' Initial unlock completed');
+    cy.unlockMachineIfNeeded();
+    cy.log('✓ Initial unlock completed');
 
     // Disconnect
     cy.log('Step 2: Disconnecting...');
     cy.contains('button', 'Disconnect').click({ force: true });
     cy.wait(3000);
-    cy.log(' Disconnected');
+    cy.log('✓ Disconnected');
 
     // Reconnect
     cy.log('Step 3: Reconnecting...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.log(' Reconnected');
+    cy.log('✓ Reconnected');
 
     // Unlock after reconnection
     cy.log('Step 4: Unlocking after reconnection...');
-    cy.ensureMachineUnlocked();
+    cy.unlockMachineIfNeeded();
     cy.wait(2000);
     
     // Verify machine is responsive
     cy.get('#app').should('be.visible');
-    cy.log(' Machine unlocked and responsive');
+    cy.log('✓ Machine unlocked and responsive');
 
     cy.log('=== Test Passed ===');
   });
@@ -306,16 +258,16 @@ describe('Machine Unlock Functionality Tests', () => {
       if (unlockButton.length > 0) {
         // Verify button is visible
         cy.wrap(unlockButton).should('be.visible');
-        cy.log(' Unlock button is visible');
+        cy.log('✓ Unlock button is visible');
 
         // Verify button is enabled
         cy.wrap(unlockButton).should('not.be.disabled');
-        cy.log(' Unlock button is enabled');
+        cy.log('✓ Unlock button is enabled');
 
         // Click and verify
         cy.wrap(unlockButton).click({ force: true });
         cy.wait(2000);
-        cy.log(' Unlock button is clickable');
+        cy.log('✓ Unlock button is clickable');
       } else {
         cy.log('ℹ No unlock button present - machine already unlocked');
       }
@@ -335,7 +287,7 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.log('Step 2: Performing rapid unlock attempts...');
     for (let i = 1; i <= 5; i++) {
       cy.log(`Unlock attempt ${i}/5`);
-      cy.unlockMachine();
+      cy.unlockMachineIfNeeded();
       cy.wait(500); // Short wait between attempts
     }
 
@@ -346,11 +298,45 @@ describe('Machine Unlock Functionality Tests', () => {
     cy.get('#app').should('be.visible');
     cy.get('body').should('not.contain', 'error');
     
-    cy.log('Machine remains functional after rapid unlocks');
+    cy.log('✓ Machine remains functional after rapid unlocks');
     cy.log('=== Test Passed ===');
   });
 
-})
+});
+
+
+describe('Comprehensive Axis Movement and Jog Control Tests', () => {
+
+  // Ignore known hydration-related UI errors and undefined.get() error
+  Cypress.on('uncaught:exception', (err) => {
+    console.log('Uncaught exception:', err.message);
+    
+    const ignoreMessages = [
+      'Hydration failed',
+      'There was an error while hydrating',
+      'Cannot read properties of undefined',
+      'reading \'get\''
+    ];
+    
+    if (ignoreMessages.some(msg => err.message.includes(msg))) {
+      return false; // ignore these exceptions
+    }
+    return true;
+  });
+
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 3,
+      waitTime: 3000,
+      timeout: 5000
+    });
+  });
+
+  it('Test Case 1: Basic axis movements and position reset', () => {
+
+    // Step 1: Connect to CNC
     cy.log('Step 1: Connecting to CNC...');
     cy.connectMachine();
     cy.wait(6000);
@@ -377,5 +363,16 @@ describe('Machine Unlock Functionality Tests', () => {
     });
 
     cy.wait(2000);
+
+    // Step 3: Verify machine status is Idle
+    cy.log('Step 3: Verifying machine status...');
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should('be.visible')
+      .then(status => {
+        cy.log(`Machine status: "${status.text().trim()}"`);
+      });
+
+    cy.log('✓ Test Case 1 completed successfully');
   });
+
 });

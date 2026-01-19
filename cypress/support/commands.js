@@ -49,16 +49,19 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
   const {
     maxRetries = 3,
     waitTime = 3000,
-    timeout = 5000
+    timeout = 5000,
+    viewport = { width: 1920, height: 1080 }
   } = options;
+
+  cy.viewport(viewport.width, viewport.height);
 
   function tryLoadUI(attempt = 1) {
     cy.log(`Loading attempt ${attempt} of ${maxRetries}`);
-    
+
     if (attempt === 1) {
-      cy.visit(url, { 
+      cy.visit(url, {
         failOnStatusCode: false,
-        timeout: 30000 
+        timeout: 30000
       });
     } else {
       cy.reload();
@@ -66,20 +69,23 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 
     cy.wait(waitTime);
 
-    // Check multiple indicators that UI has loaded
     cy.get('body', { timeout }).then(($body) => {
       const hasButton = $body.find('button').length > 0;
       const hasCOM = $body.text().includes('COM');
-      const hasConnection = $body.text().includes('Connect') || $body.text().includes('Connection');
-      
+      const hasConnection =
+        $body.text().includes('Connect') ||
+        $body.text().includes('Connection');
+
       const uiLoaded = hasButton && (hasCOM || hasConnection);
-      
-      cy.log(`Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`);
-      
+
+      cy.log(
+        `Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`
+      );
+
       if (uiLoaded) {
-        cy.log(' UI loaded successfully');
+        cy.log('UI loaded successfully');
       } else if (attempt < maxRetries) {
-        cy.log(' UI not loaded, refreshing...');
+        cy.log('UI not loaded, refreshing...');
         tryLoadUI(attempt + 1);
       } else {
         throw new Error(`Failed to load UI after ${maxRetries} attempts`);
@@ -89,6 +95,7 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 
   tryLoadUI();
 });
+
 
 // ----------------------
 //3.Connect to CNC machine grbl
@@ -411,10 +418,14 @@ Cypress.Commands.add('autoUnlock', () => {
 });
 
 // ------------------------
-// 5.Connect to CNC - GrblHAL
+// 5. Connect to CNC - GrblHAL (Cross-platform compatible)
 // ----------------------
 Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
+  // Get device pattern from environment variable or use default
+  const devicePattern = options.deviceName || Cypress.env('deviceName') || 'COM';
+  
   cy.log('Starting connection check...');
+  cy.log(`Using device pattern: "${devicePattern}"`);
   cy.wait(2000); // Brief wait for UI to stabilize
   
   cy.get('body').then(($body) => {
@@ -422,23 +433,23 @@ Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
     
     // Check if already in Idle state
     if (/\bIdle\b/i.test(bodyText)) {
-      cy.log('Machine is already connected and in Idle state');
+      cy.log(' Machine is already connected and in Idle state');
       return;
     }
     
     // Check if connected but waiting for Idle
     if (/\b(Disconnect|disconnect)\b/.test(bodyText)) {
-      cy.log('Machine is connected, waiting for Idle state...');
+      cy.log(' Machine is connected, waiting for Idle state...');
       cy.contains(/^Idle$/i, { timeout: 30000 })
         .should('be.visible')
         .then(() => {
-          cy.log('Machine reached Idle state');
+          cy.log(' Machine reached Idle state');
         });
       return;
     }
     
     // Not connected - initiate connection
-    cy.log('Machine not connected. Initiating connection...');
+    cy.log(' Machine not connected. Initiating connection...');
     
     cy.contains(/^connect to CNC$/i, { timeout: 20000 })
       .should('exist')
@@ -449,27 +460,39 @@ Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
         cy.log('Connect button clicked');
         cy.wait(1000);
         
-        // Select first available COM port
+        // Select device port matching the pattern
         cy.get('div.absolute', { timeout: 20000 })
           .should('be.visible')
           .find('button')
-          .first()
-          .should('contain.text', 'COM')
-          .then(($btn) => {
-            const portName = $btn.text().trim();
+          .then(($buttons) => {
+            // Find first button that matches the device pattern
+            const matchingButton = $buttons.toArray().find(btn => {
+              const text = btn.textContent || '';
+              return text.includes(devicePattern);
+            });
+
+            if (!matchingButton) {
+              const availablePorts = $buttons.toArray().map(b => b.textContent).join(', ');
+              throw new Error(
+                ` No device found matching pattern: "${devicePattern}". ` +
+                `Available ports: ${availablePorts}`
+              );
+            }
+
+            const portName = matchingButton.textContent.trim();
             cy.log(`Selecting port: ${portName}`);
-            cy.wrap($btn).click({ force: true });
+            cy.wrap(matchingButton).click({ force: true });
           });
         
         // Handle unlock if needed
         cy.unlockMachineIfNeeded();
         
         // Wait for Idle state
-        cy.log('Waiting for machine to reach Idle state...');
+        cy.log(' Waiting for machine to reach Idle state...');
         cy.contains(/^Idle$/i, { timeout: 30000 })
           .should('be.visible')
           .then(() => {
-            cy.log('CNC machine connected successfully and is in Idle state');
+            cy.log(' CNC machine connected successfully and is in Idle state');
           });
       });
   });
@@ -905,7 +928,7 @@ Cypress.Commands.add('jogXPlusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xPlus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X+ jog ${i}/${times} completed`);
+    cy.log(`X+ jog ${i}/${times} completed`);
   }
 });
 
@@ -914,7 +937,7 @@ Cypress.Commands.add('jogXMinusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xMinus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X- jog ${i}/${times} completed`);
+    cy.log(`X- jog ${i}/${times} completed`);
   }
 });
 
@@ -924,7 +947,7 @@ Cypress.Commands.add('jogYPlusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#yPlus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ Y+ jog ${i}/${times} completed`);
+    cy.log(`Y+ jog ${i}/${times} completed`);
   }
 });
 
@@ -933,7 +956,7 @@ Cypress.Commands.add('jogYMinusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#yMinus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ Y- jog ${i}/${times} completed`);
+    cy.log(`Y- jog ${i}/${times} completed`);
   }
 });
 
@@ -945,7 +968,7 @@ Cypress.Commands.add('jogZPlusTimes', (times = 1, waitTime = 2000) => {
       .should('exist')
       .click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ Z+ jog ${i}/${times} completed`);
+    cy.log(`Z+ jog ${i}/${times} completed`);
   }
 });
 
@@ -956,7 +979,7 @@ Cypress.Commands.add('jogZMinusTimes', (times = 1, waitTime = 2000) => {
       .should('exist')
       .click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ Z- jog ${i}/${times} completed`);
+    cy.log(`Z- jog ${i}/${times} completed`);
   }
 });
 
@@ -966,7 +989,7 @@ Cypress.Commands.add('jogXYPlusPlusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xPlusYPlus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X+Y+ jog ${i}/${times} completed`);
+    cy.log(`X+Y+ jog ${i}/${times} completed`);
   }
 });
 
@@ -975,7 +998,7 @@ Cypress.Commands.add('jogXYPlusMinusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xPlusYMinus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X+Y- jog ${i}/${times} completed`);
+    cy.log(`X+Y- jog ${i}/${times} completed`);
   }
 });
 
@@ -984,7 +1007,7 @@ Cypress.Commands.add('jogXYMinusMinusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xMinusYMinus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X-Y- jog ${i}/${times} completed`);
+    cy.log(` X-Y- jog ${i}/${times} completed`);
   }
 });
 
@@ -993,7 +1016,7 @@ Cypress.Commands.add('jogXYMinusPlusTimes', (times = 1, waitTime = 2000) => {
   for (let i = 1; i <= times; i++) {
     cy.get('path#xMinusYPlus').should('exist').click({ force: true });
     cy.wait(waitTime);
-    cy.log(`✓ X-Y+ jog ${i}/${times} completed`);
+    cy.log(`X-Y+ jog ${i}/${times} completed`);
   }
 });
 
@@ -1003,7 +1026,11 @@ Cypress.Commands.add('jogXYMinusPlusTimes', (times = 1, waitTime = 2000) => {
 // ==============================
 
 // URL Definitions
-const BASE_URL = 'http://localhost:8000';
+
+Cypress.Commands.add('loadUI', (url, options = {}) => {
+  cy.visit(url, { timeout: options.timeout || 10000 });
+  // You can also handle retries or waits here if needed
+});
 
 // Page URLs
 Cypress.Commands.add('goToCarve', () => {

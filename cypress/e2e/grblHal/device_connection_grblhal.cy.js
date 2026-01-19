@@ -1,51 +1,36 @@
 describe('Connect To CNC and Detect Firmware', () => {
-
-  Cypress.on('uncaught:exception', (err) => {
-    // Log the error for debugging
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // Prevent Cypress from failing
-    }
-    return true;
-  });   
-
-  Cypress.on('window:alert', (str) => {
-    if (str.includes('Click to unlock Machine')) {
-      cy.log('Alert detected: Click to unlock Machine');
-      return true;
-    }
-  });
-// Custom retry loop to check whether the UI is loaded completely
   beforeEach(() => {
-  cy.loadUI('http://localhost:8000/#/', '#app', 3);
-});
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 4,
+      waitTime: 4000,
+      timeout: 5000
+    });
+  });
 
-  it('connects to CNC, selects COM port, and detects firmware', () => {
+  it('connects to CNC, selects device port, and detects firmware', () => {
     cy.wait(5000);
 
+    // Get device name pattern from environment variable
+    // Default to 'COM' for Windows if not specified
+    const devicePattern = Cypress.env('deviceName') || 'COM';
     
-
+    cy.log(`Using device pattern: ${devicePattern}`);
     cy.log('Checking for Connect button...');
+    
     cy.contains(/^connect to CNC$/i, { timeout: 20000 })
       .should('exist')
       .scrollIntoView()
       .should('be.visible')
       .click({ force: true });
 
-    cy.log('Connect button clicked — selecting COM port...');
+    cy.log('Connect button clicked — selecting device port...');
     cy.get('div.absolute', { timeout: 20000 })
       .should('be.visible')
       .find('button')
       .first()
-      .should('contain.text', 'COM')
+      .should('contain.text', devicePattern)
       .then(($btn) => {
         const portName = $btn.text().trim();
         cy.log(`Selecting port: ${portName}`);
@@ -58,7 +43,7 @@ describe('Connect To CNC and Detect Firmware', () => {
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should('be.visible')
       .then(() => {
-        cy.log(' CNC machine connected successfully and is in Idle state');
+        cy.log('CNC machine connected successfully and is in Idle state');
       });
 
     cy.wait(2000);
@@ -67,11 +52,11 @@ describe('Connect To CNC and Detect Firmware', () => {
       const text = $body.text().toLowerCase();
 
       if (text.includes('grblhal')) {
-        cy.log(' Firmware Detected: GrblHAL');
+        cy.log('Firmware Detected: GrblHAL');
       } else if (text.includes('grbl')) {
-        cy.log(' Firmware Detected: Grbl');
+        cy.log('Firmware Detected: Grbl');
       } else {
-        cy.log(' Firmware information not found.');
+        cy.log('Firmware information not found.');
       }
     });
   });
