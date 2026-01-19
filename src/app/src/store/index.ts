@@ -54,7 +54,7 @@ const getConfig = (): string => {
             content = fs.readFileSync(userData!.path, 'utf8') || '{}';
         }
     } else {
-        content = localStorage.getItem('sienci') || '{}';
+        content = (typeof localStorage !== 'undefined' ? localStorage.getItem('sienci') : null) || '{}';
     }
 
     if (content === '{}') {
@@ -83,7 +83,9 @@ const persist = (data: StoreData): void => {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData!.path, value);
         } else {
-            localStorage.setItem('sienci', value);
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('sienci', value);
+            }
         }
     } catch (e) {
         log.error(e);
@@ -247,7 +249,9 @@ const backupPreviousState = (data: any): void => {
         const fs = window.require('fs'); // Use window.require to require fs module in Electron
         fs.writeFileSync(backupPath, value);
     } else {
-        localStorage.setItem('sienci-backup', value);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('sienci-backup', value);
+        }
     }
 };
 
