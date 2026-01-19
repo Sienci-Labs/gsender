@@ -1968,6 +1968,9 @@ class GrblHalController {
                     });
                 });
             },
+            'restart': () => {
+                this.command('gcode', '$REBOOT');
+            },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBLHAL, this.state);
             },

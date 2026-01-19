@@ -80,10 +80,6 @@ export function useSienciATCWizard(): Wizard {
                             component: RackPosition,
                             secondaryContent: [
                                 {
-                                    type: 'image',
-                                    content: PlaceholderImage,
-                                },
-                                {
                                     type: 'component',
                                     content: Jogging,
                                 },

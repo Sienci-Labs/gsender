@@ -10,6 +10,7 @@ interface StepActionButtonProps {
     errorLabel?: string;
     onApply: () => void;
     isComplete?: boolean;
+    disabled?: boolean;
     error?: string | null;
     className?: string;
     variant?: 'primary' | 'secondary';
@@ -27,6 +28,7 @@ export function StepActionButton({
     className = '',
     variant = 'primary',
     icon,
+    disabled = false
 }: StepActionButtonProps) {
     const [isRunning, setIsRunning] = useState(false);
 
@@ -117,6 +119,7 @@ export function StepActionButton({
                 onClick={handleClick}
                 disabled={state === 'running' || state === 'finished'}
                 className={`${getButtonStyles()} ${className}`}
+                disabled={disabled}
             >
                 {getButtonContent()}
             </button>

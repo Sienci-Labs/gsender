@@ -50,7 +50,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
                 onApply={handleRestart}
                 isComplete={restarted}
                 error={error}
-                disabled={canRestart}
+                disabled={!canRestart}
             />
 
             <p className="font-bold">AND</p>
@@ -61,7 +61,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
                 onApply={handleRehome}
                 isComplete={rehomed}
                 error={error}
-                disabled={canRehome}
+                disabled={!canRehome}
             />
         </div>
     );
