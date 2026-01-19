@@ -22,7 +22,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     };
 
     const handleRehome = () => {
-        controller.command('home');
+        controller.command('homing');
         setTimeout(() => {
             setRehomed(true);
             onComplete();

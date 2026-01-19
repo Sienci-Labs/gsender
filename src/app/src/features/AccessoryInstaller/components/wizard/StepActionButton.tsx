@@ -53,7 +53,7 @@ export function StepActionButton({
 
     const getButtonStyles = () => {
         const baseStyles =
-            'flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors min-w-[180px]';
+            'flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors min-w-[180px] disabled:bg-gray-500 disabled:text-gray-600';
 
         if (variant === 'secondary') {
             switch (state) {
