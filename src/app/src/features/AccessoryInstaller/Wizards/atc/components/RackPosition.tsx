@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import controller from "app/lib/controller.ts";
+import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const [rackPositionMethod, setRackPositionMethod] =
         useState<string>('utility');
 
     const mpos = useSelector((state: RootState) => state.controller.mpos);
+    const rackPosition = useTypedSelector((state: RootState) => state.controller.settings.parameters['G59.1'])
 
     useEffect(() => {
         if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
@@ -21,6 +24,14 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     const applySettings = async () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
+    };
+
+    const handleUseUtility = () => {
+        controller.command('gcode', 'G65 P302');
+    };
+
+    const setPositionViaPositionSetting = () => {
+        //ToDo
     };
 
     return (
@@ -52,8 +63,8 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         Rack” to start.
                     </p>
                     <StepActionButton
-                        label="Probe Rack"
-                        runningLabel="Probing..."
+                        label="Find Rack"
+                        runningLabel="Finding..."
                         onApply={applySettings}
                         onComplete={onComplete}
                         onUncomplete={onUncomplete}
