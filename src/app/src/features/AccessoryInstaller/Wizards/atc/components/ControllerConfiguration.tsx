@@ -1,10 +1,14 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { useState } from 'react';
 
 export function ControllerConfiguration({
     onComplete,
     onUncomplete,
 }: StepProps) {
+    const [applied, setApplied] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+
     const applySettings = async () => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
     };
@@ -29,11 +33,11 @@ export function ControllerConfiguration({
 
             <p>Select “Apply Settings” to apply these changes.</p>
             <StepActionButton
-                label="Apply Settings"
+                label={'Apply Settings'}
                 runningLabel="Applying..."
                 onApply={applySettings}
-                onComplete={onComplete}
-                onUncomplete={onUncomplete}
+                isComplete={applied}
+                error={error}
             />
         </div>
     );
