@@ -34,6 +34,32 @@ export function useSienciATCWizard(): Wizard {
                     completionPage: ATCCompletion,
                     steps: [
                         {
+                            id: 'rack-position',
+                            title: 'Rack Position',
+                            component: RackPosition,
+                            secondaryContent: [
+                                {
+                                    type: 'component',
+                                    content: Jogging,
+                                },
+                            ],
+                        },
+                        {
+                            id: 'tool-length-sensor',
+                            title: 'Tool Length Sensor Position',
+                            component: TLSPosition,
+                            secondaryContent: [
+                                {
+                                    type: 'image',
+                                    content: PlaceholderImage,
+                                },
+                                {
+                                    type: 'component',
+                                    content: Jogging,
+                                },
+                            ],
+                        },
+                        {
                             id: 'macro-configuration',
                             title: 'Macro Configuration',
                             component: MacroConfiguration,
@@ -79,10 +105,6 @@ export function useSienciATCWizard(): Wizard {
                             title: 'Rack Position',
                             component: RackPosition,
                             secondaryContent: [
-                                {
-                                    type: 'image',
-                                    content: PlaceholderImage,
-                                },
                                 {
                                     type: 'component',
                                     content: Jogging,

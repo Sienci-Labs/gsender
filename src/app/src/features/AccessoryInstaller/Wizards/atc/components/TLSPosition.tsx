@@ -20,6 +20,13 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
 
     const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
 
+    const setPosition = () => {
+        console.log('setting')
+        setTimeout(() => {
+            onComplete();
+        }, 1500);
+    }
+
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
             <p>
@@ -41,11 +48,11 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
                 }}
                 actionButton={
                     <StepActionButton
-                        label="Set Position"
+                        label={'Set Position'}
                         runningLabel="Setting..."
-                        onApply={applySettings}
-                        onComplete={onComplete}
-                        onUncomplete={onUncomplete}
+                        onApply={setPosition}
+                        isComplete={isComplete}
+                        error={error}
                     />
                 }
             />
