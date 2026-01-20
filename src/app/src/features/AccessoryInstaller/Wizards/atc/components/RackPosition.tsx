@@ -30,6 +30,10 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
         console.log('SETVAR:', ATCIPositionSet);
         if (ATCIPositionSet === '1') {
             onComplete();
+            setIsComplete(true);
+            setTimeout(() => {
+                setIsComplete(false);
+            }, 5000);
         }
     }, [ATCIPositionSet]);
 
