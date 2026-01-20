@@ -148,25 +148,28 @@ export const TemplatesTab: React.FC = () => {
 
                     <div className="p-0 flex-1 min-h-0">
                         <div className="h-full overflow-y-auto">
-                            {templates?.macros.map((template, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() =>
-                                        setSelectedTemplate(template)
-                                    }
-                                    className={cn(
-                                        'w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 flex items-center gap-2 transition-colors',
-                                        selectedTemplate?.name ===
-                                            template.name &&
-                                            'bg-blue-50 border-blue-200',
-                                    )}
-                                >
-                                    <FileText className="h-4 w-4 text-gray-400" />
-                                    <span className="font-medium">
-                                        {template.name}
-                                    </span>
-                                </button>
-                            ))}
+                            {templates?.macros
+                                ?.slice() // or [...templates.macros] to avoid mutating the original array
+                                .sort((a, b) => a.name.localeCompare(b.name))
+                                .map((template, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() =>
+                                            setSelectedTemplate(template)
+                                        }
+                                        className={cn(
+                                            'w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 flex items-center gap-2 transition-colors',
+                                            selectedTemplate?.name ===
+                                                template.name &&
+                                                'bg-blue-50 border-blue-200',
+                                        )}
+                                    >
+                                        <FileText className="h-4 w-4 text-gray-400" />
+                                        <span className="font-medium">
+                                            {template.name}
+                                        </span>
+                                    </button>
+                                ))}
                         </div>
                     </div>
                 </div>
