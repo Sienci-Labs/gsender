@@ -25,7 +25,7 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
         console.log('setting');
         controller.command(
             'gcode',
-            `G10 L2 P9 X${position.x} Y${position.y} Z${position.z}`,
+            `G10 L2 P9 X${position.x} Y${position.y}`,
             '$#',
         );
         setTimeout(() => {
