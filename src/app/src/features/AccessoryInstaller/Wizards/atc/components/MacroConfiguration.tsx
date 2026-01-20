@@ -9,6 +9,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     const [rackSize, setRackSize] = useState<number>(12);
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         controller.addListener('ymodem:complete', () => {
@@ -19,12 +20,13 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                 setIsComplete(false);
             }, 2000);
         });
-        controller.addListener('ymodem:error', () => {
+        controller.addListener('ymodem:error', (err) => {
             setError(true);
+            setErrorMsg(err);
             setTimeout(() => {
                 setIsComplete(false);
-                setError(false);
-            }, 3000);
+                setError(null);
+            }, 5000);
         });
         return () => {
             controller.removeListener('ymodem:complete');
@@ -92,7 +94,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                 runningLabel="Uploading..."
                 onApply={handleUpload}
                 isComplete={isComplete}
-                error={error}
+                error={errorMsg}
             />
         </div>
     );
