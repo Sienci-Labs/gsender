@@ -71,7 +71,12 @@ export class YModem extends events.EventEmitter {
         this.comms.write(header);
 
         // [<<< C]
-        await this.waitForNext([this.C, this.ACK]);
+        try {
+            await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+        } catch (e) {
+            this.emit('error', e.message);
+            throw e;
+        }
 
 
         let fileChunks;
@@ -166,8 +171,14 @@ export class YModem extends events.EventEmitter {
             this.comms.write(header);
 
             // [<<< C]
-            // eslint-disable-next-line no-await-in-loop
-            await this.waitForNext([this.C, this.ACK]);
+
+            try {
+                // eslint-disable-next-line no-await-in-loop
+                await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+            } catch (e) {
+                this.emit('error', e.message);
+                throw e;
+            }
 
 
             let fileChunks;
@@ -304,6 +315,22 @@ export class YModem extends events.EventEmitter {
                 );
             }
         }
+    }
+
+    waitForNextWithTimeout(controlChars, timeoutMs = 10000) {
+        let timeoutHandle;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutHandle = setTimeout(() => {
+                reject(new Error(`Timeout waiting for control characters: ${controlChars.map(c => DebugDict[c] || c).join(', ')}`));
+            }, timeoutMs);
+        });
+
+        return Promise.race([
+            this.waitForNext(controlChars),
+            timeoutPromise
+        ]).finally(() => {
+            clearTimeout(timeoutHandle);
+        });
     }
 
 
