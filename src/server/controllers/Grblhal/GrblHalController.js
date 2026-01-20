@@ -2345,7 +2345,7 @@ class GrblHalController {
             },
             'sdcard:list': () => {
                 const [type = 'cnc'] = args;
-
+                this.runner.clearSDFiles();
                 if (type === 'cnc') {
                     this.writeln('$F');
                     return;

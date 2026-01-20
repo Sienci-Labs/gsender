@@ -541,6 +541,10 @@ class GrblHalRunner extends events.EventEmitter {
         const axs = _.get(this.state, 'axes.axes', []);
         return !_.isEmpty(axs);
     }
+
+    clearSDFiles() {
+        this.state.sdcard.files = [];
+    }
 }
 
 export default GrblHalRunner;

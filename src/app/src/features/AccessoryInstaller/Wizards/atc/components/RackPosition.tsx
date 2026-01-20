@@ -96,7 +96,8 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         The machine will use the Stud-finder Sensor to determine
                         the precise position of your tool rack.
                         <b>Keep your hands near the E-stop</b> and click “Find
-                        Rack” to start.
+                        Rack” to start. Expect the process to take a few
+                        minutes.
                     </p>
                     <StepActionButton
                         label="Find Rack"
