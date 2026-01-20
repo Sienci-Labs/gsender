@@ -22,7 +22,7 @@
  */
 
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell, nativeImage } from "electron";
 import path from "path";
 
 const remoteMain = require("@electron/remote/main");
@@ -39,6 +39,8 @@ class WindowManager {
   width = 0;
 
   height = 0;
+
+  shouldPromptExit = false;
 
   constructor() {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#event-activate-os-x
@@ -109,11 +111,32 @@ class WindowManager {
       window.setTitle(options.title);
     });
 
+    window.on('close', (e) => {
+      if (this.shouldPromptExit) {
+        const image = nativeImage.createFromPath('../app/images/favicon.png');
+        const options = {
+            type: 'question',
+            buttons: ['No', 'Yes'],
+            message: 'Exit gSender',
+            detail: 'Are you sure you want to exit?',
+            icon: image,
+        };
+        const response = dialog.showMessageBoxSync(null, options);
+        if (response === 0) {
+          e.preventDefault();
+        }
+      }
+    });
+
     window.on("closed", (event) => {
       const index = this.windows.indexOf(event.sender);
       console.assert(index >= 0);
       this.windows.splice(index, 1);
     });
+
+    ipcMain.on("assignPromptExit", (_msg, promptExit) => {
+      this.shouldPromptExit = promptExit;
+    })
 
     window.on("maximize", (event) => {
       window.webContents.send("maximize-window");
