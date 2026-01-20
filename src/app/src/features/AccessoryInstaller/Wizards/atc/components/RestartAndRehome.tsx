@@ -6,7 +6,7 @@ import { StepActionButton } from 'app/features/AccessoryInstaller/components/wiz
 import { StepProps } from 'app/features/AccessoryInstaller/types';
 
 export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
-    const [restarted, setRestarted] = useState<boolean>(false);
+    const [restarted, setRestarted] = useState<boolean>(true);
     const [rehomed, setRehomed] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
@@ -35,25 +35,12 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Restart and Rehome
+                Rehome
             </label>
             <p>
-                The update spindle settings require a controller reset and to
-                rehome the machine before continuing. Restart the controller,
-                reconnect in the top-right corner, and then rehome using the
-                provided buttons
+                The updated homing location requires you to rehome the machine
+                before continuing. Re1`home using the provided buttons
             </p>
-
-            <StepActionButton
-                label={'Restart Controller'}
-                runningLabel="Restarting..."
-                onApply={handleRestart}
-                isComplete={restarted}
-                error={error}
-                disabled={!canRestart}
-            />
-
-            <p className="font-bold">AND</p>
 
             <StepActionButton
                 label={'Re-home'}

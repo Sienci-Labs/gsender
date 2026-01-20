@@ -4,18 +4,34 @@ import { useEffect, useState } from 'react';
 import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
-import controller from "app/lib/controller.ts";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import store from "app/store";
+import controller from 'app/lib/controller.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import store from 'app/store';
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const [rackPositionMethod, setRackPositionMethod] =
         useState<string>('utility');
     const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const rackless = store.get('widgets.atc.templates.variables._tc_rack_enable.value', 0) === 0;
+    const rackless =
+        store.get(
+            'widgets.atc.templates.variables._tc_rack_enable.value',
+            0,
+        ) === 0;
 
     const mpos = useSelector((state: RootState) => state.controller.mpos);
+    const ATCIPositionSet = useTypedSelector(
+        (state: RootState) => state.controller.settings.atci?.rack_set,
+    );
+
+    // Once we get a flag back, we can complete and move on to next step
+    useEffect(() => {
+        console.log('SETVAR:', ATCIPositionSet);
+        if (ATCIPositionSet === '1') {
+            onComplete();
+        }
+    }, [ATCIPositionSet]);
 
     useEffect(() => {
         if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
@@ -25,32 +41,33 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
 
-    const applySettings = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-    };
-
     const handleUseUtility = () => {
         controller.command('gcode', 'G65 P302');
-        setTimeout(() => {
-            onComplete();
-        }, 2000);
     };
 
     const setPositionViaPositionSetting = () => {
-        controller.command('gcode', [`G10 L2 P7 X${position.x} Y${position.y} Z${position.z}`, '$#']);
+        controller.command('gcode', [
+            `G10 L2 P7 X${position.x} Y${position.y} Z${position.z}`,
+            '$#',
+        ]);
         setTimeout(() => {
             onComplete();
         }, 1500);
     };
 
-
     if (rackless) {
         return (
             <div className="flex flex-col gap-5 p-2 justify-start">
-                <p>For ATC Configuration, you selected “No Tool Rack” and so do not need to set a rack position.</p>
-                <p>If you have a rack installed, please return to the previous step to correct your selection.</p>
+                <p>
+                    For ATC Configuration, you selected “No Tool Rack” and so do
+                    not need to set a rack position.
+                </p>
+                <p>
+                    If you have a rack installed, please return to the previous
+                    step to correct your selection.
+                </p>
             </div>
-        )
+        );
     }
 
     return (
@@ -72,7 +89,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                 <>
                     <p>
                         Position the spindle until the tool-stud sensor is
-                        almost touching the left-most tool-stud, as in the
+                        almost touching the right-most tool-stud, as in the
                         provided image. The LED on the sensor should light up.
                     </p>
                     <p>

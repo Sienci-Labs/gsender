@@ -6,7 +6,7 @@ import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
-    const [rackSize, setRackSize] = useState<number>(12);
+    const [rackSize, setRackSize] = useState<number>(6);
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 

@@ -67,7 +67,7 @@ export function useSienciATCWizard(): Wizard {
                         },
                         {
                             id: 'restart-rehome',
-                            title: 'Restart and Rehome',
+                            title: 'Rehome',
                             component: RestartAndRehome,
                             secondaryContent: [
                                 {
@@ -92,10 +92,6 @@ export function useSienciATCWizard(): Wizard {
                             title: 'Tool Length Sensor Position',
                             component: TLSPosition,
                             secondaryContent: [
-                                {
-                                    type: 'image',
-                                    content: PlaceholderImage,
-                                },
                                 {
                                     type: 'component',
                                     content: Jogging,

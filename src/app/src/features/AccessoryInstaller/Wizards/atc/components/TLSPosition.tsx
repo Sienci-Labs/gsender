@@ -11,6 +11,9 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
         await new Promise((resolve) => setTimeout(resolve, 500));
     };
 
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
     const mpos = useSelector((state: RootState) => state.controller.mpos);
 
     useEffect(() => {

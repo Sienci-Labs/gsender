@@ -1,8 +1,8 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import {useState} from "react";
-import controller from "app/lib/controller.ts";
-import store from "app/store";
+import { useState } from 'react';
+import controller from 'app/lib/controller.ts';
+import store from 'app/store';
 
 export function ControllerConfiguration({
     onComplete,
@@ -15,14 +15,14 @@ export function ControllerConfiguration({
         // Also setup gSender settings :)
         // Enable ATCI tab, enable spindle tab, set TC strategy to ignore
         store.set('workspace.atcEnabled', true);
-        store.set('workspace.toolChangeOption', 'Ignore')
-        store.set('workspace.toolChange.passthrough', true)
+        store.set('workspace.toolChangeOption', 'Ignore');
+        store.set('workspace.toolChange.passthrough', true);
         // Use macro for controller settings
-        controller.command('gcode', 'M65 P999');
+        controller.command('gcode', 'G65 P999');
         setTimeout(() => {
             setIsComplete(true);
             onComplete();
-        }, 2000)
+        }, 2000);
     };
 
     return (
