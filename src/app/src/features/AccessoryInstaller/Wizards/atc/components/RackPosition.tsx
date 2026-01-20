@@ -95,6 +95,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         zPosition={position.z}
                         onPositionChange={(positions) => {
                             console.log(positions);
+                            setPosition(positions);
                         }}
                         actionButton={
                             <StepActionButton
