@@ -10,6 +10,7 @@ import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/compone
 import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx';
 import { Jogging } from 'app/features/Jogging';
 import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
+import store from 'app/store';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -18,6 +19,7 @@ export function useSienciATCWizard(): Wizard {
         () => [connectionValidation],
         [connectionValidation],
     );
+    const storeVersion = store.get('widgets.atc.templates.version', '-');
 
     return useMemo<Wizard>(
         () => ({
@@ -30,7 +32,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Initial Setup',
                     description: 'Configure your ATC for first time use',
                     estimatedTime: '30 minutes - 2 hours',
-                    configVersion: '20260115',
+                    configVersion: storeVersion,
                     completionPage: ATCCompletion,
                     steps: [
                         {
@@ -107,7 +109,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Configure ATC',
                     description: 'Adjust ATC settings',
                     estimatedTime: '10 minutes',
-                    configVersion: '20251126',
+                    configVersion: storeVersion,
                     steps: [
                         {
                             id: 'atc-settings',
@@ -122,7 +124,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Uninstall ATC',
                     description: 'Remove ATC configuration',
                     estimatedTime: '5 minutes',
-                    configVersion: '20251126',
+                    configVersion: storeVersion,
                     steps: [
                         {
                             id: 'remove-config',
