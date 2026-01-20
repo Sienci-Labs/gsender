@@ -6,13 +6,16 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import controller from "app/lib/controller.ts";
 import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
+import store from "app/store";
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const [rackPositionMethod, setRackPositionMethod] =
         useState<string>('utility');
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+
+    const rackless = store.get('widgets.atc.templates.variables._tc_rack_enable.value', 0) === 0;
 
     const mpos = useSelector((state: RootState) => state.controller.mpos);
-    const rackPosition = useTypedSelector((state: RootState) => state.controller.settings.parameters['G59.1'])
 
     useEffect(() => {
         if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
@@ -28,11 +31,27 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     const handleUseUtility = () => {
         controller.command('gcode', 'G65 P302');
+        setTimeout(() => {
+            onComplete();
+        }, 2000);
     };
 
     const setPositionViaPositionSetting = () => {
-        //ToDo
+        controller.command('gcode', [`G10 L2 P7 X${position.x} Y${position.y} Z${position.z}`, '$#']);
+        setTimeout(() => {
+            onComplete();
+        }, 1500);
     };
+
+
+    if (rackless) {
+        return (
+            <div className="flex flex-col gap-5 p-2 justify-start">
+                <p>For ATC Configuration, you selected “No Tool Rack” and so do not need to set a rack position.</p>
+                <p>If you have a rack installed, please return to the previous step to correct your selection.</p>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
@@ -58,16 +77,16 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                     </p>
                     <p>
                         The machine will use the Stud-finder Sensor to determine
-                        the precise position of your tool rack.{' '}
+                        the precise position of your tool rack.
                         <b>Keep your hands near the E-stop</b> and click “Find
                         Rack” to start.
                     </p>
                     <StepActionButton
                         label="Find Rack"
                         runningLabel="Finding..."
-                        onApply={applySettings}
-                        onComplete={onComplete}
-                        onUncomplete={onUncomplete}
+                        onApply={handleUseUtility}
+                        isComplete={isComplete}
+                        error={error}
                     />
                 </>
             )}
@@ -101,9 +120,9 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                             <StepActionButton
                                 label="Set Position"
                                 runningLabel="Setting..."
-                                onApply={applySettings}
-                                onComplete={onComplete}
-                                onUncomplete={onUncomplete}
+                                onApply={setPositionViaPositionSetting}
+                                isComplete={isComplete}
+                                error={error}
                             />
                         }
                     />
