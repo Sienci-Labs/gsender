@@ -4,6 +4,7 @@ import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/comp
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
+import controller from 'app/lib/controller.ts';
 
 export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
     const applySettings = async () => {
@@ -22,6 +23,11 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
 
     const setTLSPosition = () => {
         console.log('setting');
+        controller.command(
+            'gcode',
+            `G10 L2 P9 X${position.x} Y${position.y} Z${position.z}`,
+            '$#',
+        );
         setTimeout(() => {
             onComplete();
         }, 1500);
@@ -45,6 +51,7 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
                 yPosition={position.y}
                 onPositionChange={(positions) => {
                     console.log(positions);
+                    setPosition(positions);
                 }}
                 actionButton={
                     <StepActionButton

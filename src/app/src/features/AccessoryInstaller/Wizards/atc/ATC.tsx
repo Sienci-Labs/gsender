@@ -34,21 +34,6 @@ export function useSienciATCWizard(): Wizard {
                     completionPage: ATCCompletion,
                     steps: [
                         {
-                            id: 'tool-length-sensor',
-                            title: 'Tool Length Sensor Position',
-                            component: TLSPosition,
-                            secondaryContent: [
-                                {
-                                    type: 'image',
-                                    content: PlaceholderImage,
-                                },
-                                {
-                                    type: 'component',
-                                    content: Jogging,
-                                },
-                            ],
-                        },
-                        {
                             id: 'macro-configuration',
                             title: 'Macro Configuration',
                             component: MacroConfiguration,
@@ -127,21 +112,6 @@ export function useSienciATCWizard(): Wizard {
                         {
                             id: 'atc-settings',
                             title: 'ATC Settings',
-                            component: Placeholder,
-                            secondaryContent: [],
-                        },
-                    ],
-                },
-                {
-                    id: 'hardware-check',
-                    title: 'Hardware Check',
-                    description: 'Verify hardware installation',
-                    estimatedTime: '15 minutes',
-                    configVersion: '20251126',
-                    steps: [
-                        {
-                            id: 'check-sensors',
-                            title: 'Check Sensors',
                             component: Placeholder,
                             secondaryContent: [],
                         },
