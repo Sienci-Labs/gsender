@@ -10,6 +10,10 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const [rehomed, setRehomed] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
+    const hasHomed = useTypedSelector(
+        (state: RootState) => state.controller.state.status.hasHomed,
+    );
+
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
