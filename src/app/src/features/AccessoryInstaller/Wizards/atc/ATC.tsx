@@ -30,7 +30,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Initial Setup',
                     description: 'Configure your ATC for first time use',
                     estimatedTime: '30 minutes - 2 hours',
-                    configVersion: '20251126',
+                    configVersion: '20260115',
                     completionPage: ATCCompletion,
                     steps: [
                         {
