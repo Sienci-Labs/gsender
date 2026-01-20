@@ -39,7 +39,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
             </label>
             <p>
                 The updated homing location requires you to rehome the machine
-                before continuing. Re1`home using the provided buttons
+                before continuing. Re-home using the provided buttons
             </p>
 
             <StepActionButton
