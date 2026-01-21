@@ -41,17 +41,17 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
             '$375=50',
             '$681=0',
             '$395=2',
+            '$REBOOT',
         ]);
     }
 
     async function configureModbusEEPROM() {
-        controller.command('gcode', ['$476=2']);
+        controller.command('gcode', ['$476=2', '$REBOOT']);
     }
 
     async function setupSpindleAndReboot() {
         await configureSpindleEEPROM();
         setTimeout(() => {
-            controller.command('reboot');
             setHasSetupSpindle(true);
         }, 1500);
     }
@@ -61,7 +61,6 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
         setTimeout(() => {
             setHasConfiguredModbus(true);
             onComplete();
-            controller.command('reboot');
         }, 1500);
     }
 

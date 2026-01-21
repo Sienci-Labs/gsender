@@ -38,12 +38,6 @@ export function useSienciATCWizard(): Wizard {
                     completionPage: ATCCompletion,
                     steps: [
                         {
-                            id: 'spindle-config',
-                            title: 'Spindle Configuration',
-                            component: SpindleSetRestart,
-                            secondaryContent: [],
-                        },
-                        {
                             id: 'macro-configuration',
                             title: 'Macro Configuration',
                             component: MacroConfiguration,
@@ -105,6 +99,12 @@ export function useSienciATCWizard(): Wizard {
                                     content: Jogging,
                                 },
                             ],
+                        },
+                        {
+                            id: 'spindle-config',
+                            title: 'Spindle Configuration',
+                            component: SpindleSetRestart,
+                            secondaryContent: [],
                         },
                     ],
                 },
