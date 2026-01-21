@@ -12,6 +12,18 @@ module.exports = defineConfig({
       charts: true,         // include charts
       embeddedScreenshots: true, // attach screenshots
     },
+    
+    // ========================================
+    // ADD THIS SECTION - Environment Variables
+    // ========================================
+    env: {
+      // Device name pattern for CNC connection
+      // Default to 'COM' for Windows
+      // Override via CLI: --env deviceName=ttyUSB
+      deviceName: process.env.CYPRESS_DEVICE_NAME || 'COM',
+    },
+    // ========================================
+    
     setupNodeEvents(on, config) {
       // Handle uncaught exceptions from the application
       on('before:browser:launch', (browser = {}, launchOptions) => {

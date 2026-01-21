@@ -3,8 +3,8 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.viewport(1920, 1080);
     // Use loadUI custom command with dynamic baseUrl
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 3,
-      waitTime: 3000,
+      maxRetries: 4,
+      waitTime: 4000,
       timeout: 5000
     });
   });
@@ -50,7 +50,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.log('Step 1: Connecting to CNC...');
     cy.connectMachine();
     cy.wait(6000); // Wait for connection to establish
-    cy.log('✓ Connected to CNC');
+    cy.log(' Connected to CNC');
     
     // Step 2: Handle unlock if needed
     cy.log('Step 2: Unlocking machine if needed...');
@@ -61,7 +61,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should('be.visible')
       .then(status => {
-        cy.log(`✓ Machine status: "${status.text().trim()}"`);
+        cy.log(` Machine status: "${status.text().trim()}"`);
       });
     cy.wait(2000);
 
@@ -69,7 +69,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.log('Step 4: Loading G-code file...');
     cy.uploadGcodeFile();
     cy.wait(2000); // Wait for file to load and process
-    cy.log('✓ File Uploaded');
+    cy.log('File Uploaded');
     
     // Step 5: Zero all axes (buttons should now be enabled)
     cy.log('Step 5: Zeroing all axes...');
@@ -97,7 +97,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.get('input[type="number"].text-blue-500').eq(0).should('have.value', '0.00');
     cy.get('input[type="number"].text-blue-500').eq(1).should('have.value', '0.00');
     cy.get('input[type="number"].text-blue-500').eq(2).should('have.value', '0.00');
-    cy.log('✓ All axes zeroed successfully');
+    cy.log('All axes zeroed successfully');
 
     // Capture initial zeroed positions
     capturePositions('After Zeroing');
@@ -111,7 +111,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
       .should('be.visible')
       .click({ force: true });
     cy.wait(2000);
-    cy.log('✓ Job started');
+    cy.log('Job started');
 
     // Capture positions immediately after start
     capturePositions('Job Started');
@@ -121,7 +121,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.contains(/running|run/i, { timeout: 10000 })
       .should('be.visible')
       .then(status => {
-        cy.log(`✓ Job status: "${status.text().trim()}"`);
+        cy.log(`Job status: "${status.text().trim()}"`);
       });
 
     // Step 9: Monitor position changes during job execution
@@ -140,7 +140,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
         const hasMovement = values.some(val => Math.abs(val) > 0.01);
         
         if (hasMovement) {
-          cy.log(`✓ Bit movement detected at ${interval}ms`);
+          cy.log(`Bit movement detected at ${interval}ms`);
         }
       });
     });
@@ -156,7 +156,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
       // Z should have moved from 0 if job is running
       if (Math.abs(z) > 0.01) {
         expect(z).to.be.a('number');
-        cy.log('✓ Z-axis is moving');
+        cy.log('Z-axis is moving');
       }
     });
 
@@ -164,14 +164,14 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.get('span.font-mono.text-gray-400').eq(0).should('exist').invoke('text').then((text) => {
       cy.log(`Machine X: ${text} mm`);
       expect(parseFloat(text)).to.be.a('number');
-      cy.log('✓ Machine X position valid');
+      cy.log('Machine X position valid');
     });
 
     // Check Machine Y position
     cy.get('span.font-mono.text-gray-400').eq(1).should('exist').invoke('text').then((text) => {
       cy.log(`Machine Y: ${text} mm`);
       expect(parseFloat(text)).to.be.a('number');
-      cy.log('✓ Machine Y position valid');
+      cy.log('Machine Y position valid');
     });
 
     // Step 11: Stop the job (or let it complete)
@@ -179,10 +179,10 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.get('body').then(($body) => {
       if ($body.find('button[aria-label="Stop"]').length > 0) {
         cy.get('button[aria-label="Stop"]').first().click();
-        cy.log('✓ Job stopped manually');
+        cy.log('Job stopped manually');
       } else if ($body.find('button[aria-label="Pause"]').length > 0) {
         cy.get('button[aria-label="Pause"]').first().click();
-        cy.log('✓ Job paused');
+        cy.log('Job paused');
       }
     });
     cy.wait(1000);
@@ -193,9 +193,9 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     // Step 12: Analyze and verify position data
     cy.log('Step 12: Analyzing captured position data...');
     cy.then(() => {
-      cy.log('═══════════════════════════════════════');
+ 
       cy.log('       POSITION LOG SUMMARY       ');
-      cy.log('═══════════════════════════════════════');
+   
       
       cy.log(`Work X positions: ${JSON.stringify(positionLog.work.x)}`);
       cy.log(`Work Y positions: ${JSON.stringify(positionLog.work.y)}`);
@@ -222,22 +222,21 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
         positionLog.work.z[0].value
       );
       
-      cy.log('═══════════════════════════════════════');
+   
       cy.log('       MOVEMENT SUMMARY       ');
-      cy.log('═══════════════════════════════════════');
       cy.log(`Total X movement: ${xMovement.toFixed(3)} mm`);
       cy.log(`Total Y movement: ${yMovement.toFixed(3)} mm`);
       cy.log(`Total Z movement: ${zMovement.toFixed(3)} mm`);
-      cy.log('═══════════════════════════════════════');
+   
       
       // Additional validation - verify movement occurred
       const totalMovement = xMovement + yMovement + zMovement;
       expect(totalMovement).to.be.greaterThan(0);
-      cy.log(`✓ Total combined movement: ${totalMovement.toFixed(3)} mm`);
+      cy.log(`Total combined movement: ${totalMovement.toFixed(3)} mm`);
       
       // Save position log to file
       cy.writeFile('cypress/results/position-log.json', positionLog);
-      cy.log('✓ Position data saved to: cypress/results/position-log.json');
+      cy.log(' Position data saved to: cypress/results/position-log.json');
       
       // Save movement summary to separate file
       const movementSummary = {
@@ -265,7 +264,7 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
       };
       
       cy.writeFile('cypress/results/movement-summary.json', movementSummary);
-      cy.log('✓ Movement summary saved to: cypress/results/movement-summary.json');
+      cy.log(' Movement summary saved to: cypress/results/movement-summary.json');
     });
 
     // Step 13: Close any modal dialogs
@@ -273,12 +272,12 @@ describe('CNC Bit Position and Job Progress Tracking', () => {
     cy.get('body').then(($body) => {
       if ($body.find('button:contains("Close")').length > 0) {
         cy.contains('button', 'Close').click({ force: true });
-        cy.log('✓ Dialog closed');
+        cy.log(' Dialog closed');
       }
     });
     
-    cy.log('═══════════════════════════════════════');
-    cy.log('✓ POSITION TRACKING TEST COMPLETED SUCCESSFULLY');
-    cy.log('═══════════════════════════════════════');
+
+    cy.log('POSITION TRACKING TEST COMPLETED SUCCESSFULLY');
+    
   });
 });
