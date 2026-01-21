@@ -383,7 +383,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             detectedEEPROMGroups,
             EEPROM,
         );
-        console.log(EEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {

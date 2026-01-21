@@ -27,7 +27,6 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     // Once we get a flag back, we can complete and move on to next step
     useEffect(() => {
-        console.log('SETVAR:', ATCIPositionSet);
         if (ATCIPositionSet === '1') {
             onComplete();
             setIsComplete(true);
@@ -135,7 +134,6 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         yPosition={position.y}
                         zPosition={position.z}
                         onPositionChange={(positions) => {
-                            console.log(positions);
                             setPosition(positions);
                         }}
                         actionButton={

@@ -33,7 +33,6 @@ export function WizardsHub({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {wizards.map((wizard) => {
-                        console.log(wizard);
                         const totalSteps = wizard.subWizards.reduce(
                             (acc, sw) => acc + sw.steps.length,
                             0,

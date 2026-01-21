@@ -53,7 +53,6 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
                 xPosition={position.x}
                 yPosition={position.y}
                 onPositionChange={(positions) => {
-                    console.log(positions);
                     setPosition(positions);
                 }}
                 actionButton={
