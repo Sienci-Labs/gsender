@@ -471,6 +471,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$37',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$680',
+                    },
                 ],
             },
             {
@@ -1378,6 +1382,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$479',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$681',
+                    },
                 ],
             },
             {
@@ -1466,6 +1474,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$673',
                     },
                     { type: 'eeprom', eID: '$456', remap: '$750' },
                     { type: 'eeprom', eID: '$457', remap: '$751' },
@@ -1683,6 +1695,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             return strategy !== 'Code';
                         },
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$675',
+                    },
                 ],
             },
             {
@@ -1859,6 +1875,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$484' },
                     { type: 'eeprom', eID: '$486' },
                     { type: 'eeprom', eID: '$666' },
+                    { type: 'eeprom', eID: '$676' },
                 ],
             },
         ],
