@@ -11,6 +11,8 @@ import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/compo
 import { Jogging } from 'app/features/Jogging';
 import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
 import store from 'app/store';
+import Spindle from 'app/features/Spindle';
+import { SpindleSetRestart } from 'app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx';
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -35,6 +37,12 @@ export function useSienciATCWizard(): Wizard {
                     configVersion: storeVersion,
                     completionPage: ATCCompletion,
                     steps: [
+                        {
+                            id: 'spindle-config',
+                            title: 'Spindle Configuration',
+                            component: SpindleSetRestart,
+                            secondaryContent: [],
+                        },
                         {
                             id: 'macro-configuration',
                             title: 'Macro Configuration',
