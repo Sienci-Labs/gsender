@@ -38,7 +38,7 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
     return (
         <div
             className={cx(
-                'absolute top-1/3 left-4 w-1/2 -translate-y-2/3 bg-white rounded flex flex-col content-end overflow-hidden z-50 border-2 border-orange-600',
+                'absolute bottom-2/3 xl:left-20 left-16 w-1/3 bg-white rounded flex flex-col content-end overflow-hidden z-50 border-2 border-orange-600',
                 {
                     hidden: !visible,
                 },
