@@ -15,13 +15,22 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
+    const connectionPort = useTypedSelector(
+        (state: RootState) => state.connection.port,
+    );
 
     const canSetupSpindle = isConnected;
     const canConfigureModbus = isConnected && hasSetupSpindle;
 
-    function setupSpindleProcess() {}
+    function setupSpindleProcess() {
+        // Get port and connection type
+        // Send EEPROM config
+        // Reboot
+        //reconnect
+        // modbus
+    }
 
-    function configureSpindleEEPROM() {
+    async function configureSpindleEEPROM() {
         controller.command('gcode', [
             '$30=24000',
             '$31=7500',
@@ -35,21 +44,24 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
         ]);
     }
 
-    function configureModbusEEPROM() {
+    async function configureModbusEEPROM() {
         controller.command('gcode', ['$476=2']);
     }
 
-    function setupSpindleAndReboot() {
-        configureSpindleEEPROM();
+    async function setupSpindleAndReboot() {
+        await configureSpindleEEPROM();
         setTimeout(() => {
             controller.command('reboot');
+            setHasSetupSpindle(true);
         }, 1500);
     }
 
-    function configureModbus() {
-        configureModbusEEPROM();
+    async function configureModbus() {
+        await configureModbusEEPROM();
         setTimeout(() => {
+            setHasConfiguredModbus(true);
             onComplete();
+            controller.command('reboot');
         }, 1500);
     }
 
@@ -64,7 +76,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
                 label="Setup Spindle"
                 runningLabel="Configuring..."
                 onApply={setupSpindleProcess}
-                isComplete={isComplete}
+                isComplete={hasConfiguredModbus}
                 error={error}
                 disabled={!canSetupSpindle}
             />
@@ -75,15 +87,19 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
                 label="Setup Spindle and Reboot"
                 runningLabel="Configuring..."
                 onApply={setupSpindleAndReboot}
-                isComplete={isComplete}
+                isComplete={hasSetupSpindle}
                 error={error}
                 disabled={!canSetupSpindle}
             />
+            <p>
+                Once you have reconnected to you device, configure the Modbus
+                Address. This will also disconnect your controller.
+            </p>
             <StepActionButton
                 label="Configure Modbus"
                 runningLabel="Configuring..."
                 onApply={configureModbus}
-                isComplete={isComplete}
+                isComplete={hasConfiguredModbus}
                 error={error}
                 disabled={!canConfigureModbus}
             />
