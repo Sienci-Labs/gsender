@@ -1217,6 +1217,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: 's',
                     },
                     {
+                        type: 'eeprom',
+                        eID: '$539',
+                    },
+                    {
                         label: 'Minimum spindle speed',
                         key: 'widgets.spindle.spindleMin',
                         description:
@@ -1296,6 +1300,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$36',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$709',
                     },
                 ],
             },
@@ -1542,6 +1550,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Enable hard limits when toggling into rotary mode (grbl only).',
                         type: 'boolean',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$538',
+                    },
                 ],
             },
         ],
@@ -1724,6 +1736,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$305' },
                     { type: 'eeprom', eID: '$307' },
                     { type: 'eeprom', eID: '$308' },
+                    { type: 'eeprom', eID: '$535' },
                 ],
             },
         ],
