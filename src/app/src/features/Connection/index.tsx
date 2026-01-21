@@ -15,6 +15,7 @@ import { PortListings } from './components/PortListings';
 import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import pubsub from 'pubsub-js';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -40,6 +41,18 @@ export type FirmwareFlavour = 'Grbl' | 'grblHAL' | '';
 
 function Connection(props: ConnectionProps) {
     const connectionConfig = new WidgetConfig('connection');
+
+    // Add listener for reconnect request
+    useEffect(() => {
+        pubsub.subscribe('reconnect', () => {
+            console.log('requesting reconnect');
+            attemptAutoConnect(true);
+        });
+
+        return () => {
+            pubsub.unsubscribe('reconnect');
+        };
+    }, []);
 
     const [connectionState, setConnectionState] = useState(
         ConnectionState.DISCONNECTED,
@@ -128,12 +141,16 @@ function Connection(props: ConnectionProps) {
         });
     }
 
-    function attemptAutoConnect() {
+    function attemptAutoConnect(force = false) {
         const autoReconnect = connectionConfig.get('autoReconnect', false);
         const port = connectionConfig.get('port', null);
 
-        if (connectionState !== ConnectionState.DISCONNECTED || !autoReconnect)
+        if (
+            connectionState !== ConnectionState.DISCONNECTED ||
+            (!autoReconnect && !force)
+        ) {
             return;
+        }
 
         // TODO: Add autoconnect for ethernet
         if (isIPv4(port)) return;

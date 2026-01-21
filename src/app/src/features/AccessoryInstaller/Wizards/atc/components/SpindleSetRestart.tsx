@@ -3,6 +3,7 @@ import { useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
+import pubsub from 'pubsub-js';
 
 export function SpindleSetRestart({ onComplete, onUncomplete }) {
     const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -24,10 +25,13 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
 
     function setupSpindleProcess() {
         // Get port and connection type
-        // Send EEPROM config
-        // Reboot
-        //reconnect
-        // modbus
+        configureSpindleEEPROM();
+        setTimeout(() => {
+            pubsub.publish('reconnect');
+            setTimeout(() => {
+                configureModbusEEPROM();
+            }, 3000);
+        }, 2500);
     }
 
     async function configureSpindleEEPROM() {
