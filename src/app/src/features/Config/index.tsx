@@ -36,18 +36,20 @@ export function Config() {
         }
     }
 
-    const { settings } = useSettings();
+    const { settings, EEPROM } = useSettings();
 
     // lets extract all the eeprom settings
-    let allEEPROM: gSenderSetting[] = settings
-        .flatMap((section) => section.settings)
-        .flatMap((subSection) => subSection.settings)
-        .filter((setting) => setting.eID);
-    // sort so they are in order of EEPROM
-    allEEPROM.sort((a, b) => {
-        const aID = a.remap ? a.remap : a.eID;
-        const bID = b.remap ? b.remap : b.eID;
-        return convertEIDToNumber(aID) - convertEIDToNumber(bID);
+    let allEEPROM: gSenderSetting[] = EEPROM.map((filtered, i) => {
+        const formatted: gSenderSetting = {
+            type: 'eeprom',
+            description: filtered.description,
+            unit: filtered.unit,
+            eID: filtered.setting,
+            globalIndex: filtered.globalIndex,
+            value: filtered.value,
+            defaultValue: filtered.defaultValue,
+        };
+        return formatted;
     });
     const eepromSettings: SettingsMenuSection[] = [
         {
