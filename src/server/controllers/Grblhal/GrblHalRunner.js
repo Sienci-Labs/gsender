@@ -320,6 +320,32 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultParameters) {
             const { name, value } = payload;
+            // Update tool offsets for current tool based on PRB results
+            // This is necessary in order to update offsets mid tool change or toolpath
+            // Ignore prb output for tool 0 (empty) since nothing to update
+            const currentTool = this.state.status.currentTool;
+            if (name === 'PRB' && currentTool > 0) {
+                const nextSettings = {
+                    ...this.settings,
+                    toolTable: {
+                        ...this.settings.toolTable,
+                        [currentTool]: {
+                            ...this.settings.toolTable[currentTool],
+                            toolOffsets: {
+                                ...this.settings.toolTable[currentTool].toolOffsets,
+                                x: Number(value.x),
+                                y: Number(value.y),
+                                z: Number(value.z)
+                            }
+                        }
+                    }
+                };
+
+                console.log(nextSettings.toolTable);
+                if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
+                    this.settings = nextSettings;
+                }
+            }
             const nextSettings = {
                 ...this.settings,
                 parameters: {
