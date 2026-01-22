@@ -49,6 +49,14 @@ export class JoystickLoop {
         this.feedrate = feedrate;
         this.multiplier = multiplier;
         this.isReadyForNextCommand = true;
+        this.axisHistory = [[], [], [], []]; // Rolling history for 4 axes
+        this.currentDirection = null; // For direction hysteresis
+        this.pendingDirection = null; // For direction debouncing
+        this.pendingDirectionCount = 0; // How many frames the pending direction has been stable
+        this.continuousJogActive = false; // For fixed speed continuous jogging
+        this.continuousJogDirection = null; // Current direction of continuous jog
+        this.continuousJogStartTime = null; // When current jog command was sent
+        this.continuousJogDuration = null; // Expected duration of current jog
     }
 
     _getCurrentGamepad = () => {
@@ -63,6 +71,30 @@ export class JoystickLoop {
         }
 
         return currentHandler?.gamepad;
+    };
+
+    _smoothAxisValue = (axisIndex, rawValue) => {
+        const HISTORY_SIZE = 3;
+        const history = this.axisHistory[axisIndex];
+
+        history.push(rawValue);
+        if (history.length > HISTORY_SIZE) {
+            history.shift();
+        }
+
+        return history.reduce((sum, val) => sum + val, 0) / history.length;
+    };
+
+    _getDirectionKey = (degrees) => {
+        if (inRange(degrees, 0, 15) || inRange(degrees, 345, 360)) return 'X+';
+        if (inRange(degrees, 16, 74)) return 'X+Y+';
+        if (inRange(degrees, 75, 105)) return 'Y+';
+        if (inRange(degrees, 106, 164)) return 'X-Y+';
+        if (inRange(degrees, 165, 195)) return 'X-';
+        if (inRange(degrees, 196, 254)) return 'X-Y-';
+        if (inRange(degrees, 255, 285)) return 'Y-';
+        if (inRange(degrees, 286, 344)) return 'X+Y-';
+        return null;
     };
 
     _computeJogMoveDuration = (axis, feedrate) => {
@@ -103,6 +135,16 @@ export class JoystickLoop {
 
         const feedrate =
             givenFeedrate > maxFeedrate ? maxFeedrate : givenFeedrate;
+
+        const fixedSpeedMode = get(
+            this.gamepadProfile,
+            'joystickOptions.fixedSpeedMode',
+            false,
+        );
+
+        if (fixedSpeedMode) {
+            return Math.round(feedrate);
+        }
 
         return Math.round(Math.abs(feedrate * stickValue));
     };
@@ -277,13 +319,6 @@ export class JoystickLoop {
 
         const controllerType = get(reduxStore.getState(), 'controller.type');
 
-        const axes = this._getAxesAndDirection({ degrees, activeAxis });
-
-        const numberOfAxes = axes.reduce(
-            (acc, curr) => (curr !== null ? acc + 1 : acc),
-            0,
-        );
-
         const timer = new Date() - this.jogMovementStartTime;
 
         if (!this.isReadyForNextCommand) {
@@ -300,7 +335,68 @@ export class JoystickLoop {
             return;
         }
 
-        const axesValues = currentGamepad?.axes;
+        // Get axis values (smoothed for fixed speed mode, raw for variable mode)
+        const rawAxesValues = currentGamepad?.axes;
+        const fixedSpeedMode = get(
+            this.gamepadProfile,
+            'joystickOptions.fixedSpeedMode',
+            false,
+        );
+
+        const axesValues = fixedSpeedMode
+            ? rawAxesValues.map((value, index) =>
+                  this._smoothAxisValue(index, value),
+              )
+            : rawAxesValues;
+
+        // Direction locking for fixed speed mode only
+        let degreesForAxes = degrees;
+        if (fixedSpeedMode) {
+            const DIRECTION_STABILITY_FRAMES = 1;
+            const newDirectionKey = this._getDirectionKey(degrees);
+
+            if (newDirectionKey !== this.pendingDirection) {
+                this.pendingDirection = newDirectionKey;
+                this.pendingDirectionCount = 1;
+            } else {
+                this.pendingDirectionCount++;
+            }
+
+            if (
+                this.pendingDirectionCount >= DIRECTION_STABILITY_FRAMES &&
+                this.currentDirection !== this.pendingDirection
+            ) {
+                this.currentDirection = this.pendingDirection;
+            }
+
+            // Use stable direction center for axis calculation
+            const directionCenters = {
+                'X+': 0,
+                'X+Y+': 45,
+                'Y+': 90,
+                'X-Y+': 135,
+                'X-': 180,
+                'X-Y-': 225,
+                'Y-': 270,
+                'X+Y-': 315,
+            };
+            degreesForAxes = this.currentDirection
+                ? directionCenters[this.currentDirection]
+                : degrees;
+        }
+
+        const axes = this._getAxesAndDirection({
+            degrees: degreesForAxes,
+            activeAxis,
+        });
+
+        const numberOfAxes = axes.reduce(
+            (acc, curr) => (curr !== null ? acc + 1 : acc),
+            0,
+        );
+
+        const axesData =
+            activeAxis < 2 ? axesValues.slice(0, 2) : axesValues.slice(2, 4);
 
         const movementDistanceOverride = get(
             this.gamepad,
@@ -330,8 +426,6 @@ export class JoystickLoop {
         const multiplier = [leftStick, leftStick, rightStick, rightStick][
             activeAxis
         ];
-        const axesData =
-            activeAxis < 2 ? axesValues.slice(0, 2) : axesValues.slice(2, 4);
 
         const feedrate = this._computeFeedrate(
             numberOfAxes === 1
@@ -400,6 +494,54 @@ export class JoystickLoop {
             return;
         }
 
+        if (fixedSpeedMode) {
+            // Wait for direction to stabilize before starting continuous jog
+            if (!this.currentDirection) {
+                return;
+            }
+
+            const JOG_DISTANCE = 100; // mm - short for safety if disconnected
+            const directionChanged =
+                this.continuousJogDirection !== this.currentDirection;
+
+            // Check if we need to send a new jog command
+            let needsNewCommand = false;
+
+            if (!this.continuousJogActive) {
+                needsNewCommand = true;
+            } else if (directionChanged) {
+                // Direction changed, cancel current jog first
+                controller.command('jog:cancel');
+                this.continuousJogActive = false;
+                needsNewCommand = true;
+            } else if (this.continuousJogStartTime && this.continuousJogDuration) {
+                // Check if current jog is near completion (80% done)
+                const elapsed = Date.now() - this.continuousJogStartTime;
+                if (elapsed >= this.continuousJogDuration * 0.8) {
+                    needsNewCommand = true;
+                }
+            }
+
+            if (!needsNewCommand) {
+                return;
+            }
+
+            // Send a continuous jog command
+            const longJogAxes = {};
+            Object.entries(updatedAxesWithOverride).forEach(([axis, value]) => {
+                longJogAxes[axis] = Math.sign(value) * JOG_DISTANCE;
+            });
+
+            this.jog(longJogAxes, feedrate);
+            this.continuousJogActive = true;
+            this.continuousJogDirection = this.currentDirection;
+            this.continuousJogStartTime = Date.now();
+            // Calculate expected duration: distance / (feedrate in mm/ms)
+            this.continuousJogDuration = (JOG_DISTANCE / (feedrate / 60)) * 1000;
+            return;
+        }
+
+        // Variable speed mode - use incremental jog commands
         this.jog(updatedAxesWithOverride, feedrate);
 
         this.jogMovementStartTime = new Date();
@@ -476,6 +618,21 @@ export class JoystickLoop {
         clearInterval(this.runLoop);
         clearTimeout(this.timeout);
         controller.removeListener('serialport:read');
+
+        // Reset smoothing state
+        this.axisHistory = [[], [], [], []];
+        this.currentDirection = null;
+        this.pendingDirection = null;
+        this.pendingDirectionCount = 0;
+
+        // Cancel any active continuous jog
+        if (this.continuousJogActive) {
+            controller.command('jog:cancel');
+            this.continuousJogActive = false;
+            this.continuousJogDirection = null;
+            this.continuousJogStartTime = null;
+            this.continuousJogDuration = null;
+        }
 
         const timer = new Date() - this.startTime;
 
