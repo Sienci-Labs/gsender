@@ -37,7 +37,6 @@ class GrblHalLineParserResultATCI {
             payload.subtype = 10;
             payload.description = r[3].trim();
         }
-        console.log(payload);
 
         return {
             type: GrblHalLineParserResultATCI,

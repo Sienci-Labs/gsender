@@ -341,7 +341,6 @@ class GrblHalRunner extends events.EventEmitter {
                     }
                 };
 
-                console.log(nextSettings.toolTable);
                 if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
                     this.settings = nextSettings;
                 }
