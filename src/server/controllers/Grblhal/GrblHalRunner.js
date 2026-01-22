@@ -125,6 +125,7 @@ class GrblHalRunner extends events.EventEmitter {
         descriptions: {
         },
         alarms: {},
+        errors: {},
         toolTable: {},
         atci: {}
     };
@@ -376,7 +377,11 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalErrorDescription) {
-            console.log('YUUURP');
+            this.settings.errors[payload.code] = {
+                code: payload.code,
+                description: payload.description
+            };
+            this.emit('errorDescription', this.settings.errors);
             return;
         }
         if (type === GrblHalLineParserResultGroupDetail) {

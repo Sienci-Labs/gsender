@@ -24,7 +24,7 @@
 
 class GrblHalErrorDescription {
     static parse(line) {
-        const r = line.match(/^\[ALARMCODE:(\d+)\|\|(.*)]$/);
+        const r = line.match(/^\[ERRORCODE:(\d+)\|\|(.*)]$/);
         if (!r) {
             return null;
         }
