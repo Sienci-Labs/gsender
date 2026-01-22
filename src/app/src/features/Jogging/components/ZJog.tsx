@@ -28,7 +28,7 @@ export function ZJog({ feedrate, distance, canClick, threshold=200 }: JoggerProp
     )();
 
     return (
-        <div id="zJog" className="relative">
+        <div id="zJog" className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]">
             <TabJog
                 topHandlers={zPlusJogHandlers}
                 bottomHandlers={zMinusJogHandlers}
@@ -37,7 +37,7 @@ export function ZJog({ feedrate, distance, canClick, threshold=200 }: JoggerProp
             <img
                 src={zLabels}
                 alt="Z Labels tab"
-                className="absolute top-0 left-0 pointer-events-none"
+                className="absolute top-0 left-0 pointer-events-none w-full h-full"
             />
         </div>
     );

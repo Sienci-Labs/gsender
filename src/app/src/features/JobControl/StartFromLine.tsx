@@ -231,7 +231,7 @@ const StartFromLine = ({
                                 onClick={handleStartFromLine}
                                 variant={'primary'}
                                 // disabled={!isConnected}
-                                className="flex flex-row p-3 items-center gap-2"
+                                className="flex flex-row p-3 items-center gap-2 portrait:px-6 portrait:text-xl"
                             >
                                 <FaPlay className="ml-2" />
                                 <span>Start from Line</span>

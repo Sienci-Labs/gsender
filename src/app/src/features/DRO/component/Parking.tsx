@@ -55,7 +55,7 @@ export function Parking({ disabled = false, isConnected = false, homingEnabled =
                 disabled={disabled}
                 icon={<RiParkingFill className="w-4 h-4" />}
                 variant="alt"
-                size="sm"
+                className="portrait:min-w-14"
                 onClick={goToParkLocation}
             />
         </Tooltip>
