@@ -1,9 +1,18 @@
 import { StatusIndicator } from 'app/features/SDCard/components/StatusIndicator.tsx';
 import { FileList } from 'app/features/SDCard/components/FileList.tsx';
 import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
+import { useEffect } from 'react';
+import controller from 'app/lib/controller.ts';
 
 const SDCardElement = () => {
-    const { isMounted, setUploadProgress, setUploadState } = useSDCard();
+    const { isMounted, setUploadProgress, setUploadState, isConnected } =
+        useSDCard();
+    useEffect(() => {
+        console.log('Headed to SD card element');
+        if (isConnected) {
+            controller.command('realtime_report'); // Request a realtime report so we can see the SD card status
+        }
+    }, []);
 
     return (
         <div className="bg-gray-50 dark:bg-slate-800 h-full flex">
