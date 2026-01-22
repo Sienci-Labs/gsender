@@ -27,7 +27,7 @@ export function ControllerConfiguration({
 
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
-            <p>
+            <p className="dark:text-white">
                 The following controller settings are required to ensure
                 compatibility with the Sienci ATC.
             </p>
@@ -43,7 +43,9 @@ export function ControllerConfiguration({
                 <li>etc.</li>
             </ul>
 
-            <p>Select “Apply Settings” to apply these changes.</p>
+            <p className="dark:text-white">
+                Select “Apply Settings” to apply these changes.
+            </p>
             <StepActionButton
                 label={'Apply'}
                 runningLabel="Applying..."
