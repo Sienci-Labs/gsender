@@ -54,6 +54,7 @@ import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GrblHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
 import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
+import GrblHalErrorDescription from './GrblHalErrorDescription';
 
 const log = logger('controller:grblHAL');
 
@@ -372,6 +373,10 @@ class GrblHalRunner extends events.EventEmitter {
             };
 
             this.emit('alarmDetail', this.settings.alarms);
+            return;
+        }
+        if (type === GrblHalErrorDescription) {
+            console.log('YUUURP');
             return;
         }
         if (type === GrblHalLineParserResultGroupDetail) {

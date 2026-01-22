@@ -1001,7 +1001,7 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$EE\n$#\n');
             await delay(25);
 
             const hasSD = _.get(this.state, 'status.sdCard', null);
@@ -1493,7 +1493,7 @@ class GrblHalController {
                             this.initController();
                         }
 
-                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$EE\n$spindles\n');
                         return;
                     }
                     if (this.connection) {
