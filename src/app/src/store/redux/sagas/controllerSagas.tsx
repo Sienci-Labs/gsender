@@ -356,6 +356,7 @@ export function* initialize(): Generator<any, void, any> {
                 line: error.line,
                 controller: error.controller,
             };
+            console.log(alarmError);
             api.alarmList.update(alarmError);
         } catch (error) {
             console.error(error);
@@ -814,6 +815,7 @@ export function* initialize(): Generator<any, void, any> {
             // );
 
             console.log(error);
+            console.log('YURRR');
 
             const showLineWarnings = store.get(
                 'widgets.visualizer.showLineWarnings',

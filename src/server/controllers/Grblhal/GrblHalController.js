@@ -791,6 +791,7 @@ class GrblHalController {
 
             const code = Number(res.message) || undefined;
             const error = _.find(this.settings.errors, { code: code }) || {};
+            console.log(error);
 
             // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
             if (firmwareIsAlarmed || code === 79) {
@@ -833,13 +834,13 @@ class GrblHalController {
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
-
+                console.log(error);
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error?.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.description})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.description}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -856,10 +857,10 @@ class GrblHalController {
             }
 
             if (error) {
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error.description})`);
             }
 
-            const msg = `Error ${code} - ${error?.message}`;
+            const msg = `Error ${code} - ${error?.description}`;
             this.emit('gcode_error', msg);
 
             this.feeder.ack();
