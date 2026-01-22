@@ -12,7 +12,7 @@ export function useSDCard() {
         (state: RootState) => state.controller.state.status?.sdCard,
     );
     const files = useTypedSelector(
-        (state: RootState) => state.controller.sdcard?.files,
+        (state: RootState) => state.controller.state.status?.sdFiles,
     );
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,

@@ -10,7 +10,7 @@ const SDCardElement = () => {
     useEffect(() => {
         console.log('Headed to SD card element');
         if (isConnected) {
-            controller.command('sdcard:mount');
+            controller.command('sdcard:list');
         }
     }, []);
 
