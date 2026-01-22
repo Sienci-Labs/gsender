@@ -34,8 +34,6 @@ class GrblHalErrorDescription {
             description: r[2]
         };
 
-        console.log(payload);
-
         return {
             type: GrblHalErrorDescription,
             payload: payload

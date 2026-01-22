@@ -778,6 +778,7 @@ class GrblHalController {
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
             console.log('error found');
+            console.log(res);
             const isRunning = this.workflow.isRunning();
             const firmwareIsAlarmed = this.runner.isAlarm();
 
@@ -789,7 +790,7 @@ class GrblHalController {
             }
 
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
+            const error = _.find(this.settings.errors, { code: code }) || {};
 
             // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
             if (firmwareIsAlarmed || code === 79) {
