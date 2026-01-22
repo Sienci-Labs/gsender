@@ -2350,12 +2350,14 @@ class GrblHalController {
                 const [type = 'cnc'] = args;
                 this.runner.clearSDFiles();
                 if (type === 'cnc') {
-                    this.write(`$FM\n$F\n${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
+                    this.write('$FM\n$F\n');
+                    this.runner.setSDStatus();
                     return;
                 }
 
                 if (type === 'all') {
                     this.write('$FM\n$F+\n');
+                    this.runner.setSDStatus();
                     return;
                 }
             },
