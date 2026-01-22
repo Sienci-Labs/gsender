@@ -21,8 +21,6 @@ export function WizardLanding({
         (sw) => sw.id === subWizards[0]?.id,
     );
 
-    console.log('on landing', validations[0]());
-
     const hasValidationFailures = () => {
         if (!validations || validations.length === 0) return false;
 
@@ -38,8 +36,8 @@ export function WizardLanding({
     const validationsFailed = hasValidationFailures();
 
     return (
-        <div className="h-full bg-gray-50 flex">
-            <div className="w-3/5 p-12 flex flex-col">
+        <div className="h-full bg-gray-50 flex portrait:flex-col portrait:w-full">
+            <div className="w-3/5 portrait:w-full p-12 flex flex-col">
                 {onBack && (
                     <button
                         onClick={onBack}
@@ -105,7 +103,7 @@ export function WizardLanding({
                 </div>
             </div>
 
-            <div className="w-2/5 bg-gray-200 p-12 flex flex-col justify-between">
+            <div className="w-2/5 portrait:w-full bg-gray-200 p-12 flex flex-col justify-between">
                 <div className="flex items-center justify-center flex-1">
                     <div className="w-full aspect-video bg-gray-300 rounded-lg flex items-center justify-center">
                         <div className="text-center text-gray-400">
