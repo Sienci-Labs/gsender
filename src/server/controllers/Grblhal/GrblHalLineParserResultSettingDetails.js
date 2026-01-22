@@ -10,8 +10,6 @@ class GrblHalLineParserResultSettingDetails {
 
         const data = r[2].split('\t');
 
-        console.log(r);
-
         const payload = {
             id: Number(r[1]),
             unitString: data[1],
