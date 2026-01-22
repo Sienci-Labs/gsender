@@ -100,7 +100,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         };
         setMovementPos(payload);
     }
-    function onPopoverOpen(open) {
+    function onPopoverOpen(open: boolean) {
         if (open) {
             if (relativeMovement) {
                 setMovementPos({
@@ -130,7 +130,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         disabled={disabled}
                         icon={<FaPaperPlane />}
                         variant="secondary"
-                        size="sm"
+                        className="portrait:min-w-14"
                     />
                 </PopoverTrigger>
             </Tooltip>

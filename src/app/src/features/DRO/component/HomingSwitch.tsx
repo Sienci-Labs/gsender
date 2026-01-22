@@ -32,7 +32,7 @@ export function HomingSwitch({
 
             <Tooltip content="Run homing" side="bottom">
                 <Button
-                    size="sm"
+                    className="portrait:min-w-14"
                     variant="primary"
                     onClick={homeMachine}
                     disabled={disabled}

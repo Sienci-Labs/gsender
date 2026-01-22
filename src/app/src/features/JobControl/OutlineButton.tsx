@@ -69,7 +69,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
         <Button
             disabled={disabled}
             className={cx(
-                'rounded-[0.2rem] border-solid border-2 text-base px-3',
+                'rounded-[0.2rem] border-solid border-2 text-base px-3 portrait:px-6 portrait:text-lg',
                 {
                     'border-blue-500 bg-blue-500 text-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
                         !disabled,
