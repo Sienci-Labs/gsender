@@ -106,7 +106,7 @@ export function AxisRow({
                 movementHandler={handleManualOffset}
             />
 
-            <span className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center">
+            <span className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center" data-testid={`mpos-${axis}`}>
                 {disablePositionUpdate ? '0.00' : mpos}
             </span>
 
