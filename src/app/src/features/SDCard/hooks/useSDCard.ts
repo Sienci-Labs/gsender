@@ -9,7 +9,7 @@ export function useSDCard() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const isMounted = useTypedSelector(
-        (state: RootState) => state.controller.state.status?.sdCard || true,
+        (state: RootState) => state.controller.state.status?.sdCard,
     );
     const files = useTypedSelector(
         (state: RootState) => state.controller.sdcard?.files,

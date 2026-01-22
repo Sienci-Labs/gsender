@@ -580,6 +580,11 @@ class GrblHalRunner extends events.EventEmitter {
     clearSDFiles() {
         this.state.sdcard.files = [];
     }
+
+    clearSDStatus() {
+        console.log('clearSDStatus');
+        this.state.status.sdCard = false;
+    }
 }
 
 export default GrblHalRunner;

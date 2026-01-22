@@ -10,7 +10,7 @@ const SDCardElement = () => {
     useEffect(() => {
         console.log('Headed to SD card element');
         if (isConnected) {
-            controller.command('realtime_report'); // Request a realtime report so we can see the SD card status
+            controller.command('sdcard:mount');
         }
     }, []);
 

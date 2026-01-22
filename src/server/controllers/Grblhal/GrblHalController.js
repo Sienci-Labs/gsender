@@ -777,8 +777,6 @@ class GrblHalController {
 
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
-            console.log('error found');
-            console.log(res);
             const isRunning = this.workflow.isRunning();
             const firmwareIsAlarmed = this.runner.isAlarm();
 
@@ -791,7 +789,6 @@ class GrblHalController {
 
             const code = Number(res.message) || undefined;
             const error = _.find(this.settings.errors, { code: code }) || {};
-            console.log(error);
 
             // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
             if (firmwareIsAlarmed || code === 79) {
@@ -834,7 +831,6 @@ class GrblHalController {
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
-                console.log(error);
                 const preferences = store.get('preferences') || { showLineWarnings: false };
                 this.emit('serialport:read', `error:${code} (${error?.description})`);
 
@@ -858,6 +854,10 @@ class GrblHalController {
 
             if (error) {
                 this.emit('serialport:read', `error:${code} (${error.description})`);
+            }
+
+            if (error.code === 60 || error.code === 64 || error.code === 62) {
+                this.runner.clearSDStatus();
             }
 
             const msg = `Error ${code} - ${error?.description}`;
@@ -2319,7 +2319,7 @@ class GrblHalController {
                 };
             },
             'realtime_report': () => {
-                this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'error_clear': () => {
                 this.write('$');
@@ -2343,18 +2343,19 @@ class GrblHalController {
                 this.runner.deleteSettings();
             },
             'sdcard:mount': () => {
-                this.writeln('$FM');
+                this.write(`$FM\n${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
+                //this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'sdcard:list': () => {
                 const [type = 'cnc'] = args;
                 this.runner.clearSDFiles();
                 if (type === 'cnc') {
-                    this.writeln('$F');
+                    this.write(`$FM\n$F\n${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
                     return;
                 }
 
                 if (type === 'all') {
-                    this.writeln('$F+');
+                    this.write('$FM\n$F+\n');
                     return;
                 }
             },
