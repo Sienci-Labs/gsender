@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { SubWizard, ValidationResult } from '../../types/wizard';
 import { ValidationBanner } from 'app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx';
+import PlaceholderImage from '../../Wizards/assets/placeholder.png';
 
 interface WizardLandingProps {
     title: string;
@@ -37,7 +38,7 @@ export function WizardLanding({
 
     return (
         <div className="h-full bg-gray-50 flex portrait:flex-col portrait:w-full">
-            <div className="w-3/5 portrait:w-full p-12 flex flex-col">
+            <div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col">
                 {onBack && (
                     <button
                         onClick={onBack}
@@ -103,21 +104,13 @@ export function WizardLanding({
                 </div>
             </div>
 
-            <div className="w-2/5 portrait:w-full bg-gray-200 p-12 flex flex-col justify-between">
+            <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 p-12 flex flex-col justify-between">
                 <div className="flex items-center justify-center flex-1">
-                    <div className="w-full aspect-video bg-gray-300 rounded-lg flex items-center justify-center">
-                        <div className="text-center text-gray-400">
-                            <div className="w-32 h-32 mx-auto mb-4 border-4 border-gray-400 rounded-lg flex items-center justify-center">
-                                <svg
-                                    className="w-16 h-16"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    <img
+                        alt="Placeholder starter image"
+                        src={PlaceholderImage}
+                        className="w-[500px]"
+                    />
                 </div>
 
                 <div className="border-2 border-blue-400 rounded-lg p-6 bg-white">
