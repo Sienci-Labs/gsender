@@ -37,7 +37,7 @@ export function WizardLanding({
     const validationsFailed = hasValidationFailures();
 
     return (
-        <div className="h-full bg-gray-50 flex portrait:flex-col portrait:w-full">
+        <div className="h-full bg-gray-50 flex portrait:flex-col-reverse portrait:w-full">
             <div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col">
                 {onBack && (
                     <button

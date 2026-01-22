@@ -82,7 +82,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 isCompleted={showCompletion}
             />
 
-            <div className="flex flex-1 overflow-hidden portrait:flex-col">
+            <div className="flex flex-1 overflow-hidden portrait:flex-col-reverse">
                 <div className="w-3/5 portrait:w-full portrait:text-xl portrait:h-3/5 p-12 overflow-y-auto">
                     {showCompletion && CompletionComponent ? (
                         <CompletionComponent />
