@@ -778,6 +778,7 @@ class GrblHalController {
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
             console.log('error found');
+            console.log(res);
             const isRunning = this.workflow.isRunning();
             const firmwareIsAlarmed = this.runner.isAlarm();
 
@@ -789,7 +790,8 @@ class GrblHalController {
             }
 
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
+            const error = _.find(this.settings.errors, { code: code }) || {};
+            console.log(error);
 
             // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
             if (firmwareIsAlarmed || code === 79) {
@@ -832,13 +834,13 @@ class GrblHalController {
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
-
+                console.log(error);
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error?.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.description})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.description}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -855,10 +857,10 @@ class GrblHalController {
             }
 
             if (error) {
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error.description})`);
             }
 
-            const msg = `Error ${code} - ${error?.message}`;
+            const msg = `Error ${code} - ${error?.description}`;
             this.emit('gcode_error', msg);
 
             this.feeder.ack();
@@ -1001,7 +1003,7 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$EE\n$#\n');
             await delay(25);
 
             const hasSD = _.get(this.state, 'status.sdCard', null);
@@ -1493,7 +1495,7 @@ class GrblHalController {
                             this.initController();
                         }
 
-                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$EE\n$spindles\n');
                         return;
                     }
                     if (this.connection) {

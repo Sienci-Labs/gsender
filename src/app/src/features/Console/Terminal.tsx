@@ -148,6 +148,7 @@ const Terminal = (
         pushUpdatedTerminalHistory();
 
         if (data.includes('error:')) {
+            console.log(data);
             terminalInstance.current?.writeln(color.xterm(TERMINAL_RED)(data));
             return;
         }
