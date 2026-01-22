@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Button as ShadButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
 import { MdFormatListNumbered } from 'react-icons/md';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import store from 'app/store';
 import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import { updateJobOverrides } from 'app/store/redux/slices/visualizer.slice';
 import controller from 'app/lib/controller';
@@ -22,6 +21,7 @@ import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import pubsub from 'pubsub-js';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -42,28 +42,30 @@ const StartFromLine = ({
     atcValidator,
 }: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
+    const { units } = useWorkspaceState();
     const [state, setState] = useState({
         showModal: false,
         needsRecovery: false,
         value: lastLine,
         startFromLine: lastLine - 10 >= 0 ? lastLine - 10 : 0,
         waitForHoming: false,
-        safeHeight:
-            store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS
-                ? 10
-                : 0.4,
-        defaultSafeHeight:
-            store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS
-                ? 10
-                : 0.4,
+        safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+        defaultSafeHeight: units === METRIC_UNITS ? 10 : 0.4,
     });
     const { delay = 0 } = useWidgetState('spindle');
 
     const lineTotal = useSelector((state: RootState) => state.file.total);
 
+    // update units for safe height
+    useEffect(() => {
+        setState({
+            ...state,
+            safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+        });
+    }, [units]);
+
     const handleStartFromLine = () => {
         const { safeHeight, startFromLine } = state;
-        const units = store.get('workspace.units', METRIC_UNITS);
 
         setState((prev) => ({
             ...prev,
@@ -185,26 +187,32 @@ const StartFromLine = ({
                         </div>
                         <div className="mb-4">
                             <div className="grid grid-cols-4 gap-2 items-center">
-                                <label htmlFor="safeHeight">
-                                    With Safe Height:
-                                </label>
+                                {/*
+                                    tooltip cannot be nested any deeper, or the controlled input
+                                    wont fire onBlur when you click off of it
+                                */}
                                 <Tooltip
                                     content={`Default Value: ${state.defaultSafeHeight}`}
                                 >
-                                    <ControlledInput
-                                        id="safeHeight"
-                                        type="number"
-                                        value={state.safeHeight}
-                                        onChange={(e) => {
-                                            setState((prev) => ({
-                                                ...prev,
-                                                safeHeight: Number(
-                                                    e.target.value,
-                                                ),
-                                            }));
-                                        }}
-                                        className="w-20"
-                                    />
+                                    <>
+                                        <label htmlFor="safeHeight">
+                                            With Safe Height:
+                                        </label>
+                                        <ControlledInput
+                                            id="safeHeight"
+                                            type="number"
+                                            value={state.safeHeight}
+                                            onChange={(e) => {
+                                                setState((prev) => ({
+                                                    ...prev,
+                                                    safeHeight: Number(
+                                                        e.target.value,
+                                                    ),
+                                                }));
+                                            }}
+                                            className="w-20"
+                                        />
+                                    </>
                                 </Tooltip>
                                 <span className="text-sm col-span-2">
                                     (amount above the max height of the file)
