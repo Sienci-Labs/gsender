@@ -41,7 +41,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
             <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Rehome
             </label>
-            <p>
+            <p className="dark:text-white">
                 The updated homing location requires you to rehome the machine
                 before continuing. Re-home using the provided buttons
             </p>

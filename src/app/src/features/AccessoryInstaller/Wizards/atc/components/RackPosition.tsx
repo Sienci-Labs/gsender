@@ -61,11 +61,11 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     if (rackless) {
         return (
             <div className="flex flex-col gap-5 p-2 justify-start">
-                <p>
+                <p className="dark:text-white">
                     For ATC Configuration, you selected “No Tool Rack” and so do
                     not need to set a rack position.
                 </p>
-                <p>
+                <p className="dark:text-white">
                     If you have a rack installed, please return to the previous
                     step to correct your selection.
                 </p>
@@ -76,7 +76,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
             <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Finding Rack Position Method
                 </label>
                 <select
@@ -90,12 +90,12 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
             </div>
             {rackPositionMethod === 'utility' && (
                 <>
-                    <p>
+                    <p className="dark:text-white">
                         Position the spindle until the tool-stud sensor is
                         almost touching the right-most tool-stud, as in the
                         provided image. The LED on the sensor should light up.
                     </p>
-                    <p>
+                    <p className="dark:text-white">
                         The machine will use the Stud-finder Sensor to determine
                         the precise position of your tool rack.
                         <b>Keep your hands near the E-stop</b> and click “Find

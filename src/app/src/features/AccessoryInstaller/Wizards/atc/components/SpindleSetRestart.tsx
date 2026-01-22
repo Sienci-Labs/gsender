@@ -70,21 +70,9 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
 
     return (
         <div className="flex flex-col gap-5 p-2 justify-start">
-            <p>
+            <p className="dark:text-white">
                 Your spindle must now be configured. This will require a reboot
                 before setting the modbus address.
-            </p>
-            <p>You board will disconnect and reconnect during this process</p>
-            <StepActionButton
-                label="Setup Spindle"
-                runningLabel="Configuring..."
-                onApply={setupSpindleProcess}
-                isComplete={hasConfiguredModbus}
-                error={error}
-                disabled={!canSetupSpindle}
-            />
-            <p>
-                <b>OR</b>
             </p>
             <StepActionButton
                 label="Setup Spindle and Reboot"
@@ -94,7 +82,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
                 error={error}
                 disabled={!canSetupSpindle}
             />
-            <p>
+            <p className="dark:text-white">
                 Once you have reconnected to you device, configure the Modbus
                 Address. This will also disconnect your controller.
             </p>
