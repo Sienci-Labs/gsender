@@ -17,15 +17,15 @@ export function ProgressBar({
     const displayStep = isCompleted ? totalSteps : currentStep;
 
     return (
-        <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+        <div className="bg-white dark:bg-dark-darker border-b border-gray-200 px-8 py-4 flex items-center justify-between">
             <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                         {isCompleted
                             ? 'All Steps Complete'
                             : `Step ${displayStep} of ${totalSteps}`}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                         {progressPercentage}% Complete
                     </span>
                 </div>
@@ -39,7 +39,7 @@ export function ProgressBar({
 
             <button
                 onClick={onExit}
-                className="ml-8 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="ml-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 transition-colors"
             >
                 <svg
                     className="w-5 h-5"

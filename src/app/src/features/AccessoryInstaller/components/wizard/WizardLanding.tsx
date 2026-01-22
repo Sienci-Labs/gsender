@@ -37,12 +37,12 @@ export function WizardLanding({
     const validationsFailed = hasValidationFailures();
 
     return (
-        <div className="h-full bg-gray-50 flex portrait:flex-col-reverse portrait:w-full">
+        <div className="h-full bg-gray-50 dark:bg-slate-800 flex portrait:flex-col-reverse portrait:w-full">
             <div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col">
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 self-start"
+                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 mb-8 self-start"
                     >
                         <ArrowLeft size={20} />
                         Back to Wizards
@@ -50,11 +50,11 @@ export function WizardLanding({
                 )}
 
                 <div className="flex-1">
-                    <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                    <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
                         {title}
                     </h1>
                     {activeSubWizard?.estimatedTime && (
-                        <p className="text-gray-700 mb-1">
+                        <p className="text-gray-700 dark:text-gray-400 mb-1">
                             <span className="font-semibold">
                                 Estimated time:
                             </span>{' '}
@@ -62,7 +62,7 @@ export function WizardLanding({
                         </p>
                     )}
                     {activeSubWizard?.configVersion && (
-                        <p className="text-gray-700 mb-8">
+                        <p className="text-gray-700 dark:text-gray-400 mb-8">
                             Configuration File Version:{' '}
                             {activeSubWizard.configVersion}
                         </p>
@@ -104,7 +104,7 @@ export function WizardLanding({
                 </div>
             </div>
 
-            <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 p-12 flex flex-col justify-between">
+            <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-dark p-12 flex flex-col justify-between">
                 <div className="flex items-center justify-center flex-1">
                     <img
                         alt="Placeholder starter image"
@@ -113,17 +113,17 @@ export function WizardLanding({
                     />
                 </div>
 
-                <div className="border-2 border-blue-400 rounded-lg p-6 bg-white">
+                <div className="border-2 border-blue-400 rounded-lg p-6 bg-white dark:bg-slate-800">
                     <div className="flex items-start gap-3">
                         <HelpCircle
                             className="text-blue-500 flex-shrink-0"
                             size={24}
                         />
                         <div>
-                            <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                            <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
                                 Need Help?
                             </h3>
-                            <p className="text-gray-600">
+                            <p className="text-gray-600 dark:text-gray-400">
                                 Follow along in our{' '}
                                 <a href="#" className="text-blue-500 font-bold">
                                     online resources

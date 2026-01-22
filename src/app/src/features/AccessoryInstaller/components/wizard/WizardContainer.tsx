@@ -74,7 +74,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     const CompletionComponent = subWizard.completionPage;
 
     return (
-        <div className="h-full bg-gray-50 flex flex-col">
+        <div className="h-full bg-gray-50 dark:bg-slate-800 flex flex-col">
             <ProgressBar
                 currentStep={currentStepIndex + 1}
                 totalSteps={subWizard.steps.length}
@@ -88,12 +88,12 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                         <CompletionComponent />
                     ) : (
                         <>
-                            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                                 {currentStep.title}
                             </h1>
 
                             {subWizard.configVersion && (
-                                <p className="text-gray-600 mb-8">
+                                <p className="text-gray-600 dark:text-gray-400 mb-8">
                                     Configuration File Version:{' '}
                                     {subWizard.configVersion}
                                 </p>
@@ -111,7 +111,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                     )}
                 </div>
 
-                <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 p-12 overflow-y-auto">
+                <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark p-12 overflow-y-auto">
                     <SecondaryContentPanel
                         content={
                             showCompletion
@@ -122,10 +122,9 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 </div>
             </div>
 
-            <div className="bg-white border-t border-gray-200 px-8 py-4 flex items-center justify-between">
+            <div className="bg-white dark:bg-dark-darker border-t border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">
                 {showCompletion ? (
                     <>
-                        <div></div>
                         <button
                             onClick={onExit}
                             className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
