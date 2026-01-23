@@ -1,6 +1,18 @@
 import { AXES_T } from 'app/features/Axes/definitions';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
 
+// Override action types for feed rate and spindle speed control
+// Direction is determined by joystick input
+// +/- for minor (1%) increments, ++/-- for major (10%) increments
+export type OVERRIDE_ACTION_T =
+    | 'feed+/-'
+    | 'feed++/--'
+    | 'spindle+/-'
+    | 'spindle++/--';
+
+// Combined type for stick actions - can be an axis, an override action, or null
+export type STICK_ACTION_T = AXES_T | OVERRIDE_ACTION_T | null;
+
 export interface GamepadDetail {
     detail: {
         index: number; // Gamepad index: Number [0-3].
@@ -26,8 +38,8 @@ export interface GamepadButton {
 }
 
 export interface StickActions {
-    primaryAction: AXES_T;
-    secondaryAction: AXES_T;
+    primaryAction: STICK_ACTION_T;
+    secondaryAction: STICK_ACTION_T;
     isReversed: boolean;
 }
 
