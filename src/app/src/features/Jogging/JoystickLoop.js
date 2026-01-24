@@ -86,14 +86,14 @@ export class JoystickLoop {
     };
 
     _getDirectionKey = (degrees) => {
-        if (inRange(degrees, 0, 15) || inRange(degrees, 345, 360)) return 'X+';
-        if (inRange(degrees, 16, 74)) return 'X+Y+';
-        if (inRange(degrees, 75, 105)) return 'Y+';
-        if (inRange(degrees, 106, 164)) return 'X-Y+';
-        if (inRange(degrees, 165, 195)) return 'X-';
-        if (inRange(degrees, 196, 254)) return 'X-Y-';
-        if (inRange(degrees, 255, 285)) return 'Y-';
-        if (inRange(degrees, 286, 344)) return 'X+Y-';
+        if (inRange(degrees, 0, 22.5) || inRange(degrees, 337.5, 360)) return 'X+';
+        if (inRange(degrees, 22.5, 67.5)) return 'X+Y+';
+        if (inRange(degrees, 67.5, 112.5)) return 'Y+';
+        if (inRange(degrees, 112.5, 157.5)) return 'X-Y+';
+        if (inRange(degrees, 157.5, 202.5)) return 'X-';
+        if (inRange(degrees, 202.5, 247.5)) return 'X-Y-';
+        if (inRange(degrees, 247.5, 292.5)) return 'Y-';
+        if (inRange(degrees, 292.5, 337.5)) return 'X+Y-';
         return null;
     };
 
