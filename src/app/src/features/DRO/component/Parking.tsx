@@ -6,7 +6,7 @@ import controller from 'app/lib/controller.ts';
 import { LOCATION_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Tooltip from 'app/components/Tooltip';
 
 function goToParkLocation() {
@@ -23,6 +23,12 @@ function goToParkLocation() {
 }
 
 export function Parking({ disabled = false, isConnected = false, homingEnabled = false }) {
+    const disabledRef = useRef(disabled);
+
+    useEffect(() => {
+        disabledRef.current = disabled;
+    }, [disabled]);
+
     const shuttleControlEvents = {
         HOMING_PARK: {
             title: 'Park ',
@@ -32,7 +38,7 @@ export function Parking({ disabled = false, isConnected = false, homingEnabled =
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: () => {
-                if (disabled) {
+                if (disabledRef.current) {
                     return;
                 }
                 goToParkLocation();
