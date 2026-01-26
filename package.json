@@ -92,8 +92,11 @@
     },
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
-    "asar": false,
-    "asarUnpack": [],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/*.{dll,so,dylib,exe}"
+    ],
     "productName": "gSender Edge",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
