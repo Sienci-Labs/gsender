@@ -117,7 +117,6 @@ export function StepActionButton({
         <div className="space-y-2">
             <button
                 onClick={handleClick}
-                disabled={state === 'running' || state === 'finished'}
                 className={`${getButtonStyles()} ${className}`}
                 disabled={disabled}
             >

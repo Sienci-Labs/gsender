@@ -1612,7 +1612,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Tool Changing',
         icon: IoIosSwap,
-        wizard: ATCIWizard,
         settings: [
             {
                 label: '',
