@@ -12,6 +12,7 @@ import { Jogging } from 'app/features/Jogging';
 import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
 import store from 'app/store';
 import { SpindleSetRestart } from 'app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx';
+import {Modbus} from "app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx";
 
 export function useSienciATCWizard(): Wizard {
     const { connectionValidation } = useValidations();
@@ -86,8 +87,8 @@ export function useSienciATCWizard(): Wizard {
                                     type: 'component',
                                     content: Jogging,
                                     props: {
-                                        hideRotary: true
-                                    }
+                                        hideRotary: true,
+                                    },
                                 },
                             ],
                         },
@@ -100,8 +101,8 @@ export function useSienciATCWizard(): Wizard {
                                     type: 'component',
                                     content: Jogging,
                                     props: {
-                                        hideRotary: true
-                                    }
+                                        hideRotary: true,
+                                    },
                                 },
                             ],
                         },
@@ -109,6 +110,12 @@ export function useSienciATCWizard(): Wizard {
                             id: 'spindle-config',
                             title: 'Spindle Configuration',
                             component: SpindleSetRestart,
+                            secondaryContent: [],
+                        },
+                        {
+                            id: 'modbus-config',
+                            title: 'Modbus Configuration',
+                            component: Modbus,
                             secondaryContent: [],
                         },
                     ],
