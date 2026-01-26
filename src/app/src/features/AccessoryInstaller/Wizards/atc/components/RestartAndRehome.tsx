@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
@@ -6,9 +6,9 @@ import { StepActionButton } from 'app/features/AccessoryInstaller/components/wiz
 import { StepProps } from 'app/features/AccessoryInstaller/types';
 
 export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
-    const [restarted, setRestarted] = useState<boolean>(true);
     const [rehomed, setRehomed] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [clickedRehome, setClickedRehome] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     const hasHomed = useTypedSelector(
         (state: RootState) => state.controller.state.status.hasHomed,
@@ -18,23 +18,19 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const handleRestart = () => {
-        controller.command('restart');
-        setTimeout(() => {
-            setRestarted(true);
-        }, 2000);
-    };
+    useEffect(() => {
+        if (clickedRehome && hasHomed) {
+            setRehomed(true)
+            onComplete(); // onComplete when we have clicked and rehoming is done
+        }
+    }, [hasHomed, clickedRehome]);
 
     const handleRehome = () => {
+        setClickedRehome(true);
         controller.command('homing');
-        setTimeout(() => {
-            setRehomed(true);
-            onComplete();
-        }, 2000);
     };
 
-    const canRehome = isConnected && restarted;
-    const canRestart = isConnected && !rehomed;
+    const canRehome = isConnected;
 
     return (
         <div className="flex flex-col gap-5 justify-start">

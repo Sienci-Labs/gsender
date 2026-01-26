@@ -25,6 +25,12 @@ class GrblHalLineParserResultATCI {
             values[parts[0]] = parts[1] || null;
         });
 
+        if (line.includes('Error:')) {
+            values.macro_abort = 1;
+        } else {
+            values.macro_abort = 0;
+        }
+
         const payload = {
             message,
             subtype,
