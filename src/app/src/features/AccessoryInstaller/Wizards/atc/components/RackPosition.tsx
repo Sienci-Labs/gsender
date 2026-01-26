@@ -33,8 +33,13 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     console.log(`aborted: ${ATCIMacroAborted}`);
 
     useEffect(() => {
-        setIsComplete(false);
-        setError('Utility failed - fix reported issue and try again');
+        if (ATCIMacroAborted === 1) {
+            setIsComplete(false);
+            setError('Utility failed - fix reported issue and try again');
+            setTimeout(() => {
+                setError('');
+            }, 3000);
+        }
     }, [ATCIMacroAborted]);
 
     // Once we get a flag back, we can complete and move on to next step
