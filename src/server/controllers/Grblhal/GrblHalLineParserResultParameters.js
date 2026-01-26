@@ -23,7 +23,7 @@
 
 class GrblHalLineParserResultParameters {
     static parse(line) {
-        const r = line.match(/^\[(G54|G55|G56|G57|G58|G59|G28|G30|G92|TLO|PRB):(.+)\]$/);
+        const r = line.match(/^\[(G54|G55|G56|G57|G58|G59|G28|G30|G92|TLO|PRB|T):(.+)\]$/);
         if (!r) {
             return null;
         }
@@ -61,6 +61,26 @@ class GrblHalLineParserResultParameters {
             for (let i = 0; i < list.length; ++i) {
                 payload.value[axes[i]] = list[i];
             }
+        }
+
+        if (name === 'T') {
+            const tr = value.match(/^([0-9]+)\|([^|]+)\|(.+)$/);
+            if (!tr) {
+                return null;
+            }
+
+            const tnum = tr[1];
+            const values = tr[2];
+            const name = `T${tnum}`;
+            payload.name = name;
+
+            const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+            const list = values.split(',');
+            payload.value = {};
+            for (let i = 0; i < list.length; ++i) {
+                payload.value[axes[i]] = list[i];
+            }
+            payload.value.radius = tr[3];
         }
 
         return {
