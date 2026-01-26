@@ -146,6 +146,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         setControllerType(value);
     }
 
+    function canClickFlash() {
+        if (controllerType === 'grbl') {
+            return port != '';
+        }
+        return port != '' && file != '';
+    }
+
     function handleFileUpload(e) {
         const file = e.target.files[0];
         if (!file) {
@@ -241,7 +248,11 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
                             <Button onClick={toggleShow}>No</Button>
-                            <Button variant="primary" onClick={flashPort}>
+                            <Button
+                                variant="primary"
+                                disabled={!canClickFlash()}
+                                onClick={flashPort}
+                            >
                                 Yes
                             </Button>
                         </div>

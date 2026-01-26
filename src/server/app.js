@@ -77,9 +77,6 @@ const appMain = () => {
 
     { // Settings
         if (process.env.NODE_ENV === 'development') {
-            // const webpackDevServer = require('./webpack-dev-server').default;
-            // webpackDevServer(app);
-
             // Error handler - https://github.com/expressjs/errorhandler
             // Development error handler, providing stack traces and error message responses
             // for requests accepting text, html, or json.
@@ -174,7 +171,13 @@ const appMain = () => {
         log.error(err);
     }
 
-    app.use(favicon(path.join(_get(settings, 'assets.app.path', ''), 'favicon.ico')));
+    // Only use favicon middleware if the file exists
+    const faviconPath = path.join(_get(settings, 'assets.app.path', ''), 'favicon.ico');
+    if (fs.existsSync(faviconPath)) {
+        app.use(favicon(faviconPath));
+    } else {
+        log.warn(`Favicon not found at ${faviconPath}, skipping favicon middleware`);
+    }
     app.use(cookieParser());
 
     // Connect's body parsing middleware. This only handles urlencoded and json bodies.
@@ -398,6 +401,10 @@ const appMain = () => {
 
         // Release Notes
         app.get(urljoin(settings.route, 'api/releasenotes'), api.releaseNotes.fetchReleaseNotes);
+
+        // Preferences
+        app.get(urljoin(settings.route, 'api/preferences'), api.preferences.fetch);
+        app.put(urljoin(settings.route, 'api/preferences'), api.preferences.replace);
     }
 
     // app.get(urljoin(settings.route, '/'), async (req, res) => {

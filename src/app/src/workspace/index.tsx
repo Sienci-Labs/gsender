@@ -43,6 +43,7 @@ import {
 import pubsub from 'pubsub-js';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
+import { Helper } from 'app/features/Helper';
 
 const Workspace = () => {
     const location = useLocation();
@@ -396,6 +397,7 @@ const Workspace = () => {
                 <div className="flex h-full no-scrollbar ">
                     <Sidebar />
                     <Alerts />
+                    <Helper />
                     <div className="w-full max-sm:p-4">
                         <Carve />
                         <Outlet />

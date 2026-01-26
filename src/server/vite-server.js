@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 
 export const viteServer = async (app) => {
-    const devDir = path.resolve(__dirname, '../../src/app');
-    const prodDir = path.resolve(__dirname, '../../dist/gsender/app');
+    const workspaceRoot = path.resolve(__dirname, '..');
+    const devDir = path.join(workspaceRoot, 'src/app');
+    const prodDir = path.join(workspaceRoot, 'dist/gsender/app');
 
     // Constants
     const isProduction = process.env.NODE_ENV === 'production';

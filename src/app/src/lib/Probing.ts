@@ -128,7 +128,6 @@ const updateOptionsForDirection = (
     direction: PROBE_DIRECTIONS,
 ): ProbingOptions => {
     const { units, plateType } = options;
-    console.log(options);
     const diameter =
         plateType === TOUCHPLATE_TYPE_3D
             ? options.tipDiameter3D
@@ -683,10 +682,15 @@ export const get3AxisAutoDiameterRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
-    const toolRadius = (units === METRIC_UNITS ? toolDiameter : convertToMetric(toolDiameter)) / 2;
+    const toolRadius =
+        (units === METRIC_UNITS
+            ? toolDiameter
+            : convertToMetric(toolDiameter)) / 2;
     const toolCompensatedThickness = -1 * toolRadius;
     // Addition because it's already negative
-    const compensatedValue = Number((22.5 + toolCompensatedThickness).toFixed(3));
+    const compensatedValue = Number(
+        (22.5 + toolCompensatedThickness).toFixed(3),
+    );
 
     if (axes.z && axes.y && axes.z) {
         code.push(

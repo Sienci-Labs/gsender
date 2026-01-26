@@ -40,6 +40,7 @@ import * as jobStats from './api.jobstats';
 import * as maintenance from './api.maintenance';
 import * as alarmList from './api.alarmList';
 import * as releaseNotes from './api.releasenotes';
+import * as preferences from './api.preferences';
 
 export {
     version,
@@ -61,4 +62,5 @@ export {
     maintenance,
     alarmList,
     releaseNotes,
+    preferences,
 };

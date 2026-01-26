@@ -41,6 +41,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
 
 export function PortListings(props: PortListingsProps): JSX.Element {
     const [ip, setIP] = useState<string>('255.255.255.255');
+    const [port, setPort] = useState<number>(23);
     const [baud, setBaud] = useState(115200);
     const [openUnrecognized, setOpenUnrecognized] = useState<boolean>(false);
 
@@ -48,6 +49,8 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         const ip = store.get('widgets.connection.ip', []);
         const ipString = ip.join('.');
         setIP(ipString);
+
+        setPort(store.get('widgets.connection.ethernetPort', 23));
     }, []);
 
     store.on('change', () => {
@@ -56,6 +59,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         const ipString = ip.join('.');
         setIP(ipString);
         setBaud(baudrate);
+        setPort(store.get('widgets.connection.ethernetPort', 23));
     });
 
     function toggleUnrecognizedPorts() {
@@ -89,7 +93,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 <div className="flex flex-col gap-1 text-right">
                     <span>{ip}</span>
                     <span className="text-sm text-gray-600 font-normal">
-                        Ethernet (port 23)
+                        Ethernet (port {port})
                     </span>
                 </div>
             </button>

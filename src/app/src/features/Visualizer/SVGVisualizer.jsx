@@ -101,6 +101,7 @@ class SVGVisualizer extends Component {
         const tokens = [
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
+                pubsub.publish('visualizeWorker:terminate');
 
                 const showWarningsOnLoad = store.get(
                     'widgets.visualizer.showWarning',
@@ -302,8 +303,14 @@ class SVGVisualizer extends Component {
     // name parameter is included to match the normal visualizer load function
     // DO NOT remove it or you'll get errors
     load(name, vizualization) {
+        const visualization = {
+            ...vizualization,
+            vertices: new Float32Array(vizualization.vertices),
+            frames: new Uint32Array(vizualization.frames),
+            spindleSpeeds: new Float32Array(vizualization.spindleSpeeds),
+        };
         this.unload();
-        this.handleSceneRender(vizualization);
+        this.handleSceneRender(visualization);
     }
 
     unload(skipVis = false) {

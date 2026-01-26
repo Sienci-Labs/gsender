@@ -36,6 +36,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
         useTypedSelector((state) => state.file);
 
     const [toggleInfo, setToggleInfo] = useState(false);
+    const [showEditor, setShowEditor] = useState(false);
     const [recentFiles, setRecentFiles] =
         useState<RecentFile[]>(getRecentFiles());
     const [lastJob, setLastJob] = useState<Job>(null);
@@ -60,6 +61,12 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             pubsub.subscribe('lastJob', (_: string, job: Job) => {
                 setLastJob(job);
             }),
+            pubsub.subscribe(
+                'gcode-editor:toggle',
+                (_: string, isVisible: boolean) => {
+                    setShowEditor(isVisible);
+                },
+            ),
         ];
         return () => {
             tokens.forEach((token) => {
@@ -67,6 +74,16 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             });
         };
     }, []);
+
+    useEffect(() => {
+        pubsub.publish('gcode-editor:toggle', showEditor);
+    }, [showEditor]);
+
+    useEffect(() => {
+        if (!fileLoaded && showEditor) {
+            setShowEditor(false);
+        }
+    }, [fileLoaded, showEditor]);
 
     if (fileProcessing) {
         return <LoadingAnimation />;
@@ -198,9 +215,6 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 </div>
             </div>
         );
-        // <div className="flex flex-col gap-2 justify-center items-center h-full">
-        //     <h2 className="text-lg font-bold">No file loaded</h2>
-        // </div>
     }
 
     const formatFileSize = (size: number): string => {
@@ -215,32 +229,32 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
         return `${(size / (1024 * 1024)).toFixed(0)} MB`;
     };
 
+    const splitFileNameAndExtension = (name: string = '') => {
+        if (!name) return ['', ''];
+
+        if (name.indexOf('.') > 0) {
+            return name.split('.');
+        }
+
+        return [name, ''];
+    };
+
     const fileSize = formatFileSize(size);
     const ToggleOutput = toggleInfo ? Info : Size;
 
-    let cutName = '';
-    let extension = '';
-    if (name && name.length > 0) {
-        if (name.indexOf('.') > 0) {
-            cutName = name.substring(0, name.indexOf('.') - 3);
-            extension = name.slice(name.indexOf('.') - 3);
-        } else {
-            cutName = name;
-            extension = '';
-        }
-    }
+    const [fileName, extension] = splitFileNameAndExtension(name);
 
     return (
-        <div className="flex flex-col mt-2 justify-center items-start self-center text-sm max-w-full text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col justify-center items-center text-sm max-w-full text-gray-900 dark:text-gray-300 h-full w-full">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="max-w-full flex flex-row">
                             <h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
-                                {cutName}
+                                {fileName}
                             </h2>
                             <h2 className="inline-block text-lg font-bold">
-                                {extension}
+                                .{extension}
                             </h2>
                         </div>
                     </TooltipTrigger>
@@ -262,8 +276,8 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 </div>
             )}
 
-            <div className="flex gap-2 min-w-64 self-center justify-center items-start">
-                <div className="flex flex-col items-center mr-1">
+            <div className="flex gap-4 justify-center items-center w-full">
+                <div className="flex flex-col items-center flex-shrink-0">
                     <span className="text-gray-500">Info</span>
                     <Switch
                         checked={toggleInfo}
@@ -273,9 +287,18 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                     <span className="text-gray-500">Size</span>
                 </div>
 
-                <div className="w-full overflow-auto self-center">
-                    <ToggleOutput />
-                </div>
+                <ToggleOutput />
+
+                {fileLoaded && (
+                    <div className="flex flex-col items-center mr-1">
+                        <span className="text-gray-500">Editor</span>
+                        <Switch
+                            checked={showEditor}
+                            onChange={() => setShowEditor((prev) => !prev)}
+                            position="vertical"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

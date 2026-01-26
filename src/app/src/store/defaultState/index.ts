@@ -41,6 +41,7 @@ import { profiles } from './gamepad';
 import { State } from '../definitions';
 import { MachineProfile } from 'app/definitions/firmware';
 import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
+import { defaultATCIMacros } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -54,6 +55,7 @@ const defaultState: State = {
         reverseWidgets: false,
         spindleFunctions: false,
         coolantFunctions: true,
+        atcEnabled: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,
@@ -63,6 +65,7 @@ const defaultState: State = {
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
         revertWorkspace: false,
+        promptExit: false,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
@@ -161,6 +164,11 @@ const defaultState: State = {
         enableDarkMode: false,
     },
     widgets: {
+        atc: {
+            toolMap: {},
+            templates: defaultATCIMacros,
+            warnOnHome: true,
+        },
         axes: {
             minimized: false,
             axes: ['x', 'y', 'z'],
@@ -221,6 +229,7 @@ const defaultState: State = {
             },
             autoReconnect: false,
             ip: [192, 168, 5, 1],
+            ethernetPort: 23,
         },
         console: {
             minimized: false,
@@ -386,6 +395,7 @@ const defaultState: State = {
             showWarning: false,
             showLineWarnings: false,
             showSoftLimitWarning: false,
+            hideProcessedLines: false,
         },
     },
     commandKeys: {},

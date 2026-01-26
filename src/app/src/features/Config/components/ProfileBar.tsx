@@ -91,14 +91,14 @@ export function ProfileBar() {
     }
 
     return (
-        <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 dark:bg-dark">
+        <div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-dark">
             <FlashDialog show={flashOpen} toggleShow={toggleFlash} />
             <div className="flex flex-row items-center border border-gray-200 h-12 rounded-lg justify-between">
-                <div className="w-1/4 min-w-64  mx-auto px-2">
+                <div className="w-1/4 min-w-64  mx-auto px-2 max-sm:hidden">
                     <MachineProfileSelector />
                 </div>
 
-                <div className="grid h-full max-w-lg grid-cols-4 font-medium divide-x">
+                <div className="grid h-full max-w-lg grid-cols-4 font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
                     <RestoreDefaultDialog />
                     <ActionButton
                         icon={<PiLightning />}

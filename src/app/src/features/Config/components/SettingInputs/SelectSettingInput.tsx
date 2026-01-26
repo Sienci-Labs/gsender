@@ -9,9 +9,9 @@ import {
 export interface SelectSettingInputProps {
     options: string[] | number[];
     index: number;
-    subIndex: number;
+    subIndex?: number;
     value: string | number;
-    onChange: (v) => void;
+    onChange: (v: any) => void;
     disabled: () => boolean;
 }
 

@@ -21,9 +21,19 @@ interface Modal {
 }
 
 interface RotationResult {
+    x: number;
     y: number;
     z: number;
     a: number;
+}
+
+type SpindleToolEventCode = 'S' | 'T' | 'M' | 'TC';
+
+interface SpindleToolEvent {
+    S?: Number;
+    T?: Number;
+    M?: Number;
+    TC?: boolean;
 }
 
 interface VMState {
@@ -33,6 +43,8 @@ interface VMState {
     bbox: BBox;
     usedAxes: Set<string>;
     invalidLines: string[];
+    toolchange: number[];
+    spindleToolEvents: { [key: number]: SpindleToolEvent };
 }
 
 type Data = Array<{
@@ -77,32 +89,42 @@ export const shouldRotate = (
 };
 
 export const rotateAxis = (
-    axis: 'y' | 'z',
-    { y, z, a }: { y: number; z: number; a: number },
+    axis: 'x' | 'y' | 'z',
+    { x, y, z, a }: { x: number; y: number; z: number; a: number },
 ): RotationResult | null => {
     if (!axis) {
         throw new Error('Axis is required');
     }
 
-    const angle = toRadians(a);
+    // Invert the A-axis angle to match the expected rotation direction convention
+    // This fixes the issue where G-code uses negative A values for clockwise rotation
+    // but the visualization expects the opposite convention
+    const angle = toRadians(-a);
+    // const angle = toRadians(a);
 
     // Calculate the sine and cosine of the angle
     const sinA = Math.sin(angle);
     const cosA = Math.cos(angle);
 
+    // Rotate the vertex around the x-axis
+    if (axis === 'x') {
+        const rotatedY = y * cosA - z * sinA;
+        const rotatedZ = y * sinA + z * cosA;
+        return { x: x, y: rotatedY, z: rotatedZ, a };
+    }
+
     // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        const rotatedZ = z * cosA - y * sinA;
-        const rotatedY = z * sinA + y * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedZ = z * cosA - x * sinA;
+        const rotatedX = z * sinA + x * cosA;
+        return { x: rotatedX, y: y, z: rotatedZ, a };
     }
 
     // Rotate the vertex around the z-axis
-    //This logic is just for testing
     if (axis === 'z') {
-        const rotatedY = y * cosA - z * sinA;
-        const rotatedZ = y * sinA + z * cosA;
-        return { y: rotatedY, z: rotatedZ, a };
+        const rotatedX = x * cosA - y * sinA;
+        const rotatedY = x * sinA + y * cosA;
+        return { x: rotatedX, y: rotatedY, z: z, a };
     }
 
     return null;
@@ -140,6 +162,8 @@ class GCodeVirtualizer extends EventEmitter {
     yMaxFeed: number = 0;
 
     zMaxFeed: number = 0;
+
+    atcEnabled: boolean = false;
 
     re1: RegExp = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
 
@@ -233,7 +257,9 @@ class GCodeVirtualizer extends EventEmitter {
             },
         },
         usedAxes: new Set(),
-        invalidLines: []
+        invalidLines: [],
+        toolchange: [],
+        spindleToolEvents: {},
     };
 
     // data to save so we don't have to reparse
@@ -266,7 +292,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
     //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
-    VALID_GCODE_REGEX = /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi
+    VALID_GCODE_REGEX =
+        /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi;
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -290,7 +317,7 @@ class GCodeVirtualizer extends EventEmitter {
         G0: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G0') {
                 this.setModal({ motion: 'G0' });
-                this.saveModal({ motion: 'G0' });
+                // this.saveModal({ motion: 'G0' });
             }
 
             const v1: BasicPosition = {
@@ -357,7 +384,7 @@ class GCodeVirtualizer extends EventEmitter {
         G1: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G1') {
                 this.setModal({ motion: 'G1' });
-                this.saveModal({ motion: 'G1' });
+                // this.saveModal({ motion: 'G1' });
             }
 
             const v1: BasicPosition = {
@@ -428,7 +455,7 @@ class GCodeVirtualizer extends EventEmitter {
         G2: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G2') {
                 this.setModal({ motion: 'G2' });
-                this.saveModal({ motion: 'G2' });
+                // this.saveModal({ motion: 'G2' });
             }
 
             const v1: BasicPosition = {
@@ -513,7 +540,7 @@ class GCodeVirtualizer extends EventEmitter {
         G3: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G3') {
                 this.setModal({ motion: 'G3' });
-                this.saveModal({ motion: 'G3' });
+                // this.saveModal({ motion: 'G3' });
             }
 
             const v1: BasicPosition = {
@@ -603,7 +630,7 @@ class GCodeVirtualizer extends EventEmitter {
         G4: (params: Record<string, any>): void => {
             if (this.modal.motion !== 'G4') {
                 this.setModal({ motion: 'G4' });
-                this.saveModal({ motion: 'G4' });
+                // this.saveModal({ motion: 'G4' });
             }
             let dwellTime: number = 0;
             if (params.P) {
@@ -621,35 +648,35 @@ class GCodeVirtualizer extends EventEmitter {
         G17: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G17') {
                 this.setModal({ plane: 'G17' });
-                this.saveModal({ plane: 'G17' });
+                // this.saveModal({ plane: 'G17' });
             }
         },
         // G18: XZ
         G18: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G18') {
                 this.setModal({ plane: 'G18' });
-                this.saveModal({ plane: 'G18' });
+                // this.saveModal({ plane: 'G18' });
             }
         },
         // G19: YZ
         G19: (_params: Record<string, any>): void => {
             if (this.modal.plane !== 'G19') {
                 this.setModal({ plane: 'G19' });
-                this.saveModal({ plane: 'G19' });
+                // this.saveModal({ plane: 'G19' });
             }
         },
         // G20: Use inches for length units
         G20: (_params: Record<string, any>): void => {
             if (this.modal.units !== 'G20') {
                 this.setModal({ units: 'G20' });
-                this.saveModal({ units: 'G20' });
+                // this.saveModal({ units: 'G20' });
             }
         },
         // G21: Use millimeters for length units
         G21: (_params: Record<string, any>): void => {
             if (this.modal.units !== 'G21') {
                 this.setModal({ units: 'G21' });
-                this.saveModal({ units: 'G21' });
+                // this.saveModal({ units: 'G21' });
             }
         },
         // G38.x: Straight Probe
@@ -657,86 +684,86 @@ class GCodeVirtualizer extends EventEmitter {
         'G38.2': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.2') {
                 this.setModal({ motion: 'G38.2' });
-                this.saveModal({ motion: 'G38.2' });
+                // this.saveModal({ motion: 'G38.2' });
             }
         },
         // G38.3: Probe toward workpiece, stop on contact
         'G38.3': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.3') {
                 this.setModal({ motion: 'G38.3' });
-                this.saveModal({ motion: 'G38.3' });
+                // this.saveModal({ motion: 'G38.3' });
             }
         },
         // G38.4: Probe away from workpiece, stop on loss of contact, signal error if failure
         'G38.4': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.4') {
                 this.setModal({ motion: 'G38.4' });
-                this.saveModal({ motion: 'G38.4' });
+                // this.saveModal({ motion: 'G38.4' });
             }
         },
         // G38.5: Probe away from workpiece, stop on loss of contact
         'G38.5': (_params: Record<string, any>): void => {
             if (this.modal.motion !== 'G38.5') {
                 this.setModal({ motion: 'G38.5' });
-                this.saveModal({ motion: 'G38.5' });
+                // this.saveModal({ motion: 'G38.5' });
             }
         },
         // G43.1: Tool Length Offset
         'G43.1': (_params: Record<string, any>): void => {
             if (this.modal.tlo !== 'G43.1') {
                 this.setModal({ tlo: 'G43.1' });
-                this.saveModal({ tlo: 'G43.1' });
+                // this.saveModal({ tlo: 'G43.1' });
             }
         },
         // G49: No Tool Length Offset
         G49: (): void => {
             if (this.modal.tlo !== 'G49') {
                 this.setModal({ tlo: 'G49' });
-                this.saveModal({ tlo: 'G49' });
+                // this.saveModal({ tlo: 'G49' });
             }
         },
         // G54..59: Coordinate System Select
         G54: (): void => {
             if (this.modal.wcs !== 'G54') {
                 this.setModal({ wcs: 'G54' });
-                this.saveModal({ wcs: 'G54' });
+                // this.saveModal({ wcs: 'G54' });
             }
         },
         G55: (): void => {
             if (this.modal.wcs !== 'G55') {
                 this.setModal({ wcs: 'G55' });
-                this.saveModal({ wcs: 'G55' });
+                // this.saveModal({ wcs: 'G55' });
             }
         },
         G56: (): void => {
             if (this.modal.wcs !== 'G56') {
                 this.setModal({ wcs: 'G56' });
-                this.saveModal({ wcs: 'G56' });
+                // this.saveModal({ wcs: 'G56' });
             }
         },
         G57: (): void => {
             if (this.modal.wcs !== 'G57') {
                 this.setModal({ wcs: 'G57' });
-                this.saveModal({ wcs: 'G57' });
+                // this.saveModal({ wcs: 'G57' });
             }
         },
         G58: (): void => {
             if (this.modal.wcs !== 'G58') {
                 this.setModal({ wcs: 'G58' });
-                this.saveModal({ wcs: 'G58' });
+                // this.saveModal({ wcs: 'G58' });
             }
         },
         G59: (): void => {
             if (this.modal.wcs !== 'G59') {
                 this.setModal({ wcs: 'G59' });
-                this.saveModal({ wcs: 'G59' });
+                // this.saveModal({ wcs: 'G59' });
             }
         },
         // G80: Cancel Canned Cycle
         G80: (): void => {
             if (this.modal.motion !== 'G80') {
                 this.setModal({ motion: 'G80' });
-                this.saveModal({ motion: 'G80' });
+                // this.saveModal({ motion: 'G80' });
             }
         },
         // G90: Set to Absolute Positioning
@@ -746,7 +773,7 @@ class GCodeVirtualizer extends EventEmitter {
         G90: (): void => {
             if (this.modal.distance !== 'G90') {
                 this.setModal({ distance: 'G90' });
-                this.saveModal({ distance: 'G90' });
+                // this.saveModal({ distance: 'G90' });
             }
         },
         // G91: Set to Relative Positioning
@@ -756,7 +783,7 @@ class GCodeVirtualizer extends EventEmitter {
         G91: (): void => {
             if (this.modal.distance !== 'G91') {
                 this.setModal({ distance: 'G91' });
-                this.saveModal({ distance: 'G91' });
+                // this.saveModal({ distance: 'G91' });
             }
         },
         // G92: Set Position
@@ -821,7 +848,7 @@ class GCodeVirtualizer extends EventEmitter {
         G93: (): void => {
             if (this.modal.feedrate !== 'G93') {
                 this.setModal({ feedrate: 'G93' });
-                this.saveModal({ feedrate: 'G93' });
+                // this.saveModal({ feedrate: 'G93' });
             }
         },
         // G94: Units per Minute Mode
@@ -832,7 +859,7 @@ class GCodeVirtualizer extends EventEmitter {
         G94: (): void => {
             if (this.modal.feedrate !== 'G94') {
                 this.setModal({ feedrate: 'G94' });
-                this.saveModal({ feedrate: 'G94' });
+                // this.saveModal({ feedrate: 'G94' });
             }
         },
         // G95: Units per Revolution Mode
@@ -843,35 +870,35 @@ class GCodeVirtualizer extends EventEmitter {
         G95: (): void => {
             if (this.modal.feedrate !== 'G95') {
                 this.setModal({ feedrate: 'G95' });
-                this.saveModal({ feedrate: 'G95' });
+                // this.saveModal({ feedrate: 'G95' });
             }
         },
         // M0: Program Pause
         M0: (): void => {
             if (this.modal.program !== 'M0') {
                 this.setModal({ program: 'M0' });
-                this.saveModal({ program: 'M0' });
+                // this.saveModal({ program: 'M0' });
             }
         },
         // M1: Program Pause
         M1: (): void => {
             if (this.modal.program !== 'M1') {
                 this.setModal({ program: 'M1' });
-                this.saveModal({ program: 'M1' });
+                // this.saveModal({ program: 'M1' });
             }
         },
         // M2: Program End
         M2: (): void => {
             if (this.modal.program !== 'M2') {
                 this.setModal({ program: 'M2' });
-                this.saveModal({ program: 'M2' });
+                // this.saveModal({ program: 'M2' });
             }
         },
         // M30: Program End
         M30: (): void => {
             if (this.modal.program !== 'M30') {
                 this.setModal({ program: 'M30' });
-                this.saveModal({ program: 'M30' });
+                // this.saveModal({ program: 'M30' });
             }
         },
         // Spindle Control
@@ -879,28 +906,34 @@ class GCodeVirtualizer extends EventEmitter {
         M3: (_params: Record<string, any>): void => {
             if (this.modal.spindle !== 'M3') {
                 this.setModal({ spindle: 'M3' });
-                this.saveModal({ spindle: 'M3' });
+                // this.saveModal({ spindle: 'M3' });
             }
         },
         // M4: Start the spindle turning counterclockwise at the currently programmed speed
         M4: (_params: Record<string, any>): void => {
             if (this.modal.spindle !== 'M4') {
                 this.setModal({ spindle: 'M4' });
-                this.saveModal({ spindle: 'M4' });
+                // this.saveModal({ spindle: 'M4' });
             }
         },
         // M5: Stop the spindle from turning
         M5: (): void => {
             if (this.modal.spindle !== 'M5') {
                 this.setModal({ spindle: 'M5' });
-                this.saveModal({ spindle: 'M5' });
+                // this.saveModal({ spindle: 'M5' });
             }
         },
         // M6: Tool Change
         M6: (params: Record<string, any>): void => {
+            this.vmState.toolchange.push(this.totalLines);
             if (params && params.T !== undefined) {
                 this.setModal({ tool: params.T });
-                this.saveModal({ tool: params.T });
+                // this.saveModal({ tool: params.T });
+            }
+            if (this.atcEnabled) {
+                this.totalTime += 45; // add 45 seconds for toolchange
+                this.estimates.push(45);
+                this.setEstimate = true;
             }
         },
         // Coolant Control
@@ -914,9 +947,9 @@ class GCodeVirtualizer extends EventEmitter {
             this.setModal({
                 coolant: coolants.indexOf('M8') >= 0 ? 'M7,M8' : 'M7',
             });
-            this.saveModal({
-                coolant: coolants.indexOf('M8') >= 0 ? 'M7,M8' : 'M7',
-            });
+            // this.saveModal({
+            //     coolant: coolants.indexOf('M8') >= 0 ? 'M7,M8' : 'M7',
+            // });
         },
         // M8: Turn flood coolant on
         M8: (): void => {
@@ -928,21 +961,21 @@ class GCodeVirtualizer extends EventEmitter {
             this.setModal({
                 coolant: coolants.indexOf('M7') >= 0 ? 'M7,M8' : 'M8',
             });
-            this.saveModal({
-                coolant: coolants.indexOf('M7') >= 0 ? 'M7,M8' : 'M8',
-            });
+            // this.saveModal({
+            //     coolant: coolants.indexOf('M7') >= 0 ? 'M7,M8' : 'M8',
+            // });
         },
         // M9: Turn all coolant off
         M9: (): void => {
             if (this.modal.coolant !== 'M9') {
                 this.setModal({ coolant: 'M9' });
-                this.saveModal({ coolant: 'M9' });
+                // this.saveModal({ coolant: 'M9' });
             }
         },
         T: (tool: number): void => {
             if (tool !== undefined) {
                 this.setModal({ tool: tool });
-                this.saveModal({ tool: tool });
+                // this.saveModal({ tool: tool });
                 if (this.collate) {
                     this.vmState.tools.add(`T${tool}`);
                 }
@@ -957,6 +990,7 @@ class GCodeVirtualizer extends EventEmitter {
             modal: Modal,
             v1: BasicPosition,
             v2: BasicPosition,
+            v0: BasicPosition,
         ) => void;
         callback?: () => void;
         collate?: boolean;
@@ -970,6 +1004,7 @@ class GCodeVirtualizer extends EventEmitter {
             yMaxFeed?: number;
             zMaxFeed?: number;
         };
+        atcEnabled?: boolean;
     }) {
         super();
         const {
@@ -980,6 +1015,7 @@ class GCodeVirtualizer extends EventEmitter {
             collate = false,
             accelerations,
             maxFeedrates,
+            atcEnabled,
         } = options;
 
         this.fn = { addLine, addArcCurve, addCurve, callback };
@@ -1005,6 +1041,8 @@ class GCodeVirtualizer extends EventEmitter {
             this.vmState.spindle = new Set<string>();
             this.vmState.invalidLines = [];
         }
+
+        this.atcEnabled = atcEnabled;
     }
 
     partitionWordsByGroup(words: [string, any][] = []): [string, any][][] {
@@ -1049,8 +1087,9 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     virtualize(line = ''): void {
-        this.setEstimate = false // Reset on each line
+        this.setEstimate = false; // Reset on each line
         if (!line) {
+            this.totalLines += 1;
             this.fn.callback();
             return;
         }
@@ -1061,19 +1100,16 @@ class GCodeVirtualizer extends EventEmitter {
             .replace(this.re3, '');
 
         if (line === '') {
+            this.totalLines += 1;
             return;
         }
-
-        /*if (line.this.INVALID_GCODE_REGEX.test(line)) {
-            console.log(`Bad line - ${line}`);
-            this.vmState.invalidLines.push(line);
-        }*/
 
         if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
             this.vmState.invalidLines.push(line);
         }
 
-        const parsedLine = parseLine(line);
+        let parsedLine = parseLine(line);
+        this.totalLines += 1; // Moved here so M6 and T commands are correctly stored
         // collect spindle and feed rates
         for (let word of parsedLine.words) {
             const letter = word[0];
@@ -1081,10 +1117,11 @@ class GCodeVirtualizer extends EventEmitter {
             if (letter === 'F') {
                 this.feed = Number(code);
                 this.vmState.feedrates.add(`F${code}`);
-                this.saveFeedrate(code);
+                // this.saveFeedrate(code);
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
+                this.updateSpindleToolEvents('S', Number(code));
             }
         }
 
@@ -1138,13 +1175,16 @@ class GCodeVirtualizer extends EventEmitter {
             } else if (letter === 'M') {
                 cmd = letter + code;
                 args = this.fromPairs(words.slice(1));
+                this.updateSpindleToolEvents('M', Number(code));
             } else if (letter === 'T') {
                 // T1 ; w/o M6
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('T', Number(code));
             } else if (letter === 'S') {
                 cmd = letter;
                 args = code;
+                this.updateSpindleToolEvents('S', Number(code));
             } else if (
                 letter === 'X' ||
                 letter === 'Y' ||
@@ -1189,9 +1229,10 @@ class GCodeVirtualizer extends EventEmitter {
         this.modalCounter++;
         this.feedrateCounter++;
         */
-        this.totalLines += 1;
+
         this.fn.callback();
         this.emit('data', parsedLine);
+        parsedLine = null;
     }
 
     generateFileStats() {
@@ -1220,6 +1261,8 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            toolchanges: this.vmState.toolchange,
+            spindleToolEvents: this.vmState.spindleToolEvents,
         };
     }
 
@@ -1499,43 +1542,55 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    getModalChanges(): ModalChanges {
-        this.modalChanges[this.modalChanges.length - 1].count =
-            this.modalCounter;
-        this.modalCounter = 0;
-        return this.modalChanges;
-    }
+    // getModalChanges(): ModalChanges {
+    //     this.modalChanges[this.modalChanges.length - 1].count =
+    //         this.modalCounter;
+    //     this.modalCounter = 0;
+    //     return this.modalChanges;
+    // }
 
-    getFeedrateChanges(): FeedrateChanges {
-        this.feedrateChanges[this.feedrateChanges.length - 1].count =
-            this.feedrateCounter;
-        this.feedrateCounter = 0;
-        return this.feedrateChanges;
-    }
+    // getFeedrateChanges(): FeedrateChanges {
+    //     this.feedrateChanges[this.feedrateChanges.length - 1].count =
+    //         this.feedrateCounter;
+    //     this.feedrateCounter = 0;
+    //     return this.feedrateChanges;
+    // }
 
     getCurrentModal(): Modal {
         return this.modal;
     }
 
-    saveModal(change: Partial<Modal>): void {
-        this.modalChanges[this.modalChanges.length - 1].count =
-            this.modalCounter;
-        this.modalCounter = 0;
-        this.modalChanges.push({ change: change, count: 0 });
-    }
+    // saveModal(change: Partial<Modal>): void {
+    //     this.modalChanges[this.modalChanges.length - 1].count =
+    //         this.modalCounter;
+    //     this.modalCounter = 0;
+    //     this.modalChanges.push({ change: change, count: 0 });
+    // }
 
-    saveFeedrate(change: string): void {
-        this.feedrateChanges[this.feedrateChanges.length - 1].count =
-            this.feedrateCounter;
-        this.feedrateCounter = 0;
-        this.feedrateChanges.push({ change: change, count: 0 });
-    }
+    // saveFeedrate(change: string): void {
+    //     this.feedrateChanges[this.feedrateChanges.length - 1].count =
+    //         this.feedrateCounter;
+    //     this.feedrateCounter = 0;
+    //     this.feedrateChanges.push({ change: change, count: 0 });
+    // }
 
     addToTotalTime(time: number): void {
         if (!Number(time)) {
             return;
         }
         this.totalTime += time;
+    }
+
+    updateSpindleToolEvents(
+        word: SpindleToolEventCode,
+        code: number | boolean,
+    ) {
+        if (!this.vmState.spindleToolEvents[this.totalLines]) {
+            this.vmState.spindleToolEvents[this.totalLines] = { [word]: code };
+        } else {
+            // @ts-ignore
+            this.vmState.spindleToolEvents[this.totalLines][word] = code;
+        }
     }
 }
 

@@ -40,6 +40,14 @@ interface ControlButtonProps {
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
     fileLoaded: boolean;
+    validateATC?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
     onStop: () => void;
 }
 
@@ -62,6 +70,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     isConnected,
     fileLoaded,
     onStop,
+    validateATC,
 }) => {
     function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
         const currentActiveState = reduxActiveState || activeState;
@@ -276,6 +285,11 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         }
 
         if (state === WORKFLOW_STATE_IDLE) {
+            const [atcInvalid, payload] = validateATC();
+            if (atcInvalid) {
+                pubsub.publish('atc_validator', payload);
+                return;
+            }
             controller.command('gcode:start');
             return;
         }
@@ -315,7 +329,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             <button
                 type="button"
                 className={cx(
-                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center portrait:h-12 h-12 max-xl:h-9 w-24 max-xl:w-22 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
+                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center portrait:h-14 h-12 max-xl:h-9 w-24 max-xl:w-22 portrait:w-28 px-2 text-base portrait:text-xl rounded border-solid border-gray-600 duration-150 ease-in-out',
                     '[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500',
                     {
                         'bg-gray-300 text-gray-600 dark:bg-dark dark:text-gray-400 cursor-not-allowed':

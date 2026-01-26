@@ -4,7 +4,7 @@ import {
     THEMES,
     VISUALIZER_TYPES,
 } from '../../constants';
-
+import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 // Types
 
 export type VISUALIZER_TYPES_T =
@@ -15,6 +15,12 @@ export type LIGHTWEIGHT_OPTIONS_T =
     (typeof LIGHTWEIGHT_OPTIONS)[keyof typeof LIGHTWEIGHT_OPTIONS];
 
 // Interfaces
+
+export interface ATC {
+    toolMap: object;
+    templates: ATCIMacroConfig;
+    warnOnHome: boolean;
+}
 
 export interface Visualizer {
     minimized: boolean;
@@ -59,4 +65,5 @@ export interface Visualizer {
     showWarning: boolean;
     showLineWarnings: boolean;
     showSoftLimitWarning: boolean;
+    hideProcessedLines: boolean;
 }

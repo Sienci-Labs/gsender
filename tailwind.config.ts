@@ -2,8 +2,8 @@ import type { Config } from "tailwindcss";
 
 export default {
   content: [
-    "./src/**/*.{js,ts,jsx,tsx,html}",
-    "./index.html",
+    "./src/app/src/**/*.{js,ts,jsx,tsx,html}",
+    "./src/app/index.html",
     "!**/node_modules/**",
   ],
   important: true,

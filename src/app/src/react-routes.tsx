@@ -1,10 +1,7 @@
 import { Routes, Route, Outlet } from 'react-router';
 import noop from 'lodash/noop';
-import { BiSolidCylinder } from 'react-icons/bi';
-
 import Workspace from './workspace';
 import { Config } from './features/Config';
-import Firmware from './features/Firmware';
 import KeyboardShortcuts from './features/Keyboard';
 import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
@@ -12,7 +9,7 @@ import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
-import { FaGamepad, FaKeyboard, FaMicrochip } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
 import { MdSquareFoot } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
@@ -41,6 +38,11 @@ import Console from 'app/features/Console';
 import Profile from './features/Gamepad/Profile';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
 import ConfirmationDialog from './components/ConfirmationDialog/ConfirmationDialog';
+import { BiSolidCylinder } from 'react-icons/bi';
+import SDCard from 'app/features/SDCard';
+import { FaSdCard } from 'react-icons/fa';
+import { LuDrill } from 'react-icons/lu';
+import { AccessoryInstaller } from 'app/features/AccessoryInstaller';
 
 export const ReactRoutes = () => {
     return (
@@ -115,10 +117,20 @@ export const ReactRoutes = () => {
                                     />
 
                                     <ToolCard
-                                        title="Old Firmware"
-                                        description="This is depreciated and used to be used for updating firmware"
-                                        icon={FaMicrochip}
-                                        link="/tools/firmware"
+                                        title={'SD Card Manager'}
+                                        description={
+                                            'Manage and view files on your SD card'
+                                        }
+                                        icon={FaSdCard}
+                                        link={'/tools/sd'}
+                                    />
+                                    <ToolCard
+                                        title={'Accessory Installation'}
+                                        description={
+                                            'Install various CNC Accessorries'
+                                        }
+                                        icon={LuDrill}
+                                        link={'/tools/accessoryInstall'}
                                     />
                                 </div>
                             </div>
@@ -203,18 +215,20 @@ export const ReactRoutes = () => {
                         element={<Profile />}
                     />
                     <Route
-                        path="firmware"
+                        path={'sd'}
                         element={
                             <Page
-                                title="Firmware (Legacy)"
+                                title="SD Card Manager"
                                 withGoBackButton
                                 withFixedArea
                             >
-                                <div className="flex justify-center items-center flex-col h-[599px] xl:h-[650px]">
-                                    <Firmware />
-                                </div>
+                                <SDCard />
                             </Page>
                         }
+                    />
+                    <Route
+                        path={'accessoryInstall'}
+                        element={<AccessoryInstaller />}
                     />
                 </Route>
                 <Route path="stats" element={<StatParent />}>
@@ -233,7 +247,7 @@ export const ReactRoutes = () => {
                 path="remote"
                 element={
                     <div className="flex flex-col gap-2">
-                        <TopBar />
+                        <TopBar isRemoteWindow={true} />
                         <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />

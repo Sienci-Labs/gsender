@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import Icon from '@mdi/react';
-import { mdiEmoticonSadOutline } from '@mdi/js';
+import { FrownIcon } from 'lucide-react';
+import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -21,11 +21,11 @@ import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
-import { Helper } from 'app/features/Helper/index';
 import { FaFeatherAlt } from 'react-icons/fa';
 import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import cx from 'classnames';
 import { Tooltip } from 'app/components/Tooltip';
+import GcodeEditor from './GcodeEditor';
 
 const PrimaryVisualizer = ({
     actions,
@@ -37,6 +37,7 @@ const PrimaryVisualizer = ({
     visualizerRef,
     workflowRef,
     widgetContentRef,
+    timeline,
 }) => {
     const {
         liteMode,
@@ -59,6 +60,46 @@ const PrimaryVisualizer = ({
     const showUnlockButton =
         isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
     const { handleLiteModeToggle, handleRun, reset, camera } = actions;
+
+    const [showEditor, setShowEditor] = useState(false);
+    const [isEditorMounted, setIsEditorMounted] = useState(false);
+    const timeoutRef = React.useRef(null);
+
+    useEffect(() => {
+        const token = pubsub.subscribe(
+            'gcode-editor:toggle',
+            (_, isVisible) => {
+                // Clear any pending timeouts
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
+
+                if (isVisible) {
+                    setIsEditorMounted(true);
+                    // Small delay to trigger fade-in animation
+                    timeoutRef.current = setTimeout(() => {
+                        setShowEditor(true);
+                        timeoutRef.current = null;
+                    }, 10);
+                } else {
+                    setShowEditor(false);
+                    // Wait for fade-out animation before unmounting
+                    timeoutRef.current = setTimeout(() => {
+                        setIsEditorMounted(false);
+                        timeoutRef.current = null;
+                    }, 200);
+                }
+            },
+        );
+
+        return () => {
+            pubsub.unsubscribe(token);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     const containerID = 'visualizer_container';
 
@@ -90,7 +131,7 @@ const PrimaryVisualizer = ({
                         />
                     ) : (
                         <div>
-                            <Icon path={mdiEmoticonSadOutline} size={4} />
+                            <FrownIcon size={4} />
                             <span style={{ fontSize: '16px' }}>
                                 {
                                     "It looks like your device doesn't support WebGL"
@@ -118,8 +159,42 @@ const PrimaryVisualizer = ({
                         camera={camera}
                         cameraPosition={cameraPosition}
                     />
-                    <Helper />
                     <WorkspaceSelector />
+
+                    {timeline}
+
+                    {isEditorMounted && (
+                        <div
+                            className={cx(
+                                'absolute top-0 left-0 right-0 bottom-0 z-10 flex items-center justify-center p-4 rounded-md transition-opacity duration-200 ease-in-out',
+                                {
+                                    'opacity-0 pointer-events-none bg-transparent':
+                                        !showEditor,
+                                    'opacity-100 bg-black bg-opacity-50':
+                                        showEditor,
+                                },
+                            )}
+                        >
+                            <div
+                                className={cx(
+                                    'w-full h-full max-w-6xl max-h-[95%] self-start transition-all duration-200 ease-in-out portrait:max-h-[85%]',
+                                    {
+                                        'scale-95 opacity-0': !showEditor,
+                                        'scale-100 opacity-100': showEditor,
+                                    },
+                                )}
+                            >
+                                <GcodeEditor
+                                    onClose={() => {
+                                        pubsub.publish(
+                                            'gcode-editor:toggle',
+                                            false,
+                                        );
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Widget.Content>
         </Widget>

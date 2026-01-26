@@ -206,103 +206,99 @@ const ButtonControlGroup = () => {
     }, 100);
 
     return (
-        <div className="relative w-full flex justify-center">
-            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11">
-                <Button
-                    onClick={handleClickLoadFile}
-                    icon={<FaFolderOpen className="w-5 h-5" />}
-                    text="Load File"
-                    variant="ghost"
-                    disabled={!canClick}
-                    className="h-full px-4 rounded-none"
-                />
+        <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
+            <Button
+                onClick={handleClickLoadFile}
+                icon={<FaFolderOpen className="w-5 h-5" />}
+                text="Load File"
+                variant="ghost"
+                disabled={!canClick}
+                className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
+            />
+            <Divider />
+            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
+                <DropdownMenu>
+                    <Tooltip content="View Recent Files">
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                icon={
+                                    <MdKeyboardArrowDown className="w-10 h-8" />
+                                }
+                                variant="ghost"
+                                disabled={!canClick}
+                                className="h-full rounded-none"
+                            />
+                        </DropdownMenuTrigger>
+                    </Tooltip>
+                    <DropdownMenuContent className="w-56 bg-white">
+                        <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+                        {recentFiles.map((file) => (
+                            <DropdownMenuItem
+                                key={file.filePath}
+                                onClick={() =>
+                                    handleLoadRecentFile(file.filePath)
+                                }
+                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+                            >
+                                <div className="w-full overflow-hidden">
+                                    <span
+                                        className="block truncate"
+                                        title={file.fileName}
+                                    >
+                                        {file.fileName}
+                                    </span>
+                                </div>
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Divider />
-                <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full">
-                    <DropdownMenu>
-                        <Tooltip content="View Recent Files">
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    icon={
-                                        <MdKeyboardArrowDown className="w-10 h-8" />
-                                    }
-                                    variant="ghost"
-                                    disabled={!canClick}
-                                    className="h-full rounded-none"
-                                />
-                            </DropdownMenuTrigger>
-                        </Tooltip>
-                        <DropdownMenuContent className="w-56 bg-white">
-                            <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
-                            {recentFiles.map((file) => (
-                                <DropdownMenuItem
-                                    key={file.filePath}
-                                    onClick={() =>
-                                        handleLoadRecentFile(file.filePath)
-                                    }
-                                    className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
-                                >
-                                    <div className="w-full overflow-hidden">
-                                        <span
-                                            className="block truncate"
-                                            title={file.fileName}
-                                        >
-                                            {file.fileName}
-                                        </span>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
 
-                    <Divider />
+                <ReloadFileAlert
+                    fileLoaded={canClick && fileLoaded && usingElectron}
+                    handleFileReload={handleFileReload}
+                />
 
-                    <ReloadFileAlert
-                        fileLoaded={canClick && fileLoaded && usingElectron}
-                        handleFileReload={handleFileReload}
-                    />
+                <Divider />
 
-                    <Divider />
+                <AlertDialog>
+                    <Tooltip content="Close File">
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                icon={<MdClose className="w-6 h-6" />}
+                                variant="ghost"
+                                className="h-full rounded-none"
+                                disabled={isRunning || !fileLoaded}
+                            />
+                        </AlertDialogTrigger>
+                    </Tooltip>
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will close the current file. Any unsaved
+                                changes will be lost.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCloseFile}>
+                                Close File
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
-                    <AlertDialog>
-                        <Tooltip content="Close File">
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    icon={<MdClose className="w-6 h-6" />}
-                                    variant="ghost"
-                                    className="h-full rounded-none"
-                                    disabled={isRunning || !fileLoaded}
-                                />
-                            </AlertDialogTrigger>
-                        </Tooltip>
-                        <AlertDialogContent className="bg-white">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This will close the current file. Any
-                                    unsaved changes will be lost.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleCloseFile}>
-                                    Close File
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        multiple={false}
-                        onChange={handleLoadFile}
-                        accept=".gcode,.gc,.nc,.tap,.cnc"
-                        id="fileInput"
-                    />
-                </div>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    multiple={false}
+                    onChange={handleLoadFile}
+                    accept=".gcode,.gc,.nc,.tap,.cnc"
+                    id="fileInput"
+                />
             </div>
         </div>
     );

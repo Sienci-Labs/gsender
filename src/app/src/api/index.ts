@@ -437,6 +437,18 @@ const releaseNotes = {
     },
 };
 
+//
+// gSender Preferences
+//
+const preferences = {
+    fetch: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/preferences');
+    },
+    replace: (options: Record<string, any>): Promise<AxiosResponse> => {
+        return authrequest.put('/api/preferences/', options);
+    },
+};
+
 export default {
     signin,
     getLatestVersion,
@@ -462,4 +474,5 @@ export default {
     metrics,
     alarmList,
     releaseNotes,
+    preferences,
 };
