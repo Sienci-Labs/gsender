@@ -86,6 +86,9 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: Jogging,
+                                    props: {
+                                        hideRotary: true
+                                    }
                                 },
                             ],
                         },
@@ -97,6 +100,9 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: Jogging,
+                                    props: {
+                                        hideRotary: true
+                                    }
                                 },
                             ],
                         },

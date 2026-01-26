@@ -61,7 +61,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                                     {item.title}
                                 </h3>
                             )}
-                            <Component />
+                            <Component {...item.props}/>
                         </div>
                     );
                 }

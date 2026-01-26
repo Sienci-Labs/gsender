@@ -54,6 +54,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
             '$#',
         ]);
         setTimeout(() => {
+            setIsComplete(true);
             onComplete();
         }, 1500);
     };

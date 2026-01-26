@@ -56,7 +56,7 @@ export interface JogValueObject {
     feedrate: number;
 }
 
-export function Jogging() {
+export function Jogging({ hideRotary = false}) {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
@@ -945,7 +945,7 @@ export function Jogging() {
 
     const isRotaryMode = mode === 'ROTARY';
     const showA =
-        (firmwareType === 'grblHAL' || isRotaryMode) &&
+        !hideRotary && (firmwareType === 'grblHAL' || isRotaryMode) &&
         rotaryWidgetState.tab.show;
 
     return (

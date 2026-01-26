@@ -17,6 +17,7 @@ export interface SecondaryContent {
     content: string | React.ComponentType<any>;
     title?: string;
     url?: string;
+    props?: Record<string, any>;
 }
 
 export interface SubWizard {
