@@ -59,6 +59,14 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
         setPosition({ x, y, z });
     }, [mpos]);
 
+    useEffect(() => {
+        if (rackless) {
+            console.log('Auto completing because rackless');
+            setIsComplete(true);
+            onComplete();
+        }
+    }, [rackless]);
+
     const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
 
     const handleUseUtility = () => {
