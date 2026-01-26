@@ -16,6 +16,7 @@ export function ControllerConfiguration({
         // Enable ATCI tab, enable spindle tab, set TC strategy to ignore
         store.set('workspace.atcEnabled', true);
         store.set('workspace.toolChangeOption', 'Ignore');
+        store.set('workspace.spindleFunctions', true)
         store.set('workspace.toolChange.passthrough', true);
         // Use macro for controller settings
         controller.command('gcode', 'G65 P999');
