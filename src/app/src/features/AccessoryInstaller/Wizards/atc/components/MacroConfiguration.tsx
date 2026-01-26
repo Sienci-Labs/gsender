@@ -61,7 +61,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     };
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <div>
                 <label className="block text-sm font-semibold text-gray-900 dark:text-gray-400 mb-2">
                     Rack Size

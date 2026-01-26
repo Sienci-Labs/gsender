@@ -69,7 +69,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }) {
     }
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
                 Your spindle must now be configured. This will require a reboot
                 before setting the modbus address.

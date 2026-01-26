@@ -60,7 +60,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     if (rackless) {
         return (
-            <div className="flex flex-col gap-5 p-2 justify-start">
+            <div className="flex flex-col gap-5 justify-start">
                 <p className="dark:text-white">
                     For ATC Configuration, you selected “No Tool Rack” and so do
                     not need to set a rack position.
@@ -74,7 +74,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     }
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <div>
                 <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Finding Rack Position Method

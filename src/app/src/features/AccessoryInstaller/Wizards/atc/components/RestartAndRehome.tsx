@@ -37,7 +37,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const canRestart = isConnected && !rehomed;
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Rehome
             </label>

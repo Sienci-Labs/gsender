@@ -26,7 +26,7 @@ export function ControllerConfiguration({
     };
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
                 The following controller settings are required to ensure
                 compatibility with the Sienci ATC.
