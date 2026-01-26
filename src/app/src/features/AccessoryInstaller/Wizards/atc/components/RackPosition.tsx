@@ -20,10 +20,22 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
             0,
         ) === 0;
 
+
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const ATCIPositionSet = useTypedSelector(
         (state: RootState) => state.controller.settings.atci?.rack_set,
     );
+
+    const ATCIMacroAborted = useTypedSelector(
+        (state: RootState) => state.controller.settings.atci?.macro_aborted,
+    );
+
+    console.log(`aborted: ${ATCIMacroAborted}`);
+
+    useEffect(() => {
+        setIsComplete(false);
+        setError('Utility failed - fix reported issue and try again');
+    }, [ATCIMacroAborted]);
 
     // Once we get a flag back, we can complete and move on to next step
     useEffect(() => {
@@ -56,7 +68,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
         setTimeout(() => {
             setIsComplete(true);
             onComplete();
-        }, 1500);
+        }, 1000);
     };
 
     if (rackless) {

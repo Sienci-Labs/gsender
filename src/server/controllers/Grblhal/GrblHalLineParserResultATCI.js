@@ -25,6 +25,8 @@ class GrblHalLineParserResultATCI {
             values[parts[0]] = parts[1] || null;
         });
 
+        // Mark abort cases with a flag that can be used on the client side
+        // Clear if not error in line - so cleared on next message
         if (line.includes('Error:')) {
             values.macro_abort = 1;
         } else {
