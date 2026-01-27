@@ -2395,9 +2395,11 @@ class GrblHalController {
                 this.command('sdcard:mount');
                 setTimeout(() => {
                     if (this.runner.isSDMounted()) {
+                        console.log('starting sending');
                         this.ymodem.sendFiles(files, this.connection.getConnectionObject());
                     } else {
-                        this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.')
+                        console.log('Failing, SD not mounted');
+                        this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.');
                     }
                 }, 2500);
             },
