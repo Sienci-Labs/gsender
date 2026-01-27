@@ -14,12 +14,16 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const rackless =
-        store.get(
-            'widgets.atc.templates.variables._tc_rack_enable.value',
-            0,
-        ) === 0;
+    const rackless = store.get(
+        'widgets.atc.templates.variables._tc_rack_enable.value',
+        0,
+    );
+    const slotCount = store.get(
+        'widgets.atc.templates.variables._tc_slots.value',
+    );
 
+    console.log('rackless:' + rackless);
+    console.log('slotCount:' + slotCount);
 
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const ATCIPositionSet = useTypedSelector(
@@ -60,7 +64,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     }, [mpos]);
 
     useEffect(() => {
-        if (rackless) {
+        if (rackless === 0 && slotCount === 0) {
             console.log('Auto completing because rackless');
             setIsComplete(true);
             onComplete();
@@ -84,7 +88,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
         }, 1000);
     };
 
-    if (rackless) {
+    if (rackless === 0 && slotCount === 0) {
         return (
             <div className="flex flex-col gap-5 justify-start">
                 <p className="dark:text-white">

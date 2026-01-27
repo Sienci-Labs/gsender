@@ -33,7 +33,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     }, []);
 
     const handleUpload = async () => {
-        if (rackSize === 0) {
+        if (rackSize === '0') {
             store.set(
                 'widgets.atc.templates.variables._tc_rack_enable.value',
                 0,
