@@ -590,6 +590,10 @@ class GrblHalRunner extends events.EventEmitter {
         console.log('setSDStatus');
         this.state.status.sdCard = true;
     }
+
+    isSDMounted() {
+        return this.state.status.sdCard;
+    }
 }
 
 export default GrblHalRunner;

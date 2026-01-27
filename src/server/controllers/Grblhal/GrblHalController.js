@@ -2344,7 +2344,10 @@ class GrblHalController {
                 this.runner.deleteSettings();
             },
             'sdcard:mount': () => {
-                this.write(`$FM\n${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
+                this.write('$FM\n');
+                this.runner.setSDStatus();
+                this.emit('controller:state', GRBLHAL, this.runner.state);
+
                 //this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'sdcard:list': () => {
@@ -2388,7 +2391,15 @@ class GrblHalController {
             },
             'ymodem:uploadFiles': () => {
                 const [files] = args;
-                this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+
+                this.command('sdcard:mount');
+                setTimeout(() => {
+                    if (this.runner.isSDMounted()) {
+                        this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+                    } else {
+                        this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.')
+                    }
+                }, 2500);
             },
             'ymodem:cancel': () => {
                 console.log('cancel upload');
