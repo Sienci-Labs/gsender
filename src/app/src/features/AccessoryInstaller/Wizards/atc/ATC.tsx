@@ -12,14 +12,14 @@ import { Jogging } from 'app/features/Jogging';
 import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
 import store from 'app/store';
 import { SpindleSetRestart } from 'app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx';
-import {Modbus} from "app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx";
+import { Modbus } from 'app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx';
 
 export function useSienciATCWizard(): Wizard {
-    const { connectionValidation } = useValidations();
+    const { connectionValidation, coreFirmwareValidation } = useValidations();
 
     const validations = useMemo(
-        () => [connectionValidation],
-        [connectionValidation],
+        () => [connectionValidation, coreFirmwareValidation],
+        [connectionValidation, coreFirmwareValidation],
     );
     const storeVersion = store.get('widgets.atc.templates.version', '-');
 
