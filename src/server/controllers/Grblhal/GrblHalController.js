@@ -858,6 +858,7 @@ class GrblHalController {
 
             if (error.code === 60 || error.code === 64 || error.code === 62) {
                 this.runner.clearSDStatus();
+                this.emit('controller:settings', GRBLHAL, this.settings);
             }
 
             const msg = `Error ${code} - ${error?.description}`;
@@ -2352,12 +2353,14 @@ class GrblHalController {
                 if (type === 'cnc') {
                     this.write('$FM\n$F\n');
                     this.runner.setSDStatus();
+                    this.emit('controller:settings', GRBLHAL, this.settings);
                     return;
                 }
 
                 if (type === 'all') {
                     this.write('$FM\n$F+\n');
                     this.runner.setSDStatus();
+                    this.emit('controller:settings', GRBLHAL, this.settings);
                     return;
                 }
             },
