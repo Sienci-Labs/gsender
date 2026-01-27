@@ -858,7 +858,7 @@ class GrblHalController {
 
             if (error.code === 60 || error.code === 64 || error.code === 62) {
                 this.runner.clearSDStatus();
-                this.emit('controller:settings', GRBLHAL, this.settings);
+                this.emit('controller:state', GRBLHAL, this.runner.state);
             }
 
             const msg = `Error ${code} - ${error?.description}`;
@@ -2350,18 +2350,16 @@ class GrblHalController {
             'sdcard:list': () => {
                 const [type = 'cnc'] = args;
                 this.runner.clearSDFiles();
+                this.runner.setSDStatus();
+                this.emit('controller:state', GRBLHAL, this.runner.state);
+
                 if (type === 'cnc') {
                     this.write('$FM\n$F\n');
-                    this.runner.setSDStatus();
-                    this.emit('controller:settings', GRBLHAL, this.settings);
                     return;
                 }
 
                 if (type === 'all') {
                     this.write('$FM\n$F+\n');
-                    this.runner.setSDStatus();
-                    this.emit('controller:settings', GRBLHAL, this.settings);
-                    return;
                 }
             },
             'sdcard:read': () => {
