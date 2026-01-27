@@ -197,19 +197,26 @@ export function SettingRow({
 
     function handleProgramSettingReset(setting: gSenderSetting) {
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
-            const defaultVal = getEEPROMDefaultValue(setting.eID);
-            if (defaultVal !== '-') {
-                handleSingleSettingReset(setting.eID, defaultVal);
-                // since hybrids are sometimes referenced using the settings values, we have to update that as well
-                store.set(setting.key, defaultVal);
-                setSettingsValues((prev) => {
-                    const updated = [...prev];
-                    updated[setting.globalIndex].value = defaultVal;
-                    updated[setting.globalIndex].dirty = false;
-                    return updated;
-                });
-            } else {
-                toast.error(`No default found for $${setting.eID}.`);
+            // check if eeprom is reported
+            const { EEPROM } = useSettings();
+            let eepromValue = EEPROM.filter(
+                (o) => o.setting === setting.eID,
+            )[0];
+            if (eepromValue) {
+                const defaultVal = getEEPROMDefaultValue(setting.eID);
+                if (defaultVal !== '-') {
+                    handleSingleSettingReset(setting.eID, defaultVal);
+                    // since hybrids are sometimes referenced using the settings values, we have to update that as well
+                    store.set(setting.key, defaultVal);
+                    setSettingsValues((prev) => {
+                        const updated = [...prev];
+                        updated[setting.globalIndex].value = defaultVal;
+                        updated[setting.globalIndex].dirty = false;
+                        return updated;
+                    });
+                } else {
+                    toast.error(`No default found for $${setting.eID}.`);
+                }
             }
         }
         if ('key' in setting) {
