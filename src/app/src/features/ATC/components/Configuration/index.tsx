@@ -15,6 +15,7 @@ export function ATCIConfiguration() {
             controller.command('sdcard:read', 'ATCI.macro');
             controller.addListener('ymodem:error', () => {
                 toast.error('Error uploaded new config');
+                setUploading(false);
             });
             controller.addListener('ymodem:complete', () => {
                 setUploading(false);
