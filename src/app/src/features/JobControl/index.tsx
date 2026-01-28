@@ -120,6 +120,8 @@ const JobControl: React.FC<JobControlProps> = ({
         let hasTC = false;
         let toolEvent = null;
 
+        return [false, null];
+
         // No ATC, always return a fine validation
         if (!atcEnabled) {
             return [false, null];
