@@ -230,6 +230,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                             config.variables._irt_offset_mode
                                                 .default
                                         }
+                                        disabled={!rackEnabled}
                                         onChange={(value) =>
                                             updateConfig({
                                                 variables: {
@@ -275,7 +276,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <Move className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
+                                    <Label className="text-xs font-semibold text-gray-900">
                                         Manual Change Position
                                     </Label>
                                 </div>

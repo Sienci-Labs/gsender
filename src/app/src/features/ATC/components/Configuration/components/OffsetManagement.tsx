@@ -10,12 +10,14 @@ interface OffsetManagementWidgetProps {
     value?: number;
     onChange?: (value: number) => void;
     defaultValue?: number;
+    disabled?: boolean;
 }
 
 export default function OffsetManagementWidget({
     value = 0,
     onChange,
     defaultValue = 0,
+    disabled = false,
 }: OffsetManagementWidgetProps) {
     const [internalValue, setInternalValue] = useState(value);
 
@@ -41,8 +43,9 @@ export default function OffsetManagementWidget({
                 <Select
                     value={String(currentValue)}
                     onValueChange={handleOffsetModeChange}
+                    disabled={disabled}
                 >
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-8 text-xs" disabled={disabled}>
                         <SelectValue placeholder="Select mode" />
                     </SelectTrigger>
                     <SelectContent className="z-[10001] bg-white">
