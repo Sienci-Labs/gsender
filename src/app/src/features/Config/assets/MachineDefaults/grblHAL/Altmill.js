@@ -178,6 +178,15 @@ export const DEFAULT_2X4 = {
     $131: '648',
 };
 
+export const DEFAULT_4X8 =  {
+    ...ALTMILL_DEFAULT,
+    $8: '1',
+    $101: '214.4403444',
+    $111: '25000',
+    $131: '2661.000',
+    $132: '220.000'
+}
+
 export const DEFAULT_2X4_SPINDLE_KIT = {
     ...ALTMILL_DEFAULT,
     $131: '648',
