@@ -125,26 +125,6 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         actionLabel="Set Manually"
                     />
                 </div>
-                <div className="space-y-1">
-                    <Label className="text-xs font-medium">
-                        Offset Management
-                    </Label>
-                    <OffsetManagementWidget
-                        value={config.variables._irt_offset_mode.value}
-                        defaultValue={config.variables._irt_offset_mode.default}
-                        onChange={(value) =>
-                            updateConfig({
-                                variables: {
-                                    ...config.variables,
-                                    _irt_offset_mode: {
-                                        ...config.variables._irt_offset_mode,
-                                        value,
-                                    },
-                                },
-                            })
-                        }
-                    />
-                </div>
             </div>
 
             {/* Tool Length Sensor Section */}
@@ -169,21 +149,51 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                     <Label className="text-xs font-medium">
                         Offset Management
                     </Label>
-                    <OffsetManagementWidget
-                        value={config.variables._ort_offset_mode.value}
-                        defaultValue={config.variables._ort_offset_mode.default}
-                        onChange={(value) =>
-                            updateConfig({
-                                variables: {
-                                    ...config.variables,
-                                    _ort_offset_mode: {
-                                        ...config.variables._ort_offset_mode,
-                                        value,
+
+                    <div className="space-y-1">
+                        <Label className="text-xs font-medium">
+                            When loading a tool from the tool rack
+                        </Label>
+                        <OffsetManagementWidget
+                            value={config.variables._irt_offset_mode.value}
+                            defaultValue={
+                                config.variables._irt_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _irt_offset_mode: {
+                                            ...config.variables
+                                                ._irt_offset_mode,
+                                            value,
+                                        },
                                     },
-                                },
-                            })
-                        }
-                    />
+                                })
+                            }
+                        />
+                        <Label className="text-xs font-medium">
+                            When loading a tool manually
+                        </Label>
+                        <OffsetManagementWidget
+                            value={config.variables._ort_offset_mode.value}
+                            defaultValue={
+                                config.variables._ort_offset_mode.default
+                            }
+                            onChange={(value) =>
+                                updateConfig({
+                                    variables: {
+                                        ...config.variables,
+                                        _ort_offset_mode: {
+                                            ...config.variables
+                                                ._ort_offset_mode,
+                                            value,
+                                        },
+                                    },
+                                })
+                            }
+                        />
+                    </div>
                 </div>
                 <PositionInput
                     label="Manual Tool Change Position"
@@ -207,7 +217,9 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         >
                             <Label className="text-xs">Pressure Sensor</Label>
                             <Switch
-                                checked={config.variables._pres_sense.value === 1}
+                                checked={
+                                    config.variables._pres_sense.value === 1
+                                }
                                 onChange={(checked) =>
                                     updateConfig({
                                         variables: {
@@ -235,13 +247,16 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         >
                             <Label className="text-xs">Tool-stud Sensor</Label>
                             <Switch
-                                checked={config.variables._holder_sense.value === 1}
+                                checked={
+                                    config.variables._holder_sense.value === 1
+                                }
                                 onChange={(checked) =>
                                     updateConfig({
                                         variables: {
                                             ...config.variables,
                                             _holder_sense: {
-                                                ...config.variables._holder_sense,
+                                                ...config.variables
+                                                    ._holder_sense,
                                                 value: checked ? 1 : 0,
                                             },
                                         },
@@ -275,7 +290,8 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                         ...config.variables,
                                         _tc_slot_offset: {
                                             ...config.variables._tc_slot_offset,
-                                            value: parseInt(e.target.value) || 0,
+                                            value:
+                                                parseInt(e.target.value) || 0,
                                         },
                                     },
                                 })
