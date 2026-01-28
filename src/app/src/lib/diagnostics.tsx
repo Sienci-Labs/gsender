@@ -964,7 +964,7 @@ function generateSupportFile() {
                             </Text>
 
                             <Text style={styles.textBold}>Safeheight:</Text>
-                            <Text>{safeHeight}</Text>
+                            <Text style={styles.text}>{safeHeight}</Text>
 
                             <Text style={styles.textBold}>Laser Mode:</Text>
                             <Text
