@@ -146,6 +146,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 16,
     },
+    gridVertical: {
+        flexDirection: 'column',
+        marginBottom: 16,
+    },
+    gridVerticalItem: {
+        flex: 1,
+        marginBottom: 12,
+        padding: 12,
+        backgroundColor: '#ffffff',
+        border: '1px solid #e9ecef',
+    },
     gridItem: {
         flex: 1,
         marginRight: 12,
@@ -237,7 +248,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Courier',
         fontSize: 9,
         lineHeight: 1.3,
-        marginBottom: 8,
+        marginBottom: 12,
     },
     codeBlockText: {
         fontSize: 9,
@@ -293,6 +304,9 @@ const styles = StyleSheet.create({
         textDecoration: 'underline',
         marginRight: 12,
         marginBottom: 4,
+    },
+    addBottomMargin: {
+        marginBottom: 12,
     },
 });
 
@@ -371,6 +385,17 @@ const getRotaryMode = (): boolean => {
     const { DEFAULT, ROTARY } = WORKSPACE_MODE;
     const isRotaryMode = store.get('workspace.mode', DEFAULT) === ROTARY;
     return isRotaryMode;
+};
+
+const getSafeHeight = (): number => {
+    const safeHeight: number = store.get('workspace.safeRetractHeight');
+    return safeHeight;
+};
+
+const getEvents = async () => {
+    const res = await api.events.fetch();
+    const events = res.data.records;
+    return events;
 };
 
 const getTerminalHistory = (): string[] => {
@@ -542,6 +567,22 @@ function generateSupportFile() {
     const jogPresets = getJogPresets();
     const workspaceUnits = getWorkspaceUnits();
     const isRotaryMode = getRotaryMode();
+    const safeHeight = getSafeHeight();
+    let fileStart = {};
+    let filePause = {};
+    let fileResume = {};
+    let fileStop = {};
+
+    getEvents().then((events) => {
+        console.log(events);
+        if (events) {
+            fileStart = events['gcode:start'];
+            filePause = events['gcode:pause'];
+            fileResume = events['gcode:resume'];
+            fileStop = events['gcode:stop'];
+        }
+    });
+
     let alarms: Array<AlarmsErrors>,
         errors: Array<AlarmsErrors> = [];
 
@@ -576,6 +617,9 @@ function generateSupportFile() {
                         </Link>
                         <Link src="#preferences" style={styles.navLink}>
                             Preferences & Settings
+                        </Link>
+                        <Link src="#automations" style={styles.navLink}>
+                            Automations
                         </Link>
                         <Link src="#firmware" style={styles.navLink}>
                             Firmware Settings
@@ -919,6 +963,9 @@ function generateSupportFile() {
                                     : 'Imperial (inches)'}
                             </Text>
 
+                            <Text style={styles.textBold}>Safeheight:</Text>
+                            <Text>{safeHeight}</Text>
+
                             <Text style={styles.textBold}>Laser Mode:</Text>
                             <Text
                                 style={[
@@ -1058,6 +1105,107 @@ function generateSupportFile() {
                             )}
                         </View>
                     </View>
+                </View>
+
+                <View style={styles.section} break>
+                    <Text id="automations" style={styles.subtitle}>
+                        Automations
+                    </Text>
+
+                    <Text style={styles.textBold}>File Start:</Text>
+                    <Text
+                        style={[
+                            styles.text,
+                            fileStart?.enabled
+                                ? styles.statusEnabled
+                                : styles.statusWarning,
+                        ]}
+                    >
+                        {fileStart?.enabled ? 'Enabled' : 'Disabled'}
+                    </Text>
+                    {fileStart?.commands ? (
+                        <View style={styles.codeBlock}>
+                            <Text style={styles.codeBlockText}>
+                                {fileStart?.commands}
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={[styles.text, styles.addBottomMargin]}>
+                            {'N/A'}
+                        </Text>
+                    )}
+
+                    <Text style={styles.textBold}>File Pause:</Text>
+                    <Text
+                        style={[
+                            styles.text,
+                            filePause?.enabled
+                                ? styles.statusEnabled
+                                : styles.statusWarning,
+                        ]}
+                    >
+                        {filePause?.enabled ? 'Enabled' : 'Disabled'}
+                    </Text>
+
+                    {filePause?.commands ? (
+                        <View style={styles.codeBlock}>
+                            <Text style={styles.codeBlockText}>
+                                {filePause?.commands}
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={[styles.text, styles.addBottomMargin]}>
+                            {'N/A'}
+                        </Text>
+                    )}
+
+                    <Text style={styles.textBold}>File Resume:</Text>
+                    <Text
+                        style={[
+                            styles.text,
+                            fileResume?.enabled
+                                ? styles.statusEnabled
+                                : styles.statusWarning,
+                        ]}
+                    >
+                        {fileResume?.enabled ? 'Enabled' : 'Disabled'}
+                    </Text>
+
+                    {fileResume?.commands ? (
+                        <View style={styles.codeBlock}>
+                            <Text style={styles.codeBlockText}>
+                                {fileResume?.commands}
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={[styles.text, styles.addBottomMargin]}>
+                            {'N/A'}
+                        </Text>
+                    )}
+
+                    <Text style={styles.textBold}>File Stop/End:</Text>
+                    <Text
+                        style={[
+                            styles.text,
+                            fileStop?.enabled
+                                ? styles.statusEnabled
+                                : styles.statusWarning,
+                        ]}
+                    >
+                        {fileStop?.enabled ? 'Enabled' : 'Disabled'}
+                    </Text>
+
+                    {fileStop?.commands ? (
+                        <View style={styles.codeBlock}>
+                            <Text style={styles.codeBlockText}>
+                                {fileStop?.commands}
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={[styles.text, styles.addBottomMargin]}>
+                            {'N/A'}
+                        </Text>
+                    )}
                 </View>
 
                 <View style={styles.section} break>
