@@ -93,8 +93,8 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
         <div className="space-y-4 flex flex-col h-full">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {/* Tool Rack Section */}
-                <Card className="border border-border shadow-none">
-                    <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between">
+                <Card className="border border-border shadow-none w-full">
+                    <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between bg-muted/30">
                         <CardTitle className="text-sm font-semibold text-foreground">
                             Tool Rack
                         </CardTitle>
@@ -155,14 +155,15 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                 onUseCurrent={() => setWorkspacePosition('P7')}
                                 disabled={!rackEnabled}
                                 actionLabel="Set Manually"
+                                hideLabel
                             />
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Tool Length Sensor Section */}
-                <Card className="border border-border shadow-none">
-                    <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between">
+                <Card className="border border-border shadow-none w-full">
+                    <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between bg-muted/30">
                         <CardTitle className="text-sm font-semibold text-foreground">
                             Tool Length Sensor
                         </CardTitle>
@@ -184,21 +185,22 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             onUseCurrent={() => setWorkspacePosition('P9')}
                             disableZ
                             actionLabel="Set Manually"
+                            hideLabel
                         />
                     </CardContent>
                 </Card>
             </div>
 
             {/* Advanced Section */}
-            <Card className="border border-border shadow-none">
-                <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between">
+            <Card className="border border-border shadow-none w-full">
+                <CardHeader className="px-4 py-3 border-b border-border flex-row items-center justify-between bg-muted/30">
                     <CardTitle className="text-sm font-semibold text-foreground">
                         Advanced Settings
                     </CardTitle>
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent className="p-4">
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
@@ -283,6 +285,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     }
                                     disableZ
                                     actionLabel="Set Manually"
+                                    hideLabel
                                 />
                             </div>
                         </div>
@@ -305,7 +308,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                                     config.variables._pres_sense
                                                         .default,
                                             },
-                                        )
+                                        )}
                                     >
                                         <Label className="text-xs font-medium">
                                             Pressure Sensor
@@ -344,7 +347,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                                     config.variables
                                                         ._holder_sense.default,
                                             },
-                                        )
+                                        )}
                                     >
                                         <Label className="text-xs font-medium">
                                             Tool-stud Sensor

@@ -33,7 +33,7 @@ export function WorkspaceSelector() {
     );
 
     const activeState = useSelector(
-        (state: RootState) => state.controller.state.status.activeState,
+        (state: RootState) => state.controller.state.status?.activeState,
     );
 
     const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
