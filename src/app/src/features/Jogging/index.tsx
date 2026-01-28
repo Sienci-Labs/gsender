@@ -45,6 +45,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { OverrideLoop, checkThumbstickIsIdle, isOverrideAction } from './OverrideLoop';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
@@ -152,6 +153,7 @@ export function Jogging({ hideRotary = false}) {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const joystickLoop = useRef<JoystickLoop | null>(null);
+    const overrideLoop = useRef<OverrideLoop | null>(null);
 
     const handleJoystickJog = useCallback(
         (
@@ -319,6 +321,83 @@ export function Jogging({ hideRotary = false}) {
 
                     if (isUsingMPGMode) {
                         return;
+                    }
+
+                    // Check if any stick direction is configured for override actions
+                    const stick = get(joystickOptions, activeStick, null);
+                    if (stick) {
+                        const { horizontal, vertical } = stick;
+                        const horizontalAction = horizontal[actionType];
+                        const verticalAction = vertical[actionType];
+
+                        // Check if either direction is an override action
+                        const isHorizontalOverride = isOverrideAction(horizontalAction);
+                        const isVerticalOverride = isOverrideAction(verticalAction);
+
+                        if (isHorizontalOverride || isVerticalOverride) {
+                            // Handle override actions
+                            const deadZone =
+                                (joystickOptions?.zeroThreshold || 30) / 100;
+
+                            // Determine which axis is being moved
+                            const axisIndex = axis;
+                            const isHorizontalAxis = axisIndex % 2 === 0;
+                            const axisValue = detail.gamepad.axes[axisIndex];
+
+                            // Get the appropriate action based on which axis is moving
+                            const activeOverrideAction = isHorizontalAxis
+                                ? horizontalAction
+                                : verticalAction;
+
+                            if (!isOverrideAction(activeOverrideAction)) {
+                                // This axis direction is not an override, fall through to normal jogging
+                            } else {
+                                // Check if stick is idle
+                                if (checkThumbstickIsIdle(axisValue, deadZone)) {
+                                    if (overrideLoop.current) {
+                                        overrideLoop.current.stop();
+                                    }
+                                    return;
+                                }
+
+                                // Determine direction from joystick input
+                                const isReversed = isHorizontalAxis
+                                    ? horizontal.isReversed
+                                    : vertical.isReversed;
+                                let direction = axisValue > 0 ? 1 : -1;
+                                // For vertical axis, positive is typically down, so we invert
+                                if (!isHorizontalAxis) {
+                                    direction = -direction;
+                                }
+                                if (isReversed) {
+                                    direction = -direction;
+                                }
+
+                                // Initialize or update OverrideLoop
+                                if (!overrideLoop.current) {
+                                    overrideLoop.current = new OverrideLoop({
+                                        gamepadProfile: currentProfile,
+                                    });
+                                }
+
+                                // Check if already running with same settings
+                                if (
+                                    overrideLoop.current.isRunning &&
+                                    overrideLoop.current.activeAxis === axis
+                                ) {
+                                    return;
+                                }
+
+                                overrideLoop.current.setOptions({
+                                    gamepadProfile: currentProfile,
+                                    action: activeOverrideAction,
+                                    direction,
+                                    activeAxis: axis,
+                                });
+                                overrideLoop.current.start();
+                                return;
+                            }
+                        }
                     }
 
                     const computeAxesAndDirection = (degrees: number) => {
@@ -503,6 +582,9 @@ export function Jogging({ hideRotary = false}) {
 
                     if (thumbsticksAreIdle) {
                         joystickLoop.current.stop();
+                        if (overrideLoop.current) {
+                            overrideLoop.current.stop();
+                        }
                         return;
                     }
 
@@ -542,6 +624,10 @@ export function Jogging({ hideRotary = false}) {
             if (joystickLoop.current) {
                 joystickLoop.current.stop();
                 joystickLoop.current = null;
+            }
+            if (overrideLoop.current) {
+                overrideLoop.current.stop();
+                overrideLoop.current = null;
             }
         };
     }, [isConnected, handleJoystickJog]);
