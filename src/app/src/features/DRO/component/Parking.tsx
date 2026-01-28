@@ -11,7 +11,7 @@ import {
 } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Tooltip from 'app/components/Tooltip';
 import { get, includes } from 'lodash';
 import reduxStore from 'app/store/redux';
@@ -29,11 +29,13 @@ function goToParkLocation() {
     controller.command('gcode', code);
 }
 
-export function Parking({
-    disabled = false,
-    isConnected = false,
-    homingEnabled = false,
-}) {
+export function Parking({ disabled = false, isConnected = false, homingEnabled = false }) {
+    const disabledRef = useRef(disabled);
+
+    useEffect(() => {
+        disabledRef.current = disabled;
+    }, [disabled]);
+
     const shortcutIsDisabled = () => {
         const isConnected = get(
             reduxStore.getState(),
@@ -65,9 +67,7 @@ export function Parking({
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: () => {
-                if (shortcutIsDisabled()) {
-                    return;
-                }
+                if (disabledRef.current || shortcutIsDisabled()) {
                 goToParkLocation();
             },
         },
