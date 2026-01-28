@@ -51,6 +51,8 @@ import get from 'lodash/get';
 import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
@@ -296,7 +298,7 @@ const ButtonControlGroup = () => {
                     className="hidden"
                     multiple={false}
                     onChange={handleLoadFile}
-                    accept=".gcode,.gc,.nc,.tap,.cnc"
+                    accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
                     id="fileInput"
                 />
             </div>
