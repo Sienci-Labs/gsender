@@ -104,7 +104,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <Crosshair className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
+                    <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
                         <div className="space-y-1">
                             <Label className="text-xs font-semibold text-gray-500">
                                 Rack Size
@@ -175,7 +175,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <Fingerprint className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
+                    <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
                         <Label className="text-xs font-semibold text-gray-500">
                             Sensor Position
                         </Label>
@@ -207,8 +207,8 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
                     </div>
                 </CardHeader>
-                <CardContent className="p-5 min-h-[320px] flex flex-col justify-center">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full">
+                <CardContent className="p-5 py-1 min-h-[320px] flex">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full items-center">
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
@@ -295,6 +295,55 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     actionLabel="Set Manually"
                                     hideLabel
                                 />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                                    <Label className="text-xs font-semibold text-gray-500">
+                                        Advanced
+                                    </Label>
+                                </div>
+                                <div
+                                    className={cn(
+                                        'rounded-md px-2.5 py-1.5 bg-gray-50 flex items-center justify-between gap-3 w-full',
+                                        {
+                                            [nonDefaultStyling]:
+                                                config.variables
+                                                    ._passthrough_offset_setting
+                                                    .value !==
+                                                config.variables
+                                                    ._passthrough_offset_setting
+                                                    .default,
+                                        },
+                                    )}
+                                >
+                                    <Label className="text-xs font-medium text-gray-700 flex-1">
+                                        Retain tool table settings when rack
+                                        removed
+                                    </Label>
+                                    <Switch
+                                        checked={
+                                            config.variables
+                                                ._passthrough_offset_setting
+                                                .value === 1
+                                        }
+                                        onChange={(checked) =>
+                                            updateConfig({
+                                                variables: {
+                                                    ...config.variables,
+                                                    _passthrough_offset_setting:
+                                                        {
+                                                            ...config.variables
+                                                                ._passthrough_offset_setting,
+                                                            value: checked
+                                                                ? 1
+                                                                : 0,
+                                                        },
+                                                },
+                                            })
+                                        }
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -457,47 +506,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
 
                             </div>
                             <div className="space-y-1">
-                                <div
-                                    className={cn(
-                                        'rounded-md px-2.5 py-1.5 bg-gray-50 flex items-center justify-between gap-3 w-full',
-                                        {
-                                            [nonDefaultStyling]:
-                                                config.variables
-                                                    ._passthrough_offset_setting
-                                                    .value !==
-                                                config.variables
-                                                    ._passthrough_offset_setting
-                                                    .default,
-                                        },
-                                    )}
-                                >
-                                    <Label className="text-xs font-medium text-gray-700 flex-1">
-                                        Retain tool table settings when rack
-                                        removed
-                                    </Label>
-                                    <Switch
-                                        checked={
-                                            config.variables
-                                                ._passthrough_offset_setting
-                                                .value === 1
-                                        }
-                                        onChange={(checked) =>
-                                            updateConfig({
-                                                variables: {
-                                                    ...config.variables,
-                                                    _passthrough_offset_setting:
-                                                        {
-                                                            ...config.variables
-                                                                ._passthrough_offset_setting,
-                                                            value: checked
-                                                                ? 1
-                                                                : 0,
-                                                        },
-                                                },
-                                            })
-                                        }
-                                    />
-                                </div>
+                                <div />
                             </div>
                         </div>
                     </div>
