@@ -1,5 +1,6 @@
 import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
 export interface HybridNumberInputProps {
@@ -35,7 +36,8 @@ export function HybridNumber({
     }, [EEPROM]);
 
     function hybridOnChange(v) {
-        if (useEEPROM) {
+        // if it's empty, then the value isnt reported in eeprom. so dont try to change the eeprom
+        if (useEEPROM && !isEmpty(eepromObject)) {
             let payload = { ...eepromObject, value: v, dirty: true };
             setEEPROM((prev) => {
                 const updated = [...prev];
@@ -53,7 +55,7 @@ export function HybridNumber({
     }
 
     // If we're connected and using SLB we use the EEPROM value
-    if (useEEPROM) {
+    if (useEEPROM && !isEmpty(eepromObject)) {
         value = eepromObject.value;
     }
 
