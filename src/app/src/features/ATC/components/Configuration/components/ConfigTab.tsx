@@ -23,6 +23,8 @@ import OffsetManagementWidget from 'app/features/ATC/components/Configuration/co
 import { Spinner } from 'app/components/shadcn/Spinner';
 import {
     BookOpen,
+    Crosshair,
+    Fingerprint,
     Move,
     Pencil,
     Settings,
@@ -99,7 +101,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <CardTitle className="text-sm font-semibold text-foreground">
                                 Tool Rack
                             </CardTitle>
-                            <Settings className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <Crosshair className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                     </CardHeader>
                     <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
@@ -170,7 +172,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <CardTitle className="text-sm font-semibold text-foreground">
                                 Tool Length Sensor
                             </CardTitle>
-                            <Pencil className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <Fingerprint className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                     </CardHeader>
                     <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
@@ -303,10 +305,10 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                         Safety Checks
                                     </Label>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <div
                                         className={cn(
-                                            'flex items-center gap-2',
+                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
                                             {
                                                 [nonDefaultStyling]:
                                                     config.variables._pres_sense
@@ -316,36 +318,42 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                             },
                                         )}
                                     >
-                                        <Label className="text-xs font-medium text-gray-700">
-                                            Pressure Sensor
-                                        </Label>
-                                        <Switch
-                                            checked={
-                                                config.variables._pres_sense
-                                                    .value === 1
-                                            }
-                                            onChange={(checked) =>
-                                                updateConfig({
-                                                    variables: {
-                                                        ...config.variables,
-                                                        _pres_sense: {
-                                                            ...config.variables
-                                                                ._pres_sense,
-                                                            value: checked
-                                                                ? 1
-                                                                : 0,
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs font-medium text-gray-700">
+                                                    Pressure Sensor
+                                                </Label>
+                                                <div className="text-[10px] text-gray-400">
+                                                    Check pressure before tool
+                                                    change
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={
+                                                    config.variables._pres_sense
+                                                        .value === 1
+                                                }
+                                                onChange={(checked) =>
+                                                    updateConfig({
+                                                        variables: {
+                                                            ...config.variables,
+                                                            _pres_sense: {
+                                                                ...config
+                                                                    .variables
+                                                                    ._pres_sense,
+                                                                value: checked
+                                                                    ? 1
+                                                                    : 0,
+                                                            },
                                                         },
-                                                    },
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="text-[10px] text-gray-400">
-                                        Check pressure before tool change
+                                                    })
+                                                }
+                                            />
+                                        </div>
                                     </div>
                                     <div
                                         className={cn(
-                                            'flex items-center gap-2',
+                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
                                             {
                                                 [nonDefaultStyling]:
                                                     config.variables
@@ -355,98 +363,115 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                             },
                                         )}
                                     >
-                                        <Label className="text-xs font-medium text-gray-700">
-                                            Tool-stud Sensor
-                                        </Label>
-                                        <Switch
-                                            checked={
-                                                config.variables._holder_sense
-                                                    .value === 1
-                                            }
-                                            onChange={(checked) =>
-                                                updateConfig({
-                                                    variables: {
-                                                        ...config.variables,
-                                                        _holder_sense: {
-                                                            ...config.variables
-                                                                ._holder_sense,
-                                                            value: checked
-                                                                ? 1
-                                                                : 0,
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="space-y-1">
+                                                <Label className="text-xs font-medium text-gray-700">
+                                                    Tool-stud Sensor
+                                                </Label>
+                                                <div className="text-[10px] text-gray-400">
+                                                    Check tool collision before
+                                                    tool unload
+                                                </div>
+                                            </div>
+                                            <Switch
+                                                checked={
+                                                    config.variables
+                                                        ._holder_sense.value ===
+                                                    1
+                                                }
+                                                onChange={(checked) =>
+                                                    updateConfig({
+                                                        variables: {
+                                                            ...config.variables,
+                                                            _holder_sense: {
+                                                                ...config
+                                                                    .variables
+                                                                    ._holder_sense,
+                                                                value: checked
+                                                                    ? 1
+                                                                    : 0,
+                                                            },
                                                         },
-                                                    },
-                                                })
-                                            }
-                                        />
+                                                    })
+                                                }
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="text-[10px] text-gray-400">
-                                        Check tool collision before tool unload
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                className={cn('space-y-1', {
-                                    [nonDefaultStyling]:
-                                        config.variables._tc_slot_offset
-                                            .value !==
-                                        config.variables._tc_slot_offset
-                                            .default,
-                                })}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
-                                        Other
-                                    </Label>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Label className="text-xs font-medium text-gray-700">
-                                        Tool Fork Spacing (mm)
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        value={
-                                            config.variables._tc_slot_offset
-                                                .value
-                                        }
-                                        onChange={(e) =>
-                                            updateConfig({
-                                                variables: {
-                                                    ...config.variables,
-                                                    _tc_slot_offset: {
-                                                        ...config.variables
-                                                            ._tc_slot_offset,
-                                                        value:
-                                                            parseInt(
-                                                                e.target.value,
-                                                            ) || 0,
-                                                    },
-                                                },
-                                            })
-                                        }
-                                        className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                    />
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
                                     <Label className="text-xs font-semibold text-gray-500">
-                                        Advanced
+                                        Other
                                     </Label>
                                 </div>
                                 <div
-                                    className={cn('flex items-center gap-2', {
-                                        [nonDefaultStyling]:
-                                            config.variables
-                                                ._passthrough_offset_setting
-                                                .value !==
-                                            config.variables
-                                                ._passthrough_offset_setting
-                                                .default,
-                                    })}
+                                    className={cn(
+                                        'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
+                                        {
+                                            [nonDefaultStyling]:
+                                                config.variables._tc_slot_offset
+                                                    .value !==
+                                                config.variables._tc_slot_offset
+                                                    .default,
+                                        },
+                                    )}
                                 >
-                                    <Label className="text-xs font-medium text-gray-700">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs font-medium text-gray-700">
+                                                Tool Fork Spacing
+                                            </Label>
+                                            <div className="text-[10px] text-gray-400">
+                                                Distance between each fork in
+                                                the rack.
+                                            </div>
+                                        </div>
+                                        <Input
+                                            type="number"
+                                            value={
+                                                config.variables._tc_slot_offset
+                                                    .value
+                                            }
+                                            onChange={(e) =>
+                                                updateConfig({
+                                                    variables: {
+                                                        ...config.variables,
+                                                        _tc_slot_offset: {
+                                                            ...config.variables
+                                                                ._tc_slot_offset,
+                                                            value:
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value,
+                                                                ) || 0,
+                                                        },
+                                                    },
+                                                })
+                                            }
+                                            className="h-7 w-16 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
+                                        />
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div className="space-y-1">
+                                <div
+                                    className={cn(
+                                        'rounded-md px-2.5 py-1.5 bg-gray-50 flex items-center justify-between gap-3 w-full',
+                                        {
+                                            [nonDefaultStyling]:
+                                                config.variables
+                                                    ._passthrough_offset_setting
+                                                    .value !==
+                                                config.variables
+                                                    ._passthrough_offset_setting
+                                                    .default,
+                                        },
+                                    )}
+                                >
+                                    <Label className="text-xs font-medium text-gray-700 flex-1">
                                         Retain tool table settings when rack
                                         removed
                                     </Label>
