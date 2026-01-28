@@ -48,7 +48,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 
     return (
         <div className="flex flex-wrap items-center gap-3 py-1">
-            <Label className="text-sm font-medium">{label}</Label>
+            <Label className="text-xs font-medium">{label}</Label>
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                     <Label className="text-xs text-muted-foreground w-4">
