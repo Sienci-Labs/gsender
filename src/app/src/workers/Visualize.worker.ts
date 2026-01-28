@@ -65,6 +65,29 @@ interface SpindleValues {
     spindleSpeed: number;
 }
 
+type RotaryMetadata = {
+    radius: number | null;
+    hasYAxisMoves: boolean;
+};
+
+const parseGcodeComments = (line: string): string =>
+    line.replace(/\([^\)]*\)/g, '').replace(/;.*$/, '');
+
+const parseRotaryMetadata = (raw: string): RotaryMetadata => {
+    const diameterMatch = raw.match(/Cylinder\s*Dia\s*:\s*([0-9.+-]+)/i);
+    const diameter = diameterMatch ? Number(diameterMatch[1]) : Number.NaN;
+    const radius =
+        Number.isFinite(diameter) && diameter > 0 ? diameter / 2 : null;
+
+    const hasYAxisMoves = raw
+        .split(/\r?\n/)
+        .some((line) =>
+            /(^|[^A-Z])Y[-+]?\d*\.?\d+/i.test(parseGcodeComments(line)),
+        );
+
+    return { radius, hasYAxisMoves };
+};
+
 self.onmessage = function ({ data }: { data: WorkerData }) {
     const {
         content,
@@ -79,6 +102,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         isSecondary,
         activeVisualizer,
     } = data;
+
+    const { radius: rotaryRadius, hasYAxisMoves } = parseRotaryMetadata(content);
+    const shouldOffsetRotaryRadius = rotaryRadius !== null && !hasYAxisMoves;
+    const applyRotaryRadiusOffset = (value: number): number =>
+        shouldOffsetRotaryRadius ? value + (rotaryRadius as number) : value;
 
     // Common state variables
     let vertices: number[] = [];
@@ -207,7 +235,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             // Interpolate position
                             const interpolatedX = v1.x + (v2.x - v1.x) * t;
                             const interpolatedY = v1.y + (v2.y - v1.y) * t;
-                            const interpolatedZ = v1.z + (v2.z - v1.z) * t;
+                            const interpolatedZ = applyRotaryRadiusOffset(
+                                v1.z + (v2.z - v1.z) * t,
+                            );
 
                             // Apply A-axis rotation around X-axis
                             const rotated = rotateAxis('x', {
@@ -251,7 +281,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const newV1 = rotateAxis('x', {
                             x: v1.x,
                             y: v1.y,
-                            z: v1.z,
+                            z: applyRotaryRadiusOffset(v1.z),
                             a: v1.a || 0,
                         });
                         v1.x = newV1.x;
@@ -261,7 +291,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const newV2 = rotateAxis('x', {
                             x: v2.x,
                             y: v2.y,
-                            z: v2.z,
+                            z: applyRotaryRadiusOffset(v2.z),
                             a: v2.a || 0,
                         });
                         v2.x = newV2.x;
@@ -315,7 +345,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         // Interpolate position
                         const interpolatedX = v1.x + (v2.x - v1.x) * t;
                         const interpolatedY = v1.y + (v2.y - v1.y) * t;
-                        const interpolatedZ = v1.z + (v2.z - v1.z) * t;
+                        const interpolatedZ = applyRotaryRadiusOffset(
+                            v1.z + (v2.z - v1.z) * t,
+                        );
 
                         // Apply A-axis rotation around X-axis
                         const rotated = rotateAxis('x', {
@@ -345,13 +377,13 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     const updatedV1 = rotateAxis('x', {
                         x: v1.x,
                         y: v1.y,
-                        z: v1.z,
+                        z: applyRotaryRadiusOffset(v1.z),
                         a: v1.a || 0,
                     });
                     const updatedV2 = rotateAxis('x', {
                         x: v2.x,
                         y: v2.y,
-                        z: v2.z,
+                        z: applyRotaryRadiusOffset(v2.z),
                         a: v2.a || 0,
                     });
 
