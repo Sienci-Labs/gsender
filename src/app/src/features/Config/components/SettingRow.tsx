@@ -146,6 +146,7 @@ export function SettingRow({
         connected,
         isSettingDefault,
         getEEPROMDefaultValue,
+        EEPROM,
     } = useSettings();
 
     const displaySetting = { ...setting };
@@ -198,7 +199,6 @@ export function SettingRow({
     function handleProgramSettingReset(setting: gSenderSetting) {
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
             // check if eeprom is reported
-            const { EEPROM } = useSettings();
             let eepromValue = EEPROM.filter(
                 (o) => o.setting === setting.eID,
             )[0];
