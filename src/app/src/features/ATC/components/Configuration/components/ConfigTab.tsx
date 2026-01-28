@@ -1,10 +1,15 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle } from 'app/components/shadcn/Card';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Input } from 'app/components/shadcn/Input';
 import { Label } from 'app/components/shadcn/Label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from 'app/components/shadcn/Select';
 import { Button } from 'app/components/Button';
-import { Progress } from 'app/components/shadcn/Progress';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
@@ -22,12 +27,40 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
         updatePosition,
         applyConfig,
         setWorkspacePosition,
-        isApplying,
-        progress,
         status,
     } = useConfigContext();
 
     const nonDefaultStyling = 'bg-yellow-50';
+    const rackSize = config.variables._tc_slots.value || 0;
+    const rackEnabled = rackSize > 0;
+
+    const handleRackSizeChange = (value: string) => {
+        const nextRackSize = parseInt(value, 10) || 0;
+        const nextVariables = {
+            ...config.variables,
+            _tc_slots: {
+                ...config.variables._tc_slots,
+                value: nextRackSize,
+            },
+            _tc_rack_enable: {
+                ...config.variables._tc_rack_enable,
+                value: nextRackSize === 0 ? 0 : 1,
+            },
+        };
+
+        if (nextRackSize === 0) {
+            nextVariables._irt_offset_mode = {
+                ...config.variables._irt_offset_mode,
+                value: 0,
+            };
+            nextVariables._ort_offset_mode = {
+                ...config.variables._ort_offset_mode,
+                value: 0,
+            };
+        }
+
+        updateConfig({ variables: nextVariables });
+    };
 
     const getStatusColor = () => {
         switch (status.type) {
@@ -43,296 +76,240 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
     };
 
     return (
-        <div className="space-y-1 flex flex-col h-full">
-            {/* General Section */}
-            <Card className="border border-border p-0">
-                <CardHeader className="pb-2">
-                    <CardTitle>General</CardTitle>
-                </CardHeader>
-                <div className="p-2">
-                    <PositionInput
-                        label="Tool Length Sensor Position"
-                        position={config.tlsPosition}
-                        onPositionChange={(position) =>
-                            updatePosition('toolLengthSensorPosition', position)
-                        }
-                        onUseCurrent={() => setWorkspacePosition('P9')}
-                    />
-
-                    <PositionInput
-                        label="Manual Tool Load Position"
-                        position={config.manualLoadPosition}
-                        onPositionChange={(position) =>
-                            updatePosition('manualToolLoadPosition', position)
-                        }
-                        onUseCurrent={() => setWorkspacePosition('P8')}
-                    />
-
-                    <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                            Offset Management
-                        </Label>
-                        <OffsetManagementWidget
-                            value={config.variables._ort_offset_mode.value}
-                            defaultValue={
-                                config.variables._ort_offset_mode.default
-                            }
-                            onChange={(value) =>
-                                updateConfig({
-                                    variables: {
-                                        ...config.variables,
-                                        _ort_offset_mode: {
-                                            ...config.variables
-                                                ._ort_offset_mode,
-                                            value,
-                                        },
-                                    },
-                                })
-                            }
-                        />
+        <div className="space-y-4 flex flex-col h-full">
+            {/* Tool Rack Section */}
+            <div className="space-y-2 border-b border-border pb-4">
+                <div className="text-sm font-semibold">Tool Rack</div>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium">Rack Size</Label>
+                    <div
+                        className={cn('w-52', {
+                            [nonDefaultStyling]:
+                                config.variables._tc_slots.value !==
+                                config.variables._tc_slots.default,
+                        })}
+                    >
+                        <Select
+                            value={String(rackSize)}
+                            onValueChange={handleRackSizeChange}
+                        >
+                            <SelectTrigger className="h-8 text-xs">
+                                <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent className="z-[10001] bg-white">
+                                <SelectItem value="0">No tool rack</SelectItem>
+                                <SelectItem value="6">
+                                    Rack with 6 tools
+                                </SelectItem>
+                                <SelectItem value="12">
+                                    Rack with 12 tools
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
-            </Card>
-
-            {/* Tool Rack Section */}
-            <Card className="border border-border p-0">
-                <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-4">
-                        Tool Rack
-                        <Switch
-                            className={cn({
-                                [nonDefaultStyling]:
-                                    config.variables._tc_rack_enable.value !==
-                                    config.variables._tc_rack_enable.default,
-                            })}
-                            checked={
-                                config.variables._tc_rack_enable.value === 1
-                            }
-                            onChange={(checked) =>
-                                updateConfig({
-                                    variables: {
-                                        ...config.variables,
-                                        _tc_rack_enable: {
-                                            ...config.variables._tc_rack_enable,
-                                            value: checked ? 1 : 0,
-                                        },
-                                    },
-                                })
-                            }
-                        />
-                    </CardTitle>
-                </CardHeader>
                 <div
                     className={cn(
-                        'p-2',
-                        config.variables._tc_rack_enable.value !== 1 &&
-                            'opacity-50 pointer-events-none',
+                        'pt-1',
+                        !rackEnabled && 'opacity-50 pointer-events-none',
                     )}
                 >
-                    <div className="flex gap-4 w-full space-between">
-                        <div
-                            className={cn(
-                                'flex flex-row items-center gap-2 justify-center',
-                                {
-                                    [nonDefaultStyling]:
-                                        config.variables._tc_slots.value !==
-                                        config.variables._tc_slots.default,
-                                },
-                            )}
-                        >
-                            <Label className="text-sm font-medium">
-                                Number of Slots
-                            </Label>
-                            <Input
-                                type="number"
-                                value={config.variables._tc_slots.value}
-                                onChange={(e) =>
-                                    updateConfig({
-                                        variables: {
-                                            ...config.variables,
-                                            _tc_slots: {
-                                                ...config.variables._tc_slots,
-                                                value:
-                                                    parseInt(e.target.value) ||
-                                                    0,
-                                            },
-                                        },
-                                    })
-                                }
-                                className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={
-                                    config.variables._tc_rack_enable.value !== 1
-                                }
-                            />
-                        </div>
-                        <div
-                            className={cn(
-                                'flex flex-row items-center gap-2 justify-center',
-                                {
-                                    [nonDefaultStyling]:
-                                        config.variables._tc_slot_offset
-                                            .value !==
-                                        config.variables._tc_slot_offset
-                                            .default,
-                                },
-                            )}
-                        >
-                            <Label className="text-sm font-medium">
-                                Slot Offset
-                            </Label>
-                            <Input
-                                type="number"
-                                value={config.variables._tc_slot_offset.value}
-                                onChange={(e) =>
-                                    updateConfig({
-                                        variables: {
-                                            ...config.variables,
-                                            _tc_slot_offset: {
-                                                ...config.variables
-                                                    ._tc_slot_offset,
-                                                value:
-                                                    parseInt(e.target.value) ||
-                                                    0,
-                                            },
-                                        },
-                                    })
-                                }
-                                className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                disabled={
-                                    config.variables._tc_rack_enable.value !== 1
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <div className="flex-1">
-                            <PositionInput
-                                label="Slot 1 Position"
-                                position={config.slot1Position}
-                                onPositionChange={(position) =>
-                                    updatePosition(
-                                        'toolRack.slot1Position',
-                                        position,
-                                    )
-                                }
-                                onUseCurrent={() => setWorkspacePosition('P7')}
-                                disabled={
-                                    config.variables._tc_rack_enable.value !== 1
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1">
-                        <Label>Offset Management</Label>
-                        <OffsetManagementWidget
-                            value={config.variables._irt_offset_mode.value}
-                            defaultValue={
-                                config.variables._irt_offset_mode.default
-                            }
-                            onChange={(value) =>
-                                updateConfig({
-                                    variables: {
-                                        ...config.variables,
-                                        _irt_offset_mode: {
-                                            ...config.variables
-                                                ._irt_offset_mode,
-                                            value,
-                                        },
-                                    },
-                                })
-                            }
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <Label className="text-sm font-medium">Advanced</Label>
-                        <div
-                            className={cn('space-y-1.5 pl-4', {
-                                [nonDefaultStyling]:
-                                    config.variables._passthrough_offset_setting
-                                        .value !==
-                                    config.variables._passthrough_offset_setting
-                                        .default,
-                            })}
-                        >
-                            <div className="flex items-center justify-between">
-                                <Label className="text-xs">
-                                    Retain tool table settings when rack removed
-                                </Label>
-                                <Switch
-                                    checked={
-                                        config.variables
-                                            ._passthrough_offset_setting
-                                            .value === 1
-                                    }
-                                    onChange={(checked) =>
-                                        updateConfig({
-                                            variables: {
-                                                ...config.variables,
-                                                _passthrough_offset_setting: {
-                                                    ...config.variables
-                                                        ._passthrough_offset_setting,
-                                                    value: checked ? 1 : 0,
-                                                },
-                                            },
-                                        })
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <PositionInput
+                        label="Tool Rack Position"
+                        position={config.slot1Position}
+                        onPositionChange={(position) =>
+                            updatePosition('toolRack.slot1Position', position)
+                        }
+                        onUseCurrent={() => setWorkspacePosition('P7')}
+                        disabled={!rackEnabled}
+                        actionLabel="Set Manually"
+                    />
                 </div>
-            </Card>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium">
+                        Offset Management
+                    </Label>
+                    <OffsetManagementWidget
+                        value={config.variables._irt_offset_mode.value}
+                        defaultValue={config.variables._irt_offset_mode.default}
+                        onChange={(value) =>
+                            updateConfig({
+                                variables: {
+                                    ...config.variables,
+                                    _irt_offset_mode: {
+                                        ...config.variables._irt_offset_mode,
+                                        value,
+                                    },
+                                },
+                            })
+                        }
+                    />
+                </div>
+            </div>
+
+            {/* Tool Length Sensor Section */}
+            <div className="space-y-2 border-b border-border pb-4">
+                <div className="text-sm font-semibold">Tool Length Sensor</div>
+                <PositionInput
+                    label="Tool Length Sensor Position"
+                    position={config.tlsPosition}
+                    onPositionChange={(position) =>
+                        updatePosition('toolLengthSensorPosition', position)
+                    }
+                    onUseCurrent={() => setWorkspacePosition('P9')}
+                    disableZ
+                    actionLabel="Set Manually"
+                />
+            </div>
 
             {/* Advanced Section */}
-            <Card className="border border-border">
-                <CardHeader className="pb-2">
-                    <CardTitle>Advanced</CardTitle>
-                </CardHeader>
-                <div className="p-2">
-                    <div
-                        className={cn('flex items-center justify-between', {
-                            [nonDefaultStyling]:
-                                config.variables._pres_sense.value !==
-                                config.variables._pres_sense.default,
-                        })}
-                    >
+            <div className="space-y-3 border-b border-border pb-4">
+                <div className="text-sm font-semibold">Advanced Settings</div>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium">
+                        Offset Management
+                    </Label>
+                    <OffsetManagementWidget
+                        value={config.variables._ort_offset_mode.value}
+                        defaultValue={config.variables._ort_offset_mode.default}
+                        onChange={(value) =>
+                            updateConfig({
+                                variables: {
+                                    ...config.variables,
+                                    _ort_offset_mode: {
+                                        ...config.variables._ort_offset_mode,
+                                        value,
+                                    },
+                                },
+                            })
+                        }
+                    />
+                </div>
+                <PositionInput
+                    label="Manual Tool Change Position"
+                    position={config.manualLoadPosition}
+                    onPositionChange={(position) =>
+                        updatePosition('manualToolLoadPosition', position)
+                    }
+                    onUseCurrent={() => setWorkspacePosition('P8')}
+                    disableZ
+                    actionLabel="Set Manually"
+                />
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium">Safety Checks</Label>
+                    <div className="space-y-1">
+                        <div
+                            className={cn('flex items-center gap-2', {
+                                [nonDefaultStyling]:
+                                    config.variables._pres_sense.value !==
+                                    config.variables._pres_sense.default,
+                            })}
+                        >
+                            <Label className="text-xs">Pressure Sensor</Label>
+                            <Switch
+                                checked={config.variables._pres_sense.value === 1}
+                                onChange={(checked) =>
+                                    updateConfig({
+                                        variables: {
+                                            ...config.variables,
+                                            _pres_sense: {
+                                                ...config.variables._pres_sense,
+                                                value: checked ? 1 : 0,
+                                            },
+                                        },
+                                    })
+                                }
+                            />
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                            Check pressure before tool change
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <div
+                            className={cn('flex items-center gap-2', {
+                                [nonDefaultStyling]:
+                                    config.variables._holder_sense.value !==
+                                    config.variables._holder_sense.default,
+                            })}
+                        >
+                            <Label className="text-xs">Tool-stud Sensor</Label>
+                            <Switch
+                                checked={config.variables._holder_sense.value === 1}
+                                onChange={(checked) =>
+                                    updateConfig({
+                                        variables: {
+                                            ...config.variables,
+                                            _holder_sense: {
+                                                ...config.variables._holder_sense,
+                                                value: checked ? 1 : 0,
+                                            },
+                                        },
+                                    })
+                                }
+                            />
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                            Check tool collision before tool unload
+                        </div>
+                    </div>
+                </div>
+                <div
+                    className={cn('space-y-1', {
+                        [nonDefaultStyling]:
+                            config.variables._tc_slot_offset.value !==
+                            config.variables._tc_slot_offset.default,
+                    })}
+                >
+                    <Label className="text-xs font-medium">Other</Label>
+                    <div className="flex items-center gap-2">
                         <Label className="text-xs">
-                            Check pressure with pressure sensor
+                            Tool Fork Spacing (mm)
                         </Label>
-                        <Switch
-                            checked={config.variables._pres_sense.value === 1}
-                            onChange={(checked) =>
+                        <Input
+                            type="number"
+                            value={config.variables._tc_slot_offset.value}
+                            onChange={(e) =>
                                 updateConfig({
                                     variables: {
                                         ...config.variables,
-                                        _pres_sense: {
-                                            ...config.variables._pres_sense,
-                                            value: checked ? 1 : 0,
+                                        _tc_slot_offset: {
+                                            ...config.variables._tc_slot_offset,
+                                            value: parseInt(e.target.value) || 0,
                                         },
                                     },
                                 })
                             }
+                            className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         />
                     </div>
+                </div>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium">Advanced</Label>
                     <div
-                        className={cn('flex items-center justify-between', {
+                        className={cn('flex items-center gap-2', {
                             [nonDefaultStyling]:
-                                config.variables._holder_sense.value !==
-                                config.variables._holder_sense.default,
+                                config.variables._passthrough_offset_setting
+                                    .value !==
+                                config.variables._passthrough_offset_setting
+                                    .default,
                         })}
                     >
                         <Label className="text-xs">
-                            Check tool presence in rack to prevent collision
+                            Retain tool table settings when rack removed
                         </Label>
                         <Switch
-                            checked={config.variables._holder_sense.value === 1}
+                            checked={
+                                config.variables._passthrough_offset_setting
+                                    .value === 1
+                            }
                             onChange={(checked) =>
                                 updateConfig({
                                     variables: {
                                         ...config.variables,
-                                        _holder_sense: {
-                                            ...config.variables._holder_sense,
+                                        _passthrough_offset_setting: {
+                                            ...config.variables
+                                                ._passthrough_offset_setting,
                                             value: checked ? 1 : 0,
                                         },
                                     },
@@ -341,7 +318,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         />
                     </div>
                 </div>
-            </Card>
+            </div>
 
             {/* Apply Section */}
             <div className="flex items-center gap-3 pt-1 flex-1 min-h-0">

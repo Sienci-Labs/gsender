@@ -1,6 +1,11 @@
 import { useState } from 'react';
-
-import { Switch } from 'app/components/shadcn/Switch';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from 'app/components/shadcn/Select';
 interface OffsetManagementWidgetProps {
     value?: number;
     onChange?: (value: number) => void;
@@ -17,24 +22,12 @@ export default function OffsetManagementWidget({
     const currentValue = onChange ? value : internalValue;
     const isDefault = currentValue === defaultValue;
 
-    const isUseToolTable = currentValue === 1 || currentValue === 2;
-    const isVerifyEnabled = currentValue === 2;
-
-    const handleOffsetModeChange = (useToolTable: boolean) => {
-        const newValue = useToolTable ? 1 : 0;
+    const handleOffsetModeChange = (nextValue: string) => {
+        const parsedValue = parseInt(nextValue, 10) || 0;
         if (onChange) {
-            onChange(newValue);
+            onChange(parsedValue);
         } else {
-            setInternalValue(newValue);
-        }
-    };
-
-    const handleVerifyToggle = () => {
-        const newValue = isVerifyEnabled ? 1 : 2;
-        if (onChange) {
-            onChange(newValue);
-        } else {
-            setInternalValue(newValue);
+            setInternalValue(parsedValue);
         }
     };
 
@@ -44,53 +37,26 @@ export default function OffsetManagementWidget({
                 isDefault ? 'bg-none' : 'bg-yellow-50'
             }`}
         >
-            <div className="space-y-2">
-                <div className="space-y-2">
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            checked={!isUseToolTable}
-                            onChange={() => handleOffsetModeChange(false)}
-                            className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                            Probe New Offset when Tool Changing
-                        </span>
-                    </label>
-
-                    <div className="space-y-2">
-                        <label className="flex items-center space-x-2 cursor-pointer">
-                            <input
-                                type="radio"
-                                checked={isUseToolTable}
-                                onChange={() => handleOffsetModeChange(true)}
-                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-gray-700">
-                                Use Tool Table Offset
-                            </span>
-                        </label>
-
-                        <div className="ml-6 pl-2">
-                            <label className="flex items-center justify-between cursor-pointer">
-                                <span
-                                    className={`text-sm ${
-                                        isUseToolTable
-                                            ? 'text-gray-700'
-                                            : 'text-gray-400'
-                                    }`}
-                                >
-                                    Verify tool length changes
-                                </span>
-                                <Switch
-                                    checked={isVerifyEnabled}
-                                    onChange={handleVerifyToggle}
-                                    disabled={!isUseToolTable}
-                                />
-                            </label>
-                        </div>
-                    </div>
-                </div>
+            <div className="w-72">
+                <Select
+                    value={String(currentValue)}
+                    onValueChange={handleOffsetModeChange}
+                >
+                    <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Select mode" />
+                    </SelectTrigger>
+                    <SelectContent className="z-[10001] bg-white">
+                        <SelectItem value="0">
+                            Probe new offset after loading
+                        </SelectItem>
+                        <SelectItem value="1">
+                            Use Tool Table offsets without verification
+                        </SelectItem>
+                        <SelectItem value="2">
+                            Use Tool Table Offsets and Probe to verify
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
         </div>
     );

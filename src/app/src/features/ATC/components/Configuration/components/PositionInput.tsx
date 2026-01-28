@@ -15,6 +15,9 @@ interface PositionInputProps {
     onPositionChange: (position: Position) => void;
     onUseCurrent: () => void;
     disabled?: boolean;
+    disableZ?: boolean;
+    hideZ?: boolean;
+    actionLabel?: string;
 }
 
 export const PositionInput: React.FC<PositionInputProps> = ({
@@ -23,6 +26,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
     onPositionChange,
     onUseCurrent,
     disabled = false,
+    disableZ = false,
+    hideZ = false,
+    actionLabel = 'Set Position',
 }) => {
     const { units } = useWorkspaceState();
 
@@ -41,8 +47,8 @@ export const PositionInput: React.FC<PositionInputProps> = ({
     });
 
     return (
-        <div className="flex items-center justify-between gap-4 py-1">
-            <Label className="text-sm font-medium flex-shrink-0">{label}</Label>
+        <div className="flex flex-wrap items-center gap-3 py-1">
+            <Label className="text-sm font-medium">{label}</Label>
             <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                     <Label className="text-xs text-muted-foreground w-4">
@@ -70,19 +76,23 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                         disabled={disabled}
                     />
                 </div>
-                <div className="flex items-center gap-1">
-                    <Label className="text-xs text-muted-foreground w-4">
-                        Z:
-                    </Label>
-                    <Input
-                        type="number"
-                        step="0.1"
-                        value={unitPosition.z}
-                        onChange={(e) => handleAxisChange('z', e.target.value)}
-                        className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                        disabled={disabled}
-                    />
-                </div>
+                {!hideZ && (
+                    <div className="flex items-center gap-1">
+                        <Label className="text-xs text-muted-foreground w-4">
+                            Z:
+                        </Label>
+                        <Input
+                            type="number"
+                            step="0.1"
+                            value={unitPosition.z}
+                            onChange={(e) =>
+                                handleAxisChange('z', e.target.value)
+                            }
+                            className="w-20 h-8 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            disabled={disabled || disableZ}
+                        />
+                    </div>
+                )}
                 <Button
                     size="sm"
                     onClick={onUseCurrent}
@@ -90,7 +100,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     disabled={disabled}
                 >
                     <FiTarget className="h-4 w-4" />
-                    Set Position
+                    {actionLabel}
                 </Button>
             </div>
         </div>
