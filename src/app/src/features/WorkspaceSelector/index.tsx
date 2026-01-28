@@ -11,7 +11,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';
-import { GRBL_ACTIVE_STATE_RUN } from 'app/constants';
+import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 
 const availableWorkspaces = {
     G54: 'P1',
@@ -36,6 +36,8 @@ export function WorkspaceSelector() {
         (state: RootState) => state.controller.state.status?.activeState,
     );
 
+    const workflowState = useSelector((state: RootState) => state.controller.workflow.state);
+
     const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
 
     // Update selected workspace if it changes elsewhere
@@ -48,7 +50,7 @@ export function WorkspaceSelector() {
         controller.command('gcode', value);
     }
 
-    const disabled = !isConnected || activeState === GRBL_ACTIVE_STATE_RUN;
+    const disabled = !isConnected || activeState === GRBL_ACTIVE_STATE_RUN || workflowState === WORKFLOW_STATE_RUNNING;
 
     return (
         <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center justify-end gap-2">
