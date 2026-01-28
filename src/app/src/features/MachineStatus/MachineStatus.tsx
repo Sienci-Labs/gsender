@@ -164,7 +164,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     )}
                 </div>
                 <div className="mt-4 z-50">
-                    {isConnected && activeState === GRBL_ACTIVE_STATE_ALARM && (
+                    {isConnected && ((activeState === GRBL_ACTIVE_STATE_ALARM) || (activeState === GRBL_ACTIVE_STATE_HOLD)) && (
                         <UnlockButton
                             onClick={unlock}
                             alarmCode={alarmCode}
