@@ -42,6 +42,7 @@ export interface JoystickOptions {
     stick2: StickOptions;
     zeroThreshold: number;
     movementDistanceOverride: number;
+    fixedSpeedMode: boolean;
 }
 
 export interface DefaultGamepadOptions {

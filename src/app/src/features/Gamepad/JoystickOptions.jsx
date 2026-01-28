@@ -64,6 +64,7 @@ const JoystickOptions = () => {
             stick2,
             zeroThreshold = 15,
             movementDistanceOverride = 100,
+            fixedSpeedMode = false,
         },
     } = profile;
 
@@ -517,6 +518,22 @@ const JoystickOptions = () => {
                     className="p-1 w-full"
                     suffix="%"
                 />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-2 mt-2">
+                <div className="dark:text-white">Fixed speed mode</div>
+                <div className="col-span-3">
+                    <Switch
+                        checked={fixedSpeedMode}
+                        onChange={(checked) =>
+                            handleChange('fixedSpeedMode', checked)
+                        }
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                        Use for controllers that don't work well with variable
+                        speed jogging
+                    </p>
+                </div>
             </div>
         </div>
     );
