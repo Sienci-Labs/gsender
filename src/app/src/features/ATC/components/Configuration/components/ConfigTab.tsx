@@ -213,13 +213,13 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
+                                    <Label className="text-xs font-semibold text-gray-900">
                                         Offset Management
                                     </Label>
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs font-medium text-gray-500">
-                                        When loading from tool rack
+                                        When loading from tool rack:
                                     </Label>
                                     <OffsetManagementWidget
                                         value={
@@ -246,7 +246,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                 </div>
                                 <div className="space-y-1">
                                     <Label className="text-xs font-medium text-gray-500">
-                                        When loading manually
+                                        When loading manually:
                                     </Label>
                                     <OffsetManagementWidget
                                         value={
@@ -299,7 +299,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
+                                    <Label className="text-xs font-semibold text-gray-900">
                                         Advanced
                                     </Label>
                                 </div>
@@ -350,7 +350,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
+                                    <Label className="text-xs font-semibold text-gray-900">
                                         Safety Checks
                                     </Label>
                                 </div>
@@ -451,7 +451,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-500">
+                                    <Label className="text-xs font-semibold text-gray-900">
                                         Other
                                     </Label>
                                 </div>
@@ -470,15 +470,15 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="space-y-1">
                                             <Label className="text-xs font-medium text-gray-700">
-                                                Tool Fork Spacing
+                                                Tool Fork Spacing (mm)
                                             </Label>
                                             <div className="text-[10px] text-gray-400">
-                                                Distance between each fork in
-                                                the rack.
+                                                Distance between each fork.
                                             </div>
                                         </div>
                                         <Input
                                             type="number"
+                                            wrapperClassName="w-auto"
                                             value={
                                                 config.variables._tc_slot_offset
                                                     .value

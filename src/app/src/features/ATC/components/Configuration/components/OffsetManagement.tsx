@@ -32,12 +32,12 @@ export default function OffsetManagementWidget({
     };
 
     return (
-        <div
-            className={` transition-colors ${
-                isDefault ? 'bg-none' : 'bg-yellow-50'
-            }`}
-        >
-            <div className="w-72">
+        <div className="w-72">
+            <div
+                className={`transition-colors ${
+                    isDefault ? '' : 'bg-yellow-50'
+                }`}
+            >
                 <Select
                     value={String(currentValue)}
                     onValueChange={handleOffsetModeChange}
@@ -50,10 +50,10 @@ export default function OffsetManagementWidget({
                             Probe new offset after loading
                         </SelectItem>
                         <SelectItem value="1">
-                            Use Tool Table offsets without verification
+                            Use Tool Table without verification
                         </SelectItem>
                         <SelectItem value="2">
-                            Use Tool Table Offsets and Probe to verify
+                            Use Tool Table and probe to verify
                         </SelectItem>
                     </SelectContent>
                 </Select>
