@@ -61,6 +61,7 @@ export function RemoteMenuFlyout() {
                 )}
             >
                 <NavFlyoutLink href={'/remote'} label={'Home'} />
+                <NavFlyoutLink href={'/configuration'} label={'Config'} />
             </div>
         </div>
     );

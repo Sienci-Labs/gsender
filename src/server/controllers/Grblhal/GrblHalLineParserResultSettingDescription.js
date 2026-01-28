@@ -30,6 +30,7 @@ class GrblHalLineParserResultSettingDescription {
             return null;
         }
 
+
         const data = r[3].split('|');
 
         const payload = {

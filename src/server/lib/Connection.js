@@ -94,13 +94,14 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
-        const { baudrate, rtscts, network, defaultFirmware } = { ...options };
+        const { baudrate, rtscts, network, defaultFirmware, ethernetPort } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
             rtscts: !!rtscts,
             defaultFirmware,
+            ethernetPort,
             network,
         };
         this.callback = callback;
@@ -110,6 +111,7 @@ class Connection extends EventEmitter {
             path: port,
             baudRate: baudrate,
             rtscts: !!rtscts,
+            ethernetPort,
             network,
             writeFilter: (data) => {
                 const line = data.trim();
@@ -288,8 +290,19 @@ class Connection extends EventEmitter {
         return this.sockets;
     }
 
+    restoreListeners() {
+        this.connection.addPortListeners();
+        /*this.connection.on('data', this.connectionEventListener.data);
+        this.connection.on('close', this.connectionEventListener.close);
+        this.connection.on('error', this.connectionEventListener.error);*/
+    }
+
     setWriteFilter(writeFilter) {
         this.connection.setWriteFilter(writeFilter);
+    }
+
+    getConnectionObject() {
+        return this.connection.port;
     }
 
     emitToSockets(eventName, ...args) {

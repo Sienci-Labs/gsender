@@ -11,6 +11,7 @@ class GrblHalLineParserResultCompleteStatus {
             return null;
         }
 
+
         const state = r[1];
         let subState = r[2] || '';
         subState = subState.replace(':', '');
@@ -25,12 +26,13 @@ class GrblHalLineParserResultCompleteStatus {
                 result[parts[0]] = parts[1].split(',') || null;
             });
         }
-
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
             payload.activeState = state;
             payload.subState = subState || '';
         }
+
+        console.log(result);
 
         // Machine Position (v0.9, v1.1)
         if (_.has(result, 'MPos')) {
@@ -77,6 +79,26 @@ class GrblHalLineParserResultCompleteStatus {
                 payload.pinState[pin] = true;
             });
         }
+
+        // Current Tool
+        if (_.has(result, 'T')) {
+            // Handle updating current tool
+            payload.currentTool = Number(result.T[0]);
+        }
+
+        // Has Homed
+        if (_.has(result, 'H')) {
+            payload.hasHomed = Boolean(Number(result.H[0]));
+            // handle hasHomed
+        }
+
+        // SD Card
+        if (_.has(result, 'SD')) {
+            payload.sdCard = Boolean(Number(result.SD[0]));
+        } else {
+            payload.sdCard = false;
+        }
+
 
         return {
             type: GrblHalLineParserResultCompleteStatus,

@@ -20,14 +20,27 @@ import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
 import { useWidgetState } from 'app/hooks/useWidgetState';
+import pubsub from 'pubsub-js';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 type StartFromLineProps = {
     disabled: boolean;
     lastLine: number;
+    atcValidator?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
 };
 
-const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
+const StartFromLine = ({
+    disabled,
+    lastLine,
+    atcValidator,
+}: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const { units } = useWorkspaceState();
     const [state, setState] = useState({
@@ -90,9 +103,21 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             disabled,
                     },
                 )}
-                onClick={() =>
-                    setState((prev) => ({ ...prev, showModal: true }))
-                }
+                onClick={() => {
+                    const [invalidATC, payload] = atcValidator();
+                    if (invalidATC) {
+                        if (payload.type === 'error') {
+                            pubsub.publish('atc_validator', payload);
+                            return;
+                        } else {
+                            console.log(
+                                'we warn but open the regular dialog with some special state',
+                            );
+                        }
+                    }
+
+                    setState((prev) => ({ ...prev, showModal: true }));
+                }}
             >
                 <MdFormatListNumbered className="text-2xl mr-1" /> Start From
             </ShadButton>
@@ -163,7 +188,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                         <div className="mb-4">
                             <div className="grid grid-cols-4 gap-2 items-center">
                                 {/*
-                                    tooltip cannot be nested any deeper, or the controlled input 
+                                    tooltip cannot be nested any deeper, or the controlled input
                                     wont fire onBlur when you click off of it
                                 */}
                                 <Tooltip
@@ -206,7 +231,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 onClick={handleStartFromLine}
                                 variant={'primary'}
                                 // disabled={!isConnected}
-                                className="flex flex-row p-3 items-center gap-2"
+                                className="flex flex-row p-3 items-center gap-2 portrait:px-6 portrait:text-xl"
                             >
                                 <FaPlay className="ml-2" />
                                 <span>Start from Line</span>

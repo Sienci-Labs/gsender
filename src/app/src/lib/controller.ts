@@ -99,7 +99,11 @@ export interface ControllerListeners {
     'flash:message': Array<Function>;
     'flash:progress': Array<Function>;
     'spindle:add': Array<Function>;
-
+    atci: Array<Function>;
+    'ymodem:start': Array<Function>;
+    'ymodem:complete': Array<Function>;
+    'ymodem:progress': Array<Function>;
+    'ymodem:error': Array<Function>;
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
@@ -108,6 +112,9 @@ export interface ControllerListeners {
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
     'job:stop': Array<Function>;
+    'sdcard:files': Array<Function>;
+    'sdcard:clear': Array<Function>;
+    'sdcard:json': Array<Function>
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -211,6 +218,14 @@ class Controller {
 
         requestEstimateData: [],
         'job:start': [],
+        'sdcard:files': [],
+        'sdcard:clear': [],
+        'sdcard:json': [],
+        atci: [],
+        'ymodem:start': [],
+        'ymodem:complete': [],
+        'ymodem:progress': [],
+        'ymodem:error': [],
         'job:stop': [],
     };
 

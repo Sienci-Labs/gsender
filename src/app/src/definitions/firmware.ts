@@ -26,6 +26,7 @@ export interface EEPROMDescriptions {
 }
 
 export interface FilteredEEPROM {
+    key?: string;
     unit: string;
     setting: EEPROM;
     message?: string;
@@ -43,6 +44,7 @@ export interface FilteredEEPROM {
     requiredBit?: number;
     globalIndex: number;
     value: string;
+    ogValue?: string;
     description?: string;
     details?: string;
     group: BasicType;
@@ -50,6 +52,7 @@ export interface FilteredEEPROM {
     dataType?: string;
     format?: string;
     unitString?: string;
+    dirty?: boolean;
 }
 
 export interface RotaryModeFirmwareSettings {

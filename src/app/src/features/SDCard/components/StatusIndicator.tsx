@@ -1,0 +1,90 @@
+import { CheckCircle, HardDrive, XCircle } from 'lucide-react';
+import { ActionButtons } from 'app/features/SDCard/components/ActionButtons.tsx';
+import { UploadState, useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
+import { UploadProgressBar } from 'app/features/SDCard/components/UploadProgressBar.tsx';
+import cn from 'classnames';
+import { useEffect, useState } from 'react';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
+
+export function StatusIndicator({ isMounted }) {
+    const { isConnected } = useSDCard();
+    const [uploadState, setUploadState] = useState<UploadState>('idle');
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
+    let status: string;
+    let colourClasses: string;
+
+    useEffect(() => {
+        controller.addListener('ymodem:start', () => {
+            setUploadProgress(0);
+            setUploadState('uploading');
+        });
+        controller.addListener('ymodem:complete', () => {
+            setUploadState('complete');
+            setTimeout(() => {
+                setUploadState('idle');
+            }, 1000);
+        });
+        controller.addListener('ymodem:progress', (prog) => {
+            setUploadProgress(prog);
+        });
+        controller.addListener('ymodem:error', (err) => {
+            setUploadState('idle');
+            toast.error('Error uploading file - ' + err + '.');
+        });
+
+        // Cleanup listeners when component unmounts
+        return () => {
+            controller.removeListener('ymodem:start');
+            controller.removeListener('ymodem:complete');
+            controller.removeListener('ymodem:progress');
+            controller.removeListener('ymodem:error');
+        };
+    }, []);
+
+    if (!isConnected) {
+        status = 'Disconnected';
+        colourClasses = 'bg-gray-50 dark:text- text-gray-700 border-gray-200';
+    } else if (isMounted) {
+        status = 'Mounted';
+        colourClasses = 'bg-green-50 text-green-700 border-green-200';
+    } else {
+        status = 'Unmounted';
+        colourClasses = 'bg-red-50 text-red-700 border-red-200';
+    }
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white dark:bg-dark px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <HardDrive className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                            SD Card Status:
+                        </span>
+                    </div>
+                    <div
+                        className={cn(
+                            `inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold border-2`,
+                            colourClasses,
+                        )}
+                    >
+                        {isConnected && isMounted ? (
+                            <CheckCircle className="w-4 h-4" />
+                        ) : (
+                            <XCircle className="w-4 h-4" />
+                        )}
+                        <span>{status}</span>
+                    </div>
+                </div>
+            </div>
+            <div className="bg-white dark:bg-dark flex items-center justify-center px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+                {uploadState === 'idle' && <ActionButtons />}
+                <UploadProgressBar
+                    uploadState={uploadState}
+                    uploadProgress={uploadProgress}
+                />
+            </div>
+        </div>
+    );
+}

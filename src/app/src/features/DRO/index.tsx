@@ -59,6 +59,7 @@ import {
 } from './utils/RapidPosition';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import reduxStore from 'app/store/redux';
+import { cn } from 'app/lib/utils';
 
 interface DROProps {
     axes: AxesArray;
@@ -425,8 +426,18 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge isRemote={isRemote} />
-            <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
+            <div
+                className={cn(
+                    'w-full min-h-10 portrait:min-h-20 flex flex-row align-bottom items-center justify-center relative gap-2',
+                    {
+                        'gap-1': isConnected && homingEnabled,
+                        // 'gap-36 max-xl:gap-32': isRotaryMode,
+                        // 'gap-32 max-xl:gap-28': !isRotaryMode,
+                    },
+                )}
+            >
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
+
                 {isConnected && homingEnabled && (
                     <RapidPositionButtons disabled={!canClick} />
                 )}
@@ -438,7 +449,7 @@ function DRO({
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go</Label>
             </div>
-            <div className="flex flex-col w-full gap-1 max-xl:gap-0 space-between">
+            <div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
                 <AxisRow
                     label={'X'}
                     axis={'X'}
@@ -485,7 +496,7 @@ function DRO({
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
-                        size="sm"
+                        className="portrait:min-w-14"
                     />
                 ) : (
                     <AlertDialog>
@@ -494,6 +505,7 @@ function DRO({
                                 text="Zero"
                                 icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
+                                className="portrait:min-w-14"
                             />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
@@ -527,7 +539,7 @@ function DRO({
                     variant="alt"
                     onClick={goXYAxes}
                     disabled={!canClick}
-                    size="sm"
+                    className="portrait:min-w-14"
                     tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                 >
                     <span className="font-mono text-lg">

@@ -40,7 +40,8 @@ class GrblHalLineParserResultStatus {
 
         const payload = {};
         //const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
-        const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
+        //const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
+        const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a-zA-Z]+){0,5})?/g;
         const params = r[1].match(pattern);
         const result = {};
 
@@ -194,6 +195,38 @@ class GrblHalLineParserResultStatus {
         // Current tool (if persisted)
         if (_.has(result, 'T')) {
             payload.currentTool = Number(result.T[0]);
+        }
+
+        // Sko Keepout area
+        if (_.has(result, 'ATCI')) {
+            const values = result.ATCI;
+            const flags = values[0] || '';
+            payload.keepout = {
+                flags: flags.split('')
+            };
+        }
+
+
+        // Probe protection status
+        // P:0 -> default probe selected, no protection
+        // P:0,P -> default probe selected, protection enabled
+        if (_.has(result, 'P')) {
+            payload.probe = {
+                type: Number(result.P[0]),
+                protected: result.P[1] === 'P'
+            };
+        }
+
+        if (_.has(result, 'SD')) {
+            payload.SD = {
+                name: result.SD[1],
+                percentage: Number(result.SD[0])
+            };
+        } else {
+            payload.SD = {
+                name: null,
+                percentage: 0
+            };
         }
 
         return {

@@ -12,6 +12,9 @@ export const buttonStyle = tv({
             secondary:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200',
             alt: 'bg-robin-500 text-white border-robin-500',
+            warning: 'bg-orange-500/90 text-white border-orange-300',
+            error: 'bg-red-500 text-white border-red-700',
+            success: 'bg-green-500 text-white border-green-700',
             outline:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark text-black dark:text-white',
             ghost: 'text-gray-600 dark:text-gray-300 border-none shadow-none',

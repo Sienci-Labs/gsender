@@ -16,6 +16,7 @@
     "@sienci/avrgirl-arduino": "^5.0.3",
     "axios": "^1.2.4",
     "bcrypt-nodejs": "0.0.3",
+    "buffer-chunks": "^0.1.1",
     "chalk": "~2.4.2",
     "classnames": "~2.2.6",
     "commander": "^10.0.0",
@@ -26,9 +27,9 @@
     "cookie-parser": "~1.4.4",
     "core-js": "^3.47.0",
     "cors": "^2.8.5",
+    "crc-full": "^1.1.0",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
-    "downloadjs": "^1.4.7",
     "electron-log": "^4.3.5",
     "electron-store": "~8.1.0",
     "electron-updater": "^5.3.0",
@@ -65,7 +66,6 @@
     "pubsub-js": "~1.9.4",
     "range_check": "~1.4.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^1.5.2",
     "react-dom": "^18.2.0",
     "react-icons": "^5.3.0",
     "react-infinite-tree": "~0.7.1",
@@ -101,6 +101,7 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.3.0",
     "@types/react-select": "^5.0.1",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/redux-action": "^1.2.8",
     "@types/redux-batched-subscribe": "^0.1.7",
     "@types/redux-logger": "^3.0.13",
@@ -124,5 +125,5 @@
     "type": "git",
     "url": "https://github.com/Sienci-Labs/gsender"
   },
-  "version": "1.5.7"
+  "version": "1.6.0-Edge-3"
 }

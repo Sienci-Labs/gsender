@@ -15,6 +15,8 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
+import api from 'app/api';
+import pubsub from 'pubsub-js';
 
 interface UserData {
     path: string;
@@ -82,6 +84,9 @@ const persist = (data: StoreData): void => {
         if (isElectron()) {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData!.path, value);
+
+            // save preferences to api so that remote window can fetch it
+            api.preferences.replace(persistData);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -296,7 +301,9 @@ const migrateStore = (): void => {
 
     if (semver.lt(cnc.version, '1.5.5')) {
         // if user has default retraction distance (4), change it to the new default (2)
-        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        const currentRetractDistance = store.get(
+            'widgets.probe.retractionDistance',
+        );
         if (currentRetractDistance === 4) {
             store.set('widgets.probe.retractionDistance', 2);
         }
@@ -649,14 +656,39 @@ const migrateStore = (): void => {
     }
 };
 
+const syncPrefs = async () => {
+    try {
+        const config = await api.preferences.fetch();
+        if (config) {
+            store.restoreState(config.data.state, () => {
+                setTimeout(() => {
+                    pubsub.publish('repopulate');
+                }, 50);
+            });
+            // force UI to update with the changes
+            pubsub.publish('config:saved', config.data.state);
+        }
+    } catch (err) {
+        log.error(err);
+    }
+};
+
 try {
     // saveBackup();
     migrateStore();
+
+    if (isElectron()) {
+        window.ipcRenderer.send(
+            'assignPromptExit',
+            store.get('workspace.promptExit'),
+        );
+    }
 } catch (err) {
     log.error(err);
 }
 
 store.getConfig = getConfig;
 store.persist = persist;
+store.syncPrefs = syncPrefs;
 
 export default store;

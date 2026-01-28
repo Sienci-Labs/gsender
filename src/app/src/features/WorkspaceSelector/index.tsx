@@ -11,6 +11,7 @@ import {
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';
+import { GRBL_ACTIVE_STATE_RUN } from 'app/constants';
 
 const availableWorkspaces = {
     G54: 'P1',
@@ -31,6 +32,10 @@ export function WorkspaceSelector() {
         (state: RootState) => state.connection.isConnected,
     );
 
+    const activeState = useSelector(
+        (state: RootState) => state.controller.state.activeState,
+    );
+
     const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
 
     // Update selected workspace if it changes elsewhere
@@ -43,6 +48,8 @@ export function WorkspaceSelector() {
         controller.command('gcode', value);
     }
 
+    const disabled = !isConnected || activeState === GRBL_ACTIVE_STATE_RUN;
+
     return (
         <div className="absolute top-4 right-4 w-56 max-sm:static flex flex-row items-center justify-end gap-2">
             <span className="text-gray-400 text-normal">Workspace:</span>
@@ -51,7 +58,7 @@ export function WorkspaceSelector() {
                     <Select
                         onValueChange={onWorkspaceSelect}
                         value={workspace}
-                        disabled={!isConnected}
+                        disabled={disabled}
                     >
                         <SelectTrigger className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300">
                             <SelectValue placeholder="G54" />

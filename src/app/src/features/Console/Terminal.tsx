@@ -9,6 +9,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';
 import reduxStore from 'app/store/redux';
+import { useDispatch } from 'react-redux';
 import uuidv4 from 'uuid/v4';
 
 import controller, {
@@ -56,6 +57,7 @@ const Terminal = (
     const terminalInstance = useRef<XtermTerminal | null>(null);
     const fitAddonInstance = useRef<FitAddon | null>(null);
     const [senderId] = useState(uuidv4());
+    const dispatch = useDispatch();
 
     useImperativeHandle(ref, () => ({
         clear: () => {
@@ -89,6 +91,7 @@ const Terminal = (
                 scrollSensitivity: 0.5,
                 smoothScrollDuration: 100,
                 tabStopWidth: 4,
+                lineHeight: 1.4,
                 fontFamily:
                     'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif',
                 fontSize: 14,
@@ -145,6 +148,7 @@ const Terminal = (
         pushUpdatedTerminalHistory();
 
         if (data.includes('error:')) {
+            console.log(data);
             terminalInstance.current?.writeln(color.xterm(TERMINAL_RED)(data));
             return;
         }

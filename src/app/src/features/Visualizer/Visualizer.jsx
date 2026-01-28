@@ -650,6 +650,7 @@ class Visualizer extends Component {
     controllerEvents = {
         gcode_error: _throttle(
             (msg) => {
+                console.log(msg);
                 toast.error(msg, { position: 'bottom-right' });
             },
             250,
@@ -1015,8 +1016,26 @@ class Visualizer extends Component {
                 this.recolorScene();
                 this.updateScene({ forceUpdate: true });
             }),
+            pubsub.subscribe('job:end', () => {
+                // Reset hidden lines when job finishes
+                if (this.visualizer) {
+                    this.visualizer.setHideProcessedLines(false);
+                    this.updateScene({ forceUpdate: true });
+                }
+            }),
+            pubsub.subscribe('workflow:state', (msg, state) => {
+                // Re-apply hide processed lines setting when job starts
+                if (state === 'running' && this.visualizer) {
+                    const hideProcessedLines = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    );
+                    this.visualizer.setHideProcessedLines(hideProcessedLines);
+                }
+            }),
             pubsub.subscribe('file:load', (msg, data) => {
                 const { isSecondary, activeVisualizer } = this.props;
+                pubsub.publish('visualizeWorker:terminate');
 
                 const showWarningsOnLoad = store.get(
                     'widgets.visualizer.showWarning',
@@ -1125,11 +1144,11 @@ class Visualizer extends Component {
                 });
             }),
             pubsub.subscribe('colors:load', (_, data) => {
-                const { colorArray, savedColors } = data;
+                const { colorArrayBuffer, savedColorsBuffer } = data;
                 this.handleSceneRender(
                     this.vizualization,
-                    colorArray,
-                    savedColors,
+                    new Float32Array(colorArrayBuffer),
+                    new Float32Array(savedColorsBuffer),
                     this.renderCallback,
                 );
                 if (this.colorsWorker) {
@@ -2140,7 +2159,15 @@ class Visualizer extends Component {
             return;
         }
 
-        this.visualizer.group.rotateX(radians);
+        // Always animate to the absolute rotation value
+        // This ensures the visual stays in sync with the actual axis position
+        gsap.to(this.visualizer.group.rotation, {
+            x: radians,
+            duration: 0.25,
+            ease: 'power1.inOut',
+            overwrite: true,
+            onUpdate: () => this.updateScene({ forceUpdate: true }),
+        });
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -2163,7 +2190,7 @@ class Visualizer extends Component {
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
 
-        const valueHasChanged = prevValue === currValue;
+        const valueHasChanged = prevValue !== currValue;
 
         if (!isRotaryFile) {
             return;
@@ -2184,9 +2211,11 @@ class Visualizer extends Component {
          *  - Controller is GRBLHal
          *  - A-axis value has changed since previous value
          */
+
         if (grblCondition || grblHalCondition) {
-            const axisDifference = currValue - prevValue;
-            this.rotateGcodeModal(axisDifference);
+            // Always use the absolute current axis value for rotation
+            // This keeps the visual model in perfect sync with the machine position
+            this.rotateGcodeModal(currValue);
         }
     }
 
@@ -2393,10 +2422,23 @@ class Visualizer extends Component {
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
+        const visualization = {
+            ...vizualization,
+            vertices: new Float32Array(vizualization.vertices),
+            frames: new Uint32Array(vizualization.frames),
+            spindleSpeeds: new Float32Array(vizualization.spindleSpeeds),
+        };
+
+        const hideProcessedLines = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+        this.visualizer.setHideProcessedLines(hideProcessedLines);
+
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.vizualization = vizualization;
+            this.vizualization = visualization;
             this.renderCallback = callback;
 
             // we may need to redraw grid if machine size is diff
@@ -2417,12 +2459,13 @@ class Visualizer extends Component {
             this.colorsWorker = colorsWorker;
             this.colorsWorker.onmessage = colorsResponse;
             this.colorsWorker.postMessage({
-                colors: vizualization.colors,
-                frames: vizualization.frames,
-                spindleSpeeds: vizualization.spindleSpeeds,
-                isLaser: vizualization.isLaser,
-                spindleChanges: vizualization.spindleChanges,
+                colors: visualization.colors,
+                frames: visualization.frames,
+                spindleSpeeds: visualization.spindleSpeeds,
+                isLaser: visualization.isLaser,
+                spindleChanges: visualization.spindleChanges,
                 theme: currentTheme,
+                toolchanges: visualization.info.toolchanges,
             });
 
             // this.handleSceneRender(vizualization, callback);

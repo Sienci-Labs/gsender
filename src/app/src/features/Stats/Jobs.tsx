@@ -7,8 +7,7 @@ import {
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
-import Icon from '@mdi/react';
-import { mdiCheckBold, mdiClose } from '@mdi/js';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
@@ -78,10 +77,14 @@ const columnData: CustomColumnDef<Job, any>[] = [
         accessorKey: 'jobStatus',
         header: () => 'Status',
         cell: (info: { renderValue: () => JOB_STATUS_T }) => {
-            return info.renderValue() === JOB_STATUS.COMPLETE ? (
-                <Icon path={mdiCheckBold} size={1} />
-            ) : (
-                <Icon path={mdiClose} size={1} />
+            return (
+                <div className="flex items-center justify-center">
+                    {info.renderValue() === JOB_STATUS.COMPLETE ? (
+                        <CheckCircle size={24} color="green" />
+                    ) : (
+                        <XCircle size={24} color="red" />
+                    )}
+                </div>
             );
         },
         size: 20,
@@ -90,6 +93,7 @@ const columnData: CustomColumnDef<Job, any>[] = [
 
 export function Jobs() {
     const { jobs } = useContext(StatContext);
+
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
             <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">

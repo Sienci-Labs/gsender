@@ -40,6 +40,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import { ATCIWizard } from 'app/features/Config/components/wizards/ATCiWizard.tsx';
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -66,6 +67,7 @@ import {
     TOASTER_LONG,
     TOASTER_UNTIL_CLOSE,
 } from 'app/lib/toaster/ToasterLib';
+import isElectron from 'is-electron';
 
 export interface SettingsMenuSection {
     label: string;
@@ -117,6 +119,8 @@ export interface gSenderSetting {
     onUpdate?: () => void;
     min?: number;
     max?: number;
+    remap?: EEPROM;
+    remapped?: boolean;
     forceEEPROM?: boolean;
 }
 
@@ -232,6 +236,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: OUTLINE_MODES,
                     },
                     {
+                        label: 'Prompt on exit',
+                        key: 'workspace.promptExit',
+                        type: 'boolean',
+                        description:
+                            'Pop up a confirmation window when exiting the program.',
+                        onEnable: () => {
+                            if (isElectron()) {
+                                window.ipcRenderer.send(
+                                    'assignPromptExit',
+                                    true,
+                                );
+                            }
+                        },
+                        onDisable: () => {
+                            if (isElectron()) {
+                                window.ipcRenderer.send(
+                                    'assignPromptExit',
+                                    false,
+                                );
+                            }
+                        },
+                    },
+                    {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:
@@ -260,6 +287,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         onUpdate: () => {
                             pubsub.publish('theme:change');
                         },
+                    },
+                    {
+                        label: 'Hide processed lines',
+                        key: 'widgets.visualizer.hideProcessedLines',
+                        description:
+                            'Hide processed g-code lines in the visualizer.',
+                        type: 'boolean',
                     },
                     {
                         label: 'Lightweight options',
@@ -436,6 +470,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$37',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$680',
                     },
                 ],
             },
@@ -742,12 +780,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
-                    { type: 'eeprom', eID: '$450' },
-                    { type: 'eeprom', eID: '$451' },
-                    { type: 'eeprom', eID: '$452' },
-                    { type: 'eeprom', eID: '$453' },
-                    { type: 'eeprom', eID: '$454' },
-                    { type: 'eeprom', eID: '$455' },
+                    { type: 'eeprom', eID: '$450', remap: '$590' },
+                    { type: 'eeprom', eID: '$451', remap: '$591' },
+                    { type: 'eeprom', eID: '$452', remap: '$592' },
+                    { type: 'eeprom', eID: '$453', remap: '$490' },
+                    { type: 'eeprom', eID: '$454', remap: '$491' },
+                    { type: 'eeprom', eID: '$455', remap: '$492' },
                 ],
             },
         ],
@@ -1183,6 +1221,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: 's',
                     },
                     {
+                        type: 'eeprom',
+                        eID: '$539',
+                    },
+                    {
                         label: 'Minimum spindle speed',
                         key: 'widgets.spindle.spindleMin',
                         description:
@@ -1263,6 +1305,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$36',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$709',
+                    },
                 ],
             },
             {
@@ -1336,6 +1382,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$479',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$681',
+                    },
                 ],
             },
             {
@@ -1345,6 +1395,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$743',
+                        remap: '$716',
                     },
                     {
                         label: 'Minimum laser power',
@@ -1424,10 +1475,30 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
-                    { type: 'eeprom', eID: '$456' },
-                    { type: 'eeprom', eID: '$457' },
-                    { type: 'eeprom', eID: '$458' },
-                    { type: 'eeprom', eID: '$459' },
+                    {
+                        type: 'eeprom',
+                        eID: '$673',
+                    },
+                    { type: 'eeprom', eID: '$456', remap: '$750' },
+                    { type: 'eeprom', eID: '$457', remap: '$751' },
+                    { type: 'eeprom', eID: '$458', remap: '$752' },
+                    { type: 'eeprom', eID: '$459', remap: '$753' },
+                    { type: 'eeprom', eID: '$754' },
+                    { type: 'eeprom', eID: '$755' },
+                    { type: 'eeprom', eID: '$756' },
+                    { type: 'eeprom', eID: '$757' },
+                    { type: 'eeprom', eID: '$758' },
+                    { type: 'eeprom', eID: '$759' },
+                    { type: 'eeprom', eID: '$760' },
+                    { type: 'eeprom', eID: '$761' },
+                    { type: 'eeprom', eID: '$762' },
+                    { type: 'eeprom', eID: '$763' },
+                    { type: 'eeprom', eID: '$764' },
+                    { type: 'eeprom', eID: '$765' },
+                    { type: 'eeprom', eID: '$766' },
+                    { type: 'eeprom', eID: '$767' },
+                    { type: 'eeprom', eID: '$768' },
+                    { type: 'eeprom', eID: '$769' },
                 ],
             },
         ],
@@ -1491,6 +1562,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Enable hard limits when toggling into rotary mode (grbl only).',
                         type: 'boolean',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$538',
+                    },
                 ],
             },
         ],
@@ -1541,6 +1616,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
             {
                 label: '',
                 settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Enable ATCi Controls',
+                        key: 'workspace.atcEnabled',
+                        description: 'Enable ATCi Controls',
+                    },
                     {
                         label: 'Passthrough',
                         type: 'boolean',
@@ -1613,6 +1694,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             return strategy !== 'Code';
                         },
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$675',
+                    },
+                ],
+            },
+            {
+                label: 'Keepout',
+                settings: [
+                    {
+                        type: 'boolean',
+                        label: 'Warn on Home',
+                        description:
+                            'Warn when homing that the keepout area is disabled and collisions are possible depending on homing cycle.',
+                        key: 'widgets.atc.warnOnHome',
+                    },
+                    { type: 'eeprom', eID: '$683' },
+                    { type: 'eeprom', eID: '$684' },
+                    { type: 'eeprom', eID: '$685' },
+                    { type: 'eeprom', eID: '$686' },
+                    { type: 'eeprom', eID: '$687' },
+                    { type: 'eeprom', eID: '$688' },
+                    { type: 'eeprom', eID: '$689' },
                 ],
             },
         ],
@@ -1631,6 +1735,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)',
                         type: 'ip',
                     },
+                    {
+                        label: 'Ethernet Port',
+                        key: 'widgets.connection.ethernetPort',
+                        description:
+                            'What port is exposed by the controller for ethernet connectivity.  This will be used when attempting to connect over ethernet. (Default 23)',
+                        type: 'number',
+                    },
                     { type: 'eeprom', eID: '$301' },
                     { type: 'eeprom', eID: '$302' },
                     { type: 'eeprom', eID: '$303' },
@@ -1640,6 +1751,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$305' },
                     { type: 'eeprom', eID: '$307' },
                     { type: 'eeprom', eID: '$308' },
+                    { type: 'eeprom', eID: '$535' },
                 ],
             },
         ],
@@ -1654,10 +1766,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$664',
+                        remap: '$536',
                     },
                     {
                         type: 'eeprom',
                         eID: '$665',
+                        remap: '$537',
                     },
                 ],
             },
@@ -1697,7 +1811,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$223' },
                     { type: 'eeprom', eID: '$338' },
                     { type: 'eeprom', eID: '$339' },
-                    { type: 'eeprom', eID: '$650' },
+
                     { type: 'eeprom', eID: '$651' },
                     { type: 'eeprom', eID: '$652' },
                     { type: 'eeprom', eID: '$653' },
@@ -1759,7 +1873,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$481' },
                     { type: 'eeprom', eID: '$484' },
                     { type: 'eeprom', eID: '$486' },
+                    {
+                        type: 'eeprom',
+                        eID: '$534',
+                    },
+                    { type: 'eeprom', eID: '$650' },
                     { type: 'eeprom', eID: '$666' },
+                    { type: 'eeprom', eID: '$676' },
                 ],
             },
         ],

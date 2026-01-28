@@ -56,6 +56,8 @@ class GCodeVisualizer {
         this.countdown = 16; // counter
         this.isRotaryFile = false;
         // rotary--
+        // Hide processed lines
+        this.hideProcessedLines = false;
 
         return this;
     }
@@ -65,7 +67,7 @@ class GCodeVisualizer {
         colorArray,
         savedColors,
     ) {
-        this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
+        this.vertices = new THREE.Float32BufferAttribute(vertices.buffer, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
@@ -88,15 +90,14 @@ class GCodeVisualizer {
             new THREE.BufferAttribute(colorArray, 4),
         );
 
-        const workpiece = new THREE.Line(
-            this.geometry,
-            new THREE.LineBasicMaterial({
-                color: defaultColor,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.9,
-            }),
-        );
+        const material = new THREE.LineBasicMaterial({
+            color: defaultColor,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9,
+        });
+
+        const workpiece = new THREE.Line(this.geometry, material);
         workpiece.name = 'workpiece';
         this.group.add(workpiece);
 
@@ -131,6 +132,10 @@ class GCodeVisualizer {
                 const offsetIndex = this.oldV1s[0] * 4; // use the oldest v1, as that's where we are updating from
                 const bufferOffsetIndex = v1 * 4;
                 const colorAttr = workpiece.geometry.getAttribute('color');
+
+                if (this.hideProcessedLines && this.oldV1s[0] > 0) {
+                    this._hideProcessedVertices(this.oldV1s[0]);
+                }
 
                 const opacity = this.isLaser ? 1 : 0.3;
                 const defaultColor = new THREE.Color(
@@ -249,6 +254,11 @@ class GCodeVisualizer {
             ];
         const v2 = this.frames[v2FrameIndex];
 
+        // Handle hiding processed lines if enabled
+        if (this.hideProcessedLines && v2 > 0) {
+            this._hideProcessedVertices(v2);
+        }
+
         if (v1 < v2 && !this.isRotaryFile) {
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
@@ -349,6 +359,37 @@ class GCodeVisualizer {
 
         // set last frame index
         this.oldFrameIndex = v2FrameIndex;
+    }
+
+    /**
+     * Hide processed vertices using drawRange
+     * @param {number} vertexIndex - The index up to which vertices should be hidden
+     */
+    _hideProcessedVertices(vertexIndex) {
+        const workpiece = this.group.children[0];
+        if (!workpiece) return;
+
+        const totalVertices = this.vertices.count;
+        const remainingCount = totalVertices - vertexIndex;
+
+        if (remainingCount > 0) {
+            this.geometry.setDrawRange(vertexIndex, remainingCount);
+        }
+    }
+
+    /**
+     * Toggle hiding of processed lines
+     * @param {boolean} hide - Whether to hide processed lines
+     */
+    setHideProcessedLines(hide) {
+        this.hideProcessedLines = hide;
+
+        if (!hide) {
+            const workpiece = this.group.children[0];
+            if (workpiece && this.geometry) {
+                this.geometry.setDrawRange(0, Infinity);
+            }
+        }
     }
 
     getCurrentLocation() {
