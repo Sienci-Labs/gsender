@@ -1,0 +1,32 @@
+{
+  "testName": "Spindle Configuration and Control Test - Decrease to 7500 RPM",
+  "timestamp": "2026-01-22T14:28:03.523Z",
+  "spindleConfiguration": {
+    "minSpindleSpeed": 2,
+    "maxSpindleSpeed": 24000
+  },
+  "spindleOverrideSequence": {
+    "initial": {
+      "override": "N/A",
+      "rpm": 19000
+    },
+    "decreased": {
+      "targetRpm": 7500,
+      "actualRpm": 7500,
+      "override": "N/A",
+      "decreaseClicksRequired": 7
+    },
+    "reset": {
+      "override": "N/A",
+      "rpm": 19000
+    }
+  },
+  "jobDetails": {
+    "jobStartTime": "2026-01-22T14:26:20.835Z",
+    "jobEndTime": "2026-01-22T14:27:55.836Z",
+    "jobDurationSeconds": 95.001,
+    "status": "COMPLETE",
+    "timeTaken": "00:01:35",
+    "errors": "None"
+  }
+}

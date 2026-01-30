@@ -165,19 +165,19 @@ describe('Job Run in grblHal', () => {
       .should('be.visible')
       .click({ force: true });
     cy.wait(1000);
-    cy.log('✓ Popup closed');
+    cy.log(' Popup closed');
 
     // Step 13: Verify popup is closed
     cy.log('Step 13: Verifying popup is closed...');
     cy.contains('h2', 'Job End').should('not.exist');
-    cy.log('✓ Popup successfully closed');
+    cy.log(' Popup successfully closed');
 
     // Step 14: Return to home position
     cy.log('Step 14: Returning to home position...');
     cy.ensureHomingEnabledAndHome();
     cy.log('Returned to home position');
 
-    cy.log('✓ JOB RUN TEST COMPLETED');
+    cy.log(' JOB RUN TEST COMPLETED');
 
   });
 

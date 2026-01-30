@@ -9,18 +9,12 @@ describe('CNC Machine - Complete Z and XYZ Axis Probing', () => {
   });
 });
   it('Configures probe once, performs Z axis probing, then XYZ axis probing', () => {
-    
-    // ═══════════════════════════════════════
+
     // PART 1: PROBE CONFIGURATION (ONCE)
-    // ═══════════════════════════════════════
-    
-    cy.log('═══════════════════════════════════════');
+
     cy.log('PART 1: PROBE CONFIGURATION');
 
     // Step 1: Visit and connect
-  cy.log('Step 1: Loading application...');
-cy.loadUI('http://localhost:8000/#/');
-cy.log('Application loaded');
 
     cy.log('Step 2: Connecting to CNC machine...');
     cy.connectMachine();
@@ -70,18 +64,7 @@ cy.log('Application loaded');
     enableSetting('Invert TLS input');
 
     // Apply settings if needed
-    cy.get('@applyState').then((state) => {
-      if (state.needsApply) {
-        cy.log('⚙ Applying settings...');
-        cy.get('div.ring > button').contains('Apply Settings').click({ force: true });
-        cy.wait(3000);
-        cy.get('body').should('not.have.attr', 'data-scroll-locked');
-        cy.wait(1000);
-        cy.log('Settings applied');
-      } else {
-        cy.log(' All settings correct');
-      }
-    });
+    cy.applySettings();
 
     cy.log(' PROBE CONFIGURATION COMPLETED');
 

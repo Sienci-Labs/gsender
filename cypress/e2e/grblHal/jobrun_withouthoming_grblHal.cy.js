@@ -52,7 +52,7 @@ describe('Job Run Test in grblHal without homing', () => {
       .should('be.visible')
       .click({ force: true });
     cy.wait(2000);
-    cy.log('✓ Job started');
+    cy.log(' Job started');
 
     // Step 5: Verify job is running
     cy.log('Step 5: Verifying job is running...');

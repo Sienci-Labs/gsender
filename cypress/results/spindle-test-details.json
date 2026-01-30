@@ -1,14 +1,14 @@
 {
   "testName": "Spindle Configuration and Control Test",
-  "timestamp": "2026-01-20T22:26:50.562Z",
+  "timestamp": "2026-01-21T17:28:05.021Z",
   "spindleConfiguration": {
     "minSpindleSpeed": 2,
     "maxSpindleSpeed": 24000
   },
   "jobDetails": {
-    "jobStartTime": "2026-01-20T22:26:21.340Z",
-    "jobEndTime": "2026-01-20T22:26:43.653Z",
-    "jobDuration": 22.313,
+    "jobStartTime": "2026-01-21T17:27:37.033Z",
+    "jobEndTime": "2026-01-21T17:27:59.259Z",
+    "jobDuration": 22.226,
     "status": "COMPLETE",
     "timeTaken": "00:00:22",
     "errors": "None"

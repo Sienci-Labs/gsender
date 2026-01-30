@@ -24,7 +24,10 @@
 //21.Axis Homing Z< Y & X 
 //22.Go to URLS 
 //23. Checking probing pin is active
-//24.Jogging every axes  
+//24.Jogging every axes
+//25.Stop Job and get details  
+//26. Verify machine status
+//27. Search items in settings
 // ***********************************************
 
 
@@ -676,7 +679,7 @@ Cypress.Commands.add('goToLocation', (x = 0, y = 0, z = 0) => {
   cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
   cy.wait(2000);
   
-  cy.log(`✓ Moved to X=${x}, Y=${y}, Z=${z}`);
+  cy.log(` Moved to X=${x}, Y=${y}, Z=${z}`);
 });
 // ----------------------
 //10.Unlock Machine if Needed
@@ -1018,6 +1021,146 @@ Cypress.Commands.add('jogXYMinusPlusTimes', (times = 1, waitTime = 2000) => {
     cy.wait(waitTime);
     cy.log(`X-Y+ jog ${i}/${times} completed`);
   }
+});
+
+
+//25.Stop Job and get details  
+Cypress.Commands.add('stopJobAndGetDetails', () => {
+  cy.log('Stopping job and collecting job details');
+
+  // Step 1: Stop the job
+  cy.get('div.top-\\[-30px\\] > div:nth-of-type(3) > button', { timeout: 10000 })
+    .contains('Stop')
+    .should('be.visible')
+    .click({ force: true });
+
+  // Step 2: Wait for Job End popup
+  cy.contains('h2', 'Job End', { timeout: 20000 })
+    .should('be.visible')
+    .closest('div')
+    .as('jobPopup');
+
+  const jobDetails = {};
+
+  // Step 3: Extract Status
+  cy.get('@jobPopup')
+    .contains('strong', 'Status:')
+    .parent()
+    .invoke('text')
+    .then(text => {
+      jobDetails.status = text.replace('Status:', '').trim();
+    });
+
+  // Step 4: Extract Time
+  cy.get('@jobPopup')
+    .contains('strong', 'Time:')
+    .parent()
+    .invoke('text')
+    .then(text => {
+      jobDetails.time = text.replace('Time:', '').trim();
+    });
+
+  // Step 5: Extract Errors
+  cy.get('@jobPopup')
+    .contains('strong', 'Errors:')
+    .parent()
+    .invoke('text')
+    .then(text => {
+      jobDetails.errors = text.replace('Errors:', '').trim();
+    });
+
+  // Step 6: Return all details as a single object
+  cy.then(() => {
+    cy.wrap(jobDetails).as('jobDetails');
+  });
+});
+
+//26. Verify machine status
+Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
+  const {
+    timeout = 30000,
+    exact = true
+  } = options;
+
+  cy.log(`Verifying machine status: ${expectedStatus}`);
+
+  const statusRegex = exact
+    ? new RegExp(`^${expectedStatus}$`, 'i')
+    : new RegExp(expectedStatus, 'i');
+
+  cy.contains(statusRegex, { timeout })
+    .should('be.visible')
+    .then($el => {
+      const actualStatus = $el.text().trim();
+      cy.log(`Machine status: "${actualStatus}"`);
+      expect(actualStatus.toLowerCase()).to.eq(expectedStatus.toLowerCase());
+    });
+});
+
+//cy.verifyMachineStatus('Idle'); cy.verifyMachineStatus('Running'); cy.verifyMachineStatus('Disconnected'); cy.verifyMachineStatus('Hold');
+
+Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
+  const { timeout = 30000 } = options;
+
+  const allowedStatuses = ['Idle', 'Disconnected', 'Running', 'Hold'];
+
+  cy.log(`Verifying machine status: ${expectedStatus}`);
+
+  // Validate input
+  expect(
+    allowedStatuses,
+    `Allowed statuses are: ${allowedStatuses.join(', ')}`
+  ).to.include(expectedStatus);
+
+  const statusRegex = new RegExp(`^${expectedStatus}$`, 'i');
+
+  cy.contains(statusRegex, { timeout })
+    .should('be.visible')
+    .then($status => {
+      const actualStatus = $status.text().trim();
+      cy.log(`Machine status: "${actualStatus}"`);
+      expect(actualStatus.toLowerCase()).to.eq(expectedStatus.toLowerCase());
+    });
+});
+
+//27. Search items in settings {cy.searchInSettings('search item name');}
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
+
+  cy.log(`Searching for: ${searchText}`);
+
+  cy.get('#simple-search', { timeout })
+    .should('be.visible')
+    .clear()
+    .type(searchText);
+});
+// Apply settings { cy.applySettings(); }
+Cypress.Commands.add('applySettings', (options = {}) => {
+  const {
+    timeout = 10000,
+    waitAfterApply = 3000
+  } = options;
+
+  cy.log('Applying settings (if changes exist)...');
+
+  cy.contains('button', 'Apply Settings', { timeout })
+    .should('exist')
+    .then($button => {
+      if ($button.is(':disabled')) {
+        cy.log('No settings changes detected');
+        return;
+      }
+
+      cy.log('Applying settings...');
+      cy.wrap($button).click();
+
+      cy.wait(waitAfterApply);
+
+      // Unlock machine if prompted
+      cy.unlockMachineIfNeeded();
+
+      cy.log('Settings applied successfully');
+    });
 });
 
 

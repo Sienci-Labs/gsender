@@ -1,0 +1,21 @@
+{
+  "testName": "Spindle Configuration and Control Test - 20% Override",
+  "timestamp": "2026-01-21T18:41:00.861Z",
+  "spindleConfiguration": {
+    "minSpindleSpeed": 2,
+    "maxSpindleSpeed": 24000
+  },
+  "spindleOverride": {
+    "initialOverride": "N/A",
+    "finalOverride": "N/A",
+    "actualRpmAt20Percent": 17000
+  },
+  "jobDetails": {
+    "jobStartTime": "2026-01-21T18:40:30.738Z",
+    "jobEndTime": "2026-01-21T18:40:53.287Z",
+    "jobDurationSeconds": 22.549,
+    "status": "COMPLETE",
+    "timeTaken": "00:00:22",
+    "errors": "None"
+  }
+}

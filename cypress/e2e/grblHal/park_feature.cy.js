@@ -413,7 +413,7 @@ describe('Park feature ', () => {
         cy.log(`Expected (jogged Z): ${joggedZ}`);
         expect(parkZ).to.be.closeTo(joggedZ, 0.1, 'Z park position should match jogged Z position');
         
-        cy.log(' Grab feature verified: Park positions match current machine positions');
+        cy.log('Grab feature verified: Park positions match current machine positions');
       });
 
   });

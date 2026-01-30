@@ -93,7 +93,7 @@ describe('CNC Machine File Info Test', () => {
         expect($canvas.attr('width')).to.exist;
         expect($canvas.attr('height')).to.exist;
       })
-      .then(() => cy.log('✓ Visualizer canvas loaded with file content'));
+      .then(() => cy.log('Visualizer canvas loaded with file content'));
 
     // Step 7: Verify "Outline" button state AFTER upload
     cy.log(' Verifying Outline button state after upload...');

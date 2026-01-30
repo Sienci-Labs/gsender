@@ -589,7 +589,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
       .should('have.value', '0.00')
       .then(($input) => {
         const yValue = $input.val();
-        cy.log(`✓ Y-axis position verified: ${yValue}`);
+        cy.log(` Y-axis position verified: ${yValue}`);
       });
 
     cy.log('STEP 19 COMPLETED: Newly added macro executed');
