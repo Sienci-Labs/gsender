@@ -335,56 +335,54 @@ export function Jogging() {
                         const isVerticalOverride = isOverrideAction(verticalAction);
 
                         if (isHorizontalOverride || isVerticalOverride) {
-                            // Handle override actions
                             const deadZone =
                                 (joystickOptions?.zeroThreshold || 30) / 100;
 
-                            // Determine which axis is being moved
-                            const axisIndex = axis;
-                            const isHorizontalAxis = axisIndex % 2 === 0;
-                            const axisValue = detail.gamepad.axes[axisIndex];
+                            // Read axis values directly from the gamepad rather than
+                            // relying on which axis triggered this event, since the
+                            // throttle (trailing edge) may swallow the override axis event.
+                            const horizontalAxisIndex = axis - (axis % 2); // 0 for stick1, 2 for stick2
+                            const verticalAxisIndex = horizontalAxisIndex + 1;
+                            const hValue = detail.gamepad.axes[horizontalAxisIndex];
+                            const vValue = detail.gamepad.axes[verticalAxisIndex];
 
-                            // Get the appropriate action based on which axis is moving
-                            const activeOverrideAction = isHorizontalAxis
-                                ? horizontalAction
-                                : verticalAction;
+                            // Find an active override axis — prefer the one that's deflected
+                            let activeOverrideAction = null;
+                            let overrideAxisValue = 0;
+                            let overrideAxisIndex = null;
+                            let overrideIsReversed = false;
+                            let overrideIsVertical = false;
 
-                            if (!isOverrideAction(activeOverrideAction)) {
-                                // This axis direction is not an override, fall through to normal jogging
-                            } else {
-                                // Check if stick is idle
-                                if (checkThumbstickIsIdle(axisValue, deadZone)) {
-                                    if (overrideLoop.current) {
-                                        overrideLoop.current.stop();
-                                    }
-                                    return;
-                                }
+                            if (isHorizontalOverride && !checkThumbstickIsIdle(hValue, deadZone)) {
+                                activeOverrideAction = horizontalAction;
+                                overrideAxisValue = hValue;
+                                overrideAxisIndex = horizontalAxisIndex;
+                                overrideIsReversed = horizontal.isReversed;
+                            } else if (isVerticalOverride && !checkThumbstickIsIdle(vValue, deadZone)) {
+                                activeOverrideAction = verticalAction;
+                                overrideAxisValue = vValue;
+                                overrideAxisIndex = verticalAxisIndex;
+                                overrideIsReversed = vertical.isReversed;
+                                overrideIsVertical = true;
+                            }
 
-                                // Determine direction from joystick input
-                                const isReversed = isHorizontalAxis
-                                    ? horizontal.isReversed
-                                    : vertical.isReversed;
-                                let direction = axisValue > 0 ? 1 : -1;
-                                // For vertical axis, positive is typically down, so we invert
-                                if (!isHorizontalAxis) {
+                            if (activeOverrideAction) {
+                                let direction = overrideAxisValue > 0 ? 1 : -1;
+                                if (overrideIsVertical) {
                                     direction = -direction;
                                 }
-                                if (isReversed) {
+                                if (overrideIsReversed) {
                                     direction = -direction;
                                 }
 
-                                // Initialize or update OverrideLoop
                                 if (!overrideLoop.current) {
                                     overrideLoop.current = new OverrideLoop({
                                         gamepadProfile: currentProfile,
                                     });
                                 }
 
-                                // Check if already running with same settings
-                                if (
-                                    overrideLoop.current.isRunning &&
-                                    overrideLoop.current.activeAxis === axis
-                                ) {
+                                // Already running or within cooldown from last command
+                                if (overrideLoop.current.isRunning || !overrideLoop.current.canStart()) {
                                     return;
                                 }
 
@@ -392,11 +390,20 @@ export function Jogging() {
                                     gamepadProfile: currentProfile,
                                     action: activeOverrideAction,
                                     direction,
-                                    activeAxis: axis,
+                                    activeAxis: overrideAxisIndex,
                                 });
                                 overrideLoop.current.start();
                                 return;
                             }
+
+                            // Override axis is idle — stop loop if running
+                            if (overrideLoop.current && overrideLoop.current.isRunning) {
+                                overrideLoop.current.stop();
+                                return;
+                            }
+
+                            // If we get here, override axes are idle but non-override
+                            // axes might be active — fall through to normal jogging
                         }
                     }
 
@@ -415,7 +422,7 @@ export function Jogging() {
                         const MOVEMENT_DISTANCE = 1;
 
                         const stickX = {
-                            axis: horizontal[actionType],
+                            axis: isOverrideAction(horizontal[actionType]) ? null : horizontal[actionType],
                             positiveDirection:
                                 MOVEMENT_DISTANCE *
                                 getDirection(horizontal.isReversed),
@@ -425,7 +432,7 @@ export function Jogging() {
                         };
 
                         const stickY = {
-                            axis: vertical[actionType],
+                            axis: isOverrideAction(vertical[actionType]) ? null : vertical[actionType],
                             positiveDirection:
                                 MOVEMENT_DISTANCE *
                                 getDirection(vertical.isReversed),

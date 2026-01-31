@@ -1,9 +1,7 @@
 import inRange from 'lodash/inRange';
 import get from 'lodash/get';
 
-import gamepad from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
-import reduxStore from 'app/store/redux';
 
 // Helper to check if an action is an override action
 export const isOverrideAction = (action) => {
@@ -18,66 +16,70 @@ export const checkThumbstickIsIdle = (axisValue, deadZone) => {
     return inRange(axisValue, -deadZone, deadZone);
 };
 
+const OVERRIDE_COMMANDS = {
+    feed: {
+        majorIncrease: String.fromCharCode(0x91),
+        majorDecrease: String.fromCharCode(0x92),
+        minorIncrease: String.fromCharCode(0x93),
+        minorDecrease: String.fromCharCode(0x94),
+    },
+    spindle: {
+        majorIncrease: String.fromCharCode(0x9A),
+        majorDecrease: String.fromCharCode(0x9B),
+        minorIncrease: String.fromCharCode(0x9C),
+        minorDecrease: String.fromCharCode(0x9D),
+    },
+};
+
+const REPEAT_INTERVAL_MS = 500;
+const COOLDOWN_MS = 400;
+
+// Module-level timestamp shared across ALL instances to prevent duplicate
+// commands from stacked event listeners or rapid instance recreation.
+let lastOverrideCommandTime = 0;
+
 export class OverrideLoop {
     constructor({ gamepadProfile }) {
         this.isRunning = false;
         this.gamepadProfile = gamepadProfile;
-        this.activeAction = null; // e.g., 'feed+/-', 'feed++/--', 'spindle+/-', etc.
-        this.activeDirection = 0; // 1 for increase, -1 for decrease (from joystick)
-        this.activeAxis = null; // which gamepad axis triggered this
-        this.intervalId = null;
-        this.lastCommandTime = 0; // Timestamp of last command sent
+        this.activeAction = null;
+        this.activeDirection = 0;
+        this.activeAxis = null;
+        this.timeoutId = null;
     }
 
     _getCurrentGamepad = () => {
-        const gamepadInstance = gamepad.getInstance();
-        const currentHandler = gamepadInstance.handlers.find((handler) =>
-            this.gamepadProfile.id.includes(handler?.gamepad?.id),
-        );
-        return currentHandler?.gamepad || null;
+        // Read fresh gamepad state from the browser API
+        const gamepads = navigator.getGamepads();
+        if (!gamepads) return null;
+
+        return Array.from(gamepads).find(
+            (gp) => gp && this.gamepadProfile.id.includes(gp.id),
+        ) || null;
     };
 
-    _sendOverrideCommand = () => {
-        if (!this.activeAction || !this.activeDirection) {
-            return;
-        }
-
-        // Debounce: only send command if 500ms has passed since last command
-        const now = Date.now();
-        if (now - this.lastCommandTime < 500) {
-            return;
-        }
-        this.lastCommandTime = now;
-
-        // Parse the action string to determine type and increment
-        // Actions: feed+/-, feed++/--, spindle+/-, spindle++/--
+    _getCommand = () => {
         const isFeed = this.activeAction.startsWith('feed');
         const isMajor = this.activeAction.includes('++');
+        const isIncrease = this.activeDirection > 0;
 
-        const increment = isMajor ? 10 : 1;
+        const type = isFeed ? 'feed' : 'spindle';
+        const size = isMajor ? 'major' : 'minor';
+        const dir = isIncrease ? 'Increase' : 'Decrease';
 
-        // Get current override values from controller state
-        const state = reduxStore.getState();
-        const ov = get(state, 'controller.state.status.ov', [100, 100, 100]);
+        return OVERRIDE_COMMANDS[type][size + dir];
+    };
 
-        // ov[0] = feed override, ov[2] = spindle override
-        const currentValue = isFeed ? ov[0] : ov[2];
+    _scheduleNext = () => {
+        this.timeoutId = setTimeout(() => {
+            if (!this._checkIfStillActive()) {
+                return;
+            }
 
-        // Calculate new target value (direction comes from joystick input)
-        const change = increment * this.activeDirection;
-        let newValue = currentValue + change;
-
-        // Clamp values to valid range (10-200 for feed, 10-230 for spindle)
-        if (isFeed) {
-            newValue = Math.max(10, Math.min(200, newValue));
-        } else {
-            newValue = Math.max(10, Math.min(230, newValue));
-        }
-
-        // Use the proper controller command
-        const commandName = isFeed ? 'feedOverride' : 'spindleOverride';
-
-        controller.command(commandName, newValue);
+            lastOverrideCommandTime = Date.now();
+            controller.write(this._getCommand());
+            this._scheduleNext();
+        }, REPEAT_INTERVAL_MS);
     };
 
     _checkIfStillActive = () => {
@@ -90,7 +92,6 @@ export class OverrideLoop {
         const deadZone =
             (this.gamepadProfile?.joystickOptions?.zeroThreshold || 30) / 100;
 
-        // Check if the active axis is still outside the dead zone
         const axisValue = currentGamepad.axes[this.activeAxis];
         if (checkThumbstickIsIdle(axisValue, deadZone)) {
             this.stop();
@@ -114,12 +115,8 @@ export class OverrideLoop {
         return true;
     };
 
-    _runLoop = () => {
-        if (!this._checkIfStillActive()) {
-            return;
-        }
-
-        this._sendOverrideCommand();
+    canStart = () => {
+        return Date.now() - lastOverrideCommandTime >= COOLDOWN_MS;
     };
 
     setOptions = ({ gamepadProfile, action, direction, activeAxis }) => {
@@ -135,14 +132,9 @@ export class OverrideLoop {
         }
 
         this.isRunning = true;
-
-        // Send first command immediately
-        this._sendOverrideCommand();
-
-        // Then repeat every 500ms while held
-        this.intervalId = setInterval(() => {
-            this._runLoop();
-        }, 500);
+        lastOverrideCommandTime = Date.now();
+        controller.write(this._getCommand());
+        this._scheduleNext();
     };
 
     stop = () => {
@@ -150,15 +142,14 @@ export class OverrideLoop {
             return;
         }
 
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
         }
 
         this.isRunning = false;
         this.activeAction = null;
         this.activeDirection = 0;
         this.activeAxis = null;
-        this.lastCommandTime = 0; // Reset so next start sends immediately
     };
 }
