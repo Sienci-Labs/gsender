@@ -14,12 +14,10 @@ const TabJog = (props: TabJogProps) => {
 
     return (
         <svg
-            width={45}
-            height={168}
             viewBox="0 0 50 187"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className={cn({
+            className={cn('w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]', {
                 'cursor-pointer': props.canClick,
                 'cursor-not-allowed': !props.canClick,
             })}

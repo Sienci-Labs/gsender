@@ -9,7 +9,7 @@ export function useSDCard() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const isMounted = useTypedSelector(
-        (state: RootState) => state.controller.state.status?.sdCard || true,
+        (state: RootState) => state.controller.state.status?.sdCard,
     );
     const files = useTypedSelector(
         (state: RootState) => state.controller.sdcard?.files,
@@ -17,6 +17,20 @@ export function useSDCard() {
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
+
+    const firmwareType = useTypedSelector(
+        (state: RootState) => state.controller.type,
+    );
+
+    const newOpts = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.NEWOPT,
+    );
+    const hasFTP =
+        newOpts !== undefined &&
+        Object.prototype.hasOwnProperty.call(newOpts, 'FTP');
+    const hasYM =
+        newOpts !== undefined &&
+        Object.prototype.hasOwnProperty.call(newOpts, 'YM');
 
     const uploadFileToSDCard = (file) => {
         controller.command('ymodem:upload', file);
@@ -39,5 +53,8 @@ export function useSDCard() {
         uploadFileToSDCard,
         runSDFile,
         deleteSDCard,
+        firmwareType,
+        hasFTP,
+        hasYM,
     };
 }

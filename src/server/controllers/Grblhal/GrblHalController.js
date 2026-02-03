@@ -88,6 +88,7 @@ import ToolChanger from '../../lib/ToolChanger';
 import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 
 import { YModem } from 'server/lib/YModemUSB';
+import { GrblHALFTP } from '../../lib/GrblHALFTP';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -217,8 +218,12 @@ class GrblHalController {
     // Macro button resume
     programResumeTimeout = null;
 
+    // SD card communication protocols
     ymodem = null;
+
     ymodemTransferInProgress = false;
+
+    ftpClient = null;
 
     constructor(engine, connection, options) {
         log.debug('constructor');
@@ -777,7 +782,6 @@ class GrblHalController {
 
         this.runner.on('error', (res) => {
             // Only pause on workflow error with hold + sender halt
-            console.log('error found');
             const isRunning = this.workflow.isRunning();
             const firmwareIsAlarmed = this.runner.isAlarm();
 
@@ -789,7 +793,7 @@ class GrblHalController {
             }
 
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_HAL_ERRORS, { code: code }) || {};
+            const error = _.find(this.settings.errors, { code: code }) || {};
 
             // Don't emit errors to UI in situations where firmware is currently alarmed and always hide error 79
             if (firmwareIsAlarmed || code === 79) {
@@ -832,13 +836,12 @@ class GrblHalController {
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
-
                 const preferences = store.get('preferences') || { showLineWarnings: false };
-                this.emit('serialport:read', `error:${code} (${error?.message})`);
+                this.emit('serialport:read', `error:${code} (${error?.description})`);
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.description}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -855,10 +858,15 @@ class GrblHalController {
             }
 
             if (error) {
-                this.emit('serialport:read', `error:${code} (${error.message})`);
+                this.emit('serialport:read', `error:${code} (${error.description})`);
             }
 
-            const msg = `Error ${code} - ${error?.message}`;
+            if (error.code === 60 || error.code === 64 || error.code === 62) {
+                this.runner.clearSDStatus();
+                this.emit('controller:state', GRBLHAL, this.runner.state);
+            }
+
+            const msg = `Error ${code} - ${error?.description}`;
             this.emit('gcode_error', msg);
 
             this.feeder.ack();
@@ -1001,7 +1009,7 @@ class GrblHalController {
             }
 
             await delay(500);
-            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$#\n');
+            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$EE\n$#\n');
             await delay(25);
 
             const hasSD = _.get(this.state, 'status.sdCard', null);
@@ -1260,6 +1268,24 @@ class GrblHalController {
                 this.command('sdcard:list');
             }, 150);
         });
+
+        // FTP client
+        this.ftpClient = new GrblHALFTP();
+        this.ftpClient.on('start', (err) => {
+            this.emit('ymodem:start');
+        });
+        this.ftpClient.on('error', (err) => {
+            this.emit('ymodem:error', err);
+        });
+        this.ftpClient.on('complete', () => {
+            this.emit('ymodem:complete');
+            setTimeout(() => {
+                this.command('sdcard:list');
+            }, 150);
+        });
+        this.ftpClient.on('progress', (progress) => {
+            this.emit('ymodem:progress', progress);
+        });
     }
 
     async initController() {
@@ -1493,7 +1519,7 @@ class GrblHalController {
                             this.initController();
                         }
 
-                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$spindles\n');
+                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$EE\n$spindles\n');
                         return;
                     }
                     if (this.connection) {
@@ -1968,6 +1994,9 @@ class GrblHalController {
                     });
                 });
             },
+            'restart': () => {
+                this.command('gcode', '$REBOOT');
+            },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBLHAL, this.state);
             },
@@ -2314,7 +2343,7 @@ class GrblHalController {
                 };
             },
             'realtime_report': () => {
-                this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'error_clear': () => {
                 this.write('$');
@@ -2338,19 +2367,26 @@ class GrblHalController {
                 this.runner.deleteSettings();
             },
             'sdcard:mount': () => {
-                this.writeln('$FM');
+                this.write('$FM\n');
+                this.runner.setSDStatus();
+                this.emit('controller:state', GRBLHAL, this.runner.state);
+
+                //this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'sdcard:list': () => {
                 const [type = 'cnc'] = args;
+                this.runner.clearSDFiles();
+                this.runner.setSDStatus();
+                this.emit('controller:state', GRBLHAL, this.runner.state);
 
                 if (type === 'cnc') {
-                    this.writeln('$F');
+                    console.log('this was called');
+                    this.write('$FM\n$F\n');
                     return;
                 }
 
                 if (type === 'all') {
-                    this.writeln('$F+');
-                    return;
+                    this.write('$FM\n$F+\n');
                 }
             },
             'sdcard:read': () => {
@@ -2373,13 +2409,38 @@ class GrblHalController {
 
                 this.writeln(`$FD=${filePath}`);
             },
-            'ymodem:upload': () => {
+            'ymodem:upload': async () => {
                 const [fileData] = args;
+                if (this.connection.isNetwork()) {
+                    console.log('Handle using FTP');
+                    const [address] = this.connection.getFTPInfo();
+                    const FTPPort = Number(this.runner.getSetting('$308', 21));
+                    await this.ftpClient.openConnection(address, FTPPort, 'grblHAL', 'grblHAL');
+                    await this.ftpClient.sendFile(fileData);
+                    return;
+                }
                 this.ymodem.sendFile(fileData, this.connection.getConnectionObject());
             },
             'ymodem:uploadFiles': () => {
                 const [files] = args;
-                this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+
+                this.command('sdcard:mount');
+                setTimeout(async () => {
+                    if (this.runner.isSDMounted()) {
+                        if (this.connection.isNetwork()) {
+                            console.log('Handle using FTP');
+                            const [address] = this.connection.getFTPInfo();
+                            const FTPPort = Number(this.runner.getSetting('$308', 21));
+                            await this.ftpClient.openConnection(address, FTPPort, 'grblHAL', 'grblHAL');
+                            await this.ftpClient.sendFiles(files);
+                            return;
+                        }
+                        this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+                    } else {
+                        console.log('Failing, SD not mounted');
+                        this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.');
+                    }
+                }, 1500);
             },
             'ymodem:cancel': () => {
                 console.log('cancel upload');

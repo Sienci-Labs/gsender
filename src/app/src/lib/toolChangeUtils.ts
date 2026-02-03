@@ -4,6 +4,7 @@ import { store as reduxStore } from '../store/redux';
 import {
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_ZERO,
 } from '../lib/constants';
 import { UNITS_GCODE } from 'app/definitions/general';
@@ -29,6 +30,9 @@ export const getProbeSettings = (): ProbeWidgetSettings => {
         probeThickness = probeProfile.zThickness.zProbe;
     } else if (touchplateType === TOUCHPLATE_TYPE_3D) {
         probeThickness = probeProfile.zThickness.probe3D;
+    } else if (touchplateType === TOUCHPLATE_TYPE_BITZERO) {
+        // Use Z-only thickness for tool change (probe placed flat on surface)
+        probeThickness = probeProfile.zThickness.bitZeroZOnly;
     }
 
     return {

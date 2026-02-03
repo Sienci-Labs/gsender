@@ -17,6 +17,7 @@ import { IconType } from 'react-icons';
 import {
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_STANDARD,
     TOUCHPLATE_TYPE_ZERO,
 } from 'app/lib/constants';
@@ -296,6 +297,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                     },
                     {
+                        label: 'Rotary diameter offset',
+                        key: 'widgets.visualizer.rotaryDiameterOffsetEnabled',
+                        description:
+                            'Apply rotary visualization offset when a cylinder diameter is found in the file.',
+                        type: 'boolean',
+                    },
+                    {
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
@@ -471,6 +479,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$37',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$680',
+                    },
                 ],
             },
             {
@@ -578,6 +590,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             TOUCHPLATE_TYPE_AUTOZERO,
                             TOUCHPLATE_TYPE_ZERO,
                             TOUCHPLATE_TYPE_3D,
+                            TOUCHPLATE_TYPE_BITZERO,
                         ],
                     },
                     {
@@ -662,6 +675,38 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'BitZero thickness (XYZ)',
+                        key: 'workspace.probeProfile.zThickness.bitZero',
+                        description:
+                            'Plate thickness for XYZ probing where the bit touches the inset surface inside the bore. (Default 13)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using BitZero
+                            return probeType !== TOUCHPLATE_TYPE_BITZERO;
+                        },
+                    },
+                    {
+                        label: 'BitZero thickness (Z-only)',
+                        key: 'workspace.probeProfile.zThickness.bitZeroZOnly',
+                        description:
+                            'Plate thickness for Z-only probing where the probe is placed flat on the surface. (Default 15.5)',
+                        type: 'number',
+                        unit: 'mm',
+                        hidden: () => {
+                            const probeType = store.get(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are not using BitZero
+                            return probeType !== TOUCHPLATE_TYPE_BITZERO;
+                        },
+                    },
+                    {
                         label: 'XY thickness',
                         key: 'workspace.probeProfile.xyThickness',
                         description:
@@ -706,8 +751,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return (
+                                probeType === TOUCHPLATE_TYPE_AUTOZERO ||
+                                probeType === TOUCHPLATE_TYPE_BITZERO
+                            );
                         },
                     },
                     {
@@ -722,8 +770,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return (
+                                probeType === TOUCHPLATE_TYPE_AUTOZERO ||
+                                probeType === TOUCHPLATE_TYPE_BITZERO
+                            );
                         },
                     },
                     {
@@ -738,8 +789,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return (
+                                probeType === TOUCHPLATE_TYPE_AUTOZERO ||
+                                probeType === TOUCHPLATE_TYPE_BITZERO
+                            );
                         },
                     },
                     {
@@ -754,8 +808,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
-                            // Hidden if we are using AutoZero touchplate
-                            return probeType === TOUCHPLATE_TYPE_AUTOZERO;
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return (
+                                probeType === TOUCHPLATE_TYPE_AUTOZERO ||
+                                probeType === TOUCHPLATE_TYPE_BITZERO
+                            );
                         },
                     },
                     {
@@ -1217,6 +1274,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: 's',
                     },
                     {
+                        type: 'eeprom',
+                        eID: '$539',
+                    },
+                    {
                         label: 'Minimum spindle speed',
                         key: 'widgets.spindle.spindleMin',
                         description:
@@ -1297,6 +1358,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$36',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$709',
+                    },
                 ],
             },
             {
@@ -1369,6 +1434,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$479',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$681',
                     },
                 ],
             },
@@ -1459,10 +1528,30 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$673',
+                    },
                     { type: 'eeprom', eID: '$456', remap: '$750' },
                     { type: 'eeprom', eID: '$457', remap: '$751' },
                     { type: 'eeprom', eID: '$458', remap: '$752' },
                     { type: 'eeprom', eID: '$459', remap: '$753' },
+                    { type: 'eeprom', eID: '$754' },
+                    { type: 'eeprom', eID: '$755' },
+                    { type: 'eeprom', eID: '$756' },
+                    { type: 'eeprom', eID: '$757' },
+                    { type: 'eeprom', eID: '$758' },
+                    { type: 'eeprom', eID: '$759' },
+                    { type: 'eeprom', eID: '$760' },
+                    { type: 'eeprom', eID: '$761' },
+                    { type: 'eeprom', eID: '$762' },
+                    { type: 'eeprom', eID: '$763' },
+                    { type: 'eeprom', eID: '$764' },
+                    { type: 'eeprom', eID: '$765' },
+                    { type: 'eeprom', eID: '$766' },
+                    { type: 'eeprom', eID: '$767' },
+                    { type: 'eeprom', eID: '$768' },
+                    { type: 'eeprom', eID: '$769' },
                 ],
             },
         ],
@@ -1526,6 +1615,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Enable hard limits when toggling into rotary mode (grbl only).',
                         type: 'boolean',
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$538',
+                    },
                 ],
             },
         ],
@@ -1572,7 +1665,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
     {
         label: 'Tool Changing',
         icon: IoIosSwap,
-        wizard: ATCIWizard,
         settings: [
             {
                 label: '',
@@ -1655,6 +1747,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             return strategy !== 'Code';
                         },
                     },
+                    {
+                        type: 'eeprom',
+                        eID: '$675',
+                    },
                 ],
             },
             {
@@ -1708,6 +1804,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$305' },
                     { type: 'eeprom', eID: '$307' },
                     { type: 'eeprom', eID: '$308' },
+                    { type: 'eeprom', eID: '$535' },
                 ],
             },
         ],
@@ -1767,7 +1864,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$223' },
                     { type: 'eeprom', eID: '$338' },
                     { type: 'eeprom', eID: '$339' },
-                    { type: 'eeprom', eID: '$650' },
+
                     { type: 'eeprom', eID: '$651' },
                     { type: 'eeprom', eID: '$652' },
                     { type: 'eeprom', eID: '$653' },
@@ -1829,7 +1926,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$481' },
                     { type: 'eeprom', eID: '$484' },
                     { type: 'eeprom', eID: '$486' },
+                    {
+                        type: 'eeprom',
+                        eID: '$534',
+                    },
+                    { type: 'eeprom', eID: '$650' },
                     { type: 'eeprom', eID: '$666' },
+                    { type: 'eeprom', eID: '$676' },
                 ],
             },
         ],

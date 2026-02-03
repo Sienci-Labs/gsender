@@ -9,14 +9,19 @@ import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/compon
 import { TLSPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx';
 import { ATCCompletion } from 'app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx';
 import { Jogging } from 'app/features/Jogging';
+import { RestartAndRehome } from 'app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx';
+import store from 'app/store';
+import { SpindleSetRestart } from 'app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx';
+import { Modbus } from 'app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx';
 
 export function useSienciATCWizard(): Wizard {
-    const { connectionValidation } = useValidations();
+    const { connectionValidation, coreFirmwareValidation } = useValidations();
 
     const validations = useMemo(
-        () => [connectionValidation],
-        [connectionValidation],
+        () => [connectionValidation, coreFirmwareValidation],
+        [connectionValidation, coreFirmwareValidation],
     );
+    const storeVersion = store.get('widgets.atc.templates.version', '-');
 
     return useMemo<Wizard>(
         () => ({
@@ -29,7 +34,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Initial Setup',
                     description: 'Configure your ATC for first time use',
                     estimatedTime: '30 minutes - 2 hours',
-                    configVersion: '20251126',
+                    configVersion: storeVersion,
                     completionPage: ATCCompletion,
                     steps: [
                         {
@@ -63,17 +68,27 @@ export function useSienciATCWizard(): Wizard {
                             ],
                         },
                         {
-                            id: 'rack-position',
-                            title: 'Rack Position',
-                            component: RackPosition,
+                            id: 'restart-rehome',
+                            title: 'Rehome',
+                            component: RestartAndRehome,
                             secondaryContent: [
                                 {
                                     type: 'image',
                                     content: PlaceholderImage,
                                 },
+                            ],
+                        },
+                        {
+                            id: 'rack-position',
+                            title: 'Rack Position',
+                            component: RackPosition,
+                            secondaryContent: [
                                 {
                                     type: 'component',
                                     content: Jogging,
+                                    props: {
+                                        hideRotary: true,
+                                    },
                                 },
                             ],
                         },
@@ -83,14 +98,25 @@ export function useSienciATCWizard(): Wizard {
                             component: TLSPosition,
                             secondaryContent: [
                                 {
-                                    type: 'image',
-                                    content: PlaceholderImage,
-                                },
-                                {
                                     type: 'component',
                                     content: Jogging,
+                                    props: {
+                                        hideRotary: true,
+                                    },
                                 },
                             ],
+                        },
+                        {
+                            id: 'spindle-config',
+                            title: 'Spindle Configuration',
+                            component: SpindleSetRestart,
+                            secondaryContent: [],
+                        },
+                        {
+                            id: 'modbus-config',
+                            title: 'Modbus Configuration',
+                            component: Modbus,
+                            secondaryContent: [],
                         },
                     ],
                 },
@@ -99,7 +125,7 @@ export function useSienciATCWizard(): Wizard {
                     title: 'Configure ATC',
                     description: 'Adjust ATC settings',
                     estimatedTime: '10 minutes',
-                    configVersion: '20251126',
+                    configVersion: storeVersion,
                     steps: [
                         {
                             id: 'atc-settings',
@@ -110,26 +136,11 @@ export function useSienciATCWizard(): Wizard {
                     ],
                 },
                 {
-                    id: 'hardware-check',
-                    title: 'Hardware Check',
-                    description: 'Verify hardware installation',
-                    estimatedTime: '15 minutes',
-                    configVersion: '20251126',
-                    steps: [
-                        {
-                            id: 'check-sensors',
-                            title: 'Check Sensors',
-                            component: Placeholder,
-                            secondaryContent: [],
-                        },
-                    ],
-                },
-                {
                     id: 'uninstall-atc',
                     title: 'Uninstall ATC',
                     description: 'Remove ATC configuration',
                     estimatedTime: '5 minutes',
-                    configVersion: '20251126',
+                    configVersion: storeVersion,
                     steps: [
                         {
                             id: 'remove-config',

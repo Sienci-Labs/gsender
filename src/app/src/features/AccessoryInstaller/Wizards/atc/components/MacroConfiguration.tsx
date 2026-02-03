@@ -6,25 +6,25 @@ import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
-    const [rackSize, setRackSize] = useState<number>(12);
+    const [rackSize, setRackSize] = useState<number | string>(6);
     const [isComplete, setIsComplete] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         controller.addListener('ymodem:complete', () => {
             setIsComplete(true);
-            setError(false);
+            setError(null);
             onComplete();
             setTimeout(() => {
                 setIsComplete(false);
             }, 2000);
         });
-        controller.addListener('ymodem:error', () => {
-            setError(true);
+        controller.addListener('ymodem:error', (err) => {
+            setError(err);
             setTimeout(() => {
                 setIsComplete(false);
-                setError(false);
-            }, 3000);
+                setError(null);
+            }, 5000);
         });
         return () => {
             controller.removeListener('ymodem:complete');
@@ -33,7 +33,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     }, []);
 
     const handleUpload = async () => {
-        if (rackSize === 0) {
+        if (rackSize === '0') {
             store.set(
                 'widgets.atc.templates.variables._tc_rack_enable.value',
                 0,
@@ -54,16 +54,16 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
 
         // start macros copying over
         const config = store.get('widgets.atc.templates');
-        const content = generateAllMacros(config);
+        const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
 
         controller.command('ymodem:uploadFiles', content);
         //await new Promise((resolve) => setTimeout(resolve, 2000));
     };
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
+        <div className="flex flex-col gap-5 justify-start">
             <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-400 mb-2">
                     Rack Size
                 </label>
                 <select
@@ -76,12 +76,12 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                     <option value={12}>12 Tool Rack</option>
                 </select>
             </div>
-            <p>
+            <p className="dark:text-white">
                 Sienci ATC operates using a set of macro programs stored in the
                 micro SD card of your controller.
             </p>
 
-            <p>
+            <p className="dark:text-white">
                 Specify your rack size and click “Upload Macros” to upload the
                 relevant program files into the SD card. This can be changed
                 later.

@@ -33,6 +33,8 @@ import findIndex from 'lodash/findIndex';
 import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 import { SPINDLE_LASER_T } from './definitions';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 interface SpindleState {
     minimized: boolean;
@@ -516,9 +518,17 @@ const SpindleWidget = () => {
             label: string;
             value: string | number;
         }) => {
+            const isModernFirmware = firmwarePastVersion(
+                ATCI_SUPPORTED_VERSION,
+            );
+
+            const spindleCommand = isModernFirmware
+                ? '$spindlesh'
+                : '$spindles';
+
             controller.command('gcode', [
                 `M104 Q${selectedSpindle.value}`,
-                '$spindles',
+                `${spindleCommand}`,
             ]);
         },
         enableSpindleMode() {

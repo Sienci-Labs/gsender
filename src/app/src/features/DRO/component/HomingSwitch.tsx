@@ -32,10 +32,10 @@ export function HomingSwitch({
 
             <Tooltip content="Run homing" side="bottom">
                 <Button
-                    size="sm"
                     variant="primary"
                     onClick={homeMachine}
                     disabled={disabled}
+                    size="responsive"
                 >
                     Home
                 </Button>

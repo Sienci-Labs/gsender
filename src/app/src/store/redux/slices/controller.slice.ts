@@ -9,7 +9,7 @@ import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/firmware';
 import { Modal } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { Spindle } from 'app/features/Spindle/definitions';
-import { BasicPosition, BasicObject } from 'app/definitions/general';
+import { BasicPosition } from 'app/definitions/general';
 
 import {
     ControllerSettings,
@@ -23,7 +23,6 @@ const initialState: ControllerState = {
         parameters: {},
         settings: {},
         groups: {},
-        alarms: {},
     },
     state: {},
     modal: {
@@ -297,7 +296,9 @@ const controllerSlice = createSlice({
         },
         updateAlarmDescriptions: (
             state,
-            action: PayloadAction<{ alarms: BasicObject }>,
+            action: PayloadAction<{
+                alarms: { [key: number]: { description: string; id: number } };
+            }>,
         ) => {
             state.settings.alarms = action.payload.alarms;
         },
@@ -345,6 +346,10 @@ const controllerSlice = createSlice({
             );
             state.sdcard.files = filteredFiles;
         },
+        emptyAllSDFiles: (state) => {
+            console.log('emptying SD list');
+            state.sdcard.files = [];
+        },
     },
 });
 
@@ -365,6 +370,7 @@ export const {
     updateSDCardMountStatus,
     addSDCardFileToList,
     clearSDCardFiles,
+    emptyAllSDFiles,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;

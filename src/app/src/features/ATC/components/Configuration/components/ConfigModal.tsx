@@ -37,13 +37,6 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
             });
         });
 
-        controller.addListener('ymodem:complete', () => {
-            setStatus({ type: 'idle', message: '' });
-            setTimeout(() => {
-                controller.command('gcode', ['G65 P100', 'G65 P200']);
-            }, 1000);
-        });
-
         return () => {
             controller.removeListener('sdcard:json');
             controller.removeListener('ymodem:error');
@@ -53,22 +46,28 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-3/5 portrait:w-4/5 overflow-y-auto h-[85vh] portrait:h-4/5 flex flex-col">
+            <DialogContent className="w-4/5 portrait:w-4/5 overflow-hidden h-[90vh] portrait:h-4/5 flex flex-col">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="w-full flex flex-col flex-1 gap-2"
+                    className="w-full flex flex-col flex-1 gap-2 min-h-0 h-full"
                 >
                     <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
                         <TabsTrigger value="config">ATCI Config</TabsTrigger>
                         <TabsTrigger value="templates">Templates</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="config" className="flex-1 mt-4">
+                    <TabsContent
+                        value="config"
+                        className="flex-1 mt-4 min-h-0 h-0"
+                    >
                         <ConfigTab uploading={uploading} />
                     </TabsContent>
 
-                    <TabsContent value="templates" className="flex-1 mt-4">
+                    <TabsContent
+                        value="templates"
+                        className="flex-1 mt-4 min-h-0 h-0 flex flex-col overflow-hidden"
+                    >
                         <TemplatesTab />
                     </TabsContent>
                 </Tabs>

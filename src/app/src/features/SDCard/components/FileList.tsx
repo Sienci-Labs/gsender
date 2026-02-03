@@ -42,8 +42,16 @@ export function isFileATCIRelated(filename, atciMacros) {
 }
 
 export const FileList: React.FC = () => {
-    const { files, isLoading, runSDFile, uploadFileToSDCard, isConnected } =
-        useSDCard();
+    const {
+        files,
+        isLoading,
+        runSDFile,
+        uploadFileToSDCard,
+        isConnected,
+        firmwareType,
+        hasFTP,
+        hasYM,
+    } = useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -97,8 +105,24 @@ export const FileList: React.FC = () => {
 
     if (!isConnected) {
         return (
-            <div className="border-gray-300 bg-white text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+            <div className="border-gray-300 bg-white dark:bg-dark text-center py-12 text-gray-500 rounded-lg shadow-sm border">
                 Must be connected to use SD card functionality.
+            </div>
+        );
+    }
+
+    if (firmwareType !== 'grblHAL') {
+        return (
+            <div className="border-gray-300 bg-white dark:bg-dark text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+                SD card tools are only available for grblHAL devices.
+            </div>
+        );
+    }
+
+    if (!hasFTP && !hasYM) {
+        return (
+            <div className="border-gray-300 bg-white dark:bg-dark text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+                Enable FTP or YMODEM in firmware to use SD card tools.
             </div>
         );
     }
@@ -107,10 +131,10 @@ export const FileList: React.FC = () => {
         return (
             <div
                 className={cn(
-                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 rounded-lg shadow-sm border border-gray-200',
+                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 dark:text-gray-300 rounded-lg shadow-sm border border-gray-200',
                     {
                         'border-blue-400 bg-blue-50': dragOver,
-                        'border-gray-300 bg-white': !dragOver,
+                        'border-gray-300 bg-white dark:bg-dark': !dragOver,
                     },
                 )}
                 onDragOver={(e) => {

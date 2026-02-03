@@ -1,5 +1,8 @@
 import controller from 'app/lib/controller.ts';
-import { updateSDCardMountStatus } from 'app/store/redux/slices/controller.slice.ts';
+import {
+    emptyAllSDFiles,
+    updateSDCardMountStatus,
+} from 'app/store/redux/slices/controller.slice.ts';
 import reduxStore from 'app/store/redux';
 
 export const handleSDCardMount = () => {
@@ -17,5 +20,6 @@ export function mountSDCard() {
 }
 
 export function refreshSDCardFiles() {
+    reduxStore.dispatch(emptyAllSDFiles()); // Empty on refresh
     controller.command('sdcard:list');
 }

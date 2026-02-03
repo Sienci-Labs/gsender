@@ -7,6 +7,8 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
+import pubsub from 'pubsub-js';
+import Tooltip from 'app/components/Tooltip';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
@@ -27,6 +29,14 @@ export function ToolTimelineItem({
     remapValue,
 }: ToolTimelineItemProps) {
     const [label, setLabel] = useState('');
+    const MAX_LABEL_LENGTH = 16;
+
+    const truncateLabel = (value: string) => {
+        if (!value || value.length <= MAX_LABEL_LENGTH) {
+            return value;
+        }
+        return `${value.slice(0, MAX_LABEL_LENGTH - 3)}...`;
+    };
 
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
@@ -35,6 +45,16 @@ export function ToolTimelineItem({
     useEffect(() => {
         const toolLookup = isRemapped ? remapValue : tool.toolNumber;
         setLabel(lookupToolName(toolLookup));
+    }, [tool, isRemapped, remapValue]);
+
+    useEffect(() => {
+        const token = pubsub.subscribe('toolmap:updated', () => {
+            const toolLookup = isRemapped ? remapValue : tool.toolNumber;
+            setLabel(lookupToolName(toolLookup));
+        });
+        return () => {
+            pubsub.unsubscribe(token);
+        };
     }, [tool, isRemapped, remapValue]);
 
     return (
@@ -121,10 +141,12 @@ export function ToolTimelineItem({
                                     )}
                                 </div>
                                 <div>
-                                    {label !== '-' && (
-                                        <span className="text-xs text-gray-500">
-                                            {label}
-                                        </span>
+                                    {label !== '-' && label && (
+                                        <Tooltip content={label} side="top">
+                                            <span className="text-xs text-gray-500">
+                                                {truncateLabel(label)}
+                                            </span>
+                                        </Tooltip>
                                     )}
                                 </div>
                             </div>

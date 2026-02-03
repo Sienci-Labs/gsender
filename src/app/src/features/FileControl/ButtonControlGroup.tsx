@@ -51,6 +51,8 @@ import get from 'lodash/get';
 import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
@@ -206,17 +208,17 @@ const ButtonControlGroup = () => {
     }, 100);
 
     return (
-        <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11">
+        <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
             <Button
                 onClick={handleClickLoadFile}
                 icon={<FaFolderOpen className="w-5 h-5" />}
                 text="Load File"
                 variant="ghost"
                 disabled={!canClick}
-                className="h-full px-4 rounded-none"
+                className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
             />
             <Divider />
-            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full">
+            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
                 <DropdownMenu>
                     <Tooltip content="View Recent Files">
                         <DropdownMenuTrigger asChild>
@@ -296,7 +298,7 @@ const ButtonControlGroup = () => {
                     className="hidden"
                     multiple={false}
                     onChange={handleLoadFile}
-                    accept=".gcode,.gc,.nc,.tap,.cnc"
+                    accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
                     id="fileInput"
                 />
             </div>

@@ -66,4 +66,5 @@ export interface Visualizer {
     showLineWarnings: boolean;
     showSoftLimitWarning: boolean;
     hideProcessedLines: boolean;
+    rotaryDiameterOffsetEnabled: boolean;
 }

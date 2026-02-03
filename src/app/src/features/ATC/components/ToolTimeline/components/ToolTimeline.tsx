@@ -45,6 +45,15 @@ export function ToolTimeline({
         setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
     }, [toolTableData, rackSize]);
 
+    useEffect(() => {
+        const token = pubsub.subscribe('toolmap:updated', () => {
+            setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
+        });
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, [toolTableData, rackSize]);
+
     // File tools
     const [fileTools, setFileTools] = useState<Number[]>([]);
     const fileToolSet = useTypedSelector(

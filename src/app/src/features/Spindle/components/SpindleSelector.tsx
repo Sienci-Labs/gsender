@@ -19,7 +19,7 @@ type Props = {
 
 const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
     return spindles.map((spindle) => ({
-        label: `${spindle.id}: ${spindle.label} (${spindle.capabilities})`,
+        label: `${spindle.label} (${spindle.capabilities})`,
         value: spindle.id,
     }));
 };

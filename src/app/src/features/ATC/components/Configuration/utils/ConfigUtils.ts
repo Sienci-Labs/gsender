@@ -26,17 +26,21 @@ function calculateOffsetValue(data: OffsetManagement): number {
     return count;
 }
 
-export function generateP100(config: ConfigState): Macro {
+export function generateP100(config: ConfigState, useValues: boolean): Macro {
+    const key = useValues ? 'value' : 'default';
+    // When false, we use values for rack size and enable state
+    // and defaults for rest
+    // This is because of the first time setup wizard
     const content = [
         `#<_tc_slots> = ${config.variables._tc_slots.value}`,
         `#<_tc_rack_enable> = ${config.variables._tc_rack_enable.value}`,
-        `#<_pres_sense> = ${config.variables._pres_sense.value}`,
-        `#<_holder_sense> = ${config.variables._holder_sense.value}`,
-        `#<_tc_slot_offset> = ${config.variables._tc_slot_offset.value}`,
-        `#<_passthrough_offset_setting> = ${config.variables._passthrough_offset_setting.value}`,
-        `#<_ort_offset_mode> = ${config.variables._ort_offset_mode.value}`,
-        `#<_irt_offset_mode> = ${config.variables._irt_offset_mode.value}`,
-        `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
+        `#<_pres_sense> = ${config.variables._pres_sense[key]}`,
+        `#<_holder_sense> = ${config.variables._holder_sense[key]}`,
+        `#<_tc_slot_offset> = ${config.variables._tc_slot_offset[key]}`,
+        `#<_passthrough_offset_setting> = ${config.variables._passthrough_offset_setting[key]}`,
+        `#<_ort_offset_mode> = ${config.variables._ort_offset_mode[key]}`,
+        `#<_irt_offset_mode> = ${config.variables._irt_offset_mode[key]}`,
+        `(msg, ATCI|rack_size:${config.variables._tc_slots[key]})`,
     ].join('\n');
 
     const data = new Blob([content]);
@@ -67,12 +71,15 @@ export function getTemplateMacros(): Macro[] {
     return blobs;
 }
 
-export function generateAllMacros(config: ConfigState) {
+export function generateAllMacros(
+    config: ConfigState,
+    useValuesForP100 = true,
+) {
     const macros: Macro[] = [];
 
     const atciContent = generateATCIJSON(config);
 
-    macros.push(generateP100(config));
+    macros.push(generateP100(config, useValuesForP100));
     macros.push(...getTemplateMacros());
     macros.push(writeableATCIConfig(atciContent));
 

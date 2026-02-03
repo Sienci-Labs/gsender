@@ -4,7 +4,7 @@ import { RootState } from 'app/store/redux';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import Button from 'app/components/Button';
-import { LuTable } from 'react-icons/lu';
+import { Table2 } from 'lucide-react';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import controller from 'app/lib/controller.ts';
 
@@ -28,11 +28,11 @@ export function ToolDisplayModal() {
             <DialogTitle className="flex justify-end">
                 <Button
                     onClick={onOpenChange}
-                    className="flex flex-row items-center gap-2"
+                    className="flex flex-row items-center gap-2 w-auto px-3"
                     disabled={disabled}
                     size="sm"
                 >
-                    <LuTable />
+                    <Table2 className="h-4 w-4" />
                     Tools
                 </Button>
             </DialogTitle>

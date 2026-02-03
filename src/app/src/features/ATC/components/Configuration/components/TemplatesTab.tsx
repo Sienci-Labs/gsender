@@ -78,7 +78,7 @@ export const TemplatesTab: React.FC = () => {
     };
 
     return (
-        <div className="space-y-4 flex flex-col h-full">
+        <div className="space-y-4 flex flex-col flex-1 min-h-0">
             <div className="grid grid-cols-2 gap-2">
                 <div className="border border-border">
                     <div className="py-2 flex items-center justify-center h-full">
@@ -139,46 +139,49 @@ export const TemplatesTab: React.FC = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1 min-h-0 h-0">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1 min-h-0">
                 {/* Macro Listing */}
-                <div className="border border-border md:col-span-2 flex flex-col h-full">
+                <div className="border border-border md:col-span-2 flex flex-col min-h-0">
                     <h1 className="text-sm font-semibold text-blue-500 p-2">
                         Macros ({templates?.macros.length || 0})
                     </h1>
 
-                    <div className="p-0 flex-1 min-h-0">
-                        <div className="h-full overflow-y-auto">
-                            {templates?.macros.map((template, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() =>
-                                        setSelectedTemplate(template)
-                                    }
-                                    className={cn(
-                                        'w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 flex items-center gap-2 transition-colors',
-                                        selectedTemplate?.name ===
-                                            template.name &&
-                                            'bg-blue-50 border-blue-200',
-                                    )}
-                                >
-                                    <FileText className="h-4 w-4 text-gray-400" />
-                                    <span className="font-medium">
-                                        {template.name}
-                                    </span>
-                                </button>
-                            ))}
+                    <div className="p-0 flex-1 min-h-0 flex flex-col">
+                        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                            {templates?.macros
+                                ?.slice() // or [...templates.macros] to avoid mutating the original array
+                                .sort((a, b) => a.name.localeCompare(b.name))
+                                .map((template, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() =>
+                                            setSelectedTemplate(template)
+                                        }
+                                        className={cn(
+                                            'w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 flex items-center gap-2 transition-colors',
+                                            selectedTemplate?.name ===
+                                                template.name &&
+                                                'bg-blue-50 border-blue-200',
+                                        )}
+                                    >
+                                        <FileText className="h-4 w-4 text-gray-400" />
+                                        <span className="font-medium">
+                                            {template.name}
+                                        </span>
+                                    </button>
+                                ))}
                         </div>
                     </div>
                 </div>
 
                 {/* Contents */}
-                <div className="border border-border md:col-span-4 flex flex-col h-full">
+                <div className="border border-border md:col-span-4 flex flex-col min-h-0">
                     <h1 className="text-sm font-semibold p-2 text-blue-500">
                         {selectedTemplate ? selectedTemplate.name : 'Content'}
                     </h1>
 
-                    <div className="flex-1">
-                        <div className="border rounded m-2 h-full overflow-auto">
+                    <div className="flex-1 min-h-0 p-2">
+                        <div className="border rounded h-full min-h-0 overflow-auto overscroll-contain">
                             {selectedTemplate ? (
                                 <GcodeViewer gcode={selectedTemplate.content} />
                             ) : (

@@ -3,11 +3,18 @@ import { RiParkingFill } from 'react-icons/ri';
 import Button from 'app/components/Button';
 import store from 'app/store';
 import controller from 'app/lib/controller.ts';
-import { LOCATION_CATEGORY } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    LOCATION_CATEGORY,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Tooltip from 'app/components/Tooltip';
+import { get, includes } from 'lodash';
+import reduxStore from 'app/store/redux';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});
@@ -22,7 +29,39 @@ function goToParkLocation() {
     controller.command('gcode', code);
 }
 
-export function Parking({ disabled = false }) {
+export function Parking({
+    disabled = false,
+    isConnected = false,
+    homingEnabled = false,
+}) {
+    const disabledRef = useRef(disabled);
+
+    useEffect(() => {
+        disabledRef.current = disabled;
+    }, [disabled]);
+
+    const shortcutIsDisabled = () => {
+        const isConnected = get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const activeState = get(
+            reduxStore.getState(),
+            'controller.state.status.activeState',
+        );
+        const workflowState = get(
+            reduxStore.getState(),
+            'controller.workflow.state',
+        );
+
+        if (!isConnected) return true;
+        if (workflowState === WORKFLOW_STATE_RUNNING) return true;
+
+        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG];
+
+        return !includes(states, activeState);
+    };
+
     const shuttleControlEvents = {
         HOMING_PARK: {
             title: 'Park ',
@@ -32,10 +71,8 @@ export function Parking({ disabled = false }) {
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: () => {
-                if (disabled) {
-                    return;
-                }
-                goToParkLocation();
+                if (disabledRef.current || shortcutIsDisabled())
+                    goToParkLocation();
             },
         },
     };
@@ -45,13 +82,17 @@ export function Parking({ disabled = false }) {
         useKeybinding(shuttleControlEvents);
     }, []);
 
+    if (!isConnected || !homingEnabled) {
+        return null;
+    }
+
     return (
         <Tooltip content="Go to Park Location">
             <Button
                 disabled={disabled}
                 icon={<RiParkingFill className="w-4 h-4" />}
                 variant="alt"
-                size="sm"
+                size="responsive"
                 onClick={goToParkLocation}
             />
         </Tooltip>

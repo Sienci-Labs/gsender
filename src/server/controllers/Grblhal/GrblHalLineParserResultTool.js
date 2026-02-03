@@ -33,6 +33,8 @@ class GrblHalLineParserResultTool {
             return null;
         }
 
+        console.log(r);
+
         const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
 
         const offsetMap = r[2].split(',')

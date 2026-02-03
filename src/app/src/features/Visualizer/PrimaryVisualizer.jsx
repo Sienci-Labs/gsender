@@ -21,7 +21,6 @@ import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
-import { Helper } from 'app/features/Helper/index';
 import { FaFeatherAlt } from 'react-icons/fa';
 import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import cx from 'classnames';
@@ -160,7 +159,6 @@ const PrimaryVisualizer = ({
                         camera={camera}
                         cameraPosition={cameraPosition}
                     />
-                    <Helper />
                     <WorkspaceSelector />
 
                     {timeline}

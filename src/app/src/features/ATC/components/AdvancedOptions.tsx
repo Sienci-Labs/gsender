@@ -1,15 +1,8 @@
-import {
-    Collapsible,
-    CollapsibleTrigger,
-    CollapsibleContent,
-} from 'app/components/shadcn/Collapsible.tsx';
-import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
+import { Pointer, PointerOff } from 'lucide-react';
 import Button from 'app/components/Button';
-import { useState } from 'react';
-import { LuHardHat } from 'react-icons/lu';
-import { releaseToolFromSpindle } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ATCIConfiguration } from 'app/features/ATC/components/Configuration';
+import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
 
 export function AdvancedOptions() {
     const {
@@ -17,63 +10,50 @@ export function AdvancedOptions() {
         setLoadToolMode,
         setLoadToolOpen,
         currentTool,
-        connected,
     } = useToolChange();
-    const [isOpen, setIsOpen] = useState(false);
+    const handleManualLoad = () => {
+        setLoadToolMode('load');
+        setLoadToolOpen(true);
+    };
 
-    const handleSaveToRack = () => {
+    const handleManualUnload = () => {
         setLoadToolMode('save');
         setLoadToolOpen(true);
     };
 
-    const loadAndSaveDisabled = !connected || currentTool === 0;
-
     return (
-        <div className="flex flex-col w-full pt-10 mt-2">
-            <Collapsible
-                open={isOpen}
-                onOpenChange={setIsOpen}
-                className="w-full"
-            >
-                <CollapsibleTrigger asChild className="p-0 w-full">
-                    <button
-                        variant="ghost"
-                        className="flex w-full flex-row px-1 py-1 items-center justify-between text-sm font-medium text-gray-700 dark:text-white rounded-lg"
-                    >
-                        <div className="flex items-center gap-1">
-                            <LuHardHat className="h-4 w-4" />
-                            <span>Advanced Options</span>
-                        </div>
-                        {isOpen ? (
-                            <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                        ) : (
-                            <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                        )}
-                    </button>
-                </CollapsibleTrigger>
+        <div className="flex h-full w-full flex-col gap-4">
+            <div className="flex items-center justify-end gap-2">
+                <ATCIConfiguration compact />
+                <ToolDisplayModal />
+            </div>
 
-                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <div className="flex flex-col gap-1">
-                        <Button
-                            onClick={releaseToolFromSpindle}
-                            size="sm"
-                            disabled={disabled || currentTool === 0}
-                            variant="primary"
-                        >
-                            Unload Tool Manually
-                        </Button>
-
-                        <Button
-                            onClick={handleSaveToRack}
-                            size="sm"
-                            disabled={disabled}
-                            variant="primary"
-                        >
-                            Load Tool Manually
-                        </Button>
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
+            <div className="flex flex-col gap-2 border-t border-gray-200 pt-3">
+                <Button
+                    onClick={handleManualLoad}
+                    size="sm"
+                    disabled={disabled}
+                    variant="ghost"
+                    className="grid grid-cols-[20px_1fr] items-center justify-start gap-3 text-gray-600 text-left"
+                >
+                    <span className="flex h-5 w-5 items-center justify-center">
+                        <Pointer className="h-4 w-4" />
+                    </span>
+                    Manual Load
+                </Button>
+                <Button
+                    onClick={handleManualUnload}
+                    size="sm"
+                    disabled={disabled || currentTool === 0}
+                    variant="ghost"
+                    className="grid grid-cols-[20px_1fr] items-center justify-start gap-3 text-gray-600 text-left"
+                >
+                    <span className="flex h-5 w-5 items-center justify-center">
+                        <PointerOff className="h-4 w-4" />
+                    </span>
+                    Manual Unload
+                </Button>
+            </div>
         </div>
     );
 }

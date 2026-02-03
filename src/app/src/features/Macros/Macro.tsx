@@ -244,8 +244,8 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
     return (
         <>
             {macros.length === 0 ? (
-                <div className="grid grid-cols-2 gap-1 p-1 h-full">
-                    <div className="w-full flex justify-center items-center">
+                <div className="flex gap-1 p-1 h-full">
+                    <div className="w-full flex justify-center items-center dark:text-white">
                         No Macros...
                     </div>
                 </div>

@@ -22,6 +22,12 @@ DIST_DIR="$__dirname/../dist/gsender"
 NODE_MODULES_DIR="$DIST_DIR/node_modules"
 PACKAGE_JSON="$DIST_DIR/package.json"
 YARN_LOCK="$DIST_DIR/yarn.lock"
+MAIN_JS="$DIST_DIR/main.js"
+
+if [ ! -f "$MAIN_JS" ]; then
+    echo "main.js missing; building electron main bundle"
+    node "$__dirname/../esbuild.config.js" --production --target=electron
+fi
 
 pushd "$DIST_DIR"
 
@@ -68,6 +74,10 @@ fi
 
 # Run electron-builder with optimizations
 echo "Building with electron-builder..."
+CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false
+if [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; then
+    CSC_IDENTITY_AUTO_DISCOVERY_VALUE=true
+fi
 cross-env USE_HARD_LINKS=false \
-    CSC_IDENTITY_AUTO_DISCOVERY=false \
+    CSC_IDENTITY_AUTO_DISCOVERY=$CSC_IDENTITY_AUTO_DISCOVERY_VALUE \
     yarn electron-builder -- "$@"

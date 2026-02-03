@@ -292,9 +292,6 @@ class Connection extends EventEmitter {
 
     restoreListeners() {
         this.connection.addPortListeners();
-        /*this.connection.on('data', this.connectionEventListener.data);
-        this.connection.on('close', this.connectionEventListener.close);
-        this.connection.on('error', this.connectionEventListener.error);*/
     }
 
     setWriteFilter(writeFilter) {
@@ -348,6 +345,14 @@ class Connection extends EventEmitter {
         if (this.timeout) {
             this.timeout = null;
         }
+    }
+
+    isNetwork() {
+        return this.options.network;
+    }
+
+    getFTPInfo() {
+        return [this.options.port, this.options.ethernetPort];
     }
 }
 

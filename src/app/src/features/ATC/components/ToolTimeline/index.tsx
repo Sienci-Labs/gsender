@@ -1,34 +1,16 @@
 import { ToolTimeline } from 'app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx';
 import { ToolChange } from 'app/features/ATC/components/ToolTimeline/components/types.ts';
 import { useEffect, useState } from 'react';
-import * as Three from 'three';
 import pubsub from 'pubsub-js';
-import {
-    DARK_THEME_VALUES,
-    G1_PART,
-    LIGHT_THEME_VALUES,
-} from 'app/features/Visualizer/constants';
-import store from 'app/store';
 import { RootState } from 'app/store/redux';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import get from 'lodash/get';
 import controller from 'app/lib/controller.ts';
-import { generateComplementaryColor } from 'app/features/ATC/utils/ATCFunctions.ts';
-
-function getThemeCuttingColour() {
-    const visualizerTheme = store.get('widgets.visualizer.theme', 'Dark');
-    if (visualizerTheme === 'Dark') {
-        return DARK_THEME_VALUES.get(G1_PART);
-    } else {
-        return LIGHT_THEME_VALUES.get(G1_PART);
-    }
-}
+import { getToolpathColor } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 function buildToolArray(toolEvents, fileLength) {
     let count = 0;
     const toolArray: ToolChange[] = [];
-    let originalColor = getThemeCuttingColour();
-    let legendColor = new Three.Color(originalColor);
 
     Object.entries(toolEvents).forEach(([line, value]) => {
         if (Object.hasOwn(value, 'M') && Object.hasOwn(value, 'T')) {
@@ -36,12 +18,11 @@ function buildToolArray(toolEvents, fileLength) {
             newTool.toolNumber = value.T;
             newTool.startLine = Number(line);
             newTool.label = `T${value.T}`;
+            const legendColor = getToolpathColor(count);
             newTool.color = `#${legendColor.getHexString()}`;
             newTool.index = count + 1;
             toolArray.push(newTool);
 
-            // Prime next colour in sequence
-            legendColor = generateComplementaryColor(legendColor, count);
             count++;
         }
     });

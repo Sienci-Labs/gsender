@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, useEffect } from 'react';
 import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
@@ -18,6 +18,7 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
+import controller from 'app/lib/controller.ts';
 
 export function Config() {
     const { ref: inViewRef } = useInView({
@@ -26,6 +27,10 @@ export function Config() {
 
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
+    );
+
+    const firmwareType = useTypedSelector(
+        (state: RootState) => state.controller.type,
     );
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
     const [activeTab, setActiveTab] = React.useState('config');
@@ -36,18 +41,30 @@ export function Config() {
         }
     }
 
-    const { settings } = useSettings();
+    useEffect(() => {
+        if (connected) {
+            if (firmwareType === 'grblHAL') {
+                controller.command('gcode', ['$$', '$ESH', '$ES']);
+            } else {
+                controller.command('gcode', '$$');
+            }
+        }
+    }, []);
+
+    const { settings, EEPROM } = useSettings();
 
     // lets extract all the eeprom settings
-    let allEEPROM: gSenderSetting[] = settings
-        .flatMap((section) => section.settings)
-        .flatMap((subSection) => subSection.settings)
-        .filter((setting) => setting.eID);
-    // sort so they are in order of EEPROM
-    allEEPROM.sort((a, b) => {
-        const aID = a.remap ? a.remap : a.eID;
-        const bID = b.remap ? b.remap : b.eID;
-        return convertEIDToNumber(aID) - convertEIDToNumber(bID);
+    let allEEPROM: gSenderSetting[] = EEPROM.map((filtered, i) => {
+        const formatted: gSenderSetting = {
+            type: 'eeprom',
+            description: filtered.description,
+            unit: filtered.unit,
+            eID: filtered.setting,
+            globalIndex: filtered.globalIndex,
+            value: filtered.value,
+            defaultValue: filtered.defaultValue,
+        };
+        return formatted;
     });
     const eepromSettings: SettingsMenuSection[] = [
         {

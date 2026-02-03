@@ -7,6 +7,7 @@ import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
+import pubsub from 'pubsub-js';
 
 export const ToolChangeContext = createContext<IToolChangeContext>({
     mode: 'load',
@@ -80,6 +81,15 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
 
     useEffect(() => {
         setTools(mapToolNicknamesAndStatus(toolTableData, rackSize));
+    }, [toolTableData, rackSize]);
+
+    useEffect(() => {
+        const token = pubsub.subscribe('toolmap:updated', () => {
+            setTools(mapToolNicknamesAndStatus(toolTableData, rackSize));
+        });
+        return () => {
+            pubsub.unsubscribe(token);
+        };
     }, [toolTableData, rackSize]);
 
     useEffect(() => {

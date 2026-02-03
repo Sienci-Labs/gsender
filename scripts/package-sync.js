@@ -49,6 +49,8 @@ const deps = _uniq([
     '@sentry/node',
     'regenerator-runtime',
     'debug',
+    'jsonfile',
+    '@electron/remote',
     'is-electron',
     'commander',
     ...resolvedImports.map((x) => x.split('/')[0]),

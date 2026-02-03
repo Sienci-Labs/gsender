@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.6.0-Edge-3",
+  "version": "1.6.0-Edge-4",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -90,10 +90,14 @@
     "extraMetadata": {
       "main": "./main.js"
     },
+    "afterSign": "./notarize.js",
     "extends": null,
     "artifactName": "${name}-${version}-${arch}.${ext}",
-    "asar": false,
-    "asarUnpack": [],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/*.{dll,so,dylib,exe}"
+    ],
     "productName": "gSender Edge",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
@@ -123,9 +127,6 @@
       "createStartMenuShortcut": false,
       "include": "electron-build/installer.nsh"
     },
-    "publish": {
-      "provider": "github"
-    },
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
@@ -134,7 +135,10 @@
       "icon": "electron-build/icon.icns",
       "electronUpdaterCompatibility": ">=2.16",
       "darkModeSupport": true,
-      "mergeASARs": false
+      "mergeASARs": false,
+      "hardenedRuntime": true,
+      "entitlements": "electron-build/entitlements.mac.plist",
+      "entitlementsInherit": "electron-build/entitlements.mac.plist"
     },
     "dmg": {
       "background": "electron-build/background.png",
@@ -186,8 +190,9 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@electron/rebuild": "^3.2.13",
-    "@electron/remote": "^2.0.8",
+    "@electron/notarize": "^3.1.1",
+    "@electron/rebuild": "^4.0.3",
+    "@electron/remote": "^2.1.3",
     "@emotion/styled": "^11.10.5",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -211,7 +216,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@react-pdf/renderer": "3.1.14",
     "@reduxjs/toolkit": "^2.2.7",
-    "@sentry/electron": "^6.7.0",
+    "@sentry/electron": "^7.7.1",
     "@sentry/react": "^9.28.0",
     "@sentry/wizard": "^5.1.0",
     "@serialport/parser-readline": "^11.0.0",
@@ -226,6 +231,7 @@
     "@xterm/xterm": "^5.5.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.2.4",
+    "basic-ftp": "^5.1.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
     "buffer-chunks": "^0.1.1",
@@ -254,9 +260,9 @@
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
     "dfu": "^0.1.5",
-    "electron-log": "^4.3.5",
-    "electron-store": "~8.1.0",
-    "electron-updater": "^5.3.0",
+    "electron-log": "^5.4.3",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.7.3",
     "embla-carousel-react": "^8.2.0",
     "ensure-array": "~1.0.0",
     "ensure-type": "^1.4.2",
@@ -281,8 +287,9 @@
     "i18next-http-middleware": "^3.2.1",
     "infinite-tree": "~1.16.2",
     "intel-hex": "^0.2.0",
-    "is-electron": "~2.2.1",
+    "is-electron": "^2.2.2",
     "is-online": "^9.0.1",
+    "jsonfile": "^6.2.0",
     "jsonwebtoken": "~8.5.1",
     "jszip": "^3.10.1",
     "lodash": "~4.17.11",
@@ -386,8 +393,8 @@
     "css-loader": "~2.1.1",
     "cypress": "^13.4.0",
     "dotenv": "~7.0.0",
-    "electron": "^33.2.0",
-    "electron-builder": "~23.6.0",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.4.0",
     "electron-reloader": "^1.2.3",
     "esbuild": "^0.25.10",
     "eslint": "~5.16.0",

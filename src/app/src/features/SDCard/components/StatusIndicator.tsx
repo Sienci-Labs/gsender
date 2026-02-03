@@ -44,7 +44,7 @@ export function StatusIndicator({ isMounted }) {
 
     if (!isConnected) {
         status = 'Disconnected';
-        colourClasses = 'bg-gray-50 text-gray-700 border-gray-200';
+        colourClasses = 'bg-gray-50 dark:text- text-gray-700 border-gray-200';
     } else if (isMounted) {
         status = 'Mounted';
         colourClasses = 'bg-green-50 text-green-700 border-green-200';
@@ -55,11 +55,11 @@ export function StatusIndicator({ isMounted }) {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-dark px-6 py-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <HardDrive className="w-6 h-6 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <HardDrive className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             SD Card Status:
                         </span>
                     </div>
@@ -78,7 +78,7 @@ export function StatusIndicator({ isMounted }) {
                     </div>
                 </div>
             </div>
-            <div className="bg-white flex items-center justify-center px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-dark flex items-center justify-center px-6 py-4 rounded-lg shadow-sm border border-gray-200">
                 {uploadState === 'idle' && <ActionButtons />}
                 <UploadProgressBar
                     uploadState={uploadState}

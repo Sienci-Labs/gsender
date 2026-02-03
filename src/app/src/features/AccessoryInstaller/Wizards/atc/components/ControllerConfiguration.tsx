@@ -1,17 +1,34 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { useState } from 'react';
+import controller from 'app/lib/controller.ts';
+import store from 'app/store';
 
 export function ControllerConfiguration({
     onComplete,
     onUncomplete,
 }: StepProps) {
+    const [error, setError] = useState<string>('');
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+
     const applySettings = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Also setup gSender settings :)
+        // Enable ATCI tab, enable spindle tab, set TC strategy to ignore
+        store.set('workspace.atcEnabled', true);
+        store.set('workspace.toolChangeOption', 'Ignore');
+        store.set('workspace.spindleFunctions', true)
+        store.set('workspace.toolChange.passthrough', true);
+        // Use macro for controller settings
+        controller.command('gcode', 'G65 P999');
+        setTimeout(() => {
+            setIsComplete(true);
+            onComplete();
+        }, 2000);
     };
 
     return (
-        <div className="flex flex-col gap-5 p-2 justify-start">
-            <p>
+        <div className="flex flex-col gap-5 justify-start">
+            <p className="dark:text-white">
                 The following controller settings are required to ensure
                 compatibility with the Sienci ATC.
             </p>
@@ -27,13 +44,15 @@ export function ControllerConfiguration({
                 <li>etc.</li>
             </ul>
 
-            <p>Select “Apply Settings” to apply these changes.</p>
+            <p className="dark:text-white">
+                Select “Apply Settings” to apply these changes.
+            </p>
             <StepActionButton
-                label="Apply Settings"
+                label={'Apply'}
                 runningLabel="Applying..."
                 onApply={applySettings}
-                onComplete={onComplete}
-                onUncomplete={onUncomplete}
+                isComplete={isComplete}
+                error={error}
             />
         </div>
     );

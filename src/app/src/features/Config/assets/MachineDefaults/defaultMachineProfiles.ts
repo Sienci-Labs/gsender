@@ -54,32 +54,6 @@ export default [
         isHal: true,
     },
     {
-        id: 1,
-        company: 'Sienci Labs',
-        name: 'AltMill 4x4 + Spindle',
-        type: '',
-        version: '',
-        mm: {
-            width: 1259.8,
-            depth: 1247.1,
-            height: 170,
-        },
-        in: {
-            width: 49.6,
-            depth: 49.1,
-            height: 6.6,
-        },
-        endstops: true,
-        spindle: true,
-        coolant: false,
-        laser: false,
-        laserOnOutline: false,
-        eepromSettings: altmillSettings.SPINDLE_KIT,
-        grblHALeepromSettings: altmillSettings.SPINDLE_KIT,
-        orderedSettings: altmillSettings.SPINDLE_ORDERED,
-        isHal: true,
-    },
-    {
         id: 2,
         company: 'Sienci Labs',
         name: 'AltMill 2x4',
@@ -88,12 +62,12 @@ export default [
         mm: {
             width: 1260,
             depth: 1248,
-            height: 170
+            height: 170,
         },
         in: {
             width: 31.18,
             depth: 33.27,
-            height: 4.5
+            height: 4.5,
         },
         endstops: true,
         spindle: false,
@@ -103,33 +77,33 @@ export default [
         eepromSettings: altmillSettings.DEFAULT_2X4,
         grblHALeepromSettings: altmillSettings.DEFAULT_2X4,
         orderedSettings: altmillSettings.ALTMILL_ORDERED,
-        isHal: true
+        isHal: true,
     },
     {
-        id: 3,
+        id: 4,
         company: 'Sienci Labs',
-        name: 'AltMill 2x4 + Spindle',
+        name: 'AltMill 4x8',
         type: '',
         version: '',
         mm: {
-            width: 609.6,
-            depth: 1247.1,
-            height: 167.6
+            width: 1260,
+            depth: 1248,
+            height: 170,
         },
         in: {
-            width: 24,
-            depth: 49.1,
-            height: 6.6
+            width: 104.7,
+            depth: 33.27,
+            height: 4.5,
         },
         endstops: true,
-        spindle: true,
+        spindle: false,
         coolant: false,
         laser: false,
         laserOnOutline: false,
-        eepromSettings: altmillSettings.DEFAULT_2X4_SPINDLE_KIT,
-        grblHALeepromSettings: altmillSettings.DEFAULT_2X4_SPINDLE_KIT,
-        orderedSettings: altmillSettings.SPINDLE_ORDERED,
-        isHal: true
+        eepromSettings: altmillSettings.DEFAULT_4X8,
+        grblHALeepromSettings: altmillSettings.DEFAULT_4X8,
+        orderedSettings: altmillSettings.ALTMILL_ORDERED,
+        isHal: true,
     },
     {
         id: 5,

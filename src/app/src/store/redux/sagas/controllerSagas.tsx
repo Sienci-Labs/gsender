@@ -216,6 +216,7 @@ export function* initialize(): Generator<any, void, any> {
             xAccel: _get(reduxState, 'controller.settings.settings.$120'),
             yAccel: _get(reduxState, 'controller.settings.settings.$121'),
             zAccel: _get(reduxState, 'controller.settings.settings.$122'),
+            aAccel: _get(reduxState, 'controller.settings.settings.$123'),
         };
         const maxFeedrates = {
             xMaxFeed: Number(
@@ -227,7 +228,14 @@ export function* initialize(): Generator<any, void, any> {
             zMaxFeed: Number(
                 _get(reduxState, 'controller.settings.settings.$112', 3000.0),
             ),
+            aMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$113', 3000.0),
+            ),
         };
+        const rotaryDiameterOffsetEnabled = store.get(
+            'widgets.visualizer.rotaryDiameterOffsetEnabled',
+            false,
+        );
         const atcFlag: string = get(
             reduxStore,
             'controller.settings.info.NEWOPT.ATC',
@@ -282,6 +290,7 @@ export function* initialize(): Generator<any, void, any> {
                     accelerations,
                     maxFeedrates,
                     atcEnabled,
+                    rotaryDiameterOffsetEnabled,
                 });
             } else {
                 reduxStore.dispatch(
@@ -334,6 +343,7 @@ export function* initialize(): Generator<any, void, any> {
             accelerations,
             maxFeedrates,
             atcEnabled,
+            rotaryDiameterOffsetEnabled,
         });
     };
 
@@ -356,6 +366,7 @@ export function* initialize(): Generator<any, void, any> {
                 line: error.line,
                 controller: error.controller,
             };
+            console.log(alarmError);
             api.alarmList.update(alarmError);
         } catch (error) {
             console.error(error);
@@ -813,8 +824,6 @@ export function* initialize(): Generator<any, void, any> {
             //     'controller.settings.settings.$22',
             // );
 
-            console.log(error);
-
             const showLineWarnings = store.get(
                 'widgets.visualizer.showLineWarnings',
                 false,
@@ -913,7 +922,7 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('settings:alarm', (data: BasicObject) => {
+    controller.addListener('settings:alarms', (data: BasicObject) => {
         reduxStore.dispatch(updateAlarmDescriptions({ alarms: data }));
     });
 

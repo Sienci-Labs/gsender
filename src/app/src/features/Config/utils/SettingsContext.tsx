@@ -57,6 +57,7 @@ interface iSettingsContext {
     eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
     isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
+    isFirmwareCurrent: boolean;
 }
 
 interface SettingsProviderProps {
@@ -98,6 +99,7 @@ const defaultState: iSettingsContext = {
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
+    isFirmwareCurrent: false,
 };
 
 export const SettingsContext =
@@ -180,7 +182,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     );
 
     useEffect(() => {
-        setIsFirmwareCurrent(firmwarePastVersion(firmwareVersion));
+        setIsFirmwareCurrent(firmwarePastVersion(ATCI_SUPPORTED_VERSION));
     }, [firmwareVersion]);
 
     const detectedEEPROM = useSelector(
@@ -383,7 +385,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             detectedEEPROMGroups,
             EEPROM,
         );
-        console.log(EEPROM);
     }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     function checkIfModified(v: gSenderSetting) {
@@ -565,6 +566,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         eepromIsDefault,
         isSettingDefault,
         getEEPROMDefaultValue,
+        isFirmwareCurrent,
     };
 
     return (

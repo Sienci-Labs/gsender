@@ -157,13 +157,21 @@ class GCodeVirtualizer extends EventEmitter {
 
     zAccel: number = 500;
 
+    aAccel: number = 500;
+
     xMaxFeed: number = 0;
 
     yMaxFeed: number = 0;
 
     zMaxFeed: number = 0;
 
+    aMaxFeed: number = 0;
+
     atcEnabled: boolean = false;
+
+    rotaryDiameter: number = 50; // Default diameter in mm for rotary calculations
+
+    autoDetectRotaryDiameter: boolean = true; // Automatically detect diameter from file bounds
 
     re1: RegExp = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
 
@@ -998,13 +1006,17 @@ class GCodeVirtualizer extends EventEmitter {
             xAccel?: number;
             yAccel?: number;
             zAccel?: number;
+            aAccel?: number;
         };
         maxFeedrates?: {
             xMaxFeed?: number;
             yMaxFeed?: number;
             zMaxFeed?: number;
+            aMaxFeed?: number;
         };
         atcEnabled?: boolean;
+        rotaryDiameter?: number;
+        autoDetectRotaryDiameter?: boolean;
     }) {
         super();
         const {
@@ -1016,23 +1028,39 @@ class GCodeVirtualizer extends EventEmitter {
             accelerations,
             maxFeedrates,
             atcEnabled,
+            rotaryDiameter,
+            autoDetectRotaryDiameter = true,
         } = options;
 
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
 
         if (accelerations) {
-            const { xAccel, yAccel, zAccel } = accelerations;
+            const { xAccel, yAccel, zAccel, aAccel } = accelerations;
             this.xAccel = xAccel;
             this.yAccel = yAccel;
             this.zAccel = zAccel;
+            if (aAccel !== undefined) {
+                this.aAccel = aAccel;
+            }
         }
 
         if (maxFeedrates) {
-            const { xMaxFeed, yMaxFeed, zMaxFeed } = maxFeedrates;
+            const { xMaxFeed, yMaxFeed, zMaxFeed, aMaxFeed } = maxFeedrates;
             this.xMaxFeed = xMaxFeed;
             this.yMaxFeed = yMaxFeed;
             this.zMaxFeed = zMaxFeed;
+            if (aMaxFeed !== undefined) {
+                this.aMaxFeed = aMaxFeed;
+            }
+        }
+
+        if (rotaryDiameter !== undefined) {
+            this.rotaryDiameter = rotaryDiameter;
+            // If a specific diameter is provided, disable auto-detection
+            this.autoDetectRotaryDiameter = false;
+        } else {
+            this.autoDetectRotaryDiameter = autoDetectRotaryDiameter;
         }
 
         if (this.collate) {
@@ -1413,6 +1441,23 @@ class GCodeVirtualizer extends EventEmitter {
             if (a < this.minBounds[3]) {
                 this.minBounds[3] = a;
             }
+
+            // Auto-detect rotary diameter from Y/Z range when A-axis is used
+            // This works regardless of where zero is set (center, surface, or arbitrary point)
+            if (this.autoDetectRotaryDiameter && a !== 0) {
+                // Calculate diameter from the full range of Y and Z movement
+                // The range represents the full diameter of the workpiece
+                const yRange = this.maxBounds[1] - this.minBounds[1];
+                const zRange = this.maxBounds[2] - this.minBounds[2];
+                
+                // Use the larger range (Y or Z depending on machine configuration)
+                const detectedDiameter = Math.max(yRange, zRange);
+                
+                // Update if we found a larger diameter, with minimum of 10mm
+                if (detectedDiameter > this.rotaryDiameter) {
+                    this.rotaryDiameter = Math.max(detectedDiameter, 10);
+                }
+            }
         }
     }
 
@@ -1449,6 +1494,7 @@ class GCodeVirtualizer extends EventEmitter {
         const dx = endPos.x - currentPos.x;
         const dy = endPos.y - currentPos.y;
         const dz = endPos.z - currentPos.z;
+        const da = (endPos.a ?? 0) - (currentPos.a ?? 0);
 
         let travelXY = Math.hypot(dx, dy);
         if (Number.isNaN(travelXY)) {
@@ -1457,52 +1503,154 @@ class GCodeVirtualizer extends EventEmitter {
             );
             return;
         }
-        let travel = 0;
-        travel = Math.hypot(travelXY, dz);
 
-        let feed;
+        // Calculate linear travel distance (XYZ)
+        let linearTravel = Math.hypot(travelXY, dz);
+
+        // Calculate rotary travel distance
+        // Convert angular motion (degrees) to linear distance (mm) using the rotary diameter
+        // Arc length = (angle in degrees / 360) * π * diameter
+        let rotaryTravel = 0;
+        if (da !== 0) {
+            const circumference = Math.PI * this.rotaryDiameter;
+            rotaryTravel = (Math.abs(da) / 360) * circumference;
+        }
+
+        // Determine which axes are moving and collect their constraints
         const maxFeedArray = [];
         const accelArray = [];
-        // if d[var] is 0, we aren't moving in that direction, so we don't need to use that feed/accel.
+        const axisMovements = [];
+
+        // For moves with both linear and rotary components, we need to consider both
+        // The machine will move all axes simultaneously, so time is determined by the slowest axis
+
         if (dx !== 0) {
             maxFeedArray.push(this.xMaxFeed);
             accelArray.push(this.xAccel);
+            axisMovements.push({
+                distance: Math.abs(dx),
+                maxFeed: this.xMaxFeed,
+                accel: this.xAccel,
+            });
         }
         if (dy !== 0) {
             maxFeedArray.push(this.yMaxFeed);
             accelArray.push(this.yAccel);
+            axisMovements.push({
+                distance: Math.abs(dy),
+                maxFeed: this.yMaxFeed,
+                accel: this.yAccel,
+            });
         }
         if (dz !== 0) {
             maxFeedArray.push(this.zMaxFeed);
             accelArray.push(this.zAccel);
+            axisMovements.push({
+                distance: Math.abs(dz),
+                maxFeed: this.zMaxFeed,
+                accel: this.zAccel,
+            });
         }
-        // find the lowest max feed/accel
-        const minMaxFeed = Math.min(...maxFeedArray);
-        const minAccel = Math.min(...accelArray);
-        // if motion is G0, use the max feed
-        feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
-        // if the feed is above the lowest max, use the lowest max instead
-        if (feed > minMaxFeed) {
-            feed = minMaxFeed;
+        if (da !== 0) {
+            // A-axis feedrate is in degrees/min, not mm/min
+            // Convert it to equivalent mm/min based on the workpiece diameter
+            const aMaxFeedLinear = (this.aMaxFeed / 360) * (Math.PI * this.rotaryDiameter);
+            const aAccelLinear = (this.aAccel / 360) * (Math.PI * this.rotaryDiameter);
+            
+            maxFeedArray.push(aMaxFeedLinear);
+            accelArray.push(aAccelLinear);
+            axisMovements.push({
+                distance: rotaryTravel,
+                maxFeed: aMaxFeedLinear,
+                accel: aAccelLinear,
+            });
         }
 
-        // Convert to metric
-        feed = this.modal.units === 'G20' ? feed * 25.4 : feed;
+        // If no movement, return early
+        if (axisMovements.length === 0) {
+            this.estimates.push(0);
+            this.setEstimate = true;
+            return;
+        }
 
-        // mm/s to mm/m
-        const f = feed / 60;
+        // For combined linear + rotary moves, calculate time based on each axis independently
+        // and take the maximum (since all axes move simultaneously)
+        if (da !== 0 && (dx !== 0 || dy !== 0 || dz !== 0)) {
+            // Combined move: calculate time for each axis independently
+            let maxTime = 0;
+            const programmedFeed = this.modal.motion === 'G0' ? 0 : this.feed;
+            const programmedFeedMetric =
+                this.modal.units === 'G20'
+                    ? programmedFeed * 25.4
+                    : programmedFeed;
 
-        if (f === this.lastF) {
-            moveDuration = f !== 0 ? travel / f : 0;
+            for (const axis of axisMovements) {
+                let axisFeed =
+                    this.modal.motion === 'G0'
+                        ? axis.maxFeed
+                        : programmedFeedMetric;
+
+                // Limit feed to max feed for this axis
+                if (axisFeed > axis.maxFeed) {
+                    axisFeed = axis.maxFeed;
+                }
+
+                const f = axisFeed / 60; // Convert to mm/s
+                let axisTime = 0;
+
+                if (f > 0) {
+                    axisTime = this.getAcceleratedMove(
+                        axis.distance,
+                        f,
+                        axis.accel,
+                    );
+                }
+
+                if (axisTime > maxTime) {
+                    maxTime = axisTime;
+                }
+            }
+
+            moveDuration = maxTime;
         } else {
-            moveDuration = this.getAcceleratedMove(
-                travel,
-                f,
-                /*this.lastF,*/ minAccel,
-            );
+            // Pure linear or pure rotary move: use traditional calculation
+            const travel = da !== 0 ? rotaryTravel : linearTravel;
+
+            // find the lowest max feed/accel
+            const minMaxFeed = Math.min(...maxFeedArray);
+            const minAccel = Math.min(...accelArray);
+
+            // if motion is G0, use the max feed
+            let feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
+            
+            // For pure rotary moves (A-axis only), the feedrate (F value) is in degrees/min
+            // Convert it to equivalent linear speed based on workpiece diameter
+            if (da !== 0 && dx === 0 && dy === 0 && dz === 0) {
+                // Pure rotary move: F is in degrees/min, convert to mm/min
+                const feedDegPerMin = this.modal.units === 'G20' ? feed * 25.4 : feed;
+                feed = (feedDegPerMin / 360) * (Math.PI * this.rotaryDiameter);
+            } else {
+                // Linear move: F is already in mm/min (or inches/min)
+                feed = this.modal.units === 'G20' ? feed * 25.4 : feed;
+            }
+
+            // if the feed is above the lowest max, use the lowest max instead
+            if (feed > minMaxFeed) {
+                feed = minMaxFeed;
+            }
+
+            // mm/s to mm/m
+            const f = feed / 60;
+
+            if (f === this.lastF && da === 0) {
+                moveDuration = f !== 0 ? travel / f : 0;
+            } else {
+                moveDuration = this.getAcceleratedMove(travel, f, minAccel);
+            }
+
+            this.lastF = f;
         }
 
-        this.lastF = f;
         this.totalTime += moveDuration;
         this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
         this.setEstimate = true;

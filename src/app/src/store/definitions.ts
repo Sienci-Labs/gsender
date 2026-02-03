@@ -65,15 +65,15 @@ export interface FirmwareOptions {
 export interface ToolTable {}
 
 export interface ControllerSettings {
-    toolTable: any;
+    toolTable?: any;
     //TODO
     parameters: BasicObject;
     settings: EEPROMSettings;
     info?: FirmwareOptions;
     descriptions?: EEPROMDescriptions;
     groups: BasicObject;
-    alarms: BasicObject;
-    version: {
+    alarms?: { [key: number]: { description: string; id: number } };
+    version?: {
         semver: number;
     };
 }

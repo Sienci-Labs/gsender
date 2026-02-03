@@ -497,6 +497,11 @@ export const GRBL_HAL_ALARMS = [
         description: 'Motor fault.'
     },
     {
+        code: 19,
+        message: 'Modbus Exception.',
+        description: 'Modbus Exception.  Timeout or error message.'
+    },
+    {
         code: 'Homing',
         message: 'Homing required',
         description: 'Homing must be run if limit switches and homing cycle is enabled in EEPROM'

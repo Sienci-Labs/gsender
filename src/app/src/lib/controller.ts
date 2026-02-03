@@ -73,7 +73,7 @@ export interface ControllerListeners {
     'controller:settings': Array<Function>;
     'controller:state': Array<Function>;
     'settings:description': Array<Function>;
-    'settings:alarm': Array<Function>;
+    'settings:alarms': Array<Function>;
     message: Array<Function>;
     'toolchange:start': Array<Function>;
     hPong: Array<Function>;
@@ -114,7 +114,7 @@ export interface ControllerListeners {
     'job:stop': Array<Function>;
     'sdcard:files': Array<Function>;
     'sdcard:clear': Array<Function>;
-    'sdcard:json': Array<Function>
+    'sdcard:json': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -127,7 +127,7 @@ const ensureArray = (...args: Array<any>) => {
     return ([] as any).concat(args);
 };
 
-const noop = () => { };
+const noop = () => {};
 
 class Controller {
     io: Function = noop;
@@ -185,7 +185,7 @@ class Controller {
         'controller:settings': [],
         'controller:state': [],
         'settings:description': [],
-        'settings:alarm': [],
+        'settings:alarms': [],
         message: [],
         'toolchange:start': [],
         hPong: [],

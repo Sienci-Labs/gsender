@@ -2,6 +2,7 @@ import { gSenderSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import cn from 'classnames';
+import { JSX } from 'react';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];

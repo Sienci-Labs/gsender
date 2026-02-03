@@ -229,8 +229,24 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         setProgress(0);
         setStatus({ type: 'idle', message: 'Applying configuration...' });
 
-        const content = generateAllMacros(config);
+        const content = generateAllMacros(config, true);
 
+        const handleComplete = () => {
+            controller.removeListener('ymodem:complete', handleComplete);
+            controller.removeListener('ymodem:error', handleError);
+            setStatus({ type: 'idle', message: '' });
+            setTimeout(() => {
+                controller.command('gcode', ['G65 P100', 'G65 P200']);
+            }, 1000);
+        };
+
+        const handleError = () => {
+            controller.removeListener('ymodem:complete', handleComplete);
+            controller.removeListener('ymodem:error', handleError);
+        };
+
+        controller.addListener('ymodem:complete', handleComplete);
+        controller.addListener('ymodem:error', handleError);
         controller.command('ymodem:uploadFiles', content);
     };
 

@@ -39,25 +39,42 @@ export const determineEEPROMAdjustment = (
     const currentXStep = Number($100);
     const currentYStep = Number($101);
 
-    const calculatedXStep = calculateMovement({
-        currentStep: currentYStep,
-        movedDistance: jogValues.y,
-        actualDistance: triangle.a,
-    });
+    const hasValidXData = jogValues.x > 0 && triangle.a > 0;
+    const hasValidYData = jogValues.y > 0 && triangle.b > 0;
 
-    const calculatedYStep = calculateMovement({
-        currentStep: currentXStep,
-        movedDistance: jogValues.x,
-        actualDistance: triangle.b,
-    });
+    const calculatedXStep = hasValidXData
+        ? calculateMovement({
+              currentStep: currentXStep,
+              movedDistance: jogValues.x,
+              actualDistance: triangle.a,
+          })
+        : currentXStep;
+
+    const calculatedYStep = hasValidYData
+        ? calculateMovement({
+              currentStep: currentYStep,
+              movedDistance: jogValues.y,
+              actualDistance: triangle.b,
+          })
+        : currentYStep;
+
+    const STEP_ADJUSTMENT_THRESHOLD = 0.001;
+    const xDiffPercent = Math.abs(
+        (calculatedXStep - currentXStep) / currentXStep,
+    );
+    const yDiffPercent = Math.abs(
+        (calculatedYStep - currentYStep) / currentYStep,
+    );
 
     return {
         x: {
-            needsAdjustment: calculatedXStep !== currentXStep,
+            needsAdjustment:
+                hasValidXData && xDiffPercent > STEP_ADJUSTMENT_THRESHOLD,
             amount: calculatedXStep,
         },
         y: {
-            needsAdjustment: calculatedYStep !== currentYStep,
+            needsAdjustment:
+                hasValidYData && yDiffPercent > STEP_ADJUSTMENT_THRESHOLD,
             amount: calculatedYStep,
         },
     };

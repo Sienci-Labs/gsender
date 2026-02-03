@@ -89,7 +89,7 @@ html,
     }
 
     .rapidButtonTransformPortrait {
-        transform: scale(1.4) translatex(-30px) perspective(160px)
+        transform: scale(1.7) translatex(-30px) perspective(160px)
             rotateX(55deg);
     }
 }

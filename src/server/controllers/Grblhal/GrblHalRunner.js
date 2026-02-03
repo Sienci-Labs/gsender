@@ -54,6 +54,7 @@ import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GrblHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
 import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
+import GrblHalErrorDescription from './GrblHalErrorDescription';
 
 const log = logger('controller:grblHAL');
 
@@ -124,6 +125,7 @@ class GrblHalRunner extends events.EventEmitter {
         descriptions: {
         },
         alarms: {},
+        errors: {},
         toolTable: {},
         atci: {}
     };
@@ -320,6 +322,33 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultParameters) {
             const { name, value } = payload;
+            // Update tool offsets for current tool based on PRB results
+            // This is necessary in order to update offsets mid tool change or toolpath
+            // Ignore prb output for tool 0 (empty) since nothing to update
+            // Ignore PRB if no success on probe
+            const currentTool = this.state.status.currentTool;
+
+            if (name === 'PRB' && value.result === 1 && currentTool > 0) {
+                const nextSettings = {
+                    ...this.settings,
+                    toolTable: {
+                        ...this.settings.toolTable,
+                        [currentTool]: {
+                            ...this.settings.toolTable[currentTool],
+                            toolOffsets: {
+                                ...this.settings.toolTable[currentTool].toolOffsets,
+                                x: Number(value.x),
+                                y: Number(value.y),
+                                z: Number(value.z)
+                            }
+                        }
+                    }
+                };
+
+                if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
+                    this.settings = nextSettings;
+                }
+            }
             const nextSettings = {
                 ...this.settings,
                 parameters: {
@@ -347,6 +376,14 @@ class GrblHalRunner extends events.EventEmitter {
             };
 
             this.emit('alarmDetail', this.settings.alarms);
+            return;
+        }
+        if (type === GrblHalErrorDescription) {
+            this.settings.errors[payload.code] = {
+                code: payload.code,
+                description: payload.description
+            };
+            this.emit('errorDescription', this.settings.errors);
             return;
         }
         if (type === GrblHalLineParserResultGroupDetail) {
@@ -537,9 +574,29 @@ class GrblHalRunner extends events.EventEmitter {
         return !_.isEmpty(this.settings.settings);
     }
 
+    getSetting(key, defaultValue = '') {
+        return _.get(this.settings.settings, key, defaultValue);
+    }
+
     hasAXS() {
         const axs = _.get(this.state, 'axes.axes', []);
         return !_.isEmpty(axs);
+    }
+
+    clearSDFiles() {
+        this.state.sdcard.files = [];
+    }
+
+    clearSDStatus() {
+        this.state.status.sdCard = false;
+    }
+
+    setSDStatus() {
+        this.state.status.sdCard = true;
+    }
+
+    isSDMounted() {
+        return this.state.status.sdCard;
     }
 }
 

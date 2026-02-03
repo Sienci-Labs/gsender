@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-    Settings,
-    Loader2,
-    CheckCircle,
-    AlertTriangle,
-    AlertCircle,
-} from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import {
     Popover,
     PopoverContent,
@@ -18,8 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
-import { Button } from 'app/components/Button';
-import controller from 'app/lib/controller.ts';
+import { Button, type ButtonProps } from 'app/components/Button';
 import {
     ToolInstance,
     ToolStatus,
@@ -33,11 +26,22 @@ import {
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 
-const ToolChangerPopover: React.FC = ({
+interface ToolChangerPopoverProps {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    disabled?: boolean;
+    tools?: ToolInstance[];
+    buttonSize?: ButtonProps['size'];
+    buttonClassName?: string;
+}
+
+const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     isOpen,
     setIsOpen,
     disabled,
     tools = [],
+    buttonSize,
+    buttonClassName,
 }) => {
     const { mode, setLoadToolMode } = useToolChange();
     const [selectedToolId, setSelectedToolId] = useState<string>('1');
@@ -116,9 +120,11 @@ const ToolChangerPopover: React.FC = ({
                 <Button
                     disabled={disabled}
                     variant="primary"
+                    size={buttonSize}
+                    className={buttonClassName}
                     onClick={handleLoadOpen}
                 >
-                    <Settings className="w-4 h-4 mr-2" />
+                    <Download className="w-4 h-4 mr-2" />
                     Load
                 </Button>
             </PopoverTrigger>

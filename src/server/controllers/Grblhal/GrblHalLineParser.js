@@ -47,6 +47,7 @@ import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
 import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
 import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
 import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
+import GrblHalErrorDescription from './GrblHalErrorDescription';
 
 class GrblHalLineParser {
     parse(line) {
@@ -111,6 +112,9 @@ class GrblHalLineParser {
 
             //[ALARMCODE:16||Power on selftest (POS) failed.]
             GrblHalLineParserResultAlarmDetails,
+
+            // [ERRORCODE:62||Directory listing failed.]
+            GrblHalErrorDescription,
 
             // Tool
             GrblHalLineParserResultTool,

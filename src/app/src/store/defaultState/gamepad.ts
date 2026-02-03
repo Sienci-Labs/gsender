@@ -42,6 +42,7 @@ export const defaultOptions: DefaultGamepadOptions = {
         },
         zeroThreshold: 30,
         movementDistanceOverride: 100,
+        fixedSpeedMode: false,
     },
     buttons: [],
 };

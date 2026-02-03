@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
@@ -8,14 +9,31 @@ interface Props {
     on: boolean;
 }
 
-export function PinIndicator({ on = false }) {
+interface PinIndicatorProps {
+    on?: boolean;
+}
+
+export function PinIndicator({ on = false }: PinIndicatorProps) {
     return (
         <div
-            className={cx('rounded-md py-1 px-2 w-3 h-3', {
+            aria-label={on ? 'On' : 'Off'}
+            title={on ? 'On' : 'Off'}
+            className={cx('relative rounded-md py-1 px-2 w-3 h-3', {
                 'bg-green-500': on,
                 'bg-red-500': !on,
             })}
-        />
+        >
+            <span
+                className="absolute inset-0 flex items-center justify-center text-white"
+                aria-hidden="true"
+            >
+                {on ? (
+                    <FaCheck className="w-2.5 h-2.5" />
+                ) : (
+                    <FaTimes className="w-2.5 h-2.5" />
+                )}
+            </span>
+        </div>
     );
 }
 
