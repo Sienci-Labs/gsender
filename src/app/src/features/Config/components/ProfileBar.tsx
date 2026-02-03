@@ -113,12 +113,14 @@ export function ProfileBar() {
                             inputRef.current.value = null;
                         }}
                         disabled={!connected}
+                        testId="firmware-settings-import-button"
                     />
                     <ActionButton
                         icon={<PiUploadSimpleBold />}
                         label="Export"
                         onClick={() => exportFirmwareSettings(rawEEPROM)}
                         disabled={!connected}
+                        testId="firmware-settings-export-button"
                     />
                 </div>
             </div>
