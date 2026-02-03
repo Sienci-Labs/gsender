@@ -20,6 +20,7 @@ export function ApplicationPreferences() {
                     label="Reset"
                     icon={<GrPowerReset />}
                     onClick={handleRestoreDefaultClick}
+                    testId="gsender-settings-reset-button"
                 />
                 <ActionButton
                     label="Import"
@@ -27,11 +28,13 @@ export function ApplicationPreferences() {
                     onClick={() => {
                         inputRef.current.click();
                     }}
+                    testId="gsender-settings-import-button"
                 />
                 <ActionButton
                     label="Export"
                     icon={<PiUploadSimple />}
                     onClick={exportSettings}
+                    testId="gsender-settings-export-button"
                 />
                 <input
                     type="file"
