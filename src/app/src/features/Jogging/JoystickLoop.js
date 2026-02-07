@@ -349,6 +349,10 @@ export class JoystickLoop {
 
             const [axis, axisValue] = Object.entries(axesData)[0];
 
+            if (isOverrideAction(axis)) {
+                return acc;
+            }
+
             const feedrate = this._computeFeedrate(curr);
 
             acc[axis] =
@@ -419,6 +423,10 @@ export class JoystickLoop {
             }
 
             const [axis, axisValue] = Object.entries(curr)[0];
+
+            if (isOverrideAction(axis)) {
+                return acc;
+            }
 
             acc[axis] = axisValue;
 
