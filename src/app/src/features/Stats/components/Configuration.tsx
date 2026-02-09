@@ -55,7 +55,7 @@ export function Configuration() {
         (state: RootState) => state.controller.settings.settings,
     );
 
-    const { $20, $13, $22 } = settings;
+    const { $20, $13, $22, $23 } = settings;
 
     const reportInchesString = $13 === '1' ? 'Enabled' : 'Disabled';
     const softLimitsString = $20 === '1' ? 'Enabled' : 'Disabled';
@@ -89,7 +89,7 @@ export function Configuration() {
                 <b>{homingEnabledString}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Home location'}>
-                <b>{homingString($20)}</b>
+                <b>{homingString($23)}</b>
             </ConfigRow>
             <ConfigRow connected={connected} label={'Report inches'}>
                 <b>{reportInchesString}</b>

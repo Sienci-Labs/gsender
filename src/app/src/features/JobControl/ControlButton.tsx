@@ -14,6 +14,7 @@ import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
+    GRBL_ACTIVE_STATE_CHECK,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -239,7 +240,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                                 controller.command('reset');
                                 return;
                             }
-                            handleStop();
+                            handleStop(activeState);
                         },
                     },
                 };
@@ -282,9 +283,13 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     const handlePause = (): void => {
         controller.command('gcode:pause');
     };
-    const handleStop = (): void => {
+    const handleStop = (reduxActiveState?: GRBL_ACTIVE_STATES_T): void => {
+        const currentActiveState = reduxActiveState || activeState;
         onStop();
         controller.command('gcode:stop', { force: true });
+        if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
+            controller.command('gcode', '$C');
+        }
     };
 
     const message: Message = {

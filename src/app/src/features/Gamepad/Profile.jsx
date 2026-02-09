@@ -18,7 +18,7 @@ import ButtonActionsTable from './components/ButtonActionsTable';
 import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
 import { GAMEPAD_MODAL } from './utils/constants';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, DownloadIcon, UploadIcon } from 'lucide-react';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);
@@ -84,6 +84,105 @@ const Profile = ({ data }) => {
         toast.info('Updated Profile Name', { position: 'bottom-right' });
     };
 
+    const handleExportProfile = () => {
+        try {
+            const exportData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                profile: data,
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `gsender-gamepad-${name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            toast.success('Gamepad profile exported successfully!', {
+                duration: 3000,
+                position: 'bottom-right',
+            });
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Failed to export gamepad profile.', {
+                position: 'bottom-right',
+            });
+        }
+    };
+
+    const handleImportProfile = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json,.json';
+
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importData = JSON.parse(event.target.result);
+
+                    // Validate the imported data
+                    if (!importData.profile) {
+                        throw new Error('Invalid gamepad profile file format');
+                    }
+
+                    const profiles = store.get(
+                        'workspace.gamepad.profiles',
+                        [],
+                    );
+
+                    // Merge imported profile data with current profile
+                    const updatedProfiles = profiles.map((profile) =>
+                        arrayComparator(profile.id, data.id)
+                            ? {
+                                  ...profile,
+                                  buttons:
+                                      importData.profile.buttons ||
+                                      profile.buttons,
+                                  joystickOptions:
+                                      importData.profile.joystickOptions ||
+                                      profile.joystickOptions,
+                                  lockout:
+                                      importData.profile.lockout ||
+                                      profile.lockout,
+                                  modifier:
+                                      importData.profile.modifier ||
+                                      profile.modifier,
+                              }
+                            : profile,
+                    );
+
+                    dispatch(setGamepadProfileList(updatedProfiles));
+
+                    toast.success('Gamepad profile imported successfully!', {
+                        duration: 3000,
+                        position: 'bottom-right',
+                    });
+                } catch (error) {
+                    console.error('Import error:', error);
+                    toast.error(
+                        'Failed to import gamepad profile. Please check the file format.',
+                        {
+                            position: 'bottom-right',
+                        },
+                    );
+                }
+            };
+
+            reader.readAsText(file);
+        };
+
+        input.click();
+    };
+
     return (
         <div className="flex flex-col gap-2 mt-4">
             <div className="flex items-center justify-between gap-2">
@@ -106,14 +205,32 @@ const Profile = ({ data }) => {
                         {isConnected ? 'Connected' : 'Disconnected'}
                     </span>
                 </div>
-                <Button
-                    onClick={() =>
-                        dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))
-                    }
-                    className="bg-orange-400 dark:bg-orange-700 border-orange-700 dark:border-orange-400 text-white hover:bg-orange-50"
-                >
-                    Help
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={handleImportProfile}
+                        icon={<DownloadIcon size={16} />}
+                        text="Import"
+                        tooltip={{
+                            content: 'Import profile settings from a file',
+                        }}
+                    />
+                    <Button
+                        onClick={handleExportProfile}
+                        icon={<UploadIcon size={16} />}
+                        text="Export"
+                        tooltip={{
+                            content: 'Export profile settings to a file',
+                        }}
+                    />
+                    <Button
+                        onClick={() =>
+                            dispatch(setCurrentModal(GAMEPAD_MODAL.HELP))
+                        }
+                        className="bg-orange-400 dark:bg-orange-700 border-orange-700 dark:border-orange-400 text-white hover:bg-orange-50"
+                    >
+                        Help
+                    </Button>
+                </div>
             </div>
 
             <div className="flex gap-4 mt-4">

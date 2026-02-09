@@ -62,7 +62,7 @@ import {
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
-    GRBL_SETTINGS
+    GRBL_SETTINGS,
 } from './constants';
 import {
     METRIC_UNITS,
@@ -767,7 +767,7 @@ class GrblController {
                 code: `${code}`,
                 description: _.get(error, 'description', ''),
                 line: line,
-                lineNumber: isFileError ? received + 1 : '',
+                lineNumber: isFileError ? received : '',
                 origin: errorOrigin,
                 controller: GRBL,
             });
@@ -782,7 +782,7 @@ class GrblController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received + 1} - ${error.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error.message}`;
                         this.emit('gcode_error', msg);
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
@@ -850,7 +850,7 @@ class GrblController {
                     code: code,
                     description: alarm.description,
                     line: line,
-                    lineNumber: isFileError ? received + 1 : '',
+                    lineNumber: isFileError ? received : '',
                     origin: errorOrigin,
                     controller: GRBL
                 });

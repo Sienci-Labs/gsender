@@ -273,10 +273,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 
     const handleProbeDiameterScroll = useCallback(
         (direction: 'up' | 'down') => {
-            if (value === PROBE_TYPE_AUTO || value === PROBE_TYPE_TIP) {
-                return;
-            }
-
             const currentIndex = options.findIndex(
                 (opt) => opt.value === value,
             );

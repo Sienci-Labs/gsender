@@ -15,7 +15,12 @@ export function unlockFirmware(
     code: string | number,
 ) {
     if (state === GRBL_ACTIVE_STATE_ALARM) {
-        controller.command('unlock');
+        if (code === 17 || code === 10) {
+            controller.command('reset:limit');
+        } else {
+            controller.command('unlock');
+        }
+
         if (code === 11 || code === 'Homing') {
             controller.command('populateConfig');
         }

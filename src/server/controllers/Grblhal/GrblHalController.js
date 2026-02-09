@@ -803,7 +803,7 @@ class GrblHalController {
                 code: `${code}`,
                 description: _.get(error, 'description', ''),
                 line: line,
-                lineNumber: isFileError ? received + 1 : '',
+                lineNumber: isFileError ? received : '',
                 origin: errorOrigin,
                 controller: GRBLHAL,
                 fileRunning: isRunning
@@ -818,7 +818,7 @@ class GrblHalController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received + 1} - ${error?.message}`;
+                        const msg = `Error ${code} on line ${received} - ${error?.message}`;
                         this.emit('gcode_error', msg);
                     }
 
@@ -888,7 +888,7 @@ class GrblHalController {
                     code: code,
                     description: alarm.description || '',
                     line: line,
-                    lineNumber: isFileError ? received + 1 : '',
+                    lineNumber: isFileError ? received : '',
                     origin: errorOrigin,
                     controller: GRBLHAL,
                 }, isRunning);
@@ -1767,7 +1767,11 @@ class GrblHalController {
                 this.feeder.next();
             },
             'feeder:stop': () => {
+                clearInterval(this.feederCB);
                 this.feeder.reset();
+                this.workflow.stop();
+                this.write('\x19');
+
 
                 delay(100).then(() => {
                     this.write('~');
@@ -1967,20 +1971,10 @@ class GrblHalController {
             },
             'gcode:test': () => {
                 this.feederCB = () => {
-                    const interval = setInterval(() => {
-                        // check if in check (lol)
-                        // if we aren't in check, there may be a race condition
-                        // where the verify is done before the board is in check
-                        // which makes it stay in check forever
-                        if (this.runner && this.runner.isCheck()) {
-                            this.feeder.reset();
-                            this.workflow.start();
-                            this.sender.next();
-                            this.feederCB = null;
-                            clearInterval(interval);
-                            return;
-                        }
-                    }, 200);
+                    this.feeder.reset();
+                    this.workflow.start();
+                    this.sender.next();
+                    this.feederCB = null;
                 };
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
