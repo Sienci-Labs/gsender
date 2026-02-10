@@ -141,6 +141,10 @@ const MeasurementStep = () => {
                                                             step.buttonLabel,
                                                         )
                                                     }
+                                                    testId={
+                                                        'confirm ' +
+                                                        measurementKey
+                                                    }
                                                 >
                                                     {step.completed
                                                         ? 'Update'
