@@ -1,22 +1,5 @@
 describe('Coolant Testing  ', () => {
 
-  // Ignore known hydration-related UI errors and undefined.get() error
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // ignore these exceptions
-    }
-    return true;
-  });
-
  beforeEach(() => {
   cy.viewport(1920, 1080);
   // Use loadUI custom command with dynamic baseUrl
@@ -41,11 +24,7 @@ describe('Coolant Testing  ', () => {
 
     // Step 2: Verify CNC machine status is Idle
     cy.log('Step 2: Verifying machine status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Idle');
 
     cy.wait(2000);
 

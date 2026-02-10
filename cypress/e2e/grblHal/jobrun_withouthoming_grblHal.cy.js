@@ -26,11 +26,7 @@ describe('Job Run Test in grblHal without homing', () => {
 
     // Step 2: Verify CNC machine status is Idle
     cy.log('Step 2: Verifying machine status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Idle');
     cy.wait(2000);
 
     // Step 3: Upload File using custom command
@@ -56,11 +52,7 @@ describe('Job Run Test in grblHal without homing', () => {
 
     // Step 5: Verify job is running
     cy.log('Step 5: Verifying job is running...');
-    cy.contains(/running|run/i, { timeout: 10000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Job status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Running');
 
     // Step 6: Wait for job completion
     cy.log('Step 6: Waiting for job completion...');

@@ -63,9 +63,9 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
             cy.log(`${axisName} axis is ENABLED - Disabling...`);
             cy.wrap($switch).click({ force: true });
             cy.wait(500);
-            cy.log(`${axisName} axis toggled to DISABLED ✓`);
+            cy.log(`${axisName} axis toggled to DISABLED `);
           } else {
-            cy.log(`${axisName} axis already DISABLED ✓ - Skipping toggle`);
+            cy.log(`${axisName} axis already DISABLED  - Skipping toggle`);
           }
         });
     };
@@ -84,9 +84,9 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
             cy.log(`${axisName} axis is DISABLED - Enabling...`);
             cy.wrap($switch).click({ force: true });
             cy.wait(500);
-            cy.log(`${axisName} axis toggled to ENABLED ✓`);
+            cy.log(`${axisName} axis toggled to ENABLED `);
           } else {
-            cy.log(`${axisName} axis already ENABLED ✓ - Skipping toggle`);
+            cy.log(`${axisName} axis already ENABLED - Skipping toggle`);
           }
         });
     };
@@ -200,7 +200,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
                        $toggle.attr('aria-checked') === 'true';
       expect(isLocked, 'Stepper motors should be LOCKED').to.be.true;
     });
-    cy.log('Stepper motors LOCKED ✓');
+    cy.log('Stepper motors LOCKED ');
     cy.wait(2000);
 
     // Test Unlock (Disable stepper motor)
@@ -224,7 +224,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
                        $toggle.attr('aria-checked') === 'true';
       expect(isLocked, 'Stepper motors should be UNLOCKED').to.be.false;
     });
-    cy.log('Stepper motors UNLOCKED ✓');
+    cy.log('Stepper motors UNLOCKED ');
     cy.wait(1000);
 
     // Final verification: Ensure motor is NOT locked at the end
@@ -234,10 +234,10 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
                        $toggle.attr('aria-checked') === 'true';
       
       expect(isLocked, 'Stepper motor should be UNLOCKED at test end').to.be.false;
-      cy.log('✓ Final state confirmed: Stepper motor is UNLOCKED');
+      cy.log(' Final state confirmed: Stepper motor is UNLOCKED');
     });
 
-    cy.log('Test completed successfully - All checks passed ✓');
+    cy.log('Test completed successfully - All checks passed ');
 
   });
 });

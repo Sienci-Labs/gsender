@@ -22,13 +22,11 @@ describe('Gsender testing - Homing functionality', () => {
 
     // Step 2: Wait for idle state before proceeding
     cy.log('Step 2: Waiting for idle state...');
-    cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.wait(1000);
-    cy.log(' Machine is idle');
+    cy.verifyMachineStatus('Idle');
 
     // Step 3: Test jogging functionality
     cy.log('Step 3: Testing jogging functionality...');
-    
+
     // X+ jogging
     cy.log('  Testing X+ jogging...');
     cy.get('path#xPlus')
@@ -37,17 +35,16 @@ describe('Gsender testing - Homing functionality', () => {
     cy.wait(3000);
     cy.log(' X+ jog button clicked');
 
-    // Y+ Jogging
+    // Y+ jogging
     cy.log('  Testing Y+ jogging...');
     cy.get('path#yPlus')
       .should('exist')
       .click({ force: true });
     cy.wait(3000);
     cy.log(' Y+ jog button clicked');
-    
+
     // Z- jogging
     cy.log('  Testing Z- jogging...');
-    //
     cy.get('path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]')
       .should('exist')
       .click({ force: true });
@@ -58,8 +55,7 @@ describe('Gsender testing - Homing functionality', () => {
 
     // Step 4: Navigate to Config page
     cy.log('Step 4: Opening Config settings...');
-    cy.get('a:nth-of-type(4) svg').click();
-    cy.wait(1000);
+    cy.goToConfig();
     cy.log('Config page opened');
 
     // Step 5: Navigate to Homing section
@@ -70,7 +66,7 @@ describe('Gsender testing - Homing functionality', () => {
 
     // Step 6: Check and enable all required homing settings
     cy.log('Step 6: Checking and enabling homing settings...');
-    
+
     const settingsToCheck = [
       { id: '$22-0-key', name: 'Enable Homing' },
       { id: '$22-2-key', name: 'Homing on startup required' },
@@ -93,31 +89,19 @@ describe('Gsender testing - Homing functionality', () => {
 
     // Step 7: Apply Settings (only if button is enabled)
     cy.log('Step 7: Checking if settings need to be applied...');
-    cy.contains('button', 'Apply Settings').then($button => {
-      if ($button.is(':disabled')) {
-        cy.log('  No settings changes detected');
-      } else {
-        cy.log('  Applying settings...');
-        cy.wrap($button).click();
-        cy.wait(2000);
-        cy.unlockMachineIfNeeded();
-        cy.wait(1000);
-        cy.log('Settings applied');
-      } 
-    });
+    cy.applySettings();
 
     // Step 8: Navigate back to Carve/Main page
     cy.log('Step 8: Returning to main view...');
-    cy.get('a:nth-of-type(1) img').click();
+    cy.goToCarve();
     cy.wait(1000);
     cy.unlockMachineIfNeeded();
     cy.wait(1000);
     cy.log('Returned to main view');
-  
 
     // Step 9: Wait for machine to be ready (Idle status)
     cy.log('Step 9: Waiting for machine ready state...');
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.verifyMachineStatus('Idle');
     cy.wait(1000);
     cy.log('Machine is ready');
 
@@ -131,27 +115,21 @@ describe('Gsender testing - Homing functionality', () => {
 
     // Step 11: Verify homing status appears
     cy.log('Step 11: Verifying homing status...');
-    cy.contains('span', 'Homing', { timeout: 10000 })
-      .should('be.visible')
-      .then(() => {
-        cy.log('Machine status changed to "Homing"');
-      });
+    cy.verifyMachineStatus('Homing');
+    cy.log('Machine status changed to "Homing"');
 
     // Step 12: Wait for homing to complete and verify Idle status
     cy.log('Step 12: Waiting for homing to complete...');
-    cy.contains(/^Idle$/i, { timeout: 60000 })
-      .should('be.visible')
-      .then(() => {
-        cy.log('Machine status changed from "Homing" to "Idle"');
-      });
-    
+    cy.verifyMachineStatus('Idle');
+    cy.log('Machine status changed from "Homing" to "Idle"');
+
     cy.wait(2000);
     cy.unlockMachineIfNeeded();
     cy.wait(1000);
 
     // Step 13: Final verification
     cy.log('Step 13: Final verification...');
-    cy.contains(/^Idle$/i).should('be.visible');
+    cy.verifyMachineStatus('Idle');
     cy.log('Machine is in Idle state after homing');
 
     // Step 14: Save test results
@@ -163,13 +141,13 @@ describe('Gsender testing - Homing functionality', () => {
       transitionToIdleVerified: true,
       status: 'PASSED'
     };
-    
+
     cy.writeFile('cypress/results/homing-test-results.json', results);
     cy.log('Results saved to: cypress/results/homing-test-results.json');
 
-
     cy.log('TEST COMPLETED SUCCESSFULLY');
     cy.log('  Status transition verified: Idle → Homing → Idle');
- 
+
   });
-});
+
+}); 

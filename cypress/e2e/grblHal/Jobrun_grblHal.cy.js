@@ -26,11 +26,7 @@ describe('Job Run in grblHal', () => {
 
     // Step 2: Verify CNC machine status is Idle
     cy.log('Step 2: Verifying machine status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Idle');
     cy.wait(2000);
 
     // Step 3: Enable homing using custom cypress command 
@@ -82,11 +78,7 @@ describe('Job Run in grblHal', () => {
 
     // Step 8: Verify job is running
     cy.log('Step 8: Verifying job is running...');
-    cy.contains(/running|run/i, { timeout: 10000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Job status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Runing');
 
     // Step 9: Wait for job completion
     cy.log('Step 9: Waiting for job completion...');

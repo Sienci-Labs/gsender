@@ -21,8 +21,7 @@ describe('Gsender testing jogging using buttons', () => {
 
     // Step 2: Wait for Idle status
     cy.log('Step 2: Waiting for Idle status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.wait(2000);
+    cy.verifyMachineStatus('Idle');
     cy.log(' Machine is Idle');
 
     // Step 3: Move to position (0, 0, 0)
@@ -47,49 +46,32 @@ describe('Gsender testing jogging using buttons', () => {
 
     // Step 5: Test Y+ jogging
     cy.log('Step 5: Testing Y+ jogging...');
-    cy.get('path#yPlus')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
+    cy.jogYPlusTimes(1);
     cy.log(' Y+ jog button clicked');
 
     // Step 6: Test Y- jogging
     cy.log('Step 6: Testing Y- jogging...');
-    cy.get('path#yMinus')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
+    cy.jogYMinusTimes(1);
     cy.log(' Y- jog button clicked');
   
     // Step 7: Test X+ jogging
     cy.log('Step 7: Testing X+ jogging...');
-    cy.get('path#xPlus')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
+    cy.jogXPlusTimes(1);
     cy.log('X+ jog button clicked');
 
     // Step 8: Test X- jogging
     cy.log('Step 8: Testing X- jogging...');
-    cy.get('path#xMinus')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
+    cy.jogXMinusTimes(1);
     cy.log(' X- jog button clicked');
 
     // Step 9: Test Z+ jogging
     cy.log('Step 9: Testing Z+ jogging...');
-    cy.get('path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
+    cy.jogZPlusTimes(1);
     cy.log(' Z+ jog button clicked');
 
     // Step 10: Test Z- jogging
     cy.log('Step 10: Testing Z- jogging...');
-    cy.get('path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]')
-      .should('exist')
-      .click({ force: true });
+    cy.jogMinusTimes(1);
     cy.wait(3000);
     cy.log(' Z- jog button clicked');
 

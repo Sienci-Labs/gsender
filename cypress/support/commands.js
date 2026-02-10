@@ -1,7 +1,6 @@
 // ***********************************************
 // cypress/support/commands.js
 // Custom commands for Gsender
-//1. wait for idle status
 //2.Load UI
 //3.Connect to CNC machine grbl
 //4.Auto unlock 
@@ -31,22 +30,8 @@
 // ***********************************************
 
 
-// ----------------------
-// 1.Wait for Idle State
-// ----------------------
-Cypress.Commands.add('waitForIdle', (timeout = 30000) => {
-  cy.log('Waiting for machine to reach Idle state...');
-  
-  // Try multiple approaches to find Idle status
-  cy.get('body', { timeout: timeout }).should(($body) => {
-    const bodyText = $body.text();
-    expect(bodyText).to.include('Idle');
-  }).then(() => {
-    cy.log(' Machine is in Idle state');
-  });
-});
 //=======//
-//2.Load UI//
+//2.Load UI//   cy.loadUI(`${Cypress.config('baseUrl')}/#/configuration`, {
 //=======//
 Cypress.Commands.add('loadUI', (url, options = {}) => {
   const {
@@ -101,7 +86,7 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 
 
 // ----------------------
-//3.Connect to CNC machine grbl
+//3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
 Cypress.Commands.add('connectMachine', () => {
   cy.log('Starting connection check...');
@@ -1102,7 +1087,7 @@ Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
 Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
   const { timeout = 30000 } = options;
 
-  const allowedStatuses = ['Idle', 'Disconnected', 'Running', 'Hold'];
+  const allowedStatuses = ['Idle', 'Disconnected', 'Running','Jogging','Hold'];
 
   cy.log(`Verifying machine status: ${expectedStatus}`);
 

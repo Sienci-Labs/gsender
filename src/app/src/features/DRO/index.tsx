@@ -117,26 +117,7 @@ function DRO({
         });
     }, []);
 
-<<<<<<< HEAD
-    useEffect(() => {
-        if (!singleAxisHoming) {
-            setHomingMode(false);
-        }
-    }, [singleAxisHoming]);
-
-    function jogToCorner(
-        corner: string,
-        homingDir?: string,
-        homingFl?: boolean,
-        pullO?: string | number,
-    ) {
-        const currentHomingDir = homingDir || homingDirection;
-        const currentHomingFlag = homingFl || homingFlag;
-        const currentPullOff = pullO || pullOff;
-
-=======
     const jogToCorner = useCallback((corner: string) => {
->>>>>>> a2e1fd911c1c1be7725dc550f761a69aa421fb34
         const gcode = getMovementGCode(
             corner,
             homingDirectionRef.current,

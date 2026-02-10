@@ -22,11 +22,7 @@ describe('Feedrate Performance Comparison Test', () => {
 
     // Verify machine status is Idle
     cy.log('Verifying machine status is Idle...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Idle');
     cy.wait(2000);
 
     // Step 2: Upload G-code File
@@ -52,11 +48,7 @@ describe('Feedrate Performance Comparison Test', () => {
 
     // Verify job is running
     cy.log('Verifying job is running...');
-    cy.contains(/running|run/i, { timeout: 10000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Job status: "${status.text().trim()}"`);
-      });
+    cy.verifyMachineStatus('Running');
     cy.wait(2000);
 
     // Step 4: Capture initial feedrate
@@ -176,8 +168,7 @@ describe('Feedrate Performance Comparison Test', () => {
     cy.wait(2000);
 
     // Verify job is running
-    cy.contains(/running|run/i, { timeout: 10000 })
-      .should('be.visible');
+    cy.verifyMachineStatus('Running');
     cy.wait(2000);
 
     // Capture initial feedrate for second job
